@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import type { Project } from "@/services/projects.service"
+import Link from "next/link"
 
 interface ProjectCardProps {
   project: Project
@@ -67,9 +68,11 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
 
       {/* Actions */}
       <div className="flex flex-col sm:flex-row items-center gap-3 mt-2">
-        <Button variant="outline" className="flex-1 w-full sm:w-auto justify-between text-muted-foreground hover:text-foreground">
-          View Project Details
-          <ArrowRight className="h-4 w-4" />
+        <Button asChild variant="outline" className="flex-1 w-full sm:w-auto justify-between text-muted-foreground hover:text-foreground">
+          <Link href={`/dashboard/project-details?id=${project.id}`}>
+            View Project Details
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </Button>
         {role === "SME" ? (
           <Button variant="secondary" className="w-full sm:w-auto px-4 bg-muted">
