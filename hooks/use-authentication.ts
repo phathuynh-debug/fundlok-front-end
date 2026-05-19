@@ -85,7 +85,7 @@ export function useCurrentUser() {
  */
 export function useRequireAuth(redirectTo = '/login') {
   const router = useRouter();
-  const { data: user, isLoading, isError, isFetched } = useCurrentUser();
+  const { data: user, isError, isFetched } = useCurrentUser();
 
   useEffect(() => {
     // Fallback client-side redirect in case middleware cookie check passes
