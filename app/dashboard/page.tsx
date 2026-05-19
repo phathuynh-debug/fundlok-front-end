@@ -6,6 +6,8 @@ import { useLogout, useRequireAuth } from "@/hooks/use-authentication"
 import { useMyProjects } from "@/hooks/use-projects"
 import { SmeDashboard } from "./_components/SmeDashboard"
 import { InvestorDashboard } from "./_components/InvestorDashboard"
+import { LogOut, Home, Briefcase, TrendingUp, Loader2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export default function DashboardPage() {
   const { user, isLoading } = useRequireAuth()
@@ -36,27 +38,46 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Universal Dashboard Header (optional depending on your layout) */}
-      <div className="border-b px-8 py-4 flex items-center justify-between bg-white/50 backdrop-blur-sm">
-        <div>
-          <h2 className="text-xl font-bold tracking-tight">
-            Welcome, {user?.full_name || "Guest"}
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Account Role: <span className="uppercase font-semibold">{user?.role}</span>
-          </p>
+      {/* Universal Dashboard Header */}
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="flex h-16 items-center justify-between px-8">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
+              {user?.role === "INVESTOR" ? (
+                <TrendingUp className="h-6 w-6 text-emerald-500" />
+              ) : (
+                <Briefcase className="h-6 w-6 text-blue-500" />
+              )}
+              <span>FundLok</span>
+            </div>
+            <span className="text-sm font-medium text-muted-foreground ml-2">
+              ({user?.role === "SME" ? "SME Portal" : "Investor Portal"})
+            </span>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-4 mr-4 text-sm font-medium">
+              <span className="text-muted-foreground">
+                Welcome back, <span className="text-foreground font-semibold">{user?.full_name || "Guest"}</span>
+              </span>
+            </div>
+
+            <Button variant="ghost" size="sm" className="hidden sm:flex gap-2">
+              <Home className="h-4 w-4" />
+              Home
+            </Button>
+
+            <Button variant="outline" size="sm" onClick={() => logout()} className="gap-2">
+              <LogOut className="h-4 w-4" />
+              Logout
+            </Button>
+          </div>
         </div>
-        <button 
-          onClick={() => logout()}
-          className="text-sm font-medium hover:underline text-muted-foreground"
-        >
-          Logout
-        </button>
-      </div>
+      </header>
 
       {/* Render Role-Specific Dashboard */}
       {user?.role === "SME" ? (
-        <SmeDashboard />
+        <SmeDashboard projects={projects} />
       ) : (
         <InvestorDashboard />
       )}
