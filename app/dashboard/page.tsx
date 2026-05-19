@@ -3,7 +3,7 @@
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useLogout, useRequireAuth } from "@/hooks/use-authentication"
-import { useMyProjects } from "@/hooks/use-projects"
+import { useMyProjects, usePublicProjects } from "@/hooks/use-projects"
 import { SmeDashboard } from "./_components/SmeDashboard"
 import { InvestorDashboard } from "./_components/InvestorDashboard"
 import { LogOut, Home, Briefcase, TrendingUp, Loader2 } from "lucide-react"
@@ -12,18 +12,21 @@ import { Button } from "@/components/ui/button"
 export default function DashboardPage() {
   const { user, isLoading } = useRequireAuth()
   const router = useRouter()
-  const shouldLoadProjects = !isLoading && user?.role === "SME"
-  const { data: projects = [], isLoading: isProjectsLoading } = useMyProjects(shouldLoadProjects)
+  const shouldLoadMyProjects = !isLoading && user?.role === "SME"
+  const shouldLoadPublicProjects = !isLoading && user?.role === "INVESTOR"
+  
+  const { data: myProjects = [], isLoading: isMyProjectsLoading } = useMyProjects(shouldLoadMyProjects)
+  const { data: publicProjects = [], isLoading: isPublicProjectsLoading } = usePublicProjects(shouldLoadPublicProjects)
+  
   const { mutate: logout } = useLogout()
 
-  console.log("projects", projects);
   useEffect(() => {
-    if (user?.role === "SME" && !isProjectsLoading && projects.length === 0) {
+    if (user?.role === "SME" && !isMyProjectsLoading && myProjects.length === 0) {
       router.replace("/project-application")
     }
-  }, [isProjectsLoading, projects.length, router, user?.role])
+  }, [isMyProjectsLoading, myProjects.length, router, user?.role])
 
-  if (isLoading || isProjectsLoading) {
+  if (isLoading || isMyProjectsLoading || isPublicProjectsLoading) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-2">
@@ -77,9 +80,9 @@ export default function DashboardPage() {
 
       {/* Render Role-Specific Dashboard */}
       {user?.role === "SME" ? (
-        <SmeDashboard projects={projects} />
+        <SmeDashboard projects={myProjects} />
       ) : (
-        <InvestorDashboard />
+        <InvestorDashboard projects={publicProjects} />
       )}
     </div>
   )

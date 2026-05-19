@@ -1,32 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { DollarSign, TrendingUp, Calendar, ArrowRight, Tag } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Calendar, Layers, Map } from "lucide-react"
+import type { Project } from "@/services/projects.service"
+import { ProjectCard } from "./ProjectCard"
 
-const MOCK_INVESTMENTS = [
-  {
-    id: 1,
-    name: "TechStart Solutions",
-    investedDate: "12/1/2025",
-    status: "Active",
-    investment: "$10,000",
-    revenueShare: "8.5% daily",
-    dailyReturn: "$42",
-    roi: "10.2%",
-  },
-  {
-    id: 2,
-    name: "Green Energy Co",
-    investedDate: "11/15/2025",
-    status: "Active",
-    investment: "$25,000",
-    revenueShare: "12% daily",
-    dailyReturn: "$95",
-    roi: "14.5%",
-  }
-]
+interface InvestorDashboardProps {
+  projects: Project[]
+}
 
-export function InvestorDashboard() {
+export function InvestorDashboard({ projects }: InvestorDashboardProps) {
+  const activeProjects = projects.filter(p => p.status === "ACTIVE" || p.status === "DRAFT").length;
+  
   return (
     <div className="flex-1 space-y-8 p-8 pt-6">
       {/* Header */}
@@ -41,86 +24,46 @@ export function InvestorDashboard() {
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Invested</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Available Opportunities</CardTitle>
           </CardHeader>
           <CardContent className="flex items-center gap-2">
-            <DollarSign className="h-6 w-6 text-blue-500" />
-            <div className="text-3xl font-bold">$50,000</div>
+            <Map className="h-6 w-6 text-blue-500" />
+            <div className="text-3xl font-bold">{projects.length}</div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Returns</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Active/Draft Projects</CardTitle>
           </CardHeader>
           <CardContent className="flex items-center gap-2">
-            <TrendingUp className="h-6 w-6 text-emerald-500" />
-            <div className="text-3xl font-bold">$25,770</div>
+            <Layers className="h-6 w-6 text-emerald-500" />
+            <div className="text-3xl font-bold">{activeProjects}</div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Active Loans</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">New This Week</CardTitle>
           </CardHeader>
           <CardContent className="flex items-center gap-2">
             <Calendar className="h-6 w-6 text-purple-500" />
-            <div className="text-3xl font-bold">2</div>
+            <div className="text-3xl font-bold">1</div>
           </CardContent>
         </Card>
       </div>
 
       {/* Investment List */}
       <div className="space-y-4">
-        {MOCK_INVESTMENTS.map((inv) => (
-          <Card key={inv.id} className="p-6 flex flex-col gap-6">
-            {/* Header */}
-            <div className="flex items-start justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-foreground">
-                  {inv.name}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  Invested {inv.investedDate}
-                </p>
-              </div>
-              <Badge className="rounded-full px-3 py-1 font-medium bg-black text-white hover:bg-black/80">
-                {inv.status}
-              </Badge>
-            </div>
-
-            {/* Metrics Row */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-muted-foreground">Investment</span>
-                <span className="text-base font-semibold">{inv.investment}</span>
-              </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-muted-foreground">Revenue Share</span>
-                <span className="text-base font-semibold">{inv.revenueShare}</span>
-              </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-muted-foreground">Daily Return</span>
-                <span className="text-base font-semibold text-emerald-500">{inv.dailyReturn}</span>
-              </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-muted-foreground">ROI</span>
-                <span className="text-base font-semibold">{inv.roi}</span>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center gap-3 mt-2">
-              <Button variant="outline" className="flex-1 justify-center text-foreground hover:bg-muted font-medium">
-                View Loan Details <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-              <Button variant="secondary" className="px-6 bg-muted hover:bg-muted/80">
-                <Tag className="h-4 w-4 mr-2" />
-                Sell
-              </Button>
-            </div>
-          </Card>
-        ))}
+        {projects.length > 0 ? (
+          projects.map((project) => (
+            <ProjectCard key={project.id} project={project} role="INVESTOR" />
+          ))
+        ) : (
+          <div className="text-center py-10 bg-muted/50 rounded-lg border border-dashed">
+            <p className="text-muted-foreground">No projects available for investment right now.</p>
+          </div>
+        )}
       </div>
     </div>
   )

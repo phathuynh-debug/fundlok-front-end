@@ -6,9 +6,10 @@ import type { Project } from "@/services/projects.service"
 
 interface ProjectCardProps {
   project: Project
+  role?: "SME" | "INVESTOR"
 }
 
-export function ProjectCard({ project }: ProjectCardProps) {
+export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
   // Format dates safely
   const createdDate = project.created_at 
     ? new Date(project.created_at).toLocaleDateString()
@@ -70,10 +71,16 @@ export function ProjectCard({ project }: ProjectCardProps) {
           View Project Details
           <ArrowRight className="h-4 w-4" />
         </Button>
-        <Button variant="secondary" className="px-4 bg-muted">
-          <Pencil className="h-4 w-4 mr-2" />
-          Edit
-        </Button>
+        {role === "SME" ? (
+          <Button variant="secondary" className="px-4 bg-muted">
+            <Pencil className="h-4 w-4 mr-2" />
+            Edit
+          </Button>
+        ) : (
+          <Button className="px-6">
+            Invest
+          </Button>
+        )}
       </div>
     </Card>
   )

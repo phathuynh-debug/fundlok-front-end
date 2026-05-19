@@ -34,6 +34,10 @@ export const projectsService = {
     return apiClient.get<Project[]>(PROJECT_ENDPOINTS.list);
   },
 
+  getPublicProjects() {
+    return apiClient.get<Project[]>(PROJECT_ENDPOINTS.public);
+  },
+
   createProject(payload: CreateProjectPayload) {
     return apiClient.post<Project>(PROJECT_ENDPOINTS.create, payload);
   },

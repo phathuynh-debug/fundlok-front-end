@@ -21,4 +21,5 @@ export const USER_ENDPOINTS = {
 export const PROJECT_ENDPOINTS = {
   list: "/projects",
   create: "/projects",
+  public: "/projects/public",
 } as const;

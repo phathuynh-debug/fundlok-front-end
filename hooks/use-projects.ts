@@ -11,12 +11,23 @@ import {
 export const projectKeys = {
   all: ['projects'] as const,
   mine: () => [...projectKeys.all, 'mine'] as const,
+  public: () => [...projectKeys.all, 'public'] as const,
 };
 
 export function useMyProjects(enabled = true) {
   return useQuery<Project[], ApiError>({
     queryKey: projectKeys.mine(),
     queryFn: () => projectsService.getMyProjects(),
+    staleTime: 2 * 60 * 1000,
+    retry: false,
+    enabled,
+  });
+}
+
+export function usePublicProjects(enabled = true) {
+  return useQuery<Project[], ApiError>({
+    queryKey: projectKeys.public(),
+    queryFn: () => projectsService.getPublicProjects(),
     staleTime: 2 * 60 * 1000,
     retry: false,
     enabled,
