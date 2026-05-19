@@ -14,10 +14,10 @@ export default function DashboardPage() {
   const router = useRouter()
   const shouldLoadMyProjects = !isLoading && user?.role === "SME"
   const shouldLoadPublicProjects = !isLoading && user?.role === "INVESTOR"
-  
+
   const { data: myProjects = [], isLoading: isMyProjectsLoading } = useMyProjects(shouldLoadMyProjects)
   const { data: publicProjects = [], isLoading: isPublicProjectsLoading } = usePublicProjects(shouldLoadPublicProjects)
-  
+
   const { mutate: logout } = useLogout()
 
   useEffect(() => {
@@ -43,9 +43,9 @@ export default function DashboardPage() {
     <div className="flex flex-col min-h-screen">
       {/* Universal Dashboard Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="flex h-16 items-center justify-between px-8">
+        <div className="flex h-16 items-center justify-between px-4 md:px-8">
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
+            <div className="flex items-center gap-2 font-bold text-lg md:text-xl tracking-tight">
               {user?.role === "INVESTOR" ? (
                 <TrendingUp className="h-6 w-6 text-emerald-500" />
               ) : (

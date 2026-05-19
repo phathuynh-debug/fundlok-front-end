@@ -17,9 +17,9 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
   const startDateStr = createdDate.toLocaleDateString();
 
   return (
-    <div className="flex-1 space-y-8 p-8 pt-6">
+    <div className="flex-1 space-y-6 md:space-y-8 p-4 md:p-8 pt-6">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Project: {project.legal_name}</h2>
           <p className="text-sm text-muted-foreground mt-2">
@@ -86,7 +86,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
           
           <div className="space-y-4">
             {project.address ? (
-              <div className="grid grid-cols-2 gap-y-4 gap-x-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-4">
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Street</p>
                   <p className="font-medium">{(project.address as any).street || "N/A"}</p>
@@ -126,7 +126,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
               <p className="font-mono text-sm bg-muted p-2 rounded-md break-all">{project.id}</p>
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Created At</p>
                 <p className="font-medium">{project.created_at ? new Date(project.created_at).toLocaleString() : "N/A"}</p>

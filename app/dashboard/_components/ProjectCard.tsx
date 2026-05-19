@@ -26,9 +26,9 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
     : "Location unavailable"
 
   return (
-    <Card className="p-6 flex flex-col gap-6">
+    <Card className="p-4 md:p-6 flex flex-col gap-6">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
         <div>
           <h3 className="text-lg font-semibold text-foreground">
             {project.legal_name}
@@ -46,7 +46,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
       </div>
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <div className="flex flex-col gap-1">
           <span className="text-sm font-medium text-muted-foreground">Industry</span>
           <span className="text-base font-semibold">{project.industry}</span>
@@ -66,18 +66,18 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-3 mt-2">
-        <Button variant="outline" className="flex-1 justify-between text-muted-foreground hover:text-foreground">
+      <div className="flex flex-col sm:flex-row items-center gap-3 mt-2">
+        <Button variant="outline" className="flex-1 w-full sm:w-auto justify-between text-muted-foreground hover:text-foreground">
           View Project Details
           <ArrowRight className="h-4 w-4" />
         </Button>
         {role === "SME" ? (
-          <Button variant="secondary" className="px-4 bg-muted">
+          <Button variant="secondary" className="w-full sm:w-auto px-4 bg-muted">
             <Pencil className="h-4 w-4 mr-2" />
             Edit
           </Button>
         ) : (
-          <Button className="px-6">
+          <Button className="w-full sm:w-auto px-6">
             Invest
           </Button>
         )}

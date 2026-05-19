@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Shield, Zap, Users } from "lucide-react"
+import { Shield, Zap, Users, TrendingUp } from "lucide-react"
 import type { ReactNode } from "react"
 
 interface AuthLayoutProps {
@@ -18,48 +18,55 @@ export function AuthLayout({ children }: AuthLayoutProps) {
       className="min-h-screen flex"
     >
       {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-primary relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.05)_0%,transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(255,255,255,0.03)_0%,transparent_40%)]" />
+      <div className="hidden lg:flex lg:w-1/2 bg-slate-950 relative overflow-hidden">
+        {/* Financial abstract background effects */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(16,185,129,0.15)_0%,transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(59,130,246,0.15)_0%,transparent_40%)]" />
+        <div className="absolute top-0 right-0 w-full h-full bg-[linear-gradient(to_bottom_right,transparent_40%,rgba(16,185,129,0.1)_100%)]" />
+        {/* Grid pattern overlay */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:24px_24px]" />
+
+        {/* Large transparent watermark logo */}
+        <div className="absolute -left-20 top-1/6 opacity-[0.04] pointer-events-none -rotate-6">
+          <TrendingUp className="w-[900px] h-[800px] text-emerald-100" />
+        </div>
 
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           <div>
             <Link href="/" className="flex items-center gap-2">
-              <div className="h-10 w-10 rounded-lg bg-accent flex items-center justify-center">
-                <span className="text-accent-foreground font-bold text-lg">F</span>
-              </div>
-              <span className="text-2xl font-bold text-primary-foreground">FundLok</span>
+              <TrendingUp className="h-8 w-8 text-emerald-400" />
+              <span className="text-2xl font-bold text-white tracking-tight">FundLok</span>
             </Link>
           </div>
 
           <div className="flex flex-col gap-8 max-w-lg">
-            <h1 className="text-4xl xl:text-5xl font-bold text-primary-foreground leading-tight text-balance">
+            <h1 className="text-4xl xl:text-5xl font-bold text-white leading-tight text-balance">
               Connecting businesses with the right investors
             </h1>
-            <p className="text-lg text-primary-foreground/70 leading-relaxed">
+            <p className="text-lg text-slate-300 leading-relaxed">
               Join thousands of SMEs and investors on our secure platform designed for smarter funding decisions.
             </p>
 
             <div className="flex flex-col gap-4 pt-4">
               <Feature
-                icon={<Shield className="h-5 w-5 text-accent" />}
+                icon={<Shield className="h-5 w-5 text-white" />}
                 title="Bank-grade security"
                 subtitle="Your data is encrypted and protected"
               />
               <Feature
-                icon={<Zap className="h-5 w-5 text-accent" />}
+                icon={<Zap className="h-5 w-5 text-white" />}
                 title="Fast funding process"
                 subtitle="Get matched within days, not months"
               />
               <Feature
-                icon={<Users className="h-5 w-5 text-accent" />}
+                icon={<Users className="h-5 w-5 text-white" />}
                 title="Trusted network"
                 subtitle="Verified SMEs and accredited investors"
               />
             </div>
           </div>
 
-          <div className="text-sm text-primary-foreground/50">
+          <div className="text-sm text-slate-500">
             © 2026 FundLok. All rights reserved.
           </div>
         </div>
@@ -70,10 +77,8 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         {/* Mobile Header */}
         <header className="lg:hidden flex items-center justify-between p-6 border-b border-border">
           <Link href="/" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-accent flex items-center justify-center">
-              <span className="text-accent-foreground font-bold">F</span>
-            </div>
-            <span className="text-xl font-bold text-foreground">FundLok</span>
+            <TrendingUp className="h-6 w-6 text-emerald-500" />
+            <span className="text-xl font-bold tracking-tight text-foreground">FundLok</span>
           </Link>
         </header>
 
@@ -110,12 +115,12 @@ function Feature({
 }) {
   return (
     <div className="flex items-center gap-4">
-      <div className="h-10 w-10 rounded-full bg-accent/20 flex items-center justify-center shrink-0">
+      <div className="h-10 w-10 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0">
         {icon}
       </div>
       <div>
-        <p className="font-medium text-primary-foreground">{title}</p>
-        <p className="text-sm text-primary-foreground/60">{subtitle}</p>
+        <p className="font-medium text-white">{title}</p>
+        <p className="text-sm text-slate-400">{subtitle}</p>
       </div>
     </div>
   )
