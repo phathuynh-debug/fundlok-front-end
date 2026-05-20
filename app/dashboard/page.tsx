@@ -14,21 +14,21 @@ export default function DashboardPage() {
   const router = useRouter()
   const shouldLoadMyProjects = !isLoading && user?.role === "SME"
 
-  const { 
-    data: myProjects = [], 
+  const {
+    data: myProjects = [],
     isLoading: isMyProjectsLoading,
     isFetching: isMyProjectsFetching
   } = useMyProjects(shouldLoadMyProjects)
 
-  const isWaitingForProjects = isMyProjectsLoading || (isMyProjectsFetching && myProjects.length === 0)
+  const isWaitingForRedirect = isMyProjectsLoading || isMyProjectsFetching
 
   useEffect(() => {
-    if (user?.role === "SME" && !isWaitingForProjects && myProjects.length === 0) {
+    if (user?.role === "SME" && !isWaitingForRedirect && myProjects.length === 0) {
       router.replace("/project-application")
     }
-  }, [isWaitingForProjects, myProjects.length, router, user?.role])
+  }, [isWaitingForRedirect, myProjects.length, router, user?.role])
 
-  if (isLoading || isWaitingForProjects) {
+  if (isLoading || isMyProjectsLoading) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-2">

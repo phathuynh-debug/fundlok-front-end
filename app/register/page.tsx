@@ -10,7 +10,7 @@ export default function RegisterPage() {
             Start your fundraising or investment journey with FundLok
           </p>
         </div>
-        
+
         {/* Main registration logic component */}
         <RegistrationForm />
       </div>

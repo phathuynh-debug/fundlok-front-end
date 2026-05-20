@@ -31,9 +31,11 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
   const [fullName, setFullName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [phone, setPhone] = useState("")
   const [role, setRole] = useState<RoleSelection>(null)
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const router = useRouter()
   const { toast } = useToast()
@@ -41,6 +43,15 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (password !== confirmPassword) {
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description: "Passwords do not match.",
+      })
+      return
+    }
 
     if (!role) {
       toast({
@@ -164,6 +175,33 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
           </button>
         </div>
       </div>
+      <div className="space-y-2">
+        <Label htmlFor="confirmPassword">Confirm Password</Label>
+        <div className="relative">
+          <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            id="confirmPassword"
+            type={showConfirmPassword ? "text" : "password"}
+            placeholder="••••••••"
+            className="px-10"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            disabled={isPending}
+          />
+          <button
+            type="button"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+          >
+            {showConfirmPassword ? (
+              <EyeOff className="h-4 w-4" />
+            ) : (
+               <Eye className="h-4 w-4" />
+            )}
+          </button>
+        </div>
+      </div>
 
       <div className="space-y-3">
         <Label>Select your account type</Label>
@@ -172,11 +210,10 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
             type="button"
             onClick={() => setRole("SME")}
             disabled={isPending}
-            className={`relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
-              role === "SME"
-                ? "border-primary bg-primary/5 ring-2 ring-primary/20"
-                : "border-muted"
-            }`}
+            className={`relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${role === "SME"
+              ? "border-primary bg-primary/5 ring-2 ring-primary/20"
+              : "border-muted"
+              }`}
           >
             {role === "SME" && (
               <Check className="absolute top-2 right-2 h-4 w-4 text-primary" />
@@ -191,11 +228,10 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
             type="button"
             onClick={() => setRole("INVESTOR")}
             disabled={isPending}
-            className={`relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
-              role === "INVESTOR"
-                ? "border-primary bg-primary/5 ring-2 ring-primary/20"
-                : "border-muted"
-            }`}
+            className={`relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${role === "INVESTOR"
+              ? "border-primary bg-primary/5 ring-2 ring-primary/20"
+              : "border-muted"
+              }`}
           >
             {role === "INVESTOR" && (
               <Check className="absolute top-2 right-2 h-4 w-4 text-primary" />
@@ -212,7 +248,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
 
       <Button
         type="submit"
-        disabled={isPending || !email || !password || !role || !fullName}
+        disabled={isPending || !email || !password || !confirmPassword || !role || !fullName}
         className="w-full h-12 text-base font-medium"
       >
         {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
