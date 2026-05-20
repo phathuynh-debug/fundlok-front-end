@@ -1,25 +1,25 @@
 "use client"
 
+import { useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { usePublicProjects } from "@/hooks/use-projects"
 import { useRequireAuth } from "@/hooks/use-authentication"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Loader2 } from "lucide-react"
+import Link from "next/link"
 import { InvestmentKpis } from "./_components/InvestmentKpis"
-import { ReturnProgress } from "./_components/ReturnProgress"
-import { PaymentHistory } from "./_components/PaymentHistory"
+import { RiskAssessmentTab } from "./_components/RiskAssessmentTab"
+import { InvestmentTab } from "./_components/InvestmentTab"
+import { DueDiligenceTab } from "./_components/DueDiligenceTab"
 
-// Simple interface for payments
-interface PaymentRecord {
-  date: string
-  amount: number
-}
+type TabType = "risk" | "investment" | "diligence"
 
 export default function ProjectDetailsPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const projectId = searchParams.get("id")
+  const [activeTab, setActiveTab] = useState<TabType>("risk")
 
   const { user, isLoading: isAuthLoading } = useRequireAuth()
   
@@ -45,25 +45,7 @@ export default function ProjectDetailsPage() {
 
   // Fallback details if no project found to make it look nice anyway
   const displayName = project?.legal_name || "TechStart Solutions"
-  const displayStatus = project?.status || "ACTIVE"
-  const displayIndustry = project?.industry || "Software & Technology"
-
-  // Mock payment history generator (last 7 days)
-  const generateMockPayments = (): PaymentRecord[] => {
-    const payments: PaymentRecord[] = []
-    const baseDate = new Date()
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(baseDate)
-      d.setDate(baseDate.getDate() - i)
-      payments.push({
-        date: d.toLocaleDateString(),
-        amount: 42,
-      })
-    }
-    return payments
-  }
-
-  const mockPayments = generateMockPayments()
+  const displayIndustry = project?.industry || "Technology"
 
   return (
     <div className="flex-1 space-y-8 p-4 md:p-8 pt-6 max-w-5xl mx-auto">
@@ -72,40 +54,84 @@ export default function ProjectDetailsPage() {
         <Button
           variant="ghost"
           size="sm"
-          className="gap-2 text-muted-foreground hover:text-foreground"
-          onClick={() => router.back()}
+          asChild
+          className="gap-2 text-muted-foreground hover:text-foreground -ml-2"
         >
-          <ArrowLeft className="h-4 w-4" />
-          Back
+          <Link href="/dashboard/projects">
+            <ArrowLeft className="h-4 w-4" />
+            Back to Marketplace
+          </Link>
         </Button>
       </div>
 
       {/* Header section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold tracking-tight">{displayName}</h1>
-            <Badge 
-              variant={displayStatus === "ACTIVE" ? "default" : "secondary"}
-              className="bg-black text-white hover:bg-black/80 rounded-full px-3"
-            >
-              {displayStatus}
-            </Badge>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-3xl font-bold tracking-tight">{displayName}</h1>
+              <div className="flex items-center gap-2">
+                <Badge className="bg-black text-white hover:bg-black/80 rounded-full px-3 py-0.5 text-xs font-semibold">
+                  Low Risk
+                </Badge>
+                <Badge variant="outline" className="bg-background text-foreground rounded-full px-3 py-0.5 text-xs font-semibold border-muted">
+                  Grade A+
+                </Badge>
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground font-medium">
+              {displayIndustry}
+            </p>
           </div>
-          <p className="text-sm text-muted-foreground mt-2">
-            Investment Performance Details &bull; {displayIndustry}
-          </p>
         </div>
+        <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl">
+          Growing SaaS company looking to expand operations and hire additional developers.
+        </p>
       </div>
 
       {/* KPI Cards Row */}
       <InvestmentKpis />
 
-      {/* Return Progress Card */}
-      <ReturnProgress />
+      {/* Tab pill selectors */}
+      <div className="bg-muted/40 p-1 rounded-2xl flex w-full max-w-2xl mx-auto grid grid-cols-3 gap-1 border">
+        <button 
+          onClick={() => setActiveTab("risk")}
+          className={`py-2.5 px-4 rounded-xl text-sm font-semibold transition-all duration-200 ${
+            activeTab === "risk" 
+              ? "bg-background text-foreground shadow-sm" 
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          Risk Assessment
+        </button>
+        <button 
+          onClick={() => setActiveTab("investment")}
+          className={`py-2.5 px-4 rounded-xl text-sm font-semibold transition-all duration-200 ${
+            activeTab === "investment" 
+              ? "bg-background text-foreground shadow-sm" 
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          Investment
+        </button>
+        <button 
+          onClick={() => setActiveTab("diligence")}
+          className={`py-2.5 px-4 rounded-xl text-sm font-semibold transition-all duration-200 ${
+            activeTab === "diligence" 
+              ? "bg-background text-foreground shadow-sm" 
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          Due Diligence
+        </button>
+      </div>
 
-      {/* Payment History Card */}
-      <PaymentHistory payments={mockPayments} />
+      {/* Active Tab Panel Content */}
+      <div className="mt-8">
+        {activeTab === "risk" && <RiskAssessmentTab />}
+        {activeTab === "investment" && <InvestmentTab />}
+        {activeTab === "diligence" && <DueDiligenceTab />}
+      </div>
     </div>
   )
 }
