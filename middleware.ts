@@ -105,6 +105,15 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
+  // Block SME users from accessing /dashboard/projects
+  if (
+    isAuthenticated &&
+    !isInvestor &&
+    pathname.startsWith("/dashboard/projects")
+  ) {
+    return NextResponse.redirect(new URL(DASHBOARD_ROUTE, request.url));
+  }
+
   // Users without projects should land on the application form instead of the dashboard.
   if (
     isAuthenticated &&

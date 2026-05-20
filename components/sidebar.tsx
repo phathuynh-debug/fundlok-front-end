@@ -2,16 +2,17 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { 
-  LayoutDashboard, 
-  Briefcase, 
-  History, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Briefcase,
+  History,
+  Settings,
   ShieldCheck,
   CircleUser,
   PieChart
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useCurrentUser } from "@/hooks/use-authentication"
 
 const navItems = [
   { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
@@ -24,6 +25,16 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname()
+  const { data: user } = useCurrentUser()
+
+  const isSME = user?.role === "SME"
+
+  const filteredNavItems = navItems.filter((item) => {
+    if (isSME && item.href === "/dashboard/projects") {
+      return false
+    }
+    return true
+  })
 
   return (
     <div className="hidden border-r bg-card md:flex md:w-64 md:flex-col h-screen">
@@ -40,7 +51,7 @@ export function Sidebar() {
 
         {/* Navigation Links */}
         <nav className="flex-1 px-3 py-4 space-y-1">
-          {navItems.map((item) => {
+          {filteredNavItems.map((item) => {
             const isActive = pathname === item.href
             return (
               <Link
@@ -48,8 +59,8 @@ export function Sidebar() {
                 href={item.href}
                 className={cn(
                   "group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200",
-                  isActive 
-                    ? "bg-primary/10 text-primary" 
+                  isActive
+                    ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                 )}
               >
@@ -70,8 +81,12 @@ export function Sidebar() {
               <CircleUser className="h-6 w-6 text-primary" />
             </div>
             <div className="flex flex-col min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">FundLok User</p>
-              <p className="text-xs text-muted-foreground truncate">Verified Member</p>
+              <p className="text-sm font-medium text-foreground truncate">
+                {user?.full_name || "FundLok User"}
+              </p>
+              <p className="text-xs text-muted-foreground truncate">
+                {user?.role ? `${user.role} Member` : "Verified Member"}
+              </p>
             </div>
           </div>
         </div>

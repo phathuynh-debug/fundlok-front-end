@@ -69,6 +69,7 @@ export function LoginForm() {
             id="password"
             type={showPassword ? "text" : "password"}
             className="px-10"
+            placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
