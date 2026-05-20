@@ -6,6 +6,7 @@ import { Building2, MapPin, Calendar, Clock, Hash, CheckCircle2, Upload, FileTex
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
+import { filesService } from "@/services/files.service"
 import type { Project } from "@/services/projects.service"
 
 interface SmeDashboardProps {
@@ -45,7 +46,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
     }
   }
 
-  const handleUploadSubmit = (e: React.FormEvent) => {
+  const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!files.taxFiling || !files.vatFiling) {
       toast({
@@ -57,14 +58,39 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
     }
 
     setIsSubmitting(true)
-    setTimeout(() => {
-      setIsSubmitting(false)
+    try {
+      const uploadPromises = []
+      
+      if (files.taxFiling) {
+        uploadPromises.push(filesService.uploadDocument(project.id, "KYC_BUSINESS_REG", files.taxFiling))
+      }
+      if (files.vatFiling) {
+        uploadPromises.push(filesService.uploadDocument(project.id, "KYC_BUSINESS_REG", files.vatFiling))
+      }
+      if (files.financialStatement) {
+        uploadPromises.push(filesService.uploadDocument(project.id, "BANK_STATEMENT", files.financialStatement))
+      }
+      if (files.businessPlan) {
+        uploadPromises.push(filesService.uploadDocument(project.id, "OTHER", files.businessPlan))
+      }
+
+      await Promise.all(uploadPromises)
+      
       setIsSubmitted(true)
       toast({
         title: "Application Submitted",
         description: "Your loan application and documents have been uploaded successfully.",
       })
-    }, 1500)
+    } catch (error: any) {
+      console.error("Document upload sequence failed:", error)
+      toast({
+        variant: "destructive",
+        title: "Upload Failed",
+        description: error?.message || "An error occurred while uploading your documents. Please try again.",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (

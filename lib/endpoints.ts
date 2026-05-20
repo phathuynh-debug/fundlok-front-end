@@ -23,3 +23,8 @@ export const PROJECT_ENDPOINTS = {
   create: "/projects",
   public: "/projects/public",
 } as const;
+
+export const FILES_ENDPOINTS = {
+  presign: "/files/presign",
+  commit: (fileId: string) => `/files/${fileId}/commit`,
+} as const;
