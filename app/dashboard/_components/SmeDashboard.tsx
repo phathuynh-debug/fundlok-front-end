@@ -1,6 +1,11 @@
+"use client"
+
+import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Building2, MapPin, Calendar, Clock, Hash, CheckCircle2 } from "lucide-react"
+import { Building2, MapPin, Calendar, Clock, Hash, CheckCircle2, Upload, FileText, Loader2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { useToast } from "@/hooks/use-toast"
 import type { Project } from "@/services/projects.service"
 
 interface SmeDashboardProps {
@@ -9,12 +14,58 @@ interface SmeDashboardProps {
 
 export function SmeDashboard({ projects }: SmeDashboardProps) {
   const project = projects[0]
+  const { toast } = useToast()
 
-  if (!project) return null;
+  const [files, setFiles] = useState<{
+    taxFiling: File | null
+    vatFiling: File | null
+    financialStatement: File | null
+    businessPlan: File | null
+  }>({
+    taxFiling: null,
+    vatFiling: null,
+    financialStatement: null,
+    businessPlan: null,
+  })
 
-  const createdDate = project.created_at ? new Date(project.created_at) : new Date();
-  const daysActive = Math.floor((new Date().getTime() - createdDate.getTime()) / (1000 * 3600 * 24));
-  const startDateStr = createdDate.toLocaleDateString();
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+
+  if (!project) return null
+
+  const createdDate = project.created_at ? new Date(project.created_at) : new Date()
+  const daysActive = Math.floor((new Date().getTime() - createdDate.getTime()) / (1000 * 3600 * 24))
+
+  const handleFileChange = (key: keyof typeof files, e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFiles((prev) => ({
+        ...prev,
+        [key]: e.target.files![0],
+      }))
+    }
+  }
+
+  const handleUploadSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!files.taxFiling || !files.vatFiling) {
+      toast({
+        variant: "destructive",
+        title: "Required Documents Missing",
+        description: "Please upload both Tax Filing 2025 and VAT Filing documents.",
+      })
+      return
+    }
+
+    setIsSubmitting(true)
+    setTimeout(() => {
+      setIsSubmitting(false)
+      setIsSubmitted(true)
+      toast({
+        title: "Application Submitted",
+        description: "Your loan application and documents have been uploaded successfully.",
+      })
+    }, 1500)
+  }
 
   return (
     <div className="flex-1 space-y-6 md:space-y-8 p-4 md:p-8 pt-6">
@@ -75,6 +126,175 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
           </CardContent>
         </Card>
       </div>
+
+      {/* Loan Application Upload Section */}
+      {project.status === "DRAFT" && (
+        <Card className="p-6 border-border/80 shadow-md">
+          <div className="mb-4">
+            <h3 className="text-2xl font-bold tracking-tight text-foreground">Submit Loan Application</h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              Upload the necessary documents to receive loan offers
+            </p>
+          </div>
+
+          <form onSubmit={handleUploadSubmit} className="space-y-6 mt-6 max-w-4xl">
+            <div className="space-y-4">
+              {/* Document 1: Tax Filing */}
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-foreground flex items-center">
+                  Tax Filing 2025 <span className="text-destructive ml-1">*</span>
+                </label>
+                <div className="flex items-center gap-3 bg-muted/40 p-2.5 rounded-lg border border-input focus-within:ring-2 focus-within:ring-primary/20">
+                  <input
+                    type="file"
+                    id="taxFiling"
+                    className="hidden"
+                    onChange={(e) => handleFileChange("taxFiling", e)}
+                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="bg-background text-xs font-semibold hover:bg-accent"
+                    onClick={() => document.getElementById("taxFiling")?.click()}
+                  >
+                    Choose File
+                  </Button>
+                  <span className="text-xs text-muted-foreground truncate">
+                    {files.taxFiling ? files.taxFiling.name : "No file chosen"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Document 2: VAT Filing */}
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-foreground flex items-center">
+                  VAT Filing <span className="text-destructive ml-1">*</span>
+                </label>
+                <div className="flex items-center gap-3 bg-muted/40 p-2.5 rounded-lg border border-input focus-within:ring-2 focus-within:ring-primary/20">
+                  <input
+                    type="file"
+                    id="vatFiling"
+                    className="hidden"
+                    onChange={(e) => handleFileChange("vatFiling", e)}
+                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="bg-background text-xs font-semibold hover:bg-accent"
+                    onClick={() => document.getElementById("vatFiling")?.click()}
+                  >
+                    Choose File
+                  </Button>
+                  <span className="text-xs text-muted-foreground truncate">
+                    {files.vatFiling ? files.vatFiling.name : "No file chosen"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Document 3: Financial Statement */}
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-foreground">
+                  Financial Statement <span className="text-muted-foreground text-xs font-normal ml-1">(Optional)</span>
+                </label>
+                <div className="flex items-center gap-3 bg-muted/40 p-2.5 rounded-lg border border-input focus-within:ring-2 focus-within:ring-primary/20">
+                  <input
+                    type="file"
+                    id="financialStatement"
+                    className="hidden"
+                    onChange={(e) => handleFileChange("financialStatement", e)}
+                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="bg-background text-xs font-semibold hover:bg-accent"
+                    onClick={() => document.getElementById("financialStatement")?.click()}
+                  >
+                    Choose File
+                  </Button>
+                  <span className="text-xs text-muted-foreground truncate">
+                    {files.financialStatement ? files.financialStatement.name : "No file chosen"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Document 4: Business Plan */}
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-foreground">
+                  Business Plan <span className="text-muted-foreground text-xs font-normal ml-1">(Optional)</span>
+                </label>
+                <div className="flex items-center gap-3 bg-muted/40 p-2.5 rounded-lg border border-input focus-within:ring-2 focus-within:ring-primary/20">
+                  <input
+                    type="file"
+                    id="businessPlan"
+                    className="hidden"
+                    onChange={(e) => handleFileChange("businessPlan", e)}
+                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="bg-background text-xs font-semibold hover:bg-accent"
+                    onClick={() => document.getElementById("businessPlan")?.click()}
+                  >
+                    Choose File
+                  </Button>
+                  <span className="text-xs text-muted-foreground truncate">
+                    {files.businessPlan ? files.businessPlan.name : "No file chosen"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex justify-end pt-2">
+              <Button 
+                type="submit" 
+                disabled={isSubmitting || isSubmitted} 
+                className="bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black gap-2 font-medium px-5 h-10 rounded-lg transition-all"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Submitting Application...
+                  </>
+                ) : isSubmitted ? (
+                  <>
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                    Application Submitted
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4" />
+                    Submit Application
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {/* Required documents Alert Box */}
+            <div className="mt-4 p-4 rounded-xl bg-blue-50 dark:bg-blue-950/20 text-blue-800 dark:text-blue-200 border border-blue-100 dark:border-blue-900/30 flex items-start gap-3">
+              <FileText className="h-5 w-5 mt-0.5 shrink-0 text-blue-600 dark:text-blue-400" />
+              <div className="space-y-1.5 text-sm">
+                <span className="font-semibold text-blue-900 dark:text-blue-100">Required Documents:</span>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Tax Filing 2025</li>
+                  <li>VAT Filing</li>
+                </ul>
+                <p className="text-xs text-blue-600 dark:text-blue-400 mt-1.5 font-medium">
+                  Optional documents may improve your loan offer.
+                </p>
+              </div>
+            </div>
+          </form>
+        </Card>
+      )}
 
       {/* Project Address & Record Info */}
       <div className="grid gap-8 md:grid-cols-2">

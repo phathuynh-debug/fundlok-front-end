@@ -8,22 +8,23 @@ import Link from "next/link"
 interface ProjectCardProps {
   project: Project
   role?: "SME" | "INVESTOR"
+  actionLabel?: string
 }
 
-export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
+export function ProjectCard({ project, role = "SME", actionLabel }: ProjectCardProps) {
   // Format dates safely
-  const createdDate = project.created_at 
+  const createdDate = project.created_at
     ? new Date(project.created_at).toLocaleDateString()
     : "Unknown"
-    
+
   const incorporationDate = project.incorporation_date
     ? new Date(project.incorporation_date).toLocaleDateString()
     : "Unknown"
 
   // Assuming address has city and country based on log
   const address = project.address as any
-  const location = address?.city && address?.country 
-    ? `${address.city}, ${address.country}` 
+  const location = address?.city && address?.country
+    ? `${address.city}, ${address.country}`
     : "Location unavailable"
 
   return (
@@ -38,7 +39,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
             Created {createdDate}
           </p>
         </div>
-        <Badge 
+        <Badge
           variant={project.status === "ACTIVE" ? "default" : "secondary"}
           className="rounded-full px-3 py-1 font-medium bg-black text-white hover:bg-black/80"
         >
@@ -81,7 +82,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
           </Button>
         ) : (
           <Button className="w-full sm:w-auto px-6">
-            Invest
+            {actionLabel || "Invest"}
           </Button>
         )}
       </div>
