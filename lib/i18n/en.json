@@ -1,0 +1,367 @@
+{
+  "common": {
+    "brandName": "FundLok",
+    "copyright": "© 2026 FundLok. All rights reserved.",
+    "loadingDashboard": "Loading dashboard...",
+    "loadingProjects": "Loading projects...",
+    "loadingProjectDetails": "Loading project details...",
+    "loadingHeader": "Loading header...",
+    "checkingProjectAccess": "Checking your project access...",
+    "loadingProjectAccess": "Loading project access...",
+    "loadingContent": "Loading content...",
+    "needHelp": "Need help?",
+    "contactSupport": "Contact support",
+    "backToHome": "Go to home",
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "logout": "Logout",
+    "guest": "Guest",
+    "verifiedMember": "Verified Member",
+    "fundlokUser": "FundLok User",
+    "noFileChosen": "No file chosen",
+    "chooseFile": "Choose File",
+    "unknown": "Unknown",
+    "na": "N/A",
+    "locationUnavailable": "Location unavailable",
+    "all": "All",
+    "filter": "Filter:",
+    "searchPlaceholder": "Search projects by name or industry...",
+    "viewProjectDetails": "View Project Details",
+    "edit": "Edit",
+    "invest": "Invest",
+    "investNow": "Invest Now",
+    "submit": "Submit",
+    "submitApplication": "Submit Application",
+    "processing": "Processing...",
+    "signIn": "Sign In",
+    "signUp": "Sign up",
+    "createAccount": "Create account",
+    "createAnAccount": "Create an Account",
+    "loading": "Loading...",
+    "pageNotFound": "Page not found",
+    "projectApplication": "Project Application"
+  },
+  "localeSwitcher": {
+    "english": "English",
+    "vietnamese": "Vietnamese"
+  },
+  "auth": {
+    "hero": {
+      "headline": "Connecting businesses with the right investors",
+      "description": "Join thousands of SMEs and investors on our secure platform designed for smarter funding decisions.",
+      "securityTitle": "Bank-grade security",
+      "securitySubtitle": "Your data is encrypted and protected",
+      "speedTitle": "Fast funding process",
+      "speedSubtitle": "Get matched within days, not months",
+      "networkTitle": "Trusted network",
+      "networkSubtitle": "Verified SMEs and accredited investors"
+    },
+    "footer": {
+      "copyright": "© 2026 FundLok. All rights reserved.",
+      "helpPrefix": "Need help?",
+      "supportLink": "Contact support"
+    },
+    "switcher": {
+      "welcomeBack": "Welcome back",
+      "createAccount": "Create your account",
+      "dontHaveAccount": "Don't have an account?",
+      "alreadyHaveAccount": "Already have an account?",
+      "signUp": "Sign up",
+      "signIn": "Sign in"
+    },
+    "login": {
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "name@company.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "••••••••",
+      "submitting": "Signing In...",
+      "submit": "Sign In",
+      "successTitle": "Welcome back!",
+      "successDescription": "Login successful. Redirecting...",
+      "failedTitle": "Login Failed",
+      "failedDescription": "Invalid email or password."
+    },
+    "register": {
+      "fullNameLabel": "Full Name",
+      "fullNamePlaceholder": "Nguyen Van A",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "founder@company.com",
+      "phoneLabel": "Phone number",
+      "phonePlaceholder": "09xx xxx xxx",
+      "passwordLabel": "Password",
+      "confirmPasswordLabel": "Confirm Password",
+      "passwordPlaceholder": "••••••••",
+      "rolePrompt": "Select your account type",
+      "roleSme": "SME",
+      "roleInvestor": "Investor",
+      "submitting": "Creating account...",
+      "submit": "Create account",
+      "validationErrorTitle": "Validation Error",
+      "passwordMismatch": "Passwords do not match.",
+      "configErrorTitle": "Configuration Error",
+      "selectRole": "Please select a user role to proceed.",
+      "successTitle": "Registration Successful",
+      "successDescription": "Your account is ready. Please sign in to continue.",
+      "failedTitle": "Registration Failed",
+      "failedDescription": "Please check your information and try again."
+    },
+    "layout": {
+      "helpPrefix": "Need help?",
+      "supportLink": "Contact support"
+    }
+  },
+  "dashboard": {
+    "header": {
+      "loading": "Loading header...",
+      "portal": {
+        "sme": "SME Portal",
+        "investor": "Investor Portal"
+      },
+      "welcomeBack": "Welcome back, {name}",
+      "home": "Home",
+      "logout": "Logout"
+    },
+    "sidebar": {
+      "overview": "Overview",
+      "investmentProjects": "Investment Projects",
+      "transactions": "Transactions",
+      "analytics": "Analytics",
+      "security": "Security",
+      "settings": "Settings",
+      "memberSuffix": "Member",
+      "verifiedMember": "Verified Member"
+    },
+    "investor": {
+      "title": "Investment Portfolio",
+      "subtitle": "Track and manage your current investments",
+      "totalInvested": "Total Invested",
+      "activeInvestments": "Active Investments",
+      "totalReturns": "Total Returns",
+      "noInvestmentsTitle": "No Investments Found",
+      "noInvestmentsDescription": "You currently have no investment for now. Browse the available opportunities to start your investment journey.",
+      "browseProjects": "Browse Investment Projects"
+    },
+    "projects": {
+      "title": "Investment Opportunities",
+      "subtitle": "Explore vetted SME projects and make your next investment",
+      "opportunitiesAvailable": "{count} Opportunities Available",
+      "searchPlaceholder": "Search projects by name or industry...",
+      "filterLabel": "Filter:",
+      "noProjectsTitle": "No Projects Match",
+      "noProjectsDescription": "We couldn't find any opportunities matching your criteria. Try adjusting your search query or filters.",
+      "investNow": "Invest Now"
+    },
+    "projectCard": {
+      "created": "Created {date}",
+      "industry": "Industry",
+      "taxId": "Tax ID",
+      "incorporation": "Incorporation",
+      "location": "Location",
+      "viewDetails": "View Project Details",
+      "edit": "Edit",
+      "invest": "Invest",
+      "status": {
+        "draft": "DRAFT",
+        "active": "ACTIVE"
+      }
+    },
+    "sme": {
+      "projectTitle": "Project: {name}",
+      "industryTaxId": "Industry: {industry} • Tax ID: {taxId}",
+      "industry": "Industry",
+      "taxId": "Tax ID",
+      "incorporationDate": "Incorporation Date",
+      "daysActive": "Days Active",
+      "submitLoanApplication": "Submit Loan Application",
+      "uploadNecessaryDocuments": "Upload the necessary documents to receive loan offers",
+      "requiredDocsMissingTitle": "Required Documents Missing",
+      "requiredDocsMissingDescription": "Please upload both Tax Filing 2025 and VAT Filing documents.",
+      "applicationSubmittedTitle": "Application Submitted",
+      "applicationSubmittedDescription": "Your loan application and documents have been uploaded successfully.",
+      "uploadFailedTitle": "Upload Failed",
+      "uploadFailedDescription": "An error occurred while uploading your documents. Please try again.",
+      "taxFiling2025": "Tax Filing 2025",
+      "vatFiling": "VAT Filing",
+      "financialStatement": "Financial Statement",
+      "businessPlan": "Business Plan",
+      "optional": "(Optional)",
+      "requiredDocuments": "Required Documents:",
+      "optionalDocuments": "Optional documents may improve your loan offer.",
+      "registeredAddress": "Registered Address",
+      "street": "Street",
+      "city": "City",
+      "stateProvince": "State/Province",
+      "postalCode": "Postal Code",
+      "country": "Country",
+      "noAddress": "No address information provided.",
+      "systemRecordDetails": "System Record Details",
+      "projectId": "Project ID (UUID)",
+      "createdAt": "Created At",
+      "lastUpdated": "Last Updated",
+      "chooseFile": "Choose File",
+      "noFileChosen": "No file chosen",
+      "submittingApplication": "Submitting Application...",
+      "applicationSubmitted": "Application Submitted",
+      "submitApplication": "Submit Application"
+    },
+    "projectDetails": {
+      "loading": "Loading project details...",
+      "backToMarketplace": "Back to Marketplace",
+      "lowRisk": "Low Risk",
+      "grade": "Grade A+",
+      "description": "Growing SaaS company looking to expand operations and hire additional developers.",
+      "riskAssessment": "Risk Assessment",
+      "investment": "Investment",
+      "dueDiligence": "Due Diligence",
+      "fallbackName": "TechStart Solutions",
+      "fallbackIndustry": "Technology"
+    }
+  },
+  "investment": {
+    "kpis": {
+      "loanAmount": "Loan Amount",
+      "expectedRoi": "Expected ROI",
+      "estPaybackPeriod": "Est. Payback Period",
+      "revenueShareRate": "Revenue Share Rate",
+      "ofDailyRevenue": "of daily revenue"
+    },
+    "tab": {
+      "fundingProgress": "Funding Progress",
+      "trackFunding": "Track how much of this loan has been funded",
+      "progress": "Progress",
+      "funded": "Funded",
+      "remaining": "Remaining",
+      "makeInvestment": "Make an Investment",
+      "enterAmount": "Enter the amount you wish to invest in this opportunity",
+      "investmentAmount": "Investment Amount ($)",
+      "placeholder": "Enter amount",
+      "maximum": "Maximum: $15,000",
+      "agreement": "By investing, you agree to deposit funds into our secure platform account",
+      "validationErrorTitle": "Validation Error",
+      "validAmount": "Please enter a valid investment amount.",
+      "maxRemainingAmount": "The maximum remaining amount you can invest is ${amount}.",
+      "investmentSuccessfulTitle": "Investment Successful",
+      "investmentSuccessfulDescription": "Successfully invested ${amount} in this project!",
+      "processing": "Processing...",
+      "investNow": "Invest Now"
+    },
+    "risk": {
+      "title": "FundLok Risk Assessment",
+      "subtitle": "Our analysis leading to the A+ grade and 10.2% expected ROI",
+      "strengths": "Strengths",
+      "risks": "Risks & Concerns",
+      "revenueShareTerms": "Revenue Share Terms",
+      "primaryRate": "Primary Rate",
+      "untilPrincipal": "Until principal paid",
+      "postPrincipalRate": "Post-Principal Rate",
+      "afterPrincipal": "After principal paid",
+      "minimumBiweekly": "Minimum Bi-weekly",
+      "everyTwoWeeks": "Every 2 weeks",
+      "howItWorksTitle": "How it works:",
+      "howItWorks": "The SME shares 8.5% of their daily revenue until the principal is repaid. After that, the rate drops to 2%. A minimum payment of $1,200 is required every 2 weeks to ensure consistent returns.",
+      "strengthItems": [
+        "Strong recurring revenue model with 95% customer retention",
+        "Consistent month-over-month growth of 15%",
+        "Experienced management team with previous exits",
+        "Complete financial documentation and transparency",
+        "Low customer acquisition cost relative to lifetime value"
+      ],
+      "riskItems": [
+        "Limited market presence outside primary region",
+        "Dependence on key clients for 40% of revenue"
+      ]
+    },
+    "dueDiligence": {
+      "title": "Documents & Financial Information",
+      "subtitle": "Review the SME's submitted documents for due diligence",
+      "downloadingFile": "Downloading file",
+      "startingDownload": "Starting download for {filename}...",
+      "reminderTitle": "Due Diligence Reminder",
+      "reminderText": "Please review all documents carefully before investing. Consider the risk level and grading when making your investment decision.",
+      "download": "Download",
+      "documents": [
+        "Tax Filing 2025.pdf",
+        "VAT Filing Q4 2025.pdf",
+        "Financial Statement 2025.pdf"
+      ]
+    },
+    "paymentHistory": {
+      "title": "Payment History",
+      "subtitle": "Recent daily revenue share payments received from this loan"
+    },
+    "returnProgress": {
+      "title": "Return Progress",
+      "subtitle": "Track your investment returns over time",
+      "progress": "Progress",
+      "roi": "ROI",
+      "dailyReturn": "Daily Return",
+      "revenueShare": "Revenue Share",
+      "postPrincipalRate": "Post-Principal Rate",
+      "minBiweekly": "Min Bi-weekly"
+    }
+  },
+  "projectApplication": {
+    "loading": "Checking your project access...",
+    "eyebrow": "Project Application",
+    "title": "Register the project your investors will see.",
+    "subtitle": "Submit the basic company details and we will route your account into the dashboard once the project is created.",
+    "info": {
+      "businessTitle": "Business details",
+      "businessText": "Tell us who you are and what you do.",
+      "locationTitle": "Location",
+      "locationText": "Add a complete operating address.",
+      "companyAgeTitle": "Company age",
+      "companyAgeText": "Share when you incorporated."
+    },
+    "card": {
+      "title": "Application form",
+      "description": "Fill in the fields below to create your first project.",
+      "submitting": "Submitting application...",
+      "submit": "Submit project application"
+    },
+    "fields": {
+      "legalName": "Legal name",
+      "taxId": "Tax ID",
+      "industry": "Industry",
+      "incorporationDate": "Incorporation date",
+      "street": "Street",
+      "city": "City",
+      "stateRegion": "State / region",
+      "postalCode": "Postal code",
+      "country": "Country"
+    },
+    "placeholders": {
+      "legalName": "Acme Holdings Limited",
+      "taxId": "123456789",
+      "industry": "Fintech",
+      "street": "123 Market Street",
+      "city": "Singapore",
+      "state": "Central",
+      "postalCode": "018956",
+      "country": "Singapore"
+    },
+    "validation": {
+      "legalName": "Legal name is required",
+      "taxId": "Tax ID is required",
+      "industry": "Industry is required",
+      "incorporationDate": "Incorporation date is required",
+      "street": "Street is required",
+      "city": "City is required",
+      "postalCode": "Postal code is required",
+      "country": "Country is required"
+    },
+    "toasts": {
+      "submittedTitle": "Application submitted",
+      "submittedDescription": "Your project is ready. Redirecting to the dashboard.",
+      "failedTitle": "Submission failed",
+      "failedDescription": "Please check the form and try again."
+    }
+  },
+  "notFound": {
+    "headline": "Looks like you took a wrong turn",
+    "description": "The page you're looking for doesn't exist or has been moved. Let's get you back on track.",
+    "pageTitle": "Page not found",
+    "body": "We couldn't find what you were looking for. The URL may be misspelled or the page may have been removed.",
+    "goHome": "Go to home"
+  }
+}

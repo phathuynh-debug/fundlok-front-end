@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card"
 import { Calendar } from "lucide-react"
+import { useTranslations } from "@/lib/i18n"
 
 interface PaymentRecord {
   date: string
@@ -11,11 +12,13 @@ interface PaymentHistoryProps {
 }
 
 export function PaymentHistory({ payments }: PaymentHistoryProps) {
+  const { t } = useTranslations()
+
   return (
     <Card className="p-6">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold">Payment History</h3>
-        <p className="text-sm text-muted-foreground">Recent daily revenue share payments received from this loan</p>
+        <h3 className="text-lg font-semibold">{t("investment.paymentHistory.title")}</h3>
+        <p className="text-sm text-muted-foreground">{t("investment.paymentHistory.subtitle")}</p>
       </div>
 
       <div className="divide-y">

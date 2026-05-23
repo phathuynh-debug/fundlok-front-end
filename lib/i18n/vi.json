@@ -1,0 +1,367 @@
+{
+  "common": {
+    "brandName": "FundLok",
+    "copyright": "© 2026 FundLok. Bảo lưu mọi quyền.",
+    "loadingDashboard": "Đang tải bảng điều khiển...",
+    "loadingProjects": "Đang tải dự án...",
+    "loadingProjectDetails": "Đang tải chi tiết dự án...",
+    "loadingHeader": "Đang tải thanh tiêu đề...",
+    "checkingProjectAccess": "Đang kiểm tra quyền truy cập dự án của bạn...",
+    "loadingProjectAccess": "Đang tải quyền truy cập dự án...",
+    "loadingContent": "Đang tải nội dung...",
+    "needHelp": "Cần hỗ trợ?",
+    "contactSupport": "Liên hệ hỗ trợ",
+    "backToHome": "Về trang chủ",
+    "home": "Trang chủ",
+    "dashboard": "Bảng điều khiển",
+    "logout": "Đăng xuất",
+    "guest": "Khách",
+    "verifiedMember": "Thành viên đã xác thực",
+    "fundlokUser": "Người dùng FundLok",
+    "noFileChosen": "Chưa chọn tệp",
+    "chooseFile": "Chọn tệp",
+    "unknown": "Không xác định",
+    "na": "Không có",
+    "locationUnavailable": "Không có thông tin vị trí",
+    "all": "Tất cả",
+    "filter": "Lọc:",
+    "searchPlaceholder": "Tìm dự án theo tên hoặc ngành...",
+    "viewProjectDetails": "Xem chi tiết dự án",
+    "edit": "Chỉnh sửa",
+    "invest": "Đầu tư",
+    "investNow": "Đầu tư ngay",
+    "submit": "Gửi",
+    "submitApplication": "Gửi đơn đăng ký",
+    "processing": "Đang xử lý...",
+    "signIn": "Đăng nhập",
+    "signUp": "Đăng ký",
+    "createAccount": "Tạo tài khoản",
+    "createAnAccount": "Tạo tài khoản",
+    "loading": "Đang tải...",
+    "pageNotFound": "Không tìm thấy trang",
+    "projectApplication": "Đơn đăng ký dự án"
+  },
+  "localeSwitcher": {
+    "english": "Tiếng Anh",
+    "vietnamese": "Tiếng Việt"
+  },
+  "auth": {
+    "hero": {
+      "headline": "Kết nối doanh nghiệp với nhà đầu tư phù hợp",
+      "description": "Tham gia cùng hàng nghìn SME và nhà đầu tư trên nền tảng bảo mật được thiết kế cho những quyết định huy động vốn thông minh hơn.",
+      "securityTitle": "Bảo mật chuẩn ngân hàng",
+      "securitySubtitle": "Dữ liệu của bạn được mã hóa và bảo vệ",
+      "speedTitle": "Quy trình gọi vốn nhanh",
+      "speedSubtitle": "Kết nối trong vài ngày, không phải vài tháng",
+      "networkTitle": "Mạng lưới đáng tin cậy",
+      "networkSubtitle": "SME đã xác thực và nhà đầu tư được công nhận"
+    },
+    "footer": {
+      "copyright": "© 2026 FundLok. Bảo lưu mọi quyền.",
+      "helpPrefix": "Cần hỗ trợ?",
+      "supportLink": "Liên hệ hỗ trợ"
+    },
+    "switcher": {
+      "welcomeBack": "Chào mừng trở lại",
+      "createAccount": "Tạo tài khoản của bạn",
+      "dontHaveAccount": "Bạn chưa có tài khoản?",
+      "alreadyHaveAccount": "Bạn đã có tài khoản?",
+      "signUp": "Đăng ký",
+      "signIn": "Đăng nhập"
+    },
+    "login": {
+      "emailLabel": "Địa chỉ email",
+      "emailPlaceholder": "name@company.com",
+      "passwordLabel": "Mật khẩu",
+      "passwordPlaceholder": "••••••••",
+      "submitting": "Đang đăng nhập...",
+      "submit": "Đăng nhập",
+      "successTitle": "Chào mừng trở lại!",
+      "successDescription": "Đăng nhập thành công. Đang chuyển hướng...",
+      "failedTitle": "Đăng nhập thất bại",
+      "failedDescription": "Email hoặc mật khẩu không hợp lệ."
+    },
+    "register": {
+      "fullNameLabel": "Họ và tên",
+      "fullNamePlaceholder": "Nguyen Van A",
+      "emailLabel": "Địa chỉ email",
+      "emailPlaceholder": "founder@company.com",
+      "phoneLabel": "Số điện thoại",
+      "phonePlaceholder": "09xx xxx xxx",
+      "passwordLabel": "Mật khẩu",
+      "confirmPasswordLabel": "Xác nhận mật khẩu",
+      "passwordPlaceholder": "••••••••",
+      "rolePrompt": "Chọn loại tài khoản của bạn",
+      "roleSme": "SME",
+      "roleInvestor": "Nhà đầu tư",
+      "submitting": "Đang tạo tài khoản...",
+      "submit": "Tạo tài khoản",
+      "validationErrorTitle": "Lỗi xác thực",
+      "passwordMismatch": "Mật khẩu không khớp.",
+      "configErrorTitle": "Lỗi cấu hình",
+      "selectRole": "Vui lòng chọn vai trò người dùng để tiếp tục.",
+      "successTitle": "Đăng ký thành công",
+      "successDescription": "Tài khoản của bạn đã sẵn sàng. Vui lòng đăng nhập để tiếp tục.",
+      "failedTitle": "Đăng ký thất bại",
+      "failedDescription": "Vui lòng kiểm tra thông tin của bạn và thử lại."
+    },
+    "layout": {
+      "helpPrefix": "Cần hỗ trợ?",
+      "supportLink": "Liên hệ hỗ trợ"
+    }
+  },
+  "dashboard": {
+    "header": {
+      "loading": "Đang tải thanh tiêu đề...",
+      "portal": {
+        "sme": "Cổng SME",
+        "investor": "Cổng nhà đầu tư"
+      },
+      "welcomeBack": "Chào mừng trở lại, {name}",
+      "home": "Trang chủ",
+      "logout": "Đăng xuất"
+    },
+    "sidebar": {
+      "overview": "Tổng quan",
+      "investmentProjects": "Dự án đầu tư",
+      "transactions": "Giao dịch",
+      "analytics": "Phân tích",
+      "security": "Bảo mật",
+      "settings": "Cài đặt",
+      "memberSuffix": "Thành viên",
+      "verifiedMember": "Thành viên đã xác thực"
+    },
+    "investor": {
+      "title": "Danh mục đầu tư",
+      "subtitle": "Theo dõi và quản lý các khoản đầu tư hiện tại của bạn",
+      "totalInvested": "Tổng đã đầu tư",
+      "activeInvestments": "Khoản đầu tư đang hoạt động",
+      "totalReturns": "Tổng lợi nhuận",
+      "noInvestmentsTitle": "Chưa có khoản đầu tư nào",
+      "noInvestmentsDescription": "Hiện tại bạn chưa có khoản đầu tư nào. Hãy khám phá các cơ hội có sẵn để bắt đầu hành trình đầu tư.",
+      "browseProjects": "Khám phá dự án đầu tư"
+    },
+    "projects": {
+      "title": "Cơ hội đầu tư",
+      "subtitle": "Khám phá các dự án SME đã được thẩm định và thực hiện khoản đầu tư tiếp theo của bạn",
+      "opportunitiesAvailable": "Có {count} cơ hội",
+      "searchPlaceholder": "Tìm dự án theo tên hoặc ngành...",
+      "filterLabel": "Lọc:",
+      "noProjectsTitle": "Không có dự án phù hợp",
+      "noProjectsDescription": "Chúng tôi không tìm thấy cơ hội nào phù hợp với tiêu chí của bạn. Hãy thử điều chỉnh truy vấn tìm kiếm hoặc bộ lọc.",
+      "investNow": "Đầu tư ngay"
+    },
+    "projectCard": {
+      "created": "Tạo ngày {date}",
+      "industry": "Ngành",
+      "taxId": "Mã số thuế",
+      "incorporation": "Thành lập",
+      "location": "Vị trí",
+      "viewDetails": "Xem chi tiết dự án",
+      "edit": "Chỉnh sửa",
+      "invest": "Đầu tư",
+      "status": {
+        "draft": "BẢN NHÁP",
+        "active": "ĐANG HOẠT ĐỘNG"
+      }
+    },
+    "sme": {
+      "projectTitle": "Dự án: {name}",
+      "industryTaxId": "Ngành: {industry} • Mã số thuế: {taxId}",
+      "industry": "Ngành",
+      "taxId": "Mã số thuế",
+      "incorporationDate": "Ngày thành lập",
+      "daysActive": "Số ngày hoạt động",
+      "submitLoanApplication": "Gửi hồ sơ vay",
+      "uploadNecessaryDocuments": "Tải lên các tài liệu cần thiết để nhận đề nghị vay",
+      "requiredDocsMissingTitle": "Thiếu tài liệu bắt buộc",
+      "requiredDocsMissingDescription": "Vui lòng tải lên cả tài liệu Tax Filing 2025 và VAT Filing.",
+      "applicationSubmittedTitle": "Đã gửi hồ sơ",
+      "applicationSubmittedDescription": "Hồ sơ vay và tài liệu của bạn đã được tải lên thành công.",
+      "uploadFailedTitle": "Tải lên thất bại",
+      "uploadFailedDescription": "Đã xảy ra lỗi khi tải lên tài liệu của bạn. Vui lòng thử lại.",
+      "taxFiling2025": "Tax Filing 2025",
+      "vatFiling": "VAT Filing",
+      "financialStatement": "Báo cáo tài chính",
+      "businessPlan": "Kế hoạch kinh doanh",
+      "optional": "(Không bắt buộc)",
+      "requiredDocuments": "Tài liệu bắt buộc:",
+      "optionalDocuments": "Tài liệu bổ sung có thể giúp cải thiện đề nghị vay của bạn.",
+      "registeredAddress": "Địa chỉ đăng ký",
+      "street": "Đường",
+      "city": "Thành phố",
+      "stateProvince": "Bang/Tỉnh",
+      "postalCode": "Mã bưu chính",
+      "country": "Quốc gia",
+      "noAddress": "Chưa cung cấp thông tin địa chỉ.",
+      "systemRecordDetails": "Chi tiết hồ sơ hệ thống",
+      "projectId": "Mã dự án (UUID)",
+      "createdAt": "Ngày tạo",
+      "lastUpdated": "Cập nhật lần cuối",
+      "chooseFile": "Chọn tệp",
+      "noFileChosen": "Chưa chọn tệp",
+      "submittingApplication": "Đang gửi hồ sơ...",
+      "applicationSubmitted": "Đã gửi hồ sơ",
+      "submitApplication": "Gửi hồ sơ"
+    },
+    "projectDetails": {
+      "loading": "Đang tải chi tiết dự án...",
+      "backToMarketplace": "Quay lại thị trường",
+      "lowRisk": "Rủi ro thấp",
+      "grade": "Hạng A+",
+      "description": "Công ty SaaS đang phát triển muốn mở rộng hoạt động và tuyển thêm nhà phát triển.",
+      "riskAssessment": "Đánh giá rủi ro",
+      "investment": "Đầu tư",
+      "dueDiligence": "Thẩm định",
+      "fallbackName": "TechStart Solutions",
+      "fallbackIndustry": "Công nghệ"
+    }
+  },
+  "investment": {
+    "kpis": {
+      "loanAmount": "Số tiền vay",
+      "expectedRoi": "ROI kỳ vọng",
+      "estPaybackPeriod": "Thời gian hoàn vốn dự kiến",
+      "revenueShareRate": "Tỷ lệ chia sẻ doanh thu",
+      "ofDailyRevenue": "trên doanh thu hằng ngày"
+    },
+    "tab": {
+      "fundingProgress": "Tiến độ gọi vốn",
+      "trackFunding": "Theo dõi số tiền đã được tài trợ cho khoản vay này",
+      "progress": "Tiến độ",
+      "funded": "Đã tài trợ",
+      "remaining": "Còn lại",
+      "makeInvestment": "Thực hiện đầu tư",
+      "enterAmount": "Nhập số tiền bạn muốn đầu tư vào cơ hội này",
+      "investmentAmount": "Số tiền đầu tư ($)",
+      "placeholder": "Nhập số tiền",
+      "maximum": "Tối đa: $15,000",
+      "agreement": "Khi đầu tư, bạn đồng ý gửi tiền vào tài khoản nền tảng an toàn của chúng tôi",
+      "validationErrorTitle": "Lỗi xác thực",
+      "validAmount": "Vui lòng nhập số tiền đầu tư hợp lệ.",
+      "maxRemainingAmount": "Số tiền tối đa còn lại bạn có thể đầu tư là ${amount}.",
+      "investmentSuccessfulTitle": "Đầu tư thành công",
+      "investmentSuccessfulDescription": "Đã đầu tư thành công ${amount} vào dự án này!",
+      "processing": "Đang xử lý...",
+      "investNow": "Đầu tư ngay"
+    },
+    "risk": {
+      "title": "Đánh giá rủi ro FundLok",
+      "subtitle": "Phân tích của chúng tôi dẫn đến hạng A+ và ROI kỳ vọng 10,2%",
+      "strengths": "Điểm mạnh",
+      "risks": "Rủi ro & lưu ý",
+      "revenueShareTerms": "Điều khoản chia sẻ doanh thu",
+      "primaryRate": "Tỷ lệ chính",
+      "untilPrincipal": "Cho đến khi gốc được trả",
+      "postPrincipalRate": "Tỷ lệ sau khi trả gốc",
+      "afterPrincipal": "Sau khi gốc được trả",
+      "minimumBiweekly": "Tối thiểu hai tuần",
+      "everyTwoWeeks": "Mỗi 2 tuần",
+      "howItWorksTitle": "Cách hoạt động:",
+      "howItWorks": "SME chia sẻ 8,5% doanh thu hằng ngày cho đến khi khoản gốc được hoàn trả. Sau đó, tỷ lệ giảm xuống 2%. Cần thanh toán tối thiểu $1,200 mỗi 2 tuần để đảm bảo lợi nhuận ổn định.",
+      "strengthItems": [
+        "Mô hình doanh thu định kỳ mạnh với 95% tỷ lệ giữ chân khách hàng",
+        "Tăng trưởng tháng qua tháng ổn định 15%",
+        "Đội ngũ quản lý giàu kinh nghiệm với các thương vụ thoái vốn trước đây",
+        "Hồ sơ tài chính đầy đủ và minh bạch",
+        "Chi phí thu hút khách hàng thấp so với giá trị vòng đời"
+      ],
+      "riskItems": [
+        "Sự hiện diện thị trường còn hạn chế ngoài khu vực chính",
+        "Phụ thuộc vào các khách hàng chủ chốt cho 40% doanh thu"
+      ]
+    },
+    "dueDiligence": {
+      "title": "Tài liệu & thông tin tài chính",
+      "subtitle": "Xem lại các tài liệu SME đã nộp để thẩm định",
+      "downloadingFile": "Đang tải tệp",
+      "startingDownload": "Bắt đầu tải {filename}...",
+      "reminderTitle": "Nhắc nhở thẩm định",
+      "reminderText": "Hãy xem xét kỹ tất cả tài liệu trước khi đầu tư. Cân nhắc mức độ rủi ro và xếp hạng khi ra quyết định đầu tư.",
+      "download": "Tải xuống",
+      "documents": [
+        "Tax Filing 2025.pdf",
+        "VAT Filing Q4 2025.pdf",
+        "Financial Statement 2025.pdf"
+      ]
+    },
+    "paymentHistory": {
+      "title": "Lịch sử thanh toán",
+      "subtitle": "Các khoản chia sẻ doanh thu hằng ngày gần đây nhận được từ khoản vay này"
+    },
+    "returnProgress": {
+      "title": "Tiến độ lợi nhuận",
+      "subtitle": "Theo dõi lợi nhuận đầu tư của bạn theo thời gian",
+      "progress": "Tiến độ",
+      "roi": "ROI",
+      "dailyReturn": "Lợi nhuận hằng ngày",
+      "revenueShare": "Chia sẻ doanh thu",
+      "postPrincipalRate": "Tỷ lệ sau khi trả gốc",
+      "minBiweekly": "Tối thiểu hai tuần"
+    }
+  },
+  "projectApplication": {
+    "loading": "Đang kiểm tra quyền truy cập dự án của bạn...",
+    "eyebrow": "Đơn đăng ký dự án",
+    "title": "Đăng ký dự án mà các nhà đầu tư của bạn sẽ thấy.",
+    "subtitle": "Gửi các thông tin cơ bản của công ty và chúng tôi sẽ chuyển tài khoản của bạn vào bảng điều khiển sau khi dự án được tạo.",
+    "info": {
+      "businessTitle": "Thông tin doanh nghiệp",
+      "businessText": "Cho chúng tôi biết bạn là ai và bạn làm gì.",
+      "locationTitle": "Vị trí",
+      "locationText": "Thêm địa chỉ hoạt động đầy đủ.",
+      "companyAgeTitle": "Tuổi công ty",
+      "companyAgeText": "Chia sẻ thời điểm bạn thành lập."
+    },
+    "card": {
+      "title": "Biểu mẫu đăng ký",
+      "description": "Điền vào các trường bên dưới để tạo dự án đầu tiên của bạn.",
+      "submitting": "Đang gửi đơn đăng ký...",
+      "submit": "Gửi đơn đăng ký dự án"
+    },
+    "fields": {
+      "legalName": "Tên pháp lý",
+      "taxId": "Mã số thuế",
+      "industry": "Ngành",
+      "incorporationDate": "Ngày thành lập",
+      "street": "Đường",
+      "city": "Thành phố",
+      "stateRegion": "Bang / khu vực",
+      "postalCode": "Mã bưu chính",
+      "country": "Quốc gia"
+    },
+    "placeholders": {
+      "legalName": "Acme Holdings Limited",
+      "taxId": "123456789",
+      "industry": "Fintech",
+      "street": "123 Market Street",
+      "city": "Singapore",
+      "state": "Central",
+      "postalCode": "018956",
+      "country": "Singapore"
+    },
+    "validation": {
+      "legalName": "Vui lòng nhập tên pháp lý",
+      "taxId": "Vui lòng nhập mã số thuế",
+      "industry": "Vui lòng nhập ngành",
+      "incorporationDate": "Vui lòng nhập ngày thành lập",
+      "street": "Vui lòng nhập đường",
+      "city": "Vui lòng nhập thành phố",
+      "postalCode": "Vui lòng nhập mã bưu chính",
+      "country": "Vui lòng nhập quốc gia"
+    },
+    "toasts": {
+      "submittedTitle": "Đã gửi đơn đăng ký",
+      "submittedDescription": "Dự án của bạn đã sẵn sàng. Đang chuyển hướng đến bảng điều khiển.",
+      "failedTitle": "Gửi thất bại",
+      "failedDescription": "Vui lòng kiểm tra biểu mẫu và thử lại."
+    }
+  },
+  "notFound": {
+    "headline": "Có vẻ bạn đã đi nhầm hướng",
+    "description": "Trang bạn đang tìm không tồn tại hoặc đã được di chuyển. Hãy để chúng tôi đưa bạn trở lại đúng hướng.",
+    "pageTitle": "Không tìm thấy trang",
+    "body": "Chúng tôi không thể tìm thấy nội dung bạn đang tìm kiếm. URL có thể bị sai hoặc trang đã bị xóa.",
+    "goHome": "Về trang chủ"
+  }
+}

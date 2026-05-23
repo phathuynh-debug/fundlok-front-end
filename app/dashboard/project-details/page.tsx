@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { usePublicProjects } from "@/hooks/use-projects"
 import { useRequireAuth } from "@/hooks/use-authentication"
 import { Badge } from "@/components/ui/badge"
@@ -12,14 +12,15 @@ import { InvestmentKpis } from "./_components/InvestmentKpis"
 import { RiskAssessmentTab } from "./_components/RiskAssessmentTab"
 import { InvestmentTab } from "./_components/InvestmentTab"
 import { DueDiligenceTab } from "./_components/DueDiligenceTab"
+import { useTranslations } from "@/lib/i18n"
 
 type TabType = "risk" | "investment" | "diligence"
 
 export default function ProjectDetailsPage() {
   const searchParams = useSearchParams()
-  const router = useRouter()
   const projectId = searchParams.get("id")
   const [activeTab, setActiveTab] = useState<TabType>("risk")
+  const { t } = useTranslations()
 
   const { user, isLoading: isAuthLoading } = useRequireAuth()
   
@@ -36,7 +37,7 @@ export default function ProjectDetailsPage() {
         <div className="flex flex-col items-center gap-2">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <span className="text-sm font-medium text-muted-foreground">
-            Loading project details...
+              {t("common.loadingProjectDetails")}
           </span>
         </div>
       </div>
@@ -44,8 +45,8 @@ export default function ProjectDetailsPage() {
   }
 
   // Fallback details if no project found to make it look nice anyway
-  const displayName = project?.legal_name || "TechStart Solutions"
-  const displayIndustry = project?.industry || "Technology"
+  const displayName = project?.legal_name || t("dashboard.projectDetails.fallbackName")
+  const displayIndustry = project?.industry || t("dashboard.projectDetails.fallbackIndustry")
 
   return (
     <div className="flex-1 space-y-8 p-4 md:p-8 pt-6 max-w-5xl mx-auto">
@@ -59,7 +60,7 @@ export default function ProjectDetailsPage() {
         >
           <Link href="/dashboard/projects">
             <ArrowLeft className="h-4 w-4" />
-            Back to Marketplace
+            {t("dashboard.projectDetails.backToMarketplace")}
           </Link>
         </Button>
       </div>
@@ -72,10 +73,10 @@ export default function ProjectDetailsPage() {
               <h1 className="text-3xl font-bold tracking-tight">{displayName}</h1>
               <div className="flex items-center gap-2">
                 <Badge className="bg-black text-white hover:bg-black/80 rounded-full px-3 py-0.5 text-xs font-semibold">
-                  Low Risk
+                  {t("dashboard.projectDetails.lowRisk")}
                 </Badge>
                 <Badge variant="outline" className="bg-background text-foreground rounded-full px-3 py-0.5 text-xs font-semibold border-muted">
-                  Grade A+
+                  {t("dashboard.projectDetails.grade")}
                 </Badge>
               </div>
             </div>
@@ -85,7 +86,7 @@ export default function ProjectDetailsPage() {
           </div>
         </div>
         <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl">
-          Growing SaaS company looking to expand operations and hire additional developers.
+          {t("dashboard.projectDetails.description")}
         </p>
       </div>
 
@@ -93,7 +94,7 @@ export default function ProjectDetailsPage() {
       <InvestmentKpis />
 
       {/* Tab pill selectors */}
-      <div className="bg-muted/40 p-1 rounded-2xl flex w-full max-w-2xl mx-auto grid grid-cols-3 gap-1 border">
+      <div className="bg-muted/40 p-1 rounded-2xl grid w-full max-w-2xl mx-auto grid-cols-3 gap-1 border">
         <button 
           onClick={() => setActiveTab("risk")}
           className={`py-2.5 px-4 rounded-xl text-sm font-semibold transition-all duration-200 ${
@@ -102,7 +103,7 @@ export default function ProjectDetailsPage() {
               : "text-muted-foreground hover:text-foreground"
           }`}
         >
-          Risk Assessment
+          {t("dashboard.projectDetails.riskAssessment")}
         </button>
         <button 
           onClick={() => setActiveTab("investment")}
@@ -112,7 +113,7 @@ export default function ProjectDetailsPage() {
               : "text-muted-foreground hover:text-foreground"
           }`}
         >
-          Investment
+          {t("dashboard.projectDetails.investment")}
         </button>
         <button 
           onClick={() => setActiveTab("diligence")}
@@ -122,7 +123,7 @@ export default function ProjectDetailsPage() {
               : "text-muted-foreground hover:text-foreground"
           }`}
         >
-          Due Diligence
+          {t("dashboard.projectDetails.dueDiligence")}
         </button>
       </div>
 

@@ -4,12 +4,16 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { Shield, Zap, Users, TrendingUp } from "lucide-react"
 import type { ReactNode } from "react"
+import { LocaleSwitcher } from "@/components/locale-switcher"
+import { useTranslations } from "@/lib/i18n"
 
 interface AuthLayoutProps {
   children: ReactNode
 }
 
 export function AuthLayout({ children }: AuthLayoutProps) {
+  const { t } = useTranslations()
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -35,39 +39,40 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           <div>
             <Link href="/" className="flex items-center gap-2">
               <TrendingUp className="h-8 w-8 text-emerald-400" />
-              <span className="text-2xl font-bold text-white tracking-tight">FundLok</span>
+              <span className="text-2xl font-bold text-white tracking-tight">{t("common.brandName")}</span>
             </Link>
           </div>
 
           <div className="flex flex-col gap-8 max-w-lg">
             <h1 className="text-4xl xl:text-5xl font-bold text-white leading-tight text-balance">
-              Connecting businesses with the right investors
+              {t("auth.hero.headline")}
             </h1>
             <p className="text-lg text-slate-300 leading-relaxed">
-              Join thousands of SMEs and investors on our secure platform designed for smarter funding decisions.
+              {t("auth.hero.description")}
             </p>
 
             <div className="flex flex-col gap-4 pt-4">
               <Feature
                 icon={<Shield className="h-5 w-5 text-white" />}
-                title="Bank-grade security"
-                subtitle="Your data is encrypted and protected"
+                title={t("auth.hero.securityTitle")}
+                subtitle={t("auth.hero.securitySubtitle")}
               />
               <Feature
                 icon={<Zap className="h-5 w-5 text-white" />}
-                title="Fast funding process"
-                subtitle="Get matched within days, not months"
+                title={t("auth.hero.speedTitle")}
+                subtitle={t("auth.hero.speedSubtitle")}
               />
               <Feature
                 icon={<Users className="h-5 w-5 text-white" />}
-                title="Trusted network"
-                subtitle="Verified SMEs and accredited investors"
+                title={t("auth.hero.networkTitle")}
+                subtitle={t("auth.hero.networkSubtitle")}
               />
             </div>
           </div>
 
-          <div className="text-sm text-slate-500">
-            © 2026 FundLok. All rights reserved.
+          <div className="flex items-center justify-between gap-4 text-sm text-slate-500">
+            <span>{t("auth.footer.copyright")}</span>
+            <LocaleSwitcher />
           </div>
         </div>
       </div>
@@ -90,12 +95,12 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         {/* Desktop Footer */}
         <div className="hidden lg:flex items-center justify-center p-6 border-t border-border">
           <p className="text-sm text-muted-foreground">
-            Need help?{" "}
+            {t("auth.footer.helpPrefix")} {" "}
             <Link
               href="#"
               className="text-foreground font-medium underline underline-offset-2 hover:text-accent transition-colors"
             >
-              Contact support
+              {t("auth.footer.supportLink")}
             </Link>
           </p>
         </div>

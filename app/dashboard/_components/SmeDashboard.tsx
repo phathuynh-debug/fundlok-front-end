@@ -8,6 +8,15 @@ import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { filesService } from "@/services/files.service"
 import type { Project } from "@/services/projects.service"
+import { useTranslations } from "@/lib/i18n"
+
+type ProjectAddress = {
+  street?: string
+  city?: string
+  state?: string
+  postal_code?: string
+  country?: string
+}
 
 interface SmeDashboardProps {
   projects: Project[]
@@ -16,6 +25,7 @@ interface SmeDashboardProps {
 export function SmeDashboard({ projects }: SmeDashboardProps) {
   const project = projects[0]
   const { toast } = useToast()
+  const { locale, t } = useTranslations()
 
   const [files, setFiles] = useState<{
     taxFiling: File | null
@@ -51,8 +61,8 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
     if (!files.taxFiling || !files.vatFiling) {
       toast({
         variant: "destructive",
-        title: "Required Documents Missing",
-        description: "Please upload both Tax Filing 2025 and VAT Filing documents.",
+        title: t("dashboard.sme.requiredDocsMissingTitle"),
+        description: t("dashboard.sme.requiredDocsMissingDescription"),
       })
       return
     }
@@ -78,15 +88,15 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
       
       setIsSubmitted(true)
       toast({
-        title: "Application Submitted",
-        description: "Your loan application and documents have been uploaded successfully.",
+        title: t("dashboard.sme.applicationSubmittedTitle"),
+        description: t("dashboard.sme.applicationSubmittedDescription"),
       })
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Document upload sequence failed:", error)
       toast({
         variant: "destructive",
-        title: "Upload Failed",
-        description: error?.message || "An error occurred while uploading your documents. Please try again.",
+        title: t("dashboard.sme.uploadFailedTitle"),
+        description: error instanceof Error ? error.message : t("dashboard.sme.uploadFailedDescription"),
       })
     } finally {
       setIsSubmitting(false)
@@ -98,13 +108,11 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Project: {project.legal_name}</h2>
-          <p className="text-sm text-muted-foreground mt-2">
-            Industry: {project.industry} &bull; Tax ID: {project.tax_id}
-          </p>
+          <h2 className="text-3xl font-bold tracking-tight">{t("dashboard.sme.projectTitle", { name: project.legal_name })}</h2>
+          <p className="text-sm text-muted-foreground mt-2">{t("dashboard.sme.industryTaxId", { industry: project.industry, taxId: project.tax_id })}</p>
         </div>
         <Badge variant={project.status === "ACTIVE" ? "default" : "secondary"} className="text-sm px-3 py-1 bg-black text-white rounded-full">
-          {project.status || "DRAFT"}
+          {project.status || t("dashboard.projectCard.status.draft")}
         </Badge>
       </div>
 
@@ -112,7 +120,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Industry</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t("dashboard.sme.industry")}</CardTitle>
             <Building2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -122,7 +130,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Tax ID</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t("dashboard.sme.taxId")}</CardTitle>
             <Hash className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -132,19 +140,19 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Incorporation Date</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t("dashboard.sme.incorporationDate")}</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-xl font-bold mt-2">
-              {project.incorporation_date ? new Date(project.incorporation_date).toLocaleDateString() : "N/A"}
+              {project.incorporation_date ? new Date(project.incorporation_date).toLocaleDateString(locale) : t("common.na")}
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Days Active</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t("dashboard.sme.daysActive")}</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -157,10 +165,8 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
       {project.status === "DRAFT" && (
         <Card className="p-6 border-border/80 shadow-md">
           <div className="mb-4">
-            <h3 className="text-2xl font-bold tracking-tight text-foreground">Submit Loan Application</h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              Upload the necessary documents to receive loan offers
-            </p>
+            <h3 className="text-2xl font-bold tracking-tight text-foreground">{t("dashboard.sme.submitLoanApplication")}</h3>
+            <p className="text-sm text-muted-foreground mt-1">{t("dashboard.sme.uploadNecessaryDocuments")}</p>
           </div>
 
           <form onSubmit={handleUploadSubmit} className="space-y-6 mt-6 max-w-4xl">
@@ -168,7 +174,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
               {/* Document 1: Tax Filing */}
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-foreground flex items-center">
-                  Tax Filing 2025 <span className="text-destructive ml-1">*</span>
+                  {t("dashboard.sme.taxFiling2025")} <span className="text-destructive ml-1">*</span>
                 </label>
                 <div className="flex items-center gap-3 bg-muted/40 p-2.5 rounded-lg border border-input focus-within:ring-2 focus-within:ring-primary/20">
                   <input
@@ -185,10 +191,10 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
                     className="bg-background text-xs font-semibold hover:bg-accent"
                     onClick={() => document.getElementById("taxFiling")?.click()}
                   >
-                    Choose File
+                    {t("dashboard.sme.chooseFile")}
                   </Button>
                   <span className="text-xs text-muted-foreground truncate">
-                    {files.taxFiling ? files.taxFiling.name : "No file chosen"}
+                    {files.taxFiling ? files.taxFiling.name : t("dashboard.sme.noFileChosen")}
                   </span>
                 </div>
               </div>
@@ -196,7 +202,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
               {/* Document 2: VAT Filing */}
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-foreground flex items-center">
-                  VAT Filing <span className="text-destructive ml-1">*</span>
+                  {t("dashboard.sme.vatFiling")} <span className="text-destructive ml-1">*</span>
                 </label>
                 <div className="flex items-center gap-3 bg-muted/40 p-2.5 rounded-lg border border-input focus-within:ring-2 focus-within:ring-primary/20">
                   <input
@@ -213,10 +219,10 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
                     className="bg-background text-xs font-semibold hover:bg-accent"
                     onClick={() => document.getElementById("vatFiling")?.click()}
                   >
-                    Choose File
+                    {t("dashboard.sme.chooseFile")}
                   </Button>
                   <span className="text-xs text-muted-foreground truncate">
-                    {files.vatFiling ? files.vatFiling.name : "No file chosen"}
+                    {files.vatFiling ? files.vatFiling.name : t("dashboard.sme.noFileChosen")}
                   </span>
                 </div>
               </div>
@@ -224,7 +230,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
               {/* Document 3: Financial Statement */}
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-foreground">
-                  Financial Statement <span className="text-muted-foreground text-xs font-normal ml-1">(Optional)</span>
+                  {t("dashboard.sme.financialStatement")} <span className="text-muted-foreground text-xs font-normal ml-1">{t("dashboard.sme.optional")}</span>
                 </label>
                 <div className="flex items-center gap-3 bg-muted/40 p-2.5 rounded-lg border border-input focus-within:ring-2 focus-within:ring-primary/20">
                   <input
@@ -241,10 +247,10 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
                     className="bg-background text-xs font-semibold hover:bg-accent"
                     onClick={() => document.getElementById("financialStatement")?.click()}
                   >
-                    Choose File
+                    {t("dashboard.sme.chooseFile")}
                   </Button>
                   <span className="text-xs text-muted-foreground truncate">
-                    {files.financialStatement ? files.financialStatement.name : "No file chosen"}
+                    {files.financialStatement ? files.financialStatement.name : t("dashboard.sme.noFileChosen")}
                   </span>
                 </div>
               </div>
@@ -252,7 +258,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
               {/* Document 4: Business Plan */}
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-foreground">
-                  Business Plan <span className="text-muted-foreground text-xs font-normal ml-1">(Optional)</span>
+                  {t("dashboard.sme.businessPlan")} <span className="text-muted-foreground text-xs font-normal ml-1">{t("dashboard.sme.optional")}</span>
                 </label>
                 <div className="flex items-center gap-3 bg-muted/40 p-2.5 rounded-lg border border-input focus-within:ring-2 focus-within:ring-primary/20">
                   <input
@@ -269,10 +275,10 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
                     className="bg-background text-xs font-semibold hover:bg-accent"
                     onClick={() => document.getElementById("businessPlan")?.click()}
                   >
-                    Choose File
+                    {t("dashboard.sme.chooseFile")}
                   </Button>
                   <span className="text-xs text-muted-foreground truncate">
-                    {files.businessPlan ? files.businessPlan.name : "No file chosen"}
+                    {files.businessPlan ? files.businessPlan.name : t("dashboard.sme.noFileChosen")}
                   </span>
                 </div>
               </div>
@@ -288,17 +294,17 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Submitting Application...
+                    {t("dashboard.sme.submittingApplication")}
                   </>
                 ) : isSubmitted ? (
                   <>
                     <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                    Application Submitted
+                    {t("dashboard.sme.applicationSubmitted")}
                   </>
                 ) : (
                   <>
                     <Upload className="h-4 w-4" />
-                    Submit Application
+                    {t("dashboard.sme.submitApplication")}
                   </>
                 )}
               </Button>
@@ -308,14 +314,12 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
             <div className="mt-4 p-4 rounded-xl bg-blue-50 dark:bg-blue-950/20 text-blue-800 dark:text-blue-200 border border-blue-100 dark:border-blue-900/30 flex items-start gap-3">
               <FileText className="h-5 w-5 mt-0.5 shrink-0 text-blue-600 dark:text-blue-400" />
               <div className="space-y-1.5 text-sm">
-                <span className="font-semibold text-blue-900 dark:text-blue-100">Required Documents:</span>
+                <span className="font-semibold text-blue-900 dark:text-blue-100">{t("dashboard.sme.requiredDocuments")}</span>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>Tax Filing 2025</li>
-                  <li>VAT Filing</li>
+                  <li>{t("dashboard.sme.taxFiling2025")}</li>
+                  <li>{t("dashboard.sme.vatFiling")}</li>
                 </ul>
-                <p className="text-xs text-blue-600 dark:text-blue-400 mt-1.5 font-medium">
-                  Optional documents may improve your loan offer.
-                </p>
+                <p className="text-xs text-blue-600 dark:text-blue-400 mt-1.5 font-medium">{t("dashboard.sme.optionalDocuments")}</p>
               </div>
             </div>
           </form>
@@ -327,35 +331,35 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
         <Card className="p-6">
           <div className="mb-6 flex items-center gap-2">
             <MapPin className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-semibold">Registered Address</h3>
+            <h3 className="text-lg font-semibold">{t("dashboard.sme.registeredAddress")}</h3>
           </div>
           
           <div className="space-y-4">
             {project.address ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-4">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Street</p>
-                  <p className="font-medium">{(project.address as any).street || "N/A"}</p>
+                  <p className="text-sm text-muted-foreground mb-1">{t("dashboard.sme.street")}</p>
+                  <p className="font-medium">{(project.address as ProjectAddress | null | undefined)?.street || t("common.na")}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">City</p>
-                  <p className="font-medium">{(project.address as any).city || "N/A"}</p>
+                  <p className="text-sm text-muted-foreground mb-1">{t("dashboard.sme.city")}</p>
+                  <p className="font-medium">{(project.address as ProjectAddress | null | undefined)?.city || t("common.na")}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">State/Province</p>
-                  <p className="font-medium">{(project.address as any).state || "N/A"}</p>
+                  <p className="text-sm text-muted-foreground mb-1">{t("dashboard.sme.stateProvince")}</p>
+                  <p className="font-medium">{(project.address as ProjectAddress | null | undefined)?.state || t("common.na")}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Postal Code</p>
-                  <p className="font-medium">{(project.address as any).postal_code || "N/A"}</p>
+                  <p className="text-sm text-muted-foreground mb-1">{t("dashboard.sme.postalCode")}</p>
+                  <p className="font-medium">{(project.address as ProjectAddress | null | undefined)?.postal_code || t("common.na")}</p>
                 </div>
                 <div className="col-span-2">
-                  <p className="text-sm text-muted-foreground mb-1">Country</p>
-                  <p className="font-medium">{(project.address as any).country || "N/A"}</p>
+                  <p className="text-sm text-muted-foreground mb-1">{t("dashboard.sme.country")}</p>
+                  <p className="font-medium">{(project.address as ProjectAddress | null | undefined)?.country || t("common.na")}</p>
                 </div>
               </div>
             ) : (
-              <p className="text-muted-foreground">No address information provided.</p>
+              <p className="text-muted-foreground">{t("dashboard.sme.noAddress")}</p>
             )}
           </div>
         </Card>
@@ -363,23 +367,23 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
         <Card className="p-6">
           <div className="mb-6 flex items-center gap-2">
             <CheckCircle2 className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-semibold">System Record Details</h3>
+            <h3 className="text-lg font-semibold">{t("dashboard.sme.systemRecordDetails")}</h3>
           </div>
           
           <div className="space-y-6">
             <div>
-              <p className="text-sm text-muted-foreground mb-1">Project ID (UUID)</p>
+              <p className="text-sm text-muted-foreground mb-1">{t("dashboard.sme.projectId")}</p>
               <p className="font-mono text-sm bg-muted p-2 rounded-md break-all">{project.id}</p>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Created At</p>
-                <p className="font-medium">{project.created_at ? new Date(project.created_at).toLocaleString() : "N/A"}</p>
+                <p className="text-sm text-muted-foreground mb-1">{t("dashboard.sme.createdAt")}</p>
+                <p className="font-medium">{project.created_at ? new Date(project.created_at).toLocaleString(locale) : t("common.na")}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Last Updated</p>
-                <p className="font-medium">{project.updated_at ? new Date(project.updated_at).toLocaleString() : "N/A"}</p>
+                <p className="text-sm text-muted-foreground mb-1">{t("dashboard.sme.lastUpdated")}</p>
+                <p className="font-medium">{project.updated_at ? new Date(project.updated_at).toLocaleString(locale) : t("common.na")}</p>
               </div>
             </div>
           </div>

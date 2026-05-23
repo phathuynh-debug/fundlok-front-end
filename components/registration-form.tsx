@@ -20,6 +20,7 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react"
+import { useTranslations } from "@/lib/i18n"
 
 type RoleSelection = UserRole | null
 
@@ -40,6 +41,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
   const router = useRouter()
   const { toast } = useToast()
   const { mutate: register, isPending } = useRegister()
+  const { t } = useTranslations()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -47,8 +49,8 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
     if (password !== confirmPassword) {
       toast({
         variant: "destructive",
-        title: "Validation Error",
-        description: "Passwords do not match.",
+        title: t("auth.register.validationErrorTitle"),
+        description: t("auth.register.passwordMismatch"),
       })
       return
     }
@@ -56,8 +58,8 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
     if (!role) {
       toast({
         variant: "destructive",
-        title: "Configuration Error",
-        description: "Please select a user role to proceed.",
+        title: t("auth.register.configErrorTitle"),
+        description: t("auth.register.selectRole"),
       })
       return
     }
@@ -73,8 +75,8 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
       {
         onSuccess: () => {
           toast({
-            title: "Registration Successful",
-            description: "Your account is ready. Please sign in to continue.",
+            title: t("auth.register.successTitle"),
+            description: t("auth.register.successDescription"),
           })
           // Use the switcher callback if available, otherwise navigate
           if (onSuccess) {
@@ -86,10 +88,8 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         onError: (error) => {
           toast({
             variant: "destructive",
-            title: "Registration Failed",
-            description:
-              error?.message ||
-              "Please check your information and try again.",
+            title: t("auth.register.failedTitle"),
+            description: error?.message || t("auth.register.failedDescription"),
           })
         },
       }
@@ -99,13 +99,13 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
-        <Label htmlFor="fullName">Full Name</Label>
+        <Label htmlFor="fullName">{t("auth.register.fullNameLabel")}</Label>
         <div className="relative">
           <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
             id="fullName"
             type="text"
-            placeholder="Nguyen Van A"
+            placeholder={t("auth.register.fullNamePlaceholder")}
             className="pl-10"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
@@ -116,13 +116,13 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email">Email address</Label>
+        <Label htmlFor="email">{t("auth.register.emailLabel")}</Label>
         <div className="relative">
           <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
             id="email"
             type="email"
-            placeholder="founder@company.com"
+            placeholder={t("auth.register.emailPlaceholder")}
             className="pl-10"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -133,13 +133,13 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="phone">Phone number</Label>
+        <Label htmlFor="phone">{t("auth.register.phoneLabel")}</Label>
         <div className="relative">
           <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
             id="phone"
             type="tel"
-            placeholder="09xx xxx xxx"
+            placeholder={t("auth.register.phonePlaceholder")}
             className="pl-10"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
@@ -149,13 +149,13 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">{t("auth.register.passwordLabel")}</Label>
         <div className="relative">
           <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
             id="password"
             type={showPassword ? "text" : "password"}
-            placeholder="••••••••"
+            placeholder={t("auth.register.passwordPlaceholder")}
             className="px-10"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -176,13 +176,13 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         </div>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="confirmPassword">Confirm Password</Label>
+        <Label htmlFor="confirmPassword">{t("auth.register.confirmPasswordLabel")}</Label>
         <div className="relative">
           <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
             id="confirmPassword"
             type={showConfirmPassword ? "text" : "password"}
-            placeholder="••••••••"
+            placeholder={t("auth.register.passwordPlaceholder")}
             className="px-10"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
@@ -204,7 +204,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
       </div>
 
       <div className="space-y-3">
-        <Label>Select your account type</Label>
+        <Label>{t("auth.register.rolePrompt")}</Label>
         <div className="grid grid-cols-2 gap-4">
           <button
             type="button"
@@ -221,7 +221,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
             <Building2
               className={role === "SME" ? "text-primary" : "text-muted-foreground"}
             />
-            <span className="font-semibold text-sm">SME</span>
+            <span className="font-semibold text-sm">{t("auth.register.roleSme")}</span>
           </button>
 
           <button
@@ -241,7 +241,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                 role === "INVESTOR" ? "text-primary" : "text-muted-foreground"
               }
             />
-            <span className="font-semibold text-sm">Investor</span>
+            <span className="font-semibold text-sm">{t("auth.register.roleInvestor")}</span>
           </button>
         </div>
       </div>
@@ -252,7 +252,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         className="w-full h-12 text-base font-medium"
       >
         {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        {isPending ? "Creating account..." : "Create account"}
+        {isPending ? t("auth.register.submitting") : t("auth.register.submit")}
       </Button>
     </form>
   )

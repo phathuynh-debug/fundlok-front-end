@@ -1,8 +1,14 @@
+"use client"
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Compass } from "lucide-react"
+import { LocaleSwitcher } from "@/components/locale-switcher"
+import { useTranslations } from "@/lib/i18n"
 
 export default function NotFound() {
+  const { t } = useTranslations()
+
   return (
     <div className="min-h-screen flex">
       {/* Left Panel - Branding (matches auth layout) */}
@@ -25,15 +31,16 @@ export default function NotFound() {
               404
             </div>
             <h1 className="text-4xl xl:text-5xl font-bold text-primary-foreground leading-tight text-balance">
-              Looks like you took a wrong turn
+              {t("notFound.headline")}
             </h1>
             <p className="text-lg text-primary-foreground/70 leading-relaxed">
-              The page you&apos;re looking for doesn&apos;t exist or has been moved. Let&apos;s get you back on track.
+              {t("notFound.description")}
             </p>
           </div>
 
-          <div className="text-sm text-primary-foreground/50">
-            © 2026 FundLok. All rights reserved.
+          <div className="flex items-center justify-between gap-4 text-sm text-primary-foreground/50">
+            <span>{t("common.copyright")}</span>
+            <LocaleSwitcher />
           </div>
         </div>
       </div>
@@ -65,24 +72,23 @@ export default function NotFound() {
 
             <div className="flex flex-col gap-3">
               <h2 className="text-2xl lg:text-3xl font-bold text-foreground">
-                Page not found
+                {t("notFound.pageTitle")}
               </h2>
               <p className="text-muted-foreground leading-relaxed">
-                We couldn&apos;t find what you were looking for. The URL may be
-                misspelled or the page may have been removed.
+                {t("notFound.body")}
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 w-full">
               <Button asChild className="flex-1 h-11">
                 <Link href="/">
-                  Go to home
+                  {t("notFound.goHome")}
                 </Link>
               </Button>
               <Button asChild variant="outline" className="flex-1 h-11">
                 <Link href="/dashboard">
                   <ArrowLeft className="h-4 w-4 mr-2" />
-                  Dashboard
+                  {t("common.dashboard")}
                 </Link>
               </Button>
             </div>
@@ -92,12 +98,12 @@ export default function NotFound() {
         {/* Desktop Footer */}
         <div className="hidden lg:flex items-center justify-center p-6 border-t border-border">
           <p className="text-sm text-muted-foreground">
-            Need help?{" "}
+            {t("common.needHelp")} {" "}
             <Link
               href="#"
               className="text-foreground font-medium underline underline-offset-2 hover:text-accent transition-colors"
             >
-              Contact support
+              {t("common.contactSupport")}
             </Link>
           </p>
         </div>

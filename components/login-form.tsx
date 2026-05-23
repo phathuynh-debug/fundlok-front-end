@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { useLogin } from "@/hooks/use-authentication"
 import { Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react"
+import { useTranslations } from "@/lib/i18n"
 
 export function LoginForm() {
   const [email, setEmail] = useState("")
@@ -17,6 +18,7 @@ export function LoginForm() {
   const router = useRouter()
   const { toast } = useToast()
   const { mutate: login, isPending } = useLogin()
+  const { t } = useTranslations()
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
@@ -26,16 +28,16 @@ export function LoginForm() {
       {
         onSuccess: () => {
           toast({
-            title: "Welcome back!",
-            description: "Login successful. Redirecting...",
+            title: t("auth.login.successTitle"),
+            description: t("auth.login.successDescription"),
           })
           router.push("/dashboard")
         },
         onError: (error) => {
           toast({
             variant: "destructive",
-            title: "Login Failed",
-            description: error?.message || "Invalid email or password.",
+            title: t("auth.login.failedTitle"),
+            description: error?.message || t("auth.login.failedDescription"),
           })
         },
       }
@@ -45,14 +47,14 @@ export function LoginForm() {
   return (
     <form onSubmit={handleLogin} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="email">Email Address</Label>
+        <Label htmlFor="email">{t("auth.login.emailLabel")}</Label>
         <div className="relative">
           <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
             id="email"
             type="email"
             className="pl-10"
-            placeholder="name@company.com"
+            placeholder={t("auth.login.emailPlaceholder")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -62,14 +64,14 @@ export function LoginForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">{t("auth.login.passwordLabel")}</Label>
         <div className="relative">
           <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
             id="password"
             type={showPassword ? "text" : "password"}
             className="px-10"
-            placeholder="••••••••"
+            placeholder={t("auth.login.passwordPlaceholder")}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -93,10 +95,10 @@ export function LoginForm() {
         {isPending ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Signing In...
+            {t("auth.login.submitting")}
           </>
         ) : (
-          "Sign In"
+          t("auth.login.submit")
         )}
       </Button>
     </form>
