@@ -15,7 +15,15 @@ export const metadata: Metadata = {
     "AI credit scoring",
     "Bastion Trading",
     "FalconX",
-    "Fasanara Digital"
+    "Fasanara Digital",
+    "Loc Vuong",
+    "Huy Pham",
+    "Edward Wong",
+    "FundLok CEO",
+    "FundLok CFO",
+    "FundLok CTO",
+    "FundLok founding team",
+    "FundLok founders"
   ],
   openGraph: {
     title: "FundLok | Flexible Capital Platform for SMEs",
@@ -31,5 +39,42 @@ export const metadata: Metadata = {
 }
 
 export default function Page() {
-  return <LandingPageClient />
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "FundLok",
+    "url": "https://www.fundlok.com",
+    "logo": "https://www.fundlok.com/images/logo.png",
+    "description": "FundLok connects investors with SMEs through a technology-led financing platform, using data and AI to support flexible funding aligned with real business needs.",
+    "founder": [
+      {
+        "@type": "Person",
+        "name": "Loc Vuong",
+        "jobTitle": "Co-Founder & CEO",
+        "sameAs": "https://www.linkedin.com/in/lok-vuong/"
+      },
+      {
+        "@type": "Person",
+        "name": "Huy Pham",
+        "jobTitle": "Co-Founder & CFO",
+        "sameAs": "https://www.linkedin.com/in/huy-pham-5646bb49/"
+      },
+      {
+        "@type": "Person",
+        "name": "Edward Wong",
+        "jobTitle": "Co-Founder & CTO",
+        "sameAs": "https://www.linkedin.com/in/eywong8/"
+      }
+    ]
+  }
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <LandingPageClient />
+    </>
+  )
 }
