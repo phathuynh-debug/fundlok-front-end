@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { 
   TrendingUp, 
@@ -13,6 +13,7 @@ import { useTranslations } from "@/lib/i18n"
 import { GuillocheWaves } from "@/components/guilloche-waves"
 import { LocaleSwitcher } from "@/components/locale-switcher"
 import { InteractiveFlow } from "@/components/interactive-flow"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 // Symmetrical custom vector logos
 const FasanaraLogo = () => (
@@ -265,7 +266,7 @@ export function LandingPageClient() {
       {/* Global Header Navigation (Sticky Glassmorphic Header) */}
       <header className="sticky top-0 z-30 w-full bg-background/45 backdrop-blur-md border-b border-border/10 flex items-center justify-between px-6 py-4 md:px-12">
         <Link href="/" className="flex items-center gap-2 group relative z-40">
-          <TrendingUp className="h-7 w-7 text-accent transition-transform duration-300 group-hover:scale-110" />
+          <TrendingUp className="h-7 w-7 text-emerald-500 dark:text-emerald-400 transition-transform duration-300 group-hover:scale-110" />
           <span className="text-xl font-bold tracking-tight text-foreground font-sans">
             {t("common.brandName")}
           </span>
@@ -299,9 +300,12 @@ export function LandingPageClient() {
           </button>
         </nav>
 
-        {/* Action Button & Language Switcher with Safe Colors */}
+        {/* Action Button & Language Switcher & Theme Toggle */}
         <div className="flex items-center gap-4 relative z-30">
           <LocaleSwitcher />
+          
+          <ThemeToggle />
+
           <Link
             href="/login"
             className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-6 py-2.5 text-xs font-mono tracking-widest font-bold uppercase transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"

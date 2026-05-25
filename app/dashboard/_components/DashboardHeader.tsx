@@ -5,6 +5,7 @@ import { LogOut, Home, Briefcase, TrendingUp, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { LocaleSwitcher } from "@/components/locale-switcher"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { useTranslations } from "@/lib/i18n"
 
 export function DashboardHeader() {
@@ -45,6 +46,7 @@ export function DashboardHeader() {
 
         <div className="flex items-center gap-4">
           <LocaleSwitcher />
+          <ThemeToggle />
 
           <div className="hidden md:flex items-center gap-4 mr-4 text-sm font-medium">
             <span className="text-muted-foreground">

@@ -5,6 +5,7 @@ import { motion } from "framer-motion"
 import { Shield, Zap, Users, TrendingUp } from "lucide-react"
 import type { ReactNode } from "react"
 import { LocaleSwitcher } from "@/components/locale-switcher"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { useTranslations } from "@/lib/i18n"
 
 interface AuthLayoutProps {
@@ -72,7 +73,10 @@ export function AuthLayout({ children }: AuthLayoutProps) {
 
           <div className="flex items-center justify-between gap-4 text-sm text-slate-500">
             <span>{t("auth.footer.copyright")}</span>
-            <LocaleSwitcher />
+            <div className="flex items-center gap-3">
+              <LocaleSwitcher />
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </div>
@@ -80,11 +84,15 @@ export function AuthLayout({ children }: AuthLayoutProps) {
       {/* Right Panel - Form */}
       <div className="flex-1 flex flex-col">
         {/* Mobile Header */}
-        <header className="lg:hidden flex items-center justify-between p-6 border-b border-border">
+        <header className="lg:hidden flex items-center justify-between p-6 border-b border-border bg-background/50 backdrop-blur-md">
           <Link href="/" className="flex items-center gap-2">
             <TrendingUp className="h-6 w-6 text-emerald-500" />
             <span className="text-xl font-bold tracking-tight text-foreground">FundLok</span>
           </Link>
+          <div className="flex items-center gap-3">
+            <LocaleSwitcher />
+            <ThemeToggle />
+          </div>
         </header>
 
         {/* Form slot */}
