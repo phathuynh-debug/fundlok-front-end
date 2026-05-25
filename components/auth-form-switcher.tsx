@@ -50,7 +50,7 @@ export function AuthFormSwitcher({ initialMode }: AuthFormSwitcherProps) {
     setMode(next)
     
     // Update URL without triggering full Next.js navigation to prevent double animation
-    window.history.pushState(null, '', next === "login" ? "/login" : "/")
+    window.history.pushState(null, '', next === "login" ? "/login" : "/register")
     
     // Duration matches transition + a little buffer
     window.setTimeout(() => setIsAnimating(false), 300)
