@@ -2,29 +2,31 @@ import type { Metadata } from "next"
 import { LandingPageClient } from "./landing-page-client"
 
 export const metadata: Metadata = {
-  title: "FundLok - Radically Transforming Credit, On-Chain",
-  description: "Building a marketplace of scaled on-chain credit facilities that displace legacy lending infrastructure and loan origination processes at each stage of the loan lifecycle.",
+  title: "FundLok | Flexible Capital Platform for SMEs",
+  description: "FundLok connects investors with SMEs through a technology-led financing platform, using data and AI to support flexible funding aligned with real business needs.",
   keywords: [
     "FundLok",
-    "credit on-chain",
-    "lending marketplace",
     "SME funding",
-    "investor portal",
     "private credit",
+    "flexible capital",
+    "on-chain credit",
+    "investor portal",
+    "flexible funding",
+    "AI credit scoring",
     "Bastion Trading",
     "FalconX",
     "Fasanara Digital"
   ],
   openGraph: {
-    title: "FundLok - Radically Transforming Credit, On-Chain",
-    description: "Building a marketplace of scaled on-chain credit facilities that displace legacy lending infrastructure and loan origination processes.",
+    title: "FundLok | Flexible Capital Platform for SMEs",
+    description: "FundLok connects investors with SMEs through a technology-led financing platform, using data and AI to support flexible funding aligned with real business needs.",
     type: "website",
     siteName: "FundLok",
   },
   twitter: {
     card: "summary_large_image",
-    title: "FundLok - Radically Transforming Credit, On-Chain",
-    description: "Building a marketplace of scaled on-chain credit facilities that displace legacy lending infrastructure and loan origination processes.",
+    title: "FundLok | Flexible Capital Platform for SMEs",
+    description: "FundLok connects investors with SMEs through a technology-led financing platform, using data and AI to support flexible funding aligned with real business needs.",
   }
 }
 

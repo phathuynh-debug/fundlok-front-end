@@ -18,8 +18,33 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'FundLok - Dashboard',
-  description: 'Connecting SMEs with Investors for smarter funding solutions',
+  title: {
+    default: "FundLok | Flexible Capital Platform for SMEs",
+    template: "%s | FundLok",
+  },
+  description: "FundLok connects investors with SMEs through a technology-led financing platform, using data and AI to support flexible funding aligned with real business needs.",
+  keywords: [
+    "FundLok",
+    "SME funding",
+    "private credit",
+    "flexible capital",
+    "on-chain credit",
+    "investor portal",
+    "flexible funding",
+    "AI credit scoring",
+    "DeFi lending"
+  ],
+  openGraph: {
+    title: "FundLok | Flexible Capital Platform for SMEs",
+    description: "FundLok connects investors with SMEs through a technology-led financing platform, using data and AI to support flexible funding aligned with real business needs.",
+    type: "website",
+    siteName: "FundLok",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "FundLok | Flexible Capital Platform for SMEs",
+    description: "FundLok connects investors with SMEs through a technology-led financing platform, using data and AI to support flexible funding aligned with real business needs.",
+  }
 }
 
 function getLocaleFromCookie(cookieValue?: string | null) {
