@@ -12,6 +12,7 @@ import {
 } from "lucide-react"
 import { useTranslations } from "@/lib/i18n"
 import { GuillocheWaves } from "@/components/guilloche-waves"
+import SiteHeader from "@/components/site-header"
 import { LocaleSwitcher } from "@/components/locale-switcher"
 import { InteractiveFlow } from "@/components/interactive-flow"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -63,6 +64,7 @@ const dict = {
     heroSubtitle: "Building a marketplace of scaled on-chain credit facilities that displace legacy lending infrastructure and loan origination processes.",
     navProduct: "PRODUCT",
     navProcess: "HOW IT WORKS",
+    navContact: "CONTACT",
     navPartners: "PARTNERS",
     navAchievements: "ACHIEVEMENTS",
     navTeam: "TEAM",
@@ -92,7 +94,7 @@ const dict = {
     heroSubtitle: "Kiến tạo thị trường cho các cơ sở tín dụng on-chain quy mô lớn, thay thế cơ sở hạ tầng tài chính truyền thống và quy trình khởi tạo khoản vay ở từng giai đoạn.",
     navProduct: "SẢN PHẨM",
     navProcess: "QUY TRÌNH",
-    navPartners: "ĐỐI TÁC",
+    navContact: "LIÊN HỆ",
     navAchievements: "THÀNH TỰU",
     navTeam: "ĐỘI NGŨ",
     enterApp: "VÀO ỨNG DỤNG",
@@ -127,6 +129,7 @@ export function LandingPageClient() {
   const processRef = useRef<HTMLDivElement>(null)
   const achievementsRef = useRef<HTMLDivElement>(null)
   const teamRef = useRef<HTMLDivElement>(null)
+  const footerRef = useRef<HTMLDivElement>(null)
 
   const [activeAchievement, setActiveAchievement] = useState(0)
   const [direction, setDirection] = useState<"left" | "right">("right")
@@ -217,6 +220,30 @@ export function LandingPageClient() {
     teamRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
   }
 
+  const scrollToFooter = (e?: React.MouseEvent) => {
+    e?.preventDefault()
+    footerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+  }
+
+  // Contact dropdown control (hover + focus friendly)
+  
+
+  // Footer contact form state
+  const [contactName, setContactName] = useState("")
+  const [contactEmail, setContactEmail] = useState("")
+  const [contactMessage, setContactMessage] = useState("")
+  const [contactSubmitted, setContactSubmitted] = useState(false)
+
+  const handleContactSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    // TODO: integrate real API endpoint
+    setContactSubmitted(true)
+    setContactName("")
+    setContactEmail("")
+    setContactMessage("")
+    setTimeout(() => setContactSubmitted(false), 6000)
+  }
+
   const partners = [
     {
       id: "fasanara",
@@ -264,67 +291,7 @@ export function LandingPageClient() {
   return (
     <div className="relative min-h-screen w-full bg-background text-foreground overflow-x-hidden flex flex-col justify-between selection:bg-accent/20">
       
-      {/* Global Header Navigation (Sticky Glassmorphic Header) */}
-      <header className="sticky top-0 z-30 w-full bg-background/45 backdrop-blur-md border-b border-border/10 flex items-center justify-between px-6 py-4 md:px-12">
-        {/* <Link href="/" className="flex items-center gap-2 group relative z-40">
-          <TrendingUp className="h-7 w-7 text-emerald-500 dark:text-emerald-400 transition-transform duration-300 group-hover:scale-110" />
-          <span className="text-xl font-bold tracking-tight text-foreground font-sans">
-            {t("common.brandName")}
-          </span>
-        </Link> */}
-        <Link href="/" className="flex items-center gap-2 group relative z-40">
-          <Image
-            src="/logo/image copy.png"
-            alt={t("common.brandName")}
-            width={120}
-            height={20}
-            className="object-contain"
-            priority
-          />
-        </Link>
-
-        {/* Central Links with Smooth Scroll */}
-        <nav className="hidden lg:flex items-center gap-6 xl:gap-8 text-[11px] font-mono tracking-widest font-semibold">
-          <Link href="#" className="transition-colors duration-200 text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white">
-            {strings.navProduct}
-          </Link>
-          <button 
-            onClick={scrollToProcess}
-            className="transition-colors duration-200 text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white cursor-pointer font-mono tracking-widest text-[11px] font-semibold bg-transparent border-none p-0 outline-none"
-          >
-            {strings.navProcess}
-          </button>
-          <Link href="#" className="transition-colors duration-200 text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white">
-            {strings.navPartners}
-          </Link>
-          <button 
-            onClick={scrollToAchievements}
-            className="transition-colors duration-200 text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white cursor-pointer font-mono tracking-widest text-[11px] font-semibold bg-transparent border-none p-0 outline-none"
-          >
-            {strings.navAchievements}
-          </button>
-          <button 
-            onClick={scrollToTeam}
-            className="transition-colors duration-200 text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white cursor-pointer font-mono tracking-widest text-[11px] font-semibold bg-transparent border-none p-0 outline-none"
-          >
-            {strings.navTeam}
-          </button>
-        </nav>
-
-        {/* Action Button & Language Switcher & Theme Toggle */}
-        <div className="flex items-center gap-4 relative z-30">
-          <LocaleSwitcher />
-          
-          <ThemeToggle />
-
-          <Link
-            href="/login"
-            className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-6 py-2.5 text-xs font-mono tracking-widest font-bold uppercase transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"
-          >
-            {strings.enterApp}
-          </Link>
-        </div>
-      </header>
+      <SiteHeader onProcess={scrollToProcess} onAchievements={scrollToAchievements} onTeam={scrollToTeam} onContact={scrollToFooter} />
 
       {/* Main Container */}
       <div className="w-full flex-1 flex flex-col">
@@ -886,10 +853,78 @@ export function LandingPageClient() {
         </section>
       </div>
 
-      {/* Footer copyright */}
-      <div className="py-4 text-center text-[10px] text-muted-foreground/50 font-sans relative z-20">
-        {t("common.copyright")}
-      </div>
+      {/* Footer */}
+      <footer ref={footerRef} className="w-full bg-background/30 border-t border-border/10 py-12 relative z-20">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <h4 className="font-bold mb-2">Contact Us</h4>
+              <form onSubmit={handleContactSubmit} className="space-y-2">
+                <input
+                  type="text"
+                  placeholder="Name"
+                  value={contactName}
+                  onChange={(e) => setContactName(e.target.value)}
+                  className="w-full rounded-md border border-border/40 px-3 py-2 text-sm bg-transparent"
+                  required
+                />
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={contactEmail}
+                  onChange={(e) => setContactEmail(e.target.value)}
+                  className="w-full rounded-md border border-border/40 px-3 py-2 text-sm bg-transparent"
+                  required
+                />
+                <textarea
+                  placeholder="Message"
+                  value={contactMessage}
+                  onChange={(e) => setContactMessage(e.target.value)}
+                  className="w-full rounded-md border border-border/40 px-3 py-2 text-sm bg-transparent resize-none h-24"
+                  required
+                />
+                <div className="flex items-center gap-3">
+                  <button
+                    type="submit"
+                    className="rounded-md bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 text-sm font-semibold"
+                  >
+                    Send
+                  </button>
+                  {contactSubmitted && (
+                    <span className="text-sm text-emerald-500">Thanks — we'll get back to you soon.</span>
+                  )}
+                </div>
+              </form>
+            </div>
+
+            <div>
+              <h4 className="font-bold mb-2">FAQ</h4>
+              <p className="text-sm text-muted-foreground">Visit our FAQ page for common questions.</p>
+              <Link href="/faq" className="text-sm text-emerald-600 hover:underline mt-2 inline-block">Open FAQ</Link>
+            </div>
+
+            <div>
+              <h4 className="font-bold mb-2">Address</h4>
+              <p className="text-sm text-muted-foreground">Trương Định / 123 Võ Thị Sáu, Xuân Hòa, Hồ Chí Minh</p>
+              <div className="mt-3 w-full h-48 rounded-md overflow-hidden border border-border/40">
+                <iframe
+                  title="FundLok Location"
+                  src={`https://www.google.com/maps?q=${encodeURIComponent("Trương Định/123 Võ Thị Sáu, Xuân Hòa, Hồ Chí Minh")}&output=embed`}
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="py-6 text-center text-[10px] text-muted-foreground/50 font-sans">
+            {t("common.copyright")}
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
