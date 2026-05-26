@@ -45,6 +45,12 @@ export const metadata: Metadata = {
     title: "FundLok | Flexible Capital Platform for SMEs",
     description: "FundLok connects investors with SMEs through a technology-led financing platform, using data and AI to support flexible funding aligned with real business needs.",
   }
+  ,
+  icons: {
+    icon: "/logo/image.png",
+    shortcut: "/logo/image.png",
+    apple: "/logo/image.png",
+  }
 }
 
 function getLocaleFromCookie(cookieValue?: string | null) {
