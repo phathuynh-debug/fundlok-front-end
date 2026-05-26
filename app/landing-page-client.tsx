@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { 
@@ -265,11 +266,21 @@ export function LandingPageClient() {
       
       {/* Global Header Navigation (Sticky Glassmorphic Header) */}
       <header className="sticky top-0 z-30 w-full bg-background/45 backdrop-blur-md border-b border-border/10 flex items-center justify-between px-6 py-4 md:px-12">
-        <Link href="/" className="flex items-center gap-2 group relative z-40">
+        {/* <Link href="/" className="flex items-center gap-2 group relative z-40">
           <TrendingUp className="h-7 w-7 text-emerald-500 dark:text-emerald-400 transition-transform duration-300 group-hover:scale-110" />
           <span className="text-xl font-bold tracking-tight text-foreground font-sans">
             {t("common.brandName")}
           </span>
+        </Link> */}
+        <Link href="/" className="flex items-center gap-2 group relative z-40">
+          <Image
+            src="/logo/image copy.png"
+            alt={t("common.brandName")}
+            width={120}
+            height={20}
+            className="object-contain"
+            priority
+          />
         </Link>
 
         {/* Central Links with Smooth Scroll */}

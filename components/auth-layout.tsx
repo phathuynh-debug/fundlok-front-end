@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { motion } from "framer-motion"
 import { Shield, Zap, Users, TrendingUp } from "lucide-react"
 import type { ReactNode } from "react"
@@ -39,8 +40,14 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           <div>
             <Link href="/" className="flex items-center gap-2">
-              <TrendingUp className="h-8 w-8 text-emerald-400" />
-              <span className="text-2xl font-bold text-white tracking-tight">{t("common.brandName")}</span>
+              <Image
+                src="/logo/image.png"
+                alt={t("common.brandName")}
+                width={120}
+                height={30}
+                className="object-contain"
+                priority
+              />
             </Link>
           </div>
 
@@ -85,10 +92,16 @@ export function AuthLayout({ children }: AuthLayoutProps) {
       <div className="flex-1 flex flex-col">
         {/* Mobile Header */}
         <header className="lg:hidden flex items-center justify-between p-6 border-b border-border bg-background/50 backdrop-blur-md">
-          <Link href="/" className="flex items-center gap-2">
-            <TrendingUp className="h-6 w-6 text-emerald-500" />
-            <span className="text-xl font-bold tracking-tight text-foreground">FundLok</span>
-          </Link>
+          <Link href="/" className="flex items-center gap-2 group relative z-40">
+          <Image
+            src="/logo/image copy.png"
+            alt={t("common.brandName")}
+            width={120}
+            height={20}
+            className="object-contain"
+            priority
+          />
+        </Link>
           <div className="flex items-center gap-3">
             <LocaleSwitcher />
             <ThemeToggle />

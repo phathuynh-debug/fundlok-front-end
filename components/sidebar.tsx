@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import {
   LayoutDashboard,
@@ -44,10 +45,7 @@ export function Sidebar() {
         {/* Brand Logo */}
         <div className="flex h-16 shrink-0 items-center px-6 border-b">
           <Link href="/dashboard" className="flex items-center gap-2 font-bold text-2xl tracking-tight text-primary">
-            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground text-sm font-black">FL</span>
-            </div>
-            {t("common.brandName")}
+            <Image src="/logo/image.png" alt={t("common.brandName")} width={140} height={36} className="object-contain" priority />
           </Link>
         </div>
 

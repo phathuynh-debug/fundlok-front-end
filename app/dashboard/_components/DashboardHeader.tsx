@@ -1,7 +1,8 @@
 "use client"
 
 import { useLogout, useRequireAuth } from "@/hooks/use-authentication"
-import { LogOut, Home, Briefcase, TrendingUp, Loader2 } from "lucide-react"
+import { LogOut, Home, Briefcase, Loader2 } from "lucide-react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { LocaleSwitcher } from "@/components/locale-switcher"
@@ -32,12 +33,7 @@ export function DashboardHeader() {
       <div className="flex h-16 items-center justify-between px-4 md:px-8">
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 font-bold text-lg md:text-xl tracking-tight">
-            {user?.role === "INVESTOR" ? (
-              <TrendingUp className="h-6 w-6 text-emerald-500" />
-            ) : (
-              <Briefcase className="h-6 w-6 text-blue-500" />
-            )}
-            <span>{t("common.brandName")}</span>
+            <Image src="/logo/image.png" alt={t("common.brandName")} width={140} height={36} className="object-contain" priority />
           </div>
           <span className="text-sm font-medium text-muted-foreground ml-2">
             ({user?.role === "SME" ? t("dashboard.header.portal.sme") : t("dashboard.header.portal.investor")})
