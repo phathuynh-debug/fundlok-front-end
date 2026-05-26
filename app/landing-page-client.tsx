@@ -334,7 +334,7 @@ export function LandingPageClient() {
             />
 
             {/* Tab Controls (Below the card) */}
-            <div className="flex flex-wrap justify-center gap-2 mb-4 relative z-20">
+            {/* <div className="flex flex-wrap justify-center gap-2 mb-4 relative z-20">
               {partners.map((partner, index) => {
                 const isActive = index === activeIndex
                 return (
@@ -351,7 +351,7 @@ export function LandingPageClient() {
                   </button>
                 )
               })}
-            </div>
+            </div> */}
 
             {/* Bouncing Scroll Indicator Arrow (To see our solution) */}
             <motion.button
