@@ -105,10 +105,6 @@ export default function Mockup(props: MockupProps) {
           <td className="py-2 text-right font-mono font-bold text-zinc-300">{smeDuration} Months</td>
         </tr>
         <tr className="border-b border-zinc-900/40">
-          <td className="py-2 font-semibold text-zinc-400">Indicative Grade</td>
-          <td className={`py-2 text-right font-mono font-bold ${isSmeRejected ? "text-red-400" : "text-zinc-300"}`}>{gradeText}</td>
-        </tr>
-        <tr className="border-b border-zinc-900/40">
           <td className="py-2 font-semibold text-zinc-400">Sigmoid Int. Rate</td>
           <td className="py-2 text-right font-mono font-bold text-emerald-400">{interestRateText}</td>
         </tr>
@@ -262,33 +258,7 @@ export default function Mockup(props: MockupProps) {
                   {view === 'sme' ? (
                     <>
                       {/* SME Capacity Gauge */}
-                      <div className="flex items-center gap-4 bg-zinc-950/45 border border-zinc-900/60 rounded-xl p-2 shrink-0 shadow-lg backdrop-blur-sm">
-                        <div className="relative w-12 h-12 flex items-center justify-center shrink-0">
-                          <svg className="absolute w-full h-full transform -rotate-90">
-                            <circle cx="24" cy="24" r="18" stroke="rgba(39, 39, 42, 0.4)" strokeWidth="3" fill="transparent" />
-                            <circle 
-                              cx="24" 
-                              cy="24" 
-                              r="18" 
-                              stroke={isSmeRejected ? "#f43f5e" : "#10b981"} 
-                              strokeWidth="3" 
-                              fill="transparent"
-                              strokeDasharray={2 * Math.PI * 18} 
-                              strokeDashoffset={2 * Math.PI * 18 - (2 * Math.PI * 18 * Math.min(1.0, grade))} 
-                              strokeLinecap="round" 
-                              className="transition-all duration-300"
-                            />
-                          </svg>
-                          <span className="text-[9px] font-mono font-bold text-zinc-100">{grade.toFixed(2)}</span>
-                        </div>
-                        <div className="flex-1 font-mono leading-tight text-[9px]">
-                          <span className="block text-[7px] text-zinc-550 uppercase font-bold tracking-wider mb-0.5">Indicative Grade</span>
-                          <span className={`text-xs font-bold ${isSmeRejected ? "text-red-400" : "text-white"}`}>{gradeText}</span>
-                          <span className="block text-[6.5px] text-zinc-500 mt-0.5">
-                            Limit: 0.50 (Max Risk)
-                          </span>
-                        </div>
-                      </div>
+      
 
                       {/* SME Sliders controls */}
                       <div className="bg-zinc-950/45 border border-zinc-900/50 rounded-xl p-2.5 flex flex-col gap-2.5 shadow-lg backdrop-blur-sm flex-1 justify-center">
