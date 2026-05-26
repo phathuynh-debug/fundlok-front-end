@@ -13,6 +13,7 @@ import {
 import { useTranslations } from "@/lib/i18n"
 import { GuillocheWaves } from "@/components/guilloche-waves"
 import SiteHeader from "@/components/site-header"
+import Mockup from "@/components/mockup"
 import { LocaleSwitcher } from "@/components/locale-switcher"
 import { InteractiveFlow } from "@/components/interactive-flow"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -314,272 +315,23 @@ export function LandingPageClient() {
               </p>
             </div>
 
-            {/* Interactive Phone Mockup Container */}
-            <div 
+            {/* Interactive Mockup: phone on small screens, laptop on large screens */}
+            <Mockup
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
-              style={{ perspective: 1000 }}
-              className="w-[300px] h-[550px] relative mb-6 shrink-0 z-20 cursor-grab active:cursor-grabbing select-none"
-            >
-              {/* Glow Behind Phone */}
-              <div className="absolute inset-0 bg-emerald-500/15 rounded-[3rem] blur-3xl pointer-events-none animate-pulse" />
-
-              {/* Phone Chassis */}
-              <motion.div 
-                style={{
-                  rotateX: rotateX,
-                  rotateY: rotateY,
-                  transformStyle: "preserve-3d"
-                }}
-                className="w-full h-full rounded-[2.8rem] border-8 border-zinc-800 dark:border-zinc-800 bg-zinc-950 p-2 relative flex flex-col justify-between overflow-hidden shadow-2xl ring-1 ring-zinc-700/50"
-              >
-                
-                {/* Dynamic Island / Notch */}
-                <div className="absolute top-3.5 left-1/2 -translate-x-1/2 w-24 h-5.5 bg-black rounded-full z-30 flex items-center justify-between px-3">
-                  <div className="w-1.5 h-1.5 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center">
-                    <span className="w-0.5 h-0.5 rounded-full bg-blue-500" />
-                  </div>
-                  <div className="w-1 h-1 rounded-full bg-zinc-900" />
-                </div>
-
-                {/* Inner Screen */}
-                <div className="w-full h-full rounded-[2.2rem] bg-zinc-950 overflow-hidden relative flex flex-col justify-between p-3.5 pt-8.5 border border-zinc-900">
-                  
-                  {/* Glass Specular Reflection Highlight */}
-                  <div 
-                    className="absolute inset-0 pointer-events-none z-20 opacity-40 mix-blend-overlay transition-opacity duration-300"
-                    style={{
-                      background: `radial-gradient(circle 140px at ${shineX}% ${shineY}%, rgba(255,255,255,0.45), transparent)`
-                    }}
-                  />
-
-                  {/* Status Bar */}
-                  <div className="flex justify-between items-center text-[8px] font-mono text-zinc-500 px-2 py-0.5">
-                    <span>9:41</span>
-                    <div className="flex items-center gap-1">
-                      <span>LTE</span>
-                      <div className="w-3.5 h-2 border border-zinc-500 rounded-2xs p-0.5 flex items-center">
-                        <div className="w-full h-full bg-zinc-500 rounded-[1px]" />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* App Screen Container */}
-                  <motion.div
-                    key={activePartner.id}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.3 }}
-                    className="flex-1 flex flex-col justify-between mt-1.5 overflow-hidden"
-                  >
-                    {/* App Header */}
-                    <div className="flex justify-between items-center px-1 mb-1.5">
-                      <div className="flex items-center gap-1">
-                        <div className="w-4 h-4 rounded-md bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
-                          <TrendingUp className="h-2.5 w-2.5 text-emerald-400" />
-                        </div>
-                        <span className="text-[8px] font-sans font-bold text-zinc-300 tracking-tight">FundLok Credit</span>
-                      </div>
-                      <div className="flex items-center gap-1 bg-emerald-950/80 border border-emerald-900/50 px-1.5 py-0.5 rounded-full scale-90">
-                        <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
-                        <span className="text-[6px] font-mono text-emerald-400 font-bold uppercase tracking-widest">
-                          Active
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Facility Asset Overview Card */}
-                    <div className="bg-zinc-900/40 border border-zinc-900 rounded-xl p-2.5 mb-1.5 flex flex-col">
-                      <div className="flex justify-between items-start mb-0.5">
-                        <span className="text-[7px] font-mono tracking-widest text-zinc-500 uppercase">
-                          {activePartner.name}
-                        </span>
-                        <span className="text-[7px] font-mono text-emerald-400 font-semibold px-1 py-0.5 rounded bg-emerald-500/10">
-                          {activePartner.category}
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-baseline gap-1 my-0.5">
-                        <span className="text-lg font-sans font-bold text-white tracking-tight">
-                          {activeIndex === 0 ? `$${tvlValue}.0M` : activeIndex === 1 ? `$60.0M` : `$${allocationValue}.0M`}
-                        </span>
-                        <span className="text-[8px] text-zinc-500 font-mono">USDC</span>
-                      </div>
-                      <span className="text-[7px] text-zinc-500 font-mono">
-                        {activeIndex === 1 ? "Total Facility Limit" : "Committed Capital TVL"}
-                      </span>
-                    </div>
-
-                    {/* Dynamic Graphics Section based on Active Tab */}
-                    {activeIndex === 0 && (
-                      <div className="flex-1 flex flex-col justify-between my-0.5">
-                        {/* Wavy Chart */}
-                        <div className="bg-zinc-900/20 border border-zinc-900/60 rounded-xl p-2 flex-1 flex flex-col justify-between mb-1.5">
-                          <div className="flex justify-between items-center text-[7px] text-zinc-505">
-                            <span>APY Performance (1d)</span>
-                            <span className="text-emerald-400 font-bold font-mono">11.2% APY</span>
-                          </div>
-                          
-                          {/* SVG Wave */}
-                          <div className="h-14 w-full mt-1.5 relative">
-                            <svg className="w-full h-full stroke-emerald-500 fill-none" viewBox="0 0 100 40" preserveAspectRatio="none">
-                              <defs>
-                                <linearGradient id="grad-fasanara" x1="0" y1="0" x2="0" y2="1">
-                                  <stop offset="0%" stopColor="rgba(16, 185, 129, 0.2)" />
-                                  <stop offset="100%" stopColor="rgba(16, 185, 129, 0)" />
-                                </linearGradient>
-                              </defs>
-                              <path d={`M 0 35 Q 15 ${35 - (15 * tvlValue / 45)} 30 ${35 - (10 * tvlValue / 45)} T 60 ${35 - (25 * tvlValue / 45)} T 90 ${35 - (35 * tvlValue / 45)} L 100 ${35 - (37 * tvlValue / 45)}`} strokeWidth="2.5" strokeLinecap="round" />
-                              <path d={`M 0 35 Q 15 ${35 - (15 * tvlValue / 45)} 30 ${35 - (10 * tvlValue / 45)} T 60 ${35 - (25 * tvlValue / 45)} T 90 ${35 - (35 * tvlValue / 45)} L 100 ${35 - (37 * tvlValue / 45)} L 100 40 L 0 40 Z`} fill="url(#grad-fasanara)" strokeWidth="0" />
-                              <circle cx="100" cy={35 - (37 * tvlValue / 45)} r="2" className="fill-emerald-400 animate-ping" />
-                              <circle cx="100" cy={35 - (37 * tvlValue / 45)} r="1.2" className="fill-emerald-400" />
-                            </svg>
-                          </div>
-                        </div>
-
-                        {/* Interactive Slider Input Box */}
-                        <div className="bg-zinc-900/30 border border-zinc-900/50 rounded-lg p-2 flex flex-col gap-1">
-                          <div className="flex justify-between items-center text-[7px] text-zinc-505 font-bold uppercase tracking-wider">
-                            <span>Adjust Allocation</span>
-                            <span className="text-white font-mono font-semibold">${tvlValue}M</span>
-                          </div>
-                          <input 
-                            type="range" 
-                            min="10" 
-                            max="100" 
-                            value={tvlValue} 
-                            onChange={(e) => setTvlValue(Number(e.target.value))}
-                            className="w-full h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500 animate-pulse"
-                          />
-                          <div className="flex justify-between items-center text-[7px] text-zinc-400 font-mono scale-95 origin-left">
-                            <span>Est. Monthly Yield:</span>
-                            <span className="text-emerald-400 font-bold">+{(tvlValue * 11.2 / 12).toFixed(1)}k USDC</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {activeIndex === 1 && (
-                      <div className="flex-1 flex flex-col justify-between my-0.5">
-                        {/* Circular Progress Gauge */}
-                        <div className="bg-zinc-900/20 border border-zinc-900/60 rounded-xl p-2 flex-1 flex flex-col justify-between mb-1.5">
-                          <div className="flex justify-between items-center text-[7px] text-zinc-550 mb-0.5">
-                            <span>Drawdown Capacity</span>
-                            <span className="text-emerald-400 font-bold font-mono">{drawdownPercent}% Utilized</span>
-                          </div>
-
-                          <div className="flex-1 flex items-center justify-between py-1">
-                            <div className="relative w-12 h-12 flex items-center justify-center shrink-0">
-                              <svg className="absolute w-full h-full transform -rotate-90">
-                                <circle cx="24" cy="24" r="20" stroke="rgba(39, 39, 42, 0.4)" strokeWidth="3" fill="transparent" />
-                                <circle cx="24" cy="24" r="20" stroke="#10b981" strokeWidth="3" fill="transparent"
-                                        strokeDasharray="125.6" strokeDashoffset={125.6 - (125.6 * drawdownPercent) / 100} strokeLinecap="round" />
-                              </svg>
-                              <span className="text-[8px] font-mono font-bold text-zinc-300">{drawdownPercent}%</span>
-                            </div>
-                            <div className="text-right flex-1 pl-3 font-mono">
-                              <span className="text-xs font-bold text-zinc-100">${((drawdownPercent * 60) / 100).toFixed(1)}M</span>
-                              <span className="block text-[7px] text-zinc-505">active drawdown</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Interactive Slider Input Box */}
-                        <div className="bg-zinc-900/30 border border-zinc-900/50 rounded-lg p-2 flex flex-col gap-1">
-                          <div className="flex justify-between items-center text-[7px] text-zinc-505 font-bold uppercase tracking-wider">
-                            <span>Utilization level</span>
-                            <span className="text-white font-mono font-semibold">{drawdownPercent}%</span>
-                          </div>
-                          <input 
-                            type="range" 
-                            min="10" 
-                            max="100" 
-                            value={drawdownPercent} 
-                            onChange={(e) => setDrawdownPercent(Number(e.target.value))}
-                            className="w-full h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500 animate-pulse"
-                          />
-                          <div className="flex justify-between items-center text-[7px] text-zinc-400 font-mono scale-95 origin-left">
-                            <span>Remaining Capacity:</span>
-                            <span className="text-emerald-400 font-bold">${(60 - (drawdownPercent * 60) / 100).toFixed(1)}M USDC</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {activeIndex === 2 && (
-                      <div className="flex-1 flex flex-col justify-between my-0.5">
-                        {/* Arbitrage Bar Chart */}
-                        <div className="bg-zinc-900/20 border border-zinc-900/60 rounded-xl p-2 flex-1 flex flex-col justify-between mb-1.5">
-                          <div className="flex justify-between items-center text-[7px] text-zinc-550 mb-1.5">
-                            <span>Market Making Activity</span>
-                            <span className="text-emerald-400 font-bold font-mono">Arb Target Met</span>
-                          </div>
-
-                          {/* Bars */}
-                          <div className="h-12 flex items-end justify-between gap-1 px-1">
-                            {[35, 55, 45, 65, 80, 50, 75, 90, 60, 85, 95, 70].map((val, idx) => {
-                              const scaledVal = Math.min(100, Math.max(10, val * (allocationValue / 30)))
-                              return (
-                                <div key={idx} className="flex-1 h-full flex items-end">
-                                  <div 
-                                    className={`w-full rounded-t-sm transition-all duration-150 ${idx === 10 ? 'bg-emerald-400 shadow-[0_0_8px_#10b981]' : 'bg-emerald-505/60'}`} 
-                                    style={{ height: `${scaledVal}%` }}
-                                  />
-                                </div>
-                              )
-                            })}
-                          </div>
-                        </div>
-
-                        {/* Interactive Slider Input Box */}
-                        <div className="bg-zinc-900/30 border border-zinc-900/50 rounded-lg p-2 flex flex-col gap-1">
-                          <div className="flex justify-between items-center text-[7px] text-zinc-505 font-bold uppercase tracking-wider">
-                            <span>Arbitrage Allocation</span>
-                            <span className="text-white font-mono font-semibold">${allocationValue}M</span>
-                          </div>
-                          <input 
-                            type="range" 
-                            min="5" 
-                            max="50" 
-                            value={allocationValue} 
-                            onChange={(e) => setAllocationValue(Number(e.target.value))}
-                            className="w-full h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500 animate-pulse"
-                          />
-                          <div className="flex justify-between items-center text-[7px] text-zinc-400 font-mono scale-95 origin-left">
-                            <span>Est. Yield Rate:</span>
-                            <span className="text-emerald-400 font-bold">+{(allocationValue * 0.024 * 30).toFixed(1)}k USDT/mo</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* App Bottom Stats */}
-                    <div className="border-t border-zinc-900 pt-2 mt-1.5 grid grid-cols-2 gap-2 text-center font-mono">
-                      <div className="bg-zinc-900/20 rounded-lg p-1">
-                        <span className="block text-[5px] tracking-wider text-zinc-550 uppercase mb-0.5">
-                          APY
-                        </span>
-                        <span className="text-[9px] font-bold text-white">
-                          {activePartner.stats.apy === strings.hidden ? '10.5%' : activePartner.stats.apy}
-                        </span>
-                      </div>
-                      <div className="bg-zinc-900/20 rounded-lg p-1">
-                        <span className="block text-[5px] tracking-wider text-zinc-550 uppercase mb-0.5">
-                          Redemption
-                        </span>
-                        <span className="text-[9px] font-bold text-white">
-                          {activePartner.stats.redemptions}
-                        </span>
-                      </div>
-                    </div>
-                  </motion.div>
-
-                  {/* Swipe Home Indicator (Notch Bar) */}
-                  <div className="w-16 h-1 bg-zinc-800 rounded-full mx-auto mt-2.5 shrink-0" />
-                </div>
-              </motion.div>
-            </div>
+              rotateX={rotateX}
+              rotateY={rotateY}
+              shineX={shineX}
+              shineY={shineY}
+              tvlValue={tvlValue}
+              drawdownPercent={drawdownPercent}
+              allocationValue={allocationValue}
+              activePartner={activePartner}
+              activeIndex={activeIndex}
+              setTvlValue={setTvlValue}
+              setDrawdownPercent={setDrawdownPercent}
+              setAllocationValue={setAllocationValue}
+            />
 
             {/* Tab Controls (Below the card) */}
             <div className="flex flex-wrap justify-center gap-2 mb-4 relative z-20">
