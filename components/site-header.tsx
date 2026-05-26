@@ -1,11 +1,11 @@
 "use client"
 
 import Link from "next/link"
-import Image from "next/image"
 import { useState } from "react"
+import Logo from "@/components/logo"
 import { LocaleSwitcher } from "@/components/locale-switcher"
 import { ThemeToggle } from "@/components/theme-toggle"
-
+import { useTheme } from "next-themes"
 type SiteHeaderProps = {
   onProcess?: (e: React.MouseEvent) => void
   onAchievements?: (e: React.MouseEvent) => void
@@ -16,10 +16,12 @@ type SiteHeaderProps = {
 export default function SiteHeader({ onProcess, onAchievements, onTeam, onContact }: SiteHeaderProps) {
   const [contactOpen, setContactOpen] = useState(false)
 
+  
+
   return (
     <header className="sticky top-0 z-30 w-full bg-background/45 backdrop-blur-md border-b border-border/10 flex items-center justify-between px-6 py-4 md:px-12">
       <Link href="/" className="flex items-center gap-2 group relative z-40">
-        <Image src="/logo/image copy.png" alt="FundLok" width={120} height={20} className="object-contain" priority />
+        <Logo />
       </Link>
 
       <nav className="hidden lg:flex items-center gap-6 xl:gap-8 text-[11px] font-mono tracking-widest font-semibold">

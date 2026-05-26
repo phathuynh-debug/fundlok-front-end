@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     "investor portal",
     "flexible funding",
     "AI credit scoring",
-    "Bastion Trading",
+
     "FalconX",
     "Fasanara Digital",
     "Loc Vuong",

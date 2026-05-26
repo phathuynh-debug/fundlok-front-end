@@ -1,13 +1,14 @@
 "use client"
 
 import Link from "next/link"
-import Image from "next/image"
+// Image handled by Logo component
 import { motion } from "framer-motion"
 import { Shield, Zap, Users, TrendingUp } from "lucide-react"
 import type { ReactNode } from "react"
 import { LocaleSwitcher } from "@/components/locale-switcher"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { useTranslations } from "@/lib/i18n"
+import Logo from "@/components/logo"
 
 interface AuthLayoutProps {
   children: ReactNode
@@ -40,14 +41,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           <div>
             <Link href="/" className="flex items-center gap-2">
-              <Image
-                src="/logo/image.png"
-                alt={t("common.brandName")}
-                width={120}
-                height={30}
-                className="object-contain"
-                priority
-              />
+              <Logo alt={t("common.brandName")} containerClassName="relative w-40 h-10" />
             </Link>
           </div>
 
@@ -93,15 +87,8 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         {/* Mobile Header */}
         <header className="lg:hidden flex items-center justify-between p-6 border-b border-border bg-background/50 backdrop-blur-md">
           <Link href="/" className="flex items-center gap-2 group relative z-40">
-          <Image
-            src="/logo/image copy.png"
-            alt={t("common.brandName")}
-            width={120}
-            height={20}
-            className="object-contain"
-            priority
-          />
-        </Link>
+            <Logo alt={t("common.brandName")} />
+          </Link>
           <div className="flex items-center gap-3">
             <LocaleSwitcher />
             <ThemeToggle />

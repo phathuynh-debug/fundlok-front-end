@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import Image from "next/image"
+// Logo component used instead of Image for theme-aware images
 import { usePathname } from "next/navigation"
 import {
   LayoutDashboard,
@@ -15,6 +15,7 @@ import {
 import { cn } from "@/lib/utils"
 import { useCurrentUser } from "@/hooks/use-authentication"
 import { useTranslations } from "@/lib/i18n"
+import Logo from "@/components/logo"
 
 const navItems = [
   { labelKey: "dashboard.sidebar.overview", href: "/dashboard", icon: LayoutDashboard },
@@ -45,7 +46,7 @@ export function Sidebar() {
         {/* Brand Logo */}
         <div className="flex h-16 shrink-0 items-center px-6 border-b">
           <Link href="/dashboard" className="flex items-center gap-2 font-bold text-2xl tracking-tight text-primary">
-            <Image src="/logo/image.png" alt={t("common.brandName")} width={140} height={36} className="object-contain" priority />
+            <Logo alt={t("common.brandName")} />
           </Link>
         </div>
 

@@ -219,7 +219,7 @@ export default function Mockup(props: MockupProps) {
                     </select>
                   ) : (
                     <span className="font-sans font-bold text-[10px] uppercase tracking-widest text-zinc-300">
-                      {partner.name} Terminal
+                      Fundlok Terminal
                     </span>
                   )}
                 </div>

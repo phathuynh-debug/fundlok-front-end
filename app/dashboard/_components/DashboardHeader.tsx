@@ -2,12 +2,12 @@
 
 import { useLogout, useRequireAuth } from "@/hooks/use-authentication"
 import { LogOut, Home, Briefcase, Loader2 } from "lucide-react"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { LocaleSwitcher } from "@/components/locale-switcher"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { useTranslations } from "@/lib/i18n"
+import Logo from "@/components/logo"
 
 export function DashboardHeader() {
   const { user, isLoading } = useRequireAuth()
@@ -33,7 +33,7 @@ export function DashboardHeader() {
       <div className="flex h-16 items-center justify-between px-4 md:px-8">
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 font-bold text-lg md:text-xl tracking-tight">
-            <Image src="/logo/image.png" alt={t("common.brandName")} width={140} height={36} className="object-contain" priority />
+            <Logo alt={t("common.brandName")} />
           </div>
           <span className="text-sm font-medium text-muted-foreground ml-2">
             ({user?.role === "SME" ? t("dashboard.header.portal.sme") : t("dashboard.header.portal.investor")})
