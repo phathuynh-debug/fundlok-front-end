@@ -47,6 +47,16 @@ export default function Mockup(props: MockupProps) {
   const [invRisk, setInvRisk] = useState<number>(5.0);
   const [invDuration, setInvDuration] = useState<number>(6);
 
+  // Show results calculation states
+  const [smeShowResults, setSmeShowResults] = useState(false);
+  const [invShowResults, setInvShowResults] = useState(false);
+
+  // Reset show results when changing partner index
+  useEffect(() => {
+    setSmeShowResults(false);
+    setInvShowResults(false);
+  }, [props.activeIndex]);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const mq = window.matchMedia("(min-width: 1024px)");
@@ -94,7 +104,7 @@ export default function Mockup(props: MockupProps) {
       maximumFractionDigits: 2,
     });
 
-  const matrixSme = (
+  const matrixSme = (showResults: boolean) => (
     <table className="w-full text-left text-[10px] md:text-[11px]">
       <tbody>
         <tr className="border-b border-zinc-900/40">
@@ -121,25 +131,37 @@ export default function Mockup(props: MockupProps) {
           <td className="py-2 font-semibold text-zinc-400">
             Sigmoid Int. Rate
           </td>
-          <td className="py-2 text-right font-mono font-bold text-emerald-400">
-            {interestRateText}
+          <td className="py-2 text-right font-mono font-bold">
+            {showResults ? (
+              <span className="text-emerald-400">{interestRateText}</span>
+            ) : (
+              <span className="text-zinc-650 font-sans text-[8.5px] flex items-center justify-end gap-1">
+                <Lock className="w-2.5 h-2.5 text-zinc-650" /> PENDING...
+              </span>
+            )}
           </td>
         </tr>
         <tr>
           <td className="py-2 font-semibold text-zinc-400">Credit Status</td>
           <td className="py-2 text-right font-sans font-extrabold uppercase tracking-wide">
-            <span
-              className={isSmeRejected ? "text-red-400" : "text-emerald-400"}
-            >
-              {statusText}
-            </span>
+            {showResults ? (
+              <span
+                className={isSmeRejected ? "text-red-400" : "text-emerald-400"}
+              >
+                {statusText}
+              </span>
+            ) : (
+              <span className="text-zinc-650 font-mono text-[8.5px] font-bold">
+                LOCKED
+              </span>
+            )}
           </td>
         </tr>
       </tbody>
     </table>
   );
 
-  const matrixInvestor = (
+  const matrixInvestor = (showResults: boolean) => (
     <table className="w-full text-left text-[10px] md:text-[11px]">
       <tbody>
         <tr className="border-b border-zinc-900/40">
@@ -162,16 +184,28 @@ export default function Mockup(props: MockupProps) {
         </tr>
         <tr className="border-b border-zinc-900/40">
           <td className="py-2 font-semibold text-zinc-400">Yearly ROI Rate</td>
-          <td className="py-2 text-right font-mono font-bold text-emerald-400">
-            {yearlyRoiText}
+          <td className="py-2 text-right font-mono font-bold">
+            {showResults ? (
+              <span className="text-emerald-400">{yearlyRoiText}</span>
+            ) : (
+              <span className="text-zinc-650 font-sans text-[8.5px] flex items-center justify-end gap-1">
+                <Lock className="w-2.5 h-2.5 text-zinc-650" /> PENDING...
+              </span>
+            )}
           </td>
         </tr>
         <tr>
           <td className="py-2 font-semibold text-zinc-400">
             Est. Profit Return
           </td>
-          <td className="py-2 text-right font-mono font-bold text-emerald-400">
-            {roiProfitText}
+          <td className="py-2 text-right font-mono font-bold">
+            {showResults ? (
+              <span className="text-emerald-400">{roiProfitText}</span>
+            ) : (
+              <span className="text-zinc-650 font-mono text-[8.5px] font-bold">
+                LOCKED
+              </span>
+            )}
           </td>
         </tr>
       </tbody>
@@ -281,150 +315,193 @@ export default function Mockup(props: MockupProps) {
                       {partner.category}
                     </span>
                   </div>
-                  {view === "sme" ? matrixSme : matrixInvestor}
+                  {view === "sme"
+                    ? matrixSme(smeShowResults)
+                    : matrixInvestor(invShowResults)}
                 </div>
 
                 {/* Right Column: Visual Charts & Controls */}
                 <div className="col-span-6 flex flex-col justify-between h-full max-h-[235px] gap-3">
                   {view === "sme" ? (
-                    <>
-                      {/* SME Capacity Gauge */}
-
-                      {/* SME Sliders controls */}
-                      <div className="bg-zinc-950/45 border border-zinc-900/50 rounded-xl p-2.5 flex flex-col gap-2.5 shadow-lg backdrop-blur-sm flex-1 justify-center">
-                        {/* Slider 1: Loan Size */}
-                        <div className="flex flex-col gap-1">
-                          <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
-                            <span>Desired Loan Size</span>
-                            <span className="text-emerald-400 font-mono font-semibold text-[9px]">
-                              ${(smeLoanSize / 1000).toFixed(0)}k
-                            </span>
+                    !smeShowResults ? (
+                      <>
+                        {/* SME Sliders controls */}
+                        <div className="bg-zinc-950/45 border border-zinc-900/50 rounded-xl p-2.5 flex flex-col gap-2 shadow-lg backdrop-blur-sm flex-1 justify-center">
+                          {/* Slider 1: Loan Size */}
+                          <div className="flex flex-col gap-1">
+                            <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
+                              <span>Desired Loan Size</span>
+                              <span className="text-emerald-400 font-mono font-semibold text-[9px]">
+                                ${(smeLoanSize / 1000).toFixed(0)}k
+                              </span>
+                            </div>
+                            <input
+                              type="range"
+                              min="10000"
+                              max="500000"
+                              step="5000"
+                              value={smeLoanSize}
+                              onChange={(e) =>
+                                setSmeLoanSize(Number(e.target.value))
+                              }
+                              className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none"
+                            />
                           </div>
-                          <input
-                            type="range"
-                            min="10000"
-                            max="500000"
-                            step="5000"
-                            value={smeLoanSize}
-                            onChange={(e) =>
-                              setSmeLoanSize(Number(e.target.value))
-                            }
-                            className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none"
-                          />
+
+                          {/* Slider 2: Monthly Revenue */}
+                          <div className="flex flex-col gap-1">
+                            <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
+                              <span>Monthly Revenue</span>
+                              <span className="text-emerald-400 font-mono font-semibold text-[9px]">
+                                ${(smeRevenue / 1000).toFixed(0)}k
+                              </span>
+                            </div>
+                            <input
+                              type="range"
+                              min="10000"
+                              max="200000"
+                              step="5000"
+                              value={smeRevenue}
+                              onChange={(e) =>
+                                setSmeRevenue(Number(e.target.value))
+                              }
+                              className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none"
+                            />
+                          </div>
+
+                          {/* Slider 3: Duration */}
+                          <div className="flex flex-col gap-1">
+                            <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
+                              <span>Loan Duration</span>
+                              <span className="text-emerald-400 font-mono font-semibold text-[9px]">
+                                {smeDuration} Months
+                              </span>
+                            </div>
+                            <input
+                              type="range"
+                              min="1"
+                              max="24"
+                              step="1"
+                              value={smeDuration}
+                              onChange={(e) =>
+                                setSmeDuration(Number(e.target.value))
+                              }
+                              className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none"
+                            />
+                          </div>
                         </div>
 
-                        {/* Slider 2: Monthly Revenue */}
-                        <div className="flex flex-col gap-1">
-                          <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
-                            <span>Monthly Revenue</span>
-                            <span className="text-emerald-400 font-mono font-semibold text-[9px]">
-                              ${(smeRevenue / 1000).toFixed(0)}k
-                            </span>
-                          </div>
-                          <input
-                            type="range"
-                            min="10000"
-                            max="200000"
-                            step="5000"
-                            value={smeRevenue}
-                            onChange={(e) =>
-                              setSmeRevenue(Number(e.target.value))
+                        <button
+                          onClick={() => setSmeShowResults(true)}
+                          className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 transition-all text-[8.5px] font-sans font-bold uppercase tracking-widest text-white shadow-lg shadow-emerald-900/20 cursor-pointer flex items-center justify-center gap-1.5"
+                        >
+                          Calculate Interest & APY
+                        </button>
+                      </>
+                    ) : (
+                      <div className="bg-zinc-950/45 border border-zinc-900/50 rounded-xl p-3 flex flex-col justify-between shadow-lg backdrop-blur-sm flex-1 h-full">
+                        <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider border-b border-zinc-900/40 pb-1.5">
+                          <span>Credit Assessment</span>
+                          <span
+                            className={
+                              isSmeRejected
+                                ? "text-red-400"
+                                : "text-emerald-400"
                             }
-                            className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none"
-                          />
-                        </div>
-
-                        {/* Slider 3: Duration */}
-                        <div className="flex flex-col gap-1">
-                          <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
-                            <span>Loan Duration</span>
-                            <span className="text-emerald-400 font-mono font-semibold text-[9px]">
-                              {smeDuration} Months
-                            </span>
-                          </div>
-                          <input
-                            type="range"
-                            min="1"
-                            max="24"
-                            step="1"
-                            value={smeDuration}
-                            onChange={(e) =>
-                              setSmeDuration(Number(e.target.value))
-                            }
-                            className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none"
-                          />
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      {/* Investor MM Activity Chart */}
-                      <div className="bg-zinc-950/45 border border-zinc-900/60 rounded-xl p-2 shrink-0 flex flex-col justify-between shadow-lg backdrop-blur-sm">
-                        <div className="flex justify-between items-center text-[7px] text-zinc-550 font-bold uppercase tracking-wider mb-1">
-                          <span>Yield Return Projection</span>
-                          <span className="text-emerald-400 font-bold font-mono">
-                            APY: {yearlyRoiText}
+                          >
+                            {statusText}
                           </span>
                         </div>
 
-                        {/* Chart bars */}
-                        <div className="h-8 flex items-end justify-between gap-1 px-1">
-                          {[3, 6, 12, 18, 24].map((dur) => {
-                            let rTranslation = 13.5;
-                            if (invRisk < 2) rTranslation = 10.5;
-                            else if (invRisk < 4) rTranslation = 11.5;
-                            else if (invRisk < 6) rTranslation = 13.5;
-                            else if (invRisk < 8) rTranslation = 16.5;
-                            else rTranslation = 17.5;
+                        <div className="flex items-center justify-around flex-1 py-1">
+                          {/* SVG Gauges */}
+                          <div className="relative w-18 h-18">
+                            <svg className="w-full h-full transform -rotate-90">
+                              {/* Track circle */}
+                              <circle
+                                cx="36"
+                                cy="36"
+                                r="30"
+                                className="stroke-zinc-800"
+                                strokeWidth="5"
+                                fill="transparent"
+                              />
+                              {/* Progress circle */}
+                              <circle
+                                cx="36"
+                                cy="36"
+                                r="30"
+                                className={`transition-all duration-500 ${
+                                  isSmeRejected
+                                    ? "stroke-red-500"
+                                    : 1 - grade >= 0.7
+                                      ? "stroke-emerald-500"
+                                      : "stroke-amber-500"
+                                }`}
+                                strokeWidth="5"
+                                fill="transparent"
+                                strokeDasharray={188.4}
+                                strokeDashoffset={
+                                  188.4 -
+                                  (Math.max(
+                                    0,
+                                    Math.min(
+                                      100,
+                                      Math.round((1 - grade) * 100),
+                                    ),
+                                  ) /
+                                    100) *
+                                    188.4
+                                }
+                                strokeLinecap="round"
+                              />
+                            </svg>
+                            <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-0.5">
+                              <span className="text-sm font-mono font-bold text-white leading-none">
+                                {Math.max(
+                                  0,
+                                  Math.min(100, Math.round((1 - grade) * 100)),
+                                )}
+                              </span>
+                              <span className="text-[5px] text-zinc-500 font-sans font-bold uppercase tracking-wider mt-0.5">
+                                SCORE
+                              </span>
+                            </div>
+                          </div>
 
-                            let adj = 0.4;
-                            if (dur <= 3) adj = 0;
-                            else if (dur <= 6) adj = 0.2;
-                            else if (dur <= 12) adj = 0.4;
-                            else adj = 0.6;
-
-                            const roi = rTranslation + adj;
-                            const profit = ((invSize * (roi / 100)) / 12) * dur;
-                            const maxProfit =
-                              ((1000000 * (18.1 / 100)) / 12) * 24;
-                            const heightPct = Math.min(
-                              100,
-                              Math.max(15, (profit / maxProfit) * 200),
-                            );
-
-                            const isHighlighted =
-                              (dur === 3 && invDuration <= 3) ||
-                              (dur === 6 &&
-                                invDuration > 3 &&
-                                invDuration <= 6) ||
-                              (dur === 12 &&
-                                invDuration > 6 &&
-                                invDuration <= 12) ||
-                              (dur === 18 &&
-                                invDuration > 12 &&
-                                invDuration <= 18) ||
-                              (dur === 24 && invDuration > 18);
-
-                            return (
-                              <div
-                                key={dur}
-                                className="flex-1 h-full flex flex-col items-center justify-end"
-                              >
-                                <div
-                                  className={`w-full rounded-t-sm transition-all duration-300 ${isHighlighted ? "bg-emerald-400 shadow-[0_0_5px_#10b981]" : "bg-emerald-500/25"}`}
-                                  style={{ height: `${heightPct}%` }}
-                                />
-                                <span className="text-[6px] font-mono text-zinc-500 mt-0.5">
-                                  {dur}M
-                                </span>
-                              </div>
-                            );
-                          })}
+                          {/* Metric readout */}
+                          <div className="flex flex-col gap-1.5 text-[9px]">
+                            <div className="flex flex-col">
+                              <span className="text-zinc-550 text-[6px] font-sans font-bold uppercase tracking-wider">
+                                Leverage Ratio
+                              </span>
+                              <span className="font-mono text-white font-bold">
+                                {gradeText}
+                              </span>
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-zinc-550 text-[6px] font-sans font-bold uppercase tracking-wider">
+                                Assigned APR
+                              </span>
+                              <span className="font-mono text-emerald-400 font-bold">
+                                {interestRateText}
+                              </span>
+                            </div>
+                          </div>
                         </div>
-                      </div>
 
+                        <button
+                          onClick={() => setSmeShowResults(false)}
+                          className="w-full py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-[8px] font-sans font-bold uppercase tracking-wider hover:bg-zinc-850 hover:border-zinc-700 active:scale-98 transition-all text-zinc-300 cursor-pointer"
+                        >
+                          ← Adjust Borrowing Specs
+                        </button>
+                      </div>
+                    )
+                  ) : !invShowResults ? (
+                    <>
                       {/* Investor Sliders controls */}
-                      <div className="bg-zinc-950/45 border border-zinc-900/50 rounded-xl p-2.5 flex flex-col gap-2.5 shadow-lg backdrop-blur-sm flex-1 justify-center">
+                      <div className="bg-zinc-950/45 border border-zinc-900/50 rounded-xl p-2.5 flex flex-col gap-2 shadow-lg backdrop-blur-sm flex-1 justify-center">
                         {/* Slider 1: Investment Size */}
                         <div className="flex flex-col gap-1">
                           <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
@@ -484,7 +561,92 @@ export default function Mockup(props: MockupProps) {
                           />
                         </div>
                       </div>
+
+                      <button
+                        onClick={() => setInvShowResults(true)}
+                        className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 transition-all text-[8.5px] font-sans font-bold uppercase tracking-widest text-white shadow-lg shadow-emerald-900/20 cursor-pointer flex items-center justify-center gap-1.5"
+                      >
+                        Calculate Yield & ROI
+                      </button>
                     </>
+                  ) : (
+                    <div className="bg-zinc-950/45 border border-zinc-900/50 rounded-xl p-3 flex flex-col justify-between shadow-lg backdrop-blur-sm flex-1 h-full">
+                      <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider border-b border-zinc-900/40 pb-1.5">
+                        <span>Yield Return Projection</span>
+                        <span className="text-emerald-400 font-bold font-mono">
+                          APY: {yearlyRoiText}
+                        </span>
+                      </div>
+
+                      {/* Chart bars */}
+                      <div className="h-20 flex items-end justify-between gap-1.5 px-1 py-1">
+                        {[3, 6, 12, 18, 24].map((dur) => {
+                          let rTranslation = 13.5;
+                          if (invRisk < 2) rTranslation = 10.5;
+                          else if (invRisk < 4) rTranslation = 11.5;
+                          else if (invRisk < 6) rTranslation = 13.5;
+                          else if (invRisk < 8) rTranslation = 16.5;
+                          else rTranslation = 17.5;
+
+                          let adj = 0.4;
+                          if (dur <= 3) adj = 0;
+                          else if (dur <= 6) adj = 0.2;
+                          else if (dur <= 12) adj = 0.4;
+                          else adj = 0.6;
+
+                          const roi = rTranslation + adj;
+                          const profit = ((invSize * (roi / 100)) / 12) * dur;
+                          const maxProfit =
+                            ((1000000 * (18.1 / 100)) / 12) * 24;
+                          const heightPct = Math.min(
+                            100,
+                            Math.max(15, (profit / maxProfit) * 150),
+                          );
+
+                          const isHighlighted =
+                            (dur === 3 && invDuration <= 3) ||
+                            (dur === 6 &&
+                              invDuration > 3 &&
+                              invDuration <= 6) ||
+                            (dur === 12 &&
+                              invDuration > 6 &&
+                              invDuration <= 12) ||
+                            (dur === 18 &&
+                              invDuration > 12 &&
+                              invDuration <= 18) ||
+                            (dur === 24 && invDuration > 18);
+
+                          return (
+                            <div
+                              key={dur}
+                              className="flex-1 h-full flex flex-col items-center justify-end"
+                            >
+                              <span
+                                className={`text-[6px] font-mono mb-0.5 ${isHighlighted ? "text-emerald-400 font-bold" : "text-zinc-500"}`}
+                              >
+                                ${Math.round(profit).toLocaleString()}
+                              </span>
+                              <div
+                                className={`w-full rounded-t-sm transition-all duration-300 ${isHighlighted ? "bg-emerald-400 shadow-[0_0_5px_#10b981]" : "bg-emerald-500/25"}`}
+                                style={{ height: `${heightPct}%` }}
+                              />
+                              <span
+                                className={`text-[6px] font-mono mt-1 ${isHighlighted ? "text-emerald-400 font-bold" : "text-zinc-500"}`}
+                              >
+                                {dur}M
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      <button
+                        onClick={() => setInvShowResults(false)}
+                        className="w-full py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-[8px] font-sans font-bold uppercase tracking-wider hover:bg-zinc-850 hover:border-zinc-700 active:scale-98 transition-all text-zinc-300 cursor-pointer"
+                      >
+                        ← Adjust Investment Specs
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -553,7 +715,7 @@ export default function Mockup(props: MockupProps) {
               <div className="text-[8px] font-mono text-emerald-400 font-bold mb-2 uppercase tracking-wide border-b border-zinc-900 pb-1">
                 {view === "sme" ? "Borrowing Specs" : "Investment Specs"}
               </div>
-              {view === "sme" ? matrixSme : matrixInvestor}
+              {view === "sme" ? matrixSme(true) : matrixInvestor(true)}
             </div>
 
             <div className="grid grid-cols-2 gap-2 text-center font-mono border-t border-zinc-900/60 pt-2.5">
