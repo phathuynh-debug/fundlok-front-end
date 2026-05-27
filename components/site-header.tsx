@@ -81,19 +81,21 @@ export default function SiteHeader({
           </button>
 
           {contactOpen && (
-            <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-slate-900 border border-border/30 rounded-md shadow-lg z-40">
-              <button
-                onClick={onContact}
-                className="w-full text-left px-3 py-2 text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-slate-800"
-              >
-                Contact Us
-              </button>
-              <Link
-                href="/faq"
-                className="block px-3 py-2 text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-slate-800"
-              >
-                FAQ
-              </Link>
+            <div className="absolute right-0 top-full pt-2 w-44 z-40">
+              <div className="bg-white dark:bg-slate-900 border border-border/30 rounded-md shadow-lg overflow-hidden">
+                <button
+                  onClick={onContact}
+                  className="w-full text-left px-3 py-2 text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-slate-800 cursor-pointer"
+                >
+                  Contact Us
+                </button>
+                <Link
+                  href="/faq"
+                  className="block px-3 py-2 text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-slate-800"
+                >
+                  FAQ
+                </Link>
+              </div>
             </div>
           )}
         </div>
