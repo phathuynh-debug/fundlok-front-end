@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, Lock } from "lucide-react";
+import { useTranslations } from "@/lib/i18n";
 
 type MockupProps = {
   onMouseMove: (e: React.MouseEvent<HTMLDivElement>) => void;
@@ -34,6 +35,7 @@ type MockupProps = {
 };
 
 export default function Mockup(props: MockupProps) {
+  const { t } = useTranslations();
   const [device, setDevice] = useState<"phone" | "laptop">("phone");
   const [view, setView] = useState<"investor" | "sme">("sme");
 
@@ -108,51 +110,51 @@ export default function Mockup(props: MockupProps) {
     <table className="w-full text-left text-[10px] md:text-[11px] matrix-table">
       <tbody>
         <tr className="border-b border-zinc-900/40">
-          <td className="py-2 font-semibold text-zinc-400">Monthly Revenue</td>
+          <td className="py-2 font-semibold text-zinc-400">{t("mockup.monthlyRevenue")}</td>
           <td className="py-2 text-right font-mono font-bold text-white">
             ${smeRevenue.toLocaleString()}
           </td>
         </tr>
         <tr className="border-b border-zinc-900/40">
           <td className="py-2 font-semibold text-zinc-400">
-            Desired Loan Size
+            {t("mockup.desiredLoanSize")}
           </td>
           <td className="py-2 text-right font-mono font-bold text-white">
             ${smeLoanSize.toLocaleString()}
           </td>
         </tr>
         <tr className="border-b border-zinc-900/40">
-          <td className="py-2 font-semibold text-zinc-400">Loan Duration</td>
+          <td className="py-2 font-semibold text-zinc-400">{t("mockup.loanDuration")}</td>
           <td className="py-2 text-right font-mono font-bold text-zinc-300">
-            {smeDuration} Months
+            {t("mockup.durationMonths", { months: smeDuration })}
           </td>
         </tr>
         <tr className="border-b border-zinc-900/40">
           <td className="py-2 font-semibold text-zinc-400">
-            Sigmoid Int. Rate
+            {t("mockup.sigmoidIntRate")}
           </td>
           <td className="py-2 text-right font-mono font-bold">
             {showResults ? (
               <span className="text-emerald-400">{interestRateText}</span>
             ) : (
               <span className="text-zinc-650 font-sans text-[8.5px] flex items-center justify-end gap-1">
-                <Lock className="w-2.5 h-2.5 text-zinc-650" /> PENDING...
+                <Lock className="w-2.5 h-2.5 text-zinc-650" /> {t("mockup.pending")}
               </span>
             )}
           </td>
         </tr>
         <tr>
-          <td className="py-2 font-semibold text-zinc-400">Credit Status</td>
+          <td className="py-2 font-semibold text-zinc-400">{t("mockup.creditStatus")}</td>
           <td className="py-2 text-right font-sans font-extrabold uppercase tracking-wide">
             {showResults ? (
               <span
                 className={isSmeRejected ? "text-red-400" : "text-emerald-400"}
               >
-                {statusText}
+                {isSmeRejected ? t("mockup.rejected") : t("mockup.approved")}
               </span>
             ) : (
               <span className="text-zinc-650 font-mono text-[8.5px] font-bold">
-                LOCKED
+                {t("mockup.locked")}
               </span>
             )}
           </td>
@@ -165,45 +167,45 @@ export default function Mockup(props: MockupProps) {
     <table className="w-full text-left text-[10px] md:text-[11px] matrix-table">
       <tbody>
         <tr className="border-b border-zinc-900/40">
-          <td className="py-2 font-semibold text-zinc-400">Investment Size</td>
+          <td className="py-2 font-semibold text-zinc-400">{t("mockup.investmentSize")}</td>
           <td className="py-2 text-right font-mono font-bold text-white">
             ${invSize.toLocaleString()}
           </td>
         </tr>
         <tr className="border-b border-zinc-900/40">
-          <td className="py-2 font-semibold text-zinc-400">Risk Tolerance</td>
+          <td className="py-2 font-semibold text-zinc-400">{t("mockup.riskTolerance")}</td>
           <td className="py-2 text-right font-mono font-bold text-white">
             {invRisk.toFixed(1)} / 10
           </td>
         </tr>
         <tr className="border-b border-zinc-900/40">
-          <td className="py-2 font-semibold text-zinc-400">Duration Terms</td>
+          <td className="py-2 font-semibold text-zinc-400">{t("mockup.durationTerms")}</td>
           <td className="py-2 text-right font-mono font-bold text-zinc-300">
-            {invDuration} Months
+            {t("mockup.durationMonths", { months: invDuration })}
           </td>
         </tr>
         <tr className="border-b border-zinc-900/40">
-          <td className="py-2 font-semibold text-zinc-400">Yearly ROI Rate</td>
+          <td className="py-2 font-semibold text-zinc-400">{t("mockup.yearlyRoiRate")}</td>
           <td className="py-2 text-right font-mono font-bold">
             {showResults ? (
               <span className="text-emerald-400">{yearlyRoiText}</span>
             ) : (
               <span className="text-zinc-650 font-sans text-[8.5px] flex items-center justify-end gap-1">
-                <Lock className="w-2.5 h-2.5 text-zinc-650" /> PENDING...
+                <Lock className="w-2.5 h-2.5 text-zinc-650" /> {t("mockup.pending")}
               </span>
             )}
           </td>
         </tr>
         <tr>
           <td className="py-2 font-semibold text-zinc-400">
-            Est. Profit Return
+            {t("mockup.estProfitReturn")}
           </td>
           <td className="py-2 text-right font-mono font-bold">
             {showResults ? (
               <span className="text-emerald-400">{roiProfitText}</span>
             ) : (
               <span className="text-zinc-650 font-mono text-[8.5px] font-bold">
-                LOCKED
+                {t("mockup.locked")}
               </span>
             )}
           </td>
@@ -292,24 +294,24 @@ export default function Mockup(props: MockupProps) {
                     onClick={() => setView("sme")}
                     className={`text-[8.5px] font-mono tracking-wider px-4 py-1.5 rounded-md font-bold transition-all duration-300 cursor-pointer ${view === "sme" ? "bg-emerald-600 text-white shadow-md" : "text-zinc-400 hover:text-zinc-200"}`}
                   >
-                    SME PORTAL
+                    {t("mockup.smePortal")}
                   </button>
                   <button
                     onClick={() => setView("investor")}
                     className={`text-[8.5px] font-mono tracking-wider px-4 py-1.5 rounded-md font-bold transition-all duration-300 cursor-pointer ${view === "investor" ? "bg-emerald-600 text-white shadow-md" : "text-zinc-400 hover:text-zinc-200"}`}
                   >
-                    INVESTOR PORTAL
+                    {t("mockup.investorPortal")}
                   </button>
                 </div>
               </div>
-
+ 
               {/* Dashboard grid */}
               <div className="grid grid-cols-12 gap-5 flex-1 pt-4 items-center">
                 {/* Left Column: table parameters */}
                 <div className="col-span-6 bg-zinc-950/45 border border-zinc-900/60 rounded-xl p-4 flex flex-col justify-between h-full max-h-[235px] shadow-lg backdrop-blur-sm">
                   <div className="flex items-center justify-between border-b border-zinc-900/60 pb-2 mb-2">
                     <span className="text-[10px] font-mono tracking-wider font-bold text-emerald-400 uppercase">
-                      {view === "sme" ? "Borrower Specs" : "Investment Specs"}
+                      {view === "sme" ? t("mockup.borrowerSpecs") : t("mockup.investmentSpecs")}
                     </span>
                     <span className="text-[9px] font-sans font-bold text-zinc-550 uppercase bg-zinc-900/60 px-2 py-0.5 rounded">
                       {partner.category}
@@ -330,7 +332,7 @@ export default function Mockup(props: MockupProps) {
                           {/* Slider 1: Loan Size */}
                           <div className="flex flex-col gap-1">
                             <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
-                              <span>Desired Loan Size</span>
+                              <span>{t("mockup.desiredLoanSize")}</span>
                               <span className="text-emerald-400 font-mono font-semibold text-[9px]">
                                 ${(smeLoanSize / 1000).toFixed(0)}k
                               </span>
@@ -351,7 +353,7 @@ export default function Mockup(props: MockupProps) {
                           {/* Slider 2: Monthly Revenue */}
                           <div className="flex flex-col gap-1">
                             <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
-                              <span>Monthly Revenue</span>
+                              <span>{t("mockup.monthlyRevenue")}</span>
                               <span className="text-emerald-400 font-mono font-semibold text-[9px]">
                                 ${(smeRevenue / 1000).toFixed(0)}k
                               </span>
@@ -372,9 +374,9 @@ export default function Mockup(props: MockupProps) {
                           {/* Slider 3: Duration */}
                           <div className="flex flex-col gap-1">
                             <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
-                              <span>Loan Duration</span>
+                              <span>{t("mockup.loanDuration")}</span>
                               <span className="text-emerald-400 font-mono font-semibold text-[9px]">
-                                {smeDuration} Months
+                                {t("mockup.durationMonths", { months: smeDuration })}
                               </span>
                             </div>
                             <input
@@ -395,13 +397,13 @@ export default function Mockup(props: MockupProps) {
                           onClick={() => setSmeShowResults(true)}
                           className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 transition-all text-[8.5px] font-sans font-bold uppercase tracking-widest text-white shadow-lg shadow-emerald-900/20 cursor-pointer flex items-center justify-center gap-1.5"
                         >
-                          Calculate Interest & APY
+                          {t("mockup.calculateSme")}
                         </button>
                       </>
                     ) : (
                       <div className="bg-zinc-950/45 border border-zinc-900/50 rounded-xl p-3 flex flex-col justify-between shadow-lg backdrop-blur-sm flex-1 h-full">
                         <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider border-b border-zinc-900/40 pb-1.5">
-                          <span>Credit Assessment</span>
+                          <span>{t("mockup.creditAssessment")}</span>
                           <span
                             className={
                               isSmeRejected
@@ -409,7 +411,7 @@ export default function Mockup(props: MockupProps) {
                                 : "text-emerald-400"
                             }
                           >
-                            {statusText}
+                            {isSmeRejected ? t("mockup.rejected") : t("mockup.approved")}
                           </span>
                         </div>
 
@@ -464,7 +466,7 @@ export default function Mockup(props: MockupProps) {
                                 )}
                               </span>
                               <span className="text-[5px] text-zinc-500 font-sans font-bold uppercase tracking-wider mt-0.5">
-                                SCORE
+                                {t("mockup.scoreLabel")}
                               </span>
                             </div>
                           </div>
@@ -473,7 +475,7 @@ export default function Mockup(props: MockupProps) {
                           <div className="flex flex-col gap-1.5 text-[9px]">
                             <div className="flex flex-col">
                               <span className="text-zinc-550 text-[6px] font-sans font-bold uppercase tracking-wider">
-                                Leverage Ratio
+                                {t("mockup.leverageRatio")}
                               </span>
                               <span className="font-mono text-white font-bold">
                                 {gradeText}
@@ -481,7 +483,7 @@ export default function Mockup(props: MockupProps) {
                             </div>
                             <div className="flex flex-col">
                               <span className="text-zinc-550 text-[6px] font-sans font-bold uppercase tracking-wider">
-                                Assigned APR
+                                {t("mockup.assignedApr")}
                               </span>
                               <span className="font-mono text-emerald-400 font-bold">
                                 {interestRateText}
@@ -494,7 +496,7 @@ export default function Mockup(props: MockupProps) {
                           onClick={() => setSmeShowResults(false)}
                           className="w-full py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-[8px] font-sans font-bold uppercase tracking-wider hover:bg-zinc-850 hover:border-zinc-700 active:scale-98 transition-all text-zinc-300 cursor-pointer"
                         >
-                          ← Adjust Borrowing Specs
+                          {t("mockup.adjustSme")}
                         </button>
                       </div>
                     )
@@ -505,7 +507,7 @@ export default function Mockup(props: MockupProps) {
                         {/* Slider 1: Investment Size */}
                         <div className="flex flex-col gap-1">
                           <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
-                            <span>Desired Investment</span>
+                            <span>{t("mockup.investmentShort")}</span>
                             <span className="text-emerald-400 font-mono font-semibold text-[9px]">
                               ${(invSize / 1000).toFixed(0)}k
                             </span>
@@ -524,7 +526,7 @@ export default function Mockup(props: MockupProps) {
                         {/* Slider 2: Risk Tolerance */}
                         <div className="flex flex-col gap-1">
                           <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
-                            <span>Risk Tolerance</span>
+                            <span>{t("mockup.riskTolerance")}</span>
                             <span className="text-emerald-400 font-mono font-semibold text-[9px]">
                               {invRisk.toFixed(1)} / 10
                             </span>
@@ -543,9 +545,9 @@ export default function Mockup(props: MockupProps) {
                         {/* Slider 3: Duration */}
                         <div className="flex flex-col gap-1">
                           <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
-                            <span>Investment Duration</span>
+                            <span>{t("mockup.durationTerms")}</span>
                             <span className="text-emerald-400 font-mono font-semibold text-[9px]">
-                              {invDuration} Months
+                              {t("mockup.durationMonths", { months: invDuration })}
                             </span>
                           </div>
                           <input
@@ -566,13 +568,13 @@ export default function Mockup(props: MockupProps) {
                         onClick={() => setInvShowResults(true)}
                         className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 transition-all text-[8.5px] font-sans font-bold uppercase tracking-widest text-white shadow-lg shadow-emerald-900/20 cursor-pointer flex items-center justify-center gap-1.5"
                       >
-                        Calculate Yield & ROI
+                        {t("mockup.calculateInv")}
                       </button>
                     </>
                   ) : (
                     <div className="bg-zinc-950/45 border border-zinc-900/50 rounded-xl p-3 flex flex-col justify-between shadow-lg backdrop-blur-sm flex-1 h-full">
                       <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider border-b border-zinc-900/40 pb-1.5">
-                        <span>Yield Return Projection</span>
+                        <span>{t("mockup.yieldReturnProjection")}</span>
                         <span className="text-emerald-400 font-bold font-mono">
                           APY: {yearlyRoiText}
                         </span>
@@ -611,10 +613,10 @@ export default function Mockup(props: MockupProps) {
                             (dur === 12 &&
                               invDuration > 6 &&
                               invDuration <= 12) ||
-                            (dur === 18 &&
-                              invDuration > 12 &&
-                              invDuration <= 18) ||
-                            (dur === 24 && invDuration > 18);
+                              (dur === 18 &&
+                                invDuration > 12 &&
+                                invDuration <= 18) ||
+                              (dur === 24 && invDuration > 18);
 
                           return (
                             <div
@@ -633,7 +635,7 @@ export default function Mockup(props: MockupProps) {
                               <span
                                 className={`text-[6px] font-mono mt-1 ${isHighlighted ? "text-emerald-400 font-bold" : "text-zinc-500"}`}
                               >
-                                {dur}M
+                                {t("mockup.durationMos", { months: dur })}
                               </span>
                             </div>
                           );
@@ -644,7 +646,7 @@ export default function Mockup(props: MockupProps) {
                         onClick={() => setInvShowResults(false)}
                         className="w-full py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-[8px] font-sans font-bold uppercase tracking-wider hover:bg-zinc-850 hover:border-zinc-700 active:scale-98 transition-all text-zinc-300 cursor-pointer"
                       >
-                        ← Adjust Investment Specs
+                        {t("mockup.adjustInv")}
                       </button>
                     </div>
                   )}
@@ -699,13 +701,13 @@ export default function Mockup(props: MockupProps) {
                 onClick={() => setView("sme")}
                 className={`text-[9px] px-2.5 py-1 rounded-md transition-all duration-200 ${view === "sme" ? "bg-emerald-600 text-white font-bold" : "text-zinc-500"}`}
               >
-                SME
+                {t("mockup.smeShort")}
               </button>
               <button
                 onClick={() => setView("investor")}
                 className={`text-[9px] px-2.5 py-1 rounded-md transition-all duration-200 ${view === "investor" ? "bg-emerald-600 text-white font-bold" : "text-zinc-500"}`}
               >
-                INV
+                {t("mockup.invShort")}
               </button>
             </div>
           </div>
@@ -714,26 +716,14 @@ export default function Mockup(props: MockupProps) {
             {/* Top: specs table */}
             <div className="bg-zinc-900/20 border border-zinc-900/60 rounded-xl p-2.5 mb-2">
               <div className="text-[7.5px] font-mono text-emerald-400 font-bold mb-1.5 uppercase tracking-wide border-b border-zinc-900 pb-1 flex justify-between">
-                <span>
-                  {view === "sme" ? "Borrower Specs" : "Investment Specs"}
-                </span>
-                {view === "sme"
-                  ? smeShowResults && (
-                      <span
-                        className={
-                          isSmeRejected ? "text-red-400" : "text-emerald-400"
-                        }
-                      >
-                        {statusText}
-                      </span>
-                    )
-                  : invShowResults && (
-                      <span className="text-emerald-400">{yearlyRoiText}</span>
-                    )}
+                <span>{view === "sme" ? t("mockup.borrowerSpecs") : t("mockup.investmentSpecs")}</span>
+                {view === "sme" ? (
+                  smeShowResults && <span className={isSmeRejected ? "text-red-400" : "text-emerald-400"}>{isSmeRejected ? t("mockup.rejected") : t("mockup.approved")}</span>
+                ) : (
+                  invShowResults && <span className="text-emerald-400">{yearlyRoiText}</span>
+                )}
               </div>
-              {view === "sme"
-                ? matrixSme(smeShowResults)
-                : matrixInvestor(invShowResults)}
+              {view === "sme" ? matrixSme(smeShowResults) : matrixInvestor(invShowResults)}
             </div>
 
             {/* Bottom: sliders / charts / CTAs */}
@@ -745,7 +735,7 @@ export default function Mockup(props: MockupProps) {
                       {/* Slider 1: Loan Size */}
                       <div className="flex flex-col gap-0.5">
                         <div className="flex justify-between items-center text-[7px] text-zinc-400 font-bold uppercase tracking-wider">
-                          <span>Desired Loan</span>
+                          <span>{t("mockup.desiredLoanShort")}</span>
                           <span className="text-emerald-400 font-mono font-semibold text-[8px]">
                             ${(smeLoanSize / 1000).toFixed(0)}k
                           </span>
@@ -766,7 +756,7 @@ export default function Mockup(props: MockupProps) {
                       {/* Slider 2: Monthly Revenue */}
                       <div className="flex flex-col gap-0.5">
                         <div className="flex justify-between items-center text-[7px] text-zinc-400 font-bold uppercase tracking-wider">
-                          <span>Monthly Rev</span>
+                          <span>{t("mockup.monthlyRevShort")}</span>
                           <span className="text-emerald-400 font-mono font-semibold text-[8px]">
                             ${(smeRevenue / 1000).toFixed(0)}k
                           </span>
@@ -787,9 +777,9 @@ export default function Mockup(props: MockupProps) {
                       {/* Slider 3: Duration */}
                       <div className="flex flex-col gap-0.5">
                         <div className="flex justify-between items-center text-[7px] text-zinc-400 font-bold uppercase tracking-wider">
-                          <span>Duration</span>
+                          <span>{t("mockup.loanDurationShort")}</span>
                           <span className="text-emerald-400 font-mono font-semibold text-[8px]">
-                            {smeDuration} Mos
+                            {t("mockup.durationMos", { months: smeDuration })}
                           </span>
                         </div>
                         <input
@@ -810,7 +800,7 @@ export default function Mockup(props: MockupProps) {
                       onClick={() => setSmeShowResults(true)}
                       className="w-full py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:scale-98 transition-all text-[8px] font-sans font-bold uppercase tracking-widest text-white shadow-lg cursor-pointer flex items-center justify-center"
                     >
-                      Calculate Interest & APY
+                      {t("mockup.calculateSme")}
                     </button>
                   </>
                 ) : (
@@ -831,7 +821,7 @@ export default function Mockup(props: MockupProps) {
                             cx="28"
                             cy="28"
                             r="23"
-                            className={`transition-all duration-500 ${isSmeRejected ? "stroke-red-500" : 1 - grade >= 0.7 ? "stroke-emerald-500" : "stroke-amber-500"}`}
+                            className={`transition-all duration-500 ${isSmeRejected ? "stroke-red-500" : (1 - grade) >= 0.7 ? "stroke-emerald-500" : "stroke-amber-500"}`}
                             strokeWidth="4"
                             fill="transparent"
                             strokeDasharray={144.4}
@@ -855,23 +845,23 @@ export default function Mockup(props: MockupProps) {
                             )}
                           </span>
                           <span className="text-[4px] text-zinc-550 font-sans font-bold uppercase tracking-wider mt-0.5">
-                            SCORE
+                            {t("mockup.scoreLabel")}
                           </span>
                         </div>
                       </div>
                       {/* Metrics */}
                       <div className="flex flex-col gap-1 text-[8px]">
                         <div className="flex flex-col">
-                          <span className="text-zinc-550 text-[6px] font-sans font-bold uppercase tracking-wider">
-                            Leverage Ratio
+                          <span className="text-zinc-555 text-[6px] font-sans font-bold uppercase tracking-wider">
+                            {t("mockup.leverageRatio")}
                           </span>
                           <span className="font-mono text-white font-bold">
                             {gradeText}
                           </span>
                         </div>
                         <div className="flex flex-col">
-                          <span className="text-zinc-550 text-[6px] font-sans font-bold uppercase tracking-wider">
-                            Assigned APR
+                          <span className="text-zinc-555 text-[6px] font-sans font-bold uppercase tracking-wider">
+                            {t("mockup.assignedApr")}
                           </span>
                           <span className="font-mono text-emerald-400 font-bold">
                             {interestRateText}
@@ -884,7 +874,7 @@ export default function Mockup(props: MockupProps) {
                       onClick={() => setSmeShowResults(false)}
                       className="w-full py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-[8px] font-sans font-bold uppercase tracking-wider hover:bg-zinc-850 hover:border-zinc-700 active:scale-98 transition-all text-zinc-300 cursor-pointer"
                     >
-                      ← Adjust Specs
+                      {t("mockup.adjustShort")}
                     </button>
                   </>
                 )
@@ -894,7 +884,7 @@ export default function Mockup(props: MockupProps) {
                     {/* Slider 1: Investment Size */}
                     <div className="flex flex-col gap-0.5">
                       <div className="flex justify-between items-center text-[7px] text-zinc-400 font-bold uppercase tracking-wider">
-                        <span>Investment</span>
+                        <span>{t("mockup.investmentShort")}</span>
                         <span className="text-emerald-400 font-mono font-semibold text-[8px]">
                           ${(invSize / 1000).toFixed(0)}k
                         </span>
@@ -913,7 +903,7 @@ export default function Mockup(props: MockupProps) {
                     {/* Slider 2: Risk */}
                     <div className="flex flex-col gap-0.5">
                       <div className="flex justify-between items-center text-[7px] text-zinc-400 font-bold uppercase tracking-wider">
-                        <span>Risk Tolerance</span>
+                        <span>{t("mockup.riskTolerance")}</span>
                         <span className="text-emerald-400 font-mono font-semibold text-[8px]">
                           {invRisk.toFixed(1)}/10
                         </span>
@@ -932,9 +922,9 @@ export default function Mockup(props: MockupProps) {
                     {/* Slider 3: Duration */}
                     <div className="flex flex-col gap-0.5">
                       <div className="flex justify-between items-center text-[7px] text-zinc-400 font-bold uppercase tracking-wider">
-                        <span>Duration</span>
+                        <span>{t("mockup.loanDurationShort")}</span>
                         <span className="text-emerald-400 font-mono font-semibold text-[8px]">
-                          {invDuration} Mos
+                          {t("mockup.durationMos", { months: invDuration })}
                         </span>
                       </div>
                       <input
@@ -953,7 +943,7 @@ export default function Mockup(props: MockupProps) {
                     onClick={() => setInvShowResults(true)}
                     className="w-full py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:scale-98 transition-all text-[8px] font-sans font-bold uppercase tracking-widest text-white shadow-lg cursor-pointer flex items-center justify-center"
                   >
-                    Calculate Yield & ROI
+                    {t("mockup.calculateInv")}
                   </button>
                 </>
               ) : (
@@ -1000,7 +990,7 @@ export default function Mockup(props: MockupProps) {
                             className="flex-1 h-full flex flex-col items-center justify-end"
                           >
                             <span
-                              className={`text-[5px] font-mono mb-0.5 ${isHighlighted ? "text-emerald-400 font-bold" : "text-zinc-550"}`}
+                              className={`text-[5px] font-mono mb-0.5 ${isHighlighted ? "text-emerald-400 font-bold" : "text-zinc-555"}`}
                             >
                               ${Math.round(profit).toLocaleString()}
                             </span>
@@ -1011,7 +1001,7 @@ export default function Mockup(props: MockupProps) {
                             <span
                               className={`text-[5px] font-mono mt-0.5 ${isHighlighted ? "text-emerald-400 font-bold" : "text-zinc-500"}`}
                             >
-                              {dur}M
+                              {t("mockup.durationMos", { months: dur })}
                             </span>
                           </div>
                         );
@@ -1023,7 +1013,7 @@ export default function Mockup(props: MockupProps) {
                     onClick={() => setInvShowResults(false)}
                     className="w-full py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-[8px] font-sans font-bold uppercase tracking-wider hover:bg-zinc-850 hover:border-zinc-700 active:scale-98 transition-all text-zinc-300 cursor-pointer"
                   >
-                    ← Adjust Specs
+                    {t("mockup.adjustShort")}
                   </button>
                 </>
               )}
