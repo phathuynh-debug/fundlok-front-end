@@ -215,7 +215,7 @@ export function LandingPageClient() {
         category: "Global Innovation",
         description:
           "Representing Vietnam (under the project name LENDMI), FundLok won a top-10 global spot for pioneering blockchain-based credit scoring and secure liquidity pooling for emerging markets.",
-        images: [],
+        images: ["/achivements/ibcol-certificate.png"],
         pdf: "/achivements/ibcol-certificate.pdf",
       },
     ],
@@ -247,7 +247,7 @@ export function LandingPageClient() {
         category: "Sáng tạo Toàn cầu",
         description:
           "Đại diện cho Việt Nam (dưới tên dự án LENDMI), FundLok đã giành vị trí top 10 toàn cầu nhờ tiên phong trong việc chấm điểm tín dụng dựa trên blockchain và tối ưu hóa bể thanh khoản an toàn cho thị trường mới nổi.",
-        images: [],
+        images: ["/achivements/ibcol-certificate.png"],
         pdf: "/achivements/ibcol-certificate.pdf",
       },
     ],
