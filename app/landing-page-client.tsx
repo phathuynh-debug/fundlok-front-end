@@ -8,7 +8,11 @@ import {
   TrendingUp, 
   ChevronDown,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  ExternalLink,
+  FileText,
+  Maximize2,
+  X
 } from "lucide-react"
 import { useTranslations } from "@/lib/i18n"
 import { GuillocheWaves } from "@/components/guilloche-waves"
@@ -133,38 +137,76 @@ export function LandingPageClient() {
   const footerRef = useRef<HTMLDivElement>(null)
 
   const [activeAchievement, setActiveAchievement] = useState(0)
+  const [activeImageIndex, setActiveImageIndex] = useState(0)
   const [direction, setDirection] = useState<"left" | "right">("right")
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null)
 
   const achievementsData = {
     en: [
       {
         title: "Top 3 Project to Facilitate Investments",
-        subtitle: "Sustainability in Action 2024 - Australian Government"
+        subtitle: "Sustainability in Action 2024 - Australian Government",
+        category: "Government Recognition",
+        description: "FundLok was recognized as a top-3 fintech project by the Australian Government for facilitating sustainable cross-border investments and ESG-aligned SME funding.",
+        images: ["/achivements/sustainability-action-1.png", "/achivements/sustainability-action-2.png"]
       },
       {
         title: "Seed Stage Start-up Incubation in FinTech Industry 2025",
-        subtitle: "Startup and Innovation Hub Ho Chi Minh City (SIHUB)"
+        subtitle: "Startup and Innovation Hub Ho Chi Minh City (SIHUB)",
+        category: "Incubation & Acceleration",
+        description: "Selected for the premium incubation program by SIHUB, receiving strategic mentorship, regulatory sandbox guidance, and network access to top regional venture capitals.",
+        images: ["/achivements/sihub-announcement.png", "/achivements/sihub-pitching-1.png", "/achivements/sihub-pitching-2.png"]
       },
       {
         title: "Top 10 Potential Project Global",
-        subtitle: "International Blockchain Olympiad 2023"
+        subtitle: "International Blockchain Olympiad 2023",
+        category: "Global Innovation",
+        description: "Representing Vietnam (under the project name LENDMI), FundLok won a top-10 global spot for pioneering blockchain-based credit scoring and secure liquidity pooling for emerging markets.",
+        images: [],
+        pdf: "/achivements/ibcol-certificate.pdf"
       }
     ],
     vi: [
       {
         title: "Top 3 Dự án Thúc đẩy Đầu tư",
-        subtitle: "Sustainability in Action 2024 - Chính phủ Úc"
+        subtitle: "Sustainability in Action 2024 - Chính phủ Úc",
+        category: "Ghi nhận từ Chính phủ",
+        description: "FundLok được ghi nhận là một trong 3 dự án FinTech xuất sắc nhất bởi Chính phủ Úc trong việc thúc đẩy đầu tư bền vững và hỗ trợ vốn SME theo tiêu chuẩn ESG.",
+        images: ["/achivements/sustainability-action-1.png", "/achivements/sustainability-action-2.png"]
       },
       {
         title: "Ươm tạo Khởi nghiệp Giai đoạn Hạt giống ngành FinTech 2025",
-        subtitle: "Trung tâm Khởi nghiệp và Đổi mới sáng tạo TP.HCM (SIHUB)"
+        subtitle: "Trung tâm Khởi nghiệp và Đổi mới sáng tạo TP.HCM (SIHUB)",
+        category: "Ươm tạo & Tăng tốc",
+        description: "Được lựa chọn tham gia chương trình ươm tạo cao cấp của SIHUB, nhận hỗ trợ tư vấn chiến lược, hướng dẫn thử nghiệm pháp lý (sandbox) và tiếp cận mạng lưới quỹ đầu tư mạo hiểm hàng đầu khu vực.",
+        images: ["/achivements/sihub-announcement.png", "/achivements/sihub-pitching-1.png", "/achivements/sihub-pitching-2.png"]
       },
       {
         title: "Top 10 Dự án Tiềm năng Toàn cầu",
-        subtitle: "Thế vận hội Blockchain Quốc tế 2023 (IBCOL)"
+        subtitle: "Thế vận hội Blockchain Quốc tế 2023 (IBCOL)",
+        category: "Sáng tạo Toàn cầu",
+        description: "Đại diện cho Việt Nam (dưới tên dự án LENDMI), FundLok đã giành vị trí top 10 toàn cầu nhờ tiên phong trong việc chấm điểm tín dụng dựa trên blockchain và tối ưu hóa bể thanh khoản an toàn cho thị trường mới nổi.",
+        images: [],
+        pdf: "/achivements/ibcol-certificate.pdf"
       }
     ]
   }
+
+  // Auto-reset activeImageIndex when activeAchievement changes
+  useEffect(() => {
+    setActiveImageIndex(0)
+  }, [activeAchievement])
+
+  // Handle keyboard events (Escape key) for the lightbox modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setLightboxImage(null)
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [])
 
   const handlePrevAchievement = () => {
     setDirection("left")
@@ -385,61 +427,33 @@ export function LandingPageClient() {
         </section>
 
         {/* Achievements Section */}
-        <section ref={achievementsRef} className="w-full py-16 px-6 max-w-5xl mx-auto border-t border-border/10 relative z-20 scroll-mt-20">
-          <div className="text-center mb-8">
+        {/* Achievements Section */}
+        <section ref={achievementsRef} className="w-full py-16 px-6 max-w-6xl mx-auto border-t border-border/10 relative z-20 scroll-mt-20">
+          <div className="text-center mb-10">
             <h2 className="font-mono text-xs tracking-widest text-emerald-600 dark:text-emerald-400 font-bold uppercase mb-2">
               {currentLocale === "vi" ? "THÀNH TỰU NỔI BẬT" : "RECOGNITIONS"}
             </h2>
             <h3 className="font-sans text-3xl font-extrabold text-foreground tracking-tight">
               {strings.achievementsTitle}
             </h3>
+            <p className="font-sans text-sm text-muted-foreground/80 max-w-2xl mx-auto mt-2">
+              {strings.achievementsSubtitle}
+            </p>
           </div>
 
-          <div className="relative w-full flex items-center justify-between min-h-[220px] md:min-h-[260px] bg-white/40 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-3xl p-6 md:p-10 shadow-lg overflow-hidden backdrop-blur-md">
+          <div className="relative w-full flex items-center bg-white/40 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-3xl p-4 md:p-8 shadow-xl backdrop-blur-md overflow-hidden min-h-[660px] sm:min-h-[740px] lg:min-h-0 lg:h-[480px]">
             
-            {/* Laurel Wreath SVG Background */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0">
-              <svg viewBox="0 0 600 300" className="w-full max-w-[550px] h-auto text-amber-500/10 dark:text-amber-500/5 transition-colors duration-300" fill="currentColor">
-                {/* Left Side */}
-                <g transform="translate(190, 150)">
-                  <path d="M 0,80 C -50,70 -80,20 -60,-40" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" />
-                  <path d="M -60,-40 C -70,-50 -65,-65 -50,-60 C -45,-45 -50,-35 -60,-40" />
-                  <path d="M -50,-20 C -65,-28 -70,-42 -55,-45 C -45,-35 -40,-25 -50,-20" />
-                  <path d="M -62,-15 C -75,-12 -80,-25 -68,-32 C -58,-28 -55,-18 -62,-15" />
-                  <path d="M -38,5 C -52,-3 -55,-18 -42,-20 C -32,-12 -28,-2 -38,5" />
-                  <path d="M -54,12 C -68,18 -70,2 -58,-2 C -48,0 -45,10 -54,12" />
-                  <path d="M -23,30 C -35,25 -38,10 -26,8 C -16,15 -13,25 -23,30" />
-                  <path d="M -40,40 C -52,50 -55,35 -42,30 C -32,32 -30,42 -40,40" />
-                  <path d="M -6,52 C -16,50 -18,35 -6,30 C 3,35 5,48 -6,52" />
-                  <path d="M -20,62 C -30,75 -35,60 -22,52 C -12,52 -10,62 -20,62" />
-                </g>
-                {/* Right Side */}
-                <g transform="translate(410, 150) scale(-1, 1)">
-                  <path d="M 0,80 C -50,70 -80,20 -60,-40" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" />
-                  <path d="M -60,-40 C -70,-50 -65,-65 -50,-60 C -45,-45 -50,-35 -60,-40" />
-                  <path d="M -50,-20 C -65,-28 -70,-42 -55,-45 C -45,-35 -40,-25 -50,-20" />
-                  <path d="M -62,-15 C -75,-12 -80,-25 -68,-32 C -58,-28 -55,-18 -62,-15" />
-                  <path d="M -38,5 C -52,-3 -55,-18 -42,-20 C -32,-12 -28,-2 -38,5" />
-                  <path d="M -54,12 C -68,18 -70,2 -58,-2 C -48,0 -45,10 -54,12" />
-                  <path d="M -23,30 C -35,25 -38,10 -26,8 C -16,15 -13,25 -23,30" />
-                  <path d="M -40,40 C -52,50 -55,35 -42,30 C -32,32 -30,42 -40,40" />
-                  <path d="M -6,52 C -16,50 -18,35 -6,30 C 3,35 5,48 -6,52" />
-                  <path d="M -20,62 C -30,75 -35,60 -22,52 C -12,52 -10,62 -20,62" />
-                </g>
-              </svg>
-            </div>
-
             {/* Left navigation arrow button */}
             <button
               onClick={handlePrevAchievement}
-              className="w-10 h-10 rounded-full bg-emerald-600/95 hover:bg-emerald-700 text-white flex items-center justify-center shadow-md transition-all duration-300 hover:scale-105 active:scale-95 z-20 shrink-0 mr-2 md:mr-4"
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-emerald-600/95 hover:bg-emerald-700 text-white flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 z-30 hidden md:flex"
               aria-label="Previous Achievement"
             >
               <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
             </button>
 
-            {/* Centered Achievement Content */}
-            <div className="flex-1 flex flex-col items-center justify-center text-center z-10 px-2 md:px-12">
+            {/* Main Content Area */}
+            <div className="w-full px-2 md:px-10 py-4">
               <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
                   key={activeAchievement}
@@ -447,7 +461,7 @@ export function LandingPageClient() {
                   variants={{
                     initial: (dir: "left" | "right") => ({
                       opacity: 0,
-                      x: dir === "right" ? 60 : -60
+                      x: dir === "right" ? 50 : -50
                     }),
                     animate: {
                       opacity: 1,
@@ -455,21 +469,142 @@ export function LandingPageClient() {
                     },
                     exit: (dir: "left" | "right") => ({
                       opacity: 0,
-                      x: dir === "right" ? -60 : 60
+                      x: dir === "right" ? -50 : 50
                     })
                   }}
                   initial="initial"
                   animate="animate"
                   exit="exit"
-                  transition={{ duration: 0.25, ease: "easeInOut" }}
-                  className="flex flex-col items-center"
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center"
                 >
-                  <h4 className="font-sans text-base md:text-2xl font-extrabold text-foreground leading-snug max-w-2xl mb-2 md:mb-4">
-                    {achievementsData[currentLocale][activeAchievement].title}
-                  </h4>
-                  <p className="font-sans text-[10px] md:text-sm text-muted-foreground/80 leading-relaxed font-semibold max-w-xl">
-                    {achievementsData[currentLocale][activeAchievement].subtitle}
-                  </p>
+                  {/* Left Column: Image Showcase (lg:col-span-5) */}
+                  <div className="lg:col-span-5 flex flex-col items-center gap-4 w-full">
+                    {achievementsData[currentLocale][activeAchievement].images.length > 0 ? (
+                      <>
+                        {/* Active Image Container */}
+                        <div 
+                          className="relative w-full max-w-md mx-auto aspect-[4/3] rounded-2xl overflow-hidden border border-border/10 shadow-md group cursor-zoom-in bg-slate-950/5 dark:bg-white/5 flex items-center justify-center"
+                          onClick={() => setLightboxImage(achievementsData[currentLocale][activeAchievement].images[activeImageIndex])}
+                        >
+                          <Image
+                            src={achievementsData[currentLocale][activeAchievement].images[activeImageIndex]}
+                            alt={achievementsData[currentLocale][activeAchievement].title}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            sizes="(max-width: 1024px) 100vw, 400px"
+                          />
+                          {/* Zoom Indicator */}
+                          <div className="absolute inset-0 bg-slate-950/0 group-hover:bg-slate-950/30 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                            <div className="p-3 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/25">
+                              <Maximize2 className="w-5 h-5" />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Thumbnail Indicators (only shown if there are multiple images) */}
+                        {achievementsData[currentLocale][activeAchievement].images.length > 1 && (
+                          <div className="flex gap-2.5">
+                            {achievementsData[currentLocale][activeAchievement].images.map((img, idx) => (
+                              <button
+                                key={idx}
+                                onClick={() => setActiveImageIndex(idx)}
+                                className={`relative w-16 h-12 rounded-lg overflow-hidden border-2 transition-all ${
+                                  activeImageIndex === idx 
+                                    ? "border-emerald-500 scale-105 shadow-sm" 
+                                    : "border-transparent opacity-60 hover:opacity-100 hover:scale-102"
+                                }`}
+                              >
+                                <Image
+                                  src={img}
+                                  alt="Thumbnail"
+                                  fill
+                                  className="object-cover"
+                                  sizes="64px"
+                                />
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      /* Fallback Certificate Placeholder when no images are present */
+                      <div className="w-full max-w-md mx-auto aspect-[4/3] rounded-2xl border-2 border-dashed border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-slate-900/40 flex flex-col items-center justify-center p-6 text-center group transition-colors duration-300 hover:bg-emerald-500/5 hover:border-emerald-500/30">
+                        <div className="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110">
+                          <FileText className="w-8 h-8" />
+                        </div>
+                        <h5 className="font-sans font-extrabold text-sm text-foreground mb-1">
+                          {currentLocale === "vi" ? "Chương trình Toàn cầu" : "Global Program"}
+                        </h5>
+                        <p className="font-sans text-xs text-muted-foreground max-w-[200px] leading-relaxed mb-4">
+                          {currentLocale === "vi" 
+                            ? "Xem tài liệu chứng nhận chính thức của thế vận hội" 
+                            : "View the official olympiad verification document"}
+                        </p>
+                        {achievementsData[currentLocale][activeAchievement].pdf && (
+                          <a
+                            href={achievementsData[currentLocale][activeAchievement].pdf}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500 text-amber-600 dark:text-amber-500 hover:text-white transition-all duration-300 font-mono text-[10px] font-bold uppercase tracking-wider"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                            {currentLocale === "vi" ? "Mở PDF" : "Open PDF"}
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Right Column: Text & Metadata Content (lg:col-span-7) */}
+                  <div className="lg:col-span-7 flex flex-col justify-center text-left lg:pl-4">
+                    {/* Category tag */}
+                    <div className="inline-block px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-mono font-bold tracking-wider uppercase w-fit mb-3">
+                      {achievementsData[currentLocale][activeAchievement].category}
+                    </div>
+
+                    {/* Title */}
+                    <h4 className="font-sans text-xl md:text-2xl font-extrabold text-foreground leading-snug tracking-tight mb-2">
+                      {achievementsData[currentLocale][activeAchievement].title}
+                    </h4>
+
+                    {/* Subtitle / Organisation */}
+                    <p className="font-sans text-xs md:text-sm text-amber-600 dark:text-amber-500 font-bold tracking-wide mb-4">
+                      {achievementsData[currentLocale][activeAchievement].subtitle}
+                    </p>
+
+                    {/* Paragraph Description */}
+                    <p className="font-sans text-sm text-muted-foreground/90 leading-relaxed mb-6">
+                      {achievementsData[currentLocale][activeAchievement].description}
+                    </p>
+
+                    {/* Action buttons */}
+                    <div className="flex flex-wrap gap-4">
+                      {/* View PDF Certificate Button if available */}
+                      {achievementsData[currentLocale][activeAchievement].pdf && (
+                        <a
+                          href={achievementsData[currentLocale][activeAchievement].pdf}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 text-xs font-mono tracking-widest font-bold uppercase transition-all duration-300 shadow-md hover:shadow-emerald-500/15"
+                        >
+                          <FileText className="w-4 h-4" />
+                          {currentLocale === "vi" ? "XEM CHỨNG NHẬN" : "VIEW CERTIFICATE"}
+                        </a>
+                      )}
+                      
+                      {/* Enlarge Photo Button - Only render if images exist */}
+                      {achievementsData[currentLocale][activeAchievement].images.length > 0 && (
+                        <button
+                          onClick={() => setLightboxImage(achievementsData[currentLocale][activeAchievement].images[activeImageIndex])}
+                          className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-slate-900/50 hover:bg-zinc-100 dark:hover:bg-slate-800 text-zinc-700 dark:text-zinc-300 text-xs font-mono tracking-widest font-bold uppercase transition-all duration-300"
+                        >
+                          <Maximize2 className="w-4 h-4" />
+                          {currentLocale === "vi" ? "PHÓNG TO ẢNH" : "ENLARGE PHOTO"}
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -477,7 +612,28 @@ export function LandingPageClient() {
             {/* Right navigation arrow button */}
             <button
               onClick={handleNextAchievement}
-              className="w-10 h-10 rounded-full bg-emerald-600/95 hover:bg-emerald-700 text-white flex items-center justify-center shadow-md transition-all duration-300 hover:scale-105 active:scale-95 z-20 shrink-0 ml-2 md:ml-4"
+              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-emerald-600/95 hover:bg-emerald-700 text-white flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 z-30 hidden md:flex"
+              aria-label="Next Achievement"
+            >
+              <ChevronRight className="w-5 h-5" strokeWidth={2.5} />
+            </button>
+          </div>
+
+          {/* Mobile Navigation controls */}
+          <div className="flex items-center justify-center gap-6 mt-6 md:hidden">
+            <button
+              onClick={handlePrevAchievement}
+              className="w-10 h-10 rounded-full bg-emerald-600/95 hover:bg-emerald-700 text-white flex items-center justify-center shadow-md transition-all duration-300"
+              aria-label="Previous Achievement"
+            >
+              <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
+            </button>
+            <span className="font-mono text-xs font-bold text-zinc-500">
+              {activeAchievement + 1} / {achievementsData[currentLocale].length}
+            </span>
+            <button
+              onClick={handleNextAchievement}
+              className="w-10 h-10 rounded-full bg-emerald-600/95 hover:bg-emerald-700 text-white flex items-center justify-center shadow-md transition-all duration-300"
               aria-label="Next Achievement"
             >
               <ChevronRight className="w-5 h-5" strokeWidth={2.5} />
@@ -677,6 +833,49 @@ export function LandingPageClient() {
           </div>
         </div>
       </footer>
+
+      {/* Lightbox Modal for Enlarge Photo */}
+      <AnimatePresence>
+        {lightboxImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4"
+            onClick={() => setLightboxImage(null)}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setLightboxImage(null)}
+              className="absolute top-4 right-4 z-50 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all outline-none border border-white/15"
+              aria-label="Close Lightbox"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            {/* Modal Image Wrapper */}
+            <motion.div
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="relative max-w-5xl max-h-[85vh] w-full h-full flex items-center justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="relative w-full h-full max-w-full max-h-full aspect-[4/3] lg:aspect-auto">
+                <Image
+                  src={lightboxImage}
+                  alt="Enlarged Achievement Photo"
+                  fill
+                  className="object-contain"
+                  sizes="100vw"
+                  priority
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

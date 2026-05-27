@@ -32,7 +32,11 @@ export const metadata: Metadata = {
     "investor portal",
     "flexible funding",
     "AI credit scoring",
-    "DeFi lending"
+    "DeFi lending",
+    "Sustainability in Action",
+    "Australian Government",
+    "SIHUB FinTech",
+    "IBCOL 2023"
   ],
   openGraph: {
     title: "FundLok | Flexible Capital Platform for SMEs",

@@ -22,7 +22,14 @@ export const metadata: Metadata = {
     "FundLok CFO",
     "FundLok CTO",
     "FundLok founding team",
-    "FundLok founders"
+    "FundLok founders",
+    "Sustainability in Action 2024",
+    "Australian Government",
+    "SIHUB 2025",
+    "Startup and Innovation Hub Ho Chi Minh City",
+    "International Blockchain Olympiad 2023",
+    "IBCOL 2023",
+    "LENDMI"
   ],
   openGraph: {
     title: "FundLok | Flexible Capital Platform for SMEs",
@@ -45,6 +52,11 @@ export default function Page() {
     "url": "https://www.fundlok.com",
     "logo": "https://www.fundlok.com/images/logo.png",
     "description": "FundLok connects investors with SMEs through a technology-led financing platform, using data and AI to support flexible funding aligned with real business needs.",
+    "award": [
+      "Top 3 Project to Facilitate Investments - Sustainability in Action 2024 (Australian Government)",
+      "Seed Stage Start-up Incubation in FinTech Industry 2025 (Startup and Innovation Hub Ho Chi Minh City - SIHUB)",
+      "Top 10 Potential Project Global - International Blockchain Olympiad 2023 (IBCOL)"
+    ],
     "founder": [
       {
         "@type": "Person",
