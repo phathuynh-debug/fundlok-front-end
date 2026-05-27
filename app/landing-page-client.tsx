@@ -102,9 +102,9 @@ const LinkedInIcon = (props: React.SVGProps<SVGSVGElement>) => (
 // Multilingual dictionary for static landing page assets
 const dict = {
   en: {
-    heroTitle: "Radically transforming credit, on-chain",
+    heroTitle: "Flexible Capital for MSMEs",
     heroSubtitle:
-      "Building a marketplace of scaled on-chain credit facilities that displace legacy lending infrastructure and loan origination processes.",
+      "FundLok helps MSMEs access financing with repayment aligned to actual revenue, supported by data, AI, and transparent on-chain investor infrastructure.",
     navProduct: "PRODUCT",
     navProcess: "HOW IT WORKS",
     navContact: "CONTACT",
@@ -136,9 +136,9 @@ const dict = {
     teamCto: "Chief Technological Officer",
   },
   vi: {
-    heroTitle: "Cách mạng hóa tín dụng hoàn toàn trên chuỗi",
+    heroTitle: "Sàn vốn linh hoạt cho doanh nghiệp vừa và nhỏ",
     heroSubtitle:
-      "Kiến tạo thị trường cho các cơ sở tín dụng on-chain quy mô lớn, thay thế cơ sở hạ tầng tài chính truyền thống và quy trình khởi tạo khoản vay ở từng giai đoạn.",
+      "FundLok giúp các doanh nghiệp vừa và nhỏ tiếp cận vốn vay với việc trả nợ được điều chỉnh theo doanh thu thực tế, được hỗ trợ bởi dữ liệu, AI và hạ tầng nhà đầu tư minh bạch trên chuỗi.",
     navProduct: "SẢN PHẨM",
     navProcess: "QUY TRÌNH",
     navContact: "LIÊN HỆ",
@@ -491,6 +491,7 @@ export function LandingPageClient() {
         {/* Process Flow Section (How it works - waves do not cover this section) */}
         <section
           ref={processRef}
+          id="process"
           className="w-full py-16 px-6 max-w-6xl mx-auto border-t border-border/10 relative z-20 scroll-mt-20"
         >
           <div className="text-center mb-12">
@@ -510,6 +511,7 @@ export function LandingPageClient() {
         {/* Achievements Section */}
         <section
           ref={achievementsRef}
+          id="achievements"
           className="w-full py-16 px-6 max-w-6xl mx-auto border-t border-border/10 relative z-20 scroll-mt-20"
         >
           <div className="text-center mb-10">
@@ -770,6 +772,7 @@ export function LandingPageClient() {
         {/* Meet Our Team Section */}
         <section
           ref={teamRef}
+          id="team"
           className="w-full py-16 px-6 max-w-6xl mx-auto border-t border-border/10 relative z-20 scroll-mt-20"
         >
           <div className="text-center mb-12">
@@ -890,7 +893,8 @@ export function LandingPageClient() {
       {/* Footer */}
       <footer
         ref={footerRef}
-        className="w-full bg-background/30 border-t border-border/10 py-12 relative z-20"
+        id="contact"
+        className="w-full bg-background/30 border-t border-border/10 py-12 relative z-20 scroll-mt-20"
       >
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

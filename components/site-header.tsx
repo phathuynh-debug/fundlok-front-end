@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import Logo from "@/components/logo";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -15,6 +16,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+
 type SiteHeaderProps = {
   onProcess?: (e: React.MouseEvent) => void;
   onAchievements?: (e: React.MouseEvent) => void;
@@ -29,8 +31,70 @@ export default function SiteHeader({
   onContact,
 }: SiteHeaderProps) {
   const { t } = useTranslations();
+  const router = useRouter();
+  const pathname = usePathname();
   const [contactOpen, setContactOpen] = useState(false);
   const [mobileContactOpen, setMobileContactOpen] = useState(false);
+
+  const handleProcessClick = (e: React.MouseEvent) => {
+    if (pathname === "/") {
+      if (onProcess) {
+        onProcess(e);
+      } else {
+        const element = document.getElementById("process");
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+    } else {
+      router.push("/#process");
+    }
+  };
+
+  const handleAchievementsClick = (e: React.MouseEvent) => {
+    if (pathname === "/") {
+      if (onAchievements) {
+        onAchievements(e);
+      } else {
+        const element = document.getElementById("achievements");
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+    } else {
+      router.push("/#achievements");
+    }
+  };
+
+  const handleTeamClick = (e: React.MouseEvent) => {
+    if (pathname === "/") {
+      if (onTeam) {
+        onTeam(e);
+      } else {
+        const element = document.getElementById("team");
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+    } else {
+      router.push("/#team");
+    }
+  };
+
+  const handleContactClick = (e: React.MouseEvent) => {
+    if (pathname === "/") {
+      if (onContact) {
+        onContact(e);
+      } else {
+        const element = document.getElementById("contact");
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+    } else {
+      router.push("/#contact");
+    }
+  };
 
   return (
     <header className="sticky top-0 z-30 w-full bg-background/45 backdrop-blur-md border-b border-border/10 flex items-center justify-between px-6 py-4 md:px-12">
@@ -46,22 +110,33 @@ export default function SiteHeader({
           {t("header.product")}
         </Link>
 
+        <Link
+          href="/why-us"
+          className={`transition-colors duration-200 font-mono tracking-widest text-[11px] font-semibold ${
+            pathname === "/why-us"
+              ? "text-emerald-600 dark:text-emerald-400"
+              : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
+          }`}
+        >
+          {t("header.whyUs")}
+        </Link>
+
         <button
-          onClick={onProcess}
+          onClick={handleProcessClick}
           className="transition-colors duration-200 text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white cursor-pointer font-mono tracking-widest text-[11px] font-semibold bg-transparent border-none p-0 outline-none"
         >
           {t("header.howItWorks")}
         </button>
 
         <button
-          onClick={onAchievements}
+          onClick={handleAchievementsClick}
           className="transition-colors duration-200 text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white cursor-pointer font-mono tracking-widest text-[11px] font-semibold bg-transparent border-none p-0 outline-none"
         >
           {t("header.achievements")}
         </button>
 
         <button
-          onClick={onTeam}
+          onClick={handleTeamClick}
           className="transition-colors duration-200 text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white cursor-pointer font-mono tracking-widest text-[11px] font-semibold bg-transparent border-none p-0 outline-none"
         >
           {t("header.team")}
@@ -86,7 +161,7 @@ export default function SiteHeader({
             <div className="absolute right-0 top-full pt-2 w-44 z-40">
               <div className="bg-white dark:bg-slate-900 border border-border/30 rounded-md shadow-lg overflow-hidden">
                 <button
-                  onClick={onContact}
+                  onClick={handleContactClick}
                   className="w-full text-left px-3 py-2 text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-slate-800 cursor-pointer"
                 >
                   {t("header.contactUs")}
@@ -154,8 +229,21 @@ export default function SiteHeader({
               </SheetClose>
 
               <SheetClose asChild>
+                <Link
+                  href="/why-us"
+                  className={`text-left py-2 font-mono tracking-widest text-xs font-bold transition-colors ${
+                    pathname === "/why-us"
+                      ? "text-emerald-600 dark:text-emerald-400"
+                      : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
+                  }`}
+                >
+                  {t("header.whyUs")}
+                </Link>
+              </SheetClose>
+
+              <SheetClose asChild>
                 <button
-                  onClick={onProcess}
+                  onClick={handleProcessClick}
                   className="text-left py-2 font-mono tracking-widest text-xs font-bold text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white cursor-pointer bg-transparent border-none p-0 outline-none transition-colors"
                 >
                   {t("header.howItWorks")}
@@ -164,7 +252,7 @@ export default function SiteHeader({
 
               <SheetClose asChild>
                 <button
-                  onClick={onAchievements}
+                  onClick={handleAchievementsClick}
                   className="text-left py-2 font-mono tracking-widest text-xs font-bold text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white cursor-pointer bg-transparent border-none p-0 outline-none transition-colors"
                 >
                   {t("header.achievements")}
@@ -173,7 +261,7 @@ export default function SiteHeader({
 
               <SheetClose asChild>
                 <button
-                  onClick={onTeam}
+                  onClick={handleTeamClick}
                   className="text-left py-2 font-mono tracking-widest text-xs font-bold text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white cursor-pointer bg-transparent border-none p-0 outline-none transition-colors"
                 >
                   {t("header.team")}
@@ -194,7 +282,7 @@ export default function SiteHeader({
                   <div className="flex flex-col gap-3 pl-3 py-2 border-l border-zinc-200/50 dark:border-zinc-800/50">
                     <SheetClose asChild>
                       <button
-                        onClick={onContact}
+                        onClick={handleContactClick}
                         className="text-left text-xs font-bold font-mono tracking-wider text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-white cursor-pointer bg-transparent border-none p-0 outline-none transition-colors"
                       >
                         {t("header.contactUs")}

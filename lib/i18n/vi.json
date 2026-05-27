@@ -414,6 +414,37 @@
     "contactUs": "Liên hệ",
     "faq": "FAQ",
     "enterApp": "VÀO ỨNG DỤNG",
-    "navigationMenu": "Danh mục"
+    "navigationMenu": "Danh mục",
+    "whyUs": "WHY US"
+  },
+  "specialPage": {
+    "title": "Vì sao chọn FundLok",
+    "subtitle": "Khám phá tầm nhìn của chúng tôi và điều làm cho các giải pháp vốn linh hoạt trở nên độc đáo.",
+    "vision": {
+      "header": "Tầm nhìn của FundLok",
+      "smeStory": "FundLok tin rằng mỗi doanh nghiệp SME đều có một câu chuyện khác nhau",
+      "paragraph1": "Dòng tiền, tốc độ tăng trưởng và áp lực trả nợ không giống nhau đối với mọi doanh nghiệp.",
+      "paragraph2": "Đó là lý do tại sao chúng tôi xây dựng các giải pháp vốn linh hoạt thích ứng với từng tình huống thực tế.",
+      "highlight": "Từ đó, các khoản đầu tư vào SME trở thành tài sản thậm chí còn tốt hơn",
+      "description": "Khi tài chính phù hợp với doanh nghiệp, các SME sẽ phát triển bền vững hơn, các nhà đầu tư có được niềm tin lớn hơn và nền kinh tế hoạt động hiệu quả hơn."
+    },
+    "whySpecial": {
+      "header": "Tại sao FundLok đặc biệt?",
+      "safetyTitle": "An toàn cho Nhà đầu tư",
+      "safetyDesc": "Cơ chế bảo vệ mạnh mẽ và cấu trúc mang lại lợi nhuận tự tin.",
+      "safetyItem1": "Thu nhập ổn định, hàng ngày",
+      "safetyItem2": "Thông tin minh bạch, rõ ràng và có tính kiểm toán cao",
+      "safetyItem3": "Lãi suất được hoàn trả lũy tiến phụ thuộc vào hiệu suất của SME",
+      "fittingTitle": "Phù hợp với từng SME",
+      "fittingDesc": "Giải pháp tài chính phù hợp, liên kết chặt chẽ với chu kỳ tăng trưởng tự nhiên của doanh nghiệp.",
+      "fittingItem1": "Trả nợ bằng cách sử dụng doanh thu hàng ngày",
+      "fittingItem2": "Kích thước khoản vay & điều khoản thanh toán linh hoạt",
+      "fittingItem3": "Hệ thống tự động, trực quan & có tính hợp tác cao",
+      "transparencyTitle": "Minh bạch, Công khai, Tự động",
+      "transparencyDesc": "Vận hành không cần trung gian tin cậy, thúc đẩy bởi đầu vào dữ liệu chuẩn và xác thực tự động.",
+      "transparencyItem1": "Đọc tài liệu, đánh giá khoản vay và tính toán lãi suất tự động 100%",
+      "transparencyItem2": "Dữ liệu gửi lên phải từ các nguồn đã được xác thực để bảo vệ tất cả các bên",
+      "transparencyItem3": "Báo cáo tài chính doanh nghiệp & đánh giá sức khỏe khoản vay theo thời gian thực"
+    }
   }
 }

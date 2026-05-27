@@ -414,6 +414,37 @@
     "contactUs": "Contact Us",
     "faq": "FAQ",
     "enterApp": "ENTER APP",
-    "navigationMenu": "Navigation Menu"
+    "navigationMenu": "Navigation Menu",
+    "whyUs": "WHY US"
+  },
+  "specialPage": {
+    "title": "Why FundLok",
+    "subtitle": "Discover our vision and what makes our flexible capital solutions unique.",
+    "vision": {
+      "header": "FundLok's Vision",
+      "smeStory": "FundLok believes every SME has a different story",
+      "paragraph1": "Cash flow, growth pace, and repayment pressure are not the same for every business.",
+      "paragraph2": "That is why we build flexible capital solutions that adapt to each real-world situation.",
+      "highlight": "Then SME investments become an even better asset",
+      "description": "When financing fits the business, SMEs grow more sustainably, investors gain greater confidence, and the economy functions more efficiently."
+    },
+    "whySpecial": {
+      "header": "Why is FundLok special?",
+      "safetyTitle": "Safety for Investors",
+      "safetyDesc": "Robust protection mechanisms and structure to deliver confident returns.",
+      "safetyItem1": "Stable, daily income",
+      "safetyItem2": "Transparent, clear, and highly auditable information",
+      "safetyItem3": "Interest repaid progressively depending on SME's performance",
+      "fittingTitle": "Fitting to each SME",
+      "fittingDesc": "Tailored financing that aligns with the natural cycles of business growth.",
+      "fittingItem1": "Repay off debt using daily revenue",
+      "fittingItem2": "Flexible loan size & payment term",
+      "fittingItem3": "Automatic, intuitive & highly collaborative system",
+      "transparencyTitle": "Transparent, Public, Automatic",
+      "transparencyDesc": "Trust-free operation driven by standard data inputs and automated verification.",
+      "transparencyItem1": "Documents reading, loan assessment, and interest calculations are 100% automatic",
+      "transparencyItem2": "Data submitted must be from verified sources to protect all parties",
+      "transparencyItem3": "Real-time business financial report & loan health assessment"
+    }
   }
 }
