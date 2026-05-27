@@ -105,7 +105,7 @@ export default function Mockup(props: MockupProps) {
     });
 
   const matrixSme = (showResults: boolean) => (
-    <table className="w-full text-left text-[10px] md:text-[11px]">
+    <table className="w-full text-left text-[10px] md:text-[11px] matrix-table">
       <tbody>
         <tr className="border-b border-zinc-900/40">
           <td className="py-2 font-semibold text-zinc-400">Monthly Revenue</td>
@@ -162,7 +162,7 @@ export default function Mockup(props: MockupProps) {
   );
 
   const matrixInvestor = (showResults: boolean) => (
-    <table className="w-full text-left text-[10px] md:text-[11px]">
+    <table className="w-full text-left text-[10px] md:text-[11px] matrix-table">
       <tbody>
         <tr className="border-b border-zinc-900/40">
           <td className="py-2 font-semibold text-zinc-400">Investment Size</td>
@@ -344,7 +344,7 @@ export default function Mockup(props: MockupProps) {
                               onChange={(e) =>
                                 setSmeLoanSize(Number(e.target.value))
                               }
-                              className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none"
+                              className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none thumb-sm"
                             />
                           </div>
 
@@ -365,7 +365,7 @@ export default function Mockup(props: MockupProps) {
                               onChange={(e) =>
                                 setSmeRevenue(Number(e.target.value))
                               }
-                              className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none"
+                              className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none thumb-sm"
                             />
                           </div>
 
@@ -386,7 +386,7 @@ export default function Mockup(props: MockupProps) {
                               onChange={(e) =>
                                 setSmeDuration(Number(e.target.value))
                               }
-                              className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none"
+                              className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none thumb-sm"
                             />
                           </div>
                         </div>
@@ -517,7 +517,7 @@ export default function Mockup(props: MockupProps) {
                             step="10000"
                             value={invSize}
                             onChange={(e) => setInvSize(Number(e.target.value))}
-                            className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none"
+                            className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none thumb-sm"
                           />
                         </div>
 
@@ -536,7 +536,7 @@ export default function Mockup(props: MockupProps) {
                             step="0.5"
                             value={invRisk}
                             onChange={(e) => setInvRisk(Number(e.target.value))}
-                            className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none"
+                            className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none thumb-sm"
                           />
                         </div>
 
@@ -557,7 +557,7 @@ export default function Mockup(props: MockupProps) {
                             onChange={(e) =>
                               setInvDuration(Number(e.target.value))
                             }
-                            className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none"
+                            className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none thumb-sm"
                           />
                         </div>
                       </div>
@@ -759,7 +759,7 @@ export default function Mockup(props: MockupProps) {
                           onChange={(e) =>
                             setSmeLoanSize(Number(e.target.value))
                           }
-                          className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none"
+                          className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none thumb-sm"
                         />
                       </div>
 
@@ -780,7 +780,7 @@ export default function Mockup(props: MockupProps) {
                           onChange={(e) =>
                             setSmeRevenue(Number(e.target.value))
                           }
-                          className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none"
+                          className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none thumb-sm"
                         />
                       </div>
 
@@ -801,7 +801,7 @@ export default function Mockup(props: MockupProps) {
                           onChange={(e) =>
                             setSmeDuration(Number(e.target.value))
                           }
-                          className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none"
+                          className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none thumb-sm"
                         />
                       </div>
                     </div>
@@ -906,7 +906,7 @@ export default function Mockup(props: MockupProps) {
                         step="10000"
                         value={invSize}
                         onChange={(e) => setInvSize(Number(e.target.value))}
-                        className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none"
+                        className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none thumb-sm"
                       />
                     </div>
 
@@ -925,7 +925,7 @@ export default function Mockup(props: MockupProps) {
                         step="0.5"
                         value={invRisk}
                         onChange={(e) => setInvRisk(Number(e.target.value))}
-                        className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none"
+                        className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none thumb-sm"
                       />
                     </div>
 
@@ -944,7 +944,7 @@ export default function Mockup(props: MockupProps) {
                         step="1"
                         value={invDuration}
                         onChange={(e) => setInvDuration(Number(e.target.value))}
-                        className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none"
+                        className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none thumb-sm"
                       />
                     </div>
                   </div>
