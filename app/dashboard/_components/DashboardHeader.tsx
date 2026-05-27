@@ -1,7 +1,7 @@
 "use client";
 
 import { useLogout, useRequireAuth } from "@/hooks/use-authentication";
-import { LogOut, Home, Briefcase, Loader2 } from "lucide-react";
+import { LogOut, Home, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { LocaleSwitcher } from "@/components/locale-switcher";

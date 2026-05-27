@@ -1,49 +1,81 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import Image from "next/image"
-import { useState, useRef, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { 
-  TrendingUp, 
+import Link from "next/link";
+import Image from "next/image";
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   ExternalLink,
   FileText,
   Maximize2,
-  X
-} from "lucide-react"
-import { useTranslations } from "@/lib/i18n"
-import { GuillocheWaves } from "@/components/guilloche-waves"
-import SiteHeader from "@/components/site-header"
-import Mockup from "@/components/mockup"
-import { LocaleSwitcher } from "@/components/locale-switcher"
-import { InteractiveFlow } from "@/components/interactive-flow"
-import { ThemeToggle } from "@/components/theme-toggle"
+  X,
+} from "lucide-react";
+import { useTranslations } from "@/lib/i18n";
+import { GuillocheWaves } from "@/components/guilloche-waves";
+import SiteHeader from "@/components/site-header";
+import Mockup from "@/components/mockup";
+import { InteractiveFlow } from "@/components/interactive-flow";
 
 // Symmetrical custom vector logos
 const FasanaraLogo = () => (
   <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-accent/15 text-accent ring-1 ring-accent/30 shrink-0">
-    <svg className="w-7 h-7 animate-pulse" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="24" cy="24" r="12" stroke="currentColor" strokeWidth="2.5" strokeDasharray="3 3" />
+    <svg
+      className="w-7 h-7 animate-pulse"
+      viewBox="0 0 48 48"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle
+        cx="24"
+        cy="24"
+        r="12"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeDasharray="3 3"
+      />
       <circle cx="24" cy="24" r="5" fill="currentColor" />
     </svg>
   </div>
-)
+);
 
 const FalconLogo = () => (
   <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-accent/15 text-accent ring-1 ring-accent/30 shrink-0">
-    <svg className="w-7 h-7" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M10 14L24 28L38 14" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M10 24L24 38L38 24" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" strokeOpacity="0.4" />
+    <svg
+      className="w-7 h-7"
+      viewBox="0 0 48 48"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M10 14L24 28L38 14"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M10 24L24 38L38 24"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeOpacity="0.4"
+      />
     </svg>
   </div>
-)
+);
 
 const BastionLogo = () => (
   <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-accent/15 text-accent ring-1 ring-accent/30 shrink-0">
-    <svg className="w-7 h-7" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      className="w-7 h-7"
+      viewBox="0 0 48 48"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <circle cx="16" cy="16" r="3.5" fill="currentColor" />
       <circle cx="32" cy="16" r="3.5" fill="currentColor" fillOpacity="0.5" />
       <circle cx="16" cy="32" r="3.5" fill="currentColor" fillOpacity="0.5" />
@@ -54,19 +86,25 @@ const BastionLogo = () => (
       <path d="M20 32H28" stroke="currentColor" strokeWidth="2" />
     </svg>
   </div>
-)
+);
 
 const LinkedInIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className={props.className} {...props}>
+  <svg
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={props.className}
+    {...props}
+  >
     <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
   </svg>
-)
+);
 
 // Multilingual dictionary for static landing page assets
 const dict = {
   en: {
     heroTitle: "Radically transforming credit, on-chain",
-    heroSubtitle: "Building a marketplace of scaled on-chain credit facilities that displace legacy lending infrastructure and loan origination processes.",
+    heroSubtitle:
+      "Building a marketplace of scaled on-chain credit facilities that displace legacy lending infrastructure and loan origination processes.",
     navProduct: "PRODUCT",
     navProcess: "HOW IT WORKS",
     navContact: "CONTACT",
@@ -84,19 +122,23 @@ const dict = {
     fixedRate: "Fixed rate",
     variableRate: "Variable rate",
     processTitle: "A clearer, technology-enabled funding journey",
-    processSubtitle: "FundLok is designed to make funding more flexible for SMEs and more transparent for investors — combining a customer-friendly experience with automation, data-driven assessment, secure fund handling, and clear repayment tracking.",
+    processSubtitle:
+      "FundLok is designed to make funding more flexible for SMEs and more transparent for investors — combining a customer-friendly experience with automation, data-driven assessment, secure fund handling, and clear repayment tracking.",
     ourSolution: "Our Solution",
     achievementsTitle: "FundLok's Achievements",
-    achievementsSubtitle: "Recognized locally and globally for innovation, impact, and technology in FinTech and investment facilitation.",
+    achievementsSubtitle:
+      "Recognized locally and globally for innovation, impact, and technology in FinTech and investment facilitation.",
     teamTitle: "Meet Our Team",
-    teamSubtitle: "The builders and visionaries behind FundLok's technology, financial structuring, and growth.",
+    teamSubtitle:
+      "The builders and visionaries behind FundLok's technology, financial structuring, and growth.",
     teamCfo: "Chief Financial Officer",
     teamCeo: "Founder & Chief Executive Officer",
-    teamCto: "Chief Technological Officer"
+    teamCto: "Chief Technological Officer",
   },
   vi: {
     heroTitle: "Cách mạng hóa tín dụng hoàn toàn trên chuỗi",
-    heroSubtitle: "Kiến tạo thị trường cho các cơ sở tín dụng on-chain quy mô lớn, thay thế cơ sở hạ tầng tài chính truyền thống và quy trình khởi tạo khoản vay ở từng giai đoạn.",
+    heroSubtitle:
+      "Kiến tạo thị trường cho các cơ sở tín dụng on-chain quy mô lớn, thay thế cơ sở hạ tầng tài chính truyền thống và quy trình khởi tạo khoản vay ở từng giai đoạn.",
     navProduct: "SẢN PHẨM",
     navProcess: "QUY TRÌNH",
     navContact: "LIÊN HỆ",
@@ -113,33 +155,36 @@ const dict = {
     fixedRate: "Lãi suất cố định",
     variableRate: "Lãi suất thả nổi",
     processTitle: "Hành trình gọi vốn rõ ràng hơn, hỗ trợ bởi công nghệ",
-    processSubtitle: "FundLok được thiết kế để giúp việc gọi vốn linh hoạt hơn cho doanh nghiệp SME và minh bạch hơn cho nhà đầu tư — kết hợp trải nghiệm thân thiện với khách hàng cùng quy trình tự động hóa, thẩm định bằng dữ liệu, quản lý quỹ an toàn và theo dõi hoàn trả rõ ràng.",
+    processSubtitle:
+      "FundLok được thiết kế để giúp việc gọi vốn linh hoạt hơn cho doanh nghiệp SME và minh bạch hơn cho nhà đầu tư — kết hợp trải nghiệm thân thiện với khách hàng cùng quy trình tự động hóa, thẩm định bằng dữ liệu, quản lý quỹ an toàn và theo dõi hoàn trả rõ ràng.",
     ourSolution: "Giải pháp của chúng tôi",
     achievementsTitle: "Thành tựu của FundLok",
-    achievementsSubtitle: "Được ghi nhận trong nước và quốc tế vì sự đổi mới sáng tạo, tầm ảnh hưởng và công nghệ trong lĩnh vực FinTech và thúc đẩy đầu tư.",
+    achievementsSubtitle:
+      "Được ghi nhận trong nước và quốc tế vì sự đổi mới sáng tạo, tầm ảnh hưởng và công nghệ trong lĩnh vực FinTech và thúc đẩy đầu tư.",
     teamTitle: "Đội ngũ sáng lập",
-    teamSubtitle: "Những người xây dựng và kiến tạo đằng sau công nghệ, cấu trúc tài chính và sự tăng trưởng của FundLok.",
+    teamSubtitle:
+      "Những người xây dựng và kiến tạo đằng sau công nghệ, cấu trúc tài chính và sự tăng trưởng của FundLok.",
     teamCfo: "Giám đốc Tài chính (CFO)",
     teamCeo: "Nhà sáng lập & Giám đốc Điều hành (CEO)",
-    teamCto: "Giám đốc Công nghệ (CTO)"
-  }
-}
+    teamCto: "Giám đốc Công nghệ (CTO)",
+  },
+};
 
 export function LandingPageClient() {
-  const { t, locale } = useTranslations()
-  const currentLocale = (locale === "vi" ? "vi" : "en") as "en" | "vi"
-  const strings = dict[currentLocale]
+  const { t, locale } = useTranslations();
+  const currentLocale = (locale === "vi" ? "vi" : "en") as "en" | "vi";
+  const strings = dict[currentLocale];
 
-  const [activeIndex, setActiveIndex] = useState(2) // Defaults to Bastion Trading (index 2)
-  const processRef = useRef<HTMLDivElement>(null)
-  const achievementsRef = useRef<HTMLDivElement>(null)
-  const teamRef = useRef<HTMLDivElement>(null)
-  const footerRef = useRef<HTMLDivElement>(null)
+  const [activeIndex, setActiveIndex] = useState(2); // Defaults to Bastion Trading (index 2)
+  const processRef = useRef<HTMLDivElement>(null);
+  const achievementsRef = useRef<HTMLDivElement>(null);
+  const teamRef = useRef<HTMLDivElement>(null);
+  const footerRef = useRef<HTMLDivElement>(null);
 
-  const [activeAchievement, setActiveAchievement] = useState(0)
-  const [activeImageIndex, setActiveImageIndex] = useState(0)
-  const [direction, setDirection] = useState<"left" | "right">("right")
-  const [lightboxImage, setLightboxImage] = useState<string | null>(null)
+  const [activeAchievement, setActiveAchievement] = useState(0);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [direction, setDirection] = useState<"left" | "right">("right");
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
 
   const achievementsData = {
     en: [
@@ -147,145 +192,171 @@ export function LandingPageClient() {
         title: "Top 3 Project to Facilitate Investments",
         subtitle: "Sustainability in Action 2024 - Australian Government",
         category: "Government Recognition",
-        description: "FundLok was recognized as a top-3 fintech project by the Australian Government for facilitating sustainable cross-border investments and ESG-aligned SME funding.",
-        images: ["/achivements/sustainability-action-1.png", "/achivements/sustainability-action-2.png"]
+        description:
+          "FundLok was recognized as a top-3 fintech project by the Australian Government for facilitating sustainable cross-border investments and ESG-aligned SME funding.",
+        images: [
+          "/achivements/sustainability-action-1.png",
+          "/achivements/sustainability-action-2.png",
+        ],
       },
       {
         title: "Seed Stage Start-up Incubation in FinTech Industry 2025",
         subtitle: "Startup and Innovation Hub Ho Chi Minh City (SIHUB)",
         category: "Incubation & Acceleration",
-        description: "Selected for the premium incubation program by SIHUB, receiving strategic mentorship, regulatory sandbox guidance, and network access to top regional venture capitals.",
-        images: ["/achivements/sihub-announcement.png", "/achivements/sihub-pitching-1.png", "/achivements/sihub-pitching-2.png"]
+        description:
+          "Selected for the premium incubation program by SIHUB, receiving strategic mentorship, regulatory sandbox guidance, and network access to top regional venture capitals.",
+        images: [
+          "/achivements/sihub-announcement.png",
+          "/achivements/sihub-pitching-1.png",
+          "/achivements/sihub-pitching-2.png",
+        ],
       },
       {
         title: "Top 10 Potential Project Global",
         subtitle: "International Blockchain Olympiad 2023",
         category: "Global Innovation",
-        description: "Representing Vietnam (under the project name LENDMI), FundLok won a top-10 global spot for pioneering blockchain-based credit scoring and secure liquidity pooling for emerging markets.",
+        description:
+          "Representing Vietnam (under the project name LENDMI), FundLok won a top-10 global spot for pioneering blockchain-based credit scoring and secure liquidity pooling for emerging markets.",
         images: [],
-        pdf: "/achivements/ibcol-certificate.pdf"
-      }
+        pdf: "/achivements/ibcol-certificate.pdf",
+      },
     ],
     vi: [
       {
         title: "Top 3 Dự án Thúc đẩy Đầu tư",
         subtitle: "Sustainability in Action 2024 - Chính phủ Úc",
         category: "Ghi nhận từ Chính phủ",
-        description: "FundLok được ghi nhận là một trong 3 dự án FinTech xuất sắc nhất bởi Chính phủ Úc trong việc thúc đẩy đầu tư bền vững và hỗ trợ vốn SME theo tiêu chuẩn ESG.",
-        images: ["/achivements/sustainability-action-1.png", "/achivements/sustainability-action-2.png"]
+        description:
+          "FundLok được ghi nhận là một trong 3 dự án FinTech xuất sắc nhất bởi Chính phủ Úc trong việc thúc đẩy đầu tư bền vững và hỗ trợ vốn SME theo tiêu chuẩn ESG.",
+        images: [
+          "/achivements/sustainability-action-1.png",
+          "/achivements/sustainability-action-2.png",
+        ],
       },
       {
         title: "Ươm tạo Khởi nghiệp Giai đoạn Hạt giống ngành FinTech 2025",
         subtitle: "Trung tâm Khởi nghiệp và Đổi mới sáng tạo TP.HCM (SIHUB)",
         category: "Ươm tạo & Tăng tốc",
-        description: "Được lựa chọn tham gia chương trình ươm tạo cao cấp của SIHUB, nhận hỗ trợ tư vấn chiến lược, hướng dẫn thử nghiệm pháp lý (sandbox) và tiếp cận mạng lưới quỹ đầu tư mạo hiểm hàng đầu khu vực.",
-        images: ["/achivements/sihub-announcement.png", "/achivements/sihub-pitching-1.png", "/achivements/sihub-pitching-2.png"]
+        description:
+          "Được lựa chọn tham gia chương trình ươm tạo cao cấp của SIHUB, nhận hỗ trợ tư vấn chiến lược, hướng dẫn thử nghiệm pháp lý (sandbox) và tiếp cận mạng lưới quỹ đầu tư mạo hiểm hàng đầu khu vực.",
+        images: [
+          "/achivements/sihub-announcement.png",
+          "/achivements/sihub-pitching-1.png",
+          "/achivements/sihub-pitching-2.png",
+        ],
       },
       {
         title: "Top 10 Dự án Tiềm năng Toàn cầu",
         subtitle: "Thế vận hội Blockchain Quốc tế 2023 (IBCOL)",
         category: "Sáng tạo Toàn cầu",
-        description: "Đại diện cho Việt Nam (dưới tên dự án LENDMI), FundLok đã giành vị trí top 10 toàn cầu nhờ tiên phong trong việc chấm điểm tín dụng dựa trên blockchain và tối ưu hóa bể thanh khoản an toàn cho thị trường mới nổi.",
+        description:
+          "Đại diện cho Việt Nam (dưới tên dự án LENDMI), FundLok đã giành vị trí top 10 toàn cầu nhờ tiên phong trong việc chấm điểm tín dụng dựa trên blockchain và tối ưu hóa bể thanh khoản an toàn cho thị trường mới nổi.",
         images: [],
-        pdf: "/achivements/ibcol-certificate.pdf"
-      }
-    ]
-  }
+        pdf: "/achivements/ibcol-certificate.pdf",
+      },
+    ],
+  };
 
   // Auto-reset activeImageIndex when activeAchievement changes
   useEffect(() => {
-    setActiveImageIndex(0)
-  }, [activeAchievement])
+    setActiveImageIndex(0);
+  }, [activeAchievement]);
 
   // Handle keyboard events (Escape key) for the lightbox modal
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        setLightboxImage(null)
+        setLightboxImage(null);
       }
-    }
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [])
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const handlePrevAchievement = () => {
-    setDirection("left")
-    setActiveAchievement((prev) => (prev === 0 ? achievementsData[currentLocale].length - 1 : prev - 1))
-  }
+    setDirection("left");
+    setActiveAchievement((prev) =>
+      prev === 0 ? achievementsData[currentLocale].length - 1 : prev - 1,
+    );
+  };
 
   const handleNextAchievement = () => {
-    setDirection("right")
-    setActiveAchievement((prev) => (prev === achievementsData[currentLocale].length - 1 ? 0 : prev + 1))
-  }
+    setDirection("right");
+    setActiveAchievement((prev) =>
+      prev === achievementsData[currentLocale].length - 1 ? 0 : prev + 1,
+    );
+  };
 
   // Interactive Phone Mockup States
-  const [tvlValue, setTvlValue] = useState(45)
-  const [drawdownPercent, setDrawdownPercent] = useState(70)
-  const [allocationValue, setAllocationValue] = useState(30)
-  
+  const [tvlValue, setTvlValue] = useState(45);
+  const [drawdownPercent, setDrawdownPercent] = useState(70);
+  const [allocationValue, setAllocationValue] = useState(30);
+
   // 3D Perspective Tilt States
-  const [rotateX, setRotateX] = useState(0)
-  const [rotateY, setRotateY] = useState(0)
-  const [shineX, setShineX] = useState(50)
-  const [shineY, setShineY] = useState(50)
+  const [rotateX, setRotateX] = useState(0);
+  const [rotateY, setRotateY] = useState(0);
+  const [shineX, setShineX] = useState(50);
+  const [shineY, setShineY] = useState(50);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const card = e.currentTarget
-    const rect = card.getBoundingClientRect()
-    const x = e.clientX - rect.left - rect.width / 2
-    const y = e.clientY - rect.top - rect.height / 2
-    setRotateX(-y / (rect.height / 10)) // Max 10 deg tilt
-    setRotateY(x / (rect.width / 10))
-    setShineX(((e.clientX - rect.left) / rect.width) * 100)
-    setShineY(((e.clientY - rect.top) / rect.height) * 100)
-  }
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    setRotateX(-y / (rect.height / 10)); // Max 10 deg tilt
+    setRotateY(x / (rect.width / 10));
+    setShineX(((e.clientX - rect.left) / rect.width) * 100);
+    setShineY(((e.clientY - rect.top) / rect.height) * 100);
+  };
 
   const handleMouseLeave = () => {
-    setRotateX(0)
-    setRotateY(0)
-    setShineX(50)
-    setShineY(50)
-  }
+    setRotateX(0);
+    setRotateY(0);
+    setShineX(50);
+    setShineY(50);
+  };
 
   // Smooth scroll handlers
   const scrollToProcess = (e: React.MouseEvent) => {
-    e.preventDefault()
-    processRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
-  }
+    e.preventDefault();
+    processRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   const scrollToAchievements = (e: React.MouseEvent) => {
-    e.preventDefault()
-    achievementsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
-  }
+    e.preventDefault();
+    achievementsRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
 
   const scrollToTeam = (e: React.MouseEvent) => {
-    e.preventDefault()
-    teamRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
-  }
+    e.preventDefault();
+    teamRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   const scrollToFooter = (e?: React.MouseEvent) => {
-    e?.preventDefault()
-    footerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
-  }
+    e?.preventDefault();
+    footerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   // Contact dropdown control (hover + focus friendly)
-  
 
   // Footer contact form state
-  const [contactName, setContactName] = useState("")
-  const [contactEmail, setContactEmail] = useState("")
-  const [contactMessage, setContactMessage] = useState("")
-  const [contactSubmitted, setContactSubmitted] = useState(false)
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactMessage, setContactMessage] = useState("");
+  const [contactSubmitted, setContactSubmitted] = useState(false);
 
   const handleContactSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     // TODO: integrate real API endpoint
-    setContactSubmitted(true)
-    setContactName("")
-    setContactEmail("")
-    setContactMessage("")
-    setTimeout(() => setContactSubmitted(false), 6000)
-  }
+    setContactSubmitted(true);
+    setContactName("");
+    setContactEmail("");
+    setContactMessage("");
+    setTimeout(() => setContactSubmitted(false), 6000);
+  };
 
   const partners = [
     {
@@ -294,12 +365,13 @@ export function LandingPageClient() {
       logo: FasanaraLogo,
       category: "Asset Management",
       badges: ["USDC", strings.variableRate],
-      description: "Receivables finance and liquidity provision for digital asset ecosystem and institutional players.",
+      description:
+        "Receivables finance and liquidity provision for digital asset ecosystem and institutional players.",
       stats: {
         tvl: "$45m",
         apy: "11.2%",
-        redemptions: strings.weekly
-      }
+        redemptions: strings.weekly,
+      },
     },
     {
       id: "falconx",
@@ -307,12 +379,13 @@ export function LandingPageClient() {
       logo: FalconLogo,
       category: "Prime Brokerage",
       badges: ["USDC / USDT", strings.fixedRate],
-      description: "Institutional credit lines for market making, arbitrage, and treasury management solutions.",
+      description:
+        "Institutional credit lines for market making, arbitrage, and treasury management solutions.",
       stats: {
         tvl: "$60m",
         apy: strings.hidden,
-        redemptions: strings.daily
-      }
+        redemptions: strings.daily,
+      },
     },
     {
       id: "bastion",
@@ -320,25 +393,29 @@ export function LandingPageClient() {
       logo: BastionLogo,
       category: "Market Making",
       badges: ["USDT", strings.fixedRate],
-      description: "Fixed rate loan channeling funds into derivatives trading and market-making strategies.",
+      description:
+        "Fixed rate loan channeling funds into derivatives trading and market-making strategies.",
       stats: {
         tvl: "$30m",
         apy: strings.hidden,
-        redemptions: strings.monthly
-      }
-    }
-  ]
+        redemptions: strings.monthly,
+      },
+    },
+  ];
 
-  const activePartner = partners[activeIndex]
+  const activePartner = partners[activeIndex];
 
   return (
     <div className="relative min-h-screen w-full bg-background text-foreground overflow-x-hidden flex flex-col justify-between selection:bg-accent/20">
-      
-      <SiteHeader onProcess={scrollToProcess} onAchievements={scrollToAchievements} onTeam={scrollToTeam} onContact={scrollToFooter} />
+      <SiteHeader
+        onProcess={scrollToProcess}
+        onAchievements={scrollToAchievements}
+        onTeam={scrollToTeam}
+        onContact={scrollToFooter}
+      />
 
       {/* Main Container */}
       <div className="w-full flex-1 flex flex-col">
-        
         {/* Hero Section Container (Spans full screen width to allow waves to go 100vw, height is restricted to hero only) */}
         <section className="relative w-full min-h-[calc(100vh-76px)] flex flex-col items-center overflow-hidden">
           {/* Symmetrical Animated Waves Canvas (Full screen width, absolute inside hero) */}
@@ -346,7 +423,6 @@ export function LandingPageClient() {
 
           {/* Centered Content Wrapper (Restricted max-w-4xl width) */}
           <div className="relative z-10 w-full max-w-4xl mx-auto flex-1 flex flex-col items-center justify-between pt-10 pb-4 px-4">
-            
             {/* Title and Description */}
             <div className="text-center px-4 flex flex-col items-center mb-6 max-w-3xl">
               <h1 className="font-sans text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground leading-[1.15] mb-4 tracking-tight">
@@ -399,7 +475,11 @@ export function LandingPageClient() {
             <motion.button
               onClick={scrollToProcess}
               animate={{ y: [0, 6, 0] }}
-              transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+              transition={{
+                repeat: Infinity,
+                duration: 1.8,
+                ease: "easeInOut",
+              }}
               className="relative z-20 mt-2 mb-2 text-muted-foreground/60 hover:text-accent cursor-pointer flex flex-col items-center gap-0.5 text-[9px] font-mono tracking-widest font-bold uppercase transition-colors select-none outline-none border-none bg-transparent"
             >
               <span>{strings.ourSolution}</span>
@@ -409,7 +489,7 @@ export function LandingPageClient() {
         </section>
 
         {/* Process Flow Section (How it works - waves do not cover this section) */}
-        <section 
+        <section
           ref={processRef}
           className="w-full py-16 px-6 max-w-6xl mx-auto border-t border-border/10 relative z-20 scroll-mt-20"
         >
@@ -428,7 +508,10 @@ export function LandingPageClient() {
 
         {/* Achievements Section */}
         {/* Achievements Section */}
-        <section ref={achievementsRef} className="w-full py-16 px-6 max-w-6xl mx-auto border-t border-border/10 relative z-20 scroll-mt-20">
+        <section
+          ref={achievementsRef}
+          className="w-full py-16 px-6 max-w-6xl mx-auto border-t border-border/10 relative z-20 scroll-mt-20"
+        >
           <div className="text-center mb-10">
             <h2 className="font-mono text-xs tracking-widest text-emerald-600 dark:text-emerald-400 font-bold uppercase mb-2">
               {currentLocale === "vi" ? "THÀNH TỰU NỔI BẬT" : "RECOGNITIONS"}
@@ -442,7 +525,6 @@ export function LandingPageClient() {
           </div>
 
           <div className="relative w-full flex items-center bg-white/40 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-3xl p-4 md:p-8 shadow-xl backdrop-blur-md overflow-hidden min-h-[660px] sm:min-h-[740px] lg:min-h-0 lg:h-[480px]">
-            
             {/* Left navigation arrow button */}
             <button
               onClick={handlePrevAchievement}
@@ -461,16 +543,16 @@ export function LandingPageClient() {
                   variants={{
                     initial: (dir: "left" | "right") => ({
                       opacity: 0,
-                      x: dir === "right" ? 50 : -50
+                      x: dir === "right" ? 50 : -50,
                     }),
                     animate: {
                       opacity: 1,
-                      x: 0
+                      x: 0,
                     },
                     exit: (dir: "left" | "right") => ({
                       opacity: 0,
-                      x: dir === "right" ? -50 : 50
-                    })
+                      x: dir === "right" ? -50 : 50,
+                    }),
                   }}
                   initial="initial"
                   animate="animate"
@@ -480,16 +562,28 @@ export function LandingPageClient() {
                 >
                   {/* Left Column: Image Showcase (lg:col-span-5) */}
                   <div className="lg:col-span-5 flex flex-col items-center gap-4 w-full">
-                    {achievementsData[currentLocale][activeAchievement].images.length > 0 ? (
+                    {achievementsData[currentLocale][activeAchievement].images
+                      .length > 0 ? (
                       <>
                         {/* Active Image Container */}
-                        <div 
+                        <div
                           className="relative w-full max-w-md mx-auto aspect-[4/3] rounded-2xl overflow-hidden border border-border/10 shadow-md group cursor-zoom-in bg-slate-950/5 dark:bg-white/5 flex items-center justify-center"
-                          onClick={() => setLightboxImage(achievementsData[currentLocale][activeAchievement].images[activeImageIndex])}
+                          onClick={() =>
+                            setLightboxImage(
+                              achievementsData[currentLocale][activeAchievement]
+                                .images[activeImageIndex],
+                            )
+                          }
                         >
                           <Image
-                            src={achievementsData[currentLocale][activeAchievement].images[activeImageIndex]}
-                            alt={achievementsData[currentLocale][activeAchievement].title}
+                            src={
+                              achievementsData[currentLocale][activeAchievement]
+                                .images[activeImageIndex]
+                            }
+                            alt={
+                              achievementsData[currentLocale][activeAchievement]
+                                .title
+                            }
                             fill
                             className="object-cover transition-transform duration-500 group-hover:scale-105"
                             sizes="(max-width: 1024px) 100vw, 400px"
@@ -503,15 +597,18 @@ export function LandingPageClient() {
                         </div>
 
                         {/* Thumbnail Indicators (only shown if there are multiple images) */}
-                        {achievementsData[currentLocale][activeAchievement].images.length > 1 && (
+                        {achievementsData[currentLocale][activeAchievement]
+                          .images.length > 1 && (
                           <div className="flex gap-2.5">
-                            {achievementsData[currentLocale][activeAchievement].images.map((img, idx) => (
+                            {achievementsData[currentLocale][
+                              activeAchievement
+                            ].images.map((img, idx) => (
                               <button
                                 key={idx}
                                 onClick={() => setActiveImageIndex(idx)}
                                 className={`relative w-16 h-12 rounded-lg overflow-hidden border-2 transition-all ${
-                                  activeImageIndex === idx 
-                                    ? "border-emerald-500 scale-105 shadow-sm" 
+                                  activeImageIndex === idx
+                                    ? "border-emerald-500 scale-105 shadow-sm"
                                     : "border-transparent opacity-60 hover:opacity-100 hover:scale-102"
                                 }`}
                               >
@@ -534,16 +631,22 @@ export function LandingPageClient() {
                           <FileText className="w-8 h-8" />
                         </div>
                         <h5 className="font-sans font-extrabold text-sm text-foreground mb-1">
-                          {currentLocale === "vi" ? "Chương trình Toàn cầu" : "Global Program"}
+                          {currentLocale === "vi"
+                            ? "Chương trình Toàn cầu"
+                            : "Global Program"}
                         </h5>
                         <p className="font-sans text-xs text-muted-foreground max-w-[200px] leading-relaxed mb-4">
-                          {currentLocale === "vi" 
-                            ? "Xem tài liệu chứng nhận chính thức của thế vận hội" 
+                          {currentLocale === "vi"
+                            ? "Xem tài liệu chứng nhận chính thức của thế vận hội"
                             : "View the official olympiad verification document"}
                         </p>
-                        {achievementsData[currentLocale][activeAchievement].pdf && (
+                        {achievementsData[currentLocale][activeAchievement]
+                          .pdf && (
                           <a
-                            href={achievementsData[currentLocale][activeAchievement].pdf}
+                            href={
+                              achievementsData[currentLocale][activeAchievement]
+                                .pdf
+                            }
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500 text-amber-600 dark:text-amber-500 hover:text-white transition-all duration-300 font-mono text-[10px] font-bold uppercase tracking-wider"
@@ -560,7 +663,10 @@ export function LandingPageClient() {
                   <div className="lg:col-span-7 flex flex-col justify-center text-left lg:pl-4">
                     {/* Category tag */}
                     <div className="inline-block px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-mono font-bold tracking-wider uppercase w-fit mb-3">
-                      {achievementsData[currentLocale][activeAchievement].category}
+                      {
+                        achievementsData[currentLocale][activeAchievement]
+                          .category
+                      }
                     </div>
 
                     {/* Title */}
@@ -570,37 +676,57 @@ export function LandingPageClient() {
 
                     {/* Subtitle / Organisation */}
                     <p className="font-sans text-xs md:text-sm text-amber-600 dark:text-amber-500 font-bold tracking-wide mb-4">
-                      {achievementsData[currentLocale][activeAchievement].subtitle}
+                      {
+                        achievementsData[currentLocale][activeAchievement]
+                          .subtitle
+                      }
                     </p>
 
                     {/* Paragraph Description */}
                     <p className="font-sans text-sm text-muted-foreground/90 leading-relaxed mb-6">
-                      {achievementsData[currentLocale][activeAchievement].description}
+                      {
+                        achievementsData[currentLocale][activeAchievement]
+                          .description
+                      }
                     </p>
 
                     {/* Action buttons */}
                     <div className="flex flex-wrap gap-4">
                       {/* View PDF Certificate Button if available */}
-                      {achievementsData[currentLocale][activeAchievement].pdf && (
+                      {achievementsData[currentLocale][activeAchievement]
+                        .pdf && (
                         <a
-                          href={achievementsData[currentLocale][activeAchievement].pdf}
+                          href={
+                            achievementsData[currentLocale][activeAchievement]
+                              .pdf
+                          }
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 text-xs font-mono tracking-widest font-bold uppercase transition-all duration-300 shadow-md hover:shadow-emerald-500/15"
                         >
                           <FileText className="w-4 h-4" />
-                          {currentLocale === "vi" ? "XEM CHỨNG NHẬN" : "VIEW CERTIFICATE"}
+                          {currentLocale === "vi"
+                            ? "XEM CHỨNG NHẬN"
+                            : "VIEW CERTIFICATE"}
                         </a>
                       )}
-                      
+
                       {/* Enlarge Photo Button - Only render if images exist */}
-                      {achievementsData[currentLocale][activeAchievement].images.length > 0 && (
+                      {achievementsData[currentLocale][activeAchievement].images
+                        .length > 0 && (
                         <button
-                          onClick={() => setLightboxImage(achievementsData[currentLocale][activeAchievement].images[activeImageIndex])}
+                          onClick={() =>
+                            setLightboxImage(
+                              achievementsData[currentLocale][activeAchievement]
+                                .images[activeImageIndex],
+                            )
+                          }
                           className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-slate-900/50 hover:bg-zinc-100 dark:hover:bg-slate-800 text-zinc-700 dark:text-zinc-300 text-xs font-mono tracking-widest font-bold uppercase transition-all duration-300"
                         >
                           <Maximize2 className="w-4 h-4" />
-                          {currentLocale === "vi" ? "PHÓNG TO ẢNH" : "ENLARGE PHOTO"}
+                          {currentLocale === "vi"
+                            ? "PHÓNG TO ẢNH"
+                            : "ENLARGE PHOTO"}
                         </button>
                       )}
                     </div>
@@ -642,7 +768,10 @@ export function LandingPageClient() {
         </section>
 
         {/* Meet Our Team Section */}
-        <section ref={teamRef} className="w-full py-16 px-6 max-w-6xl mx-auto border-t border-border/10 relative z-20 scroll-mt-20">
+        <section
+          ref={teamRef}
+          className="w-full py-16 px-6 max-w-6xl mx-auto border-t border-border/10 relative z-20 scroll-mt-20"
+        >
           <div className="text-center mb-12">
             <h2 className="font-mono text-xs tracking-widest text-emerald-600 dark:text-emerald-400 font-bold uppercase mb-2">
               {currentLocale === "vi" ? "ĐỘI NGŨ SÁNG LẬP" : "LEADERSHIP"}
@@ -659,9 +788,9 @@ export function LandingPageClient() {
             {/* Team Member 1: Huy Pham */}
             <div className="flex flex-col bg-white/40 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-3xl p-5 shadow-lg backdrop-blur-md hover:scale-[1.01] transition-transform duration-300">
               <div className="relative aspect-square w-full rounded-2xl overflow-hidden mb-5 bg-slate-100 dark:bg-slate-800">
-                <img 
-                  src="/images/huy.png" 
-                  alt="Huy Pham" 
+                <img
+                  src="/images/huy.png"
+                  alt="Huy Pham"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -669,8 +798,8 @@ export function LandingPageClient() {
                 <h4 className="font-sans font-bold text-lg text-foreground">
                   Huy Pham
                 </h4>
-                <a 
-                  href="https://www.linkedin.com/in/huy-pham-5646bb49/" 
+                <a
+                  href="https://www.linkedin.com/in/huy-pham-5646bb49/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-emerald-600 transition-colors"
@@ -683,19 +812,18 @@ export function LandingPageClient() {
                 {strings.teamCfo}
               </p>
               <p className="text-xs text-muted-foreground leading-relaxed font-sans font-medium">
-                {currentLocale === "vi" 
+                {currentLocale === "vi"
                   ? "Huy dẫn dắt kỷ luật tài chính và giám sát chiến lược của FundLok, giúp định hình một nền tảng được xây dựng trên cấu trúc vững chắc, uy tín và tăng trưởng bền vững. Tầm nhìn của anh hỗ trợ cam kết của FundLok đối với nền tảng tài chính mạnh mẽ và khả năng phục hồi dài hạn."
-                  : "Huy leads FundLok's financial discipline and strategic oversight, helping shape a platform built for sound structure, credibility, and sustainable growth. His perspective supports FundLok's commitment to strong financial foundations and long-term resilience."
-                }
+                  : "Huy leads FundLok's financial discipline and strategic oversight, helping shape a platform built for sound structure, credibility, and sustainable growth. His perspective supports FundLok's commitment to strong financial foundations and long-term resilience."}
               </p>
             </div>
 
             {/* Team Member 2: Loc Vuong */}
             <div className="flex flex-col bg-white/40 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-3xl p-5 shadow-lg backdrop-blur-md hover:scale-[1.01] transition-transform duration-300">
               <div className="relative aspect-square w-full rounded-2xl overflow-hidden mb-5 bg-slate-100 dark:bg-slate-800">
-                <img 
-                  src="/images/loc.png" 
-                  alt="Loc Vuong" 
+                <img
+                  src="/images/loc.png"
+                  alt="Loc Vuong"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -703,8 +831,8 @@ export function LandingPageClient() {
                 <h4 className="font-sans font-bold text-lg text-foreground">
                   Loc Vuong
                 </h4>
-                <a 
-                  href="https://www.linkedin.com/in/lok-vuong/" 
+                <a
+                  href="https://www.linkedin.com/in/lok-vuong/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-emerald-600 transition-colors"
@@ -719,17 +847,16 @@ export function LandingPageClient() {
               <p className="text-xs text-muted-foreground leading-relaxed font-sans font-medium">
                 {currentLocale === "vi"
                   ? "Lộc lớn lên trong môi trường doanh nghiệp vừa và nhỏ và hiểu rõ những thách thức tài chính mà nhiều doanh nghiệp phải đối mặt. Anh thành lập FundLok để xây dựng nền tảng vốn linh hoạt và minh bạch hơn, được thiết kế xoay quanh dòng tiền thực tế, tốc độ tăng trưởng và khả năng hoàn trả của doanh nghiệp để mọi doanh nghiệp đều có thể tiếp cận vốn và bất kỳ ai cũng có thể là nhà đầu tư."
-                  : "Loc grew up in an SME environment and understands firsthand the funding challenges many businesses face. He founded FundLok to build a more flexible and transparent capital platform designed around real business cash flow, growth pace, and repayment capacity so that everyone can access fundings, and anyone can be an investor."
-                }
+                  : "Loc grew up in an SME environment and understands firsthand the funding challenges many businesses face. He founded FundLok to build a more flexible and transparent capital platform designed around real business cash flow, growth pace, and repayment capacity so that everyone can access fundings, and anyone can be an investor."}
               </p>
             </div>
 
             {/* Team Member 3: Edward Wong */}
             <div className="flex flex-col bg-white/40 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-3xl p-5 shadow-lg backdrop-blur-md hover:scale-[1.01] transition-transform duration-300">
               <div className="relative aspect-square w-full rounded-2xl overflow-hidden mb-5 bg-slate-100 dark:bg-slate-800">
-                <img 
-                  src="/images/edward.png" 
-                  alt="Edward Wong" 
+                <img
+                  src="/images/edward.png"
+                  alt="Edward Wong"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -737,8 +864,8 @@ export function LandingPageClient() {
                 <h4 className="font-sans font-bold text-lg text-foreground">
                   Edward Wong
                 </h4>
-                <a 
-                  href="https://www.linkedin.com/in/eywong8/" 
+                <a
+                  href="https://www.linkedin.com/in/eywong8/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-emerald-600 transition-colors"
@@ -753,8 +880,7 @@ export function LandingPageClient() {
               <p className="text-xs text-muted-foreground leading-relaxed font-sans font-medium">
                 {currentLocale === "vi"
                   ? "Edward dẫn dắt kiến trúc công nghệ của FundLok, với kiến thức sâu rộng về ngành fintech và tập trung mạnh mẽ vào tự động hóa, thiết kế hệ thống và cơ sở hạ tầng thông minh. Là một Chuyên gia Trí tuệ Nhân tạo Tác nhân (Agentic AI) được chứng nhận bởi NVIDIA, anh giúp định hình lớp công nghệ giúp FundLok có quy mô lớn, an toàn và hiệu quả."
-                  : "Edward leads FundLok's technology architecture, with deep knowledge of the fintech industry and a strong focus on automation, system design, and intelligent infrastructure. As an NVIDIA-certified Agentic AI Professional, he helps shape the technology layer that makes FundLok scalable, secure, and efficient."
-                }
+                  : "Edward leads FundLok's technology architecture, with deep knowledge of the fintech industry and a strong focus on automation, system design, and intelligent infrastructure. As an NVIDIA-certified Agentic AI Professional, he helps shape the technology layer that makes FundLok scalable, secure, and efficient."}
               </p>
             </div>
           </div>
@@ -762,7 +888,10 @@ export function LandingPageClient() {
       </div>
 
       {/* Footer */}
-      <footer ref={footerRef} className="w-full bg-background/30 border-t border-border/10 py-12 relative z-20">
+      <footer
+        ref={footerRef}
+        className="w-full bg-background/30 border-t border-border/10 py-12 relative z-20"
+      >
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
@@ -799,7 +928,9 @@ export function LandingPageClient() {
                     Send
                   </button>
                   {contactSubmitted && (
-                    <span className="text-sm text-emerald-500">Thanks — we'll get back to you soon.</span>
+                    <span className="text-sm text-emerald-500">
+                      Thanks — we'll get back to you soon.
+                    </span>
                   )}
                 </div>
               </form>
@@ -807,13 +938,22 @@ export function LandingPageClient() {
 
             <div>
               <h4 className="font-bold mb-2">FAQ</h4>
-              <p className="text-sm text-muted-foreground">Visit our FAQ page for common questions.</p>
-              <Link href="/faq" className="text-sm text-emerald-600 hover:underline mt-2 inline-block">Open FAQ</Link>
+              <p className="text-sm text-muted-foreground">
+                Visit our FAQ page for common questions.
+              </p>
+              <Link
+                href="/faq"
+                className="text-sm text-emerald-600 hover:underline mt-2 inline-block"
+              >
+                Open FAQ
+              </Link>
             </div>
 
             <div>
               <h4 className="font-bold mb-2">Address</h4>
-              <p className="text-sm text-muted-foreground">Trương Định / 123 Võ Thị Sáu, Xuân Hòa, Hồ Chí Minh</p>
+              <p className="text-sm text-muted-foreground">
+                Trương Định / 123 Võ Thị Sáu, Xuân Hòa, Hồ Chí Minh
+              </p>
               <div className="mt-3 w-full h-48 rounded-md overflow-hidden border border-border/40">
                 <iframe
                   title="FundLok Location"
@@ -877,5 +1017,5 @@ export function LandingPageClient() {
         )}
       </AnimatePresence>
     </div>
-  )
+  );
 }
