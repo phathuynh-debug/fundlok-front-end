@@ -194,10 +194,7 @@ export function LandingPageClient() {
         category: "Government Recognition",
         description:
           "FundLok was recognized as a top-3 fintech project by the Australian Government for facilitating sustainable cross-border investments and ESG-aligned SME funding.",
-        images: [
-          "/achivements/sustainability-action-1.png",
-          "/achivements/sustainability-action-2.png",
-        ],
+        images: ["/achivements/sustainability-action-2.png"],
       },
       {
         title: "Seed Stage Start-up Incubation in FinTech Industry 2025",
@@ -206,6 +203,7 @@ export function LandingPageClient() {
         description:
           "Selected for the premium incubation program by SIHUB, receiving strategic mentorship, regulatory sandbox guidance, and network access to top regional venture capitals.",
         images: [
+          "/achivements/sustainability-action-1.png",
           "/achivements/sihub-announcement.png",
           "/achivements/sihub-pitching-1.png",
           "/achivements/sihub-pitching-2.png",
@@ -228,10 +226,7 @@ export function LandingPageClient() {
         category: "Ghi nhận từ Chính phủ",
         description:
           "FundLok được ghi nhận là một trong 3 dự án FinTech xuất sắc nhất bởi Chính phủ Úc trong việc thúc đẩy đầu tư bền vững và hỗ trợ vốn SME theo tiêu chuẩn ESG.",
-        images: [
-          "/achivements/sustainability-action-1.png",
-          "/achivements/sustainability-action-2.png",
-        ],
+        images: ["/achivements/sustainability-action-2.png"],
       },
       {
         title: "Ươm tạo Khởi nghiệp Giai đoạn Hạt giống ngành FinTech 2025",
@@ -240,6 +235,7 @@ export function LandingPageClient() {
         description:
           "Được lựa chọn tham gia chương trình ươm tạo cao cấp của SIHUB, nhận hỗ trợ tư vấn chiến lược, hướng dẫn thử nghiệm pháp lý (sandbox) và tiếp cận mạng lưới quỹ đầu tư mạo hiểm hàng đầu khu vực.",
         images: [
+          "/achivements/sustainability-action-1.png",
           "/achivements/sihub-announcement.png",
           "/achivements/sihub-pitching-1.png",
           "/achivements/sihub-pitching-2.png",
@@ -587,7 +583,15 @@ export function LandingPageClient() {
                                 .title
                             }
                             fill
-                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            className={`object-cover transition-transform duration-500 ${
+                              achievementsData[currentLocale][
+                                activeAchievement
+                              ].images[activeImageIndex]?.includes(
+                                "sustainability-action-2",
+                              )
+                                ? "rotate-270 scale-[1.33] group-hover:scale-[1.40]"
+                                : "group-hover:scale-105"
+                            }`}
                             sizes="(max-width: 1024px) 100vw, 400px"
                           />
                           {/* Zoom Indicator */}
@@ -1011,7 +1015,11 @@ export function LandingPageClient() {
                   src={lightboxImage}
                   alt="Enlarged Achievement Photo"
                   fill
-                  className="object-contain"
+                  className={`object-contain transition-transform duration-300 ${
+                    lightboxImage.includes("sustainability-action")
+                      ? "rotate-270 scale-[0.75]"
+                      : ""
+                  }`}
                   sizes="100vw"
                   priority
                 />
