@@ -175,7 +175,7 @@ export function LandingPageClient() {
   const currentLocale = (locale === "vi" ? "vi" : "en") as "en" | "vi";
   const strings = dict[currentLocale];
 
-  const [activeIndex, setActiveIndex] = useState(2); // Defaults to Bastion Trading (index 2)
+  const [activeIndex, _setActiveIndex] = useState(2); // Defaults to Bastion Trading (index 2)
   const processRef = useRef<HTMLDivElement>(null);
   const achievementsRef = useRef<HTMLDivElement>(null);
   const teamRef = useRef<HTMLDivElement>(null);
