@@ -3,15 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "@/lib/i18n";
-import {
-  UserCheck,
-  Activity,
-  FileCheck,
-  Coins,
-  ChevronRight,
-  ChevronLeft,
-  RotateCcw,
-} from "lucide-react";
+import { ChevronRight, ChevronLeft, RotateCcw } from "lucide-react";
 
 // Content structures for both roles in both English and Vietnamese
 const contentData = {
