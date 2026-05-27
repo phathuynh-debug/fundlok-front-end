@@ -404,5 +404,16 @@
     "leverageRatio": "Tỷ lệ Đòn bẩy",
     "assignedApr": "Lãi suất Gán",
     "yieldReturnProjection": "Dự phóng Lợi nhuận"
+  },
+  "header": {
+    "product": "SẢN PHẨM",
+    "howItWorks": "QUY TRÌNH",
+    "achievements": "THÀNH TỰU",
+    "team": "ĐỘI NGŨ",
+    "contact": "LIÊN HỆ",
+    "contactUs": "Liên hệ",
+    "faq": "FAQ",
+    "enterApp": "VÀO ỨNG DỤNG",
+    "navigationMenu": "Danh mục"
   }
 }

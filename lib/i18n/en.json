@@ -404,5 +404,16 @@
     "leverageRatio": "Leverage Ratio",
     "assignedApr": "Assigned APR",
     "yieldReturnProjection": "Yield Return Projection"
+  },
+  "header": {
+    "product": "PRODUCT",
+    "howItWorks": "HOW IT WORKS",
+    "achievements": "ACHIEVEMENTS",
+    "team": "TEAM",
+    "contact": "CONTACT",
+    "contactUs": "Contact Us",
+    "faq": "FAQ",
+    "enterApp": "ENTER APP",
+    "navigationMenu": "Navigation Menu"
   }
 }

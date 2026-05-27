@@ -6,6 +6,7 @@ import Logo from "@/components/logo";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Menu, ChevronDown } from "lucide-react";
+import { useTranslations } from "@/lib/i18n";
 import {
   Sheet,
   SheetContent,
@@ -27,6 +28,7 @@ export default function SiteHeader({
   onTeam,
   onContact,
 }: SiteHeaderProps) {
+  const { t } = useTranslations();
   const [contactOpen, setContactOpen] = useState(false);
   const [mobileContactOpen, setMobileContactOpen] = useState(false);
 
@@ -41,28 +43,28 @@ export default function SiteHeader({
           href="#"
           className="transition-colors duration-200 text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
         >
-          PRODUCT
+          {t("header.product")}
         </Link>
 
         <button
           onClick={onProcess}
           className="transition-colors duration-200 text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white cursor-pointer font-mono tracking-widest text-[11px] font-semibold bg-transparent border-none p-0 outline-none"
         >
-          HOW IT WORKS
+          {t("header.howItWorks")}
         </button>
 
         <button
           onClick={onAchievements}
           className="transition-colors duration-200 text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white cursor-pointer font-mono tracking-widest text-[11px] font-semibold bg-transparent border-none p-0 outline-none"
         >
-          ACHIEVEMENTS
+          {t("header.achievements")}
         </button>
 
         <button
           onClick={onTeam}
           className="transition-colors duration-200 text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white cursor-pointer font-mono tracking-widest text-[11px] font-semibold bg-transparent border-none p-0 outline-none"
         >
-          TEAM
+          {t("header.team")}
         </button>
 
         <div
@@ -77,7 +79,7 @@ export default function SiteHeader({
             aria-haspopup="true"
             aria-expanded={contactOpen}
           >
-            CONTACT
+            {t("header.contact")}
           </button>
 
           {contactOpen && (
@@ -87,13 +89,13 @@ export default function SiteHeader({
                   onClick={onContact}
                   className="w-full text-left px-3 py-2 text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-slate-800 cursor-pointer"
                 >
-                  Contact Us
+                  {t("header.contactUs")}
                 </button>
                 <Link
                   href="/faq"
                   className="block px-3 py-2 text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-slate-800"
                 >
-                  FAQ
+                  {t("header.faq")}
                 </Link>
               </div>
             </div>
@@ -109,7 +111,7 @@ export default function SiteHeader({
           href="/login"
           className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-6 py-2.5 text-xs font-mono tracking-widest font-bold uppercase transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"
         >
-          ENTER APP
+          {t("header.enterApp")}
         </Link>
       </div>
 
@@ -119,7 +121,7 @@ export default function SiteHeader({
           href="/login"
           className="w-full text-center rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-6 py-3.5 text-xs font-mono tracking-widest font-bold uppercase transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"
         >
-          ENTER APP
+          {t("header.enterApp")}
         </Link>
         <Sheet>
           <SheetTrigger asChild>
@@ -136,7 +138,7 @@ export default function SiteHeader({
           >
             <SheetHeader className="p-0 border-b border-border/10 pb-4 mb-4">
               <SheetTitle className="text-left font-mono tracking-widest text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase">
-                Navigation Menu
+                {t("header.navigationMenu")}
               </SheetTitle>
             </SheetHeader>
 
@@ -147,7 +149,7 @@ export default function SiteHeader({
                   href="#"
                   className="text-left py-2 font-mono tracking-widest text-xs font-bold text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white transition-colors"
                 >
-                  PRODUCT
+                  {t("header.product")}
                 </Link>
               </SheetClose>
 
@@ -156,7 +158,7 @@ export default function SiteHeader({
                   onClick={onProcess}
                   className="text-left py-2 font-mono tracking-widest text-xs font-bold text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white cursor-pointer bg-transparent border-none p-0 outline-none transition-colors"
                 >
-                  HOW IT WORKS
+                  {t("header.howItWorks")}
                 </button>
               </SheetClose>
 
@@ -165,7 +167,7 @@ export default function SiteHeader({
                   onClick={onAchievements}
                   className="text-left py-2 font-mono tracking-widest text-xs font-bold text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white cursor-pointer bg-transparent border-none p-0 outline-none transition-colors"
                 >
-                  ACHIEVEMENTS
+                  {t("header.achievements")}
                 </button>
               </SheetClose>
 
@@ -174,7 +176,7 @@ export default function SiteHeader({
                   onClick={onTeam}
                   className="text-left py-2 font-mono tracking-widest text-xs font-bold text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white cursor-pointer bg-transparent border-none p-0 outline-none transition-colors"
                 >
-                  TEAM
+                  {t("header.team")}
                 </button>
               </SheetClose>
 
@@ -183,7 +185,7 @@ export default function SiteHeader({
                   onClick={() => setMobileContactOpen(!mobileContactOpen)}
                   className="text-left py-2 font-mono tracking-widest text-xs font-bold text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white cursor-pointer bg-transparent border-none p-0 outline-none transition-colors flex justify-between items-center"
                 >
-                  <span>CONTACT</span>
+                  <span>{t("header.contact")}</span>
                   <ChevronDown
                     className={`w-3.5 h-3.5 transition-transform duration-200 ${mobileContactOpen ? "rotate-180" : ""}`}
                   />
@@ -195,7 +197,7 @@ export default function SiteHeader({
                         onClick={onContact}
                         className="text-left text-xs font-bold font-mono tracking-wider text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-white cursor-pointer bg-transparent border-none p-0 outline-none transition-colors"
                       >
-                        Contact Us
+                        {t("header.contactUs")}
                       </button>
                     </SheetClose>
                     <SheetClose asChild>
@@ -203,7 +205,7 @@ export default function SiteHeader({
                         href="/faq"
                         className="text-left text-xs font-bold font-mono tracking-wider text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-white transition-colors"
                       >
-                        FAQ
+                        {t("header.faq")}
                       </Link>
                     </SheetClose>
                   </div>
@@ -225,7 +227,7 @@ export default function SiteHeader({
                   href="/login"
                   className="w-full text-center rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-6 py-3.5 text-xs font-mono tracking-widest font-bold uppercase transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"
                 >
-                  ENTER APP
+                  {t("header.enterApp")}
                 </Link>
               </SheetClose>
             </div>
