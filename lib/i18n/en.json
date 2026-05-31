@@ -88,6 +88,7 @@
       "emailPlaceholder": "founder@company.com",
       "phoneLabel": "Phone number",
       "phonePlaceholder": "09xx xxx xxx",
+      "phoneInvalid": "Please enter a valid phone number. Vietnamese numbers like 09xxxxxxxx, +849xxxxxxxx, or international formats are allowed.",
       "passwordLabel": "Password",
       "confirmPasswordLabel": "Confirm Password",
       "passwordPlaceholder": "••••••••",

@@ -88,6 +88,7 @@
       "emailPlaceholder": "founder@company.com",
       "phoneLabel": "Số điện thoại",
       "phonePlaceholder": "09xx xxx xxx",
+      "phoneInvalid": "Vui lòng nhập số điện thoại hợp lệ. Hỗ trợ số Việt Nam như 09xxxxxxxx, +849xxxxxxxx, hoặc định dạng quốc tế.",
       "passwordLabel": "Mật khẩu",
       "confirmPasswordLabel": "Xác nhận mật khẩu",
       "passwordPlaceholder": "••••••••",

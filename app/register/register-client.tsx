@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { RegistrationForm } from "@/components/registration-form"
-import { LocaleSwitcher } from "@/components/locale-switcher"
-import { useTranslations } from "@/lib/i18n"
+import { RegistrationForm } from "@/components/registration-form";
+import { LocaleSwitcher } from "@/components/locale-switcher";
+import { useTranslations } from "@/lib/i18n";
 
 export function RegisterClient() {
-  const { t } = useTranslations()
+  const { t } = useTranslations();
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/50 p-6">
@@ -14,7 +14,9 @@ export function RegisterClient() {
           <LocaleSwitcher />
         </div>
         <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold tracking-tight">{t("common.createAnAccount")}</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {t("common.createAnAccount")}
+          </h1>
           <p className="text-muted-foreground">{t("auth.hero.description")}</p>
         </div>
 
@@ -22,5 +24,5 @@ export function RegisterClient() {
         <RegistrationForm />
       </div>
     </div>
-  )
+  );
 }
