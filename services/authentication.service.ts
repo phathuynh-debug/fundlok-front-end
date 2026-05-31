@@ -3,6 +3,7 @@ import { AUTH_ENDPOINTS } from '@/lib/endpoints';
 
 export type UserRole = 'SME' | 'INVESTOR';
 export type UserStatus = 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
+export type OAuthProvider = 'google';
 
 export interface User {
   id: string;
@@ -26,11 +27,25 @@ export interface RegisterPayload {
   role: UserRole;
 }
 
+export interface OAuthLoginPayload {
+  provider: OAuthProvider;
+  id_token: string;
+}
+
+export interface OAuthTokenResponse {
+  access_token: string;
+  refresh_token: string;
+}
+
 export const authenticationService = {
   // Backend sets httpOnly cookies and returns the User object.
   // During transition the backend may still return Token shape — we handle both.
   login(payload: LoginPayload) {
     return apiClient.post<User>(AUTH_ENDPOINTS.login, payload);
+  },
+
+  oauthLogin(payload: OAuthLoginPayload) {
+    return apiClient.post<OAuthTokenResponse>(AUTH_ENDPOINTS.oauthLogin, payload);
   },
 
   // Returns the created User. No tokens — caller redirects to login.

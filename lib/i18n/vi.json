@@ -72,6 +72,8 @@
     "login": {
       "emailLabel": "Địa chỉ email",
       "emailPlaceholder": "name@company.com",
+      "signInWithGoogle": "Đăng nhập bằng Google",
+      "or": "hoặc",
       "passwordLabel": "Mật khẩu",
       "passwordPlaceholder": "••••••••",
       "submitting": "Đang đăng nhập...",

@@ -1,27 +1,25 @@
-"use client"
+"use client";
 
-import React, { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useToast } from "@/hooks/use-toast"
-import { useLogin } from "@/hooks/use-authentication"
-import { Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react"
-import { useTranslations } from "@/lib/i18n"
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { useLogin } from "@/app/login/use-login";
+import { Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
+import { useTranslations } from "@/lib/i18n";
 
 export function LoginForm() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
-  const router = useRouter()
-  const { toast } = useToast()
-  const { mutate: login, isPending } = useLogin()
-  const { t } = useTranslations()
+  const { toast } = useToast();
+  const { login, googleLogin, isPending, isGooglePending } = useLogin();
+  const { t } = useTranslations();
 
   const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     login(
       { email, password },
@@ -30,77 +28,118 @@ export function LoginForm() {
           toast({
             title: t("auth.login.successTitle"),
             description: t("auth.login.successDescription"),
-          })
-          router.push("/dashboard")
+          });
         },
         onError: (error) => {
           toast({
             variant: "destructive",
             title: t("auth.login.failedTitle"),
             description: error?.message || t("auth.login.failedDescription"),
-          })
+          });
         },
-      }
-    )
-  }
+      },
+    );
+  };
 
   return (
-    <form onSubmit={handleLogin} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="email">{t("auth.login.emailLabel")}</Label>
-        <div className="relative">
-          <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            id="email"
-            type="email"
-            className="pl-10"
-            placeholder={t("auth.login.emailPlaceholder")}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            disabled={isPending}
+    <div className="space-y-4">
+      <Button
+        type="button"
+        onClick={() => googleLogin()}
+        disabled={isGooglePending}
+        className="w-full h-11 bg-white text-black flex items-center justify-center"
+      >
+        <svg
+          className="mr-3 h-4 w-4"
+          viewBox="0 0 533.5 544.3"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden
+        >
+          <path
+            fill="#4285F4"
+            d="M533.5 278.4c0-18.5-1.5-37.3-4.7-55.3H272v104.8h147.5c-6.3 34.1-25.1 62.9-53.6 82.2v68.2h86.6c50.7-46.7 80-115.4 80-199.9z"
           />
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="password">{t("auth.login.passwordLabel")}</Label>
-        <div className="relative">
-          <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            id="password"
-            type={showPassword ? "text" : "password"}
-            className="px-10"
-            placeholder={t("auth.login.passwordPlaceholder")}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            disabled={isPending}
+          <path
+            fill="#34A853"
+            d="M272 544.3c72.6 0 133.6-23.9 178.2-64.8l-86.6-68.2c-24.1 16.2-55 25.8-91.6 25.8-70 0-129.3-47.2-150.5-110.5H32.3v69.5C76.9 489.5 167.6 544.3 272 544.3z"
           />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
-          >
-            {showPassword ? (
-              <EyeOff className="h-4 w-4" />
-            ) : (
-              <Eye className="h-4 w-4" />
-            )}
-          </button>
-        </div>
-      </div>
-
-      <Button type="submit" className="w-full h-11" disabled={isPending}>
-        {isPending ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            {t("auth.login.submitting")}
-          </>
-        ) : (
-          t("auth.login.submit")
-        )}
+          <path
+            fill="#FBBC05"
+            d="M121.5 325c-10.7-32-10.7-66.2 0-98.2V157.3H32.3c-43 85.4-43 187.2 0 272.6l89.2-69.9z"
+          />
+          <path
+            fill="#EA4335"
+            d="M272 109.7c38.8 0 73.6 13.4 101 39l75.7-75.7C405.8 28.2 349.6 0 272 0 167.6 0 76.9 54.8 32.3 137.8l89.2 69.5c21.2-63.3 80.5-110.5 150.5-110.5z"
+          />
+        </svg>
+        <span>{t("auth.login.signInWithGoogle")}</span>
       </Button>
-    </form>
-  )
+
+      <div className="flex items-center gap-3">
+        <span className="flex-1 h-px bg-border" />
+        <span className="text-sm text-muted-foreground">
+          {t("auth.login.or")}
+        </span>
+        <span className="flex-1 h-px bg-border" />
+      </div>
+
+      <form onSubmit={handleLogin} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="email">{t("auth.login.emailLabel")}</Label>
+          <div className="relative">
+            <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              id="email"
+              type="email"
+              className="pl-10"
+              placeholder={t("auth.login.emailPlaceholder")}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={isPending}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="password">{t("auth.login.passwordLabel")}</Label>
+          <div className="relative">
+            <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              className="px-10"
+              placeholder={t("auth.login.passwordPlaceholder")}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={isPending}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        <Button type="submit" className="w-full h-11" disabled={isPending}>
+          {isPending ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {t("auth.login.submitting")}
+            </>
+          ) : (
+            t("auth.login.submit")
+          )}
+        </Button>
+      </form>
+    </div>
+  );
 }

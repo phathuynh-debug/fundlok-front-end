@@ -72,6 +72,8 @@
     "login": {
       "emailLabel": "Email Address",
       "emailPlaceholder": "name@company.com",
+        "signInWithGoogle": "Sign in with Google",
+        "or": "or",
       "passwordLabel": "Password",
       "passwordPlaceholder": "••••••••",
       "submitting": "Signing In...",
