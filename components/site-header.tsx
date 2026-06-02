@@ -21,14 +21,12 @@ type SiteHeaderProps = {
   onProcess?: (e: React.MouseEvent) => void;
   onAchievements?: (e: React.MouseEvent) => void;
   onTeam?: (e: React.MouseEvent) => void;
-  onContact?: (e?: React.MouseEvent) => void;
 };
 
 export default function SiteHeader({
   onProcess,
   onAchievements,
   onTeam,
-  onContact,
 }: SiteHeaderProps) {
   const { t } = useTranslations();
   const router = useRouter();
@@ -78,21 +76,6 @@ export default function SiteHeader({
       }
     } else {
       router.push("/#team");
-    }
-  };
-
-  const handleContactClick = (e: React.MouseEvent) => {
-    if (pathname === "/") {
-      if (onContact) {
-        onContact(e);
-      } else {
-        const element = document.getElementById("contact");
-        if (element) {
-          element.scrollIntoView({ behavior: "smooth" });
-        }
-      }
-    } else {
-      router.push("/#contact");
     }
   };
 
@@ -160,12 +143,12 @@ export default function SiteHeader({
           {contactOpen && (
             <div className="absolute right-0 top-full pt-2 w-44 z-40">
               <div className="bg-white dark:bg-slate-900 border border-border/30 rounded-md shadow-lg overflow-hidden">
-                <button
-                  onClick={handleContactClick}
-                  className="w-full text-left px-3 py-2 text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-slate-800 cursor-pointer"
+                <Link
+                  href="/contact"
+                  className="block px-3 py-2 text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-slate-800"
                 >
                   {t("header.contactUs")}
-                </button>
+                </Link>
                 <Link
                   href="/faq"
                   className="block px-3 py-2 text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-slate-800"
@@ -281,12 +264,12 @@ export default function SiteHeader({
                 {mobileContactOpen && (
                   <div className="flex flex-col gap-3 pl-3 py-2 border-l border-zinc-200/50 dark:border-zinc-800/50">
                     <SheetClose asChild>
-                      <button
-                        onClick={handleContactClick}
-                        className="text-left text-xs font-bold font-mono tracking-wider text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-white cursor-pointer bg-transparent border-none p-0 outline-none transition-colors"
+                      <Link
+                        href="/contact"
+                        className="text-left text-xs font-bold font-mono tracking-wider text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-white transition-colors"
                       >
                         {t("header.contactUs")}
-                      </button>
+                      </Link>
                     </SheetClose>
                     <SheetClose asChild>
                       <Link

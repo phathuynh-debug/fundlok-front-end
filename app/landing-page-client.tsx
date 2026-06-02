@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,6 +17,7 @@ import { GuillocheWaves } from "@/components/guilloche-waves";
 import SiteHeader from "@/components/site-header";
 import Mockup from "@/components/mockup";
 import { InteractiveFlow } from "@/components/interactive-flow";
+import SiteFooter from "@/components/site-footer";
 
 // Symmetrical custom vector logos
 const FasanaraLogo = () => (
@@ -179,7 +179,6 @@ export function LandingPageClient() {
   const processRef = useRef<HTMLDivElement>(null);
   const achievementsRef = useRef<HTMLDivElement>(null);
   const teamRef = useRef<HTMLDivElement>(null);
-  const footerRef = useRef<HTMLDivElement>(null);
 
   const [activeAchievement, setActiveAchievement] = useState(0);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -331,29 +330,6 @@ export function LandingPageClient() {
     teamRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const scrollToFooter = (e?: React.MouseEvent) => {
-    e?.preventDefault();
-    footerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
-  // Contact dropdown control (hover + focus friendly)
-
-  // Footer contact form state
-  const [contactName, setContactName] = useState("");
-  const [contactEmail, setContactEmail] = useState("");
-  const [contactMessage, setContactMessage] = useState("");
-  const [contactSubmitted, setContactSubmitted] = useState(false);
-
-  const handleContactSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: integrate real API endpoint
-    setContactSubmitted(true);
-    setContactName("");
-    setContactEmail("");
-    setContactMessage("");
-    setTimeout(() => setContactSubmitted(false), 6000);
-  };
-
   const partners = [
     {
       id: "fasanara",
@@ -407,7 +383,6 @@ export function LandingPageClient() {
         onProcess={scrollToProcess}
         onAchievements={scrollToAchievements}
         onTeam={scrollToTeam}
-        onContact={scrollToFooter}
       />
 
       {/* Main Container */}
@@ -522,18 +497,18 @@ export function LandingPageClient() {
             </p>
           </div>
 
-          <div className="relative w-full flex items-center bg-white/40 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-3xl p-4 md:p-8 shadow-xl backdrop-blur-md overflow-hidden min-h-[660px] sm:min-h-[740px] lg:min-h-0 lg:h-[480px]">
+          <div className="relative w-full flex items-center bg-white/40 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-3xl p-3 md:p-4 shadow-xl backdrop-blur-md overflow-hidden min-h-96 sm:min-h-112 lg:h-88">
             {/* Left navigation arrow button */}
             <button
               onClick={handlePrevAchievement}
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-emerald-600/95 hover:bg-emerald-700 text-white flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 z-30 hidden md:flex"
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-emerald-600/95 hover:bg-emerald-700 text-white flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 z-30 invisible md:visible"
               aria-label="Previous Achievement"
             >
               <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
             </button>
 
             {/* Main Content Area */}
-            <div className="w-full px-2 md:px-10 py-4">
+            <div className="w-full px-2 md:px-6 py-1 md:py-2">
               <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
                   key={activeAchievement}
@@ -556,16 +531,16 @@ export function LandingPageClient() {
                   animate="animate"
                   exit="exit"
                   transition={{ duration: 0.3, ease: "easeInOut" }}
-                  className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center"
+                  className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center"
                 >
                   {/* Left Column: Image Showcase (lg:col-span-5) */}
-                  <div className="lg:col-span-5 flex flex-col items-center gap-4 w-full">
+                  <div className="lg:col-span-5 flex flex-col items-center gap-2 w-full">
                     {achievementsData[currentLocale][activeAchievement].images
                       .length > 0 ? (
                       <>
                         {/* Active Image Container */}
                         <div
-                          className="relative w-full max-w-md mx-auto aspect-[4/3] rounded-2xl overflow-hidden border border-border/10 shadow-md group cursor-zoom-in bg-slate-950/5 dark:bg-white/5 flex items-center justify-center"
+                          className="relative w-full max-w-md mx-auto aspect-4/3 rounded-2xl overflow-hidden border border-border/10 shadow-md group cursor-zoom-in bg-slate-950/5 dark:bg-white/5 flex items-center justify-center"
                           onClick={() =>
                             setLightboxImage(
                               achievementsData[currentLocale][activeAchievement]
@@ -605,7 +580,7 @@ export function LandingPageClient() {
                         {/* Thumbnail Indicators (only shown if there are multiple images) */}
                         {achievementsData[currentLocale][activeAchievement]
                           .images.length > 1 && (
-                          <div className="flex gap-2.5">
+                          <div className="flex gap-1.5">
                             {achievementsData[currentLocale][
                               activeAchievement
                             ].images.map((img, idx) => (
@@ -632,8 +607,8 @@ export function LandingPageClient() {
                       </>
                     ) : (
                       /* Fallback Certificate Placeholder when no images are present */
-                      <div className="w-full max-w-md mx-auto aspect-[4/3] rounded-2xl border-2 border-dashed border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-slate-900/40 flex flex-col items-center justify-center p-6 text-center group transition-colors duration-300 hover:bg-emerald-500/5 hover:border-emerald-500/30">
-                        <div className="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110">
+                      <div className="w-full max-w-md mx-auto aspect-4/3 rounded-2xl border-2 border-dashed border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-slate-900/40 flex flex-col items-center justify-center p-4 text-center group transition-colors duration-300 hover:bg-emerald-500/5 hover:border-emerald-500/30">
+                        <div className="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center mb-3 transition-transform duration-300 group-hover:scale-110">
                           <FileText className="w-8 h-8" />
                         </div>
                         <h5 className="font-sans font-extrabold text-sm text-foreground mb-1">
@@ -641,7 +616,7 @@ export function LandingPageClient() {
                             ? "Chương trình Toàn cầu"
                             : "Global Program"}
                         </h5>
-                        <p className="font-sans text-xs text-muted-foreground max-w-[200px] leading-relaxed mb-4">
+                        <p className="font-sans text-xs text-muted-foreground max-w-50 leading-relaxed mb-2">
                           {currentLocale === "vi"
                             ? "Xem tài liệu chứng nhận chính thức của thế vận hội"
                             : "View the official olympiad verification document"}
@@ -676,12 +651,12 @@ export function LandingPageClient() {
                     </div>
 
                     {/* Title */}
-                    <h4 className="font-sans text-xl md:text-2xl font-extrabold text-foreground leading-snug tracking-tight mb-2">
+                    <h4 className="font-sans text-xl md:text-2xl font-extrabold text-foreground leading-snug tracking-tight mb-1.5">
                       {achievementsData[currentLocale][activeAchievement].title}
                     </h4>
 
                     {/* Subtitle / Organisation */}
-                    <p className="font-sans text-xs md:text-sm text-amber-600 dark:text-amber-500 font-bold tracking-wide mb-4">
+                    <p className="font-sans text-xs md:text-sm text-amber-600 dark:text-amber-500 font-bold tracking-wide mb-3">
                       {
                         achievementsData[currentLocale][activeAchievement]
                           .subtitle
@@ -689,7 +664,7 @@ export function LandingPageClient() {
                     </p>
 
                     {/* Paragraph Description */}
-                    <p className="font-sans text-sm text-muted-foreground/90 leading-relaxed mb-6">
+                    <p className="font-sans text-sm text-muted-foreground/90 leading-relaxed mb-4">
                       {
                         achievementsData[currentLocale][activeAchievement]
                           .description
@@ -697,7 +672,7 @@ export function LandingPageClient() {
                     </p>
 
                     {/* Action buttons */}
-                    <div className="flex flex-wrap gap-4">
+                    <div className="flex flex-wrap gap-2.5">
                       {/* View PDF Certificate Button if available */}
                       {achievementsData[currentLocale][activeAchievement]
                         .pdf && (
@@ -744,7 +719,7 @@ export function LandingPageClient() {
             {/* Right navigation arrow button */}
             <button
               onClick={handleNextAchievement}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-emerald-600/95 hover:bg-emerald-700 text-white flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 z-30 hidden md:flex"
+              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-emerald-600/95 hover:bg-emerald-700 text-white flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 z-30 invisible md:visible"
               aria-label="Next Achievement"
             >
               <ChevronRight className="w-5 h-5" strokeWidth={2.5} />
@@ -894,93 +869,7 @@ export function LandingPageClient() {
         </section>
       </div>
 
-      {/* Footer */}
-      <footer
-        ref={footerRef}
-        id="contact"
-        className="w-full bg-background/30 border-t border-border/10 py-12 relative z-20 scroll-mt-20"
-      >
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <h4 className="font-bold mb-2">Contact Us</h4>
-              <form onSubmit={handleContactSubmit} className="space-y-2">
-                <input
-                  type="text"
-                  placeholder="Name"
-                  value={contactName}
-                  onChange={(e) => setContactName(e.target.value)}
-                  className="w-full rounded-md border border-border/40 px-3 py-2 text-sm bg-transparent"
-                  required
-                />
-                <input
-                  type="email"
-                  placeholder="Email"
-                  value={contactEmail}
-                  onChange={(e) => setContactEmail(e.target.value)}
-                  className="w-full rounded-md border border-border/40 px-3 py-2 text-sm bg-transparent"
-                  required
-                />
-                <textarea
-                  placeholder="Message"
-                  value={contactMessage}
-                  onChange={(e) => setContactMessage(e.target.value)}
-                  className="w-full rounded-md border border-border/40 px-3 py-2 text-sm bg-transparent resize-none h-24"
-                  required
-                />
-                <div className="flex items-center gap-3">
-                  <button
-                    type="submit"
-                    className="rounded-md bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 text-sm font-semibold"
-                  >
-                    Send
-                  </button>
-                  {contactSubmitted && (
-                    <span className="text-sm text-emerald-500">
-                      Thanks — we'll get back to you soon.
-                    </span>
-                  )}
-                </div>
-              </form>
-            </div>
-
-            <div>
-              <h4 className="font-bold mb-2">FAQ</h4>
-              <p className="text-sm text-muted-foreground">
-                Visit our FAQ page for common questions.
-              </p>
-              <Link
-                href="/faq"
-                className="text-sm text-emerald-600 hover:underline mt-2 inline-block"
-              >
-                Open FAQ
-              </Link>
-            </div>
-
-            <div>
-              <h4 className="font-bold mb-2">Address</h4>
-              <p className="text-sm text-muted-foreground">
-                Trương Định / 123 Võ Thị Sáu, Xuân Hòa, Hồ Chí Minh
-              </p>
-              <div className="mt-3 w-full h-48 rounded-md overflow-hidden border border-border/40">
-                <iframe
-                  title="FundLok Location"
-                  src={`https://www.google.com/maps?q=${encodeURIComponent("Trương Định/123 Võ Thị Sáu, Xuân Hòa, Hồ Chí Minh")}&output=embed`}
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="py-6 text-center text-[10px] text-muted-foreground/50 font-sans">
-            {t("common.copyright")}
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
 
       {/* Lightbox Modal for Enlarge Photo */}
       <AnimatePresence>
@@ -1010,7 +899,7 @@ export function LandingPageClient() {
               className="relative max-w-5xl max-h-[85vh] w-full h-full flex items-center justify-center"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="relative w-full h-full max-w-full max-h-full aspect-[4/3] lg:aspect-auto">
+              <div className="relative w-full h-full max-w-full max-h-full aspect-4/3 lg:aspect-auto">
                 <Image
                   src={lightboxImage}
                   alt="Enlarged Achievement Photo"
