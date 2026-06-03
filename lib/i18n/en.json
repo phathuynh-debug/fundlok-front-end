@@ -234,7 +234,7 @@
     "kpis": {
       "loanAmount": "Loan Amount",
       "expectedRoi": "Expected ROI",
-      "estPaybackPeriod": "Est. Payback Period",
+      "estPaybackPeriod": "Loan Duration",
       "revenueShareRate": "Revenue Share Rate",
       "ofDailyRevenue": "of daily revenue"
     },

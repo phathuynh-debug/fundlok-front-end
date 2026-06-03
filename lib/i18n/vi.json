@@ -234,7 +234,7 @@
     "kpis": {
       "loanAmount": "Số tiền vay",
       "expectedRoi": "ROI kỳ vọng",
-      "estPaybackPeriod": "Thời gian hoàn vốn dự kiến",
+      "estPaybackPeriod": "Thời hạn vay",
       "revenueShareRate": "Tỷ lệ chia sẻ doanh thu",
       "ofDailyRevenue": "trên doanh thu hằng ngày"
     },
