@@ -108,6 +108,16 @@
       "failedTitle": "Registration Failed",
       "failedDescription": "Please check your information and try again."
     },
+    "verifyEmail": {
+      "title": "Verify your email address",
+      "description": "We've sent a verification link to your email. Please click the link in that email to verify your account.",
+      "statusLabel": "Sent to",
+      "checkStatus": "I have verified my email",
+      "resendBtn": "Resend verification email",
+      "resendSuccess": "Verification email resent successfully!",
+      "resendFailed": "Failed to resend verification email. Please try again.",
+      "logoutBtn": "Sign out"
+    },
     "layout": {
       "helpPrefix": "Need help?",
       "supportLink": "Contact support"
