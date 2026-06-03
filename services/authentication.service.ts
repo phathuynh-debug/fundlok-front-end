@@ -12,6 +12,7 @@ export interface User {
   phone?: string | null;
   role: UserRole;
   status?: UserStatus;
+  email_verified?: boolean;
 }
 
 export interface LoginPayload {
@@ -62,5 +63,18 @@ export const authenticationService = {
   // No payload needed — the cookie is sent automatically.
   refresh() {
     return apiClient.post<void>(AUTH_ENDPOINTS.refresh);
+  },
+
+  verifyEmail(token: string) {
+    return apiClient.get<{ status: string; message: string }>(
+      AUTH_ENDPOINTS.verifyEmail(token)
+    );
+  },
+
+  resendVerification(email: string) {
+    return apiClient.post<{ status: string; message: string }>(
+      AUTH_ENDPOINTS.resendVerification,
+      { email }
+    );
   },
 };

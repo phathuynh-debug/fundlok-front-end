@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card"
-import { CheckCircle2, AlertTriangle, Info } from "lucide-react"
+import { CheckCircle2, AlertTriangle } from "lucide-react"
 import { getDictionary, useTranslations } from "@/lib/i18n"
+import { InvestmentTab } from "./InvestmentTab"
 
 export function RiskAssessmentTab() {
   const { locale, t } = useTranslations()
@@ -58,59 +59,8 @@ export function RiskAssessmentTab() {
         </div>
       </Card>
 
-      {/* Revenue Share Terms Section */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-foreground">{t("investment.risk.revenueShareTerms")}</h3>
-        
-        <div className="grid gap-4 sm:grid-cols-3">
-          {/* Card 1: Primary Rate */}
-          <div className="p-5 rounded-2xl border bg-blue-50/50 dark:bg-blue-950/10 border-blue-100 dark:border-blue-900/30 flex flex-col justify-between min-h-27.5">
-            <div>
-              <p className="text-xs font-semibold text-blue-600/80 dark:text-blue-400 tracking-wider uppercase">
-                {t("investment.risk.primaryRate")}
-              </p>
-              <p className="text-3xl font-extrabold text-blue-700 dark:text-blue-300 mt-1">
-                8.5%
-              </p>
-            </div>
-            <p className="text-xs text-blue-600/70 dark:text-blue-400/70 mt-2">{t("investment.risk.untilPrincipal")}</p>
-          </div>
-
-          {/* Card 2: Post-Principal Rate */}
-          <div className="p-5 rounded-2xl border bg-emerald-50/50 dark:bg-emerald-950/10 border-emerald-100 dark:border-emerald-900/30 flex flex-col justify-between min-h-27.5">
-            <div>
-              <p className="text-xs font-semibold text-emerald-600/80 dark:text-emerald-400 tracking-wider uppercase">
-                {t("investment.risk.postPrincipalRate")}
-              </p>
-              <p className="text-3xl font-extrabold text-emerald-700 dark:text-emerald-300 mt-1">
-                2%
-              </p>
-            </div>
-            <p className="text-xs text-emerald-600/70 dark:text-emerald-400/70 mt-2">{t("investment.risk.afterPrincipal")}</p>
-          </div>
-
-          {/* Card 3: Minimum Bi-weekly */}
-          <div className="p-5 rounded-2xl border bg-purple-50/50 dark:bg-purple-950/10 border-purple-100 dark:border-purple-900/30 flex flex-col justify-between min-h-27.5">
-            <div>
-              <p className="text-xs font-semibold text-purple-600/80 dark:text-purple-400 tracking-wider uppercase">
-                {t("investment.risk.minimumBiweekly")}
-              </p>
-              <p className="text-3xl font-extrabold text-purple-700 dark:text-purple-300 mt-1">
-                $1,200
-              </p>
-            </div>
-            <p className="text-xs text-purple-600/70 dark:text-purple-400/70 mt-2">{t("investment.risk.everyTwoWeeks")}</p>
-          </div>
-        </div>
-
-        {/* How it works info box */}
-        <div className="flex gap-3 p-4 rounded-xl border bg-sky-50/30 dark:bg-sky-950/10 border-sky-100 dark:border-sky-900/30">
-          <Info className="h-5 w-5 text-sky-500 mt-0.5 shrink-0" />
-          <p className="text-sm text-sky-700/90 dark:text-sky-300/90 leading-relaxed">
-            <span className="font-semibold">{t("investment.risk.howItWorksTitle")}</span> {t("investment.risk.howItWorks")}
-          </p>
-        </div>
-      </div>
+      {/* Investment Tab content embedded directly below Risk Assessment */}
+      <InvestmentTab />
     </div>
   )
 }
