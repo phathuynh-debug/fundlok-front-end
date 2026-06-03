@@ -47,7 +47,7 @@ export function LoginForm() {
         type="button"
         onClick={() => googleLogin()}
         disabled={isGooglePending}
-        className="w-full h-11 bg-white text-black flex items-center justify-center"
+        className="w-full h-11 bg-white text-black flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-colors"
       >
         <svg
           className="mr-3 h-4 w-4"
