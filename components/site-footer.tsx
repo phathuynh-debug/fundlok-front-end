@@ -34,12 +34,12 @@ const supportLinks = [
 const socialLinks = [
   {
     label: "Facebook",
-    href: "https://www.facebook.com/",
+    href: "https://www.facebook.com/profile.php?id=61579474545924",
     icon: FacebookIcon,
   },
   {
     label: "LinkedIn",
-    href: "https://www.linkedin.com/company/",
+    href: "https://www.linkedin.com/company/fundlok/posts/?feedView=all",
     icon: LinkedInIcon,
   },
   {
