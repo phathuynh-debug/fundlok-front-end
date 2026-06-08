@@ -18,6 +18,7 @@ export interface User {
 export interface LoginPayload {
   email: string;
   password: string;
+  turnstile_token?: string | null;
 }
 
 export interface RegisterPayload {
@@ -26,6 +27,7 @@ export interface RegisterPayload {
   password: string;
   phone?: string | null;
   role: UserRole;
+  turnstile_token?: string | null;
 }
 
 export interface OAuthLoginPayload {
