@@ -13,7 +13,7 @@ declare global {
           callback: (token: string) => void;
           "error-callback"?: () => void;
           "expired-callback"?: () => void;
-        }
+        },
       ) => string;
       remove: (widgetId?: string) => void;
     };
@@ -46,7 +46,8 @@ export function LoginForm() {
     if (!script) {
       script = document.createElement("script");
       script.id = scriptId;
-      script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+      script.src =
+        "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
       script.async = true;
       script.defer = true;
       document.body.appendChild(script);
@@ -55,7 +56,9 @@ export function LoginForm() {
     const initializeTurnstile = () => {
       if (window.turnstile && turnstileContainerRef.current) {
         window.turnstile.render(turnstileContainerRef.current, {
-          sitekey: process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY || "0x4AAAAAAADgp22IT7NjMKXhN",
+          sitekey:
+            process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY ||
+            "0x4AAAAAAADgp22IT7NjMKXhN",
           callback: (token: string) => {
             setTurnstileToken(token);
           },
