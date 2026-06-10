@@ -1,15 +1,13 @@
-"use client";
+"use client"
 
-import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
-
-
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
-import { useRegister } from "@/hooks/use-authentication";
-import type { UserRole } from "@/services/authentication.service";
+import React, { useState } from "react"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { useToast } from "@/hooks/use-toast"
+import { useRegister } from "@/hooks/use-authentication"
+import type { UserRole } from "@/services/authentication.service"
 import {
   User,
   Mail,
@@ -21,119 +19,40 @@ import {
   Loader2,
   Eye,
   EyeOff,
-} from "lucide-react";
-import { useTranslations } from "@/lib/i18n";
+} from "lucide-react"
+import { useTranslations } from "@/lib/i18n"
 
-type RoleSelection = UserRole | null;
-
-const normalizePhoneNumber = (value: string) =>
-  value.trim().replace(/[\s().-]/g, "");
-
-const isValidPhoneNumber = (value: string) => {
-  if (!value.trim()) {
-    return true;
-  }
-
-  const normalized = normalizePhoneNumber(value);
-
-  return (
-    /^(?:\+84|84|0)(?:3|5|7|8|9)\d{8}$/.test(normalized) ||
-    /^\+?[1-9]\d{7,14}$/.test(normalized)
-  );
-};
+type RoleSelection = UserRole | null
 
 interface RegistrationFormProps {
-  onSuccess?: () => void;
+  onSuccess?: () => void
 }
 
 export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [phone, setPhone] = useState("");
-  const [role, setRole] = useState<RoleSelection>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [fullName, setFullName] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [phone, setPhone] = useState("")
+  const [role, setRole] = useState<RoleSelection>(null)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-  // Cloudflare Turnstile States & Ref
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-  const turnstileContainerRef = useRef<HTMLDivElement>(null);
-
-  const router = useRouter();
-  const { toast } = useToast();
-  const { mutate: register, isPending } = useRegister();
-  const { t } = useTranslations();
-
-  useEffect(() => {
-    const scriptId = "cloudflare-turnstile-script";
-    let script = document.getElementById(scriptId) as HTMLScriptElement;
-
-    if (!script) {
-      script = document.createElement("script");
-      script.id = scriptId;
-      script.src =
-        "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-      script.async = true;
-      script.defer = true;
-      document.body.appendChild(script);
-    }
-
-    const initializeTurnstile = () => {
-      if (window.turnstile && turnstileContainerRef.current) {
-        window.turnstile.render(turnstileContainerRef.current, {
-          sitekey:
-            process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY ||
-            "0x4AAAAAAADgp22IT7NjMKXhN",
-          callback: (token: string) => {
-            setTurnstileToken(token);
-          },
-          "expired-callback": () => {
-            setTurnstileToken(null);
-          },
-          "error-callback": () => {
-            setTurnstileToken(null);
-          },
-        });
-      }
-    };
-
-    if (window.turnstile) {
-      initializeTurnstile();
-    } else {
-      script.onload = initializeTurnstile;
-    }
-
-    return () => {
-      if (window.turnstile && turnstileContainerRef.current) {
-        try {
-          window.turnstile.remove();
-        } catch (e) {
-          // ignore
-        }
-      }
-    };
-  }, []);
+  const router = useRouter()
+  const { toast } = useToast()
+  const { mutate: register, isPending } = useRegister()
+  const { t } = useTranslations()
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!isValidPhoneNumber(phone)) {
-      toast({
-        variant: "destructive",
-        title: t("auth.register.validationErrorTitle"),
-        description: t("auth.register.phoneInvalid"),
-      });
-      return;
-    }
+    e.preventDefault()
 
     if (password !== confirmPassword) {
       toast({
         variant: "destructive",
         title: t("auth.register.validationErrorTitle"),
         description: t("auth.register.passwordMismatch"),
-      });
-      return;
+      })
+      return
     }
 
     if (!role) {
@@ -141,17 +60,8 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         variant: "destructive",
         title: t("auth.register.configErrorTitle"),
         description: t("auth.register.selectRole"),
-      });
-      return;
-    }
-
-    if (!turnstileToken) {
-      toast({
-        variant: "destructive",
-        title: t("auth.register.validationErrorTitle"),
-        description: "Please complete the security check.",
-      });
-      return;
+      })
+      return
     }
 
     register(
@@ -161,19 +71,18 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         password,
         phone: phone || null,
         role,
-        turnstile_token: turnstileToken,
       },
       {
         onSuccess: () => {
           toast({
             title: t("auth.register.successTitle"),
             description: t("auth.register.successDescription"),
-          });
+          })
           // Use the switcher callback if available, otherwise navigate
           if (onSuccess) {
-            setTimeout(() => onSuccess(), 1200);
+            setTimeout(() => onSuccess(), 1200)
           } else {
-            setTimeout(() => router.push("/login"), 1200);
+            setTimeout(() => router.push("/login"), 1200)
           }
         },
         onError: (error) => {
@@ -181,11 +90,11 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
             variant: "destructive",
             title: t("auth.register.failedTitle"),
             description: error?.message || t("auth.register.failedDescription"),
-          });
+          })
         },
-      },
-    );
-  };
+      }
+    )
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -232,8 +141,6 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
             type="tel"
             placeholder={t("auth.register.phonePlaceholder")}
             className="pl-10"
-            inputMode="tel"
-            autoComplete="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             disabled={isPending}
@@ -269,9 +176,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         </div>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="confirmPassword">
-          {t("auth.register.confirmPasswordLabel")}
-        </Label>
+        <Label htmlFor="confirmPassword">{t("auth.register.confirmPasswordLabel")}</Label>
         <div className="relative">
           <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
@@ -292,7 +197,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
             {showConfirmPassword ? (
               <EyeOff className="h-4 w-4" />
             ) : (
-              <Eye className="h-4 w-4" />
+               <Eye className="h-4 w-4" />
             )}
           </button>
         </div>
@@ -305,34 +210,28 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
             type="button"
             onClick={() => setRole("SME")}
             disabled={isPending}
-            className={`relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
-              role === "SME"
-                ? "border-primary bg-primary/5 ring-2 ring-primary/20"
-                : "border-muted"
-            }`}
+            className={`relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${role === "SME"
+              ? "border-primary bg-primary/5 ring-2 ring-primary/20"
+              : "border-muted"
+              }`}
           >
             {role === "SME" && (
               <Check className="absolute top-2 right-2 h-4 w-4 text-primary" />
             )}
             <Building2
-              className={
-                role === "SME" ? "text-primary" : "text-muted-foreground"
-              }
+              className={role === "SME" ? "text-primary" : "text-muted-foreground"}
             />
-            <span className="font-semibold text-sm">
-              {t("auth.register.roleSme")}
-            </span>
+            <span className="font-semibold text-sm">{t("auth.register.roleSme")}</span>
           </button>
 
           <button
             type="button"
             onClick={() => setRole("INVESTOR")}
             disabled={isPending}
-            className={`relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
-              role === "INVESTOR"
-                ? "border-primary bg-primary/5 ring-2 ring-primary/20"
-                : "border-muted"
-            }`}
+            className={`relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${role === "INVESTOR"
+              ? "border-primary bg-primary/5 ring-2 ring-primary/20"
+              : "border-muted"
+              }`}
           >
             {role === "INVESTOR" && (
               <Check className="absolute top-2 right-2 h-4 w-4 text-primary" />
@@ -342,34 +241,19 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
                 role === "INVESTOR" ? "text-primary" : "text-muted-foreground"
               }
             />
-            <span className="font-semibold text-sm">
-              {t("auth.register.roleInvestor")}
-            </span>
+            <span className="font-semibold text-sm">{t("auth.register.roleInvestor")}</span>
           </button>
         </div>
       </div>
 
-      {/* Cloudflare Turnstile Spam Prevention */}
-      <div className="flex justify-center py-2">
-        <div ref={turnstileContainerRef} />
-      </div>
-
       <Button
         type="submit"
-        disabled={
-          isPending ||
-          !email ||
-          !password ||
-          !confirmPassword ||
-          !role ||
-          !fullName ||
-          !turnstileToken
-        }
+        disabled={isPending || !email || !password || !confirmPassword || !role || !fullName}
         className="w-full h-12 text-base font-medium"
       >
         {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         {isPending ? t("auth.register.submitting") : t("auth.register.submit")}
       </Button>
     </form>
-  );
+  )
 }

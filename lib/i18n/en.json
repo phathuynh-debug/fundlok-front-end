@@ -72,8 +72,6 @@
     "login": {
       "emailLabel": "Email Address",
       "emailPlaceholder": "name@company.com",
-        "signInWithGoogle": "Sign in with Google",
-        "or": "or",
       "passwordLabel": "Password",
       "passwordPlaceholder": "••••••••",
       "submitting": "Signing In...",
@@ -90,7 +88,6 @@
       "emailPlaceholder": "founder@company.com",
       "phoneLabel": "Phone number",
       "phonePlaceholder": "09xx xxx xxx",
-      "phoneInvalid": "Please enter a valid phone number. Vietnamese numbers like 09xxxxxxxx, +849xxxxxxxx, or international formats are allowed.",
       "passwordLabel": "Password",
       "confirmPasswordLabel": "Confirm Password",
       "passwordPlaceholder": "••••••••",
@@ -107,16 +104,6 @@
       "successDescription": "Your account is ready. Please sign in to continue.",
       "failedTitle": "Registration Failed",
       "failedDescription": "Please check your information and try again."
-    },
-    "verifyEmail": {
-      "title": "Verify your email address",
-      "description": "We've sent a verification link to your email. Please click the link in that email to verify your account.",
-      "statusLabel": "Sent to",
-      "checkStatus": "I have verified my email",
-      "resendBtn": "Resend verification email",
-      "resendSuccess": "Verification email resent successfully!",
-      "resendFailed": "Failed to resend verification email. Please try again.",
-      "logoutBtn": "Sign out"
     },
     "layout": {
       "helpPrefix": "Need help?",
@@ -234,7 +221,7 @@
     "kpis": {
       "loanAmount": "Loan Amount",
       "expectedRoi": "Expected ROI",
-      "estPaybackPeriod": "Loan Duration",
+      "estPaybackPeriod": "Est. Payback Period",
       "revenueShareRate": "Revenue Share Rate",
       "ofDailyRevenue": "of daily revenue"
     },
@@ -324,8 +311,7 @@
       "locationTitle": "Location",
       "locationText": "Add a complete operating address.",
       "companyAgeTitle": "Company age",
-      "companyAgeText": "Share when you incorporated.",
-      "reviewTitle": "Review"
+      "companyAgeText": "Share when you incorporated."
     },
     "card": {
       "title": "Application form",
@@ -377,88 +363,5 @@
     "pageTitle": "Page not found",
     "body": "We couldn't find what you were looking for. The URL may be misspelled or the page may have been removed.",
     "goHome": "Go to home"
-  },
-  "mockup": {
-    "smePortal": "SME PORTAL",
-    "investorPortal": "INVESTOR PORTAL",
-    "smeShort": "SME",
-    "invShort": "NĐT",
-    "borrowerSpecs": "Borrower Specs",
-    "investmentSpecs": "Investment Specs",
-    "monthlyRevenue": "Monthly Revenue",
-    "monthlyRevShort": "Monthly Rev",
-    "desiredLoanSize": "Desired Loan Size",
-    "desiredLoanShort": "Desired Loan",
-    "loanDuration": "Loan Duration",
-    "loanDurationShort": "Duration",
-    "durationMos": "{months} Mos",
-    "durationMonths": "{months} Months",
-    "sigmoidIntRate": "Sigmoid Int. Rate",
-    "creditStatus": "Credit Status",
-    "pending": "PENDING...",
-    "locked": "LOCKED",
-    "approved": "APPROVED",
-    "rejected": "REJECTED",
-    "investmentSize": "Investment Size",
-    "investmentShort": "Investment",
-    "riskTolerance": "Risk Tolerance",
-    "durationTerms": "Duration Terms",
-    "yearlyRoiRate": "Yearly ROI Rate",
-    "yearlyRoiShort": "YEARLY ROI",
-    "estApyShort": "EST. APY",
-    "estProfitReturn": "Est. Profit Return",
-    "estProfitShort": "EST. PROFIT",
-    "calculateSme": "Calculate Interest & APY",
-    "calculateInv": "Calculate Yield & ROI",
-    "adjustSme": "← Adjust Borrowing Specs",
-    "adjustInv": "← Adjust Investment Specs",
-    "adjustShort": "← Adjust Specs",
-    "creditAssessment": "Credit Assessment",
-    "scoreLabel": "SCORE",
-    "leverageRatio": "Leverage Ratio",
-    "assignedApr": "Assigned APR",
-    "yieldReturnProjection": "Yield Return Projection"
-  },
-  "header": {
-    "product": "PRODUCT",
-    "howItWorks": "HOW IT WORKS",
-    "achievements": "ACHIEVEMENTS",
-    "team": "TEAM",
-    "contact": "CONTACT",
-    "contactUs": "Contact Us",
-    "faq": "FAQ",
-    "enterApp": "ENTER APP",
-    "navigationMenu": "Navigation Menu",
-    "whyUs": "WHY US"
-  },
-  "specialPage": {
-    "title": "Why FundLok",
-    "subtitle": "Discover our vision and what makes our flexible capital solutions unique.",
-    "vision": {
-      "header": "FundLok's Vision",
-      "smeStory": "FundLok believes every SME has a different story",
-      "paragraph1": "Cash flow, growth pace, and repayment pressure are not the same for every business.",
-      "paragraph2": "That is why we build flexible capital solutions that adapt to each real-world situation.",
-      "highlight": "Then SME investments become an even better asset",
-      "description": "When financing fits the business, SMEs grow more sustainably, investors gain greater confidence, and the economy functions more efficiently."
-    },
-    "whySpecial": {
-      "header": "Why is FundLok special?",
-      "safetyTitle": "Safety for Investors",
-      "safetyDesc": "Robust protection mechanisms and structure to deliver confident returns.",
-      "safetyItem1": "Stable, daily income",
-      "safetyItem2": "Transparent, clear, and highly auditable information",
-      "safetyItem3": "Interest repaid progressively depending on SME's performance",
-      "fittingTitle": "Fitting to each SME",
-      "fittingDesc": "Tailored financing that aligns with the natural cycles of business growth.",
-      "fittingItem1": "Repay off debt using daily revenue",
-      "fittingItem2": "Flexible loan size & payment term",
-      "fittingItem3": "Automatic, intuitive & highly collaborative system",
-      "transparencyTitle": "Transparent, Public, Automatic",
-      "transparencyDesc": "Trust-free operation driven by standard data inputs and automated verification.",
-      "transparencyItem1": "Documents reading, loan assessment, and interest calculations are 100% automatic",
-      "transparencyItem2": "Data submitted must be from verified sources to protect all parties",
-      "transparencyItem3": "Real-time business financial report & loan health assessment"
-    }
   }
 }

@@ -1,14 +1,11 @@
 "use client"
 
 import Link from "next/link"
-// Image handled by Logo component
 import { motion } from "framer-motion"
 import { Shield, Zap, Users, TrendingUp } from "lucide-react"
 import type { ReactNode } from "react"
 import { LocaleSwitcher } from "@/components/locale-switcher"
-import { ThemeToggle } from "@/components/theme-toggle"
 import { useTranslations } from "@/lib/i18n"
-import Logo from "@/components/logo"
 
 interface AuthLayoutProps {
   children: ReactNode
@@ -41,7 +38,8 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           <div>
             <Link href="/" className="flex items-center gap-2">
-              <Logo alt={t("common.brandName")} containerClassName="relative w-40 h-10" />
+              <TrendingUp className="h-8 w-8 text-emerald-400" />
+              <span className="text-2xl font-bold text-white tracking-tight">{t("common.brandName")}</span>
             </Link>
           </div>
 
@@ -74,10 +72,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
 
           <div className="flex items-center justify-between gap-4 text-sm text-slate-500">
             <span>{t("auth.footer.copyright")}</span>
-            <div className="flex items-center gap-3">
-              <LocaleSwitcher />
-              <ThemeToggle />
-            </div>
+            <LocaleSwitcher />
           </div>
         </div>
       </div>
@@ -85,14 +80,11 @@ export function AuthLayout({ children }: AuthLayoutProps) {
       {/* Right Panel - Form */}
       <div className="flex-1 flex flex-col">
         {/* Mobile Header */}
-        <header className="lg:hidden flex items-center justify-between p-6 border-b border-border bg-background/50 backdrop-blur-md">
-          <Link href="/" className="flex items-center gap-2 group relative z-40">
-            <Logo alt={t("common.brandName")} />
+        <header className="lg:hidden flex items-center justify-between p-6 border-b border-border">
+          <Link href="/" className="flex items-center gap-2">
+            <TrendingUp className="h-6 w-6 text-emerald-500" />
+            <span className="text-xl font-bold tracking-tight text-foreground">FundLok</span>
           </Link>
-          <div className="flex items-center gap-3">
-            <LocaleSwitcher />
-            <ThemeToggle />
-          </div>
         </header>
 
         {/* Form slot */}

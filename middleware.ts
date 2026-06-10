@@ -13,7 +13,6 @@ const API_BASE_URL =
 
 type CurrentUser = {
   role?: string;
-  email_verified?: boolean;
 };
 
 async function getCurrentUser(request: NextRequest) {
@@ -94,33 +93,6 @@ export async function middleware(request: NextRequest) {
       ? APPLICATION_ROUTE
       : DASHBOARD_ROUTE;
 
-  // Redirect unauthenticated users away from /verify-email to login.
-  if (!isAuthenticated && pathname === "/verify-email") {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("from", pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  // Redirect authenticated & verified users away from /verify-email.
-  if (
-    isAuthenticated &&
-    currentUser &&
-    currentUser.email_verified === true &&
-    pathname === "/verify-email"
-  ) {
-    return NextResponse.redirect(new URL(authRedirectTarget, request.url));
-  }
-
-  // Redirect authenticated but unverified users to /verify-email.
-  if (
-    isAuthenticated &&
-    currentUser &&
-    currentUser.email_verified === false &&
-    pathname !== "/verify-email"
-  ) {
-    return NextResponse.redirect(new URL("/verify-email", request.url));
-  }
-
   // Redirect authenticated users away from auth pages to their landing page.
   if (isAuthenticated && AUTH_ROUTES.some((r) => pathname === r)) {
     return NextResponse.redirect(new URL(authRedirectTarget, request.url));
@@ -166,12 +138,5 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   // Run middleware on these paths only — skip static files and API routes.
-  matcher: [
-    "/",
-    "/login",
-    "/dashboard/:path*",
-    "/project-application",
-    "/project-application/:path*",
-    "/verify-email",
-  ],
+  matcher: ["/", "/login", "/dashboard/:path*", "/project-application", "/project-application/:path*"],
 };

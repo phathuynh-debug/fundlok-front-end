@@ -14,7 +14,7 @@ import { InvestmentTab } from "./_components/InvestmentTab"
 import { DueDiligenceTab } from "./_components/DueDiligenceTab"
 import { useTranslations } from "@/lib/i18n"
 
-type TabType = "risk" | "diligence"
+type TabType = "risk" | "investment" | "diligence"
 
 export default function ProjectDetailsPage() {
   const searchParams = useSearchParams()
@@ -94,7 +94,7 @@ export default function ProjectDetailsPage() {
       <InvestmentKpis />
 
       {/* Tab pill selectors */}
-      <div className="bg-muted/40 p-1 rounded-2xl grid w-full max-w-2xl mx-auto grid-cols-2 gap-1 border">
+      <div className="bg-muted/40 p-1 rounded-2xl grid w-full max-w-2xl mx-auto grid-cols-3 gap-1 border">
         <button 
           onClick={() => setActiveTab("risk")}
           className={`py-2.5 px-4 rounded-xl text-sm font-semibold transition-all duration-200 ${
@@ -104,6 +104,16 @@ export default function ProjectDetailsPage() {
           }`}
         >
           {t("dashboard.projectDetails.riskAssessment")}
+        </button>
+        <button 
+          onClick={() => setActiveTab("investment")}
+          className={`py-2.5 px-4 rounded-xl text-sm font-semibold transition-all duration-200 ${
+            activeTab === "investment" 
+              ? "bg-background text-foreground shadow-sm" 
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          {t("dashboard.projectDetails.investment")}
         </button>
         <button 
           onClick={() => setActiveTab("diligence")}
@@ -120,6 +130,7 @@ export default function ProjectDetailsPage() {
       {/* Active Tab Panel Content */}
       <div className="mt-8">
         {activeTab === "risk" && <RiskAssessmentTab />}
+        {activeTab === "investment" && <InvestmentTab />}
         {activeTab === "diligence" && <DueDiligenceTab />}
       </div>
     </div>

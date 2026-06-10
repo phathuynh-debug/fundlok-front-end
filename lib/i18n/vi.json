@@ -72,8 +72,6 @@
     "login": {
       "emailLabel": "Địa chỉ email",
       "emailPlaceholder": "name@company.com",
-      "signInWithGoogle": "Đăng nhập bằng Google",
-      "or": "hoặc",
       "passwordLabel": "Mật khẩu",
       "passwordPlaceholder": "••••••••",
       "submitting": "Đang đăng nhập...",
@@ -90,7 +88,6 @@
       "emailPlaceholder": "founder@company.com",
       "phoneLabel": "Số điện thoại",
       "phonePlaceholder": "09xx xxx xxx",
-      "phoneInvalid": "Vui lòng nhập số điện thoại hợp lệ. Hỗ trợ số Việt Nam như 09xxxxxxxx, +849xxxxxxxx, hoặc định dạng quốc tế.",
       "passwordLabel": "Mật khẩu",
       "confirmPasswordLabel": "Xác nhận mật khẩu",
       "passwordPlaceholder": "••••••••",
@@ -107,16 +104,6 @@
       "successDescription": "Tài khoản của bạn đã sẵn sàng. Vui lòng đăng nhập để tiếp tục.",
       "failedTitle": "Đăng ký thất bại",
       "failedDescription": "Vui lòng kiểm tra thông tin của bạn và thử lại."
-    },
-    "verifyEmail": {
-      "title": "Xác thực địa chỉ email của bạn",
-      "description": "Chúng tôi đã gửi một liên kết xác thực đến địa chỉ email của bạn. Vui lòng nhấp vào liên kết trong email đó để xác thực tài khoản.",
-      "statusLabel": "Đã gửi đến",
-      "checkStatus": "Tôi đã xác thực email",
-      "resendBtn": "Gửi lại email xác thực",
-      "resendSuccess": "Email xác thực đã được gửi lại thành công!",
-      "resendFailed": "Gửi lại email xác thực thất bại. Vui lòng thử lại.",
-      "logoutBtn": "Đăng xuất"
     },
     "layout": {
       "helpPrefix": "Cần hỗ trợ?",
@@ -234,7 +221,7 @@
     "kpis": {
       "loanAmount": "Số tiền vay",
       "expectedRoi": "ROI kỳ vọng",
-      "estPaybackPeriod": "Thời hạn vay",
+      "estPaybackPeriod": "Thời gian hoàn vốn dự kiến",
       "revenueShareRate": "Tỷ lệ chia sẻ doanh thu",
       "ofDailyRevenue": "trên doanh thu hằng ngày"
     },
@@ -324,8 +311,7 @@
       "locationTitle": "Vị trí",
       "locationText": "Thêm địa chỉ hoạt động đầy đủ.",
       "companyAgeTitle": "Tuổi công ty",
-      "companyAgeText": "Chia sẻ thời điểm bạn thành lập.",
-      "reviewTitle": "Xác nhận"
+      "companyAgeText": "Chia sẻ thời điểm bạn thành lập."
     },
     "card": {
       "title": "Biểu mẫu đăng ký",
@@ -377,88 +363,5 @@
     "pageTitle": "Không tìm thấy trang",
     "body": "Chúng tôi không thể tìm thấy nội dung bạn đang tìm kiếm. URL có thể bị sai hoặc trang đã bị xóa.",
     "goHome": "Về trang chủ"
-  },
-  "mockup": {
-    "smePortal": "CỔNG DOANH NGHIỆP",
-    "investorPortal": "CỔNG NHÀ ĐẦU TƯ",
-    "smeShort": "SME",
-    "invShort": "NĐT",
-    "borrowerSpecs": "Thông số Người vay",
-    "investmentSpecs": "Thông số Đầu tư",
-    "monthlyRevenue": "Doanh thu hàng tháng",
-    "monthlyRevShort": "Doanh thu tháng",
-    "desiredLoanSize": "Khoản vay mong muốn",
-    "desiredLoanShort": "Khoản vay",
-    "loanDuration": "Thời hạn vay",
-    "loanDurationShort": "Thời hạn",
-    "durationMos": "{months} Tháng",
-    "durationMonths": "{months} Tháng",
-    "sigmoidIntRate": "Lãi suất Sigmoid",
-    "creditStatus": "Trạng thái tín dụng",
-    "pending": "ĐANG XỬ LÝ...",
-    "locked": "ĐÃ KHÓA",
-    "approved": "ĐÃ DUYỆT",
-    "rejected": "TỪ CHỐI",
-    "investmentSize": "Khoản đầu tư",
-    "investmentShort": "Khoản đầu tư",
-    "riskTolerance": "Mức độ rủi ro",
-    "durationTerms": "Kỳ hạn đầu tư",
-    "yearlyRoiRate": "ROI hàng năm",
-    "yearlyRoiShort": "ROI HÀNG NĂM",
-    "estApyShort": "APY DỰ KIẾN",
-    "estProfitReturn": "Lợi nhuận dự kiến",
-    "estProfitShort": "LỢI NHUẬN",
-    "calculateSme": "Tính lãi suất & APY",
-    "calculateInv": "Tính lợi suất & ROI",
-    "adjustSme": "← Điều chỉnh thông số vay",
-    "adjustInv": "← Điều chỉnh thông số đầu tư",
-    "adjustShort": "← Điều chỉnh",
-    "creditAssessment": "Đánh giá Tín dụng",
-    "scoreLabel": "ĐIỂM SỐ",
-    "leverageRatio": "Tỷ lệ Đòn bẩy",
-    "assignedApr": "Lãi suất Gán",
-    "yieldReturnProjection": "Dự phóng Lợi nhuận"
-  },
-  "header": {
-    "product": "SẢN PHẨM",
-    "howItWorks": "QUY TRÌNH",
-    "achievements": "THÀNH TỰU",
-    "team": "ĐỘI NGŨ",
-    "contact": "LIÊN HỆ",
-    "contactUs": "Liên hệ",
-    "faq": "FAQ",
-    "enterApp": "VÀO ỨNG DỤNG",
-    "navigationMenu": "Danh mục",
-    "whyUs": "WHY US"
-  },
-  "specialPage": {
-    "title": "Vì sao chọn FundLok",
-    "subtitle": "Khám phá tầm nhìn của chúng tôi và điều làm cho các giải pháp vốn linh hoạt trở nên độc đáo.",
-    "vision": {
-      "header": "Tầm nhìn của FundLok",
-      "smeStory": "FundLok tin rằng mỗi doanh nghiệp SME đều có một câu chuyện khác nhau",
-      "paragraph1": "Dòng tiền, tốc độ tăng trưởng và áp lực trả nợ không giống nhau đối với mọi doanh nghiệp.",
-      "paragraph2": "Đó là lý do tại sao chúng tôi xây dựng các giải pháp vốn linh hoạt thích ứng với từng tình huống thực tế.",
-      "highlight": "Từ đó, các khoản đầu tư vào SME trở thành tài sản thậm chí còn tốt hơn",
-      "description": "Khi tài chính phù hợp với doanh nghiệp, các SME sẽ phát triển bền vững hơn, các nhà đầu tư có được niềm tin lớn hơn và nền kinh tế hoạt động hiệu quả hơn."
-    },
-    "whySpecial": {
-      "header": "Tại sao FundLok đặc biệt?",
-      "safetyTitle": "An toàn cho Nhà đầu tư",
-      "safetyDesc": "Cơ chế bảo vệ mạnh mẽ và cấu trúc mang lại lợi nhuận tự tin.",
-      "safetyItem1": "Thu nhập ổn định, hàng ngày",
-      "safetyItem2": "Thông tin minh bạch, rõ ràng và có tính kiểm toán cao",
-      "safetyItem3": "Lãi suất được hoàn trả lũy tiến phụ thuộc vào hiệu suất của SME",
-      "fittingTitle": "Phù hợp với từng SME",
-      "fittingDesc": "Giải pháp tài chính phù hợp, liên kết chặt chẽ với chu kỳ tăng trưởng tự nhiên của doanh nghiệp.",
-      "fittingItem1": "Trả nợ bằng cách sử dụng doanh thu hàng ngày",
-      "fittingItem2": "Kích thước khoản vay & điều khoản thanh toán linh hoạt",
-      "fittingItem3": "Hệ thống tự động, trực quan & có tính hợp tác cao",
-      "transparencyTitle": "Minh bạch, Công khai, Tự động",
-      "transparencyDesc": "Vận hành không cần trung gian tin cậy, thúc đẩy bởi đầu vào dữ liệu chuẩn và xác thực tự động.",
-      "transparencyItem1": "Đọc tài liệu, đánh giá khoản vay và tính toán lãi suất tự động 100%",
-      "transparencyItem2": "Dữ liệu gửi lên phải từ các nguồn đã được xác thực để bảo vệ tất cả các bên",
-      "transparencyItem3": "Báo cáo tài chính doanh nghiệp & đánh giá sức khỏe khoản vay theo thời gian thực"
-    }
   }
 }

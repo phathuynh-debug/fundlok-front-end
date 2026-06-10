@@ -10,11 +10,8 @@ export const APP_URL =
 export const AUTH_ENDPOINTS = {
   login: "/auth/login",
   register: "/auth/register",
-  oauthLogin: "/auth/oauth/login",
   refresh: "/auth/refresh",
   logout: "/auth/logout",
-  verifyEmail: (token: string) => `/auth/verify-email?token=${token}`,
-  resendVerification: "/auth/resend-verification",
 } as const;
 
 export const USER_ENDPOINTS = {
