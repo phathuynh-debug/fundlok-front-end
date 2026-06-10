@@ -16,7 +16,6 @@ export function LoginForm() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // Cloudflare Turnstile States & Ref
   const [turnstileToken, setTurnstileToken] = useState<string | null>(
     process.env.NEXT_PUBLIC_DISABLE_TURNSTILE === "true" ? "mock-token" : null
   );

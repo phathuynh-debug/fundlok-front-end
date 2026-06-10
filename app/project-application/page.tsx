@@ -196,7 +196,7 @@ export default function ProjectApplicationPage() {
             <h2 className="text-3xl font-bold tracking-tight text-foreground">{t('projectApplication.card.title')}</h2>
             <p className="text-sm text-muted-foreground">{t('projectApplication.card.description')}</p>
           </div>
-          
+
           {/* Multi-step progress stepper */}
           <div className="flex items-center justify-between px-1 mb-2">
             {[
@@ -213,8 +213,8 @@ export default function ProjectApplicationPage() {
                       currentStep === step.id
                         ? "bg-emerald-600 text-white ring-4 ring-emerald-600/20 shadow-sm"
                         : currentStep > step.id
-                        ? "bg-emerald-100 dark:bg-emerald-950/30 text-emerald-600 border border-emerald-500/20"
-                        : "bg-muted text-muted-foreground border border-transparent"
+                          ? "bg-emerald-100 dark:bg-emerald-950/30 text-emerald-600 border border-emerald-500/20"
+                          : "bg-muted text-muted-foreground border border-transparent"
                     )}
                   >
                     {step.id}
@@ -240,7 +240,24 @@ export default function ProjectApplicationPage() {
             ))}
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (currentStep === 4) {
+                handleSubmit(onSubmit)(e);
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                const target = e.target as HTMLElement;
+                if (target.tagName === 'INPUT') {
+                  e.preventDefault();
+                  handleNextStep();
+                }
+              }
+            }}
+            className="space-y-5"
+          >
             {/* Step 1: Business details */}
             {currentStep === 1 && (
               <div className="space-y-4 animate-in fade-in duration-200">
@@ -426,6 +443,7 @@ export default function ProjectApplicationPage() {
 
               {currentStep < 4 ? (
                 <Button
+                  key="next-btn"
                   type="button"
                   onClick={handleNextStep}
                   className="h-11 px-6 ml-auto flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
@@ -434,18 +452,23 @@ export default function ProjectApplicationPage() {
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               ) : (
-                <Button type="submit" className="h-11 px-6 ml-auto flex items-center gap-2" disabled={isPending}>
+                <Button
+                  key="submit-btn"
+                  type="submit"
+                  className="h-11 px-6 ml-auto flex items-center gap-2"
+                  disabled={isPending}
+                >
                   {isPending ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {t('projectApplication.card.submitting')}
-                      </>
-                    ) : (
-                      <>
-                        <Send className="mr-2 h-4 w-4" />
-                        {t('projectApplication.card.submit')}
-                      </>
-                    )}
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {t('projectApplication.card.submitting')}
+                    </>
+                  ) : (
+                    <>
+                      <Send className="mr-2 h-4 w-4" />
+                      {t('projectApplication.card.submit')}
+                    </>
+                  )}
                 </Button>
               )}
             </div>
