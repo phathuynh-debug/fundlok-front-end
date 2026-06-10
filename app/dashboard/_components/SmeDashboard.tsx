@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Building2, MapPin, Calendar, Clock, Hash, CheckCircle2, Upload, FileText, Loader2 } from "lucide-react"
+import { Card } from "@/components/ui/card"
+import { MapPin, CheckCircle2, Upload, FileText, Loader2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
