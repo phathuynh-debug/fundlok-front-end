@@ -113,7 +113,7 @@ export default function ProjectApplicationClient() {
     }
 
     if (user?.role === 'SME' && !isLoading && projects.length > 0) {
-      router.replace('/dashboard');
+      window.location.href = '/dashboard';
     }
   }, [isLoading, projects.length, router, user?.role]);
 
@@ -152,7 +152,7 @@ export default function ProjectApplicationClient() {
             title: t('projectApplication.toasts.submittedTitle'),
             description: t('projectApplication.toasts.submittedDescription'),
           });
-          router.replace('/dashboard');
+          window.location.href = '/dashboard';
         },
         onError: (error) => {
           toast({
