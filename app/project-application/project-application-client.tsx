@@ -10,6 +10,13 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useRequireAuth } from '@/hooks/use-authentication';
 import { useCreateProject, useMyProjects } from '@/hooks/use-projects';
@@ -34,7 +41,7 @@ type ProjectApplicationValues = {
 export default function ProjectApplicationClient() {
   const router = useRouter();
   const { toast } = useToast();
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const { user, isLoading: isAuthLoading } = useRequireAuth();
   const shouldLoadProjects = !isAuthLoading && user?.role === 'SME';
   const { data: projects = [], isLoading } = useMyProjects(shouldLoadProjects);
@@ -61,6 +68,8 @@ export default function ProjectApplicationClient() {
     handleSubmit,
     trigger,
     getValues,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<ProjectApplicationValues>({
     resolver: zodResolver(projectApplicationSchema),
@@ -78,6 +87,24 @@ export default function ProjectApplicationClient() {
       },
     },
   });
+
+  useEffect(() => {
+    register('industry');
+  }, [register]);
+
+  const selectedIndustry = watch('industry');
+
+  const industries = [
+    { value: 'Technology & Software', label: locale === 'vi' ? 'Công nghệ & Phần mềm' : 'Technology & Software' },
+    { value: 'Retail & E-commerce', label: locale === 'vi' ? 'Bán lẻ & Thương mại điện tử' : 'Retail & E-commerce' },
+    { value: 'Healthcare & Medical', label: locale === 'vi' ? 'Y tế & Chăm sóc sức khỏe' : 'Healthcare & Medical' },
+    { value: 'Manufacturing', label: locale === 'vi' ? 'Sản xuất' : 'Manufacturing' },
+    { value: 'Food & Beverage / Hospitality', label: locale === 'vi' ? 'Thực phẩm & Đồ uống / Khách sạn' : 'Food & Beverage / Hospitality' },
+    { value: 'Logistics & Transportation', label: locale === 'vi' ? 'Logistics & Vận tải' : 'Logistics & Transportation' },
+    { value: 'Construction & Real Estate', label: locale === 'vi' ? 'Xây dựng & Bất động sản' : 'Construction & Real Estate' },
+    { value: 'Professional Services', label: locale === 'vi' ? 'Dịch vụ chuyên nghiệp (Tư vấn, Marketing...)' : 'Professional Services' },
+    { value: 'Other', label: locale === 'vi' ? 'Khác' : 'Other' },
+  ];
 
   useEffect(() => {
     if (user?.role === 'INVESTOR') {
@@ -279,12 +306,22 @@ export default function ProjectApplicationClient() {
                 </Field>
 
                 <Field label={t('projectApplication.fields.industry')} htmlFor="industry" error={errors.industry?.message}>
-                  <Input
-                    id="industry"
-                    placeholder={t('projectApplication.placeholders.industry')}
-                    {...register('industry')}
+                  <Select
+                    value={selectedIndustry}
+                    onValueChange={(value) => setValue('industry', value, { shouldValidate: true })}
                     disabled={isPending}
-                  />
+                  >
+                    <SelectTrigger id="industry" className="w-full">
+                      <SelectValue placeholder={t('projectApplication.placeholders.industry')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {industries.map((ind) => (
+                        <SelectItem key={ind.value} value={ind.value}>
+                          {ind.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </Field>
               </div>
             )}
