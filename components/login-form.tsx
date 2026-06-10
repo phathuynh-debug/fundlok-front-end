@@ -17,7 +17,9 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
 
   // Cloudflare Turnstile States & Ref
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(
+    process.env.NEXT_PUBLIC_DISABLE_TURNSTILE === "true" ? "mock-token" : null
+  );
   const turnstileContainerRef = useRef<HTMLDivElement>(null);
 
   const { toast } = useToast();
@@ -25,6 +27,9 @@ export function LoginForm() {
   const { t } = useTranslations();
 
   useEffect(() => {
+    if (process.env.NEXT_PUBLIC_DISABLE_TURNSTILE === "true") {
+      return;
+    }
     const scriptId = "cloudflare-turnstile-script";
     let script = document.getElementById(scriptId) as HTMLScriptElement;
 
@@ -195,9 +200,11 @@ export function LoginForm() {
         </div>
 
         {/* Cloudflare Turnstile Spam Prevention */}
-        <div className="flex justify-center py-2">
-          <div ref={turnstileContainerRef} />
-        </div>
+        {process.env.NEXT_PUBLIC_DISABLE_TURNSTILE !== "true" && (
+          <div className="flex justify-center py-2">
+            <div ref={turnstileContainerRef} />
+          </div>
+        )}
 
         <Button
           type="submit"

@@ -57,7 +57,9 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Cloudflare Turnstile States & Ref
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(
+    process.env.NEXT_PUBLIC_DISABLE_TURNSTILE === "true" ? "mock-token" : null
+  );
   const turnstileContainerRef = useRef<HTMLDivElement>(null);
 
   const router = useRouter();
@@ -66,6 +68,9 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
   const { t } = useTranslations();
 
   useEffect(() => {
+    if (process.env.NEXT_PUBLIC_DISABLE_TURNSTILE === "true") {
+      return;
+    }
     const scriptId = "cloudflare-turnstile-script";
     let script = document.getElementById(scriptId) as HTMLScriptElement;
 
@@ -305,11 +310,10 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
             type="button"
             onClick={() => setRole("SME")}
             disabled={isPending}
-            className={`relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
-              role === "SME"
+            className={`relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${role === "SME"
                 ? "border-primary bg-primary/5 ring-2 ring-primary/20"
                 : "border-muted"
-            }`}
+              }`}
           >
             {role === "SME" && (
               <Check className="absolute top-2 right-2 h-4 w-4 text-primary" />
@@ -328,11 +332,10 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
             type="button"
             onClick={() => setRole("INVESTOR")}
             disabled={isPending}
-            className={`relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
-              role === "INVESTOR"
+            className={`relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${role === "INVESTOR"
                 ? "border-primary bg-primary/5 ring-2 ring-primary/20"
                 : "border-muted"
-            }`}
+              }`}
           >
             {role === "INVESTOR" && (
               <Check className="absolute top-2 right-2 h-4 w-4 text-primary" />
@@ -350,9 +353,11 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
       </div>
 
       {/* Cloudflare Turnstile Spam Prevention */}
-      <div className="flex justify-center py-2">
-        <div ref={turnstileContainerRef} />
-      </div>
+      {process.env.NEXT_PUBLIC_DISABLE_TURNSTILE !== "true" && (
+        <div className="flex justify-center py-2">
+          <div ref={turnstileContainerRef} />
+        </div>
+      )}
 
       <Button
         type="submit"

@@ -15,12 +15,17 @@ export function ContactForm() {
   const [isPending, setIsPending] = useState(false);
 
   // Cloudflare Turnstile States & Ref
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(
+    process.env.NEXT_PUBLIC_DISABLE_TURNSTILE === "true" ? "mock-token" : null
+  );
   const turnstileContainerRef = useRef<HTMLDivElement>(null);
 
   const { toast } = useToast();
 
   useEffect(() => {
+    if (process.env.NEXT_PUBLIC_DISABLE_TURNSTILE === "true") {
+      return;
+    }
     const scriptId = "cloudflare-turnstile-script";
     let script = document.getElementById(scriptId) as HTMLScriptElement;
 
@@ -101,7 +106,7 @@ export function ContactForm() {
       setSubject("");
       setMessage("");
       setTurnstileToken(null);
-      
+
       // Reset Turnstile widget visually
       if (window.turnstile) {
         try {
@@ -168,9 +173,11 @@ export function ContactForm() {
       />
 
       {/* Cloudflare Turnstile Spam Prevention */}
-      <div className="flex justify-center py-2">
-        <div ref={turnstileContainerRef} />
-      </div>
+      {process.env.NEXT_PUBLIC_DISABLE_TURNSTILE !== "true" && (
+        <div className="flex justify-center py-2">
+          <div ref={turnstileContainerRef} />
+        </div>
+      )}
 
       <button
         type="submit"
