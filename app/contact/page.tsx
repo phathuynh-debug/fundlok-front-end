@@ -3,6 +3,7 @@ import SiteHeader from "@/components/site-header";
 import SiteFooter from "@/components/site-footer";
 import { ContactForm } from "@/components/contact-form";
 import { BackgroundBlobs } from "@/components/background-blobs";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Contact FundLok | Partnerships, Support, and Inquiries",
@@ -47,12 +48,12 @@ const contactJsonLd = {
   name: "Contact FundLok",
   description:
     "Reach out to FundLok for partnerships, support, and general inquiries.",
-  url: "https://www.fundlok.com/contact",
+  url: `${SITE_URL}/contact`,
   mainEntity: {
     "@type": "Organization",
     name: "FundLok",
     email: "support@fundlok.com",
-    url: "https://www.fundlok.com",
+    url: SITE_URL,
   },
 };
 

@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { QueryProvider } from "@/providers/query-provider";
 import { LocaleProvider } from "@/lib/i18n";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import { SITE_URL } from "@/lib/site";
 const geistSans = Geist({
   subsets: ["latin"],
   variable: "--font-geist-sans",
@@ -18,6 +19,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  // Resolves relative canonical/OG URLs (e.g. "/faq") to absolute ones.
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "FundLok | Flexible Capital Platform for SMEs",
     template: "%s | FundLok",

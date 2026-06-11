@@ -1,38 +1,47 @@
-import { MetadataRoute } from 'next'
+import type { MetadataRoute } from "next";
+import { SITE_URL } from "@/lib/site";
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://fundlok.com'
+// Public marketing pages only — authenticated/app routes (dashboard,
+// project-application) are disallowed in robots.ts and excluded here.
+export default function sitemap(): MetadataRoute.Sitemap {
+  const lastModified = new Date();
 
   return [
     {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
+      url: SITE_URL,
+      lastModified,
+      changeFrequency: "daily",
       priority: 1,
     },
     {
-      url: `${baseUrl}/why-us`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
+      url: `${SITE_URL}/why-us`,
+      lastModified,
+      changeFrequency: "weekly",
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/faq`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
+      url: `${SITE_URL}/faq`,
+      lastModified,
+      changeFrequency: "weekly",
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/login`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
+      url: `${SITE_URL}/contact`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${SITE_URL}/login`,
+      lastModified,
+      changeFrequency: "monthly",
       priority: 0.5,
     },
     {
-      url: `${baseUrl}/register`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
+      url: `${SITE_URL}/register`,
+      lastModified,
+      changeFrequency: "monthly",
       priority: 0.5,
     },
-  ]
+  ];
 }
