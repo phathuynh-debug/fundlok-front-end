@@ -247,7 +247,16 @@
       "noFileChosen": "No file chosen",
       "submittingApplication": "Submitting Application...",
       "applicationSubmitted": "Application Submitted",
-      "submitApplication": "Submit Application"
+      "submitApplication": "Submit Application",
+      "uploadingFile": "Uploading... {percent}%",
+      "uploadComplete": "Uploaded",
+      "retryUpload": "Retry",
+      "maxFileSizeHint": "Max {maxSize} MB",
+      "invalidFileType": "Invalid file type. Allowed: {extensions}",
+      "fileTooLargeError": "File is too large. Maximum size is {maxSize} MB.",
+      "fileUploadFailed": "Upload failed. Please try again.",
+      "documentsStillUploadingTitle": "Documents still uploading",
+      "documentsStillUploadingDescription": "Please wait for all documents to finish uploading before submitting."
     },
     "projectDetails": {
       "loading": "Loading project details...",
@@ -357,6 +366,8 @@
       "locationText": "Add a complete operating address.",
       "companyAgeTitle": "Company age",
       "companyAgeText": "Share when you incorporated.",
+      "loanTitle": "Loan request",
+      "loanText": "Tell us how much you need and how you plan to repay.",
       "reviewTitle": "Review"
     },
     "card": {
@@ -374,7 +385,10 @@
       "city": "City",
       "stateRegion": "State / region",
       "postalCode": "Postal code",
-      "country": "Country"
+      "country": "Country",
+      "requestedAmount": "Requested amount (VND)",
+      "loanPurpose": "Loan purpose",
+      "repaymentPreference": "Repayment preference"
     },
     "placeholders": {
       "legalName": "Acme Holdings Limited",
@@ -384,7 +398,10 @@
       "city": "Singapore",
       "state": "Central",
       "postalCode": "018956",
-      "country": "Singapore"
+      "country": "Singapore",
+      "requestedAmount": "500000000",
+      "loanPurpose": "Working capital to fulfil new orders",
+      "repaymentPreference": "Select a repayment preference"
     },
     "validation": {
       "legalName": "Legal name is required",
@@ -394,7 +411,9 @@
       "street": "Street is required",
       "city": "City is required",
       "postalCode": "Postal code is required",
-      "country": "Country is required"
+      "country": "Country is required",
+      "requestedAmount": "Enter a requested amount greater than 0",
+      "repaymentPreference": "Repayment preference is required"
     },
     "toasts": {
       "submittedTitle": "Application submitted",

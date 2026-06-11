@@ -153,10 +153,11 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
         </div>
       </Card>
 
-      {/* Loan Application Upload Section */}
-      {project.status === "DRAFT" && (
+      {/* Loan Application Upload Section — needs a DRAFT loan application
+          (created together with the project) to upload documents against */}
+      {project.loan_application?.status === "DRAFT" && (
         <LoanApplicationUpload
-          projectId={project.id}
+          loanApplicationId={project.loan_application.id}
           locale={locale}
           theme={theme}
           t={t}

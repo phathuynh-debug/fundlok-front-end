@@ -1,28 +1,38 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import type { ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Building2, CalendarDays, Loader2, MapPin, Send, ArrowRight, ArrowLeft } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import React, { useEffect, useState } from "react";
+import type { ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Building2,
+  CalendarDays,
+  Loader2,
+  MapPin,
+  Banknote,
+  Send,
+  ArrowRight,
+  ArrowLeft,
+} from "lucide-react";
+import { useForm, type Path } from "react-hook-form";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
-import { useRequireAuth } from '@/hooks/use-authentication';
-import { useCreateProject, useMyProjects } from '@/hooks/use-projects';
-import { LocaleSwitcher } from '@/components/locale-switcher';
-import { useTranslations } from '@/lib/i18n';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { useRequireAuth } from "@/hooks/use-authentication";
+import { useCreateProject, useMyProjects } from "@/hooks/use-projects";
+import { LocaleSwitcher } from "@/components/locale-switcher";
+import { useTranslations } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
 type ProjectApplicationValues = {
   legal_name: string;
@@ -36,30 +46,69 @@ type ProjectApplicationValues = {
     postal_code: string;
     country: string;
   };
+  loan: {
+    requested_amount: string;
+    purpose?: string;
+    repayment_preference: string;
+  };
 };
+
+const TOTAL_STEPS = 5;
 
 export default function ProjectApplicationClient() {
   const router = useRouter();
   const { toast } = useToast();
   const { t, locale } = useTranslations();
   const { user, isLoading: isAuthLoading } = useRequireAuth();
-  const shouldLoadProjects = !isAuthLoading && user?.role === 'SME';
+  const shouldLoadProjects = !isAuthLoading && user?.role === "SME";
   const { data: projects = [], isLoading } = useMyProjects(shouldLoadProjects);
   const { mutate: createProject, isPending } = useCreateProject();
 
   const [currentStep, setCurrentStep] = useState(1);
 
   const projectApplicationSchema = z.object({
-    legal_name: z.string().trim().min(2, t('projectApplication.validation.legalName')),
-    tax_id: z.string().trim().min(3, t('projectApplication.validation.taxId')),
-    industry: z.string().trim().min(2, t('projectApplication.validation.industry')),
-    incorporation_date: z.string().min(1, t('projectApplication.validation.incorporationDate')),
+    legal_name: z
+      .string()
+      .trim()
+      .min(2, t("projectApplication.validation.legalName")),
+    tax_id: z.string().trim().min(3, t("projectApplication.validation.taxId")),
+    industry: z
+      .string()
+      .trim()
+      .min(2, t("projectApplication.validation.industry")),
+    incorporation_date: z
+      .string()
+      .min(1, t("projectApplication.validation.incorporationDate")),
     address: z.object({
-      street: z.string().trim().min(2, t('projectApplication.validation.street')),
-      city: z.string().trim().min(2, t('projectApplication.validation.city')),
+      street: z
+        .string()
+        .trim()
+        .min(2, t("projectApplication.validation.street")),
+      city: z.string().trim().min(2, t("projectApplication.validation.city")),
       state: z.string().trim().optional(),
-      postal_code: z.string().trim().min(2, t('projectApplication.validation.postalCode')),
-      country: z.string().trim().min(2, t('projectApplication.validation.country')),
+      postal_code: z
+        .string()
+        .trim()
+        .min(2, t("projectApplication.validation.postalCode")),
+      country: z
+        .string()
+        .trim()
+        .min(2, t("projectApplication.validation.country")),
+    }),
+    loan: z.object({
+      requested_amount: z
+        .string()
+        .trim()
+        .min(1, t("projectApplication.validation.requestedAmount"))
+        .refine(
+          (value) => Number(value) > 0,
+          t("projectApplication.validation.requestedAmount"),
+        ),
+      purpose: z.string().trim().optional(),
+      repayment_preference: z
+        .string()
+        .trim()
+        .min(1, t("projectApplication.validation.repaymentPreference")),
     }),
   });
 
@@ -74,68 +123,133 @@ export default function ProjectApplicationClient() {
   } = useForm<ProjectApplicationValues>({
     resolver: zodResolver(projectApplicationSchema),
     defaultValues: {
-      legal_name: '',
-      tax_id: '',
-      industry: '',
-      incorporation_date: '',
+      legal_name: "",
+      tax_id: "",
+      industry: "",
+      incorporation_date: "",
       address: {
-        street: '',
-        city: '',
-        state: '',
-        postal_code: '',
-        country: '',
+        street: "",
+        city: "",
+        state: "",
+        postal_code: "",
+        country: "",
+      },
+      loan: {
+        requested_amount: "",
+        purpose: "",
+        repayment_preference: "",
       },
     },
   });
 
   useEffect(() => {
-    register('industry');
+    register("industry");
+    register("loan.repayment_preference");
   }, [register]);
 
-  const selectedIndustry = watch('industry');
+  const selectedIndustry = watch("industry");
+  const selectedRepayment = watch("loan.repayment_preference");
+
+  const repaymentOptions = [
+    {
+      value: "MONTHLY",
+      label: locale === "vi" ? "Trả góp hàng tháng" : "Monthly installments",
+    },
+    {
+      value: "QUARTERLY",
+      label: locale === "vi" ? "Trả góp hàng quý" : "Quarterly installments",
+    },
+    {
+      value: "END_OF_TERM",
+      label:
+        locale === "vi" ? "Trả một lần cuối kỳ" : "Lump sum at end of term",
+    },
+  ];
 
   const industries = [
-    { value: 'Technology & Software', label: locale === 'vi' ? 'Công nghệ & Phần mềm' : 'Technology & Software' },
-    { value: 'Retail & E-commerce', label: locale === 'vi' ? 'Bán lẻ & Thương mại điện tử' : 'Retail & E-commerce' },
-    { value: 'Healthcare & Medical', label: locale === 'vi' ? 'Y tế & Chăm sóc sức khỏe' : 'Healthcare & Medical' },
-    { value: 'Manufacturing', label: locale === 'vi' ? 'Sản xuất' : 'Manufacturing' },
-    { value: 'Food & Beverage / Hospitality', label: locale === 'vi' ? 'Thực phẩm & Đồ uống / Khách sạn' : 'Food & Beverage / Hospitality' },
-    { value: 'Logistics & Transportation', label: locale === 'vi' ? 'Logistics & Vận tải' : 'Logistics & Transportation' },
-    { value: 'Construction & Real Estate', label: locale === 'vi' ? 'Xây dựng & Bất động sản' : 'Construction & Real Estate' },
-    { value: 'Professional Services', label: locale === 'vi' ? 'Dịch vụ chuyên nghiệp (Tư vấn, Marketing...)' : 'Professional Services' },
-    { value: 'Other', label: locale === 'vi' ? 'Khác' : 'Other' },
+    {
+      value: "Technology & Software",
+      label: locale === "vi" ? "Công nghệ & Phần mềm" : "Technology & Software",
+    },
+    {
+      value: "Retail & E-commerce",
+      label:
+        locale === "vi" ? "Bán lẻ & Thương mại điện tử" : "Retail & E-commerce",
+    },
+    {
+      value: "Healthcare & Medical",
+      label:
+        locale === "vi" ? "Y tế & Chăm sóc sức khỏe" : "Healthcare & Medical",
+    },
+    {
+      value: "Manufacturing",
+      label: locale === "vi" ? "Sản xuất" : "Manufacturing",
+    },
+    {
+      value: "Food & Beverage / Hospitality",
+      label:
+        locale === "vi"
+          ? "Thực phẩm & Đồ uống / Khách sạn"
+          : "Food & Beverage / Hospitality",
+    },
+    {
+      value: "Logistics & Transportation",
+      label:
+        locale === "vi" ? "Logistics & Vận tải" : "Logistics & Transportation",
+    },
+    {
+      value: "Construction & Real Estate",
+      label:
+        locale === "vi"
+          ? "Xây dựng & Bất động sản"
+          : "Construction & Real Estate",
+    },
+    {
+      value: "Professional Services",
+      label:
+        locale === "vi"
+          ? "Dịch vụ chuyên nghiệp (Tư vấn, Marketing...)"
+          : "Professional Services",
+    },
+    { value: "Other", label: locale === "vi" ? "Khác" : "Other" },
   ];
 
   useEffect(() => {
-    if (user?.role === 'INVESTOR') {
-      router.replace('/dashboard');
+    if (user?.role === "INVESTOR") {
+      router.replace("/dashboard");
       return;
     }
 
-    if (user?.role === 'SME' && !isLoading && projects.length > 0) {
-      window.location.href = '/dashboard';
+    if (user?.role === "SME" && !isLoading && projects.length > 0) {
+      window.location.href = "/dashboard";
     }
   }, [isLoading, projects.length, router, user?.role]);
 
   const handleNextStep = async () => {
-    let fieldsToValidate: any[] = [];
+    let fieldsToValidate: Path<ProjectApplicationValues>[] = [];
     if (currentStep === 1) {
-      fieldsToValidate = ['legal_name', 'tax_id', 'industry'];
+      fieldsToValidate = ["legal_name", "tax_id", "industry"];
     } else if (currentStep === 2) {
       fieldsToValidate = [
-        'address.street',
-        'address.city',
-        'address.state',
-        'address.postal_code',
-        'address.country',
+        "address.street",
+        "address.city",
+        "address.state",
+        "address.postal_code",
+        "address.country",
       ];
     } else if (currentStep === 3) {
-      fieldsToValidate = ['incorporation_date'];
+      fieldsToValidate = ["incorporation_date"];
+    } else if (currentStep === 4) {
+      fieldsToValidate = [
+        "loan.requested_amount",
+        "loan.purpose",
+        "loan.repayment_preference",
+      ];
     }
 
     const isValid = await trigger(fieldsToValidate);
     if (isValid) {
-      setCurrentStep((prev) => prev + 1);
+      setCurrentStep((prev) => Math.min(TOTAL_STEPS, prev + 1));
     }
   };
 
@@ -144,25 +258,33 @@ export default function ProjectApplicationClient() {
   };
 
   const onSubmit = (values: ProjectApplicationValues) => {
-    createProject(
-      values,
-      {
-        onSuccess: () => {
-          toast({
-            title: t('projectApplication.toasts.submittedTitle'),
-            description: t('projectApplication.toasts.submittedDescription'),
-          });
-          window.location.href = '/dashboard';
-        },
-        onError: (error) => {
-          toast({
-            variant: 'destructive',
-            title: t('projectApplication.toasts.failedTitle'),
-            description: error?.message || t('projectApplication.toasts.failedDescription'),
-          });
-        },
-      }
-    );
+    const { loan, ...project } = values;
+    const payload = {
+      ...project,
+      loan_application: {
+        requested_amount: Number(loan.requested_amount),
+        purpose: loan.purpose?.trim() || null,
+        repayment_preference: loan.repayment_preference,
+      },
+    };
+
+    createProject(payload, {
+      onSuccess: () => {
+        toast({
+          title: t("projectApplication.toasts.submittedTitle"),
+          description: t("projectApplication.toasts.submittedDescription"),
+        });
+        window.location.href = "/dashboard";
+      },
+      onError: (error) => {
+        toast({
+          variant: "destructive",
+          title: t("projectApplication.toasts.failedTitle"),
+          description:
+            error?.message || t("projectApplication.toasts.failedDescription"),
+        });
+      },
+    });
   };
 
   if (isAuthLoading || isLoading) {
@@ -170,48 +292,54 @@ export default function ProjectApplicationClient() {
       <div className="flex min-h-[70vh] items-center justify-center">
         <div className="flex items-center gap-2 text-muted-foreground">
           <Loader2 className="h-5 w-5 animate-spin" />
-          {t('projectApplication.loading')}
+          {t("projectApplication.loading")}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto grid w-full max-w-5xl gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+    <div className="mx-auto grid w-full max-w-[96rem] gap-8 lg:grid-cols-[1fr_1.1fr] lg:gap-14">
       <div className="flex flex-col justify-center gap-6">
         <div className="flex justify-end lg:justify-start">
           <LocaleSwitcher />
         </div>
         <div className="space-y-3">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
-            {t('projectApplication.eyebrow')}
+            {t("projectApplication.eyebrow")}
           </p>
           <h1 className="text-4xl font-bold tracking-tight text-foreground lg:text-5xl">
-            {t('projectApplication.title')}
+            {t("projectApplication.title")}
           </h1>
           <p className="max-w-xl text-base leading-7 text-muted-foreground">
-            {t('projectApplication.subtitle')}
+            {t("projectApplication.subtitle")}
           </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 grid-cols-2">
           <InfoCard
             icon={<Building2 className="h-4 w-4" />}
-            title={t('projectApplication.info.businessTitle')}
-            text={t('projectApplication.info.businessText')}
+            title={t("projectApplication.info.businessTitle")}
+            text={t("projectApplication.info.businessText")}
             isActive={currentStep === 1}
           />
           <InfoCard
             icon={<MapPin className="h-4 w-4" />}
-            title={t('projectApplication.info.locationTitle')}
-            text={t('projectApplication.info.locationText')}
+            title={t("projectApplication.info.locationTitle")}
+            text={t("projectApplication.info.locationText")}
             isActive={currentStep === 2}
           />
           <InfoCard
             icon={<CalendarDays className="h-4 w-4" />}
-            title={t('projectApplication.info.companyAgeTitle')}
-            text={t('projectApplication.info.companyAgeText')}
+            title={t("projectApplication.info.companyAgeTitle")}
+            text={t("projectApplication.info.companyAgeText")}
             isActive={currentStep === 3}
+          />
+          <InfoCard
+            icon={<Banknote className="h-4 w-4" />}
+            title={t("projectApplication.info.loanTitle")}
+            text={t("projectApplication.info.loanText")}
+            isActive={currentStep === 4}
           />
         </div>
       </div>
@@ -219,17 +347,22 @@ export default function ProjectApplicationClient() {
       <div className="flex flex-col justify-between py-6">
         <div className="space-y-6">
           <div className="space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight text-foreground">{t('projectApplication.card.title')}</h2>
-            <p className="text-sm text-muted-foreground">{t('projectApplication.card.description')}</p>
+            <h2 className="text-3xl font-bold tracking-tight text-foreground">
+              {t("projectApplication.card.title")}
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              {t("projectApplication.card.description")}
+            </p>
           </div>
 
           {/* Multi-step progress stepper */}
           <div className="flex items-center justify-between px-1 mb-2">
             {[
-              { id: 1, label: t('projectApplication.info.businessTitle') },
-              { id: 2, label: t('projectApplication.info.locationTitle') },
-              { id: 3, label: t('projectApplication.info.companyAgeTitle') },
-              { id: 4, label: t('projectApplication.info.reviewTitle') },
+              { id: 1, label: t("projectApplication.info.businessTitle") },
+              { id: 2, label: t("projectApplication.info.locationTitle") },
+              { id: 3, label: t("projectApplication.info.companyAgeTitle") },
+              { id: 4, label: t("projectApplication.info.loanTitle") },
+              { id: 5, label: t("projectApplication.info.reviewTitle") },
             ].map((step, index) => (
               <React.Fragment key={step.id}>
                 <div className="flex items-center gap-2">
@@ -240,7 +373,7 @@ export default function ProjectApplicationClient() {
                         ? "bg-emerald-600 text-white ring-4 ring-emerald-600/20 shadow-sm"
                         : currentStep > step.id
                           ? "bg-emerald-100 dark:bg-emerald-950/30 text-emerald-600 border border-emerald-500/20"
-                          : "bg-muted text-muted-foreground border border-transparent"
+                          : "bg-muted text-muted-foreground border border-transparent",
                     )}
                   >
                     {step.id}
@@ -248,17 +381,19 @@ export default function ProjectApplicationClient() {
                   <span
                     className={cn(
                       "text-xs font-semibold hidden sm:inline transition-colors",
-                      currentStep === step.id ? "text-foreground" : "text-muted-foreground"
+                      currentStep === step.id
+                        ? "text-foreground"
+                        : "text-muted-foreground",
                     )}
                   >
                     {step.label}
                   </span>
                 </div>
-                {index < 3 && (
+                {index < 4 && (
                   <div
                     className={cn(
                       "flex-1 h-[2px] mx-2 transition-colors duration-300",
-                      currentStep > step.id ? "bg-emerald-600" : "bg-muted"
+                      currentStep > step.id ? "bg-emerald-600" : "bg-muted",
                     )}
                   />
                 )}
@@ -269,14 +404,14 @@ export default function ProjectApplicationClient() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              if (currentStep === 4) {
+              if (currentStep === TOTAL_STEPS) {
                 handleSubmit(onSubmit)(e);
               }
             }}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+              if (e.key === "Enter") {
                 const target = e.target as HTMLElement;
-                if (target.tagName === 'INPUT') {
+                if (target.tagName === "INPUT") {
                   e.preventDefault();
                   handleNextStep();
                 }
@@ -287,32 +422,50 @@ export default function ProjectApplicationClient() {
             {/* Step 1: Business details */}
             {currentStep === 1 && (
               <div className="space-y-4 animate-in fade-in duration-200">
-                <Field label={t('projectApplication.fields.legalName')} htmlFor="legalName" error={errors.legal_name?.message}>
+                <Field
+                  label={t("projectApplication.fields.legalName")}
+                  htmlFor="legalName"
+                  error={errors.legal_name?.message}
+                >
                   <Input
                     id="legalName"
-                    placeholder={t('projectApplication.placeholders.legalName')}
-                    {...register('legal_name')}
+                    placeholder={t("projectApplication.placeholders.legalName")}
+                    {...register("legal_name")}
                     disabled={isPending}
                   />
                 </Field>
 
-                <Field label={t('projectApplication.fields.taxId')} htmlFor="taxId" error={errors.tax_id?.message}>
+                <Field
+                  label={t("projectApplication.fields.taxId")}
+                  htmlFor="taxId"
+                  error={errors.tax_id?.message}
+                >
                   <Input
                     id="taxId"
-                    placeholder={t('projectApplication.placeholders.taxId')}
-                    {...register('tax_id')}
+                    placeholder={t("projectApplication.placeholders.taxId")}
+                    {...register("tax_id")}
                     disabled={isPending}
                   />
                 </Field>
 
-                <Field label={t('projectApplication.fields.industry')} htmlFor="industry" error={errors.industry?.message}>
+                <Field
+                  label={t("projectApplication.fields.industry")}
+                  htmlFor="industry"
+                  error={errors.industry?.message}
+                >
                   <Select
                     value={selectedIndustry}
-                    onValueChange={(value) => setValue('industry', value, { shouldValidate: true })}
+                    onValueChange={(value) =>
+                      setValue("industry", value, { shouldValidate: true })
+                    }
                     disabled={isPending}
                   >
                     <SelectTrigger id="industry" className="w-full">
-                      <SelectValue placeholder={t('projectApplication.placeholders.industry')} />
+                      <SelectValue
+                        placeholder={t(
+                          "projectApplication.placeholders.industry",
+                        )}
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {industries.map((ind) => (
@@ -331,65 +484,71 @@ export default function ProjectApplicationClient() {
               <div className="space-y-4 animate-in fade-in duration-200">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Field
-                    label={t('projectApplication.fields.street')}
+                    label={t("projectApplication.fields.street")}
                     htmlFor="street"
                     error={errors.address?.street?.message}
                   >
                     <Input
                       id="street"
-                      placeholder={t('projectApplication.placeholders.street')}
-                      {...register('address.street')}
+                      placeholder={t("projectApplication.placeholders.street")}
+                      {...register("address.street")}
                       disabled={isPending}
                     />
                   </Field>
 
                   <Field
-                    label={t('projectApplication.fields.city')}
+                    label={t("projectApplication.fields.city")}
                     htmlFor="city"
                     error={errors.address?.city?.message}
                   >
                     <Input
                       id="city"
-                      placeholder={t('projectApplication.placeholders.city')}
-                      {...register('address.city')}
+                      placeholder={t("projectApplication.placeholders.city")}
+                      {...register("address.city")}
                       disabled={isPending}
                     />
                   </Field>
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <Field label={t('projectApplication.fields.stateRegion')} htmlFor="state" error={errors.address?.state?.message}>
+                  <Field
+                    label={t("projectApplication.fields.stateRegion")}
+                    htmlFor="state"
+                    error={errors.address?.state?.message}
+                  >
                     <Input
                       id="state"
-                      placeholder={t('projectApplication.placeholders.state')}
-                      {...register('address.state')}
+                      placeholder={t("projectApplication.placeholders.state")}
+                      {...register("address.state")}
                       disabled={isPending}
                     />
                   </Field>
 
                   <Field
-                    label={t('projectApplication.fields.postalCode')}
+                    label={t("projectApplication.fields.postalCode")}
                     htmlFor="postalCode"
                     error={errors.address?.postal_code?.message}
                   >
                     <Input
                       id="postalCode"
-                      placeholder={t('projectApplication.placeholders.postalCode')}
-                      {...register('address.postal_code')}
+                      placeholder={t(
+                        "projectApplication.placeholders.postalCode",
+                      )}
+                      {...register("address.postal_code")}
                       disabled={isPending}
                     />
                   </Field>
                 </div>
 
                 <Field
-                  label={t('projectApplication.fields.country')}
+                  label={t("projectApplication.fields.country")}
                   htmlFor="country"
                   error={errors.address?.country?.message}
                 >
                   <Input
                     id="country"
-                    placeholder={t('projectApplication.placeholders.country')}
-                    {...register('address.country')}
+                    placeholder={t("projectApplication.placeholders.country")}
+                    {...register("address.country")}
                     disabled={isPending}
                   />
                 </Field>
@@ -400,51 +559,130 @@ export default function ProjectApplicationClient() {
             {currentStep === 3 && (
               <div className="space-y-4 animate-in fade-in duration-200">
                 <Field
-                  label={t('projectApplication.fields.incorporationDate')}
+                  label={t("projectApplication.fields.incorporationDate")}
                   htmlFor="incorporationDate"
                   error={errors.incorporation_date?.message}
                 >
                   <Input
                     id="incorporationDate"
                     type="date"
-                    {...register('incorporation_date')}
+                    {...register("incorporation_date")}
                     disabled={isPending}
                   />
                 </Field>
               </div>
             )}
 
-            {/* Step 4: Review Summary */}
+            {/* Step 4: Loan request */}
             {currentStep === 4 && (
+              <div className="space-y-4 animate-in fade-in duration-200">
+                <Field
+                  label={t("projectApplication.fields.requestedAmount")}
+                  htmlFor="requestedAmount"
+                  error={errors.loan?.requested_amount?.message}
+                >
+                  <Input
+                    id="requestedAmount"
+                    type="number"
+                    min="0"
+                    step="any"
+                    placeholder={t(
+                      "projectApplication.placeholders.requestedAmount",
+                    )}
+                    {...register("loan.requested_amount")}
+                    disabled={isPending}
+                  />
+                </Field>
+
+                <Field
+                  label={t("projectApplication.fields.repaymentPreference")}
+                  htmlFor="repaymentPreference"
+                  error={errors.loan?.repayment_preference?.message}
+                >
+                  <Select
+                    value={selectedRepayment}
+                    onValueChange={(value) =>
+                      setValue("loan.repayment_preference", value, {
+                        shouldValidate: true,
+                      })
+                    }
+                    disabled={isPending}
+                  >
+                    <SelectTrigger id="repaymentPreference" className="w-full">
+                      <SelectValue
+                        placeholder={t(
+                          "projectApplication.placeholders.repaymentPreference",
+                        )}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {repaymentOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+
+                <Field
+                  label={t("projectApplication.fields.loanPurpose")}
+                  htmlFor="loanPurpose"
+                  error={errors.loan?.purpose?.message}
+                >
+                  <Textarea
+                    id="loanPurpose"
+                    rows={3}
+                    placeholder={t(
+                      "projectApplication.placeholders.loanPurpose",
+                    )}
+                    {...register("loan.purpose")}
+                    disabled={isPending}
+                  />
+                </Field>
+              </div>
+            )}
+
+            {/* Step 5: Review Summary */}
+            {currentStep === 5 && (
               <div className="space-y-4 animate-in fade-in duration-200 text-sm">
                 <div className="rounded-2xl border border-border/60 bg-muted/20 p-5 space-y-3">
                   <h3 className="font-bold text-foreground flex items-center gap-2 pb-2 border-b border-border/50">
                     <Building2 className="h-4 w-4 text-emerald-600 animate-pulse" />
-                    <span>{t('projectApplication.info.businessTitle')}</span>
+                    <span>{t("projectApplication.info.businessTitle")}</span>
                   </h3>
                   <div className="grid grid-cols-[120px_1fr] gap-y-2 text-muted-foreground">
-                    <span>{t('projectApplication.fields.legalName')}:</span>
-                    <span className="text-foreground font-semibold">{getValues('legal_name')}</span>
+                    <span>{t("projectApplication.fields.legalName")}:</span>
+                    <span className="text-foreground font-semibold">
+                      {getValues("legal_name")}
+                    </span>
 
-                    <span>{t('projectApplication.fields.taxId')}:</span>
-                    <span className="text-foreground font-semibold">{getValues('tax_id')}</span>
+                    <span>{t("projectApplication.fields.taxId")}:</span>
+                    <span className="text-foreground font-semibold">
+                      {getValues("tax_id")}
+                    </span>
 
-                    <span>{t('projectApplication.fields.industry')}:</span>
-                    <span className="text-foreground font-semibold">{getValues('industry')}</span>
+                    <span>{t("projectApplication.fields.industry")}:</span>
+                    <span className="text-foreground font-semibold">
+                      {getValues("industry")}
+                    </span>
                   </div>
                 </div>
 
                 <div className="rounded-2xl border border-border/60 bg-muted/20 p-5 space-y-3">
                   <h3 className="font-bold text-foreground flex items-center gap-2 pb-2 border-b border-border/50">
                     <MapPin className="h-4 w-4 text-emerald-600 animate-pulse" />
-                    <span>{t('projectApplication.info.locationTitle')}</span>
+                    <span>{t("projectApplication.info.locationTitle")}</span>
                   </h3>
                   <div className="grid grid-cols-[120px_1fr] gap-y-2 text-muted-foreground">
                     <span>Address:</span>
                     <span className="text-foreground font-semibold leading-relaxed">
-                      {getValues('address.street')}, {getValues('address.city')}
-                      {getValues('address.state') ? `, ${getValues('address.state')}` : ''}
-                      {`, ${getValues('address.postal_code')}`}, {getValues('address.country')}
+                      {getValues("address.street")}, {getValues("address.city")}
+                      {getValues("address.state")
+                        ? `, ${getValues("address.state")}`
+                        : ""}
+                      {`, ${getValues("address.postal_code")}`},{" "}
+                      {getValues("address.country")}
                     </span>
                   </div>
                 </div>
@@ -452,11 +690,57 @@ export default function ProjectApplicationClient() {
                 <div className="rounded-2xl border border-border/60 bg-muted/20 p-5 space-y-3">
                   <h3 className="font-bold text-foreground flex items-center gap-2 pb-2 border-b border-border/50">
                     <CalendarDays className="h-4 w-4 text-emerald-600 animate-pulse" />
-                    <span>{t('projectApplication.info.companyAgeTitle')}</span>
+                    <span>{t("projectApplication.info.companyAgeTitle")}</span>
                   </h3>
                   <div className="grid grid-cols-[120px_1fr] gap-y-2 text-muted-foreground">
-                    <span>{t('projectApplication.fields.incorporationDate')}:</span>
-                    <span className="text-foreground font-semibold">{getValues('incorporation_date')}</span>
+                    <span>
+                      {t("projectApplication.fields.incorporationDate")}:
+                    </span>
+                    <span className="text-foreground font-semibold">
+                      {getValues("incorporation_date")}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-border/60 bg-muted/20 p-5 space-y-3">
+                  <h3 className="font-bold text-foreground flex items-center gap-2 pb-2 border-b border-border/50">
+                    <Banknote className="h-4 w-4 text-emerald-600 animate-pulse" />
+                    <span>{t("projectApplication.info.loanTitle")}</span>
+                  </h3>
+                  <div className="grid grid-cols-[120px_1fr] gap-y-2 text-muted-foreground">
+                    <span>
+                      {t("projectApplication.fields.requestedAmount")}:
+                    </span>
+                    <span className="text-foreground font-semibold">
+                      {Number(
+                        getValues("loan.requested_amount"),
+                      ).toLocaleString(
+                        locale === "vi" ? "vi-VN" : "en-US",
+                      )}{" "}
+                      VND
+                    </span>
+
+                    <span>
+                      {t("projectApplication.fields.repaymentPreference")}:
+                    </span>
+                    <span className="text-foreground font-semibold">
+                      {repaymentOptions.find(
+                        (option) =>
+                          option.value ===
+                          getValues("loan.repayment_preference"),
+                      )?.label ?? getValues("loan.repayment_preference")}
+                    </span>
+
+                    {getValues("loan.purpose") ? (
+                      <>
+                        <span>
+                          {t("projectApplication.fields.loanPurpose")}:
+                        </span>
+                        <span className="text-foreground font-semibold leading-relaxed">
+                          {getValues("loan.purpose")}
+                        </span>
+                      </>
+                    ) : null}
                   </div>
                 </div>
               </div>
@@ -477,7 +761,7 @@ export default function ProjectApplicationClient() {
                 </Button>
               )}
 
-              {currentStep < 4 ? (
+              {currentStep < TOTAL_STEPS ? (
                 <Button
                   key="next-btn"
                   type="button"
@@ -497,12 +781,12 @@ export default function ProjectApplicationClient() {
                   {isPending ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      {t('projectApplication.card.submitting')}
+                      {t("projectApplication.card.submitting")}
                     </>
                   ) : (
                     <>
                       <Send className="mr-2 h-4 w-4" />
-                      {t('projectApplication.card.submit')}
+                      {t("projectApplication.card.submit")}
                     </>
                   )}
                 </Button>
@@ -525,7 +809,9 @@ type FieldProps = {
 function Field({ label, htmlFor, children, error }: FieldProps) {
   return (
     <div className="space-y-2">
-      <Label htmlFor={htmlFor} className="text-sm font-semibold">{label}</Label>
+      <Label htmlFor={htmlFor} className="text-sm font-semibold">
+        {label}
+      </Label>
       {children}
       {error ? <p className="text-xs text-destructive mt-1">{error}</p> : null}
     </div>
@@ -546,18 +832,29 @@ function InfoCard({ icon, title, text, isActive }: InfoCardProps) {
         "rounded-2xl border bg-background/80 p-4 shadow-sm backdrop-blur transition-all duration-300",
         isActive
           ? "border-emerald-600 ring-2 ring-emerald-600/10 shadow-emerald-500/5 translate-y-[-2px] scale-[1.01]"
-          : "border-border/60"
+          : "border-border/60",
       )}
     >
       <div
         className={cn(
           "mb-3 inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors duration-300",
-          isActive ? "bg-emerald-500/10 text-emerald-600" : "bg-primary/10 text-primary"
+          isActive
+            ? "bg-emerald-500/10 text-emerald-600"
+            : "bg-primary/10 text-primary",
         )}
       >
         {icon}
       </div>
-      <h2 className={cn("font-semibold text-sm transition-colors", isActive ? "text-emerald-700 dark:text-emerald-400" : "text-foreground")}>{title}</h2>
+      <h2
+        className={cn(
+          "font-semibold text-sm transition-colors",
+          isActive
+            ? "text-emerald-700 dark:text-emerald-400"
+            : "text-foreground",
+        )}
+      >
+        {title}
+      </h2>
       <p className="mt-1 text-xs leading-5 text-muted-foreground">{text}</p>
     </div>
   );

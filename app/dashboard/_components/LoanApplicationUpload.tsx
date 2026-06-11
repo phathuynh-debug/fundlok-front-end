@@ -2,54 +2,67 @@
 
 import { Card } from "@/components/ui/card"
 import { motion, AnimatePresence } from "framer-motion"
-import { CheckCircle2, Upload, FileText, Loader2, AlertCircle } from "lucide-react"
+import { CheckCircle2, Upload, FileText, Loader2, AlertCircle, RotateCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import type { IndustryTheme } from "./sme-dashboard-config"
-import { useLoanApplication, type DocumentFiles } from "./useLoanApplication"
+import {
+  useLoanApplication,
+  acceptForDocument,
+  maxSizeMbForDocument,
+  type DocumentKey,
+} from "./useLoanApplication"
 
 interface LoanApplicationUploadProps {
-  projectId: string
+  loanApplicationId: string
   locale: string
   theme: IndustryTheme
   t: (key: string) => string
 }
 
-export function LoanApplicationUpload({ projectId, locale, theme, t }: LoanApplicationUploadProps) {
+export function LoanApplicationUpload({ loanApplicationId, locale, theme, t }: LoanApplicationUploadProps) {
   const {
-    files,
+    documents,
     currentStep,
     isSubmitting,
     isSubmitted,
+    allFilesUploaded,
     handleFileChange,
     removeFile,
+    retryUpload,
     goToStep,
     goToNextStep,
     goToPreviousStep,
     handleSubmit,
-  } = useLoanApplication({ projectId, t })
+  } = useLoanApplication({ loanApplicationId, t })
 
   const renderUploadField = (
     id: string,
-    key: keyof DocumentFiles,
+    key: DocumentKey,
     label: string,
-    required: boolean = true,
-    accept: string = ".pdf,.doc,.docx,.jpg,.jpeg,.png,.zip"
+    required: boolean = true
   ) => {
-    const file = files[key];
+    const doc = documents[key];
+    const { file, status, progress, error } = doc;
     return (
       <div className="space-y-2">
         <label className="text-sm font-semibold text-foreground flex items-center gap-1">
           {label}
           {required && <span className="text-destructive font-bold">*</span>}
+          <span className="ml-auto text-[10px] font-normal text-muted-foreground">
+            {t("dashboard.sme.maxFileSizeHint").replace("{maxSize}", String(maxSizeMbForDocument(key)))}
+          </span>
         </label>
         <div
-          onClick={() => document.getElementById(id)?.click()}
+          onClick={() => {
+            if (status !== "uploading") document.getElementById(id)?.click()
+          }}
           className={cn(
-            "border border-dashed rounded-xl p-4 flex flex-col sm:flex-row items-center justify-center gap-3 cursor-pointer transition-all duration-200",
-            file
-              ? "border-emerald-500/50 bg-emerald-500/5 dark:bg-emerald-950/10 hover:bg-emerald-500/10"
-              : "border-border hover:border-primary/50 hover:bg-accent/40 bg-muted/20"
+            "border border-dashed rounded-xl p-4 flex flex-col sm:flex-row items-center justify-center gap-3 transition-all duration-200",
+            status === "uploading" && "border-primary/50 bg-accent/30 cursor-wait",
+            status === "uploaded" && "border-emerald-500/50 bg-emerald-500/5 dark:bg-emerald-950/10 hover:bg-emerald-500/10 cursor-pointer",
+            status === "error" && "border-destructive/60 bg-destructive/5 hover:bg-destructive/10 cursor-pointer",
+            status === "idle" && "border-border hover:border-primary/50 hover:bg-accent/40 bg-muted/20 cursor-pointer"
           )}
         >
           <input
@@ -57,26 +70,66 @@ export function LoanApplicationUpload({ projectId, locale, theme, t }: LoanAppli
             id={id}
             className="hidden"
             onChange={(e) => handleFileChange(key, e)}
-            accept={accept}
+            accept={acceptForDocument(key)}
           />
-          {file ? (
+          {status === "uploading" && file ? (
+            <>
+              <Loader2 className="h-5 w-5 text-primary animate-spin shrink-0" />
+              <div className="text-center sm:text-left min-w-0 flex-1 space-y-1.5">
+                <p className="text-sm font-medium text-foreground truncate">{file.name}</p>
+                <div className="h-1.5 w-full rounded-full bg-border overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-primary transition-all duration-200"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {t("dashboard.sme.uploadingFile").replace("{percent}", String(progress))}
+                </p>
+              </div>
+            </>
+          ) : status === "uploaded" && file ? (
             <>
               <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
               <div className="text-center sm:text-left min-w-0 flex-1">
                 <p className="text-sm font-medium text-foreground truncate">{file.name}</p>
-                <p className="text-xs text-muted-foreground">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
+                <p className="text-xs text-muted-foreground">
+                  {(file.size / (1024 * 1024)).toFixed(2)} MB · {t("dashboard.sme.uploadComplete")}
+                </p>
               </div>
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
                 className="h-8 text-xs text-destructive hover:bg-destructive/10"
+                disabled={isSubmitting || isSubmitted}
                 onClick={(e) => {
                   e.stopPropagation();
                   removeFile(key);
                 }}
               >
                 {locale === 'vi' ? 'Xoá' : 'Remove'}
+              </Button>
+            </>
+          ) : status === "error" && file ? (
+            <>
+              <AlertCircle className="h-5 w-5 text-destructive shrink-0" />
+              <div className="text-center sm:text-left min-w-0 flex-1">
+                <p className="text-sm font-medium text-foreground truncate">{file.name}</p>
+                <p className="text-xs text-destructive">{error}</p>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-8 text-xs gap-1.5"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  retryUpload(key);
+                }}
+              >
+                <RotateCcw className="h-3 w-3" />
+                {t("dashboard.sme.retryUpload")}
               </Button>
             </>
           ) : (
@@ -179,12 +232,12 @@ export function LoanApplicationUpload({ projectId, locale, theme, t }: LoanAppli
                     <h4 className="text-lg font-bold text-foreground">
                       {t("dashboard.sme.step1Title")}
                     </h4>
-                    {renderUploadField("companyCharter", "companyCharter", t("dashboard.sme.companyCharter"), true, ".pdf,.doc,.docx,.jpg,.jpeg,.png")}
+                    {renderUploadField("companyCharter", "companyCharter", t("dashboard.sme.companyCharter"))}
 
                     {/* Divider between upload fields */}
                     <div className="border-t border-border/60 my-5" />
 
-                    {renderUploadField("companyRegistration", "companyRegistration", t("dashboard.sme.companyRegistration"), true, ".pdf,.doc,.docx,.jpg,.jpeg,.png")}
+                    {renderUploadField("companyRegistration", "companyRegistration", t("dashboard.sme.companyRegistration"))}
                   </div>
                 )}
 
@@ -200,7 +253,7 @@ export function LoanApplicationUpload({ projectId, locale, theme, t }: LoanAppli
                         <strong className="font-bold text-amber-950 dark:text-amber-100">{t("dashboard.sme.vatDeclarationsHelpTitle")}</strong> {t("dashboard.sme.vatDeclarationsHelpText")}
                       </div>
                     </div>
-                    {renderUploadField("vatDeclarations", "vatDeclarations", t("dashboard.sme.vatZipLabel"), true, ".zip")}
+                    {renderUploadField("vatDeclarations", "vatDeclarations", t("dashboard.sme.vatZipLabel"))}
                   </div>
                 )}
 
@@ -209,7 +262,7 @@ export function LoanApplicationUpload({ projectId, locale, theme, t }: LoanAppli
                     <h4 className="text-lg font-bold text-foreground">
                       {t("dashboard.sme.annualFinancialStatement")}
                     </h4>
-                    {renderUploadField("financialStatement", "financialStatement", t("dashboard.sme.annualFinancialStatement"), true, ".pdf,.doc,.docx,.jpg,.jpeg,.png")}
+                    {renderUploadField("financialStatement", "financialStatement", t("dashboard.sme.annualFinancialStatement"))}
                   </div>
                 )}
 
@@ -218,7 +271,7 @@ export function LoanApplicationUpload({ projectId, locale, theme, t }: LoanAppli
                     <h4 className="text-lg font-bold text-foreground">
                       {t("dashboard.sme.eInvoiceData")}
                     </h4>
-                    {renderUploadField("eInvoiceData", "eInvoiceData", t("dashboard.sme.eInvoiceData"), true, ".pdf,.doc,.docx,.jpg,.jpeg,.png,.zip")}
+                    {renderUploadField("eInvoiceData", "eInvoiceData", t("dashboard.sme.eInvoiceData"))}
                   </div>
                 )}
 
@@ -234,7 +287,7 @@ export function LoanApplicationUpload({ projectId, locale, theme, t }: LoanAppli
                         {t("dashboard.sme.cicReportHelpText")}
                       </div>
                     </div>
-                    {renderUploadField("cicReport", "cicReport", t("dashboard.sme.cicCreditReport"), true, ".pdf")}
+                    {renderUploadField("cicReport", "cicReport", t("dashboard.sme.cicCreditReport"))}
                   </div>
                 )}
               </div>
@@ -354,7 +407,7 @@ export function LoanApplicationUpload({ projectId, locale, theme, t }: LoanAppli
             ) : (
               <Button
                 type="submit"
-                disabled={isSubmitting || isSubmitted}
+                disabled={isSubmitting || isSubmitted || !allFilesUploaded}
                 className={cn("text-white gap-2 font-medium px-6 h-10 rounded-lg transition-all border shadow-xs duration-300",
                   isSubmitted ? "bg-emerald-600 hover:bg-emerald-700 border-emerald-500" : "bg-black hover:bg-black/90 dark:bg-white dark:text-black border-transparent"
                 )}

@@ -31,3 +31,13 @@ export const FILES_ENDPOINTS = {
   presign: "/files/presign",
   commit: (fileId: string) => `/files/${fileId}/commit`,
 } as const;
+
+export const UPLOADS_ENDPOINTS = {
+  initUpload: "/uploads/init-upload",
+  confirm: "/uploads/confirm",
+} as const;
+
+export const LOANS_ENDPOINTS = {
+  submit: (applicationId: string) =>
+    `/loans/applications/${applicationId}/submit`,
+} as const;

@@ -247,7 +247,16 @@
       "noFileChosen": "Chưa chọn tệp",
       "submittingApplication": "Đang gửi hồ sơ...",
       "applicationSubmitted": "Đã gửi hồ sơ",
-      "submitApplication": "Gửi hồ sơ"
+      "submitApplication": "Gửi hồ sơ",
+      "uploadingFile": "Đang tải lên... {percent}%",
+      "uploadComplete": "Đã tải lên",
+      "retryUpload": "Thử lại",
+      "maxFileSizeHint": "Tối đa {maxSize} MB",
+      "invalidFileType": "Định dạng tệp không hợp lệ. Cho phép: {extensions}",
+      "fileTooLargeError": "Tệp quá lớn. Dung lượng tối đa là {maxSize} MB.",
+      "fileUploadFailed": "Tải lên thất bại. Vui lòng thử lại.",
+      "documentsStillUploadingTitle": "Tài liệu đang được tải lên",
+      "documentsStillUploadingDescription": "Vui lòng đợi tất cả tài liệu tải lên xong trước khi gửi hồ sơ."
     },
     "projectDetails": {
       "loading": "Đang tải chi tiết dự án...",
@@ -357,6 +366,8 @@
       "locationText": "Thêm địa chỉ hoạt động đầy đủ.",
       "companyAgeTitle": "Tuổi công ty",
       "companyAgeText": "Chia sẻ thời điểm bạn thành lập.",
+      "loanTitle": "Khoản vay",
+      "loanText": "Cho chúng tôi biết số tiền bạn cần và kế hoạch trả nợ.",
       "reviewTitle": "Xác nhận"
     },
     "card": {
@@ -374,7 +385,10 @@
       "city": "Thành phố",
       "stateRegion": "Bang / khu vực",
       "postalCode": "Mã bưu chính",
-      "country": "Quốc gia"
+      "country": "Quốc gia",
+      "requestedAmount": "Số tiền vay (VND)",
+      "loanPurpose": "Mục đích vay",
+      "repaymentPreference": "Hình thức trả nợ"
     },
     "placeholders": {
       "legalName": "Acme Holdings Limited",
@@ -384,7 +398,10 @@
       "city": "Singapore",
       "state": "Central",
       "postalCode": "018956",
-      "country": "Singapore"
+      "country": "Singapore",
+      "requestedAmount": "500000000",
+      "loanPurpose": "Vốn lưu động cho các đơn hàng mới",
+      "repaymentPreference": "Chọn hình thức trả nợ"
     },
     "validation": {
       "legalName": "Vui lòng nhập tên pháp lý",
@@ -394,7 +411,9 @@
       "street": "Vui lòng nhập đường",
       "city": "Vui lòng nhập thành phố",
       "postalCode": "Vui lòng nhập mã bưu chính",
-      "country": "Vui lòng nhập quốc gia"
+      "country": "Vui lòng nhập quốc gia",
+      "requestedAmount": "Vui lòng nhập số tiền vay lớn hơn 0",
+      "repaymentPreference": "Vui lòng chọn hình thức trả nợ"
     },
     "toasts": {
       "submittedTitle": "Đã gửi đơn đăng ký",
