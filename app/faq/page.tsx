@@ -1,36 +1,60 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import SiteHeader from "@/components/site-header";
+import en from "@/lib/i18n/en.json";
+import FaqClient from "./faq-client";
+
+// Everything below is derived from the same dictionary the page renders,
+// so metadata and structured data never drift from the visible content.
+const faq = en.faqPage;
+const categories = [faq.general, faq.msme, faq.investor];
+
+const questionNumbers = [1, 2, 3, 4, 5, 6] as const;
+
+const qaPairs = categories.flatMap((category) =>
+  questionNumbers.map((n) => ({
+    question: category[`q${n}` as keyof typeof category] as string,
+    answer: category[`a${n}` as keyof typeof category] as string,
+  })),
+);
+
+// Search engines see every question verbatim in the keywords list.
+const questionKeywords = qaPairs.map(({ question }) => question);
+
+const description =
+  "Answers to the most common questions about FundLok: what FundLok is, " +
+  "how it differs from a traditional loan, who can apply for MSME funding, " +
+  "how businesses are assessed and repay, who can invest, and how investor " +
+  "funds are protected, tracked, and repaid.";
+
+const title = "FundLok FAQ | Frequently Asked Questions";
 
 export const metadata: Metadata = {
-  title: "FundLok FAQ | Frequently Asked Questions",
-  description:
-    "Find answers to common questions about FundLok, support, and partnerships.",
+  title,
+  description,
   keywords: [
     "FundLok FAQ",
     "FundLok questions",
     "FundLok support",
+    "MSME financing FAQ",
     "SME financing FAQ",
     "private credit FAQ",
+    "invest in SMEs",
     "contact FundLok",
-    "partnership FAQ",
+    ...questionKeywords,
   ],
   alternates: {
     canonical: "/faq",
   },
   openGraph: {
-    title: "FundLok FAQ | Frequently Asked Questions",
-    description:
-      "Find answers to common questions about FundLok, support, and partnerships.",
+    title,
+    description,
     url: "/faq",
     siteName: "FundLok",
     type: "website",
   },
   twitter: {
     card: "summary",
-    title: "FundLok FAQ | Frequently Asked Questions",
-    description:
-      "Find answers to common questions about FundLok, support, and partnerships.",
+    title,
+    description,
   },
   robots: {
     index: true,
@@ -38,84 +62,29 @@ export const metadata: Metadata = {
   },
 };
 
+// FAQPage rich-result structured data: every question with its full answer.
+// This is what makes Q&As eligible to appear directly in search results.
 const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
-  mainEntity: [
-    {
-      "@type": "Question",
-      name: "How do I contact support?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Use the Contact page or email hello@fundlok.com.",
-      },
+  mainEntity: qaPairs.map(({ question, answer }) => ({
+    "@type": "Question",
+    name: question,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: answer,
     },
-    {
-      "@type": "Question",
-      name: "What is FundLok?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "FundLok is a marketplace for on-chain credit facilities designed to improve capital access for SMEs and provide investment opportunities.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "How do I become a partner?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Reach out via the Contact page or email us directly and our partnerships team will follow up.",
-      },
-    },
-  ],
+  })),
 };
 
 export default function FaqPage() {
   return (
-    <div className="min-h-screen w-full bg-background text-foreground">
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <SiteHeader />
-      <div className="py-16 px-6">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-extrabold mb-6">
-            Frequently Asked Questions
-          </h1>
-
-          <section className="space-y-6">
-            <div>
-              <h3 className="font-bold">How do I contact support?</h3>
-              <p className="text-sm text-muted-foreground">
-                Use the Contact page or email hello@fundlok.com.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-bold">What is FundLok?</h3>
-              <p className="text-sm text-muted-foreground">
-                FundLok is a marketplace for on-chain credit facilities designed
-                to improve capital access for SMEs and provide investment
-                opportunities.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-bold">How do I become a partner?</h3>
-              <p className="text-sm text-muted-foreground">
-                Reach out via the Contact page or email us directly and our
-                partnerships team will follow up.
-              </p>
-            </div>
-          </section>
-
-          <div className="mt-8">
-            <Link href="/" className="text-emerald-600 hover:underline">
-              Back to Home
-            </Link>
-          </div>
-        </div>
-      </div>
-    </div>
+      <FaqClient />
+    </>
   );
 }
