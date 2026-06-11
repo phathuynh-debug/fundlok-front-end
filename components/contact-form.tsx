@@ -5,8 +5,6 @@ import { apiClient } from "@/lib/api-client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 
-
-
 export function ContactForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -16,7 +14,7 @@ export function ContactForm() {
 
   // Cloudflare Turnstile States & Ref
   const [turnstileToken, setTurnstileToken] = useState<string | null>(
-    process.env.NEXT_PUBLIC_DISABLE_TURNSTILE === "true" ? "mock-token" : null
+    process.env.NEXT_PUBLIC_DISABLE_TURNSTILE === "true" ? "mock-token" : null,
   );
   const turnstileContainerRef = useRef<HTMLDivElement>(null);
 
@@ -32,7 +30,8 @@ export function ContactForm() {
     if (!script) {
       script = document.createElement("script");
       script.id = scriptId;
-      script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+      script.src =
+        "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
       script.async = true;
       script.defer = true;
       document.body.appendChild(script);
@@ -41,7 +40,9 @@ export function ContactForm() {
     const initializeTurnstile = () => {
       if (window.turnstile && turnstileContainerRef.current) {
         window.turnstile.render(turnstileContainerRef.current, {
-          sitekey: process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY || "0x4AAAAAAADgp22IT7NjMKXhN",
+          sitekey:
+            process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY ||
+            "0x4AAAAAAADgp22IT7NjMKXhN",
           callback: (token: string) => {
             setTurnstileToken(token);
           },
@@ -120,12 +121,12 @@ export function ContactForm() {
           // ignore
         }
       }
-
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Failed to Send Message",
-        description: error?.message || "Something went wrong. Please try again.",
+        description:
+          error?.message || "Something went wrong. Please try again.",
       });
     } finally {
       setIsPending(false);

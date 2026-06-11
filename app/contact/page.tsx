@@ -50,7 +50,7 @@ const contactJsonLd = {
   mainEntity: {
     "@type": "Organization",
     name: "FundLok",
-    email: "hello@fundlok.com",
+    email: "support@fundlok.com",
     url: "https://www.fundlok.com",
   },
 };
@@ -86,7 +86,7 @@ export default function ContactPage() {
                   Email
                 </h2>
                 <p className="mt-3 text-sm text-muted-foreground">
-                  hello@fundlok.com
+                  support@fundlok.com
                 </p>
               </div>
               <div className="rounded-3xl border border-border/60 bg-white/40 p-5 shadow-sm backdrop-blur-md dark:bg-slate-900/30">
