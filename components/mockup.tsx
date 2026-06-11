@@ -12,26 +12,11 @@ type MockupProps = {
   rotateY: number;
   shineX: number;
   shineY: number;
-  tvlValue: number;
-  drawdownPercent: number;
-  allocationValue: number;
   activePartner: {
     id: string;
     name: string;
     category: string;
-    badges: string[];
-    description: string;
-    stats: {
-      tvl: string;
-      apy: string;
-      redemptions: string;
-    };
   };
-  activeIndex: number;
-  setTvlValue: (v: number) => void;
-  setDrawdownPercent: (v: number) => void;
-  setAllocationValue: (v: number) => void;
-  setActiveIndex?: (index: number) => void;
 };
 
 export default function Mockup(props: MockupProps) {
@@ -53,17 +38,11 @@ export default function Mockup(props: MockupProps) {
   const [smeShowResults, setSmeShowResults] = useState(false);
   const [invShowResults, setInvShowResults] = useState(false);
 
-  // Reset show results when changing partner index
-  useEffect(() => {
-    setSmeShowResults(false);
-    setInvShowResults(false);
-  }, [props.activeIndex]);
-
   useEffect(() => {
     if (typeof window === "undefined") return;
     const mq = window.matchMedia("(min-width: 1024px)");
     const handler = (e: MediaQueryListEvent | MediaQueryList) => {
-      setDevice((e as any).matches ? "laptop" : "phone");
+      setDevice(e.matches ? "laptop" : "phone");
     };
     handler(mq);
     mq.addEventListener("change", handler);
@@ -80,7 +59,6 @@ export default function Mockup(props: MockupProps) {
 
   const gradeText = grade.toFixed(4);
   const interestRateText = interestRate.toFixed(2) + "%";
-  const statusText = isSmeRejected ? "REJECTED" : "APPROVED";
 
   // Investor Calculations
   let roiTranslation = 13.5;
@@ -285,23 +263,9 @@ export default function Mockup(props: MockupProps) {
                   <div className="w-5.5 h-5.5 rounded bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
                     <TrendingUp className="h-3 w-3 text-emerald-400" />
                   </div>
-                  {props.setActiveIndex ? (
-                    <select
-                      value={props.activeIndex}
-                      onChange={(e) =>
-                        props.setActiveIndex?.(Number(e.target.value))
-                      }
-                      className="bg-zinc-950/80 border border-zinc-800/80 text-zinc-200 text-[9px] font-sans font-bold uppercase tracking-wider rounded px-2 py-0.5 focus:outline-none cursor-pointer hover:border-zinc-700 transition-colors"
-                    >
-                      <option value={0}>Fasanara Digital</option>
-                      <option value={1}>FalconX</option>
-                      <option value={2}>Bastion Trading</option>
-                    </select>
-                  ) : (
-                    <span className="font-sans font-bold text-[10px] uppercase tracking-widest text-zinc-300">
-                      Fundlok Terminal
-                    </span>
-                  )}
+                  <span className="font-sans font-bold text-[10px] uppercase tracking-widest text-zinc-300">
+                    {partner.name}
+                  </span>
                 </div>
 
                 {/* Portal Selectors */}
