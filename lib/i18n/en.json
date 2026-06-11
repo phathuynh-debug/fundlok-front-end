@@ -471,7 +471,9 @@
     "yieldReturnProjection": "Yield Return Projection"
   },
   "header": {
+    "home": "HOME",
     "product": "PRODUCT",
+    "overview": "OVERVIEW",
     "howItWorks": "HOW IT WORKS",
     "achievements": "ACHIEVEMENTS",
     "team": "TEAM",

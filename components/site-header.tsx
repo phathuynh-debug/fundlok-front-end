@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Logo from "@/components/logo";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Menu, ChevronDown } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
 import {
   Sheet,
@@ -17,67 +16,23 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 
-type SiteHeaderProps = {
-  onProcess?: (e: React.MouseEvent) => void;
-  onAchievements?: (e: React.MouseEvent) => void;
-  onTeam?: (e: React.MouseEvent) => void;
-};
+const NAV_LINKS = [
+  { href: "/", labelKey: "header.home" },
+  { href: "/why-us", labelKey: "header.whyUs" },
+  { href: "/faq", labelKey: "header.faq" },
+  { href: "/contact", labelKey: "header.contactUs" },
+] as const;
 
-export default function SiteHeader({
-  onProcess,
-  onAchievements,
-  onTeam,
-}: SiteHeaderProps) {
+// Page-level navigation only. In-page section navigation on the landing page
+// is handled by the SectionLocator rail instead.
+export default function SiteHeader() {
   const { t } = useTranslations();
-  const router = useRouter();
   const pathname = usePathname();
-  const [contactOpen, setContactOpen] = useState(false);
-  const [mobileContactOpen, setMobileContactOpen] = useState(false);
 
-  const handleProcessClick = (e: React.MouseEvent) => {
-    if (pathname === "/") {
-      if (onProcess) {
-        onProcess(e);
-      } else {
-        const element = document.getElementById("process");
-        if (element) {
-          element.scrollIntoView({ behavior: "smooth" });
-        }
-      }
-    } else {
-      router.push("/#process");
-    }
-  };
-
-  const handleAchievementsClick = (e: React.MouseEvent) => {
-    if (pathname === "/") {
-      if (onAchievements) {
-        onAchievements(e);
-      } else {
-        const element = document.getElementById("achievements");
-        if (element) {
-          element.scrollIntoView({ behavior: "smooth" });
-        }
-      }
-    } else {
-      router.push("/#achievements");
-    }
-  };
-
-  const handleTeamClick = (e: React.MouseEvent) => {
-    if (pathname === "/") {
-      if (onTeam) {
-        onTeam(e);
-      } else {
-        const element = document.getElementById("team");
-        if (element) {
-          element.scrollIntoView({ behavior: "smooth" });
-        }
-      }
-    } else {
-      router.push("/#team");
-    }
-  };
+  const linkClass = (href: string) =>
+    pathname === href
+      ? "text-emerald-600 dark:text-emerald-400"
+      : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white";
 
   return (
     <header className="sticky top-0 z-30 w-full bg-background/45 backdrop-blur-md border-b border-border/10 flex items-center justify-between px-6 py-4 md:px-12">
@@ -85,80 +40,16 @@ export default function SiteHeader({
         <Logo />
       </Link>
 
-      <nav className="hidden lg:flex items-center gap-6 xl:gap-8 text-[11px] font-mono tracking-widest font-semibold">
-        <Link
-          href="#"
-          className="transition-colors duration-200 text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
-        >
-          {t("header.product")}
-        </Link>
-
-        <Link
-          href="/why-us"
-          className={`transition-colors duration-200 font-mono tracking-widest text-[11px] font-semibold ${
-            pathname === "/why-us"
-              ? "text-emerald-600 dark:text-emerald-400"
-              : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
-          }`}
-        >
-          {t("header.whyUs")}
-        </Link>
-
-        <button
-          onClick={handleProcessClick}
-          className="transition-colors duration-200 text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white cursor-pointer font-mono tracking-widest text-[11px] font-semibold bg-transparent border-none p-0 outline-none"
-        >
-          {t("header.howItWorks")}
-        </button>
-
-        <button
-          onClick={handleAchievementsClick}
-          className="transition-colors duration-200 text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white cursor-pointer font-mono tracking-widest text-[11px] font-semibold bg-transparent border-none p-0 outline-none"
-        >
-          {t("header.achievements")}
-        </button>
-
-        <button
-          onClick={handleTeamClick}
-          className="transition-colors duration-200 text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white cursor-pointer font-mono tracking-widest text-[11px] font-semibold bg-transparent border-none p-0 outline-none"
-        >
-          {t("header.team")}
-        </button>
-
-        <div
-          className="relative"
-          onMouseEnter={() => setContactOpen(true)}
-          onMouseLeave={() => setContactOpen(false)}
-        >
-          <button
-            onFocus={() => setContactOpen(true)}
-            onBlur={() => setContactOpen(false)}
-            className="transition-colors duration-200 text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white cursor-pointer font-mono tracking-widest text-[11px] font-semibold bg-transparent border-none p-0 outline-none"
-            aria-haspopup="true"
-            aria-expanded={contactOpen}
+      <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
+        {NAV_LINKS.map(({ href, labelKey }) => (
+          <Link
+            key={href}
+            href={href}
+            className={`transition-colors duration-200 font-mono tracking-widest text-[11px] font-semibold uppercase ${linkClass(href)}`}
           >
-            {t("header.contact")}
-          </button>
-
-          {contactOpen && (
-            <div className="absolute right-0 top-full pt-2 w-44 z-40">
-              <div className="bg-white dark:bg-slate-900 border border-border/30 rounded-md shadow-lg overflow-hidden">
-                <Link
-                  href="/contact"
-                  className="block px-3 py-2 text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-slate-800"
-                >
-                  {t("header.contactUs")}
-                </Link>
-                <Link
-                  href="/faq"
-                  className="block px-3 py-2 text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-slate-800"
-                >
-                  {t("header.faq")}
-                </Link>
-              </div>
-            </div>
-          )}
-        </div>
+            {t(labelKey)}
+          </Link>
+        ))}
       </nav>
 
       {/* Desktop Header Navigation Actions */}
@@ -202,86 +93,16 @@ export default function SiteHeader({
 
             {/* Mobile Navigation List */}
             <div className="flex flex-col gap-4 py-2">
-              <SheetClose asChild>
-                <Link
-                  href="#"
-                  className="text-left py-2 font-mono tracking-widest text-xs font-bold text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white transition-colors"
-                >
-                  {t("header.product")}
-                </Link>
-              </SheetClose>
-
-              <SheetClose asChild>
-                <Link
-                  href="/why-us"
-                  className={`text-left py-2 font-mono tracking-widest text-xs font-bold transition-colors ${
-                    pathname === "/why-us"
-                      ? "text-emerald-600 dark:text-emerald-400"
-                      : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
-                  }`}
-                >
-                  {t("header.whyUs")}
-                </Link>
-              </SheetClose>
-
-              <SheetClose asChild>
-                <button
-                  onClick={handleProcessClick}
-                  className="text-left py-2 font-mono tracking-widest text-xs font-bold text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white cursor-pointer bg-transparent border-none p-0 outline-none transition-colors"
-                >
-                  {t("header.howItWorks")}
-                </button>
-              </SheetClose>
-
-              <SheetClose asChild>
-                <button
-                  onClick={handleAchievementsClick}
-                  className="text-left py-2 font-mono tracking-widest text-xs font-bold text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white cursor-pointer bg-transparent border-none p-0 outline-none transition-colors"
-                >
-                  {t("header.achievements")}
-                </button>
-              </SheetClose>
-
-              <SheetClose asChild>
-                <button
-                  onClick={handleTeamClick}
-                  className="text-left py-2 font-mono tracking-widest text-xs font-bold text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white cursor-pointer bg-transparent border-none p-0 outline-none transition-colors"
-                >
-                  {t("header.team")}
-                </button>
-              </SheetClose>
-
-              <div className="flex flex-col gap-1.5">
-                <button
-                  onClick={() => setMobileContactOpen(!mobileContactOpen)}
-                  className="text-left py-2 font-mono tracking-widest text-xs font-bold text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white cursor-pointer bg-transparent border-none p-0 outline-none transition-colors flex justify-between items-center"
-                >
-                  <span>{t("header.contact")}</span>
-                  <ChevronDown
-                    className={`w-3.5 h-3.5 transition-transform duration-200 ${mobileContactOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
-                {mobileContactOpen && (
-                  <div className="flex flex-col gap-3 pl-3 py-2 border-l border-zinc-200/50 dark:border-zinc-800/50">
-                    <SheetClose asChild>
-                      <Link
-                        href="/contact"
-                        className="text-left text-xs font-bold font-mono tracking-wider text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-white transition-colors"
-                      >
-                        {t("header.contactUs")}
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        href="/faq"
-                        className="text-left text-xs font-bold font-mono tracking-wider text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-white transition-colors"
-                      >
-                        {t("header.faq")}
-                      </Link>
-                    </SheetClose>
-                  </div>
-                )}
-              </div>
+              {NAV_LINKS.map(({ href, labelKey }) => (
+                <SheetClose asChild key={href}>
+                  <Link
+                    href={href}
+                    className={`text-left py-2 font-mono tracking-widest text-xs font-bold uppercase transition-colors ${linkClass(href)}`}
+                  >
+                    {t(labelKey)}
+                  </Link>
+                </SheetClose>
+              ))}
             </div>
 
             {/* Mobile Drawer Settings & CTA Action */}

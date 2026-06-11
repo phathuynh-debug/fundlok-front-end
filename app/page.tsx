@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import SiteHeader from "@/components/site-header";
+import { SectionLocator } from "@/components/section-locator";
 import SiteFooter from "@/components/site-footer";
 import { HeroInteractive } from "@/components/hero-interactive";
 import { InteractiveFlow } from "@/components/interactive-flow";
@@ -211,10 +212,16 @@ export default async function Page() {
       <div className="relative min-h-screen w-full bg-background text-foreground overflow-x-hidden flex flex-col justify-between selection:bg-accent/20">
         <SiteHeader />
 
+        {/* Right-edge scroll-spy rail showing the section currently in view */}
+        <SectionLocator />
+
         {/* Main Container */}
         <div className="w-full flex-1 flex flex-col">
           {/* Hero Section Container */}
-          <section className="relative w-full min-h-[calc(100vh-76px)] flex flex-col items-center overflow-hidden">
+          <section
+            id="hero"
+            className="relative w-full min-h-[calc(100vh-76px)] flex flex-col items-center overflow-hidden scroll-mt-20"
+          >
             {/* Client interactive GUI logic (waves + mockup + animated headers) */}
             <HeroInteractive strings={strings} />
           </section>

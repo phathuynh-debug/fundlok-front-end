@@ -471,7 +471,9 @@
     "yieldReturnProjection": "Dự phóng Lợi nhuận"
   },
   "header": {
+    "home": "TRANG CHỦ",
     "product": "SẢN PHẨM",
+    "overview": "TỔNG QUAN",
     "howItWorks": "QUY TRÌNH",
     "achievements": "THÀNH TỰU",
     "team": "ĐỘI NGŨ",
