@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import SiteHeader from "@/components/site-header";
 import SiteFooter from "@/components/site-footer";
 import { ContactForm } from "@/components/contact-form";
+import { BackgroundBlobs } from "@/components/background-blobs";
 
 export const metadata: Metadata = {
   title: "Contact FundLok | Partnerships, Support, and Inquiries",
@@ -57,13 +58,15 @@ const contactJsonLd = {
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen w-full bg-background text-foreground">
+    <div className="relative min-h-screen w-full bg-background text-foreground overflow-x-hidden">
       <script type="application/ld+json" id="contact-jsonld">
         {JSON.stringify(contactJsonLd)}
       </script>
       <SiteHeader />
 
-      <main className="mx-auto w-full max-w-6xl px-6 py-16 md:py-20">
+      <BackgroundBlobs variant="compact" />
+
+      <main className="relative z-10 mx-auto w-full max-w-6xl px-6 py-16 md:py-20">
         <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr]">
           <section className="space-y-6">
             <div className="space-y-3">

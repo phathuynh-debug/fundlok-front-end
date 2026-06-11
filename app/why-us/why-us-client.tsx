@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion, Variants } from "framer-motion";
 import { useTranslations } from "@/lib/i18n";
 import SiteHeader from "@/components/site-header";
+import { BackgroundBlobs } from "@/components/background-blobs";
 import {
   ShieldCheck,
   Coins,
@@ -17,6 +18,7 @@ import {
   Sparkles,
   Layers,
 } from "lucide-react";
+import SiteFooter from "@/components/site-footer";
 
 export default function WhyUsClient() {
   const { t } = useTranslations();
@@ -50,6 +52,8 @@ export default function WhyUsClient() {
       {/* Ambient background decoration */}
       <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-emerald-500/10 dark:bg-emerald-500/5 blur-[120px] pointer-events-none -z-10" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-accent/15 dark:bg-accent/5 blur-[100px] pointer-events-none -z-10" />
+
+      <BackgroundBlobs />
 
       <SiteHeader />
 
@@ -272,10 +276,7 @@ export default function WhyUsClient() {
         </motion.section>
       </main>
 
-      {/* Footer copyright */}
-      <footer className="py-12 border-t border-border/10 text-center text-xs text-muted-foreground">
-        <p>{t("common.copyright")}</p>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
