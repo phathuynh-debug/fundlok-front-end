@@ -217,19 +217,7 @@ export default async function Page() {
         <div className="w-full flex-1 flex flex-col">
           {/* Hero Section Container */}
           <section className="relative w-full min-h-[calc(100vh-76px)] flex flex-col items-center overflow-hidden">
-            {/* Server-rendered static text content */}
-            <div className="relative z-10 w-full max-w-4xl mx-auto pt-10 pb-4 px-4 text-center">
-              <div className="text-center px-4 flex flex-col items-center mb-6 max-w-3xl mx-auto">
-                <h1 className="font-sans text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground leading-[1.15] mb-4 tracking-tight">
-                  {strings.heroTitle}
-                </h1>
-                <p className="font-sans text-xs md:text-sm text-muted-foreground/85 leading-relaxed max-w-2xl">
-                  {strings.heroSubtitle}
-                </p>
-              </div>
-            </div>
-
-            {/* Client interactive GUI logic (waves + mockup) */}
+            {/* Client interactive GUI logic (waves + mockup + animated headers) */}
             <HeroInteractive strings={strings} />
           </section>
 
