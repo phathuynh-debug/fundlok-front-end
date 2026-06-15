@@ -566,5 +566,26 @@
       "transparencyItem2": "Dữ liệu gửi lên phải từ các nguồn đã được xác thực để bảo vệ tất cả các bên",
       "transparencyItem3": "Báo cáo tài chính doanh nghiệp & đánh giá sức khỏe khoản vay theo thời gian thực"
     }
+  },
+  "contactPage": {
+    "eyebrow": "Liên hệ",
+    "title": "Trao đổi với đội ngũ FundLok",
+    "description": "Sử dụng trang này cho các yêu cầu hợp tác, câu hỏi về sản phẩm hoặc hỗ trợ chung. Chúng tôi phản hồi qua email và có thể chuyển tiếp yêu cầu của bạn đến đúng bộ phận nhanh hơn so với biểu mẫu chân trang cũ.",
+    "emailLabel": "Email",
+    "locationLabel": "Địa điểm",
+    "locationValue": "Trương Định / 123 Võ Thị Sáu, Xuân Hòa, Hồ Chí Minh",
+    "form": {
+      "namePlaceholder": "Họ và tên",
+      "emailPlaceholder": "Email",
+      "subjectPlaceholder": "Tiêu đề",
+      "messagePlaceholder": "Tin nhắn",
+      "securityCheckRequired": "Yêu cầu kiểm tra bảo mật",
+      "completeSecurityCheck": "Vui lòng hoàn thành kiểm tra bảo mật.",
+      "messageSent": "Đã gửi tin nhắn",
+      "inquirySubmitted": "Cảm ơn bạn! Yêu cầu của bạn đã được gửi thành công.",
+      "failedToSendMessage": "Gửi tin nhắn thất bại",
+      "sending": "Đang gửi...",
+      "sendMessage": "Gửi tin nhắn"
+    }
   }
 }

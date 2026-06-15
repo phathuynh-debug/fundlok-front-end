@@ -4,8 +4,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { apiClient } from "@/lib/api-client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "@/lib/i18n";
 
 export function ContactForm() {
+  const { t, locale } = useTranslations();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("");
@@ -79,8 +81,8 @@ export function ContactForm() {
     if (!turnstileToken) {
       toast({
         variant: "destructive",
-        title: "Security Check Required",
-        description: "Please complete the security check.",
+        title: t("contactPage.form.securityCheckRequired"),
+        description: t("contactPage.form.completeSecurityCheck"),
       });
       return;
     }
@@ -97,8 +99,8 @@ export function ContactForm() {
       });
 
       toast({
-        title: "Message Sent",
-        description: "Thank you! Your inquiry has been submitted successfully.",
+        title: t("contactPage.form.messageSent"),
+        description: t("contactPage.form.inquirySubmitted"),
       });
 
       // Reset form states
@@ -124,9 +126,12 @@ export function ContactForm() {
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: "Failed to Send Message",
+        title: t("contactPage.form.failedToSendMessage"),
         description:
-          error?.message || "Something went wrong. Please try again.",
+          error?.message ||
+          (locale === "vi"
+            ? "Đã có lỗi xảy ra. Vui lòng thử lại."
+            : "Something went wrong. Please try again."),
       });
     } finally {
       setIsPending(false);
@@ -138,7 +143,7 @@ export function ContactForm() {
       <div className="grid gap-4 sm:grid-cols-2">
         <input
           type="text"
-          placeholder="Name"
+          placeholder={t("contactPage.form.namePlaceholder")}
           className="w-full rounded-2xl border border-border/40 bg-transparent px-4 py-3 text-sm outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-emerald-500"
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -147,7 +152,7 @@ export function ContactForm() {
         />
         <input
           type="email"
-          placeholder="Email"
+          placeholder={t("contactPage.form.emailPlaceholder")}
           className="w-full rounded-2xl border border-border/40 bg-transparent px-4 py-3 text-sm outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-emerald-500"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -157,7 +162,7 @@ export function ContactForm() {
       </div>
       <input
         type="text"
-        placeholder="Subject"
+        placeholder={t("contactPage.form.subjectPlaceholder")}
         className="w-full rounded-2xl border border-border/40 bg-transparent px-4 py-3 text-sm outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-emerald-500"
         value={subject}
         onChange={(e) => setSubject(e.target.value)}
@@ -165,7 +170,7 @@ export function ContactForm() {
         disabled={isPending}
       />
       <textarea
-        placeholder="Message"
+        placeholder={t("contactPage.form.messagePlaceholder")}
         className="h-36 w-full resize-none rounded-2xl border border-border/40 bg-transparent px-4 py-3 text-sm outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-emerald-500"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
@@ -186,7 +191,7 @@ export function ContactForm() {
         className="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-emerald-500 px-6 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white transition-colors hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
       >
         {isPending && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
-        {isPending ? "Sending..." : "Send Message"}
+        {isPending ? t("contactPage.form.sending") : t("contactPage.form.sendMessage")}
       </button>
     </form>
   );
