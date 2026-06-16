@@ -256,7 +256,22 @@
       "fileTooLargeError": "Tệp quá lớn. Dung lượng tối đa là {maxSize} MB.",
       "fileUploadFailed": "Tải lên thất bại. Vui lòng thử lại.",
       "documentsStillUploadingTitle": "Tài liệu đang được tải lên",
-      "documentsStillUploadingDescription": "Vui lòng đợi tất cả tài liệu tải lên xong trước khi gửi hồ sơ."
+      "documentsStillUploadingDescription": "Vui lòng đợi tất cả tài liệu tải lên xong trước khi gửi hồ sơ.",
+      "statusSubmittedEyebrow": "Hồ sơ vay vốn",
+      "statusSubmittedTitle": "Đã gửi — chờ xét duyệt",
+      "statusSubmittedSubtitle": "Chúng tôi đã nhận được tài liệu của bạn. Đội ngũ của chúng tôi đang xem xét và sẽ liên hệ qua email về kết quả.",
+      "statusUnderReviewBadge": "Đang xét duyệt",
+      "statusSubmittedOn": "Đã gửi {date}",
+      "statusReference": "Mã hồ sơ",
+      "statusRequestedAmount": "Số tiền yêu cầu",
+      "statusRepaymentPreference": "Trả nợ",
+      "statusDocuments": "Tài liệu",
+      "statusDocumentsReceivedCount": "Đã nhận {count}/{total}",
+      "statusReceived": "Đã nhận",
+      "statusStepSubmitted": "Đã gửi",
+      "statusStepReview": "Đang xét duyệt",
+      "statusStepDecision": "Quyết định",
+      "statusReviewNote": "Quá trình xét duyệt thường mất vài ngày làm việc. Hiện tại bạn không cần thực hiện thêm thao tác nào."
     },
     "projectDetails": {
       "loading": "Đang tải chi tiết dự án...",

@@ -256,7 +256,22 @@
       "fileTooLargeError": "File is too large. Maximum size is {maxSize} MB.",
       "fileUploadFailed": "Upload failed. Please try again.",
       "documentsStillUploadingTitle": "Documents still uploading",
-      "documentsStillUploadingDescription": "Please wait for all documents to finish uploading before submitting."
+      "documentsStillUploadingDescription": "Please wait for all documents to finish uploading before submitting.",
+      "statusSubmittedEyebrow": "Loan Application",
+      "statusSubmittedTitle": "Submitted — awaiting review",
+      "statusSubmittedSubtitle": "We've received your documents. Our team is reviewing them and will reach out by email with the outcome.",
+      "statusUnderReviewBadge": "Under Review",
+      "statusSubmittedOn": "Submitted {date}",
+      "statusReference": "Reference",
+      "statusRequestedAmount": "Requested Amount",
+      "statusRepaymentPreference": "Repayment",
+      "statusDocuments": "Documents",
+      "statusDocumentsReceivedCount": "{count}/{total} received",
+      "statusReceived": "Received",
+      "statusStepSubmitted": "Submitted",
+      "statusStepReview": "Under review",
+      "statusStepDecision": "Decision",
+      "statusReviewNote": "Reviews typically take a few business days. No action is needed from you right now."
     },
     "projectDetails": {
       "loading": "Loading project details...",

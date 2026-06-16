@@ -8,6 +8,7 @@ import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { getIndustryTheme } from "./sme-dashboard-config";
 import { LoanApplicationUpload } from "./LoanApplicationUpload";
+import { LoanApplicationStatus } from "./LoanApplicationStatus";
 
 type ProjectAddress = {
   street?: string;
@@ -257,16 +258,25 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
         </div>
       </Card>
 
-      {/* Loan Application Upload Section — needs a DRAFT loan application
-          (created together with the project) to upload documents against */}
-      {project.loan_application?.status === "DRAFT" && (
-        <LoanApplicationUpload
-          loanApplicationId={project.loan_application.id}
-          locale={locale}
-          theme={theme}
-          t={t}
-        />
-      )}
+      {/* Loan application section. A DRAFT application (created together with
+          the project) shows the document upload wizard; once submitted it
+          flips to a read-only "submitted — awaiting review" status panel. */}
+      {project.loan_application &&
+        (project.loan_application.status === "DRAFT" ? (
+          <LoanApplicationUpload
+            loanApplicationId={project.loan_application.id}
+            locale={locale}
+            theme={theme}
+            t={t}
+          />
+        ) : (
+          <LoanApplicationStatus
+            loanApplication={project.loan_application}
+            locale={locale}
+            theme={theme}
+            t={t}
+          />
+        ))}
     </div>
   );
 }
