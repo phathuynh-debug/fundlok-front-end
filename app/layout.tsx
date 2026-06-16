@@ -74,11 +74,38 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   const locale = getLocaleFromCookie(cookieStore.get("NEXT_LOCALE")?.value);
 
+  const localBusinessSchema = {
+    "@context": "https://schema.org",
+    "@type": "FinancialService",
+    name: "FundLok",
+    alternateName: "Công ty Cổ phần FundLok",
+    url: SITE_URL,
+    logo: `${SITE_URL}/logo/image.png`,
+    description:
+      "FundLok connects investors with SMEs through a technology-led financing platform, using data and AI to support flexible funding.",
+    telephone: "094 371 13 82",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "Trương Định/123 Võ Thị Sáu",
+      addressLocality: "Xuân Hòa",
+      addressRegion: "Hồ Chí Minh",
+      addressCountry: "VN",
+    },
+    sameAs: ["https://www.linkedin.com/company/fundlok"],
+  };
+
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
       >
+        <script
+          type="application/ld+json"
+          id="local-business-schema"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(localBusinessSchema),
+          }}
+        />
         <GoogleOAuthProvider
           clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}
         >
