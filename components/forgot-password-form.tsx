@@ -9,18 +9,17 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Mail, Loader2, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
-import { authenticationService } from "@/services/authentication.service";
+import { useForgotPassword } from "@/app/forgot-password/use-forgot-password";
 
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
-  const [isPending, setIsPending] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
 
   const { turnstileToken, turnstileContainerRef, reset: resetTurnstile } = useTurnstile();
   const { toast } = useToast();
   const { t } = useTranslations();
+  const { forgotPassword, isPending, isSuccess } = useForgotPassword();
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
+  const handleForgotPassword = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (process.env.NEXT_PUBLIC_DISABLE_TURNSTILE !== "true" && !turnstileToken) {
@@ -32,29 +31,25 @@ export function ForgotPasswordForm() {
       return;
     }
 
-    setIsPending(true);
-
-    try {
-      await authenticationService.forgotPassword({
-        email,
-        turnstile_token: turnstileToken,
-      });
-
-      setIsSuccess(true);
-      toast({
-        title: t("auth.forgotPassword.successTitle"),
-        description: t("auth.forgotPassword.successDescription"),
-      });
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: t("auth.forgotPassword.failedTitle"),
-        description: error?.message || t("auth.forgotPassword.failedDescription"),
-      });
-      resetTurnstile();
-    } finally {
-      setIsPending(false);
-    }
+    forgotPassword(
+      { email, turnstile_token: turnstileToken },
+      {
+        onSuccess: () => {
+          toast({
+            title: t("auth.forgotPassword.successTitle"),
+            description: t("auth.forgotPassword.successDescription"),
+          });
+        },
+        onError: (error) => {
+          toast({
+            variant: "destructive",
+            title: t("auth.forgotPassword.failedTitle"),
+            description: error?.message || t("auth.forgotPassword.failedDescription"),
+          });
+          resetTurnstile();
+        },
+      }
+    );
   };
 
   if (isSuccess) {

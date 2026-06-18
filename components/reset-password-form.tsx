@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Lock, Loader2, Eye, EyeOff, CheckCircle2, AlertCircle } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
-import { authenticationService } from "@/services/authentication.service";
+import { useResetPassword } from "@/app/reset-password/use-reset-password";
 
 export function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -20,13 +20,12 @@ export function ResetPasswordForm() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isPending, setIsPending] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
 
   const { toast } = useToast();
   const { t } = useTranslations();
+  const { resetPassword, isPending, isSuccess } = useResetPassword();
 
-  const handleResetPassword = async (e: React.FormEvent) => {
+  const handleResetPassword = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!token) {
@@ -56,33 +55,32 @@ export function ResetPasswordForm() {
       return;
     }
 
-    setIsPending(true);
-
-    try {
-      await authenticationService.resetPassword({
+    resetPassword(
+      {
         token,
         new_password: password,
-      });
+      },
+      {
+        onSuccess: () => {
+          toast({
+            title: t("auth.resetPassword.successTitle"),
+            description: t("auth.resetPassword.successDescription"),
+          });
 
-      setIsSuccess(true);
-      toast({
-        title: t("auth.resetPassword.successTitle"),
-        description: t("auth.resetPassword.successDescription"),
-      });
-
-      // Redirect to login after 3 seconds
-      setTimeout(() => {
-        router.push("/login");
-      }, 3000);
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: t("auth.resetPassword.failedTitle"),
-        description: error?.message || t("auth.resetPassword.failedDescription"),
-      });
-    } finally {
-      setIsPending(false);
-    }
+          // Redirect to login after 3 seconds
+          setTimeout(() => {
+            router.push("/login");
+          }, 3000);
+        },
+        onError: (error) => {
+          toast({
+            variant: "destructive",
+            title: t("auth.resetPassword.failedTitle"),
+            description: error?.message || t("auth.resetPassword.failedDescription"),
+          });
+        },
+      }
+    );
   };
 
   if (!token) {
