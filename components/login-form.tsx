@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useTurnstile } from "@/hooks/use-turnstile";
 import Link from "next/link";
@@ -162,7 +163,7 @@ export function LoginForm() {
         <Button
           type="submit"
           className="w-full h-11"
-          disabled={isPending || !turnstileToken}
+          disabled={isPending || !turnstileToken || isGooglePending}
         >
           {isPending ? (
             <>

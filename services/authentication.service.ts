@@ -40,6 +40,16 @@ export interface OAuthTokenResponse {
   refresh_token: string;
 }
 
+export interface ForgotPasswordPayload {
+  email: string;
+  turnstile_token?: string | null;
+}
+
+export interface ResetPasswordPayload {
+  token: string;
+  new_password: string;
+}
+
 export const authenticationService = {
   // Backend sets httpOnly cookies and returns the User object.
   // During transition the backend may still return Token shape — we handle both.
@@ -77,6 +87,20 @@ export const authenticationService = {
     return apiClient.post<{ status: string; message: string }>(
       AUTH_ENDPOINTS.resendVerification,
       { email }
+    );
+  },
+
+  forgotPassword(payload: ForgotPasswordPayload) {
+    return apiClient.post<{ status: string; message: string }>(
+      AUTH_ENDPOINTS.forgotPassword,
+      payload
+    );
+  },
+
+  resetPassword(payload: ResetPasswordPayload) {
+    return apiClient.post<{ status: string; message: string }>(
+      AUTH_ENDPOINTS.resetPassword,
+      payload
     );
   },
 };

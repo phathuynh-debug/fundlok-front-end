@@ -81,7 +81,8 @@
       "successTitle": "Welcome back!",
       "successDescription": "Login successful. Redirecting...",
       "failedTitle": "Login Failed",
-      "failedDescription": "Invalid email or password."
+      "failedDescription": "Invalid email or password.",
+      "forgotPassword": "Forgot password?"
     },
     "register": {
       "fullNameLabel": "Full Name",
@@ -121,6 +122,35 @@
     "layout": {
       "helpPrefix": "Need help?",
       "supportLink": "Contact support"
+    },
+    "forgotPassword": {
+      "title": "Reset your password",
+      "description": "Enter your email address and we'll send you a link to reset your password.",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "name@company.com",
+      "submit": "Send reset link",
+      "submitting": "Sending...",
+      "successTitle": "Reset link sent",
+      "successDescription": "If the email is registered, a password reset link has been sent.",
+      "failedTitle": "Request Failed",
+      "failedDescription": "Failed to send password reset email. Please try again.",
+      "backToLogin": "Back to sign in"
+    },
+    "resetPassword": {
+      "title": "Choose a new password",
+      "description": "Please enter your new password below to reset your account access.",
+      "passwordLabel": "New Password",
+      "passwordPlaceholder": "••••••••",
+      "confirmPasswordLabel": "Confirm New Password",
+      "confirmPasswordPlaceholder": "••••••••",
+      "submit": "Reset password",
+      "submitting": "Resetting...",
+      "successTitle": "Password reset successful",
+      "successDescription": "Your password has been successfully reset. You can now sign in with your new password.",
+      "failedTitle": "Reset Failed",
+      "failedDescription": "Failed to reset password. The link may have expired or is invalid.",
+      "passwordMismatch": "Passwords do not match.",
+      "invalidToken": "Invalid or missing password reset token."
     }
   },
   "dashboard": {
