@@ -3,8 +3,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useTurnstile } from "@/hooks/use-turnstile";
-
-
+import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
@@ -116,7 +115,9 @@ export function LoginForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="password">{t("auth.login.passwordLabel")}</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password">{t("auth.login.passwordLabel")}</Label>
+          </div>
           <div className="relative">
             <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
@@ -140,6 +141,14 @@ export function LoginForm() {
                 <Eye className="h-4 w-4" />
               )}
             </button>
+            <div className="flex justify-end">
+              <Link
+                href="/forgot-password"
+                className="text-xs text-muted-foreground hover:text-foreground hover:underline transition-colors"
+              >
+                {t("auth.login.forgotPassword")}
+              </Link>
+            </div>
           </div>
         </div>
 
