@@ -81,7 +81,8 @@
       "successTitle": "Chào mừng trở lại!",
       "successDescription": "Đăng nhập thành công. Đang chuyển hướng...",
       "failedTitle": "Đăng nhập thất bại",
-      "failedDescription": "Email hoặc mật khẩu không hợp lệ."
+      "failedDescription": "Email hoặc mật khẩu không hợp lệ.",
+      "forgotPassword": "Quên mật khẩu?"
     },
     "register": {
       "fullNameLabel": "Họ và tên",
@@ -121,6 +122,35 @@
     "layout": {
       "helpPrefix": "Cần hỗ trợ?",
       "supportLink": "Liên hệ hỗ trợ"
+    },
+    "forgotPassword": {
+      "title": "Đặt lại mật khẩu của bạn",
+      "description": "Nhập địa chỉ email của bạn và chúng tôi sẽ gửi liên kết để đặt lại mật khẩu.",
+      "emailLabel": "Địa chỉ email",
+      "emailPlaceholder": "name@company.com",
+      "submit": "Gửi liên kết đặt lại",
+      "submitting": "Đang gửi...",
+      "successTitle": "Đã gửi liên kết",
+      "successDescription": "Nếu email được đăng ký, liên kết đặt lại mật khẩu đã được gửi.",
+      "failedTitle": "Yêu cầu thất bại",
+      "failedDescription": "Gửi email đặt lại mật khẩu thất bại. Vui lòng thử lại.",
+      "backToLogin": "Quay lại đăng nhập"
+    },
+    "resetPassword": {
+      "title": "Chọn mật khẩu mới",
+      "description": "Vui lòng nhập mật khẩu mới bên dưới để đặt lại quyền truy cập tài khoản.",
+      "passwordLabel": "Mật khẩu mới",
+      "passwordPlaceholder": "••••••••",
+      "confirmPasswordLabel": "Xác nhận mật khẩu mới",
+      "confirmPasswordPlaceholder": "••••••••",
+      "submit": "Đặt lại mật khẩu",
+      "submitting": "Đang đặt lại...",
+      "successTitle": "Đặt lại mật khẩu thành công",
+      "successDescription": "Mật khẩu của bạn đã được đặt lại thành công. Bây giờ bạn có thể đăng nhập bằng mật khẩu mới.",
+      "failedTitle": "Đặt lại thất bại",
+      "failedDescription": "Đặt lại mật khẩu thất bại. Liên kết có thể đã hết hạn hoặc không hợp lệ.",
+      "passwordMismatch": "Mật khẩu không khớp.",
+      "invalidToken": "Mã xác thực đặt lại mật khẩu không hợp lệ hoặc bị thiếu."
     }
   },
   "dashboard": {

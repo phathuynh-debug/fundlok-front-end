@@ -15,6 +15,8 @@ export const AUTH_ENDPOINTS = {
   logout: "/auth/logout",
   verifyEmail: (token: string) => `/auth/verify-email?token=${token}`,
   resendVerification: "/auth/resend-verification",
+  forgotPassword: "/auth/forgot-password",
+  resetPassword: "/auth/reset-password",
 } as const;
 
 export const USER_ENDPOINTS = {
