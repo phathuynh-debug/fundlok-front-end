@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useTurnstile } from "@/hooks/use-turnstile";
 
@@ -116,7 +117,7 @@ export function LoginForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="password">{t("auth.login.passwordLabel")}</Label>
+
           <div className="relative">
             <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
@@ -140,6 +141,15 @@ export function LoginForm() {
                 <Eye className="h-4 w-4" />
               )}
             </button>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">{t("auth.login.passwordLabel")}</Label>
+              <Link
+                href="/forgot-password"
+                className="text-xs text-muted-foreground hover:text-foreground hover:underline transition-colors"
+              >
+                {t("auth.login.forgotPassword")}
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -153,7 +163,7 @@ export function LoginForm() {
         <Button
           type="submit"
           className="w-full h-11"
-          disabled={isPending || !turnstileToken}
+          disabled={isPending || !turnstileToken || isGooglePending}
         >
           {isPending ? (
             <>
