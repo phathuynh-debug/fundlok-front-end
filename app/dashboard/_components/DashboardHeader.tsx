@@ -8,7 +8,6 @@ import {
   Loader2,
   Menu,
   X,
-  User,
   LayoutDashboard,
   Briefcase,
   History,
@@ -17,13 +16,14 @@ import {
   Settings,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useTranslations } from "@/lib/i18n";
 import Logo from "@/components/logo";
-import { cn } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/utils";
 
 const navItems = [
   { labelKey: "dashboard.sidebar.overview", href: "/dashboard", icon: LayoutDashboard },
@@ -151,9 +151,12 @@ export function DashboardHeader() {
         <div className="px-4 py-3 space-y-1">
           {/* User info */}
           <div className="flex items-center gap-2.5 py-2 px-1">
-            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-              <User className="h-4 w-4 text-primary" />
-            </div>
+            <Avatar className="h-8 w-8 shrink-0">
+              <AvatarImage src={user?.avatar_url ?? undefined} alt={user?.full_name ?? ""} />
+              <AvatarFallback className="bg-primary/10 text-[11px] font-semibold text-primary">
+                {getInitials(user?.full_name)}
+              </AvatarFallback>
+            </Avatar>
             <div className="min-w-0">
               <p className="text-sm font-semibold text-foreground truncate">
                 {user?.full_name || t("common.guest")}

@@ -10,7 +10,6 @@ import {
   History,
   Settings,
   ShieldCheck,
-  CircleUser,
   PieChart,
   ChevronLeft,
   ChevronRight,
@@ -21,7 +20,8 @@ import {
   CreditCard,
   type LucideIcon,
 } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn, getInitials } from "@/lib/utils"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useCurrentUser } from "@/hooks/use-authentication"
 import { useTranslations } from "@/lib/i18n"
 import Logo from "@/components/logo"
@@ -178,9 +178,12 @@ export function Sidebar() {
         {/* User Profile Summary */}
         <div className="flex shrink-0 border-t p-4">
           <div className="flex items-center gap-3 px-2 py-2 w-full">
-            <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center">
-              <CircleUser className="h-6 w-6 text-primary" />
-            </div>
+            <Avatar className="h-9 w-9 shrink-0">
+              <AvatarImage src={user?.avatar_url ?? undefined} alt={user?.full_name ?? ""} />
+              <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
+                {getInitials(user?.full_name)}
+              </AvatarFallback>
+            </Avatar>
             <div className="flex flex-col min-w-0">
               <p className="text-sm font-medium text-foreground truncate">
                 {user?.full_name || t("common.fundlokUser")}
