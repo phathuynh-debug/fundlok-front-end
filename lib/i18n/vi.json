@@ -171,6 +171,11 @@
       "analytics": "Phân tích",
       "security": "Bảo mật",
       "settings": "Cài đặt",
+      "settingsProfile": "Hồ sơ",
+      "settingsAccount": "Tài khoản",
+      "settingsNotifications": "Thông báo",
+      "settingsAppearance": "Giao diện",
+      "settingsBilling": "Thanh toán",
       "memberSuffix": "Thành viên",
       "verifiedMember": "Thành viên đã xác thực"
     },

@@ -171,6 +171,11 @@
       "analytics": "Analytics",
       "security": "Security",
       "settings": "Settings",
+      "settingsProfile": "Profile",
+      "settingsAccount": "Account",
+      "settingsNotifications": "Notifications",
+      "settingsAppearance": "Appearance",
+      "settingsBilling": "Billing",
       "memberSuffix": "Member",
       "verifiedMember": "Verified Member"
     },
