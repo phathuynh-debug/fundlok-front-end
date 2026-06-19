@@ -1,7 +1,10 @@
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { usersService } from '@/services/users.service';
+import {
+  usersService,
+  type UpdateProfileRequest,
+} from '@/services/users.service';
 import { authKeys } from '@/hooks/use-authentication';
 import type { User } from '@/services/authentication.service';
 import type { ApiError } from '@/lib/types';
@@ -20,6 +23,19 @@ export function useUpdateAvatar() {
   return useMutation<User, ApiError, UpdateAvatarVariables>({
     mutationFn: ({ file, onProgress }) =>
       usersService.uploadAvatar({ file, onProgress }),
+    onSuccess: (user) => {
+      queryClient.setQueryData(authKeys.currentUser(), user);
+    },
+  });
+}
+
+// PATCH /users/me. The response is the refreshed user, so seed it into the
+// currentUser cache — header, sidebar, and profile reflect the edit at once.
+export function useUpdateProfile() {
+  const queryClient = useQueryClient();
+
+  return useMutation<User, ApiError, UpdateProfileRequest>({
+    mutationFn: (payload) => usersService.updateProfile(payload),
     onSuccess: (user) => {
       queryClient.setQueryData(authKeys.currentUser(), user);
     },

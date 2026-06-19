@@ -9,6 +9,9 @@ import {
     Monitor,
     KeyRound,
     Camera,
+    Loader2,
+    Check,
+    X,
 } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -18,6 +21,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { useCurrentUser } from "@/hooks/use-authentication"
+import { useUpdateProfile } from "@/hooks/use-users"
+import { useToast } from "@/hooks/use-toast"
 import { useTranslations } from "@/lib/i18n"
 import { AvatarUploadDialog } from "../_components/AvatarUploadDialog"
 
@@ -55,6 +60,57 @@ export default function ProfilePage() {
 
     const [avatarOpen, setAvatarOpen] = useState(false)
 
+    // --- Edit profile (full_name + phone via PATCH /users/me) ---
+    const { toast } = useToast()
+    const updateProfile = useUpdateProfile()
+    const [isEditing, setIsEditing] = useState(false)
+    const [fullName, setFullName] = useState("")
+    const [phone, setPhone] = useState("")
+    const [nameError, setNameError] = useState<string | null>(null)
+
+    const startEditing = () => {
+        setFullName(user?.full_name ?? "")
+        setPhone(user?.phone ?? "")
+        setNameError(null)
+        setIsEditing(true)
+    }
+
+    const cancelEditing = () => {
+        setIsEditing(false)
+        setNameError(null)
+    }
+
+    const saveProfile = () => {
+        const trimmedName = fullName.trim()
+        if (!trimmedName) {
+            setNameError(t("dashboard.settings.profile.fullNameRequired"))
+            return
+        }
+        updateProfile.mutate(
+            { full_name: trimmedName, phone: phone.trim() || null },
+            {
+                onSuccess: () => {
+                    setIsEditing(false)
+                    toast({
+                        title: t("dashboard.settings.profile.updatedTitle"),
+                        description: t("dashboard.settings.profile.updatedDescription"),
+                    })
+                },
+                onError: (error) => {
+                    toast({
+                        variant: "destructive",
+                        title: t("dashboard.settings.profile.updateFailedTitle"),
+                        description:
+                            error?.message ||
+                            t("dashboard.settings.profile.updateFailedDescription"),
+                    })
+                },
+            }
+        )
+    }
+
+    const isSaving = updateProfile.isPending
+
     return (
         <div className="space-y-6 md:space-y-8">
             {/* Page header */}
@@ -74,12 +130,51 @@ export default function ProfilePage() {
                         <User className="h-5 w-5 text-primary" />
                         {t("dashboard.settings.profile.personalInformation")}
                     </h2>
-                    <Button variant="outline" size="sm" className="gap-2 shrink-0">
-                        <Pencil className="h-3.5 w-3.5" />
-                        <span className="hidden sm:inline">
-                            {t("dashboard.settings.profile.editProfile")}
-                        </span>
-                    </Button>
+                    {isEditing ? (
+                        <div className="flex shrink-0 items-center gap-2">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="gap-2"
+                                disabled={isSaving}
+                                onClick={cancelEditing}
+                            >
+                                <X className="h-3.5 w-3.5" />
+                                <span className="hidden sm:inline">
+                                    {t("dashboard.settings.profile.cancel")}
+                                </span>
+                            </Button>
+                            <Button
+                                size="sm"
+                                className="gap-2"
+                                disabled={isSaving}
+                                onClick={saveProfile}
+                            >
+                                {isSaving ? (
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                ) : (
+                                    <Check className="h-3.5 w-3.5" />
+                                )}
+                                <span className="hidden sm:inline">
+                                    {isSaving
+                                        ? t("dashboard.settings.profile.saving")
+                                        : t("dashboard.settings.profile.save")}
+                                </span>
+                            </Button>
+                        </div>
+                    ) : (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-2 shrink-0"
+                            onClick={startEditing}
+                        >
+                            <Pencil className="h-3.5 w-3.5" />
+                            <span className="hidden sm:inline">
+                                {t("dashboard.settings.profile.editProfile")}
+                            </span>
+                        </Button>
+                    )}
                 </div>
 
                 <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
@@ -107,25 +202,59 @@ export default function ProfilePage() {
                     <div className="flex-1 space-y-5">
                         <div className="grid gap-5 sm:grid-cols-2">
                             <div className="space-y-1.5">
-                                <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                                <Label htmlFor="fullName" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                                     {t("dashboard.settings.profile.fullName")}
                                 </Label>
                                 <Input
-                                    readOnly
-                                    value={user?.full_name ?? ""}
-                                    placeholder={t("dashboard.settings.profile.notProvided")}
-                                    className="bg-muted/40"
+                                    id="fullName"
+                                    readOnly={!isEditing}
+                                    disabled={isSaving}
+                                    value={isEditing ? fullName : (user?.full_name ?? "")}
+                                    onChange={(e) => {
+                                        setFullName(e.target.value)
+                                        if (nameError) setNameError(null)
+                                    }}
+                                    placeholder={
+                                        isEditing
+                                            ? t("dashboard.settings.profile.fullNamePlaceholder")
+                                            : t("dashboard.settings.profile.notProvided")
+                                    }
+                                    aria-invalid={!!nameError}
+                                    className={isEditing ? "" : "bg-muted/40"}
                                 />
+                                {nameError && (
+                                    <p className="text-xs font-medium text-destructive">{nameError}</p>
+                                )}
                             </div>
                             <div className="space-y-1.5">
                                 <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                                     {t("dashboard.settings.profile.emailAddress")}
                                 </Label>
+                                {/* Email is not editable here */}
                                 <Input
                                     readOnly
                                     value={user?.email ?? ""}
                                     placeholder={t("dashboard.settings.profile.notProvided")}
                                     className="bg-muted/40"
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label htmlFor="phone" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                                    {t("dashboard.settings.profile.phone")}
+                                </Label>
+                                <Input
+                                    id="phone"
+                                    type="tel"
+                                    readOnly={!isEditing}
+                                    disabled={isSaving}
+                                    value={isEditing ? phone : (user?.phone ?? "")}
+                                    onChange={(e) => setPhone(e.target.value)}
+                                    placeholder={
+                                        isEditing
+                                            ? t("dashboard.settings.profile.phonePlaceholder")
+                                            : t("dashboard.settings.profile.notProvided")
+                                    }
+                                    className={isEditing ? "" : "bg-muted/40"}
                                 />
                             </div>
                         </div>

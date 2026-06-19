@@ -20,6 +20,12 @@ export interface AvatarConfirmRequest {
   file_key: string;
 }
 
+// Mirrors backend UserUpdateRequest (PATCH /users/me). Only editable fields.
+export interface UpdateProfileRequest {
+  full_name?: string;
+  phone?: string | null;
+}
+
 // Same three-step flow as the loan document upload:
 // presign → direct PUT to R2 → confirm. The file never touches the API server.
 export const AVATAR_RULES = {
@@ -33,6 +39,11 @@ export const usersService = {
   // GET /users/me — returns the currently authenticated user
   getCurrentUser() {
     return apiClient.get<User>(USER_ENDPOINTS.me);
+  },
+
+  // PATCH /users/me — returns the refreshed user (user_me_payload).
+  updateProfile(payload: UpdateProfileRequest) {
+    return apiClient.patch<User>(USER_ENDPOINTS.me, payload);
   },
 
   presignAvatar(payload: AvatarPresignRequest) {
