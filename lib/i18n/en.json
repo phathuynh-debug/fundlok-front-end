@@ -179,6 +179,45 @@
       "memberSuffix": "Member",
       "verifiedMember": "Verified Member"
     },
+    "settings": {
+      "profile": {
+        "title": "Profile",
+        "subtitle": "Manage your personal information",
+        "personalInformation": "Personal Information",
+        "editProfile": "Edit Profile",
+        "fullName": "Full Name",
+        "emailAddress": "Email Address",
+        "bio": "Bio",
+        "bioPlaceholder": "Tell us a little about yourself...",
+        "notProvided": "Not provided",
+        "accountDetails": "Account Details",
+        "role": "Role",
+        "memberSince": "Member Since",
+        "emailVerified": "Email Verified",
+        "emailNotVerified": "Not Verified",
+        "security": "Security",
+        "loginMethod": "Login Method",
+        "password": "Password",
+        "passwordSet": "Set",
+        "changePassword": "Change password",
+        "currentBrowser": "Current Browser",
+        "avatar": {
+          "title": "Avatar",
+          "description": "Choose a new avatar image.",
+          "newAvatar": "New avatar",
+          "removeAvatar": "Remove avatar",
+          "saveAvatar": "Save avatar",
+          "saving": "Saving...",
+          "uploading": "Uploading {percent}%",
+          "invalidType": "Please choose a JPG, PNG, or WebP image.",
+          "tooLarge": "Image must be smaller than {maxSize} MB.",
+          "updatedTitle": "Avatar updated",
+          "updatedDescription": "Your new avatar has been saved.",
+          "failedTitle": "Upload failed",
+          "failedDescription": "Could not update your avatar. Please try again."
+        }
+      }
+    },
     "investor": {
       "title": "Investment Portfolio",
       "subtitle": "Track and manage your current investments",

@@ -21,6 +21,8 @@ export const AUTH_ENDPOINTS = {
 
 export const USER_ENDPOINTS = {
   me: "/users/me",
+  avatarPresign: "/users/me/avatar/presign",
+  avatarConfirm: "/users/me/avatar/confirm",
 } as const;
 
 export const PROJECT_ENDPOINTS = {

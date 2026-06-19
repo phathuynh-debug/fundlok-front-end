@@ -179,6 +179,45 @@
       "memberSuffix": "Thành viên",
       "verifiedMember": "Thành viên đã xác thực"
     },
+    "settings": {
+      "profile": {
+        "title": "Hồ sơ",
+        "subtitle": "Quản lý thông tin cá nhân của bạn",
+        "personalInformation": "Thông tin cá nhân",
+        "editProfile": "Chỉnh sửa hồ sơ",
+        "fullName": "Họ và tên",
+        "emailAddress": "Địa chỉ email",
+        "bio": "Giới thiệu",
+        "bioPlaceholder": "Giới thiệu đôi nét về bạn...",
+        "notProvided": "Chưa cung cấp",
+        "accountDetails": "Chi tiết tài khoản",
+        "role": "Vai trò",
+        "memberSince": "Thành viên từ",
+        "emailVerified": "Email đã xác thực",
+        "emailNotVerified": "Chưa xác thực",
+        "security": "Bảo mật",
+        "loginMethod": "Phương thức đăng nhập",
+        "password": "Mật khẩu",
+        "passwordSet": "Đã đặt",
+        "changePassword": "Đổi mật khẩu",
+        "currentBrowser": "Trình duyệt hiện tại",
+        "avatar": {
+          "title": "Ảnh đại diện",
+          "description": "Chọn ảnh đại diện mới.",
+          "newAvatar": "Ảnh mới",
+          "removeAvatar": "Xóa ảnh",
+          "saveAvatar": "Lưu ảnh",
+          "saving": "Đang lưu...",
+          "uploading": "Đang tải lên {percent}%",
+          "invalidType": "Vui lòng chọn ảnh định dạng JPG, PNG hoặc WebP.",
+          "tooLarge": "Ảnh phải nhỏ hơn {maxSize} MB.",
+          "updatedTitle": "Đã cập nhật ảnh đại diện",
+          "updatedDescription": "Ảnh đại diện mới của bạn đã được lưu.",
+          "failedTitle": "Tải lên thất bại",
+          "failedDescription": "Không thể cập nhật ảnh đại diện. Vui lòng thử lại."
+        }
+      }
+    },
     "investor": {
       "title": "Danh mục đầu tư",
       "subtitle": "Theo dõi và quản lý các khoản đầu tư hiện tại của bạn",
