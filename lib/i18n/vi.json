@@ -197,6 +197,8 @@
         "saving": "Đang lưu...",
         "cancel": "Hủy",
         "fullNameRequired": "Vui lòng nhập họ và tên.",
+        "phoneTooLong": "Số điện thoại quá dài.",
+        "bioTooLong": "Giới thiệu không được vượt quá 500 ký tự.",
         "updatedTitle": "Đã cập nhật hồ sơ",
         "updatedDescription": "Các thay đổi của bạn đã được lưu.",
         "updateFailedTitle": "Cập nhật thất bại",

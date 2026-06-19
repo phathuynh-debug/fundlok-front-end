@@ -197,6 +197,8 @@
         "saving": "Saving...",
         "cancel": "Cancel",
         "fullNameRequired": "Full name is required.",
+        "phoneTooLong": "Phone number is too long.",
+        "bioTooLong": "Bio must be 500 characters or fewer.",
         "updatedTitle": "Profile updated",
         "updatedDescription": "Your changes have been saved.",
         "updateFailedTitle": "Update failed",

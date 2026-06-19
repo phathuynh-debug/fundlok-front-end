@@ -24,6 +24,7 @@ export interface AvatarConfirmRequest {
 export interface UpdateProfileRequest {
   full_name?: string;
   phone?: string | null;
+  bio?: string | null;
 }
 
 // Same three-step flow as the loan document upload:

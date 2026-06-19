@@ -11,9 +11,11 @@ export interface User {
   full_name: string;
   phone?: string | null;
   avatar_url?: string | null;
+  bio?: string | null;
   role: UserRole;
   status?: UserStatus;
   email_verified?: boolean;
+  created_at?: string | null;
 }
 
 export interface LoginPayload {
