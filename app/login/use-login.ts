@@ -10,8 +10,27 @@ import {
 	type OAuthTokenResponse,
 	type User,
 } from "@/services/authentication.service";
+import { usersService } from "@/services/users.service";
 import { authKeys } from "@/hooks/use-authentication";
 import type { ApiError } from "@/lib/types";
+
+// /auth/login (and the OAuth exchange) may return a partial user — the cookie
+// is what actually starts the session. Pull the canonical profile from
+// /users/me into the cache before navigating so every component reading
+// useCurrentUser (header, sidebar, …) renders correct info on first paint.
+// Without this the seeded partial is treated as fresh (staleTime) and the UI
+// only corrects itself after a hard refresh wipes the in-memory cache.
+async function hydrateCurrentUser(queryClient: ReturnType<typeof useQueryClient>) {
+	try {
+		await queryClient.fetchQuery({
+			queryKey: authKeys.currentUser(),
+			queryFn: () => usersService.getCurrentUser(),
+			staleTime: 0,
+		});
+	} catch {
+		// Keep whatever is already cached; useCurrentUser refetches on mount.
+	}
+}
 
 export function useLogin() {
 	const queryClient = useQueryClient();
@@ -19,8 +38,10 @@ export function useLogin() {
 
 	const emailPasswordLogin = useMutation<User, ApiError, LoginPayload>({
 		mutationFn: (payload) => authenticationService.login(payload),
-		onSuccess: (user) => {
+		onSuccess: async (user) => {
+			// Seed for an instant paint, then reconcile against /users/me.
 			queryClient.setQueryData(authKeys.currentUser(), user);
+			await hydrateCurrentUser(queryClient);
 			router.push("/dashboard");
 		},
 	});
@@ -31,17 +52,19 @@ export function useLogin() {
 		OAuthLoginPayload
 	>({
 		mutationFn: (payload) => authenticationService.oauthLogin(payload),
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: authKeys.currentUser() });
+		onSuccess: async () => {
+			await hydrateCurrentUser(queryClient);
 			router.push("/dashboard");
 		},
 	});
 
 	const handleGoogleLogin = useGoogleLogin({
 		onSuccess: async (tokenResponse) => {
-			const anyResp = tokenResponse as any;
+			// The token shape varies by flow (implicit vs auth-code), so probe the
+			// known fields without assuming one.
+			const resp = tokenResponse as unknown as Record<string, string | undefined>;
 			const idToken =
-				anyResp?.credential ?? anyResp?.id_token ?? anyResp?.access_token;
+				resp?.credential ?? resp?.id_token ?? resp?.access_token;
 
 			if (!idToken) {
 				return;
