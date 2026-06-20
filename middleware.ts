@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // Routes that require a valid session cookie to access.
-const PROTECTED_ROUTES = ["/dashboard", "/project-application"];
+const PROTECTED_ROUTES = ["/dashboard", "/project-application", "/admin"];
 
 // Routes that should redirect based on whether the user already has projects.
 const AUTH_ROUTES = ["/login", "/"];
 const APPLICATION_ROUTE = "/project-application";
 const DASHBOARD_ROUTE = "/dashboard";
+const ADMIN_ROUTE = "/admin";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
@@ -83,16 +84,21 @@ export async function middleware(request: NextRequest) {
   const accessToken = request.cookies.get("access_token")?.value;
   const isAuthenticated = !!accessToken;
   const currentUser = isAuthenticated ? await getCurrentUser(request) : null;
+  const isAdmin = currentUser?.role === "ADMIN";
   const isInvestor = currentUser?.role === "INVESTOR";
   const projectCount =
-    isAuthenticated && !isInvestor ? await getProjectCount(request) : null;
+    isAuthenticated && !isInvestor && !isAdmin
+      ? await getProjectCount(request)
+      : null;
   const hasProjects = typeof projectCount === "number" ? projectCount > 0 : null;
 
-  const authRedirectTarget = isInvestor
-    ? DASHBOARD_ROUTE
-    : hasProjects === false
-      ? APPLICATION_ROUTE
-      : DASHBOARD_ROUTE;
+  const authRedirectTarget = isAdmin
+    ? ADMIN_ROUTE
+    : isInvestor
+      ? DASHBOARD_ROUTE
+      : hasProjects === false
+        ? APPLICATION_ROUTE
+        : DASHBOARD_ROUTE;
 
   // Redirect unauthenticated users away from /verify-email to login.
   if (!isAuthenticated && pathname === "/verify-email") {
@@ -133,10 +139,16 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
+  // Restrict /admin to ADMIN users only — send everyone else to their landing page.
+  if (isAuthenticated && !isAdmin && pathname.startsWith(ADMIN_ROUTE)) {
+    return NextResponse.redirect(new URL(authRedirectTarget, request.url));
+  }
+
   // Block SME users from accessing /dashboard/projects
   if (
     isAuthenticated &&
     !isInvestor &&
+    !isAdmin &&
     pathname.startsWith("/dashboard/projects")
   ) {
     return NextResponse.redirect(new URL(DASHBOARD_ROUTE, request.url));
@@ -146,19 +158,20 @@ export async function middleware(request: NextRequest) {
   if (
     isAuthenticated &&
     !isInvestor &&
+    !isAdmin &&
     hasProjects === false &&
     pathname.startsWith(DASHBOARD_ROUTE)
   ) {
     return NextResponse.redirect(new URL(APPLICATION_ROUTE, request.url));
   }
 
-  // Users with projects should not stay on the application page.
+  // Users with projects (and admins) should not stay on the application page.
   if (
     isAuthenticated &&
-    (isInvestor || hasProjects === true) &&
+    (isAdmin || isInvestor || hasProjects === true) &&
     pathname.startsWith(APPLICATION_ROUTE)
   ) {
-    return NextResponse.redirect(new URL(DASHBOARD_ROUTE, request.url));
+    return NextResponse.redirect(new URL(authRedirectTarget, request.url));
   }
 
   return NextResponse.next();
@@ -172,6 +185,8 @@ export const config = {
     "/dashboard/:path*",
     "/project-application",
     "/project-application/:path*",
+    "/admin",
+    "/admin/:path*",
     "/verify-email",
   ],
 };

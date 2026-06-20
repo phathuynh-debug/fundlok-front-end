@@ -22,14 +22,21 @@ import type { ApiError } from "@/lib/types";
 // only corrects itself after a hard refresh wipes the in-memory cache.
 async function hydrateCurrentUser(queryClient: ReturnType<typeof useQueryClient>) {
 	try {
-		await queryClient.fetchQuery({
+		return await queryClient.fetchQuery({
 			queryKey: authKeys.currentUser(),
 			queryFn: () => usersService.getCurrentUser(),
 			staleTime: 0,
 		});
 	} catch {
 		// Keep whatever is already cached; useCurrentUser refetches on mount.
+		return queryClient.getQueryData<User>(authKeys.currentUser());
 	}
+}
+
+// Admins land in the admin area; everyone else goes to the dashboard, where
+// middleware further routes SMEs without projects to the application form.
+function landingRouteFor(user?: User | null) {
+	return user?.role === "ADMIN" ? "/admin" : "/dashboard";
 }
 
 export function useLogin() {
@@ -41,8 +48,8 @@ export function useLogin() {
 		onSuccess: async (user) => {
 			// Seed for an instant paint, then reconcile against /users/me.
 			queryClient.setQueryData(authKeys.currentUser(), user);
-			await hydrateCurrentUser(queryClient);
-			router.push("/dashboard");
+			const current = await hydrateCurrentUser(queryClient);
+			router.push(landingRouteFor(current ?? user));
 		},
 	});
 
@@ -53,8 +60,8 @@ export function useLogin() {
 	>({
 		mutationFn: (payload) => authenticationService.oauthLogin(payload),
 		onSuccess: async () => {
-			await hydrateCurrentUser(queryClient);
-			router.push("/dashboard");
+			const current = await hydrateCurrentUser(queryClient);
+			router.push(landingRouteFor(current));
 		},
 	});
 

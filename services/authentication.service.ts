@@ -1,7 +1,7 @@
 import { apiClient } from '@/lib/api-client';
 import { AUTH_ENDPOINTS } from '@/lib/endpoints';
 
-export type UserRole = 'SME' | 'INVESTOR';
+export type UserRole = 'SME' | 'INVESTOR' | 'ADMIN';
 export type UserStatus = 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
 export type OAuthProvider = 'google';
 
