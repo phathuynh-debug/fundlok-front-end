@@ -4,6 +4,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Compass } from "lucide-react"
 import { LocaleSwitcher } from "@/components/locale-switcher"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { useTranslations } from "@/lib/i18n"
 
 export default function NotFound() {
@@ -40,7 +41,10 @@ export default function NotFound() {
 
           <div className="flex items-center justify-between gap-4 text-sm text-primary-foreground/50">
             <span>{t("common.copyright")}</span>
-            <LocaleSwitcher />
+            <div className="flex items-center gap-3">
+              <ThemeToggle />
+              <LocaleSwitcher tone="inverted" />
+            </div>
           </div>
         </div>
       </div>
