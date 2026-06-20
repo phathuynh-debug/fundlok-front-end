@@ -45,3 +45,8 @@ export const LOANS_ENDPOINTS = {
   submit: (applicationId: string) =>
     `/loans/applications/${applicationId}/submit`,
 } as const;
+
+export const ADMIN_ENDPOINTS = {
+  overview: "/admin/overview",
+  auditLogs: "/admin/audit-logs",
+} as const;
