@@ -698,7 +698,8 @@
       "badge": "Admin",
       "overview": "Overview",
       "users": "Users",
-      "logout": "Log out"
+      "logout": "Log out",
+      "auditLogs": "Audit logs"
     },
     "stats": {
       "users": "Users",
@@ -736,6 +737,18 @@
       "title": "Users",
       "subtitle": "Manage platform users from here.",
       "comingSoon": "User management coming soon."
+    },
+    "auditLogs": {
+      "title": "Audit logs",
+      "subtitle": "Inspect recent activity across the platform.",
+      "entityPlaceholder": "Entity type…",
+      "limit": "Limit",
+      "empty": "No audit logs found.",
+      "time": "Time",
+      "action": "Action",
+      "entity": "Entity",
+      "actor": "Actor",
+      "ip": "IP address"
     }
   }
 }

@@ -698,7 +698,8 @@
       "badge": "Quản trị",
       "overview": "Tổng quan",
       "users": "Người dùng",
-      "logout": "Đăng xuất"
+      "logout": "Đăng xuất",
+      "auditLogs": "Nhật ký kiểm toán"
     },
     "stats": {
       "users": "Người dùng",
@@ -736,6 +737,18 @@
       "title": "Người dùng",
       "subtitle": "Quản lý người dùng nền tảng tại đây.",
       "comingSoon": "Quản lý người dùng sắp ra mắt."
+    },
+    "auditLogs": {
+      "title": "Nhật ký kiểm toán",
+      "subtitle": "Kiểm tra hoạt động gần đây trên toàn nền tảng.",
+      "entityPlaceholder": "Loại đối tượng…",
+      "limit": "Giới hạn",
+      "empty": "Không tìm thấy nhật ký.",
+      "time": "Thời gian",
+      "action": "Hành động",
+      "entity": "Đối tượng",
+      "actor": "Người thực hiện",
+      "ip": "Địa chỉ IP"
     }
   }
 }

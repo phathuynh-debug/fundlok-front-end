@@ -63,8 +63,47 @@ export interface AdminOverviewParams {
   industry?: string | null;
 }
 
+// A resolved user reference on an audit log (ActorOut on the backend).
+export interface AuditUserRef {
+  id: string;
+  full_name: string;
+  email: string;
+}
+
+// Mirrors backend AuditLogOut.
+export interface AuditLog {
+  id: string;
+  entity_type: string;
+  entity_id: string | null;
+  action: string;
+  actor_id: string | null;
+  // Who performed the action.
+  actor: AuditUserRef | null;
+  // The subject user — only populated when entity_type === "USER".
+  entity_user: AuditUserRef | null;
+  before_state: Record<string, unknown> | null;
+  after_state: Record<string, unknown> | null;
+  ip_address: string | null;
+  created_at: string | null;
+}
+
+export interface AuditLogParams {
+  entity_type?: string | null;
+  entity_id?: string | null;
+  actor_id?: string | null;
+  // ISO timestamps for the backend's created_after / created_before filters.
+  created_after?: string | null;
+  created_before?: string | null;
+  limit?: number;
+}
+
 export const adminService = {
   getOverview(params: AdminOverviewParams = {}) {
     return apiClient.get<AdminOverview>(ADMIN_ENDPOINTS.overview, { params });
+  },
+
+  // Admin only — returns a flat list (not paginated), newest first.
+  getAuditLogs(params: AuditLogParams = {}) {
+    return apiClient.get<AuditLog[]>(ADMIN_ENDPOINTS.auditLogs, { params });
   },
 };

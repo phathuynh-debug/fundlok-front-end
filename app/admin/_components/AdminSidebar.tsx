@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import {
   LayoutDashboard,
   Users,
+  ScrollText,
   ShieldCheck,
   LogOut,
   Loader2,
@@ -24,6 +25,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { labelKey: "admin.sidebar.overview", href: "/admin", icon: LayoutDashboard },
   { labelKey: "admin.sidebar.users", href: "/admin/users", icon: Users },
+  { labelKey: "admin.sidebar.auditLogs", href: "/admin/audit-logs", icon: ScrollText },
 ]
 
 export function AdminSidebar() {
