@@ -22,15 +22,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { cn, getInitials } from "@/lib/utils"
+import { DataTable, type Column } from "./_components/DataTable"
+import { getInitials } from "@/lib/utils"
 
 const PAGE_SIZE = 14
 
@@ -51,6 +44,73 @@ function statusVariant(status: string) {
   if (s === "SUSPENDED" || s === "INACTIVE") return "destructive" as const
   return "secondary" as const
 }
+
+// Column configs — each table just declares how to render its cells.
+const userColumns: Column<AdminUserRow>[] = [
+  {
+    key: "name",
+    header: "Name",
+    render: (u) => (
+      <div className="flex items-center gap-3">
+        <Avatar className="h-8 w-8 shrink-0">
+          <AvatarImage src={u.avatar_url ?? undefined} alt={u.full_name ?? ""} />
+          <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
+            {getInitials(u.full_name)}
+          </AvatarFallback>
+        </Avatar>
+        <span className="font-medium text-foreground">{u.full_name || "—"}</span>
+      </div>
+    ),
+  },
+  {
+    key: "email",
+    header: "Email",
+    cellClassName: "text-muted-foreground",
+    render: (u) => u.email,
+  },
+  {
+    key: "role",
+    header: "Role",
+    render: (u) => <Badge variant="outline">{u.role}</Badge>,
+  },
+  {
+    key: "status",
+    header: "Status",
+    render: (u) => <Badge variant={statusVariant(u.status)}>{u.status}</Badge>,
+  },
+  {
+    key: "joined",
+    header: "Joined",
+    cellClassName: "text-muted-foreground",
+    render: (u) => formatDate(u.created_at),
+  },
+]
+
+const projectColumns: Column<AdminProjectRow>[] = [
+  {
+    key: "legal_name",
+    header: "Legal name",
+    cellClassName: "font-medium text-foreground",
+    render: (p) => p.legal_name,
+  },
+  {
+    key: "industry",
+    header: "Industry",
+    cellClassName: "text-muted-foreground",
+    render: (p) => p.industry || "—",
+  },
+  {
+    key: "status",
+    header: "Status",
+    render: (p) => <Badge variant={statusVariant(p.status)}>{p.status}</Badge>,
+  },
+  {
+    key: "created",
+    header: "Created",
+    cellClassName: "text-muted-foreground",
+    render: (p) => formatDate(p.created_at),
+  },
+]
 
 export default function AdminPage() {
   const { user, isLoading } = useRequireAuth()
@@ -200,111 +260,25 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="relative overflow-x-auto">
-          {/* Subtle overlay while refetching a new page/filter */}
-          {isFetching && !isOverviewLoading && (
-            <div className="absolute right-3 top-3 z-10">
-              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-            </div>
-          )}
-
-          <Table>
-            <TableHeader>
-              {mode === "users" ? (
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Joined</TableHead>
-                </TableRow>
-              ) : (
-                <TableRow>
-                  <TableHead>Legal name</TableHead>
-                  <TableHead>Industry</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Created</TableHead>
-                </TableRow>
-              )}
-            </TableHeader>
-
-            <TableBody>
-              {isOverviewLoading ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={mode === "users" ? 5 : 4}
-                    className="h-32 text-center"
-                  >
-                    <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" />
-                  </TableCell>
-                </TableRow>
-              ) : rows.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={mode === "users" ? 5 : 4}
-                    className="h-32 text-center text-sm text-muted-foreground"
-                  >
-                    {mode === "users" ? "No users found." : "No projects found."}
-                  </TableCell>
-                </TableRow>
-              ) : mode === "users" ? (
-                (rows as AdminUserRow[]).map((row) => (
-                  <TableRow key={row.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8 shrink-0">
-                          <AvatarImage
-                            src={row.avatar_url ?? undefined}
-                            alt={row.full_name ?? ""}
-                          />
-                          <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
-                            {getInitials(row.full_name)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="font-medium text-foreground">
-                          {row.full_name || "—"}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {row.email}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{row.role}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={statusVariant(row.status)}>
-                        {row.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {formatDate(row.created_at)}
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                (rows as AdminProjectRow[]).map((row) => (
-                  <TableRow key={row.id}>
-                    <TableCell className="font-medium text-foreground">
-                      {row.legal_name}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {row.industry || "—"}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={statusVariant(row.status)}>
-                        {row.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {formatDate(row.created_at)}
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+        {mode === "users" ? (
+          <DataTable<AdminUserRow>
+            columns={userColumns}
+            rows={rows as AdminUserRow[]}
+            getRowKey={(u) => u.id}
+            isLoading={isOverviewLoading}
+            isFetching={isFetching}
+            emptyMessage="No users found."
+          />
+        ) : (
+          <DataTable<AdminProjectRow>
+            columns={projectColumns}
+            rows={rows as AdminProjectRow[]}
+            getRowKey={(p) => p.id}
+            isLoading={isOverviewLoading}
+            isFetching={isFetching}
+            emptyMessage="No projects found."
+          />
+        )}
 
         {/* Pagination */}
         <div className="flex items-center justify-between border-t px-4 py-3">
@@ -327,7 +301,7 @@ export default function AdminPage() {
               type="button"
               size="sm"
               variant="outline"
-              className={cn("gap-1")}
+              className="gap-1"
               disabled={page <= 1 || isFetching}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
             >
