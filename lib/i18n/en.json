@@ -699,7 +699,8 @@
       "overview": "Overview",
       "users": "Users",
       "logout": "Log out",
-      "auditLogs": "Audit logs"
+      "auditLogs": "Audit logs",
+      "systemSettings": "System settings"
     },
     "stats": {
       "users": "Users",
@@ -749,6 +750,27 @@
       "entity": "Entity",
       "actor": "Actor",
       "ip": "IP address"
+    },
+    "system": {
+      "title": "System settings",
+      "subtitle": "System-level controls for the platform.",
+      "maintenance": {
+        "title": "Maintenance mode",
+        "description": "When enabled, only the landing page stays reachable for everyone except system admins.",
+        "enabledLabel": "Enable maintenance mode",
+        "on": "Maintenance mode is ON",
+        "off": "Maintenance mode is OFF",
+        "messageLabel": "Message to visitors",
+        "messagePlaceholder": "We'll be back shortly…",
+        "save": "Save changes",
+        "saving": "Saving…",
+        "saved": "Saved.",
+        "error": "Could not save. Please try again."
+      }
     }
+  },
+  "maintenancePage": {
+    "title": "We'll be right back",
+    "defaultMessage": "The platform is undergoing scheduled maintenance. Please check back shortly."
   }
 }

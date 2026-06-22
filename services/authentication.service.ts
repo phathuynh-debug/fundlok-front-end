@@ -1,7 +1,14 @@
 import { apiClient } from '@/lib/api-client';
 import { AUTH_ENDPOINTS } from '@/lib/endpoints';
 
-export type UserRole = 'SME' | 'INVESTOR' | 'ADMIN';
+export type UserRole = 'SME' | 'INVESTOR' | 'ADMIN' | 'SYSTEM_ADMIN';
+
+// Roles allowed into the /admin area (mirrors the backend's require_admin).
+export const ADMIN_ROLES: UserRole[] = ['ADMIN', 'SYSTEM_ADMIN'];
+
+export function isAdminRole(role?: UserRole | string | null): boolean {
+  return role === 'ADMIN' || role === 'SYSTEM_ADMIN';
+}
 export type UserStatus = 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
 export type OAuthProvider = 'google';
 

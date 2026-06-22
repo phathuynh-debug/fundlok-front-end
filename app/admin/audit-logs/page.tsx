@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { useRequireAuth } from "@/hooks/use-authentication"
 import { useAuditLogs } from "@/hooks/use-admin"
 import type { AuditLog, AuditUserRef } from "@/services/admin.service"
+import { isAdminRole } from "@/services/authentication.service"
 import { Loader2, ScrollText } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -124,7 +125,7 @@ export default function AdminAuditLogsPage() {
   const { user, isLoading } = useRequireAuth()
   const router = useRouter()
   const { t } = useTranslations()
-  const isAdmin = !isLoading && user?.role === "ADMIN"
+  const isAdmin = !isLoading && isAdminRole(user?.role)
 
   const [entityInput, setEntityInput] = useState("")
   const [entityType, setEntityType] = useState("")
@@ -143,12 +144,12 @@ export default function AdminAuditLogsPage() {
 
   // Fallback guard: middleware blocks non-admins server-side.
   useEffect(() => {
-    if (!isLoading && user && user.role !== "ADMIN") {
+    if (!isLoading && user && !isAdminRole(user.role)) {
       router.replace("/dashboard")
     }
   }, [isLoading, user, router])
 
-  if (isLoading || !user || user.role !== "ADMIN") {
+  if (isLoading || !user || !isAdminRole(user.role)) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-2">

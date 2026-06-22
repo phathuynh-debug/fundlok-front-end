@@ -6,13 +6,14 @@ import {
   LayoutDashboard,
   Users,
   ScrollText,
+  ServerCog,
   ShieldCheck,
   LogOut,
   Loader2,
   type LucideIcon,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useLogout } from "@/hooks/use-authentication"
+import { useCurrentUser, useLogout } from "@/hooks/use-authentication"
 import { useTranslations } from "@/lib/i18n"
 import Logo from "@/components/logo"
 
@@ -20,18 +21,27 @@ interface NavItem {
   labelKey: string
   href: string
   icon: LucideIcon
+  // When true, only SYSTEM_ADMIN sees this entry.
+  systemAdminOnly?: boolean
 }
 
 const navItems: NavItem[] = [
   { labelKey: "admin.sidebar.overview", href: "/admin", icon: LayoutDashboard },
   { labelKey: "admin.sidebar.users", href: "/admin/users", icon: Users },
   { labelKey: "admin.sidebar.auditLogs", href: "/admin/audit-logs", icon: ScrollText },
+  { labelKey: "admin.sidebar.systemSettings", href: "/admin/system", icon: ServerCog, systemAdminOnly: true },
 ]
 
 export function AdminSidebar() {
   const pathname = usePathname()
   const { mutate: logout, isPending: isLoggingOut } = useLogout()
+  const { data: user } = useCurrentUser()
   const { t } = useTranslations()
+
+  const isSystemAdmin = user?.role === "SYSTEM_ADMIN"
+  const visibleNavItems = navItems.filter(
+    (item) => !item.systemAdminOnly || isSystemAdmin
+  )
 
   return (
     <div className="hidden border-r bg-card md:flex md:w-64 md:flex-col h-screen">
@@ -55,7 +65,7 @@ export function AdminSidebar() {
 
         {/* Navigation */}
         <nav className="flex-1 min-h-0 overflow-y-auto px-3 py-4 space-y-1">
-          {navItems.map((item) => {
+          {visibleNavItems.map((item) => {
             const active =
               item.href === "/admin"
                 ? pathname === "/admin"

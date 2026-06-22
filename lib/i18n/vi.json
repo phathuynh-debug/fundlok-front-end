@@ -699,7 +699,8 @@
       "overview": "Tổng quan",
       "users": "Người dùng",
       "logout": "Đăng xuất",
-      "auditLogs": "Nhật ký kiểm toán"
+      "auditLogs": "Nhật ký kiểm toán",
+      "systemSettings": "Cài đặt hệ thống"
     },
     "stats": {
       "users": "Người dùng",
@@ -749,6 +750,27 @@
       "entity": "Đối tượng",
       "actor": "Người thực hiện",
       "ip": "Địa chỉ IP"
+    },
+    "system": {
+      "title": "Cài đặt hệ thống",
+      "subtitle": "Các điều khiển cấp hệ thống cho nền tảng.",
+      "maintenance": {
+        "title": "Chế độ bảo trì",
+        "description": "Khi bật, chỉ trang chủ còn truy cập được với mọi người, trừ quản trị hệ thống.",
+        "enabledLabel": "Bật chế độ bảo trì",
+        "on": "Chế độ bảo trì đang BẬT",
+        "off": "Chế độ bảo trì đang TẮT",
+        "messageLabel": "Thông báo tới người dùng",
+        "messagePlaceholder": "Chúng tôi sẽ trở lại sớm…",
+        "save": "Lưu thay đổi",
+        "saving": "Đang lưu…",
+        "saved": "Đã lưu.",
+        "error": "Không thể lưu. Vui lòng thử lại."
+      }
     }
+  },
+  "maintenancePage": {
+    "title": "Chúng tôi sẽ trở lại ngay",
+    "defaultMessage": "Nền tảng đang bảo trì theo lịch. Vui lòng quay lại sau ít phút."
   }
 }

@@ -49,4 +49,5 @@ export const LOANS_ENDPOINTS = {
 export const ADMIN_ENDPOINTS = {
   overview: "/admin/overview",
   auditLogs: "/admin/audit-logs",
+  maintenance: "/system/maintenance",
 } as const;

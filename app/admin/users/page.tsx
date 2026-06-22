@@ -3,6 +3,7 @@
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useRequireAuth } from "@/hooks/use-authentication"
+import { isAdminRole } from "@/services/authentication.service"
 import { useTranslations } from "@/lib/i18n"
 import { Loader2 } from "lucide-react"
 
@@ -12,12 +13,12 @@ export default function AdminUsersPage() {
   const { t } = useTranslations()
 
   useEffect(() => {
-    if (!isLoading && user && user.role !== "ADMIN") {
+    if (!isLoading && user && !isAdminRole(user.role)) {
       router.replace("/dashboard")
     }
   }, [isLoading, user, router])
 
-  if (isLoading || !user || user.role !== "ADMIN") {
+  if (isLoading || !user || !isAdminRole(user.role)) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-2">

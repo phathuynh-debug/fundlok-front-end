@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useGoogleLogin } from "@react-oauth/google";
 import {
 	authenticationService,
+	isAdminRole,
 	type LoginPayload,
 	type OAuthLoginPayload,
 	type OAuthTokenResponse,
@@ -33,10 +34,10 @@ async function hydrateCurrentUser(queryClient: ReturnType<typeof useQueryClient>
 	}
 }
 
-// Admins land in the admin area; everyone else goes to the dashboard, where
-// middleware further routes SMEs without projects to the application form.
+// Admins (and system admins) land in the admin area; everyone else goes to the
+// dashboard, where middleware further routes SMEs without projects to the form.
 function landingRouteFor(user?: User | null) {
-	return user?.role === "ADMIN" ? "/admin" : "/dashboard";
+	return isAdminRole(user?.role) ? "/admin" : "/dashboard";
 }
 
 export function useLogin() {

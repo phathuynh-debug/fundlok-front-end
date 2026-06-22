@@ -97,6 +97,20 @@ export interface AuditLogParams {
   limit?: number;
 }
 
+// Mirrors backend MaintenanceState.
+export interface MaintenanceState {
+  enabled: boolean;
+  message: string | null;
+  updated_at?: string | null;
+  updated_by?: string | null;
+}
+
+// Body for PUT /admin/system/maintenance (MaintenanceUpdate).
+export interface MaintenanceUpdate {
+  enabled: boolean;
+  message?: string | null;
+}
+
 export const adminService = {
   getOverview(params: AdminOverviewParams = {}) {
     return apiClient.get<AdminOverview>(ADMIN_ENDPOINTS.overview, { params });
@@ -105,5 +119,14 @@ export const adminService = {
   // Admin only — returns a flat list (not paginated), newest first.
   getAuditLogs(params: AuditLogParams = {}) {
     return apiClient.get<AuditLog[]>(ADMIN_ENDPOINTS.auditLogs, { params });
+  },
+
+  // System-admin only.
+  getMaintenance() {
+    return apiClient.get<MaintenanceState>(ADMIN_ENDPOINTS.maintenance);
+  },
+
+  setMaintenance(body: MaintenanceUpdate) {
+    return apiClient.put<MaintenanceState>(ADMIN_ENDPOINTS.maintenance, body);
   },
 };

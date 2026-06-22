@@ -9,6 +9,7 @@ import type {
   AdminProjectRow,
   AdminUserRow,
 } from "@/services/admin.service"
+import { isAdminRole } from "@/services/authentication.service"
 import {
   Loader2,
   Users,
@@ -127,7 +128,7 @@ export default function AdminPage() {
   const { user, isLoading } = useRequireAuth()
   const router = useRouter()
   const { t } = useTranslations()
-  const isAdmin = !isLoading && user?.role === "ADMIN"
+  const isAdmin = !isLoading && isAdminRole(user?.role)
 
   const userColumns = buildUserColumns(t)
   const projectColumns = buildProjectColumns(t)
@@ -176,12 +177,12 @@ export default function AdminPage() {
   // Fallback guard: middleware blocks non-admins server-side, but if the
   // session changes between the request and render, bounce them out.
   useEffect(() => {
-    if (!isLoading && user && user.role !== "ADMIN") {
+    if (!isLoading && user && !isAdminRole(user.role)) {
       router.replace("/dashboard")
     }
   }, [isLoading, user, router])
 
-  if (isLoading || !user || user.role !== "ADMIN") {
+  if (isLoading || !user || !isAdminRole(user.role)) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-2">
