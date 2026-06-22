@@ -21,6 +21,13 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DataTable, type Column } from "./_components/DataTable"
 import { getInitials } from "@/lib/utils"
@@ -121,8 +128,13 @@ export default function AdminPage() {
   const [page, setPage] = useState(1)
   const [searchInput, setSearchInput] = useState("")
   const [search, setSearch] = useState("")
+  // "all" = no filter (Radix Select can't use an empty-string value).
+  const [status, setStatus] = useState("all")
+  const [role, setRole] = useState("all")
+  const [industryInput, setIndustryInput] = useState("")
+  const [industry, setIndustry] = useState("")
 
-  // Debounce the search box; reset to the first page whenever it changes.
+  // Debounce the free-text inputs; reset to the first page whenever they change.
   useEffect(() => {
     const id = setTimeout(() => {
       setSearch(searchInput.trim())
@@ -131,8 +143,25 @@ export default function AdminPage() {
     return () => clearTimeout(id)
   }, [searchInput])
 
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setIndustry(industryInput.trim())
+      setPage(1)
+    }, 350)
+    return () => clearTimeout(id)
+  }, [industryInput])
+
   const { data, isLoading: isOverviewLoading, isFetching } = useAdminOverview(
-    { mode, page, page_size: PAGE_SIZE, search: search || undefined },
+    {
+      mode,
+      page,
+      page_size: PAGE_SIZE,
+      search: search || undefined,
+      status: status !== "all" ? status : undefined,
+      // role applies to users mode only; industry to projects mode only.
+      role: mode === "users" && role !== "all" ? role : undefined,
+      industry: mode === "projects" && industry ? industry : undefined,
+    },
     isAdmin
   )
 
@@ -163,10 +192,22 @@ export default function AdminPage() {
   const total = table?.total ?? rows.length
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
 
+  // Filter options come from the stats maps (global counts, so they stay
+  // stable while filtering) — only keys that exist in the DB are present.
+  const statusOptions = Object.keys(
+    (mode === "users" ? stats?.users_by_status : stats?.projects_by_status) ?? {}
+  )
+  const roleOptions = Object.keys(stats?.users_by_role ?? {})
+
   function switchMode(next: AdminMode) {
     if (next === mode) return
     setMode(next)
     setPage(1)
+    // Reset filters that don't apply to / don't carry over to the other mode.
+    setStatus("all")
+    setRole("all")
+    setIndustry("")
+    setIndustryInput("")
   }
 
   return (
@@ -246,17 +287,74 @@ export default function AdminPage() {
             </Button>
           </div>
 
-          {/* Search */}
-          <div className="relative w-full sm:max-w-xs">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              placeholder={
-                mode === "users" ? "Search users…" : "Search projects…"
-              }
-              className="pl-9"
-            />
+          {/* Filters + search */}
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+            {/* Status — both modes */}
+            <Select
+              value={status}
+              onValueChange={(v) => {
+                setStatus(v)
+                setPage(1)
+              }}
+            >
+              <SelectTrigger size="sm" className="w-full sm:w-40">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All statuses</SelectItem>
+                {statusOptions.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {s}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Role — users mode only */}
+            {mode === "users" && (
+              <Select
+                value={role}
+                onValueChange={(v) => {
+                  setRole(v)
+                  setPage(1)
+                }}
+              >
+                <SelectTrigger size="sm" className="w-full sm:w-40">
+                  <SelectValue placeholder="Role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All roles</SelectItem>
+                  {roleOptions.map((r) => (
+                    <SelectItem key={r} value={r}>
+                      {r}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+
+            {/* Industry — projects mode only */}
+            {mode === "projects" && (
+              <Input
+                value={industryInput}
+                onChange={(e) => setIndustryInput(e.target.value)}
+                placeholder="Industry…"
+                className="w-full sm:w-40"
+              />
+            )}
+
+            {/* Search */}
+            <div className="relative w-full sm:w-64">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder={
+                  mode === "users" ? "Search users…" : "Search projects…"
+                }
+                className="pl-9"
+              />
+            </div>
           </div>
         </div>
 

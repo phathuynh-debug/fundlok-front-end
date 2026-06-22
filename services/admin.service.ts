@@ -60,10 +60,10 @@ export interface AdminOverviewParams {
   search?: string | null;
   status?: string | null;
   role?: string | null;
+  industry?: string | null;
 }
 
 export const adminService = {
-  // Admin only — backend returns 403 for non-ADMIN, 401 when unauthenticated.
   getOverview(params: AdminOverviewParams = {}) {
     return apiClient.get<AdminOverview>(ADMIN_ENDPOINTS.overview, { params });
   },
