@@ -3,11 +3,13 @@
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useRequireAuth } from "@/hooks/use-authentication"
+import { useTranslations } from "@/lib/i18n"
 import { Loader2 } from "lucide-react"
 
 export default function AdminUsersPage() {
   const { user, isLoading } = useRequireAuth()
   const router = useRouter()
+  const { t } = useTranslations()
 
   useEffect(() => {
     if (!isLoading && user && user.role !== "ADMIN") {
@@ -21,7 +23,7 @@ export default function AdminUsersPage() {
         <div className="flex flex-col items-center gap-2">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <span className="text-sm font-medium text-muted-foreground">
-            Loading admin…
+            {t("admin.loading")}
           </span>
         </div>
       </div>
@@ -32,15 +34,15 @@ export default function AdminUsersPage() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          Users
+          {t("admin.usersPage.title")}
         </h1>
         <p className="text-sm text-muted-foreground">
-          Manage platform users from here.
+          {t("admin.usersPage.subtitle")}
         </p>
       </div>
 
       <div className="rounded-lg border bg-card p-8 text-center text-sm text-muted-foreground">
-        User management coming soon.
+        {t("admin.usersPage.comingSoon")}
       </div>
     </div>
   )

@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { AdminSidebar } from "./_components/AdminSidebar"
+import { LocaleSwitcher } from "@/components/locale-switcher"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export const metadata: Metadata = {
   title: 'Admin',
@@ -18,6 +20,12 @@ export default function AdminLayout({
 
       {/* Main Content Area */}
       <main className="flex-1 relative overflow-y-auto bg-background focus:outline-none">
+        {/* Top bar: language + theme switchers */}
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-end gap-3 border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60 sm:px-6 md:px-8">
+          <LocaleSwitcher />
+          <ThemeToggle />
+        </header>
+
         <div className="py-6">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
             {children}

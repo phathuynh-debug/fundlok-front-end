@@ -30,9 +30,12 @@ import {
 } from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DataTable, type Column } from "./_components/DataTable"
+import { useTranslations } from "@/lib/i18n"
 import { getInitials } from "@/lib/utils"
 
 const PAGE_SIZE = 14
+
+type TranslateFn = (key: string, values?: Record<string, string | number>) => string
 
 function formatDate(value?: string | null) {
   if (!value) return "—"
@@ -53,10 +56,11 @@ function statusVariant(status: string) {
 }
 
 // Column configs — each table just declares how to render its cells.
-const userColumns: Column<AdminUserRow>[] = [
+// Built with `t` so the headers localize with the active language.
+const buildUserColumns = (t: TranslateFn): Column<AdminUserRow>[] => [
   {
     key: "name",
-    header: "Name",
+    header: t("admin.table.name"),
     render: (u) => (
       <div className="flex items-center gap-3">
         <Avatar className="h-8 w-8 shrink-0">
@@ -71,49 +75,49 @@ const userColumns: Column<AdminUserRow>[] = [
   },
   {
     key: "email",
-    header: "Email",
+    header: t("admin.table.email"),
     cellClassName: "text-muted-foreground",
     render: (u) => u.email,
   },
   {
     key: "role",
-    header: "Role",
+    header: t("admin.table.role"),
     render: (u) => <Badge variant="outline">{u.role}</Badge>,
   },
   {
     key: "status",
-    header: "Status",
+    header: t("admin.table.status"),
     render: (u) => <Badge variant={statusVariant(u.status)}>{u.status}</Badge>,
   },
   {
     key: "joined",
-    header: "Joined",
+    header: t("admin.table.joined"),
     cellClassName: "text-muted-foreground",
     render: (u) => formatDate(u.created_at),
   },
 ]
 
-const projectColumns: Column<AdminProjectRow>[] = [
+const buildProjectColumns = (t: TranslateFn): Column<AdminProjectRow>[] => [
   {
     key: "legal_name",
-    header: "Legal name",
+    header: t("admin.table.legalName"),
     cellClassName: "font-medium text-foreground",
     render: (p) => p.legal_name,
   },
   {
     key: "industry",
-    header: "Industry",
+    header: t("admin.table.industry"),
     cellClassName: "text-muted-foreground",
     render: (p) => p.industry || "—",
   },
   {
     key: "status",
-    header: "Status",
+    header: t("admin.table.status"),
     render: (p) => <Badge variant={statusVariant(p.status)}>{p.status}</Badge>,
   },
   {
     key: "created",
-    header: "Created",
+    header: t("admin.table.created"),
     cellClassName: "text-muted-foreground",
     render: (p) => formatDate(p.created_at),
   },
@@ -122,7 +126,11 @@ const projectColumns: Column<AdminProjectRow>[] = [
 export default function AdminPage() {
   const { user, isLoading } = useRequireAuth()
   const router = useRouter()
+  const { t } = useTranslations()
   const isAdmin = !isLoading && user?.role === "ADMIN"
+
+  const userColumns = buildUserColumns(t)
+  const projectColumns = buildProjectColumns(t)
 
   const [mode, setMode] = useState<AdminMode>("users")
   const [page, setPage] = useState(1)
@@ -179,7 +187,7 @@ export default function AdminPage() {
         <div className="flex flex-col items-center gap-2">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <span className="text-sm font-medium text-muted-foreground">
-            Loading admin…
+            {t("admin.loading")}
           </span>
         </div>
       </div>
@@ -214,10 +222,10 @@ export default function AdminPage() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          Admin overview
+          {t("admin.title")}
         </h1>
         <p className="text-sm text-muted-foreground">
-          Welcome back, {user.full_name || user.email}.
+          {t("admin.welcome", { name: user.full_name || user.email })}
         </p>
       </div>
 
@@ -226,7 +234,7 @@ export default function AdminPage() {
         <div className="rounded-lg border bg-card p-5">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Users className="h-4 w-4" />
-            <span className="text-sm font-medium">Users</span>
+            <span className="text-sm font-medium">{t("admin.stats.users")}</span>
           </div>
           <p className="mt-2 text-2xl font-bold text-foreground">
             {isOverviewLoading ? (
@@ -240,7 +248,7 @@ export default function AdminPage() {
         <div className="rounded-lg border bg-card p-5">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Briefcase className="h-4 w-4" />
-            <span className="text-sm font-medium">Projects</span>
+            <span className="text-sm font-medium">{t("admin.stats.projects")}</span>
           </div>
           <p className="mt-2 text-2xl font-bold text-foreground">
             {isOverviewLoading ? (
@@ -254,7 +262,7 @@ export default function AdminPage() {
         <div className="rounded-lg border bg-card p-5">
           <div className="flex items-center gap-2 text-muted-foreground">
             <ShieldCheck className="h-4 w-4" />
-            <span className="text-sm font-medium">Role</span>
+            <span className="text-sm font-medium">{t("admin.stats.role")}</span>
           </div>
           <p className="mt-2 text-2xl font-bold text-foreground">{user.role}</p>
         </div>
@@ -273,7 +281,7 @@ export default function AdminPage() {
               onClick={() => switchMode("users")}
             >
               <Users className="h-4 w-4" />
-              Users
+              {t("admin.table.users")}
             </Button>
             <Button
               type="button"
@@ -283,7 +291,7 @@ export default function AdminPage() {
               onClick={() => switchMode("projects")}
             >
               <Briefcase className="h-4 w-4" />
-              Projects
+              {t("admin.table.projects")}
             </Button>
           </div>
 
@@ -298,10 +306,10 @@ export default function AdminPage() {
               }}
             >
               <SelectTrigger size="sm" className="w-full sm:w-40">
-                <SelectValue placeholder="Status" />
+                <SelectValue placeholder={t("admin.table.status")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All statuses</SelectItem>
+                <SelectItem value="all">{t("admin.table.allStatuses")}</SelectItem>
                 {statusOptions.map((s) => (
                   <SelectItem key={s} value={s}>
                     {s}
@@ -320,10 +328,10 @@ export default function AdminPage() {
                 }}
               >
                 <SelectTrigger size="sm" className="w-full sm:w-40">
-                  <SelectValue placeholder="Role" />
+                  <SelectValue placeholder={t("admin.table.role")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All roles</SelectItem>
+                  <SelectItem value="all">{t("admin.table.allRoles")}</SelectItem>
                   {roleOptions.map((r) => (
                     <SelectItem key={r} value={r}>
                       {r}
@@ -338,7 +346,7 @@ export default function AdminPage() {
               <Input
                 value={industryInput}
                 onChange={(e) => setIndustryInput(e.target.value)}
-                placeholder="Industry…"
+                placeholder={t("admin.table.industryPlaceholder")}
                 className="w-full sm:w-40"
               />
             )}
@@ -350,7 +358,9 @@ export default function AdminPage() {
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder={
-                  mode === "users" ? "Search users…" : "Search projects…"
+                  mode === "users"
+                    ? t("admin.table.searchUsers")
+                    : t("admin.table.searchProjects")
                 }
                 className="pl-9"
               />
@@ -365,7 +375,7 @@ export default function AdminPage() {
             getRowKey={(u) => u.id}
             isLoading={isOverviewLoading}
             isFetching={isFetching}
-            emptyMessage="No users found."
+            emptyMessage={t("admin.table.noUsers")}
           />
         ) : (
           <DataTable<AdminProjectRow>
@@ -374,7 +384,7 @@ export default function AdminPage() {
             getRowKey={(p) => p.id}
             isLoading={isOverviewLoading}
             isFetching={isFetching}
-            emptyMessage="No projects found."
+            emptyMessage={t("admin.table.noProjects")}
           />
         )}
 
@@ -383,12 +393,16 @@ export default function AdminPage() {
           <p className="text-sm text-muted-foreground">
             {total > 0 ? (
               <>
-                Page <span className="font-medium text-foreground">{page}</span>{" "}
-                of{" "}
+                {t("admin.pagination.page")}{" "}
+                <span className="font-medium text-foreground">{page}</span>{" "}
+                {t("admin.pagination.of")}{" "}
                 <span className="font-medium text-foreground">
                   {totalPages}
                 </span>{" "}
-                · {total} {mode === "users" ? "users" : "projects"}
+                · {total}{" "}
+                {mode === "users"
+                  ? t("admin.pagination.users")
+                  : t("admin.pagination.projects")}
               </>
             ) : (
               "—"
@@ -404,7 +418,7 @@ export default function AdminPage() {
               onClick={() => setPage((p) => Math.max(1, p - 1))}
             >
               <ChevronLeft className="h-4 w-4" />
-              Prev
+              {t("admin.pagination.prev")}
             </Button>
             <Button
               type="button"
@@ -414,7 +428,7 @@ export default function AdminPage() {
               disabled={page >= totalPages || isFetching}
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             >
-              Next
+              {t("admin.pagination.next")}
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>

@@ -689,5 +689,53 @@
       "sending": "Đang gửi...",
       "sendMessage": "Gửi tin nhắn"
     }
+  },
+  "admin": {
+    "title": "Tổng quan quản trị",
+    "welcome": "Chào mừng trở lại, {name}.",
+    "loading": "Đang tải trang quản trị…",
+    "sidebar": {
+      "badge": "Quản trị",
+      "overview": "Tổng quan",
+      "users": "Người dùng",
+      "logout": "Đăng xuất"
+    },
+    "stats": {
+      "users": "Người dùng",
+      "projects": "Dự án",
+      "role": "Vai trò"
+    },
+    "table": {
+      "users": "Người dùng",
+      "projects": "Dự án",
+      "searchUsers": "Tìm người dùng…",
+      "searchProjects": "Tìm dự án…",
+      "allStatuses": "Tất cả trạng thái",
+      "allRoles": "Tất cả vai trò",
+      "industryPlaceholder": "Ngành…",
+      "noUsers": "Không tìm thấy người dùng.",
+      "noProjects": "Không tìm thấy dự án.",
+      "name": "Tên",
+      "email": "Email",
+      "role": "Vai trò",
+      "status": "Trạng thái",
+      "joined": "Tham gia",
+      "legalName": "Tên pháp lý",
+      "industry": "Ngành",
+      "created": "Ngày tạo"
+    },
+    "pagination": {
+      "page": "Trang",
+      "of": "trên",
+      "prev": "Trước",
+      "next": "Sau",
+      "users": "người dùng",
+      "projects": "dự án"
+    },
+    "usersPage": {
+      "title": "Người dùng",
+      "subtitle": "Quản lý người dùng nền tảng tại đây.",
+      "comingSoon": "Quản lý người dùng sắp ra mắt."
+    }
   }
 }

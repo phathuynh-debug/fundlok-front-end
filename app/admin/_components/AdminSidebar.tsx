@@ -12,22 +12,24 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useLogout } from "@/hooks/use-authentication"
+import { useTranslations } from "@/lib/i18n"
 import Logo from "@/components/logo"
 
 interface NavItem {
-  label: string
+  labelKey: string
   href: string
   icon: LucideIcon
 }
 
 const navItems: NavItem[] = [
-  { label: "Overview", href: "/admin", icon: LayoutDashboard },
-  { label: "Users", href: "/admin/users", icon: Users },
+  { labelKey: "admin.sidebar.overview", href: "/admin", icon: LayoutDashboard },
+  { labelKey: "admin.sidebar.users", href: "/admin/users", icon: Users },
 ]
 
 export function AdminSidebar() {
   const pathname = usePathname()
   const { mutate: logout, isPending: isLoggingOut } = useLogout()
+  const { t } = useTranslations()
 
   return (
     <div className="hidden border-r bg-card md:flex md:w-64 md:flex-col h-screen">
@@ -45,7 +47,7 @@ export function AdminSidebar() {
           </Link>
           <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
             <ShieldCheck className="h-3.5 w-3.5" />
-            Admin
+            {t("admin.sidebar.badge")}
           </span>
         </div>
 
@@ -76,7 +78,7 @@ export function AdminSidebar() {
                       : "text-muted-foreground group-hover:text-accent-foreground"
                   )}
                 />
-                {item.label}
+                {t(item.labelKey)}
               </Link>
             )
           })}
@@ -95,7 +97,7 @@ export function AdminSidebar() {
             ) : (
               <LogOut className="mr-3 h-5 w-5 shrink-0 text-muted-foreground group-hover:text-accent-foreground" />
             )}
-            Log out
+            {t("admin.sidebar.logout")}
           </button>
         </div>
       </div>

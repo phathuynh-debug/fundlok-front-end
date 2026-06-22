@@ -689,5 +689,53 @@
       "sending": "Sending...",
       "sendMessage": "Send Message"
     }
+  },
+  "admin": {
+    "title": "Admin overview",
+    "welcome": "Welcome back, {name}.",
+    "loading": "Loading admin…",
+    "sidebar": {
+      "badge": "Admin",
+      "overview": "Overview",
+      "users": "Users",
+      "logout": "Log out"
+    },
+    "stats": {
+      "users": "Users",
+      "projects": "Projects",
+      "role": "Role"
+    },
+    "table": {
+      "users": "Users",
+      "projects": "Projects",
+      "searchUsers": "Search users…",
+      "searchProjects": "Search projects…",
+      "allStatuses": "All statuses",
+      "allRoles": "All roles",
+      "industryPlaceholder": "Industry…",
+      "noUsers": "No users found.",
+      "noProjects": "No projects found.",
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "joined": "Joined",
+      "legalName": "Legal name",
+      "industry": "Industry",
+      "created": "Created"
+    },
+    "pagination": {
+      "page": "Page",
+      "of": "of",
+      "prev": "Prev",
+      "next": "Next",
+      "users": "users",
+      "projects": "projects"
+    },
+    "usersPage": {
+      "title": "Users",
+      "subtitle": "Manage platform users from here.",
+      "comingSoon": "User management coming soon."
+    }
   }
 }
