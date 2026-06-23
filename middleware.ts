@@ -11,6 +11,9 @@ const ADMIN_ROUTE = "/admin";
 // Frontend system-settings page (distinct from the backend /system API prefix).
 const SYSTEM_SETTINGS_ROUTE = "/admin/system";
 const MAINTENANCE_ROUTE = "/maintenance";
+// During maintenance only the auth entry points are blocked — public pages and
+// the rest of the site stay accessible.
+const MAINTENANCE_BLOCKED_ROUTES = ["/login", "/register"];
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
@@ -20,9 +23,8 @@ type CurrentUser = {
   email_verified?: boolean;
 };
 
-// Paths whose auth/role rules are handled below. Every other path only passes
-// through the maintenance gate (the matcher is now a catch-all so maintenance
-// can block the whole site).
+// Paths whose auth/role rules are handled below. The matcher only runs
+// middleware on these app routes plus the maintenance-relevant ones.
 function isHandledRoute(pathname: string) {
   return (
     pathname === "/" ||
@@ -128,20 +130,24 @@ export async function middleware(request: NextRequest) {
   const isInvestor = currentUser?.role === "INVESTOR";
 
   // --- Maintenance gate ---
-  // When maintenance is on, everyone except system admins is sent to the
-  // maintenance page (login stays open so a system admin can sign in and turn
-  // it off).
-  const maintenance = await getMaintenance();
-  if (maintenance?.enabled && !isSystemAdmin) {
-    if (pathname === MAINTENANCE_ROUTE || pathname === "/login") {
-      return NextResponse.next();
-    }
-    return NextResponse.redirect(new URL(MAINTENANCE_ROUTE, request.url));
-  }
+  // During maintenance only the auth entry points (login/register) are blocked;
+  // public pages stay fully accessible. System admins are never blocked.
+  const isMaintenancePage = pathname === MAINTENANCE_ROUTE;
+  const isBlockedDuringMaintenance = MAINTENANCE_BLOCKED_ROUTES.some(
+    (r) => pathname === r || pathname.startsWith(`${r}/`)
+  );
+  if (isMaintenancePage || isBlockedDuringMaintenance) {
+    const maintenance = await getMaintenance();
+    const maintenanceOn = !!maintenance?.enabled;
 
-  // Maintenance is off — nobody should sit on the maintenance page.
-  if (!maintenance?.enabled && pathname === MAINTENANCE_ROUTE) {
-    return NextResponse.redirect(new URL("/", request.url));
+    if (maintenanceOn && isBlockedDuringMaintenance && !isSystemAdmin) {
+      return NextResponse.redirect(new URL(MAINTENANCE_ROUTE, request.url));
+    }
+
+    // Don't strand anyone on the maintenance page once it's lifted.
+    if (!maintenanceOn && isMaintenancePage) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
   }
 
   // Anything outside the auth/role-managed set just passes through.
@@ -250,9 +256,19 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Catch-all so the maintenance gate can run on every page. Skips API routes,
-  // Next internals, metadata files, and any path with a file extension (assets).
+  // Run only on app routes + the maintenance-relevant ones. Public marketing
+  // pages (/faq, /why-us, /contact, …) are intentionally absent so maintenance
+  // never blocks them.
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.[\\w]+$).*)",
+    "/",
+    "/login",
+    "/register",
+    "/dashboard/:path*",
+    "/project-application",
+    "/project-application/:path*",
+    "/admin",
+    "/admin/:path*",
+    "/verify-email",
+    "/maintenance",
   ],
 };
