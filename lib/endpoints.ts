@@ -21,6 +21,8 @@ export const AUTH_ENDPOINTS = {
 
 export const USER_ENDPOINTS = {
   me: "/users/me",
+  // Sets the role for a user who registered/logged in without one.
+  selectRole: "/users/me/role",
   avatarPresign: "/users/me/avatar/presign",
   avatarConfirm: "/users/me/avatar/confirm",
 } as const;

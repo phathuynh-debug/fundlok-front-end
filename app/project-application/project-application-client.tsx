@@ -215,15 +215,26 @@ export default function ProjectApplicationClient() {
   ];
 
   useEffect(() => {
-    if (user?.role === "INVESTOR") {
+    if (isAuthLoading || !user) {
+      return;
+    }
+
+    // This page is for SMEs only. Users who haven't picked a role yet go pick
+    // one; investors (and anyone else) belong on the dashboard.
+    if (!user.role) {
+      router.replace("/select-role");
+      return;
+    }
+
+    if (user.role !== "SME") {
       router.replace("/dashboard");
       return;
     }
 
-    if (user?.role === "SME" && !isLoading && projects.length > 0) {
+    if (!isLoading && projects.length > 0) {
       window.location.href = "/dashboard";
     }
-  }, [isLoading, projects.length, router, user?.role]);
+  }, [isAuthLoading, isLoading, projects.length, router, user]);
 
   const handleNextStep = async () => {
     let fieldsToValidate: Path<ProjectApplicationValues>[] = [];

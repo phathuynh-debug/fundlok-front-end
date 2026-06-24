@@ -7,6 +7,7 @@ import {
   authenticationService,
   type LoginPayload,
   type RegisterPayload,
+  type SelectableRole,
   type User,
 } from '@/services/authentication.service';
 import { usersService } from '@/services/users.service';
@@ -43,6 +44,22 @@ export function useLogin() {
 export function useRegister() {
   return useMutation<User, ApiError, RegisterPayload>({
     mutationFn: (payload) => authenticationService.register(payload),
+  });
+}
+
+/**
+ * Select role. For users who registered/logged in without one. Persists the
+ * choice via PATCH /users/me/role and seeds the cache with the refreshed user
+ * so the rest of the app sees the new role immediately.
+ */
+export function useSelectRole() {
+  const queryClient = useQueryClient();
+
+  return useMutation<User, ApiError, SelectableRole>({
+    mutationFn: (role) => usersService.selectRole(role),
+    onSuccess: (user) => {
+      queryClient.setQueryData(authKeys.currentUser(), user);
+    },
   });
 }
 

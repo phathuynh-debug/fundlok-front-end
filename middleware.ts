@@ -1,13 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // Routes that require a valid session cookie to access.
-const PROTECTED_ROUTES = ["/dashboard", "/project-application", "/admin"];
+const PROTECTED_ROUTES = [
+  "/dashboard",
+  "/project-application",
+  "/admin",
+  "/select-role",
+];
 
 // Routes that should redirect based on whether the user already has projects.
 const AUTH_ROUTES = ["/login", "/"];
 const APPLICATION_ROUTE = "/project-application";
 const DASHBOARD_ROUTE = "/dashboard";
 const ADMIN_ROUTE = "/admin";
+// Where users without a role pick one (SME / Investor) before continuing.
+const SELECT_ROLE_ROUTE = "/select-role";
 // Frontend system-settings page (distinct from the backend /system API prefix).
 const SYSTEM_SETTINGS_ROUTE = "/admin/system";
 const MAINTENANCE_ROUTE = "/maintenance";
@@ -30,6 +37,7 @@ function isHandledRoute(pathname: string) {
     pathname === "/" ||
     pathname === "/login" ||
     pathname === "/verify-email" ||
+    pathname === SELECT_ROLE_ROUTE ||
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/project-application") ||
     pathname.startsWith("/admin")
@@ -128,6 +136,9 @@ export async function middleware(request: NextRequest) {
   // Both ADMIN and SYSTEM_ADMIN may enter the /admin area (mirrors require_admin).
   const canAccessAdmin = isAdmin || isSystemAdmin;
   const isInvestor = currentUser?.role === "INVESTOR";
+  const isSme = currentUser?.role === "SME";
+  // Authenticated users with no role yet must pick one on the select-role page.
+  const hasRole = !!currentUser?.role;
 
   // --- Maintenance gate ---
   // During maintenance only the auth entry points (login/register) are blocked;
@@ -155,19 +166,20 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const projectCount =
-    isAuthenticated && !isInvestor && !canAccessAdmin
-      ? await getProjectCount(request)
-      : null;
+  // Only SMEs are routed by project count — skip the lookup for everyone else
+  // (investors, admins, and users who haven't picked a role yet).
+  const projectCount = isSme ? await getProjectCount(request) : null;
   const hasProjects = typeof projectCount === "number" ? projectCount > 0 : null;
 
   const authRedirectTarget = canAccessAdmin
     ? ADMIN_ROUTE
-    : isInvestor
-      ? DASHBOARD_ROUTE
-      : hasProjects === false
-        ? APPLICATION_ROUTE
-        : DASHBOARD_ROUTE;
+    : !hasRole
+      ? SELECT_ROLE_ROUTE
+      : isInvestor
+        ? DASHBOARD_ROUTE
+        : hasProjects === false
+          ? APPLICATION_ROUTE
+          : DASHBOARD_ROUTE;
 
   // Redirect unauthenticated users away from /verify-email to login.
   if (!isAuthenticated && pathname === "/verify-email") {
@@ -194,6 +206,25 @@ export async function middleware(request: NextRequest) {
     pathname !== "/verify-email"
   ) {
     return NextResponse.redirect(new URL("/verify-email", request.url));
+  }
+
+  // Send authenticated users without a role to the select-role screen — but
+  // only once their email is verified, so this never fights the verify-email
+  // gate above (an unverified roleless user stays on /verify-email).
+  if (
+    isAuthenticated &&
+    currentUser &&
+    !hasRole &&
+    currentUser.email_verified !== false &&
+    pathname !== SELECT_ROLE_ROUTE &&
+    pathname !== "/verify-email"
+  ) {
+    return NextResponse.redirect(new URL(SELECT_ROLE_ROUTE, request.url));
+  }
+
+  // Users who already have a role shouldn't sit on the select-role screen.
+  if (isAuthenticated && hasRole && pathname === SELECT_ROLE_ROUTE) {
+    return NextResponse.redirect(new URL(authRedirectTarget, request.url));
   }
 
   // Redirect authenticated users away from auth pages to their landing page.
@@ -268,6 +299,7 @@ export const config = {
     "/project-application/:path*",
     "/admin",
     "/admin/:path*",
+    "/select-role",
     "/verify-email",
     "/maintenance",
   ],

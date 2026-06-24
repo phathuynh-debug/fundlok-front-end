@@ -34,10 +34,17 @@ async function hydrateCurrentUser(queryClient: ReturnType<typeof useQueryClient>
 	}
 }
 
-// Admins (and system admins) land in the admin area; everyone else goes to the
-// dashboard, where middleware further routes SMEs without projects to the form.
+// Admins (and system admins) land in the admin area. Users who don't have a
+// role yet must pick one first. Everyone else goes to the dashboard, where
+// middleware further routes SMEs without projects to the application form.
 function landingRouteFor(user?: User | null) {
-	return isAdminRole(user?.role) ? "/admin" : "/dashboard";
+	if (isAdminRole(user?.role)) {
+		return "/admin";
+	}
+	if (!user?.role) {
+		return "/select-role";
+	}
+	return "/dashboard";
 }
 
 export function useLogin() {

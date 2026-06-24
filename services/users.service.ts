@@ -1,7 +1,7 @@
 import { apiClient } from '@/lib/api-client';
 import { USER_ENDPOINTS } from '@/lib/endpoints';
 import { uploadsService } from '@/services/uploads.service';
-import type { User } from './authentication.service';
+import type { SelectableRole, User } from './authentication.service';
 
 // Mirrors backend AvatarPresignRequest / AvatarPresignResponse.
 export interface AvatarPresignRequest {
@@ -27,6 +27,11 @@ export interface UpdateProfileRequest {
   bio?: string | null;
 }
 
+// Mirrors backend RoleSelectRequest (PATCH /users/me/role).
+export interface RoleSelectRequest {
+  role: SelectableRole;
+}
+
 // Same three-step flow as the loan document upload:
 // presign → direct PUT to R2 → confirm. The file never touches the API server.
 export const AVATAR_RULES = {
@@ -45,6 +50,12 @@ export const usersService = {
   // PATCH /users/me — returns the refreshed user (user_me_payload).
   updateProfile(payload: UpdateProfileRequest) {
     return apiClient.patch<User>(USER_ENDPOINTS.me, payload);
+  },
+
+  // PATCH /users/me/role — sets the role for a user that doesn't have one yet.
+  // Returns the refreshed user (user_me_payload) with the chosen role.
+  selectRole(role: SelectableRole) {
+    return apiClient.patch<User>(USER_ENDPOINTS.selectRole, { role });
   },
 
   presignAvatar(payload: AvatarPresignRequest) {

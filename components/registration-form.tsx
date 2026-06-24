@@ -10,22 +10,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useRegister } from "@/hooks/use-authentication";
-import type { UserRole } from "@/services/authentication.service";
 import {
   User,
   Mail,
   Lock,
   Phone,
-  Building2,
-  TrendingUp,
-  Check,
   Loader2,
   Eye,
   EyeOff,
 } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
-
-type RoleSelection = UserRole | null;
 
 const normalizePhoneNumber = (value: string) =>
   value.trim().replace(/[\s().-]/g, "");
@@ -44,7 +38,8 @@ const isValidPhoneNumber = (value: string) => {
 };
 
 interface RegistrationFormProps {
-  onSuccess?: () => void;
+  // Receives the registered email so the caller can show the verify-email step.
+  onSuccess?: (email: string) => void;
 }
 
 export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
@@ -53,7 +48,6 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [phone, setPhone] = useState("");
-  const [role, setRole] = useState<RoleSelection>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -86,15 +80,6 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
       return;
     }
 
-    if (!role) {
-      toast({
-        variant: "destructive",
-        title: t("auth.register.configErrorTitle"),
-        description: t("auth.register.selectRole"),
-      });
-      return;
-    }
-
     if (!turnstileToken) {
       toast({
         variant: "destructive",
@@ -110,7 +95,6 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         email,
         password,
         phone: phone || null,
-        role,
         turnstile_token: turnstileToken,
       },
       {
@@ -119,9 +103,10 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
             title: t("auth.register.successTitle"),
             description: t("auth.register.successDescription"),
           });
-          // Use the switcher callback if available, otherwise navigate
+          // Hand the email to the caller so it can show the verify-email step;
+          // fall back to the login page when used without a callback.
           if (onSuccess) {
-            setTimeout(() => onSuccess(), 1200);
+            setTimeout(() => onSuccess(email), 1200);
           } else {
             setTimeout(() => router.push("/login"), 1200);
           }
@@ -248,55 +233,6 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         </div>
       </div>
 
-      <div className="space-y-3">
-        <Label>{t("auth.register.rolePrompt")}</Label>
-        <div className="grid grid-cols-2 gap-4">
-          <button
-            type="button"
-            onClick={() => setRole("SME")}
-            disabled={isPending}
-            className={`relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${role === "SME"
-                ? "border-primary bg-primary/5 ring-2 ring-primary/20"
-                : "border-muted"
-              }`}
-          >
-            {role === "SME" && (
-              <Check className="absolute top-2 right-2 h-4 w-4 text-primary" />
-            )}
-            <Building2
-              className={
-                role === "SME" ? "text-primary" : "text-muted-foreground"
-              }
-            />
-            <span className="font-semibold text-sm">
-              {t("auth.register.roleSme")}
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setRole("INVESTOR")}
-            disabled={isPending}
-            className={`relative flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${role === "INVESTOR"
-                ? "border-primary bg-primary/5 ring-2 ring-primary/20"
-                : "border-muted"
-              }`}
-          >
-            {role === "INVESTOR" && (
-              <Check className="absolute top-2 right-2 h-4 w-4 text-primary" />
-            )}
-            <TrendingUp
-              className={
-                role === "INVESTOR" ? "text-primary" : "text-muted-foreground"
-              }
-            />
-            <span className="font-semibold text-sm">
-              {t("auth.register.roleInvestor")}
-            </span>
-          </button>
-        </div>
-      </div>
-
       {/* Cloudflare Turnstile Spam Prevention */}
       {process.env.NEXT_PUBLIC_DISABLE_TURNSTILE !== "true" && (
         <div className="flex justify-center py-2">
@@ -311,7 +247,6 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
           !email ||
           !password ||
           !confirmPassword ||
-          !role ||
           !fullName ||
           !turnstileToken
         }

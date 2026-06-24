@@ -3,6 +3,10 @@ import { AUTH_ENDPOINTS } from '@/lib/endpoints';
 
 export type UserRole = 'SME' | 'INVESTOR' | 'ADMIN' | 'SYSTEM_ADMIN';
 
+// The roles a user may pick for themselves on the select-role screen.
+// ADMIN / SYSTEM_ADMIN are backend-assigned and never self-selectable.
+export type SelectableRole = Extract<UserRole, 'SME' | 'INVESTOR'>;
+
 // Roles allowed into the /admin area (mirrors the backend's require_admin).
 export const ADMIN_ROLES: UserRole[] = ['ADMIN', 'SYSTEM_ADMIN'];
 
@@ -19,7 +23,9 @@ export interface User {
   phone?: string | null;
   avatar_url?: string | null;
   bio?: string | null;
-  role: UserRole;
+  // Optional: users now register without a role and pick one after login on
+  // the select-role screen, so a freshly created user has no role yet.
+  role?: UserRole | null;
   status?: UserStatus;
   email_verified?: boolean;
   created_at?: string | null;
@@ -36,7 +42,6 @@ export interface RegisterPayload {
   email: string;
   password: string;
   phone?: string | null;
-  role: UserRole;
   turnstile_token?: string | null;
 }
 
