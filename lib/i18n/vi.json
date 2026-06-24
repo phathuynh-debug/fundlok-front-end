@@ -113,6 +113,8 @@
       "investorDescription": "Khám phá các cơ hội đã được thẩm định, xây dựng danh mục và đầu tư vào các thương vụ tín dụng tư nhân.",
       "select": "Chọn",
       "submitting": "Đang thiết lập...",
+      "onboardingTitle": "Đang thiết lập tài khoản cho bạn",
+      "onboardingSubtitle": "Vui lòng chờ trong khi chúng tôi chuẩn bị không gian làm việc của bạn.",
       "successTitle": "Đã hoàn tất",
       "successDescription": "Loại tài khoản của bạn đã được lưu.",
       "failedTitle": "Không thể lưu lựa chọn",

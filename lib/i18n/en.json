@@ -113,6 +113,8 @@
       "investorDescription": "Discover vetted opportunities, build your portfolio, and invest in private credit deals.",
       "select": "Select",
       "submitting": "Setting up...",
+      "onboardingTitle": "We're onboarding you",
+      "onboardingSubtitle": "Hang tight while we set up your workspace.",
       "successTitle": "You're all set",
       "successDescription": "Your account type has been saved.",
       "failedTitle": "Couldn't save your selection",
