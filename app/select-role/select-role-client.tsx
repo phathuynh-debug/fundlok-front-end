@@ -190,7 +190,7 @@ export function SelectRoleClient() {
                     whileHover={{ y: -6, scale: 1.02 }}
                     whileTap={{ scale: 0.99 }}
                     transition={{ type: "spring", stiffness: 320, damping: 22 }}
-                    className="group flex flex-col items-center gap-5 rounded-3xl border border-border bg-white p-10 text-center shadow-sm transition-colors hover:border-primary/50 hover:shadow-xl"
+                    className="group flex flex-col items-center gap-5 rounded-3xl border border-border bg-card text-card-foreground p-10 text-center shadow-sm transition-colors hover:border-primary/50 hover:shadow-xl"
                   >
                     <motion.div
                       whileHover={{ rotate: -6, scale: 1.08 }}

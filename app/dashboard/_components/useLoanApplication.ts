@@ -16,7 +16,12 @@ export type DocumentKey =
   | "eInvoiceData"
   | "cicReport"
 
-export type UploadStatus = "idle" | "uploading" | "uploaded" | "error"
+// "ready" = a valid file is staged locally but not yet uploaded. Uploads are
+// deferred until the user clicks Send on the review step, then run one-by-one.
+export type UploadStatus = "idle" | "ready" | "uploading" | "uploaded" | "error"
+
+// Distinguishes a bad file (blocks sending) from a transfer failure (resumable).
+export type ErrorKind = "validation" | "upload" | null
 
 export interface DocumentUpload {
   file: File | null
@@ -24,6 +29,7 @@ export interface DocumentUpload {
   progress: number
   fileKey: string | null
   error: string | null
+  errorKind: ErrorKind
 }
 
 export type DocumentUploads = Record<DocumentKey, DocumentUpload>
@@ -48,7 +54,9 @@ const STEP_DOCUMENTS: Record<number, DocumentKey[]> = {
 
 const ALL_DOCUMENT_KEYS = Object.keys(DOCUMENT_TYPES) as DocumentKey[]
 
-const TOTAL_STEPS = 5
+// Steps 1-5 collect the documents; step 6 is the review-and-send screen.
+const REVIEW_STEP = 6
+const TOTAL_STEPS = 6
 
 const emptyUpload = (): DocumentUpload => ({
   file: null,
@@ -56,7 +64,14 @@ const emptyUpload = (): DocumentUpload => ({
   progress: 0,
   fileKey: null,
   error: null,
+  errorKind: null,
 })
+
+// A document is "staged" when it holds a file that passed validation — i.e. it
+// can be sent. Covers ready (not yet sent), uploaded (already sent), and a prior
+// upload failure (resumable). A validation error is the only non-staged file.
+const isStaged = (doc: DocumentUpload): boolean =>
+  doc.file !== null && doc.errorKind !== "validation"
 
 export function acceptForDocument(key: DocumentKey): string {
   return DOCUMENT_TYPE_RULES[DOCUMENT_TYPES[key]].extensions
@@ -86,6 +101,8 @@ export function useLoanApplication({ loanApplicationId, t }: UseLoanApplicationO
 
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  // True while the sequential send loop is running.
+  const [isSending, setIsSending] = useState(false)
 
   const updateDocument = (key: DocumentKey, patch: Partial<DocumentUpload>) => {
     setDocuments((prev) => ({ ...prev, [key]: { ...prev[key], ...patch } }))
@@ -106,72 +123,145 @@ export function useLoanApplication({ loanApplicationId, t }: UseLoanApplicationO
     )
   }
 
-  // --- Upload (runs immediately when a file is picked) ---
-
-  const startUpload = (key: DocumentKey, file: File) => {
-    updateDocument(key, {
-      file,
-      status: "uploading",
-      progress: 0,
-      fileKey: null,
-      error: null,
-    })
-
-    uploadDocument.mutate(
-      {
-        loanApplicationId,
-        documentType: DOCUMENT_TYPES[key],
-        file,
-        onProgress: (percent) => updateDocument(key, { progress: percent }),
-      },
-      {
-        onSuccess: ({ fileKey }) => {
-          updateDocument(key, { status: "uploaded", progress: 100, fileKey })
-        },
-        onError: (error) => {
-          updateDocument(key, {
-            status: "error",
-            error: error.message || t("dashboard.sme.fileUploadFailed"),
-          })
-        },
-      }
-    )
-  }
+  // --- File selection (stages the file; no upload yet) ---
 
   const handleFileChange = (key: DocumentKey, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    // Reset so picking the same file again re-triggers onChange (retry case).
+    // Reset so picking the same file again re-triggers onChange.
     e.target.value = ""
     if (!file) return
 
     const message = validationMessage(key, file)
     if (message) {
-      updateDocument(key, { ...emptyUpload(), file, status: "error", error: message })
+      updateDocument(key, {
+        ...emptyUpload(),
+        file,
+        status: "error",
+        errorKind: "validation",
+        error: message,
+      })
       return
     }
 
-    startUpload(key, file)
-  }
-
-  // Failed transfers are retried individually: redo init-upload + PUT for that file.
-  const retryUpload = (key: DocumentKey) => {
-    const { file } = documents[key]
-    if (!file) return
-    const message = validationMessage(key, file)
-    if (message) return
-    startUpload(key, file)
+    // Valid file — stage it. The actual upload happens on Send.
+    updateDocument(key, { ...emptyUpload(), file, status: "ready" })
   }
 
   const removeFile = (key: DocumentKey) => {
     updateDocument(key, emptyUpload())
   }
 
-  // --- Step Validation ---
+  // --- Uploading ---
 
+  // Uploads a single staged document. Resolves with its file_key, or throws
+  // after marking the document as a (resumable) upload error.
+  const uploadOne = async (key: DocumentKey): Promise<string> => {
+    const file = documents[key].file
+    if (!file) {
+      throw new Error("No file staged")
+    }
+
+    updateDocument(key, { status: "uploading", progress: 0, error: null, errorKind: null })
+
+    try {
+      const { fileKey } = await uploadDocument.mutateAsync({
+        loanApplicationId,
+        documentType: DOCUMENT_TYPES[key],
+        file,
+        onProgress: (percent) => updateDocument(key, { progress: percent }),
+      })
+      updateDocument(key, { status: "uploaded", progress: 100, fileKey })
+      return fileKey
+    } catch (err) {
+      const message = (err as { message?: string })?.message || t("dashboard.sme.fileUploadFailed")
+      updateDocument(key, { status: "error", errorKind: "upload", error: message })
+      throw err
+    }
+  }
+
+  // Sends every document one by one, then confirms + submits. Already-uploaded
+  // documents are skipped, so this doubles as resume-after-failure. Stops at the
+  // first transfer that fails and leaves the rest for a retry.
+  const handleSend = async () => {
+    if (!canSend || isSending) {
+      if (!canSend) {
+        toast({
+          variant: "destructive",
+          title: t("dashboard.sme.requiredDocsMissingTitle"),
+          description: t("dashboard.sme.requiredDocsMissingDescription"),
+        })
+      }
+      return
+    }
+
+    setIsSending(true)
+
+    const fileKeys: string[] = []
+    for (const key of ALL_DOCUMENT_KEYS) {
+      const doc = documents[key]
+      if (doc.status === "uploaded" && doc.fileKey) {
+        fileKeys.push(doc.fileKey)
+        continue
+      }
+      try {
+        fileKeys.push(await uploadOne(key))
+      } catch {
+        // uploadOne already marked the document; halt the queue here.
+        toast({
+          variant: "destructive",
+          title: t("dashboard.sme.uploadFailedTitle"),
+          description: t("dashboard.sme.fileUploadFailed"),
+        })
+        setIsSending(false)
+        return
+      }
+    }
+
+    try {
+      await confirmUploads.mutateAsync({
+        loan_application_id: loanApplicationId,
+        file_keys: fileKeys,
+      })
+      await submitApplication.mutateAsync(loanApplicationId)
+      setIsSubmitted(true)
+      toast({
+        title: t("dashboard.sme.applicationSubmittedTitle"),
+        description: t("dashboard.sme.applicationSubmittedDescription"),
+      })
+    } catch (error) {
+      const message = (error as { message?: string })?.message
+      toast({
+        variant: "destructive",
+        title: t("dashboard.sme.uploadFailedTitle"),
+        description: message || t("dashboard.sme.uploadFailedDescription"),
+      })
+    } finally {
+      setIsSending(false)
+    }
+  }
+
+  // Re-send a single failed document from the review list.
+  const retryUpload = async (key: DocumentKey) => {
+    if (isSending) return
+    try {
+      await uploadOne(key)
+    } catch {
+      toast({
+        variant: "destructive",
+        title: t("dashboard.sme.uploadFailedTitle"),
+        description: documents[key].error || t("dashboard.sme.fileUploadFailed"),
+      })
+    }
+  }
+
+  // --- Step validation & navigation ---
+
+  // A collection step is satisfied once its documents hold valid (staged) files.
   const isStepValid = (step: number): boolean => {
+    if (step === REVIEW_STEP) return canSend
     const keys = STEP_DOCUMENTS[step]
     if (!keys) return false
-    return keys.every((key) => documents[key].status === "uploaded")
+    return keys.every((key) => isStaged(documents[key]))
   }
 
   const canNavigateToStep = (targetStep: number): boolean => {
@@ -181,12 +271,8 @@ export function useLoanApplication({ loanApplicationId, t }: UseLoanApplicationO
     return true
   }
 
-  // --- Step Navigation ---
-
   const goToStep = (step: number) => {
-    if (step <= currentStep) {
-      setCurrentStep(step)
-    } else if (canNavigateToStep(step)) {
+    if (step <= currentStep || canNavigateToStep(step)) {
       setCurrentStep(step)
     } else {
       toast({
@@ -213,71 +299,33 @@ export function useLoanApplication({ loanApplicationId, t }: UseLoanApplicationO
     setCurrentStep((prev) => Math.max(1, prev - 1))
   }
 
-  // --- Submission ---
+  // --- Derived flags ---
 
+  // Every document holds a sendable file (no missing files, no bad files).
+  const canSend = ALL_DOCUMENT_KEYS.every((key) => isStaged(documents[key]))
   const allFilesUploaded = ALL_DOCUMENT_KEYS.every(
     (key) => documents[key].status === "uploaded"
   )
-
-  const isUploadingAny = ALL_DOCUMENT_KEYS.some(
-    (key) => documents[key].status === "uploading"
-  )
-
-  const isSubmitting = confirmUploads.isPending || submitApplication.isPending
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (isUploadingAny) {
-      toast({
-        variant: "destructive",
-        title: t("dashboard.sme.documentsStillUploadingTitle"),
-        description: t("dashboard.sme.documentsStillUploadingDescription"),
-      })
-      return
-    }
-
-    const fileKeys = ALL_DOCUMENT_KEYS.map((key) => documents[key].fileKey)
-    if (!allFilesUploaded || fileKeys.some((key) => !key)) {
-      toast({
-        variant: "destructive",
-        title: t("dashboard.sme.requiredDocsMissingTitle"),
-        description: t("dashboard.sme.requiredDocsMissingDescription"),
-      })
-      return
-    }
-
-    try {
-      await confirmUploads.mutateAsync({
-        loan_application_id: loanApplicationId,
-        file_keys: fileKeys as string[],
-      })
-
-      await submitApplication.mutateAsync(loanApplicationId)
-
-      setIsSubmitted(true)
-      toast({
-        title: t("dashboard.sme.applicationSubmittedTitle"),
-        description: t("dashboard.sme.applicationSubmittedDescription"),
-      })
-    } catch (error) {
-      const message = (error as { message?: string })?.message
-      toast({
-        variant: "destructive",
-        title: t("dashboard.sme.uploadFailedTitle"),
-        description: message || t("dashboard.sme.uploadFailedDescription"),
-      })
-    }
-  }
+  const uploadedCount = ALL_DOCUMENT_KEYS.filter(
+    (key) => documents[key].status === "uploaded"
+  ).length
+  // Confirm + submit running after every file is up.
+  const isFinalizing = confirmUploads.isPending || submitApplication.isPending
 
   return {
     // State
     documents,
     currentStep,
-    isSubmitting,
-    isSubmitted,
-    allFilesUploaded,
     totalSteps: TOTAL_STEPS,
+    reviewStep: REVIEW_STEP,
+    isSending,
+    isFinalizing,
+    isSubmitted,
+    canSend,
+    allFilesUploaded,
+    uploadedCount,
+    totalDocuments: ALL_DOCUMENT_KEYS.length,
+    documentKeys: ALL_DOCUMENT_KEYS,
 
     // File actions
     handleFileChange,
@@ -291,6 +339,6 @@ export function useLoanApplication({ loanApplicationId, t }: UseLoanApplicationO
     isStepValid,
 
     // Submission
-    handleSubmit,
+    handleSend,
   }
 }
