@@ -6,7 +6,7 @@ import { Check, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ProjectLoanApplication } from "@/services/projects.service";
 import type { LoanDocumentType } from "@/services/uploads.service";
-import type { IndustryTheme } from "./sme-dashboard-config";
+import type { IndustryTheme } from "../sme-dashboard-config";
 
 interface LoanApplicationStatusProps {
   loanApplication: ProjectLoanApplication;

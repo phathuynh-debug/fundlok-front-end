@@ -7,8 +7,8 @@ import type { Project } from "@/services/projects.service";
 import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { getIndustryTheme } from "./sme-dashboard-config";
-import { LoanApplicationUpload } from "./LoanApplicationUpload";
-import { LoanApplicationStatus } from "./LoanApplicationStatus";
+import { LoanApplicationUpload } from "./loan-application/LoanApplicationUpload";
+import { LoanApplicationStatus } from "./loan-application/LoanApplicationStatus";
 
 type ProjectAddress = {
   street?: string;
