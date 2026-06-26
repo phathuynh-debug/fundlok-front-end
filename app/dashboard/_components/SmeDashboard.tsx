@@ -146,8 +146,8 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
                 <p className="text-base font-bold text-foreground">
                   {project.incorporation_date
                     ? new Date(project.incorporation_date).toLocaleDateString(
-                        locale,
-                      )
+                      locale,
+                    )
                     : t("common.na")}
                 </p>
               </div>

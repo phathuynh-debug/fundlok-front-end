@@ -365,6 +365,8 @@
       "readyToSend": "Ready to send",
       "notSelectedYet": "Not selected",
       "sentStatus": "Sent",
+      "preview": "Preview",
+      "previewUnavailable": "Preview isn't available for this file type. You can still send it.",
       "sendProgress": "Sent {done} of {total}",
       "documentsStillUploadingTitle": "Documents still uploading",
       "documentsStillUploadingDescription": "Please wait for all documents to finish uploading before submitting.",

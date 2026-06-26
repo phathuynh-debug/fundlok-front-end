@@ -1,8 +1,9 @@
 "use client"
 
+import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { motion, AnimatePresence } from "framer-motion"
-import { CheckCircle2, Upload, FileText, Loader2, AlertCircle, RotateCcw, Send } from "lucide-react"
+import { CheckCircle2, Upload, FileText, Loader2, AlertCircle, RotateCcw, Send, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import type { IndustryTheme } from "./sme-dashboard-config"
@@ -12,6 +13,7 @@ import {
   maxSizeMbForDocument,
   type DocumentKey,
 } from "./useLoanApplication"
+import { DocumentPreviewDialog, isPreviewable } from "./DocumentPreviewDialog"
 
 interface LoanApplicationUploadProps {
   loanApplicationId: string
@@ -53,6 +55,14 @@ export function LoanApplicationUpload({ loanApplicationId, locale, theme, t }: L
   } = useLoanApplication({ loanApplicationId, t })
 
   const busy = isSending || isFinalizing || isSubmitted
+
+  const [previewFile, setPreviewFile] = useState<File | null>(null)
+  const [previewOpen, setPreviewOpen] = useState(false)
+
+  const openPreview = (file: File) => {
+    setPreviewFile(file)
+    setPreviewOpen(true)
+  }
 
   const renderUploadField = (
     id: string,
@@ -211,7 +221,19 @@ export function LoanApplicationUpload({ loanApplicationId, locale, theme, t }: L
           )}
         </div>
 
-        <div className="shrink-0">
+        <div className="flex shrink-0 items-center gap-1">
+          {file && isPreviewable(file) && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-8 gap-1.5 text-xs"
+              onClick={() => openPreview(file)}
+            >
+              <Eye className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">{t("dashboard.sme.preview")}</span>
+            </Button>
+          )}
           {status === "uploaded" ? (
             <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
               {t("dashboard.sme.sentStatus")}
@@ -275,7 +297,6 @@ export function LoanApplicationUpload({ loanApplicationId, locale, theme, t }: L
 
   const onFormSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    handleSend()
   }
 
   return (
@@ -550,7 +571,8 @@ export function LoanApplicationUpload({ loanApplicationId, locale, theme, t }: L
               </Button>
             ) : (
               <Button
-                type="submit"
+                type="button"
+                onClick={handleSend}
                 disabled={isSending || isFinalizing || isSubmitted || !canSend}
                 className={cn("text-white gap-2 font-medium px-6 h-10 rounded-lg transition-all border shadow-xs duration-300",
                   isSubmitted ? "bg-emerald-600 hover:bg-emerald-700 border-emerald-500" : "bg-black hover:bg-black/90 dark:bg-white dark:text-black border-transparent"
@@ -587,6 +609,13 @@ export function LoanApplicationUpload({ loanApplicationId, locale, theme, t }: L
           </div>
         </div>
       </form>
+
+      <DocumentPreviewDialog
+        file={previewFile}
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+        t={t}
+      />
     </Card>
   );
 }

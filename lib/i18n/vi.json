@@ -365,6 +365,8 @@
       "readyToSend": "Sẵn sàng gửi",
       "notSelectedYet": "Chưa chọn",
       "sentStatus": "Đã gửi",
+      "preview": "Xem trước",
+      "previewUnavailable": "Không thể xem trước loại tệp này. Bạn vẫn có thể gửi.",
       "sendProgress": "Đã gửi {done}/{total}",
       "documentsStillUploadingTitle": "Tài liệu đang được tải lên",
       "documentsStillUploadingDescription": "Vui lòng đợi tất cả tài liệu tải lên xong trước khi gửi hồ sơ.",
