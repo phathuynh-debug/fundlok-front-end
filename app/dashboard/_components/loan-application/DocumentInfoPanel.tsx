@@ -3,17 +3,13 @@
 import { Card } from "@/components/ui/card"
 import { CheckCircle2, FileText } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { IndustryTheme } from "../sme-dashboard-config"
-
-interface DocumentInfoPanelProps {
-  currentStep: number
-  theme: IndustryTheme
-  t: (key: string) => string
-}
+import { useLoanApplicationContext } from "./LoanApplicationContext"
 
 // The "why we need this / how to obtain it" panel shown beside each collection
 // step. Content is keyed off the current step.
-export function DocumentInfoPanel({ currentStep, theme, t }: DocumentInfoPanelProps) {
+export function DocumentInfoPanel() {
+  const { currentStep, theme, t } = useLoanApplicationContext()
+
   return (
     <Card className="p-5 bg-muted/40 border border-border/50 rounded-2xl shadow-inner space-y-4">
       <div className="space-y-1">

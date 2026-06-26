@@ -1,13 +1,15 @@
 "use client"
 
-import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { motion, AnimatePresence } from "framer-motion"
 import { CheckCircle2, Loader2, AlertCircle, Send } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import type { IndustryTheme } from "../sme-dashboard-config"
-import { useLoanApplication, type DocumentKey } from "./useLoanApplication"
+import {
+  LoanApplicationProvider,
+  useLoanApplicationContext,
+} from "./LoanApplicationContext"
 import { DocumentPreviewDialog } from "./DocumentPreviewDialog"
 import { StepIndicator } from "./StepIndicator"
 import { UploadField } from "./UploadField"
@@ -21,69 +23,37 @@ interface LoanApplicationUploadProps {
   t: (key: string) => string
 }
 
-// Which wizard step collects each document (used by the review "add" links).
-const STEP_FOR_DOCUMENT: Record<DocumentKey, number> = {
-  companyCharter: 1,
-  companyRegistration: 1,
-  vatDeclarations: 2,
-  financialStatement: 3,
-  eInvoiceData: 4,
-  cicReport: 5,
+// Entry point: wires up the shared wizard state, then renders the wizard. All
+// state lives in the provider, so the inner components read it via context
+// instead of being handed props.
+export function LoanApplicationUpload(props: LoanApplicationUploadProps) {
+  return (
+    <LoanApplicationProvider {...props}>
+      <LoanApplicationWizard />
+    </LoanApplicationProvider>
+  )
 }
 
-export function LoanApplicationUpload({ loanApplicationId, locale, theme, t }: LoanApplicationUploadProps) {
+function LoanApplicationWizard() {
   const {
-    documents,
     currentStep,
-    totalSteps,
     reviewStep,
+    totalSteps,
+    busy,
+    theme,
+    t,
     isSending,
     isFinalizing,
     isSubmitted,
     canSend,
     uploadedCount,
-    totalDocuments,
-    documentKeys,
-    handleFileChange,
-    removeFile,
-    retryUpload,
-    goToStep,
     goToNextStep,
     goToPreviousStep,
     handleSend,
-  } = useLoanApplication({ loanApplicationId, t })
-
-  const busy = isSending || isFinalizing || isSubmitted
-
-  // Locally-staged document currently open in the preview dialog.
-  const [previewFile, setPreviewFile] = useState<File | null>(null)
-  const [previewOpen, setPreviewOpen] = useState(false)
-
-  const openPreview = (file: File) => {
-    setPreviewFile(file)
-    setPreviewOpen(true)
-  }
-
-  const stepLabel = (step: number) => {
-    if (step === 1) return locale === "vi" ? "Hồ sơ pháp lý" : "Legal Docs"
-    if (step === 2) return locale === "vi" ? "Thuế GTGT" : "VAT"
-    if (step === 3) return locale === "vi" ? "Báo cáo TC" : "Financials"
-    if (step === 4) return locale === "vi" ? "Hóa đơn ĐT" : "E-Invoice"
-    if (step === 5) return "CIC"
-    return t("dashboard.sme.reviewStepLabel")
-  }
-
-  // Shared props for every UploadField on the collection steps.
-  const uploadFieldProps = (key: DocumentKey) => ({
-    id: key,
-    docKey: key,
-    doc: documents[key],
-    busy,
-    locale,
-    t,
-    onFileChange: handleFileChange,
-    onRemove: removeFile,
-  })
+    previewFile,
+    previewOpen,
+    setPreviewOpen,
+  } = useLoanApplicationContext()
 
   return (
     <Card className={cn("p-6 md:p-8 border w-full shadow-md transition-all duration-300", theme.borderColor)}>
@@ -95,14 +65,7 @@ export function LoanApplicationUpload({ loanApplicationId, locale, theme, t }: L
       {/* The form never submits on its own — sending is only triggered by an
           explicit click on the Send button below. */}
       <form onSubmit={(e) => e.preventDefault()} className="space-y-6 mt-6">
-        <StepIndicator
-          currentStep={currentStep}
-          totalSteps={totalSteps}
-          reviewStep={reviewStep}
-          busy={busy}
-          onStepClick={goToStep}
-          stepLabel={stepLabel}
-        />
+        <StepIndicator />
 
         {/* Step content */}
         <div className="relative overflow-hidden min-h-[360px] mt-8">
@@ -115,20 +78,7 @@ export function LoanApplicationUpload({ loanApplicationId, locale, theme, t }: L
               transition={{ duration: 0.3, ease: "easeInOut" }}
             >
               {currentStep === reviewStep ? (
-                <ReviewStep
-                  documentKeys={documentKeys}
-                  documents={documents}
-                  canSend={canSend}
-                  busy={busy}
-                  isSending={isSending}
-                  isFinalizing={isFinalizing}
-                  uploadedCount={uploadedCount}
-                  totalDocuments={totalDocuments}
-                  t={t}
-                  onPreview={openPreview}
-                  onRetry={retryUpload}
-                  onAdd={(key) => goToStep(STEP_FOR_DOCUMENT[key])}
-                />
+                <ReviewStep />
               ) : (
                 /* --- Document collection steps (split layout) --- */
                 <div className="grid gap-0 md:grid-cols-[1fr_auto_1fr] items-stretch">
@@ -137,9 +87,9 @@ export function LoanApplicationUpload({ loanApplicationId, locale, theme, t }: L
                     {currentStep === 1 && (
                       <div className="space-y-4">
                         <h4 className="text-lg font-bold text-foreground">{t("dashboard.sme.step1Title")}</h4>
-                        <UploadField {...uploadFieldProps("companyCharter")} label={t("dashboard.sme.companyCharter")} />
+                        <UploadField docKey="companyCharter" label={t("dashboard.sme.companyCharter")} />
                         <div className="border-t border-border/60 my-5" />
-                        <UploadField {...uploadFieldProps("companyRegistration")} label={t("dashboard.sme.companyRegistration")} />
+                        <UploadField docKey="companyRegistration" label={t("dashboard.sme.companyRegistration")} />
                       </div>
                     )}
 
@@ -152,21 +102,21 @@ export function LoanApplicationUpload({ loanApplicationId, locale, theme, t }: L
                             <strong className="font-bold text-amber-950 dark:text-amber-100">{t("dashboard.sme.vatDeclarationsHelpTitle")}</strong> {t("dashboard.sme.vatDeclarationsHelpText")}
                           </div>
                         </div>
-                        <UploadField {...uploadFieldProps("vatDeclarations")} label={t("dashboard.sme.vatZipLabel")} />
+                        <UploadField docKey="vatDeclarations" label={t("dashboard.sme.vatZipLabel")} />
                       </div>
                     )}
 
                     {currentStep === 3 && (
                       <div className="space-y-4">
                         <h4 className="text-lg font-bold text-foreground">{t("dashboard.sme.annualFinancialStatement")}</h4>
-                        <UploadField {...uploadFieldProps("financialStatement")} label={t("dashboard.sme.annualFinancialStatement")} />
+                        <UploadField docKey="financialStatement" label={t("dashboard.sme.annualFinancialStatement")} />
                       </div>
                     )}
 
                     {currentStep === 4 && (
                       <div className="space-y-4">
                         <h4 className="text-lg font-bold text-foreground">{t("dashboard.sme.eInvoiceData")}</h4>
-                        <UploadField {...uploadFieldProps("eInvoiceData")} label={t("dashboard.sme.eInvoiceData")} />
+                        <UploadField docKey="eInvoiceData" label={t("dashboard.sme.eInvoiceData")} />
                       </div>
                     )}
 
@@ -179,7 +129,7 @@ export function LoanApplicationUpload({ loanApplicationId, locale, theme, t }: L
                             {t("dashboard.sme.cicReportHelpText")}
                           </div>
                         </div>
-                        <UploadField {...uploadFieldProps("cicReport")} label={t("dashboard.sme.cicCreditReport")} />
+                        <UploadField docKey="cicReport" label={t("dashboard.sme.cicCreditReport")} />
                       </div>
                     )}
                   </div>
@@ -200,7 +150,7 @@ export function LoanApplicationUpload({ loanApplicationId, locale, theme, t }: L
 
                   {/* Right Column: Why & How panel */}
                   <div className="space-y-4 p-4 md:pl-6 flex flex-col justify-center">
-                    <DocumentInfoPanel currentStep={currentStep} theme={theme} t={t} />
+                    <DocumentInfoPanel />
                   </div>
                 </div>
               )}

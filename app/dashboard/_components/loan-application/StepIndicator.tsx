@@ -3,26 +3,14 @@
 import { motion } from "framer-motion"
 import { CheckCircle2, Send } from "lucide-react"
 import { cn } from "@/lib/utils"
-
-interface StepIndicatorProps {
-  currentStep: number
-  totalSteps: number
-  reviewStep: number
-  busy: boolean
-  onStepClick: (step: number) => void
-  stepLabel: (step: number) => string
-}
+import { useLoanApplicationContext } from "./LoanApplicationContext"
 
 // The animated stepper bar: a progress line with a glowing tip plus a clickable
 // node per step (the final node is the review/send step).
-export function StepIndicator({
-  currentStep,
-  totalSteps,
-  reviewStep,
-  busy,
-  onStepClick,
-  stepLabel,
-}: StepIndicatorProps) {
+export function StepIndicator() {
+  const { currentStep, totalSteps, reviewStep, busy, goToStep, stepLabel } =
+    useLoanApplicationContext()
+
   const progress = ((currentStep - 1) / (totalSteps - 1)) * 100
 
   return (
@@ -58,7 +46,7 @@ export function StepIndicator({
             <div key={step} className="flex flex-col items-center space-y-2.5 relative" style={{ zIndex: 3 }}>
               <button
                 type="button"
-                onClick={() => onStepClick(step)}
+                onClick={() => goToStep(step)}
                 disabled={busy}
                 className={cn(
                   "w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs transition-all duration-300 border-2 bg-background disabled:cursor-not-allowed",

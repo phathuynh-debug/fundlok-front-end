@@ -3,41 +3,26 @@
 import { CheckCircle2, Upload, FileText, Loader2, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { useLoanApplicationContext } from "./LoanApplicationContext"
 import {
   acceptForDocument,
   maxSizeMbForDocument,
   type DocumentKey,
-  type DocumentUpload,
 } from "./useLoanApplication"
 
 interface UploadFieldProps {
-  id: string
   docKey: DocumentKey
   label: string
   required?: boolean
-  doc: DocumentUpload
-  busy: boolean
-  locale: string
-  t: (key: string) => string
-  onFileChange: (key: DocumentKey, e: React.ChangeEvent<HTMLInputElement>) => void
-  onRemove: (key: DocumentKey) => void
 }
 
 // A single drag-style upload tile. Files are only staged here (status "ready");
 // the actual upload happens later from the review step.
-export function UploadField({
-  id,
-  docKey,
-  label,
-  required = true,
-  doc,
-  busy,
-  locale,
-  t,
-  onFileChange,
-  onRemove,
-}: UploadFieldProps) {
-  const { file, status, progress, error } = doc
+export function UploadField({ docKey, label, required = true }: UploadFieldProps) {
+  const { documents, busy, locale, t, handleFileChange, removeFile } =
+    useLoanApplicationContext()
+  const { file, status, progress, error } = documents[docKey]
+  const id = docKey
 
   return (
     <div className="space-y-2">
@@ -65,7 +50,7 @@ export function UploadField({
           type="file"
           id={id}
           className="hidden"
-          onChange={(e) => onFileChange(docKey, e)}
+          onChange={(e) => handleFileChange(docKey, e)}
           accept={acceptForDocument(docKey)}
         />
         {status === "uploading" && file ? (
@@ -119,7 +104,7 @@ export function UploadField({
               disabled={busy}
               onClick={(e) => {
                 e.stopPropagation()
-                onRemove(docKey)
+                removeFile(docKey)
               }}
             >
               {locale === "vi" ? "Xoá" : "Remove"}

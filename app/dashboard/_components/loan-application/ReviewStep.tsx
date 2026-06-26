@@ -2,7 +2,8 @@
 
 import { motion } from "framer-motion"
 import { ReviewRow } from "./ReviewRow"
-import type { DocumentKey, DocumentUploads } from "./useLoanApplication"
+import { useLoanApplicationContext } from "./LoanApplicationContext"
+import type { DocumentKey } from "./useLoanApplication"
 
 // Review-list label per document (reuses the existing per-step strings).
 const DOCUMENT_LABEL_KEYS: Record<DocumentKey, string> = {
@@ -14,37 +15,19 @@ const DOCUMENT_LABEL_KEYS: Record<DocumentKey, string> = {
   cicReport: "dashboard.sme.cicCreditReport",
 }
 
-interface ReviewStepProps {
-  documentKeys: DocumentKey[]
-  documents: DocumentUploads
-  canSend: boolean
-  busy: boolean
-  isSending: boolean
-  isFinalizing: boolean
-  uploadedCount: number
-  totalDocuments: number
-  t: (key: string) => string
-  onPreview: (file: File) => void
-  onRetry: (key: DocumentKey) => void
-  onAdd: (key: DocumentKey) => void
-}
-
 // The final wizard step: lists every document with its status and an overall
 // send-progress bar. Sending is triggered from the orchestrator's Send button.
-export function ReviewStep({
-  documentKeys,
-  documents,
-  canSend,
-  busy,
-  isSending,
-  isFinalizing,
-  uploadedCount,
-  totalDocuments,
-  t,
-  onPreview,
-  onRetry,
-  onAdd,
-}: ReviewStepProps) {
+export function ReviewStep() {
+  const {
+    documentKeys,
+    canSend,
+    isSending,
+    isFinalizing,
+    uploadedCount,
+    totalDocuments,
+    t,
+  } = useLoanApplicationContext()
+
   const showProgress = isSending || isFinalizing || uploadedCount > 0
 
   return (
@@ -73,19 +56,7 @@ export function ReviewStep({
 
       <div className="space-y-2.5">
         {documentKeys.map((key) => (
-          <ReviewRow
-            key={key}
-            docKey={key}
-            doc={documents[key]}
-            label={t(DOCUMENT_LABEL_KEYS[key])}
-            busy={busy}
-            isSending={isSending}
-            isFinalizing={isFinalizing}
-            t={t}
-            onPreview={onPreview}
-            onRetry={onRetry}
-            onAdd={onAdd}
-          />
+          <ReviewRow key={key} docKey={key} label={t(DOCUMENT_LABEL_KEYS[key])} />
         ))}
       </div>
 

@@ -116,11 +116,11 @@ export function LoanApplicationStatus({
                   className={cn(
                     "flex h-9 w-9 items-center justify-center rounded-full border-2 text-xs font-bold transition-colors",
                     step.state === "done" &&
-                      "border-emerald-500 bg-emerald-500 text-white",
+                    "border-emerald-500 bg-emerald-500 text-white",
                     step.state === "active" &&
-                      "border-amber-500 bg-background text-amber-600 dark:text-amber-400",
+                    "border-amber-500 bg-background text-amber-600 dark:text-amber-400",
                     step.state === "pending" &&
-                      "border-border bg-background text-muted-foreground",
+                    "border-border bg-background text-muted-foreground",
                   )}
                 >
                   {step.state === "done" ? (

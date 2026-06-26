@@ -4,36 +4,29 @@ import { CheckCircle2, FileText, Loader2, AlertCircle, RotateCcw, Eye } from "lu
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { isPreviewable } from "./DocumentPreviewDialog"
-import type { DocumentKey, DocumentUpload } from "./useLoanApplication"
+import { useLoanApplicationContext } from "./LoanApplicationContext"
+import type { DocumentKey } from "./useLoanApplication"
 
 interface ReviewRowProps {
   docKey: DocumentKey
-  doc: DocumentUpload
   label: string
-  busy: boolean
-  isSending: boolean
-  isFinalizing: boolean
-  t: (key: string) => string
-  onPreview: (file: File) => void
-  onRetry: (key: DocumentKey) => void
-  onAdd: (key: DocumentKey) => void
 }
 
 // One document line on the review step: icon + name/size + live status, with a
 // Preview action (when renderable) and a Retry/Add action as needed.
-export function ReviewRow({
-  docKey,
-  doc,
-  label,
-  busy,
-  isSending,
-  isFinalizing,
-  t,
-  onPreview,
-  onRetry,
-  onAdd,
-}: ReviewRowProps) {
-  const { file, status, progress, error } = doc
+export function ReviewRow({ docKey, label }: ReviewRowProps) {
+  const {
+    documents,
+    busy,
+    isSending,
+    isFinalizing,
+    t,
+    openPreview,
+    retryUpload,
+    goToStep,
+    stepForDocument,
+  } = useLoanApplicationContext()
+  const { file, status, progress, error } = documents[docKey]
 
   return (
     <div
@@ -88,7 +81,7 @@ export function ReviewRow({
             variant="ghost"
             size="sm"
             className="h-8 gap-1.5 text-xs"
-            onClick={() => onPreview(file)}
+            onClick={() => openPreview(file)}
           >
             <Eye className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">{t("dashboard.sme.preview")}</span>
@@ -107,7 +100,7 @@ export function ReviewRow({
             size="sm"
             className="h-8 gap-1.5 text-xs"
             disabled={isSending || isFinalizing}
-            onClick={() => onRetry(docKey)}
+            onClick={() => retryUpload(docKey)}
           >
             <RotateCcw className="h-3 w-3" />
             {t("dashboard.sme.retryUpload")}
@@ -119,7 +112,7 @@ export function ReviewRow({
             size="sm"
             className="h-8 text-xs"
             disabled={busy}
-            onClick={() => onAdd(docKey)}
+            onClick={() => goToStep(stepForDocument(docKey))}
           >
             {t("dashboard.sme.clickToUpload")}
           </Button>
