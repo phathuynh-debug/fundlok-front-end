@@ -12,14 +12,6 @@ import { useSelectRole } from "@/hooks/use-authentication";
 import { useTranslations } from "@/lib/i18n";
 import type { SelectableRole } from "@/services/authentication.service";
 
-// After picking a role, send the user straight to where that role belongs.
-// Middleware re-validates and (for SMEs without projects) forwards on to the
-// application form, so this is just an optimistic first hop.
-const LANDING_BY_ROLE: Record<SelectableRole, string> = {
-  SME: "/project-application",
-  INVESTOR: "/dashboard",
-};
-
 // Stagger children so the heading and cards cascade in instead of popping.
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -54,7 +46,9 @@ export function SelectRoleClient() {
           title: t("auth.selectRole.successTitle"),
           description: t("auth.selectRole.successDescription"),
         });
-        router.push(LANDING_BY_ROLE[role]);
+        // Identity verification is the next onboarding step (middleware also
+        // enforces this); SME/Investor branching happens after KYC approval.
+        router.push("/kyc");
       },
       onError: (error) => {
         // Drop back to the cards so the user can retry.

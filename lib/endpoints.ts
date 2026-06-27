@@ -53,3 +53,12 @@ export const ADMIN_ENDPOINTS = {
   auditLogs: "/admin/audit-logs",
   maintenance: "/system/maintenance",
 } as const;
+
+// Identity verification (KYC) via Didit. The browser only ever talks to our
+// API; the backend creates the Didit session and is the source of truth for
+// the decision (set from Didit's signed webhook).
+export const KYC_ENDPOINTS = {
+  start: "/kyc/start",
+  status: "/kyc/status",
+  sync: "/kyc/sync",
+} as const;

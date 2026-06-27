@@ -6,6 +6,7 @@ const PROTECTED_ROUTES = [
   "/project-application",
   "/admin",
   "/select-role",
+  "/kyc",
 ];
 
 // Routes that should redirect based on whether the user already has projects.
@@ -15,6 +16,8 @@ const DASHBOARD_ROUTE = "/dashboard";
 const ADMIN_ROUTE = "/admin";
 // Where users without a role pick one (SME / Investor) before continuing.
 const SELECT_ROLE_ROUTE = "/select-role";
+// Identity verification gate; users must be KYC-approved before the app.
+const KYC_ROUTE = "/kyc";
 // Frontend system-settings page (distinct from the backend /system API prefix).
 const SYSTEM_SETTINGS_ROUTE = "/admin/system";
 const MAINTENANCE_ROUTE = "/maintenance";
@@ -38,6 +41,7 @@ function isHandledRoute(pathname: string) {
     pathname === "/login" ||
     pathname === "/verify-email" ||
     pathname === SELECT_ROLE_ROUTE ||
+    pathname.startsWith(KYC_ROUTE) ||
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/project-application") ||
     pathname.startsWith("/admin")
@@ -126,6 +130,27 @@ async function getProjectCount(request: NextRequest) {
   }
 }
 
+// Reads whether the user's KYC is approved (GET /kyc/status → is_approved).
+// 404 means they never started KYC. Fails closed (false) on any error — the gate
+// must not be bypassable, and a backend outage already breaks the app anyway.
+async function getKycApproved(request: NextRequest) {
+  try {
+    const response = await fetch(new URL("/kyc/status", API_BASE_URL), {
+      headers: { cookie: request.headers.get("cookie") ?? "" },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      return false;
+    }
+
+    const data = (await response.json()) as { is_approved?: boolean };
+    return data?.is_approved === true;
+  } catch {
+    return false;
+  }
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const accessToken = request.cookies.get("access_token")?.value;
@@ -166,20 +191,33 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Only SMEs are routed by project count — skip the lookup for everyone else
-  // (investors, admins, and users who haven't picked a role yet).
-  const projectCount = isSme ? await getProjectCount(request) : null;
+  // KYC is required once a (non-admin) user has a verified email and a role.
+  // Admins are backend-managed and skip it. Only fetch the status when it could
+  // actually apply, to avoid an extra request on every other route.
+  const needsKyc =
+    isAuthenticated &&
+    !!currentUser &&
+    currentUser.email_verified !== false &&
+    hasRole &&
+    !canAccessAdmin;
+  const kycApproved = needsKyc ? await getKycApproved(request) : true;
+
+  // Only SMEs are routed by project count, and only once they're past KYC —
+  // skip the lookup for everyone else (investors, admins, no-role, pre-KYC).
+  const projectCount = isSme && kycApproved ? await getProjectCount(request) : null;
   const hasProjects = typeof projectCount === "number" ? projectCount > 0 : null;
 
   const authRedirectTarget = canAccessAdmin
     ? ADMIN_ROUTE
     : !hasRole
       ? SELECT_ROLE_ROUTE
-      : isInvestor
-        ? DASHBOARD_ROUTE
-        : hasProjects === false
-          ? APPLICATION_ROUTE
-          : DASHBOARD_ROUTE;
+      : !kycApproved
+        ? KYC_ROUTE
+        : isInvestor
+          ? DASHBOARD_ROUTE
+          : hasProjects === false
+            ? APPLICATION_ROUTE
+            : DASHBOARD_ROUTE;
 
   // Redirect unauthenticated users away from /verify-email to login.
   if (!isAuthenticated && pathname === "/verify-email") {
@@ -224,6 +262,28 @@ export async function middleware(request: NextRequest) {
 
   // Users who already have a role shouldn't sit on the select-role screen.
   if (isAuthenticated && hasRole && pathname === SELECT_ROLE_ROUTE) {
+    return NextResponse.redirect(new URL(authRedirectTarget, request.url));
+  }
+
+  // KYC gate: a role-having, non-admin user must be verified before entering
+  // the app. Keep them on the KYC pages until approved. (Runs after the
+  // verify-email and role gates, so by here they're verified and have a role.)
+  if (
+    isAuthenticated &&
+    hasRole &&
+    !canAccessAdmin &&
+    !kycApproved &&
+    !pathname.startsWith(KYC_ROUTE)
+  ) {
+    return NextResponse.redirect(new URL(KYC_ROUTE, request.url));
+  }
+
+  // Approved users (and admins) shouldn't linger on the KYC pages.
+  if (
+    isAuthenticated &&
+    (kycApproved || canAccessAdmin) &&
+    pathname.startsWith(KYC_ROUTE)
+  ) {
     return NextResponse.redirect(new URL(authRedirectTarget, request.url));
   }
 
@@ -300,6 +360,8 @@ export const config = {
     "/admin",
     "/admin/:path*",
     "/select-role",
+    "/kyc",
+    "/kyc/:path*",
     "/verify-email",
     "/maintenance",
   ],
