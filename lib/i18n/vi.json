@@ -579,6 +579,22 @@
       "submittedDescription": "Dự án của bạn đã sẵn sàng. Đang chuyển hướng đến bảng điều khiển.",
       "failedTitle": "Gửi thất bại",
       "failedDescription": "Vui lòng kiểm tra biểu mẫu và thử lại."
+    },
+    "repaymentOptions": {
+      "monthly": "Trả góp hàng tháng",
+      "quarterly": "Trả góp hàng quý",
+      "endOfTerm": "Trả một lần cuối kỳ"
+    },
+    "industries": {
+      "tech": "Công nghệ & Phần mềm",
+      "retail": "Bán lẻ & Thương mại điện tử",
+      "healthcare": "Y tế & Chăm sóc sức khỏe",
+      "manufacturing": "Sản xuất",
+      "foodBev": "Thực phẩm & Đồ uống / Khách sạn",
+      "logistics": "Logistics & Vận tải",
+      "construction": "Xây dựng & Bất động sản",
+      "professional": "Dịch vụ chuyên nghiệp (Tư vấn, Marketing...)",
+      "other": "Khác"
     }
   },
   "notFound": {

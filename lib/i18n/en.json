@@ -579,6 +579,22 @@
       "submittedDescription": "Your project is ready. Redirecting to the dashboard.",
       "failedTitle": "Submission failed",
       "failedDescription": "Please check the form and try again."
+    },
+    "repaymentOptions": {
+      "monthly": "Monthly installments",
+      "quarterly": "Quarterly installments",
+      "endOfTerm": "Lump sum at end of term"
+    },
+    "industries": {
+      "tech": "Technology & Software",
+      "retail": "Retail & E-commerce",
+      "healthcare": "Healthcare & Medical",
+      "manufacturing": "Manufacturing",
+      "foodBev": "Food & Beverage / Hospitality",
+      "logistics": "Logistics & Transportation",
+      "construction": "Construction & Real Estate",
+      "professional": "Professional Services",
+      "other": "Other"
     }
   },
   "notFound": {

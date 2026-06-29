@@ -162,65 +162,55 @@ export default function ProjectApplicationClient() {
   const repaymentOptions = [
     {
       value: "MONTHLY",
-      label: locale === "vi" ? "Trả góp hàng tháng" : "Monthly installments",
+      label: t("projectApplication.repaymentOptions.monthly"),
     },
     {
       value: "QUARTERLY",
-      label: locale === "vi" ? "Trả góp hàng quý" : "Quarterly installments",
+      label: t("projectApplication.repaymentOptions.quarterly"),
     },
     {
       value: "END_OF_TERM",
-      label:
-        locale === "vi" ? "Trả một lần cuối kỳ" : "Lump sum at end of term",
+      label: t("projectApplication.repaymentOptions.endOfTerm"),
     },
   ];
 
   const industries = [
     {
       value: "Technology & Software",
-      label: locale === "vi" ? "Công nghệ & Phần mềm" : "Technology & Software",
+      label: t("projectApplication.industries.tech"),
     },
     {
       value: "Retail & E-commerce",
-      label:
-        locale === "vi" ? "Bán lẻ & Thương mại điện tử" : "Retail & E-commerce",
+      label: t("projectApplication.industries.retail"),
     },
     {
       value: "Healthcare & Medical",
-      label:
-        locale === "vi" ? "Y tế & Chăm sóc sức khỏe" : "Healthcare & Medical",
+      label: t("projectApplication.industries.healthcare"),
     },
     {
       value: "Manufacturing",
-      label: locale === "vi" ? "Sản xuất" : "Manufacturing",
+      label: t("projectApplication.industries.manufacturing"),
     },
     {
       value: "Food & Beverage / Hospitality",
-      label:
-        locale === "vi"
-          ? "Thực phẩm & Đồ uống / Khách sạn"
-          : "Food & Beverage / Hospitality",
+      label: t("projectApplication.industries.foodBev"),
     },
     {
       value: "Logistics & Transportation",
-      label:
-        locale === "vi" ? "Logistics & Vận tải" : "Logistics & Transportation",
+      label: t("projectApplication.industries.logistics"),
     },
     {
       value: "Construction & Real Estate",
-      label:
-        locale === "vi"
-          ? "Xây dựng & Bất động sản"
-          : "Construction & Real Estate",
+      label: t("projectApplication.industries.construction"),
     },
     {
       value: "Professional Services",
-      label:
-        locale === "vi"
-          ? "Dịch vụ chuyên nghiệp (Tư vấn, Marketing...)"
-          : "Professional Services",
+      label: t("projectApplication.industries.professional"),
     },
-    { value: "Other", label: locale === "vi" ? "Khác" : "Other" },
+    {
+      value: "Other",
+      label: t("projectApplication.industries.other"),
+    },
   ];
 
   useEffect(() => {
