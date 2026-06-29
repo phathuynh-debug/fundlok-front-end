@@ -31,7 +31,7 @@ import type { ApiError } from "@/lib/types";
 export function KycClient() {
   const router = useRouter();
   const { toast } = useToast();
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const { data: user } = useCurrentUser();
   const { data: status } = useKycStatus({ poll: true });
   const { mutateAsync: start, isPending: starting } = useStartKyc();
@@ -66,7 +66,8 @@ export function KycClient() {
 
   const handleStart = async () => {
     try {
-      const { verification_url } = await start();
+      // Pass the UI locale so Didit's hosted flow matches the user's language.
+      const { verification_url } = await start(locale);
       window.location.href = verification_url; // full-page redirect to Didit
     } catch (err) {
       toast({

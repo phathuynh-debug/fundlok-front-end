@@ -14,6 +14,12 @@ export type KycStatus =
   | 'Expired'
   | 'Kyc Expired';
 
+// POST /kyc/start — optional body. `language` is the user's locale (e.g. "vi"),
+// passed through so Didit's hosted flow renders in that language.
+export interface KycStartRequest {
+  language?: string;
+}
+
 // POST /kyc/start — creates (or resumes) a Didit session.
 export interface KycStartResponse {
   verification_id: string;
@@ -44,8 +50,13 @@ export const KYC_NOT_STARTED: KycStatusResponse = {
 
 export const kycService = {
   // Begin or resume verification. Open the returned verification_url.
-  start() {
-    return apiClient.post<KycStartResponse>(KYC_ENDPOINTS.start);
+  // Pass the current locale so Didit shows the flow in the user's language;
+  // the backend falls back to its DIDIT_LANGUAGE default when omitted.
+  start(language?: string) {
+    return apiClient.post<KycStartResponse>(
+      KYC_ENDPOINTS.start,
+      language ? { language } : undefined,
+    );
   },
 
   // Latest decision, read from our DB (cheap — use this for polling).

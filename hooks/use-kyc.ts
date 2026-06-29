@@ -56,10 +56,11 @@ export function useKycStatus({ poll = false, enabled = true }: UseKycStatusOptio
   });
 }
 
-// Begins/resumes verification. The caller redirects to verification_url.
+// Begins/resumes verification. The caller passes the current locale (so Didit
+// renders in that language) and redirects to verification_url.
 export function useStartKyc() {
-  return useMutation<KycStartResponse, ApiError, void>({
-    mutationFn: () => kycService.start(),
+  return useMutation<KycStartResponse, ApiError, string | undefined>({
+    mutationFn: (language) => kycService.start(language),
   });
 }
 
