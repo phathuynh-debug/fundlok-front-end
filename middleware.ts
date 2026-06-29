@@ -90,7 +90,9 @@ export async function middleware(request: NextRequest) {
     currentUser.email_verified !== false &&
     hasRole &&
     !canAccessAdmin;
-  const kycApproved = needsKyc ? await middlewareService.getKycApproved(request) : true;
+  const kycApproved = needsKyc
+    ? await middlewareService.getVerificationApproved(request, currentUser?.role)
+    : true;
 
   // Only SMEs are routed by project count, and only once they're past KYC —
   // skip the lookup for everyone else (investors, admins, no-role, pre-KYC).

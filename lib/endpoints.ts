@@ -54,11 +54,18 @@ export const ADMIN_ENDPOINTS = {
   maintenance: "/system/maintenance",
 } as const;
 
-// Identity verification (KYC) via Didit. The browser only ever talks to our
-// API; the backend creates the Didit session and is the source of truth for
-// the decision (set from Didit's signed webhook).
-export const KYC_ENDPOINTS = {
-  start: "/kyc/start",
-  status: "/kyc/status",
-  sync: "/kyc/sync",
-} as const;
+// Identity/business verification via Didit. Two behaviourally-identical
+// prefixes, gated by role server-side: investors do KYC (/kyc/*), SMEs do KYB
+// (/kyb/*). Pick the prefix from the user's role — calling the wrong one 403s.
+// The browser only talks to our API; the backend owns the Didit session and is
+// the source of truth (set from Didit's signed webhook).
+export type VerificationKind = "KYC" | "KYB";
+
+export function verificationEndpoints(kind: VerificationKind) {
+  const base = kind === "KYC" ? "/kyc" : "/kyb";
+  return {
+    start: `${base}/start`,
+    status: `${base}/status`,
+    sync: `${base}/sync`,
+  } as const;
+}

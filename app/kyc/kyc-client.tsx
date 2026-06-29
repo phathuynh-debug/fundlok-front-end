@@ -20,27 +20,45 @@ import { LocaleSwitcher } from "@/components/locale-switcher";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
 import { useCurrentUser } from "@/hooks/use-authentication";
-import { useKycStatus, useStartKyc, useSyncKyc } from "@/hooks/use-kyc";
+import {
+  useVerificationStatus,
+  useStartVerification,
+  useSyncVerification,
+} from "@/hooks/use-verification";
+import { verificationKindForRole } from "@/services/verification.service";
 import { kycLandingForRole } from "./kyc-landing";
 import type { ApiError } from "@/lib/types";
 
-// Drives the whole KYC screen (used for both /kyc and /kyc/callback). Didit may
-// return the user to either route, so this single component handles every
-// status: consent for a fresh start, live polling while a session is in flight,
-// auto-redirect on approval, and retry for terminal failures.
+// Drives the whole verification screen (used for both /kyc and /kyc/callback).
+// The data layer picks the right prefix from the user's role (investor → KYC,
+// SME → KYB); this component is role-agnostic and handles every status: consent
+// for a fresh start, live polling while a session is in flight, auto-redirect on
+// approval, and retry for terminal failures.
 export function KycClient() {
   const router = useRouter();
   const { toast } = useToast();
   const { t, locale } = useTranslations();
   const { data: user } = useCurrentUser();
-  const { data: status } = useKycStatus({ poll: true });
-  const { mutateAsync: start, isPending: starting } = useStartKyc();
-  const { mutate: sync, isPending: syncing } = useSyncKyc();
+  const { data: status } = useVerificationStatus({ poll: true });
+  const { mutateAsync: start, isPending: starting } = useStartVerification();
+  const { mutate: sync, isPending: syncing } = useSyncVerification();
   const syncedRef = useRef(false);
 
   const landing = kycLandingForRole(user?.role);
   const s = status?.status;
   const isApproved = status?.is_approved === true;
+
+  // Role must be chosen before verification, and the kind (KYC vs KYB) is
+  // derived from it. Send a roleless user to pick one first; bounce a role that
+  // doesn't verify (admins) to their landing. SME/Investor stay.
+  useEffect(() => {
+    if (!user) return;
+    if (!user.role) {
+      router.replace("/select-role");
+    } else if (verificationKindForRole(user.role) === null) {
+      router.replace(landing);
+    }
+  }, [user, router, landing]);
 
   // The user has a session that's begun but isn't terminal yet (e.g. they just
   // returned from Didit). "In Review" is excluded — a human decides that one.

@@ -93,12 +93,18 @@ export const middlewareService = {
     }
   },
 
-  // Reads whether the user's KYC is approved (GET /kyc/status → is_approved).
-  // 404 means they never started KYC. Fails closed (false) on any error — the gate
-  // must not be bypassable, and a backend outage already breaks the app anyway.
-  async getKycApproved(request: NextRequest): Promise<boolean> {
+  // Reads whether the user's verification is approved. The prefix depends on
+  // role: investors do KYC (/kyc/status), SMEs do KYB (/kyb/status); calling the
+  // wrong one 403s. 404 means they never started. Fails closed (false) on any
+  // error — the gate must not be bypassable, and a backend outage already breaks
+  // the app anyway.
+  async getVerificationApproved(
+    request: NextRequest,
+    role?: string,
+  ): Promise<boolean> {
+    const base = role === "SME" ? "/kyb" : "/kyc"; // INVESTOR (and default) → KYC
     try {
-      const response = await fetch(new URL("/kyc/status", API_BASE_URL), {
+      const response = await fetch(new URL(`${base}/status`, API_BASE_URL), {
         headers: { cookie: request.headers.get("cookie") ?? "" },
         cache: "no-store",
       });
