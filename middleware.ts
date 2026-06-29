@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { middlewareService } from "@/services/middleware.service";
 
 // Routes that require a valid session cookie to access.
 const PROTECTED_ROUTES = [
@@ -25,14 +26,6 @@ const MAINTENANCE_ROUTE = "/maintenance";
 // the rest of the site stay accessible.
 const MAINTENANCE_BLOCKED_ROUTES = ["/login", "/register"];
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
-
-type CurrentUser = {
-  role?: string;
-  email_verified?: boolean;
-};
-
 // Paths whose auth/role rules are handled below. The matcher only runs
 // middleware on these app routes plus the maintenance-relevant ones.
 function isHandledRoute(pathname: string) {
@@ -48,114 +41,11 @@ function isHandledRoute(pathname: string) {
   );
 }
 
-// Reads the platform maintenance flag from the public maintenance endpoint
-// (GET /system/maintenance — readable without auth so the gate can apply to
-// anonymous visitors). Fails open (returns null) on any error so a backend
-// hiccup never locks the whole site out.
-async function getMaintenance() {
-  try {
-    const response = await fetch(new URL("/system/maintenance", API_BASE_URL), {
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    return (await response.json()) as { enabled?: boolean };
-  } catch {
-    return null;
-  }
-}
-
-async function getCurrentUser(request: NextRequest) {
-  const accessToken = request.cookies.get("access_token")?.value;
-
-  if (!accessToken) {
-    return null;
-  }
-
-  try {
-    const response = await fetch(new URL("/users/me", API_BASE_URL), {
-      headers: {
-        cookie: request.headers.get("cookie") ?? "",
-      },
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    return (await response.json()) as CurrentUser;
-  } catch {
-    return null;
-  }
-}
-
-async function getProjectCount(request: NextRequest) {
-  try {
-    const response = await fetch(new URL("/projects", API_BASE_URL), {
-      headers: {
-        cookie: request.headers.get("cookie") ?? "",
-      },
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const data = (await response.json()) as
-      | unknown[]
-      | { content?: unknown[]; data?: unknown[] };
-
-    if (Array.isArray(data)) {
-      return data.length;
-    }
-
-    const payload = data as { content?: unknown[]; data?: unknown[] };
-
-    if (Array.isArray(payload.content)) {
-      return payload.content.length;
-    }
-
-    if (Array.isArray(payload.data)) {
-      return payload.data.length;
-    }
-
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-// Reads whether the user's KYC is approved (GET /kyc/status → is_approved).
-// 404 means they never started KYC. Fails closed (false) on any error — the gate
-// must not be bypassable, and a backend outage already breaks the app anyway.
-async function getKycApproved(request: NextRequest) {
-  try {
-    const response = await fetch(new URL("/kyc/status", API_BASE_URL), {
-      headers: { cookie: request.headers.get("cookie") ?? "" },
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      return false;
-    }
-
-    const data = (await response.json()) as { is_approved?: boolean };
-    return data?.is_approved === true;
-  } catch {
-    return false;
-  }
-}
-
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const accessToken = request.cookies.get("access_token")?.value;
   const isAuthenticated = !!accessToken;
-  const currentUser = isAuthenticated ? await getCurrentUser(request) : null;
+  const currentUser = isAuthenticated ? await middlewareService.getCurrentUser(request) : null;
   const isSystemAdmin = currentUser?.role === "SYSTEM_ADMIN";
   const isAdmin = currentUser?.role === "ADMIN";
   // Both ADMIN and SYSTEM_ADMIN may enter the /admin area (mirrors require_admin).
@@ -173,7 +63,7 @@ export async function middleware(request: NextRequest) {
     (r) => pathname === r || pathname.startsWith(`${r}/`)
   );
   if (isMaintenancePage || isBlockedDuringMaintenance) {
-    const maintenance = await getMaintenance();
+    const maintenance = await middlewareService.getMaintenance();
     const maintenanceOn = !!maintenance?.enabled;
 
     if (maintenanceOn && isBlockedDuringMaintenance && !isSystemAdmin) {
@@ -200,11 +90,11 @@ export async function middleware(request: NextRequest) {
     currentUser.email_verified !== false &&
     hasRole &&
     !canAccessAdmin;
-  const kycApproved = needsKyc ? await getKycApproved(request) : true;
+  const kycApproved = needsKyc ? await middlewareService.getKycApproved(request) : true;
 
   // Only SMEs are routed by project count, and only once they're past KYC —
   // skip the lookup for everyone else (investors, admins, no-role, pre-KYC).
-  const projectCount = isSme && kycApproved ? await getProjectCount(request) : null;
+  const projectCount = isSme && kycApproved ? await middlewareService.getProjectCount(request) : null;
   const hasProjects = typeof projectCount === "number" ? projectCount > 0 : null;
 
   const authRedirectTarget = canAccessAdmin
