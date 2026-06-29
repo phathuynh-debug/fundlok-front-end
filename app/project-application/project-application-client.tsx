@@ -33,6 +33,11 @@ import { useCreateProject, useMyProjects } from "@/hooks/use-projects";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import {
+  VN_PROVINCES,
+  SUPPORTED_COUNTRIES,
+  DEFAULT_COUNTRY,
+} from "@/lib/vn-provinces";
 
 type ProjectApplicationValues = {
   legal_name: string;
@@ -132,7 +137,7 @@ export default function ProjectApplicationClient() {
         city: "",
         state: "",
         postal_code: "",
-        country: "",
+        country: DEFAULT_COUNTRY, // pre-selected while only one country is supported
       },
       loan: {
         requested_amount: "",
@@ -145,10 +150,14 @@ export default function ProjectApplicationClient() {
   useEffect(() => {
     register("industry");
     register("loan.repayment_preference");
+    register("address.city");
+    register("address.country");
   }, [register]);
 
   const selectedIndustry = watch("industry");
   const selectedRepayment = watch("loan.repayment_preference");
+  const selectedCity = watch("address.city");
+  const selectedCountry = watch("address.country");
 
   const repaymentOptions = [
     {
@@ -512,12 +521,28 @@ export default function ProjectApplicationClient() {
                     htmlFor="city"
                     error={errors.address?.city?.message}
                   >
-                    <Input
-                      id="city"
-                      placeholder={t("projectApplication.placeholders.city")}
-                      {...register("address.city")}
+                    <Select
+                      value={selectedCity || undefined}
+                      onValueChange={(value) =>
+                        setValue("address.city", value, {
+                          shouldValidate: true,
+                        })
+                      }
                       disabled={isPending}
-                    />
+                    >
+                      <SelectTrigger id="city" className="w-full">
+                        <SelectValue
+                          placeholder={t("projectApplication.placeholders.city")}
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {VN_PROVINCES.map((province) => (
+                          <SelectItem key={province} value={province}>
+                            {province}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </Field>
                 </div>
 
@@ -556,12 +581,30 @@ export default function ProjectApplicationClient() {
                   htmlFor="country"
                   error={errors.address?.country?.message}
                 >
-                  <Input
-                    id="country"
-                    placeholder={t("projectApplication.placeholders.country")}
-                    {...register("address.country")}
-                    disabled={isPending}
-                  />
+                  {/* Driven by SUPPORTED_COUNTRIES: locked while there's only
+                      one option, and selectable once more are added there. */}
+                  <Select
+                    value={selectedCountry || undefined}
+                    onValueChange={(value) =>
+                      setValue("address.country", value, {
+                        shouldValidate: true,
+                      })
+                    }
+                    disabled={isPending || SUPPORTED_COUNTRIES.length <= 1}
+                  >
+                    <SelectTrigger id="country" className="w-full">
+                      <SelectValue
+                        placeholder={t("projectApplication.placeholders.country")}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SUPPORTED_COUNTRIES.map((country) => (
+                        <SelectItem key={country} value={country}>
+                          {country}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </Field>
               </div>
             )}
