@@ -241,6 +241,9 @@ hard-refresh.
 - Writing `bg-white`, `text-black`, or a hex color for a surface → use a theme
   token so dark mode works.
 - Adding an i18n key to only one of `en.json` / `vi.json` → add it to both.
+- Formatting a numeric date with `toLocaleDateString` → use `formatDate` /
+  `formatDateTime` from `@/lib/format-date` (locale-aware: vi → DD/MM/YYYY,
+  en → MM/DD/YYYY), passing the `locale` from `useTranslations()`.
 - A multi-step form where the final action is wired to `<form onSubmit>` →
   make submit a no-op and trigger the action from an explicit button.
 - Inventing a folder/naming scheme for a new feature → mirror an existing one

@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import type { Project } from "@/services/projects.service"
 import Link from "next/link"
 import { useTranslations } from "@/lib/i18n"
+import { formatDate } from "@/lib/format-date"
 
 interface ProjectCardProps {
   project: Project
@@ -20,13 +21,13 @@ type ProjectAddress = {
 export function ProjectCard({ project, role = "SME", actionLabel }: ProjectCardProps) {
   const { locale, t } = useTranslations()
 
-  // Format dates safely
+  // Format dates safely (locale-aware: vi → DD/MM/YYYY, en → MM/DD/YYYY)
   const createdDate = project.created_at
-    ? new Date(project.created_at).toLocaleDateString(locale)
+    ? formatDate(project.created_at, locale)
     : t("common.unknown")
 
   const incorporationDate = project.incorporation_date
-    ? new Date(project.incorporation_date).toLocaleDateString(locale)
+    ? formatDate(project.incorporation_date, locale)
     : t("common.unknown")
 
   // Assuming address has city and country based on log

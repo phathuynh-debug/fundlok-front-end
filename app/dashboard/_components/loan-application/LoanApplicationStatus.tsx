@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import type { ProjectLoanApplication } from "@/services/projects.service";
 import type { LoanDocumentType } from "@/services/uploads.service";
 import type { IndustryTheme } from "../sme-dashboard-config";
+import { formatDate } from "@/lib/format-date";
 
 interface LoanApplicationStatusProps {
   loanApplication: ProjectLoanApplication;
@@ -193,7 +194,7 @@ export function LoanApplicationStatus({
                 {t("dashboard.sme.statusStepSubmitted")}
               </dt>
               <dd className="text-sm font-bold text-foreground">
-                {submittedAt.toLocaleDateString(locale)}
+                {formatDate(submittedAt, locale)}
               </dd>
             </div>
           )}

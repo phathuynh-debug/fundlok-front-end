@@ -7,6 +7,7 @@ import type { Project } from "@/services/projects.service";
 import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { getIndustryTheme } from "./sme-dashboard-config";
+import { formatDate, formatDateTime } from "@/lib/format-date";
 import { LoanApplicationUpload } from "./loan-application/LoanApplicationUpload";
 import { LoanApplicationStatus } from "./loan-application/LoanApplicationStatus";
 
@@ -145,9 +146,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
                 </p>
                 <p className="text-base font-bold text-foreground">
                   {project.incorporation_date
-                    ? new Date(project.incorporation_date).toLocaleDateString(
-                      locale,
-                    )
+                    ? formatDate(project.incorporation_date, locale)
                     : t("common.na")}
                 </p>
               </div>
@@ -208,7 +207,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
                   <p>
                     Created:{" "}
                     {project.created_at
-                      ? new Date(project.created_at).toLocaleString(locale)
+                      ? formatDateTime(project.created_at, locale)
                       : t("common.na")}
                   </p>
                 </div>
