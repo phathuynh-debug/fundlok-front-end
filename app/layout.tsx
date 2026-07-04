@@ -77,6 +77,7 @@ export default async function RootLayout({
   const localBusinessSchema = {
     "@context": "https://schema.org",
     "@type": "FinancialService",
+    "@id": `${SITE_URL}#organization`,
     name: "FundLok",
     alternateName: "Công ty Cổ phần FundLok",
     url: SITE_URL,

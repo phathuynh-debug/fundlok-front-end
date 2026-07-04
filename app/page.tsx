@@ -118,13 +118,6 @@ export const metadata: Metadata = {
     "FundLok CTO",
     "FundLok founding team",
     "FundLok founders",
-    "Sustainability in Action 2024",
-    "Australian Government",
-    "SIHUB 2025",
-    "Startup and Innovation Hub Ho Chi Minh City",
-    "International Blockchain Olympiad 2023",
-    "IBCOL 2023",
-    "LENDMI",
   ],
   openGraph: {
     title: "FundLok | Flexible Capital Platform for SMEs",
