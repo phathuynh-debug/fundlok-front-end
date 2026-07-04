@@ -21,7 +21,7 @@ const aboutLinks = [
   { label: "Our Story", href: "/why-us" },
   { label: "Our Solution", href: "/#process" },
   { label: "Team", href: "/#team" },
-  { label: "Achievements", href: "/#achievements" },
+  { label: "Achievements", href: "/why-us#achievements" },
 ];
 
 const supportLinks = [

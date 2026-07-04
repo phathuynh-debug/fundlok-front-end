@@ -5,7 +5,6 @@ import { SectionLocator } from "@/components/section-locator";
 import SiteFooter from "@/components/site-footer";
 import { HeroInteractive } from "@/components/hero-interactive";
 import { InteractiveFlow } from "@/components/interactive-flow";
-import { AchievementsCarousel } from "@/components/achievements-carousel";
 
 const LinkedInIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -96,73 +95,6 @@ const dict = {
     teamCeo: "Nhà sáng lập & Giám đốc Điều hành (CEO)",
     teamCto: "Giám đốc Công nghệ (CTO)",
   },
-};
-
-const achievementsData = {
-  en: [
-    {
-      title: "Top 3 Project to Facilitate Investments",
-      subtitle: "Sustainability in Action 2024 - Australian Government",
-      category: "Government Recognition",
-      description:
-        "FundLok was recognized as a top-3 fintech project by the Australian Government for facilitating sustainable cross-border investments and ESG-aligned SME funding.",
-      images: ["/achivements/sustainability-action-2.png"],
-    },
-    {
-      title: "Seed Stage Start-up Incubation in FinTech Industry 2025",
-      subtitle: "Startup and Innovation Hub Ho Chi Minh City (SIHUB)",
-      category: "Incubation & Acceleration",
-      description:
-        "Selected for the premium incubation program by SIHUB, receiving strategic mentorship, regulatory sandbox guidance, and network access to top regional venture capitals.",
-      images: [
-        "/achivements/sustainability-action-1.png",
-        "/achivements/sihub-announcement.png",
-        "/achivements/sihub-pitching-1.png",
-        "/achivements/sihub-pitching-2.png",
-      ],
-    },
-    {
-      title: "Top 10 Potential Project Global",
-      subtitle: "International Blockchain Olympiad 2023",
-      category: "Global Innovation",
-      description:
-        "Representing Vietnam (under the project name LENDMI), FundLok won a top-10 global spot for pioneering blockchain-based credit scoring and secure liquidity pooling for emerging markets.",
-      images: ["/achivements/ibcol-certificate.png"],
-      pdf: "/achivements/ibcol-certificate.pdf",
-    },
-  ],
-  vi: [
-    {
-      title: "Top 3 Dự án Thúc đẩy Đầu tư",
-      subtitle: "Sustainability in Action 2024 - Chính phủ Úc",
-      category: "Ghi nhận từ Chính phủ",
-      description:
-        "FundLok được ghi nhận là một trong 3 dự án FinTech xuất sắc nhất bởi Chính phủ Úc trong việc thúc đẩy đầu tư bền vững và hỗ trợ vốn SME theo tiêu chuẩn ESG.",
-      images: ["/achivements/sustainability-action-2.png"],
-    },
-    {
-      title: "Ươm tạo Khởi nghiệp Giai đoạn Hạt giống ngành FinTech 2025",
-      subtitle: "Trung tâm Khởi nghiệp và Đổi mới sáng tạo TP.HCM (SIHUB)",
-      category: "Ươm tạo & Tăng tốc",
-      description:
-        "Được lựa chọn tham gia chương trình ươm tạo cao cấp của SIHUB, nhận hỗ trợ tư vấn chiến lược, hướng dẫn thử nghiệm pháp lý (sandbox) và tiếp cận mạng lưới quỹ đầu tư mạo hiểm hàng đầu khu vực.",
-      images: [
-        "/achivements/sustainability-action-1.png",
-        "/achivements/sihub-announcement.png",
-        "/achivements/sihub-pitching-1.png",
-        "/achivements/sihub-pitching-2.png",
-      ],
-    },
-    {
-      title: "Top 10 Dự án Tiềm năng Toàn cầu",
-      subtitle: "Thế vận hội Blockchain Quốc tế 2023 (IBCOL)",
-      category: "Sáng tạo Toàn cầu",
-      description:
-        "Đại diện cho Việt Nam (dưới tên dự án LENDMI), FundLok đã giành vị trí top 10 toàn cầu nhờ tiên phong trong việc chấm điểm tín dụng dựa trên blockchain và tối ưu hóa bể thanh khoản an toàn cho thị trường mới nổi.",
-      images: ["/achivements/ibcol-certificate.png"],
-      pdf: "/achivements/ibcol-certificate.pdf",
-    },
-  ],
 };
 
 export const metadata: Metadata = {
@@ -326,29 +258,6 @@ export default async function Page() {
                 />
               </a>
             </div>
-          </section>
-
-          {/* Achievements Section */}
-          <section
-            id="achievements"
-            className="w-full py-16 px-6 max-w-6xl mx-auto border-t border-border/10 relative z-20 scroll-mt-20"
-          >
-            <div className="text-center mb-10">
-              <h2 className="font-mono text-xs tracking-widest text-emerald-600 dark:text-emerald-400 font-bold uppercase mb-2">
-                {currentLocale === "vi" ? "THÀNH TỰU NỔI BẬT" : "RECOGNITIONS"}
-              </h2>
-              <h3 className="font-sans text-3xl font-extrabold text-foreground tracking-tight">
-                {strings.achievementsTitle}
-              </h3>
-              <p className="font-sans text-sm text-muted-foreground/80 max-w-2xl mx-auto mt-2">
-                {strings.achievementsSubtitle}
-              </p>
-            </div>
-
-            <AchievementsCarousel
-              achievements={achievementsData[currentLocale]}
-              currentLocale={currentLocale}
-            />
           </section>
 
           {/* Meet Our Team Section */}
