@@ -9,6 +9,7 @@ import { useTranslations } from "@/lib/i18n";
 const SECTIONS = [
   { id: "hero", labelKey: "header.overview" },
   { id: "process", labelKey: "header.howItWorks" },
+  { id: "partners", labelKey: "header.partners" },
   { id: "achievements", labelKey: "header.achievements" },
   { id: "team", labelKey: "header.team" },
 ] as const;

@@ -44,6 +44,10 @@ const dict = {
     processSubtitle:
       "FundLok is designed to make funding more flexible for SMEs and more transparent for investors — combining a customer-friendly experience with automation, data-driven assessment, secure fund handling, and clear repayment tracking.",
     ourSolution: "Our Solution",
+    partnersEyebrow: "BACKED BY",
+    partnersTitle: "Our Partners & Programs",
+    partnersSubtitle:
+      "FundLok is supported by leading startup programs providing cloud infrastructure, mentorship, and ecosystem access.",
     achievementsTitle: "FundLok's Achievements",
     achievementsSubtitle:
       "Recognized locally and globally for innovation, impact, and technology in FinTech and investment facilitation.",
@@ -61,6 +65,7 @@ const dict = {
     navProduct: "SẢN PHẨM",
     navProcess: "QUY TRÌNH",
     navContact: "LIÊN HỆ",
+    navPartners: "ĐỐI TÁC",
     navAchievements: "THÀNH TỰU",
     navTeam: "ĐỘI NGŨ",
     enterApp: "VÀO ỨNG DỤNG",
@@ -77,6 +82,10 @@ const dict = {
     processSubtitle:
       "FundLok được thiết kế để giúp việc gọi vốn linh hoạt hơn cho doanh nghiệp SME và minh bạch hơn cho nhà đầu tư — kết hợp trải nghiệm thân thiện với khách hàng cùng quy trình tự động hóa, thẩm định bằng dữ liệu, quản lý quỹ an toàn và theo dõi hoàn trả rõ ràng.",
     ourSolution: "Giải pháp của chúng tôi",
+    partnersEyebrow: "ĐỒNG HÀNH CÙNG",
+    partnersTitle: "Đối tác & Chương trình",
+    partnersSubtitle:
+      "FundLok được đồng hành bởi các chương trình khởi nghiệp hàng đầu, cung cấp hạ tầng đám mây, cố vấn và kết nối hệ sinh thái.",
     achievementsTitle: "Thành tựu của FundLok",
     achievementsSubtitle:
       "Được ghi nhận trong nước và quốc tế vì sự đổi mới sáng tạo, tầm ảnh hưởng và công nghệ trong lĩnh vực FinTech và thúc đẩy đầu tư.",
@@ -241,6 +250,82 @@ export default async function Page() {
             </div>
 
             <InteractiveFlow />
+          </section>
+
+          {/* Partners / Sponsors Section */}
+          <section
+            id="partners"
+            className="w-full py-16 px-6 max-w-6xl mx-auto border-t border-border/10 relative z-20 scroll-mt-20"
+          >
+            <div className="text-center mb-10">
+              <h2 className="font-mono text-xs tracking-widest text-emerald-600 dark:text-emerald-400 font-bold uppercase mb-2">
+                {strings.partnersEyebrow}
+              </h2>
+              <h3 className="font-sans text-3xl font-extrabold text-foreground tracking-tight">
+                {strings.partnersTitle}
+              </h3>
+              <p className="font-sans text-sm text-muted-foreground/80 max-w-2xl mx-auto mt-2">
+                {strings.partnersSubtitle}
+              </p>
+            </div>
+
+            {/* Equal-sized cells: each logo scales to fit the same box, so mixed
+                aspect ratios (square SIHUB vs. wide banners) read as one size. */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 items-center">
+              <a
+                href="https://www.sihub.gov.vn/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Startup and Innovation Hub of Ho Chi Minh City (SIHUB)"
+                className="group relative flex items-center justify-center h-20 md:h-24 hover:scale-[1.03] transition-transform duration-300"
+              >
+                {/* Soft glow that lights up and wraps the logo on hover */}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 -m-2 rounded-3xl bg-emerald-400/25 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
+                />
+                <img
+                  src="/images/partners/sihub.png"
+                  alt="Startup and Innovation Hub of Ho Chi Minh City (SIHUB)"
+                  className="relative z-10 max-h-full max-w-full object-contain"
+                />
+              </a>
+              <a
+                href="https://cloud.google.com/startup"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Google Cloud for Startups"
+                className="group relative flex items-center justify-center h-20 md:h-24 hover:scale-[1.03] transition-transform duration-300"
+              >
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 -m-2 rounded-3xl bg-emerald-400/25 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
+                />
+                <img
+                  src="/images/partners/google-cloud-startups.png"
+                  alt="Google Cloud for Startups"
+                  className="relative z-10 max-h-full max-w-full object-contain"
+                />
+              </a>
+              <a
+                href="https://www.cloudflare.com/forstartups/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Cloudflare for Startups"
+                className="group relative flex items-center justify-center h-20 md:h-24 hover:scale-[1.03] transition-transform duration-300"
+              >
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 -m-2 rounded-3xl bg-emerald-400/25 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
+                />
+                {/* Cloudflare wordmark is dark; lift it to stay legible on dark backgrounds */}
+                <img
+                  src="/images/partners/cloudflare-startups.png"
+                  alt="Cloudflare for Startups"
+                  className="relative z-10 max-h-full max-w-full object-contain dark:brightness-0 dark:invert"
+                />
+              </a>
+            </div>
           </section>
 
           {/* Achievements Section */}
