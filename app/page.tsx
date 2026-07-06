@@ -47,6 +47,8 @@ const dict = {
     partnersTitle: "Our Partners & Programs",
     partnersSubtitle:
       "FundLok is supported by leading startup programs providing cloud infrastructure, mentorship, and ecosystem access.",
+    partnersStrategic: "Strategic Partner",
+    partnersInfra: "Cloud Infrastructure Partners",
     achievementsTitle: "FundLok's Achievements",
     achievementsSubtitle:
       "Recognized locally and globally for innovation, impact, and technology in FinTech and investment facilitation.",
@@ -85,6 +87,8 @@ const dict = {
     partnersTitle: "Đối tác & Chương trình",
     partnersSubtitle:
       "FundLok được đồng hành bởi các chương trình khởi nghiệp hàng đầu, cung cấp hạ tầng đám mây, cố vấn và kết nối hệ sinh thái.",
+    partnersStrategic: "Đối tác Chiến lược",
+    partnersInfra: "Đối tác Hạ tầng Đám mây",
     achievementsTitle: "Thành tựu của FundLok",
     achievementsSubtitle:
       "Được ghi nhận trong nước và quốc tế vì sự đổi mới sáng tạo, tầm ảnh hưởng và công nghệ trong lĩnh vực FinTech và thúc đẩy đầu tư.",
@@ -194,62 +198,77 @@ export default async function Page() {
               </p>
             </div>
 
-            {/* Equal-sized cells: each logo scales to fit the same box, so mixed
-                aspect ratios (square SIHUB vs. wide banners) read as one size. */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 items-center">
-              <a
-                href="https://www.sihub.gov.vn/"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Startup and Innovation Hub of Ho Chi Minh City (SIHUB)"
-                className="group relative flex items-center justify-center h-20 md:h-24 hover:scale-[1.03] transition-transform duration-300"
-              >
-                {/* Soft glow that lights up and wraps the logo on hover */}
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0 -m-2 rounded-3xl bg-emerald-400/25 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
-                />
-                <img
-                  src="/images/partners/sihub.png"
-                  alt="Startup and Innovation Hub of Ho Chi Minh City (SIHUB)"
-                  className="relative z-10 max-h-full max-w-full object-contain"
-                />
-              </a>
-              <a
-                href="https://cloud.google.com/startup"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Google Cloud for Startups"
-                className="group relative flex items-center justify-center h-20 md:h-24 hover:scale-[1.03] transition-transform duration-300"
-              >
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0 -m-2 rounded-3xl bg-emerald-400/25 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
-                />
-                <img
-                  src="/images/partners/google-cloud-startups.png"
-                  alt="Google Cloud for Startups"
-                  className="relative z-10 max-h-full max-w-full object-contain"
-                />
-              </a>
-              <a
-                href="https://www.cloudflare.com/forstartups/"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Cloudflare for Startups"
-                className="group relative flex items-center justify-center h-20 md:h-24 hover:scale-[1.03] transition-transform duration-300"
-              >
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0 -m-2 rounded-3xl bg-emerald-400/25 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
-                />
-                {/* Cloudflare wordmark is dark; lift it to stay legible on dark backgrounds */}
-                <img
-                  src="/images/partners/cloudflare-startups.png"
-                  alt="Cloudflare for Startups"
-                  className="relative z-10 max-h-full max-w-full object-contain dark:brightness-0 dark:invert"
-                />
-              </a>
+            {/* Two labeled groups: SIHUB (strategic, featured larger) on the
+                left; the cloud-infrastructure programs on the right. */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-8 items-start md:divide-x md:divide-border/10">
+              {/* Strategic Partner — SIHUB, featured larger */}
+              <div className="flex flex-col items-center gap-7">
+                <h4 className="font-mono text-[11px] tracking-widest text-muted-foreground/70 font-bold uppercase">
+                  {strings.partnersStrategic}
+                </h4>
+                <a
+                  href="https://www.sihub.gov.vn/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Startup and Innovation Hub of Ho Chi Minh City (SIHUB)"
+                  className="group relative flex items-center justify-center h-48 md:h-64 hover:scale-[1.03] transition-transform duration-300"
+                >
+                  {/* Soft glow that lights up and wraps the logo on hover */}
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 -m-2 rounded-3xl bg-emerald-400/25 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
+                  />
+                  <img
+                    src="/images/partners/sihub.png"
+                    alt="Startup and Innovation Hub of Ho Chi Minh City (SIHUB)"
+                    className="relative z-10 max-h-full max-w-full object-contain"
+                  />
+                </a>
+              </div>
+
+              {/* Cloud Infrastructure Partners — Google Cloud + Cloudflare */}
+              <div className="flex flex-col items-center gap-7">
+                <h4 className="font-mono text-[11px] tracking-widest text-muted-foreground/70 font-bold uppercase">
+                  {strings.partnersInfra}
+                </h4>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-10 sm:gap-12">
+                  <a
+                    href="https://cloud.google.com/startup"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Google Cloud for Startups"
+                    className="group relative flex items-center justify-center h-14 md:h-16 hover:scale-[1.03] transition-transform duration-300"
+                  >
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute inset-0 -m-2 rounded-3xl bg-emerald-400/25 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
+                    />
+                    <img
+                      src="/images/partners/google-cloud-startups.png"
+                      alt="Google Cloud for Startups"
+                      className="relative z-10 max-h-full max-w-full object-contain"
+                    />
+                  </a>
+                  <a
+                    href="https://www.cloudflare.com/forstartups/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Cloudflare for Startups"
+                    className="group relative flex items-center justify-center h-14 md:h-16 hover:scale-[1.03] transition-transform duration-300"
+                  >
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute inset-0 -m-2 rounded-3xl bg-emerald-400/25 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
+                    />
+                    {/* Cloudflare wordmark is dark; lift it to stay legible on dark backgrounds */}
+                    <img
+                      src="/images/partners/cloudflare-startups.png"
+                      alt="Cloudflare for Startups"
+                      className="relative z-10 max-h-full max-w-full object-contain dark:brightness-0 dark:invert"
+                    />
+                  </a>
+                </div>
+              </div>
             </div>
           </section>
 
