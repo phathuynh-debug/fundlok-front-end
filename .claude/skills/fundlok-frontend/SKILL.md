@@ -95,7 +95,7 @@ export function useSelectRole() {
 - `lib/api-client.ts` is an axios wrapper with `withCredentials: true`. Base
   URL is `/api` (see `lib/endpoints.ts`).
 - `next.config` rewrites `/api/:path*` → the FastAPI origin
-  (`NEXT_PUBLIC_API_URL`, default `http://127.0.0.1:8000`). The browser only
+  (`API_URL`, default `http://127.0.0.1:8000`). The browser only
   ever talks to same-origin `localhost:3000`, so **httpOnly auth cookies are
   sent automatically** — there is no token handling in the frontend.
 - Login/OAuth/refresh/logout all rely on the backend setting/clearing cookies.
