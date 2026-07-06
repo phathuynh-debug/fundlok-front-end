@@ -145,6 +145,38 @@ export default async function Page() {
   const currentLocale = locale;
   const strings = dict[currentLocale];
 
+  // Sponsor-style partner tiers: each level renders as a labeled row of tiles.
+  const partnerTiers = [
+    {
+      label: strings.partnersStrategic,
+      logos: [
+        {
+          src: "/images/partners/sihub.png",
+          alt: "Startup and Innovation Hub of Ho Chi Minh City (SIHUB)",
+          href: "https://www.sihub.gov.vn/",
+          invertOnDark: false,
+        },
+      ],
+    },
+    {
+      label: strings.partnersInfra,
+      logos: [
+        {
+          src: "/images/partners/google-cloud-startups.png",
+          alt: "Google Cloud for Startups",
+          href: "https://cloud.google.com/startup",
+          invertOnDark: false,
+        },
+        {
+          src: "/images/partners/cloudflare-startups.png",
+          alt: "Cloudflare for Startups",
+          href: "https://www.cloudflare.com/forstartups/",
+          invertOnDark: true,
+        },
+      ],
+    },
+  ];
+
   return (
     <>
       <div className="relative min-h-screen w-full bg-background text-foreground overflow-x-hidden flex flex-col justify-between selection:bg-accent/20">
@@ -198,77 +230,39 @@ export default async function Page() {
               </p>
             </div>
 
-            {/* Two labeled groups: SIHUB (strategic, featured larger) on the
-                left; the cloud-infrastructure programs on the right. */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-8 items-start md:divide-x md:divide-border/10">
-              {/* Strategic Partner — SIHUB, featured larger */}
-              <div className="flex flex-col items-center gap-7">
-                <h4 className="font-mono text-[11px] tracking-widest text-muted-foreground/70 font-bold uppercase">
-                  {strings.partnersStrategic}
-                </h4>
-                <a
-                  href="https://www.sihub.gov.vn/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Startup and Innovation Hub of Ho Chi Minh City (SIHUB)"
-                  className="group relative flex items-center justify-center h-48 md:h-64 hover:scale-[1.03] transition-transform duration-300"
+            {/* Sponsor-style tiers: each partnership level is a labeled row of
+                uniform logo tiles. */}
+            <div className="flex flex-col items-center gap-12">
+              {partnerTiers.map((tier) => (
+                <div
+                  key={tier.label}
+                  className="w-full flex flex-col items-center gap-6"
                 >
-                  {/* Soft glow that lights up and wraps the logo on hover */}
-                  <span
-                    aria-hidden
-                    className="pointer-events-none absolute inset-0 -m-2 rounded-3xl bg-emerald-400/25 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
-                  />
-                  <img
-                    src="/images/partners/sihub.png"
-                    alt="Startup and Innovation Hub of Ho Chi Minh City (SIHUB)"
-                    className="relative z-10 max-h-full max-w-full object-contain"
-                  />
-                </a>
-              </div>
-
-              {/* Cloud Infrastructure Partners — Google Cloud + Cloudflare */}
-              <div className="flex flex-col items-center gap-7">
-                <h4 className="font-mono text-[11px] tracking-widest text-muted-foreground/70 font-bold uppercase">
-                  {strings.partnersInfra}
-                </h4>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-10 sm:gap-12">
-                  <a
-                    href="https://cloud.google.com/startup"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Google Cloud for Startups"
-                    className="group relative flex items-center justify-center h-14 md:h-16 hover:scale-[1.03] transition-transform duration-300"
-                  >
-                    <span
-                      aria-hidden
-                      className="pointer-events-none absolute inset-0 -m-2 rounded-3xl bg-emerald-400/25 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
-                    />
-                    <img
-                      src="/images/partners/google-cloud-startups.png"
-                      alt="Google Cloud for Startups"
-                      className="relative z-10 max-h-full max-w-full object-contain"
-                    />
-                  </a>
-                  <a
-                    href="https://www.cloudflare.com/forstartups/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Cloudflare for Startups"
-                    className="group relative flex items-center justify-center h-14 md:h-16 hover:scale-[1.03] transition-transform duration-300"
-                  >
-                    <span
-                      aria-hidden
-                      className="pointer-events-none absolute inset-0 -m-2 rounded-3xl bg-emerald-400/25 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
-                    />
-                    {/* Cloudflare wordmark is dark; lift it to stay legible on dark backgrounds */}
-                    <img
-                      src="/images/partners/cloudflare-startups.png"
-                      alt="Cloudflare for Startups"
-                      className="relative z-10 max-h-full max-w-full object-contain dark:brightness-0 dark:invert"
-                    />
-                  </a>
+                  <h4 className="font-mono text-[11px] tracking-widest text-emerald-600 dark:text-emerald-400 font-bold uppercase">
+                    {tier.label}
+                  </h4>
+                  <div className="flex flex-wrap items-center justify-center gap-5 md:gap-6">
+                    {tier.logos.map((logo) => (
+                      <a
+                        key={logo.src}
+                        href={logo.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={logo.alt}
+                        className="group flex items-center justify-center rounded-2xl border border-border/40 bg-card/60 dark:bg-white/[0.04] shadow-sm p-6 h-28 w-52 md:h-32 md:w-60 hover:-translate-y-1 hover:shadow-md hover:border-emerald-500/30 transition-all duration-300"
+                      >
+                        <img
+                          src={logo.src}
+                          alt={logo.alt}
+                          className={`max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105 ${
+                            logo.invertOnDark ? "dark:brightness-0 dark:invert" : ""
+                          }`}
+                        />
+                      </a>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
           </section>
 
