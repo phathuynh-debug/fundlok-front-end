@@ -13,13 +13,14 @@ import {
   XCircle,
   RotateCcw,
   RefreshCw,
+  LogOut,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
-import { useCurrentUser } from "@/hooks/use-authentication";
+import { useCurrentUser, useLogout } from "@/hooks/use-authentication";
 import {
   useVerificationStatus,
   useStartVerification,
@@ -39,6 +40,7 @@ export function KycClient() {
   const { toast } = useToast();
   const { t, locale } = useTranslations();
   const { data: user } = useCurrentUser();
+  const { mutate: logout, isPending: loggingOut } = useLogout();
   const { data: status } = useVerificationStatus({ poll: true });
   const { mutateAsync: start, isPending: starting } = useStartVerification();
   const { mutate: sync, isPending: syncing } = useSyncVerification();
@@ -107,7 +109,21 @@ export function KycClient() {
         transition={{ duration: 0.3, ease: "easeOut" }}
         className="w-full max-w-lg space-y-6 rounded-2xl border border-border bg-card p-8 text-center text-card-foreground shadow-lg"
       >
-        <div className="flex justify-end">
+        <div className="flex items-center justify-between">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-muted-foreground hover:text-destructive"
+            disabled={loggingOut}
+            onClick={() => logout()}
+          >
+            {loggingOut ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <LogOut className="mr-2 h-4 w-4" />
+            )}
+            {t("common.logout")}
+          </Button>
           <LocaleSwitcher />
         </div>
 
