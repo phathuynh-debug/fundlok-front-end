@@ -16,7 +16,7 @@ export function LoginForm() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const { turnstileToken, turnstileContainerRef } = useTurnstile();
+  const { turnstileToken, turnstileContainerRef, reset: resetTurnstile } = useTurnstile();
 
   const { toast } = useToast();
   const { login, googleLogin, isPending, isGooglePending } = useLogin();
@@ -44,6 +44,8 @@ export function LoginForm() {
           });
         },
         onError: (error) => {
+          // Turnstile tokens are single-use: reset so a retry gets a fresh one.
+          resetTurnstile();
           toast({
             variant: "destructive",
             title: t("auth.login.failedTitle"),

@@ -52,7 +52,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Cloudflare Turnstile Hook
-  const { turnstileToken, turnstileContainerRef } = useTurnstile();
+  const { turnstileToken, turnstileContainerRef, reset: resetTurnstile } = useTurnstile();
 
   const router = useRouter();
   const { toast } = useToast();
@@ -112,6 +112,9 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
           }
         },
         onError: (error) => {
+          // Turnstile tokens are single-use: without a reset, every retry
+          // re-sends the consumed token and fails verification server-side.
+          resetTurnstile();
           toast({
             variant: "destructive",
             title: t("auth.register.failedTitle"),
