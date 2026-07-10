@@ -111,8 +111,15 @@ export async function proxy(request: NextRequest) {
             ? APPLICATION_ROUTE
             : DASHBOARD_ROUTE;
 
-  // Redirect unauthenticated users away from /verify-email to login.
-  if (!isAuthenticated && pathname === "/verify-email") {
+  // Redirect unauthenticated users away from /verify-email to login — unless
+  // they carry a verification token from the email link. The signed token
+  // authenticates the action by itself (the backend endpoint is public), and
+  // redirecting would drop the ?token= query, forcing a login + resend loop.
+  if (
+    !isAuthenticated &&
+    pathname === "/verify-email" &&
+    !request.nextUrl.searchParams.has("token")
+  ) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("from", pathname);
     return NextResponse.redirect(loginUrl);

@@ -16,7 +16,7 @@ export function VerifyEmailClient() {
   const { toast } = useToast();
   const { t } = useTranslations();
   const router = useRouter();
-  
+
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
@@ -37,9 +37,8 @@ export function VerifyEmailClient() {
             title: "Success",
             description: res.message || "Email verified successfully!",
           });
-          // Refetch current user to update cache
-          await refetch();
-          router.push("/dashboard");
+          const { data: refreshedUser } = await refetch();
+          router.push(refreshedUser ? "/dashboard" : "/login");
         } catch (err: any) {
           const errMsg = err?.response?.data?.detail || "Invalid or expired verification link.";
           setVerificationError(errMsg);
@@ -93,7 +92,7 @@ export function VerifyEmailClient() {
       });
       return;
     }
-    
+
     setIsResending(true);
     try {
       const res = await authenticationService.resendVerification(user.email);
@@ -175,7 +174,7 @@ export function VerifyEmailClient() {
         <h2 className="text-2xl lg:text-3xl font-bold text-foreground">
           {t("auth.verifyEmail.title")}
         </h2>
-        
+
         <p className="text-muted-foreground text-sm lg:text-base max-w-sm leading-relaxed">
           {t("auth.verifyEmail.description")}
         </p>
