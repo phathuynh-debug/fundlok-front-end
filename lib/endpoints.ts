@@ -69,3 +69,20 @@ export function verificationEndpoints(kind: VerificationKind) {
     sync: `${base}/sync`,
   } as const;
 }
+
+// GVerify (Datatrust) eKYC — the direct-API KYC provider that replaces the
+// Didit hosted flow for INVESTORS. No redirect and no webhook: we submit the
+// ID images + portrait in one call and the response carries the final verdict.
+// SMEs (KYB) stay on the Didit flow above until GVerify eKYB lands.
+export const GVERIFY_ENDPOINTS = {
+  verify: "/gverify/kyc/verify",
+  status: "/gverify/kyc/status",
+  // Phone handoff: desktop mints a 10-minute token (shown as a QR), the phone
+  // submits the images with it as a Bearer credential — no login cookie needed.
+  handoff: "/gverify/kyc/handoff",
+  handoffVerify: "/gverify/kyc/handoff/verify",
+  // KYB — business verification for SMEs: registration certificate OCR +
+  // state tax-registry cross-check, synchronous verdict.
+  kybVerify: "/gverify/kyb/verify",
+  kybStatus: "/gverify/kyb/status",
+} as const;

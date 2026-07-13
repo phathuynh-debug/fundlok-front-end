@@ -43,6 +43,14 @@ function isHandledRoute(pathname: string) {
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Phone side of the KYC QR handoff. Opened by scanning a QR on another
+  // device, so there is no session cookie here — auth is the short-lived
+  // handoff token in the query string, validated by the backend on submit.
+  // Must bypass every session-based gate (login redirect, KYC gate, …).
+  if (pathname.startsWith("/kyc/mobile")) {
+    return NextResponse.next();
+  }
   const accessToken = request.cookies.get("access_token")?.value;
   const isAuthenticated = !!accessToken;
   const currentUser = isAuthenticated ? await middlewareService.getCurrentUser(request) : null;
@@ -170,9 +178,14 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL(KYC_ROUTE, request.url));
   }
 
-  // Approved users (and admins) shouldn't linger on the KYC pages.
+  // Approved users (and admins) shouldn't linger on the KYC pages. Requires a
+  // resolved currentUser: with an unreadable session (expired/invalid token or
+  // an unreachable backend) kycApproved defaults to true and hasRole to false,
+  // and this rule would bounce /kyc → /select-role in a redirect loop with the
+  // client. When in doubt, let /kyc render — the client routes correctly.
   if (
     isAuthenticated &&
+    !!currentUser &&
     (kycApproved || canAccessAdmin) &&
     pathname.startsWith(KYC_ROUTE)
   ) {
