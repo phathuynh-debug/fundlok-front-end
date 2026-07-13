@@ -1,7 +1,9 @@
 import { NextRequest } from "next/server";
 
-const API_BASE_URL =
-  process.env.API_URL;
+// Same fallback as the /api rewrite in next.config.ts — without it, every
+// server-side lookup here throws on new URL(..., undefined) and the proxy
+// routes blind (currentUser null for everyone).
+const API_BASE_URL = process.env.API_URL || "http://127.0.0.1:8000";
 
 export type CurrentUser = {
   role?: string;
@@ -93,18 +95,19 @@ export const middlewareService = {
     }
   },
 
-  // Reads whether the user's verification is approved. The prefix depends on
-  // role: investors do KYC (/kyc/status), SMEs do KYB (/kyb/status); calling the
-  // wrong one 403s. 404 means they never started. Fails closed (false) on any
-  // error — the gate must not be bypassable, and a backend outage already breaks
-  // the app anyway.
+  // Reads whether the user's verification is approved. The endpoint depends on
+  // role: investors do KYC via GVerify (/gverify/kyc/status), SMEs do KYB via
+  // Didit (/kyb/status); calling the wrong one 403s. 404 means they never
+  // started. Fails closed (false) on any error — the gate must not be
+  // bypassable, and a backend outage already breaks the app anyway.
   async getVerificationApproved(
     request: NextRequest,
     role?: string,
   ): Promise<boolean> {
-    const base = role === "SME" ? "/kyb" : "/kyc"; // INVESTOR (and default) → KYC
+    // INVESTOR (and default) → GVerify KYC
+    const statusPath = role === "SME" ? "/kyb/status" : "/gverify/kyc/status";
     try {
-      const response = await fetch(new URL(`${base}/status`, API_BASE_URL), {
+      const response = await fetch(new URL(statusPath, API_BASE_URL), {
         headers: { cookie: request.headers.get("cookie") ?? "" },
         cache: "no-store",
       });

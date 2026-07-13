@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Next blocks cross-origin requests to the dev server by default. The KYC
+  // QR handoff opens the app on a phone via the Mac's LAN address, so allow
+  // private-network origins in dev (no effect on production builds).
+  allowedDevOrigins: ["192.168.*.*", "10.*.*.*", "*.ngrok-free.app"],
   async rewrites() {
     return [
       {

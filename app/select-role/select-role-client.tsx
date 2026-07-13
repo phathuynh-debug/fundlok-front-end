@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { Building2, TrendingUp, Loader2, ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { useToast } from "@/hooks/use-toast";
-import { useSelectRole } from "@/hooks/use-authentication";
+import { authKeys, useCurrentUser, useSelectRole } from "@/hooks/use-authentication";
 import { useTranslations } from "@/lib/i18n";
 import type { SelectableRole } from "@/services/authentication.service";
 
@@ -34,9 +35,19 @@ export function SelectRoleClient() {
   const router = useRouter();
   const { toast } = useToast();
   const { t } = useTranslations();
+  const queryClient = useQueryClient();
+  const { data: user } = useCurrentUser();
   const { mutate: selectRole } = useSelectRole();
   // The chosen role; once set we swap the cards for the onboarding loader.
   const [selectedRole, setSelectedRole] = useState<SelectableRole | null>(null);
+
+  // Already has a role (picked earlier, another tab, stale session)? There's
+  // nothing to choose — head straight to /kyc and let the middleware route
+  // onward (verification, or the landing page if already approved).
+  const alreadyHasRole = !!user?.role && !selectedRole;
+  useEffect(() => {
+    if (alreadyHasRole) router.replace("/kyc");
+  }, [alreadyHasRole, router]);
 
   const handleSelect = (role: SelectableRole) => {
     setSelectedRole(role);
@@ -51,6 +62,14 @@ export function SelectRoleClient() {
         router.push("/kyc");
       },
       onError: (error) => {
+        // 409 = the account already has a role (e.g. picked in another tab, or
+        // the page was reached with a stale session). Nothing to retry — sync
+        // the cached user and continue; the middleware routes from there.
+        if (error?.status === 409) {
+          void queryClient.invalidateQueries({ queryKey: authKeys.currentUser() });
+          router.push("/kyc");
+          return;
+        }
         // Drop back to the cards so the user can retry.
         setSelectedRole(null);
         toast({
@@ -120,7 +139,7 @@ export function SelectRoleClient() {
 
       <div className="relative z-10 w-full max-w-5xl">
         <AnimatePresence mode="wait">
-          {selectedRole ? (
+          {selectedRole || alreadyHasRole ? (
             // --- Onboarding loader ---
             <motion.div
               key="onboarding"
