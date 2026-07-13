@@ -81,4 +81,8 @@ export const GVERIFY_ENDPOINTS = {
   // submits the images with it as a Bearer credential — no login cookie needed.
   handoff: "/gverify/kyc/handoff",
   handoffVerify: "/gverify/kyc/handoff/verify",
+  // KYB — business verification for SMEs: registration certificate OCR +
+  // state tax-registry cross-check, synchronous verdict.
+  kybVerify: "/gverify/kyb/verify",
+  kybStatus: "/gverify/kyb/status",
 } as const;

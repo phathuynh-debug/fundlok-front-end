@@ -98,6 +98,23 @@
       "mobileExpired": "This link has expired. Go back to your computer and generate a new QR code.",
       "mobileNoTokenTitle": "Link incomplete",
       "mobileNoTokenHint": "This page only works when opened by scanning the QR code shown on your computer."
+    },
+    "kyb": {
+      "title": "Verify your business",
+      "subtitle": "Upload your business registration certificate — we'll read it and check it against the tax registry.",
+      "typeLabel": "Certificate type",
+      "typeCompany": "Company",
+      "typeBranch": "Company branch",
+      "typeHousehold": "Household business",
+      "docLabelCompany": "Enterprise registration certificate (Giấy chứng nhận đăng ký doanh nghiệp)",
+      "docLabelBranch": "Branch operation registration certificate (Giấy chứng nhận đăng ký hoạt động chi nhánh)",
+      "docLabelHousehold": "Household business registration certificate (Giấy chứng nhận đăng ký hộ kinh doanh)",
+      "clickToAdd": "Tap to add a photo or PDF",
+      "invalidTypeDoc": "Must be a JPEG, PNG or PDF file",
+      "consent": "Your certificate is sent securely to our verification partner to read the details and confirm them with the state tax registry. The file itself is not stored.",
+      "approvedTitle": "Business verified",
+      "approvedHint": "Your business checks out. Taking you to your application…",
+      "declinedTitle": "Business verification failed"
     }
   },
   "localeSwitcher": {

@@ -95,17 +95,16 @@ export const middlewareService = {
     }
   },
 
-  // Reads whether the user's verification is approved. The endpoint depends on
-  // role: investors do KYC via GVerify (/gverify/kyc/status), SMEs do KYB via
-  // Didit (/kyb/status); calling the wrong one 403s. 404 means they never
-  // started. Fails closed (false) on any error — the gate must not be
-  // bypassable, and a backend outage already breaks the app anyway.
+  // Reads whether the user's verification is approved — both roles via
+  // GVerify now: investors /gverify/kyc/status, SMEs /gverify/kyb/status
+  // (calling the wrong one 403s). 404 means they never started. Fails closed
+  // (false) on any error — the gate must not be bypassable, and a backend
+  // outage already breaks the app anyway.
   async getVerificationApproved(
     request: NextRequest,
     role?: string,
   ): Promise<boolean> {
-    // INVESTOR (and default) → GVerify KYC
-    const statusPath = role === "SME" ? "/kyb/status" : "/gverify/kyc/status";
+    const statusPath = role === "SME" ? "/gverify/kyb/status" : "/gverify/kyc/status";
     try {
       const response = await fetch(new URL(statusPath, API_BASE_URL), {
         headers: { cookie: request.headers.get("cookie") ?? "" },

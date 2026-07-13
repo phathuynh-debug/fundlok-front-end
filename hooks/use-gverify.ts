@@ -4,11 +4,16 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   gverifyService,
   gverifyNotStarted,
+  gverifyKybNotStarted,
+  kybVerifyResponseToStatus,
   verifyResponseToStatus,
   type GVerifyHandoffResponse,
   type GVerifyVerifyPayload,
   type GVerifyVerifyResponse,
   type GVerifyStatusResponse,
+  type GVerifyKybVerifyPayload,
+  type GVerifyKybVerifyResponse,
+  type GVerifyKybStatusResponse,
 } from '@/services/gverify.service';
 import type { ApiError } from '@/lib/types';
 
@@ -16,6 +21,7 @@ import type { ApiError } from '@/lib/types';
 export const gverifyKeys = {
   all: ['gverify'] as const,
   status: () => [...gverifyKeys.all, 'status'] as const,
+  kybStatus: () => [...gverifyKeys.all, 'kyb-status'] as const,
 };
 
 interface UseGVerifyStatusOptions {
@@ -71,6 +77,42 @@ export function useGVerifyVerify() {
 export function useGVerifyHandoff() {
   return useMutation<GVerifyHandoffResponse, ApiError, void>({
     mutationFn: () => gverifyService.createHandoff(),
+  });
+}
+
+// ---------- KYB (business verification, SME) ----------
+
+// Latest GVerify KYB attempt for the logged-in SME. 404 = never attempted,
+// surfaced as synthetic NOT_STARTED. No polling — KYB is same-device only.
+export function useGVerifyKybStatus(enabled = true) {
+  return useQuery<GVerifyKybStatusResponse, ApiError>({
+    queryKey: gverifyKeys.kybStatus(),
+    enabled,
+    queryFn: async () => {
+      try {
+        return await gverifyService.kybGetStatus();
+      } catch (err) {
+        if ((err as ApiError)?.status === 404) return gverifyKybNotStarted();
+        throw err;
+      }
+    },
+    staleTime: 0,
+    retry: false,
+  });
+}
+
+// Submits the certificate and returns the synchronous verdict; seeds the KYB
+// status cache. A 502 leaves a FAILED attempt server-side → invalidate.
+export function useGVerifyKybVerify() {
+  const queryClient = useQueryClient();
+  return useMutation<GVerifyKybVerifyResponse, ApiError, GVerifyKybVerifyPayload>({
+    mutationFn: (payload) => gverifyService.kybVerify(payload),
+    onSuccess: (data) => {
+      queryClient.setQueryData(gverifyKeys.kybStatus(), kybVerifyResponseToStatus(data));
+    },
+    onError: () => {
+      void queryClient.invalidateQueries({ queryKey: gverifyKeys.kybStatus() });
+    },
   });
 }
 

@@ -98,6 +98,23 @@
       "mobileExpired": "Liên kết đã hết hạn. Hãy quay lại máy tính và tạo mã QR mới.",
       "mobileNoTokenTitle": "Liên kết không đầy đủ",
       "mobileNoTokenHint": "Trang này chỉ hoạt động khi được mở bằng cách quét mã QR hiển thị trên máy tính của bạn."
+    },
+    "kyb": {
+      "title": "Xác minh doanh nghiệp",
+      "subtitle": "Tải lên Giấy đăng ký kinh doanh — chúng tôi sẽ đọc thông tin và đối chiếu với Tổng Cục Thuế.",
+      "typeLabel": "Loại giấy phép",
+      "typeCompany": "Doanh nghiệp",
+      "typeBranch": "Chi nhánh doanh nghiệp",
+      "typeHousehold": "Hộ kinh doanh cá thể",
+      "docLabelCompany": "Giấy chứng nhận đăng ký doanh nghiệp",
+      "docLabelBranch": "Giấy chứng nhận đăng ký hoạt động chi nhánh",
+      "docLabelHousehold": "Giấy chứng nhận đăng ký hộ kinh doanh",
+      "clickToAdd": "Nhấn để thêm ảnh hoặc PDF",
+      "invalidTypeDoc": "Tệp phải ở định dạng JPEG, PNG hoặc PDF",
+      "consent": "Giấy phép của bạn được gửi an toàn tới đối tác xác minh để đọc thông tin và đối chiếu với cơ quan thuế. Bản thân tệp sẽ không được lưu trữ.",
+      "approvedTitle": "Doanh nghiệp đã được xác minh",
+      "approvedHint": "Doanh nghiệp của bạn hợp lệ. Đang chuyển tới hồ sơ vay…",
+      "declinedTitle": "Xác minh doanh nghiệp thất bại"
     }
   },
   "localeSwitcher": {

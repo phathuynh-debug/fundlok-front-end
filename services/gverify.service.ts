@@ -72,6 +72,78 @@ export interface GVerifyHandoffResponse {
   expires_in_seconds: number;
 }
 
+// ---------- KYB (business verification, SME) ----------
+
+// Certificate variant, matching GVerify OCR X's `type` parameter.
+export type GVerifyKybDocumentType = 'COMPANY' | 'COMPANY_BRANCH' | 'HOUSEHOLD';
+
+export interface GVerifyKybVerifyPayload {
+  document_b64: string; // JPEG | PNG | PDF, decoded size ≤ 10MB
+  document_type: GVerifyKybDocumentType;
+}
+
+export interface GVerifyKybRepresentative {
+  name: string | null;
+  id_number: string | null;
+  title: string | null;
+}
+
+// POST /gverify/kyb/verify — synchronous verdict (APPROVED | REJECTED).
+export interface GVerifyKybVerifyResponse {
+  verification_id: string;
+  status: GVerifyStatus;
+  is_approved: boolean;
+  rejection_reason: string | null;
+  tax_code: string | null;
+  business_name: string | null;
+  business_type: string | null;
+  business_status: string | null;
+  representatives: GVerifyKybRepresentative[];
+  created_at: string | null;
+}
+
+// GET /gverify/kyb/status — the caller's latest attempt.
+export interface GVerifyKybStatusResponse {
+  verification_id: string;
+  status: GVerifyStatus | 'NOT_STARTED';
+  is_terminal: boolean;
+  is_approved: boolean;
+  rejection_reason: string | null;
+  tax_code: string | null;
+  business_name: string | null;
+  updated_at: string | null;
+}
+
+// Synthetic status for an SME who has never attempted (the endpoint 404s).
+export function gverifyKybNotStarted(): GVerifyKybStatusResponse {
+  return {
+    verification_id: '',
+    status: 'NOT_STARTED',
+    is_terminal: false,
+    is_approved: false,
+    rejection_reason: null,
+    tax_code: null,
+    business_name: null,
+    updated_at: null,
+  };
+}
+
+// A KYB verify response reshaped to seed the status query cache.
+export function kybVerifyResponseToStatus(
+  data: GVerifyKybVerifyResponse,
+): GVerifyKybStatusResponse {
+  return {
+    verification_id: data.verification_id,
+    status: data.status,
+    is_terminal: true,
+    is_approved: data.is_approved,
+    rejection_reason: data.rejection_reason,
+    tax_code: data.tax_code,
+    business_name: data.business_name,
+    updated_at: data.created_at,
+  };
+}
+
 // OCR + biometrics are slower than plain CRUD — give the verify calls more
 // room than the client's default 20s.
 const VERIFY_TIMEOUT_MS = 60_000;
@@ -103,5 +175,16 @@ export const gverifyService = {
   // Latest attempt, read from our DB. 404 = never attempted.
   getStatus() {
     return apiClient.get<GVerifyStatusResponse>(GVERIFY_ENDPOINTS.status);
+  },
+
+  // KYB: OCR the registration certificate + tax-registry cross-check.
+  kybVerify(payload: GVerifyKybVerifyPayload) {
+    return apiClient.post<GVerifyKybVerifyResponse>(GVERIFY_ENDPOINTS.kybVerify, payload, {
+      timeout: VERIFY_TIMEOUT_MS,
+    });
+  },
+
+  kybGetStatus() {
+    return apiClient.get<GVerifyKybStatusResponse>(GVERIFY_ENDPOINTS.kybStatus);
   },
 };

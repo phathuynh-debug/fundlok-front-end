@@ -8,10 +8,13 @@ import { verificationKindForRole } from "@/services/verification.service";
 import { kycLandingForRole } from "./kyc-landing";
 import { DiditKycClient } from "./_components/didit-kyc-client";
 import { GVerifyKycClient } from "./_components/gverify/GVerifyKycClient";
+import { GVerifyKybClient } from "./_components/gverify/GVerifyKybClient";
 
 // Role switcher for the verification screen (used by /kyc and /kyc/callback):
-//   INVESTOR → GVerify in-app KYC (submit ID images + portrait, synchronous verdict)
-//   SME      → Didit hosted KYB (redirect + webhook)
+//   INVESTOR → GVerify in-app KYC (ID images + portrait, synchronous verdict)
+//   SME      → GVerify in-app KYB (registration certificate + tax registry)
+// The Didit hosted client remains only as the pre-load fallback (and for any
+// straggler returning to /kyc/callback from an old Didit session).
 // Roleless users pick a role first; roles that don't verify (admins) bounce to
 // their landing.
 export function KycClient() {
@@ -29,6 +32,7 @@ export function KycClient() {
   }, [user, router, landing]);
 
   if (user?.role === "INVESTOR") return <GVerifyKycClient />;
-  // SMEs — and the pre-load state, which renders Didit's neutral spinner.
+  if (user?.role === "SME") return <GVerifyKybClient />;
+  // Pre-load state (user not resolved yet) — Didit's neutral spinner.
   return <DiditKycClient />;
 }

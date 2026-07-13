@@ -24,7 +24,7 @@ const MAX_DIMENSION = 1920;
 const JPEG_QUALITY = 0.85;
 const COMPRESS_ABOVE_BYTES = 1_500_000;
 
-async function compressImage(file: File): Promise<File> {
+export async function compressImage(file: File): Promise<File> {
   if (file.size <= COMPRESS_ABOVE_BYTES) return file;
   const bitmap = await createImageBitmap(file);
   try {
@@ -53,7 +53,7 @@ export interface StagedImage {
 
 const emptySlot = (): StagedImage => ({ file: null, previewUrl: null, error: null });
 
-function fileToBase64(file: File): Promise<string> {
+export function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     // readAsDataURL yields "data:image/jpeg;base64,<payload>" — backend wants
