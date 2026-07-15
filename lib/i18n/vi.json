@@ -794,7 +794,7 @@
     "description": "Sử dụng trang này cho các yêu cầu hợp tác, câu hỏi về sản phẩm hoặc hỗ trợ chung. Chúng tôi phản hồi qua email và có thể chuyển tiếp yêu cầu của bạn đến đúng bộ phận nhanh hơn so với biểu mẫu chân trang cũ.",
     "emailLabel": "Email",
     "locationLabel": "Địa điểm",
-    "locationValue": "Trương Định / 123 Võ Thị Sáu, Xuân Hòa, Hồ Chí Minh",
+    "locationValue": "123 Trương Định, Xuân Hòa, Ho Chi Minh",
     "form": {
       "namePlaceholder": "Họ và tên",
       "emailPlaceholder": "Email",

@@ -794,7 +794,7 @@
     "description": "Use this page for partnership requests, product questions, or general support. We reply by email and can route your request to the right team faster than the old footer form.",
     "emailLabel": "Email",
     "locationLabel": "Location",
-    "locationValue": "Trương Định / 123 Võ Thị Sáu, Xuân Hòa, Hồ Chí Minh",
+    "locationValue": "123 Trương Định, Xuân Hòa, Ho Chi Minh",
     "form": {
       "namePlaceholder": "Name",
       "emailPlaceholder": "Email",
