@@ -102,7 +102,10 @@
       "cameraHintFace": "Căn khuôn mặt vào giữa khung bầu dục, trong điều kiện đủ sáng",
       "captureBtn": "Chụp ảnh",
       "cameraClose": "Đóng máy ảnh",
-      "chooseFromLibrary": "Từ thư viện"
+      "chooseFromLibrary": "Từ thư viện",
+      "tabFront": "CCCD mặt trước",
+      "tabBack": "CCCD mặt sau",
+      "tabSelfie": "Chân dung"
     },
     "kyb": {
       "title": "Xác minh doanh nghiệp",

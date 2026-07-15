@@ -102,7 +102,10 @@
       "cameraHintFace": "Center your face in the oval, in good light",
       "captureBtn": "Take photo",
       "cameraClose": "Close camera",
-      "chooseFromLibrary": "From library"
+      "chooseFromLibrary": "From library",
+      "tabFront": "ID front",
+      "tabBack": "ID back",
+      "tabSelfie": "Selfie"
     },
     "kyb": {
       "title": "Verify your business",
