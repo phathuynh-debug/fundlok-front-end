@@ -1,9 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { AlertCircle, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useTranslations } from '@/lib/i18n';
+import { CameraCaptureDialog, cameraSupported } from './CameraCaptureDialog';
 import { CAPTURE_ACCEPT, type CaptureSlot, type StagedImage } from './useGVerifyKyc';
 
 interface ImageCaptureFieldProps {
@@ -28,6 +30,12 @@ export function ImageCaptureField({
   const { t, locale } = useTranslations();
   const inputId = `gverify-${slot}`;
   const label = t(`kyc.gv.${slot}Label`);
+  // In-app guided camera (framing rectangle + crop-to-frame). Falls back to
+  // the native file input when getUserMedia is unavailable (no permission or
+  // insecure http origin).
+  const [cameraOpen, setCameraOpen] = useState(false);
+
+  const openPicker = () => document.getElementById(inputId)?.click();
 
   return (
     <div className="space-y-2 text-left">
@@ -35,9 +43,30 @@ export function ImageCaptureField({
         {label}
         <span className="font-bold text-destructive">*</span>
       </label>
+      {cameraOpen && (
+        <CameraCaptureDialog
+          guide={slot === 'portrait' ? 'face' : 'card'}
+          title={label}
+          onCapture={(file) => {
+            setCameraOpen(false);
+            onSelect(slot, file);
+          }}
+          onClose={() => setCameraOpen(false)}
+          onUnavailable={() => {
+            setCameraOpen(false);
+            openPicker();
+          }}
+          onPickFile={() => {
+            setCameraOpen(false);
+            openPicker();
+          }}
+        />
+      )}
       <div
         onClick={() => {
-          if (!disabled) document.getElementById(inputId)?.click();
+          if (disabled) return;
+          if (cameraCapture && cameraSupported()) setCameraOpen(true);
+          else openPicker();
         }}
         className={cn(
           'flex min-h-24 items-center justify-center gap-3 rounded-xl border border-dashed p-3 transition-all duration-200',
