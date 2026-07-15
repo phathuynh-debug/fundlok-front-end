@@ -97,7 +97,15 @@
       "mobileApprovedHint": "You're verified! You can close this page and return to your computer.",
       "mobileExpired": "This link has expired. Go back to your computer and generate a new QR code.",
       "mobileNoTokenTitle": "Link incomplete",
-      "mobileNoTokenHint": "This page only works when opened by scanning the QR code shown on your computer."
+      "mobileNoTokenHint": "This page only works when opened by scanning the QR code shown on your computer.",
+      "cameraHintCard": "Fit your ID card inside the frame — fill it edge to edge, avoid glare",
+      "cameraHintFace": "Center your face in the oval, in good light",
+      "captureBtn": "Take photo",
+      "cameraClose": "Close camera",
+      "chooseFromLibrary": "From library",
+      "tabFront": "ID front",
+      "tabBack": "ID back",
+      "tabSelfie": "Selfie"
     },
     "kyb": {
       "title": "Verify your business",

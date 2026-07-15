@@ -16,8 +16,8 @@ import { Button } from '@/components/ui/button';
 import { LocaleSwitcher } from '@/components/locale-switcher';
 import { useTranslations } from '@/lib/i18n';
 import { StatusBlock } from '../_components/status-block';
-import { ImageCaptureField } from '../_components/gverify/ImageCaptureField';
-import { CAPTURE_SLOTS, useGVerifyKyc } from '../_components/gverify/useGVerifyKyc';
+import { CaptureTabs } from '../_components/gverify/CaptureTabs';
+import { useGVerifyKyc } from '../_components/gverify/useGVerifyKyc';
 import type { GVerifyVerifyResponse } from '@/services/gverify.service';
 import type { ApiError } from '@/lib/types';
 
@@ -118,18 +118,12 @@ export function MobileKycClient() {
               </div>
             </div>
 
-            <div className="space-y-3">
-              {CAPTURE_SLOTS.map((slot) => (
-                <ImageCaptureField
-                  key={slot}
-                  slot={slot}
-                  image={images[slot]}
-                  disabled={submitting}
-                  onSelect={setFile}
-                  cameraCapture
-                />
-              ))}
-            </div>
+            <CaptureTabs
+              images={images}
+              disabled={submitting}
+              onSelect={setFile}
+              cameraCapture
+            />
 
             <p className="text-xs leading-relaxed text-muted-foreground">
               {t('kyc.gv.consent')}

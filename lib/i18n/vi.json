@@ -97,7 +97,15 @@
       "mobileApprovedHint": "Bạn đã được xác minh! Hãy đóng trang này và quay lại máy tính.",
       "mobileExpired": "Liên kết đã hết hạn. Hãy quay lại máy tính và tạo mã QR mới.",
       "mobileNoTokenTitle": "Liên kết không đầy đủ",
-      "mobileNoTokenHint": "Trang này chỉ hoạt động khi được mở bằng cách quét mã QR hiển thị trên máy tính của bạn."
+      "mobileNoTokenHint": "Trang này chỉ hoạt động khi được mở bằng cách quét mã QR hiển thị trên máy tính của bạn.",
+      "cameraHintCard": "Đặt CCCD/CMND vừa khít trong khung — lấp đầy khung, tránh lóa sáng",
+      "cameraHintFace": "Căn khuôn mặt vào giữa khung bầu dục, trong điều kiện đủ sáng",
+      "captureBtn": "Chụp ảnh",
+      "cameraClose": "Đóng máy ảnh",
+      "chooseFromLibrary": "Từ thư viện",
+      "tabFront": "CCCD mặt trước",
+      "tabBack": "CCCD mặt sau",
+      "tabSelfie": "Chân dung"
     },
     "kyb": {
       "title": "Xác minh doanh nghiệp",

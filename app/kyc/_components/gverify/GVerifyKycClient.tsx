@@ -24,8 +24,8 @@ import { useCurrentUser, useLogout } from '@/hooks/use-authentication';
 import { useGVerifyHandoff, useGVerifyStatus } from '@/hooks/use-gverify';
 import { kycLandingForRole } from '../../kyc-landing';
 import { StatusBlock } from '../status-block';
-import { ImageCaptureField } from './ImageCaptureField';
-import { CAPTURE_SLOTS, useGVerifyKyc } from './useGVerifyKyc';
+import { CaptureTabs } from './CaptureTabs';
+import { useGVerifyKyc } from './useGVerifyKyc';
 import type { ApiError } from '@/lib/types';
 
 // Investor KYC via GVerify (Datatrust) — the in-app replacement for the Didit
@@ -213,17 +213,15 @@ export function GVerifyKycClient() {
               </div>
             </div>
 
-            <div className="space-y-3">
-              {CAPTURE_SLOTS.map((slot) => (
-                <ImageCaptureField
-                  key={slot}
-                  slot={slot}
-                  image={images[slot]}
-                  disabled={submitting}
-                  onSelect={setFile}
-                />
-              ))}
-            </div>
+            {/* One tab per capture; the in-app guided camera (framing overlay)
+                opens on desktop too — it falls back to the file picker when
+                getUserMedia is unavailable (e.g. plain-http LAN origins). */}
+            <CaptureTabs
+              images={images}
+              disabled={submitting}
+              onSelect={setFile}
+              cameraCapture
+            />
 
             <p className="text-xs leading-relaxed text-muted-foreground">
               {t('kyc.gv.consent')}
