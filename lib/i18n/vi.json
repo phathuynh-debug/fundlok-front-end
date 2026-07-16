@@ -80,7 +80,7 @@
       "invalidType": "Ảnh phải ở định dạng JPEG hoặc PNG",
       "tooLarge": "Ảnh vượt quá giới hạn 10MB",
       "processFailed": "Không thể đọc ảnh này — hãy thử ảnh khác",
-      "consent": "Ảnh của bạn được gửi an toàn tới đối tác xác minh để đọc thông tin giấy tờ và đối chiếu khuôn mặt. Bản thân ảnh sẽ không được lưu trữ.",
+      "consent": "Ảnh của bạn được gửi an toàn tới đối tác xác minh để đọc thông tin giấy tờ và đối chiếu khuôn mặt, và được lưu trữ an toàn theo yêu cầu tuân thủ về xác minh danh tính.",
       "submitBtn": "Gửi xác minh",
       "submitting": "Đang xác minh…",
       "errorTitle": "Không thể hoàn tất xác minh",
@@ -113,16 +113,17 @@
       "typeLabel": "Loại giấy phép",
       "typeCompany": "Doanh nghiệp",
       "typeBranch": "Chi nhánh doanh nghiệp",
-      "typeHousehold": "Hộ kinh doanh cá thể",
       "docLabelCompany": "Giấy chứng nhận đăng ký doanh nghiệp",
       "docLabelBranch": "Giấy chứng nhận đăng ký hoạt động chi nhánh",
-      "docLabelHousehold": "Giấy chứng nhận đăng ký hộ kinh doanh",
       "clickToAdd": "Nhấn để thêm ảnh hoặc PDF",
       "invalidTypeDoc": "Tệp phải ở định dạng JPEG, PNG hoặc PDF",
-      "consent": "Giấy phép của bạn được gửi an toàn tới đối tác xác minh để đọc thông tin và đối chiếu với cơ quan thuế. Bản thân tệp sẽ không được lưu trữ.",
+      "consent": "Giấy phép của bạn được gửi an toàn tới đối tác xác minh để đọc thông tin và đối chiếu với cơ quan thuế, và được lưu trữ an toàn theo yêu cầu tuân thủ về xác minh doanh nghiệp.",
       "approvedTitle": "Doanh nghiệp đã được xác minh",
       "approvedHint": "Doanh nghiệp của bạn hợp lệ. Đang chuyển tới hồ sơ vay…",
-      "declinedTitle": "Xác minh doanh nghiệp thất bại"
+      "declinedTitle": "Xác minh doanh nghiệp thất bại",
+      "stepDocument": "1. Giấy phép",
+      "stepReview": "2. Kiểm tra & gửi",
+      "backBtn": "Quay lại"
     }
   },
   "localeSwitcher": {

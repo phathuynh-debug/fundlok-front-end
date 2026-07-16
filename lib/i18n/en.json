@@ -80,7 +80,7 @@
       "invalidType": "Must be a JPEG or PNG image",
       "tooLarge": "Image exceeds the 10MB limit",
       "processFailed": "Couldn't read this image — try another photo",
-      "consent": "Your photos are sent securely to our verification partner to read your ID and match your face. The photos themselves are not stored.",
+      "consent": "Your photos are sent securely to our verification partner to read your ID and match your face, and are retained securely as required for identity-verification compliance.",
       "submitBtn": "Submit for verification",
       "submitting": "Verifying…",
       "errorTitle": "Verification couldn't be completed",
@@ -113,16 +113,17 @@
       "typeLabel": "Certificate type",
       "typeCompany": "Company",
       "typeBranch": "Company branch",
-      "typeHousehold": "Household business",
       "docLabelCompany": "Enterprise registration certificate (Giấy chứng nhận đăng ký doanh nghiệp)",
       "docLabelBranch": "Branch operation registration certificate (Giấy chứng nhận đăng ký hoạt động chi nhánh)",
-      "docLabelHousehold": "Household business registration certificate (Giấy chứng nhận đăng ký hộ kinh doanh)",
       "clickToAdd": "Tap to add a photo or PDF",
       "invalidTypeDoc": "Must be a JPEG, PNG or PDF file",
-      "consent": "Your certificate is sent securely to our verification partner to read the details and confirm them with the state tax registry. The file itself is not stored.",
+      "consent": "Your certificate is sent securely to our verification partner to read the details and confirm them with the state tax registry, and is retained securely as required for business-verification compliance.",
       "approvedTitle": "Business verified",
       "approvedHint": "Your business checks out. Taking you to your application…",
-      "declinedTitle": "Business verification failed"
+      "declinedTitle": "Business verification failed",
+      "stepDocument": "1. Certificate",
+      "stepReview": "2. Review & submit",
+      "backBtn": "Back"
     }
   },
   "localeSwitcher": {

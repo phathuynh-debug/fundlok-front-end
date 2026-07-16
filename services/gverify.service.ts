@@ -4,8 +4,9 @@ import { GVERIFY_ENDPOINTS } from '@/lib/endpoints';
 // GVerify attempt statuses (backend spec:
 // docs/specs/gverify/ekyc-kyc-verification.md). Every attempt ends terminal
 // within the request that created it; "NOT_STARTED" is our synthetic value for
-// a user with no attempts (the status endpoint 404s).
-export type GVerifyStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'FAILED';
+// a user with no attempts (the status endpoint 404s). MANUAL_REVIEW is
+// KYB-only: borderline results parked for an ops decision.
+export type GVerifyStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'FAILED' | 'MANUAL_REVIEW';
 
 export interface GVerifyVerifyPayload {
   id_front_b64: string;
@@ -75,7 +76,7 @@ export interface GVerifyHandoffResponse {
 // ---------- KYB (business verification, SME) ----------
 
 // Certificate variant, matching GVerify OCR X's `type` parameter.
-export type GVerifyKybDocumentType = 'COMPANY' | 'COMPANY_BRANCH' | 'HOUSEHOLD';
+export type GVerifyKybDocumentType = 'COMPANY' | 'COMPANY_BRANCH';
 
 export interface GVerifyKybVerifyPayload {
   document_b64: string; // JPEG | PNG | PDF, decoded size ≤ 10MB
