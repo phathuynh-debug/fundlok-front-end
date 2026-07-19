@@ -123,7 +123,9 @@
       "declinedTitle": "Business verification failed",
       "stepDocument": "1. Certificate",
       "stepReview": "2. Review & submit",
-      "backBtn": "Back"
+      "backBtn": "Back",
+      "taxCodeLabel": "Tax code (Mã số doanh nghiệp) — optional",
+      "taxCodeHint": "Fill this in if it's printed on your certificate — it helps when the automatic reading misses it."
     }
   },
   "localeSwitcher": {

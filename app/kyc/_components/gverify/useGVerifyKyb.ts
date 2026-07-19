@@ -31,6 +31,9 @@ const empty = (): StagedDocument => ({ file: null, previewUrl: null, error: null
 export function useGVerifyKyb() {
   const [document, setDocument] = useState<StagedDocument>(empty());
   const [documentType, setDocumentType] = useState<GVerifyKybDocumentType>('COMPANY');
+  // Optional declared MST — backend fallback when OCR misses the tax code on
+  // the certificate (the registry name cross-check still binds it).
+  const [taxCode, setTaxCode] = useState('');
   const { mutateAsync: verify, isPending: submitting } = useGVerifyKybVerify();
 
   const urlsRef = useRef<Set<string>>(new Set());
@@ -104,8 +107,13 @@ export function useGVerifyKyb() {
 
   const submit = useCallback(async (): Promise<GVerifyKybVerifyResponse> => {
     const document_b64 = await fileToBase64(document.file as File);
-    return verify({ document_b64, document_type: documentType });
-  }, [document, documentType, verify]);
+    const trimmed = taxCode.trim();
+    return verify({
+      document_b64,
+      document_type: documentType,
+      ...(trimmed ? { tax_code: trimmed } : {}),
+    });
+  }, [document, documentType, taxCode, verify]);
 
   return {
     document,
@@ -113,6 +121,8 @@ export function useGVerifyKyb() {
     reset,
     documentType,
     selectDocumentType,
+    taxCode,
+    setTaxCode,
     ready,
     submit,
     submitting,

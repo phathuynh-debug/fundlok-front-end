@@ -81,6 +81,8 @@ export type GVerifyKybDocumentType = 'COMPANY' | 'COMPANY_BRANCH';
 export interface GVerifyKybVerifyPayload {
   document_b64: string; // JPEG | PNG | PDF, decoded size ≤ 10MB
   document_type: GVerifyKybDocumentType;
+  // Optional declared MST — backend fallback when OCR misses the tax code.
+  tax_code?: string;
 }
 
 export interface GVerifyKybRepresentative {

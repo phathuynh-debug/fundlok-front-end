@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { LocaleSwitcher } from '@/components/locale-switcher';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -63,6 +64,8 @@ export function GVerifyKybClient() {
     reset,
     documentType,
     selectDocumentType,
+    taxCode,
+    setTaxCode,
     ready,
     submit,
     submitting,
@@ -272,6 +275,25 @@ export function GVerifyKybClient() {
                       'kyc.kyb.docLabelCompany',
                   )}
                 />
+
+                <div className="space-y-1.5 text-left">
+                  <label
+                    htmlFor="kyb-tax-code"
+                    className="text-sm font-semibold text-foreground"
+                  >
+                    {t('kyc.kyb.taxCodeLabel')}
+                  </label>
+                  <Input
+                    id="kyb-tax-code"
+                    inputMode="numeric"
+                    maxLength={14}
+                    placeholder="1501167629"
+                    value={taxCode}
+                    disabled={submitting}
+                    onChange={(e) => setTaxCode(e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">{t('kyc.kyb.taxCodeHint')}</p>
+                </div>
 
                 <Button
                   type="button"
