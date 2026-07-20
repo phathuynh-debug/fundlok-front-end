@@ -23,6 +23,12 @@ export interface StagedDocument {
 }
 
 const empty = (): StagedDocument => ({ file: null, previewUrl: null, error: null });
+export interface KybDeclaredDetails {
+  taxCode: string;
+  licenseCode: string;
+}
+
+const emptyDetails = (): KybDeclaredDetails => ({ taxCode: '', licenseCode: '' });
 
 // Local capture state for the GVerify KYB screen: one staged registration
 // certificate (photo or PDF) + the certificate variant, and the submit that
@@ -31,10 +37,15 @@ const empty = (): StagedDocument => ({ file: null, previewUrl: null, error: null
 export function useGVerifyKyb() {
   const [document, setDocument] = useState<StagedDocument>(empty());
   const [documentType, setDocumentType] = useState<GVerifyKybDocumentType>('COMPANY');
-  // Optional declared MST — backend fallback when OCR misses the tax code on
-  // the certificate (the registry name cross-check still binds it).
-  const [taxCode, setTaxCode] = useState('');
+  const [details, setDetails] = useState<KybDeclaredDetails>(emptyDetails);
   const { mutateAsync: verify, isPending: submitting } = useGVerifyKybVerify();
+
+  // Update one declared field by key, e.g. setDetail('taxCode', value).
+  const setDetail = useCallback(
+    <K extends keyof KybDeclaredDetails>(field: K, value: KybDeclaredDetails[K]) =>
+      setDetails((prev) => ({ ...prev, [field]: value })),
+    [],
+  );
 
   const urlsRef = useRef<Set<string>>(new Set());
   useEffect(() => {
@@ -107,13 +118,15 @@ export function useGVerifyKyb() {
 
   const submit = useCallback(async (): Promise<GVerifyKybVerifyResponse> => {
     const document_b64 = await fileToBase64(document.file as File);
-    const trimmed = taxCode.trim();
+    const trimmedTax = details.taxCode.trim();
+    const trimmedLicense = details.licenseCode.trim();
     return verify({
       document_b64,
       document_type: documentType,
-      ...(trimmed ? { tax_code: trimmed } : {}),
+      ...(trimmedTax ? { tax_code: trimmedTax } : {}),
+      ...(trimmedLicense ? { license_code: trimmedLicense } : {}),
     });
-  }, [document, documentType, taxCode, verify]);
+  }, [document, documentType, details, verify]);
 
   return {
     document,
@@ -121,8 +134,8 @@ export function useGVerifyKyb() {
     reset,
     documentType,
     selectDocumentType,
-    taxCode,
-    setTaxCode,
+    details,
+    setDetail,
     ready,
     submit,
     submitting,

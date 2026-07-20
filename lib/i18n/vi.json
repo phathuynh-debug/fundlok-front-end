@@ -125,7 +125,9 @@
       "stepReview": "2. Kiểm tra & gửi",
       "backBtn": "Quay lại",
       "taxCodeLabel": "Mã số doanh nghiệp (MST) — không bắt buộc",
-      "taxCodeHint": "Điền nếu có in trên giấy phép — hữu ích khi hệ thống đọc tự động bỏ sót."
+      "taxCodeHint": "Điền nếu có in trên giấy phép — hữu ích khi hệ thống đọc tự động bỏ sót.",
+      "licenseCodeLabel": "Số giấy phép kinh doanh — không bắt buộc",
+      "licenseCodeHint": "Số đăng ký/giấy phép trên giấy chứng nhận, nếu khác mã số thuế. Mặc định dùng mã số thuế nếu để trống."
     }
   },
   "localeSwitcher": {

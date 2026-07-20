@@ -64,8 +64,8 @@ export function GVerifyKybClient() {
     reset,
     documentType,
     selectDocumentType,
-    taxCode,
-    setTaxCode,
+    details,
+    setDetail,
     ready,
     submit,
     submitting,
@@ -288,11 +288,29 @@ export function GVerifyKybClient() {
                     inputMode="numeric"
                     maxLength={14}
                     placeholder="1501167629"
-                    value={taxCode}
+                    value={details.taxCode}
                     disabled={submitting}
-                    onChange={(e) => setTaxCode(e.target.value)}
+                    onChange={(e) => setDetail('taxCode', e.target.value)}
                   />
                   <p className="text-xs text-muted-foreground">{t('kyc.kyb.taxCodeHint')}</p>
+                </div>
+
+                <div className="space-y-1.5 text-left">
+                  <label
+                    htmlFor="kyb-license-code"
+                    className="text-sm font-semibold text-foreground"
+                  >
+                    {t('kyc.kyb.licenseCodeLabel')}
+                  </label>
+                  <Input
+                    id="kyb-license-code"
+                    maxLength={32}
+                    placeholder="41M8041297"
+                    value={details.licenseCode}
+                    disabled={submitting}
+                    onChange={(e) => setDetail('licenseCode', e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">{t('kyc.kyb.licenseCodeHint')}</p>
                 </div>
 
                 <Button

@@ -125,7 +125,9 @@
       "stepReview": "2. Review & submit",
       "backBtn": "Back",
       "taxCodeLabel": "Tax code (Mã số doanh nghiệp) — optional",
-      "taxCodeHint": "Fill this in if it's printed on your certificate — it helps when the automatic reading misses it."
+      "taxCodeHint": "Fill this in if it's printed on your certificate — it helps when the automatic reading misses it.",
+      "licenseCodeLabel": "Business licence code — optional",
+      "licenseCodeHint": "The registration/licence number on your certificate, if different from the tax code. Defaults to the tax code when left blank."
     }
   },
   "localeSwitcher": {
