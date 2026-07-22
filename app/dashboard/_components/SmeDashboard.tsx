@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { MapPin, CheckCircle2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { MapPin, CheckCircle2, Rocket, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Project } from "@/services/projects.service";
 import { useTranslations } from "@/lib/i18n";
@@ -27,7 +29,34 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
   const project = projects[0];
   const { locale, t } = useTranslations();
 
-  if (!project) return null;
+  // No project yet → invite the SME to apply. "Apply for funding" links to
+  // /project-application, which the proxy KYB-gates: an unverified SME is sent
+  // through /kyc first, then returned to the application form.
+  if (!project) {
+    return (
+      <div className="flex-1 p-4 md:p-8 pt-6">
+        <Card className="mx-auto flex max-w-2xl flex-col items-center gap-6 rounded-2xl border border-dashed bg-card p-8 text-center md:p-12">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <Rocket className="h-8 w-8" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground">
+              {t("dashboard.sme.emptyTitle")}
+            </h2>
+            <p className="mx-auto max-w-md text-sm leading-relaxed text-muted-foreground">
+              {t("dashboard.sme.emptyDescription")}
+            </p>
+          </div>
+          <Button asChild size="lg" className="gap-2">
+            <Link href="/project-application">
+              {t("dashboard.sme.emptyCta")}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
+        </Card>
+      </div>
+    );
+  }
 
   const theme = getIndustryTheme(project.industry);
 

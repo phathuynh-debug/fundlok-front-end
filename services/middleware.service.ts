@@ -57,44 +57,6 @@ export const middlewareService = {
     }
   },
 
-  // Reads the user's project count
-  async getProjectCount(request: NextRequest): Promise<number | null> {
-    try {
-      const response = await fetch(new URL("/projects", API_BASE_URL), {
-        headers: {
-          cookie: request.headers.get("cookie") ?? "",
-        },
-        cache: "no-store",
-      });
-
-      if (!response.ok) {
-        return null;
-      }
-
-      const data = (await response.json()) as
-        | unknown[]
-        | { content?: unknown[]; data?: unknown[] };
-
-      if (Array.isArray(data)) {
-        return data.length;
-      }
-
-      const payload = data as { content?: unknown[]; data?: unknown[] };
-
-      if (Array.isArray(payload.content)) {
-        return payload.content.length;
-      }
-
-      if (Array.isArray(payload.data)) {
-        return payload.data.length;
-      }
-
-      return null;
-    } catch {
-      return null;
-    }
-  },
-
   // Reads whether the user's verification is approved — both roles via
   // GVerify now: investors /gverify/kyc/status, SMEs /gverify/kyb/status
   // (calling the wrong one 403s). 404 means they never started. Fails closed

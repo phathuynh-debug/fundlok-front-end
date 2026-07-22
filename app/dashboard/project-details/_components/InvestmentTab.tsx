@@ -1,4 +1,5 @@
 import React, { useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,6 +9,9 @@ import { DollarSign } from "lucide-react"
 import { useTranslations } from "@/lib/i18n"
 
 export function InvestmentTab() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const projectId = searchParams.get("id")
   const [amount, setAmount] = useState("")
   const [isPending, setIsPending] = useState(false)
   const { toast } = useToast()
@@ -16,6 +20,10 @@ export function InvestmentTab() {
   const maxAmount = 15000
   const progressPercent = 70.0
 
+  // Investing requires an approved KYC. Rather than gate the button here, we
+  // hand off to the /dashboard/invest route, which the proxy hard-gates: an
+  // unverified investor is bounced to /kyc?next=… and returned here after
+  // approval. So this handler only validates the amount, then navigates.
   const handleInvest = (e: React.FormEvent) => {
     e.preventDefault()
     const numericAmount = parseFloat(amount)
@@ -39,14 +47,9 @@ export function InvestmentTab() {
     }
 
     setIsPending(true)
-    setTimeout(() => {
-      setIsPending(false)
-      toast({
-        title: t("investment.tab.investmentSuccessfulTitle"),
-        description: t("investment.tab.investmentSuccessfulDescription", { amount: `$${numericAmount.toLocaleString(locale)}` }),
-      })
-      setAmount("")
-    }, 1500)
+    const params = new URLSearchParams({ amount: String(numericAmount) })
+    if (projectId) params.set("projectId", projectId)
+    router.push(`/dashboard/invest?${params.toString()}`)
   }
 
   return (

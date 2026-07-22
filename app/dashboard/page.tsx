@@ -1,7 +1,5 @@
 "use client"
 
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
 import { useRequireAuth } from "@/hooks/use-authentication"
 import { useMyProjects } from "@/hooks/use-projects"
 import { SmeDashboard } from "./_components/SmeDashboard"
@@ -12,23 +10,15 @@ import { useTranslations } from "@/lib/i18n"
 
 export default function DashboardPage() {
   const { user, isLoading } = useRequireAuth()
-  const router = useRouter()
   const { t } = useTranslations()
   const shouldLoadMyProjects = !isLoading && user?.role === "SME"
 
+  // SMEs with no project land here (not on /project-application) and see an
+  // empty state that links to the KYB-gated application flow. No redirect.
   const {
     data: myProjects = [],
     isLoading: isMyProjectsLoading,
-    isFetching: isMyProjectsFetching
   } = useMyProjects(shouldLoadMyProjects)
-
-  const isWaitingForRedirect = isMyProjectsLoading || isMyProjectsFetching
-
-  useEffect(() => {
-    if (user?.role === "SME" && !isWaitingForRedirect && myProjects.length === 0) {
-      router.replace("/project-application")
-    }
-  }, [isWaitingForRedirect, myProjects.length, router, user?.role])
 
   if (isLoading || isMyProjectsLoading) {
     return (

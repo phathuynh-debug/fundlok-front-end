@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { useCurrentUser } from "@/hooks/use-authentication";
 import { verificationKindForRole } from "@/services/verification.service";
-import { kycLandingForRole } from "./kyc-landing";
+import { postVerificationTarget } from "./kyc-landing";
 import { DiditKycClient } from "./_components/didit-kyc-client";
 import { GVerifyKycClient } from "./_components/gverify/GVerifyKycClient";
 import { GVerifyKybClient } from "./_components/gverify/GVerifyKybClient";
@@ -19,8 +19,9 @@ import { GVerifyKybClient } from "./_components/gverify/GVerifyKybClient";
 // their landing.
 export function KycClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: user } = useCurrentUser();
-  const landing = kycLandingForRole(user?.role);
+  const landing = postVerificationTarget(searchParams.get("next"), user?.role);
 
   useEffect(() => {
     if (!user) return;

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import QRCode from 'react-qr-code';
 import {
@@ -22,7 +22,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from '@/lib/i18n';
 import { useCurrentUser, useLogout } from '@/hooks/use-authentication';
 import { useGVerifyHandoff, useGVerifyStatus } from '@/hooks/use-gverify';
-import { kycLandingForRole } from '../../kyc-landing';
+import { postVerificationTarget } from '../../kyc-landing';
 import { StatusBlock } from '../status-block';
 import { CaptureTabs } from './CaptureTabs';
 import { useGVerifyKyc } from './useGVerifyKyc';
@@ -34,6 +34,7 @@ import type { ApiError } from '@/lib/types';
 // webhook, no polling.
 export function GVerifyKycClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
   const { t } = useTranslations();
   const { data: user } = useCurrentUser();
@@ -77,7 +78,7 @@ export function GVerifyKycClient() {
     }
   };
 
-  const landing = kycLandingForRole(user?.role);
+  const landing = postVerificationTarget(searchParams.get('next'), user?.role);
   const isApproved = status?.is_approved === true;
 
   // Once approved, head into the app after a brief confirmation.

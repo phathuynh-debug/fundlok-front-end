@@ -372,6 +372,9 @@
       "taxId": "Tax ID",
       "incorporationDate": "Incorporation Date",
       "daysActive": "Days Active",
+      "emptyTitle": "Ready to raise funding?",
+      "emptyDescription": "You don't have a funding application yet. Start one to describe your business and request a loan — we'll verify your business (KYB) as part of the process.",
+      "emptyCta": "Apply for funding",
       "submitLoanApplication": "Submit Loan Application",
       "uploadNecessaryDocuments": "Before your project goes live, please complete this documentation. We will review and get back to you in 3-5 working days.",
       "requiredDocsMissingTitle": "Required Documents Missing",
@@ -487,6 +490,19 @@
       "fallbackName": "TechStart Solutions",
       "fallbackIndustry": "Technology"
     }
+  },
+  "investConfirm": {
+    "back": "Back to marketplace",
+    "verifiedBadge": "Identity verified",
+    "title": "Confirm your investment",
+    "subtitle": "Review the amount below and confirm to place your investment.",
+    "amountLabel": "Investment amount",
+    "confirmBtn": "Confirm investment",
+    "processing": "Processing…",
+    "doneHint": "Your investment has been placed.",
+    "goToDashboard": "Go to dashboard",
+    "successTitle": "Investment successful",
+    "successDescription": "You have invested {amount}."
   },
   "investment": {
     "kpis": {

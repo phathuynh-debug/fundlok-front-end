@@ -42,11 +42,12 @@ export function SelectRoleClient() {
   const [selectedRole, setSelectedRole] = useState<SelectableRole | null>(null);
 
   // Already has a role (picked earlier, another tab, stale session)? There's
-  // nothing to choose — head straight to /kyc and let the middleware route
-  // onward (verification, or the landing page if already approved).
+  // nothing to choose — head to the dashboard and let the middleware route
+  // onward. Verification is no longer forced here; it's demanded on-demand only
+  // when the user invests (KYC) or applies for funding (KYB).
   const alreadyHasRole = !!user?.role && !selectedRole;
   useEffect(() => {
-    if (alreadyHasRole) router.replace("/kyc");
+    if (alreadyHasRole) router.replace("/dashboard");
   }, [alreadyHasRole, router]);
 
   const handleSelect = (role: SelectableRole) => {
@@ -57,9 +58,9 @@ export function SelectRoleClient() {
           title: t("auth.selectRole.successTitle"),
           description: t("auth.selectRole.successDescription"),
         });
-        // Identity verification is the next onboarding step (middleware also
-        // enforces this); SME/Investor branching happens after KYC approval.
-        router.push("/kyc");
+        // Straight into the app — no forced verification. KYC/KYB is requested
+        // later, only when the user takes an action that requires it.
+        router.push("/dashboard");
       },
       onError: (error) => {
         // 409 = the account already has a role (e.g. picked in another tab, or
@@ -67,7 +68,7 @@ export function SelectRoleClient() {
         // the cached user and continue; the middleware routes from there.
         if (error?.status === 409) {
           void queryClient.invalidateQueries({ queryKey: authKeys.currentUser() });
-          router.push("/kyc");
+          router.push("/dashboard");
           return;
         }
         // Drop back to the cards so the user can retry.

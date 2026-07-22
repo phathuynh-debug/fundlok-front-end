@@ -372,6 +372,9 @@
       "taxId": "Mã số thuế",
       "incorporationDate": "Ngày thành lập",
       "daysActive": "Số ngày hoạt động",
+      "emptyTitle": "Sẵn sàng huy động vốn?",
+      "emptyDescription": "Bạn chưa có hồ sơ vay vốn nào. Hãy bắt đầu để mô tả doanh nghiệp và yêu cầu khoản vay — chúng tôi sẽ xác minh doanh nghiệp (KYB) trong quá trình này.",
+      "emptyCta": "Đăng ký vay vốn",
       "submitLoanApplication": "Gửi hồ sơ vay",
       "uploadNecessaryDocuments": "Trước khi dự án của bạn hoạt động chính thức, vui lòng hoàn thiện các hồ sơ này. Chúng tôi sẽ xem xét và phản hồi trong vòng 3-5 ngày làm việc.",
       "requiredDocsMissingTitle": "Thiếu tài liệu bắt buộc",
@@ -487,6 +490,19 @@
       "fallbackName": "TechStart Solutions",
       "fallbackIndustry": "Công nghệ"
     }
+  },
+  "investConfirm": {
+    "back": "Quay lại thị trường",
+    "verifiedBadge": "Đã xác minh danh tính",
+    "title": "Xác nhận khoản đầu tư",
+    "subtitle": "Xem lại số tiền bên dưới và xác nhận để thực hiện khoản đầu tư.",
+    "amountLabel": "Số tiền đầu tư",
+    "confirmBtn": "Xác nhận đầu tư",
+    "processing": "Đang xử lý…",
+    "doneHint": "Khoản đầu tư của bạn đã được thực hiện.",
+    "goToDashboard": "Về trang tổng quan",
+    "successTitle": "Đầu tư thành công",
+    "successDescription": "Bạn đã đầu tư {amount}."
   },
   "investment": {
     "kpis": {

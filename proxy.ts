@@ -17,7 +17,8 @@ const DASHBOARD_ROUTE = "/dashboard";
 const ADMIN_ROUTE = "/admin";
 // Where users without a role pick one (SME / Investor) before continuing.
 const SELECT_ROLE_ROUTE = "/select-role";
-// Identity verification gate; users must be KYC-approved before the app.
+// On-demand identity/business verification screen. No longer a blanket entry
+// gate — reached only when a user hits a verification-gated action route.
 const KYC_ROUTE = "/kyc";
 // Frontend system-settings page (distinct from the backend /system API prefix).
 const SYSTEM_SETTINGS_ROUTE = "/admin/system";
@@ -25,6 +26,37 @@ const MAINTENANCE_ROUTE = "/maintenance";
 // During maintenance only the auth entry points are blocked — public pages and
 // the rest of the site stay accessible.
 const MAINTENANCE_BLOCKED_ROUTES = ["/login", "/register"];
+
+// --- On-demand verification gates ---
+// KYC/KYB is NOT a blanket gate after login anymore. Users register, pick a
+// role, and browse freely. Verification is only demanded when a user takes a
+// value action that legally requires it:
+//   INVESTOR invests  → KYC  (the mock /dashboard/invest route)
+//   SME asks for fund → KYB  (/project-application)
+// Hitting one of these routes unverified sends the user to /kyc?next=<route>,
+// and they're returned to the action once approved.
+const INVESTOR_KYC_ROUTES = ["/dashboard/invest"];
+const SME_KYB_ROUTES = [APPLICATION_ROUTE];
+
+// The verification kind a route requires for a given role, or null if the route
+// is ungated for that role. Matches the exact path and any nested sub-path.
+function requiredVerificationForPath(
+  pathname: string,
+  role?: string,
+): "KYC" | "KYB" | null {
+  const matches = (routes: string[]) =>
+    routes.some((r) => pathname === r || pathname.startsWith(`${r}/`));
+  if (role === "INVESTOR" && matches(INVESTOR_KYC_ROUTES)) return "KYC";
+  if (role === "SME" && matches(SME_KYB_ROUTES)) return "KYB";
+  return null;
+}
+
+// Only accept same-origin absolute paths as a post-verification redirect target,
+// so a crafted ?next= can't turn /kyc into an open redirect.
+function safeNextPath(next: string | null): string | null {
+  if (!next || !next.startsWith("/") || next.startsWith("//")) return null;
+  return next;
+}
 
 // Paths whose auth/role rules are handled below. The matcher only runs
 // middleware on these app routes plus the maintenance-relevant ones.
@@ -59,7 +91,6 @@ export async function proxy(request: NextRequest) {
   // Both ADMIN and SYSTEM_ADMIN may enter the /admin area (mirrors require_admin).
   const canAccessAdmin = isAdmin || isSystemAdmin;
   const isInvestor = currentUser?.role === "INVESTOR";
-  const isSme = currentUser?.role === "SME";
   // Authenticated users with no role yet must pick one on the select-role page.
   const hasRole = !!currentUser?.role;
 
@@ -89,35 +120,36 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // KYC is required once a (non-admin) user has a verified email and a role.
-  // Admins are backend-managed and skip it. Only fetch the status when it could
-  // actually apply, to avoid an extra request on every other route.
-  const needsKyc =
+  // Verification is now on-demand, not a login gate. Fetch approval only when it
+  // can actually matter this request — on a verification-gated route, or on
+  // /kyc itself — so the common path stays at a single /users/me call. Admins
+  // are backend-managed and never verify.
+  const requiredKind = requiredVerificationForPath(pathname, currentUser?.role);
+  const onKycRoute = pathname.startsWith(KYC_ROUTE);
+  const shouldCheckApproval =
     isAuthenticated &&
     !!currentUser &&
-    currentUser.email_verified !== false &&
     hasRole &&
-    !canAccessAdmin;
-  const kycApproved = needsKyc
+    !canAccessAdmin &&
+    (requiredKind !== null || onKycRoute);
+  // null = not looked up / unreadable; only a definite `false` blocks a route
+  // and only a definite `true` releases /kyc, so a backend hiccup can't loop.
+  const isApproved = shouldCheckApproval
     ? await middlewareService.getVerificationApproved(request, currentUser?.role)
-    : true;
+    : null;
 
-  // Only SMEs are routed by project count, and only once they're past KYC —
-  // skip the lookup for everyone else (investors, admins, no-role, pre-KYC).
-  const projectCount = isSme && kycApproved ? await middlewareService.getProjectCount(request) : null;
-  const hasProjects = typeof projectCount === "number" ? projectCount > 0 : null;
-
+  // Post-login landing no longer depends on KYC or project count — users land on
+  // their normal home and are routed to verification only by the action gate.
   const authRedirectTarget = canAccessAdmin
     ? ADMIN_ROUTE
     : !hasRole
       ? SELECT_ROLE_ROUTE
-      : !kycApproved
-        ? KYC_ROUTE
-        : isInvestor
-          ? DASHBOARD_ROUTE
-          : hasProjects === false
-            ? APPLICATION_ROUTE
-            : DASHBOARD_ROUTE;
+      : DASHBOARD_ROUTE;
+
+  // Where to send the user out of /kyc: back to the action they were attempting
+  // (?next=), else their normal landing.
+  const postKycTarget =
+    safeNextPath(request.nextUrl.searchParams.get("next")) ?? authRedirectTarget;
 
   // Redirect unauthenticated users away from /verify-email to login.
   if (!isAuthenticated && pathname === "/verify-email") {
@@ -165,31 +197,21 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL(authRedirectTarget, request.url));
   }
 
-  // KYC gate: a role-having, non-admin user must be verified before entering
-  // the app. Keep them on the KYC pages until approved. (Runs after the
-  // verify-email and role gates, so by here they're verified and have a role.)
-  if (
-    isAuthenticated &&
-    hasRole &&
-    !canAccessAdmin &&
-    !kycApproved &&
-    !pathname.startsWith(KYC_ROUTE)
-  ) {
-    return NextResponse.redirect(new URL(KYC_ROUTE, request.url));
+  // Action gate: an unverified user attempting a gated action (investor →
+  // invest, SME → apply for funding) is sent to /kyc, remembering where they
+  // were headed so approval returns them there. Only a definite `false` blocks.
+  if (requiredKind !== null && isApproved === false) {
+    const kycUrl = new URL(KYC_ROUTE, request.url);
+    kycUrl.searchParams.set("next", pathname + request.nextUrl.search);
+    return NextResponse.redirect(kycUrl);
   }
 
-  // Approved users (and admins) shouldn't linger on the KYC pages. Requires a
-  // resolved currentUser: with an unreadable session (expired/invalid token or
-  // an unreachable backend) kycApproved defaults to true and hasRole to false,
-  // and this rule would bounce /kyc → /select-role in a redirect loop with the
-  // client. When in doubt, let /kyc render — the client routes correctly.
-  if (
-    isAuthenticated &&
-    !!currentUser &&
-    (kycApproved || canAccessAdmin) &&
-    pathname.startsWith(KYC_ROUTE)
-  ) {
-    return NextResponse.redirect(new URL(authRedirectTarget, request.url));
+  // Don't strand a user on /kyc when there's nothing to verify: admins never
+  // verify, and an already-approved user is sent on to their intended action
+  // (?next=) or landing. A verifying role with an unreadable status
+  // (isApproved === null) is left on /kyc so a backend hiccup can't loop them.
+  if (onKycRoute && (canAccessAdmin || isApproved === true)) {
+    return NextResponse.redirect(new URL(postKycTarget, request.url));
   }
 
   // Redirect authenticated users away from auth pages to their landing page.
@@ -228,25 +250,10 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL(DASHBOARD_ROUTE, request.url));
   }
 
-  // Users without projects should land on the application form instead of the dashboard.
-  if (
-    isAuthenticated &&
-    !isInvestor &&
-    !canAccessAdmin &&
-    hasProjects === false &&
-    pathname.startsWith(DASHBOARD_ROUTE)
-  ) {
-    return NextResponse.redirect(new URL(APPLICATION_ROUTE, request.url));
-  }
-
-  // Users with projects (and admins) should not stay on the application page.
-  if (
-    isAuthenticated &&
-    (canAccessAdmin || isInvestor || hasProjects === true) &&
-    pathname.startsWith(APPLICATION_ROUTE)
-  ) {
-    return NextResponse.redirect(new URL(authRedirectTarget, request.url));
-  }
+  // Note: SME project-based routing (no-project SMEs see a dashboard empty
+  // state; SMEs who already have a project are kept off /project-application)
+  // is handled client-side now — the dashboard and application pages redirect
+  // themselves. The middleware no longer counts projects.
 
   return NextResponse.next();
 }

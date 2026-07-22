@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   Building2,
@@ -26,7 +26,7 @@ import { useTranslations } from '@/lib/i18n';
 import { useCurrentUser, useLogout } from '@/hooks/use-authentication';
 import { useGVerifyKybStatus } from '@/hooks/use-gverify';
 import type { GVerifyKybDocumentType } from '@/services/gverify.service';
-import { kycLandingForRole } from '../../kyc-landing';
+import { postVerificationTarget } from '../../kyc-landing';
 import { StatusBlock } from '../status-block';
 import { DocumentCaptureField } from './DocumentCaptureField';
 import { useGVerifyKyb } from './useGVerifyKyb';
@@ -53,6 +53,7 @@ const DOCUMENT_TYPES: Array<{
 // registry, and the verdict comes back synchronously.
 export function GVerifyKybClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
   const { t } = useTranslations();
   const { data: user } = useCurrentUser();
@@ -78,7 +79,7 @@ export function GVerifyKybClient() {
   // Step 2 is reachable only once a document is staged.
   const [step, setStep] = useState<1 | 2>(1);
 
-  const landing = kycLandingForRole(user?.role);
+  const landing = postVerificationTarget(searchParams.get('next'), user?.role);
   const isApproved = status?.is_approved === true;
 
   useEffect(() => {
