@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Mail, RefreshCw, LogOut, Loader2, XCircle, CheckCircle2 } from "lucide-react";
+import { Mail, RefreshCw, LogOut, Loader2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCurrentUser, useLogout } from "@/hooks/use-authentication";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authenticationService } from "@/services/authentication.service";
+import type { ApiError } from "@/lib/types";
 
 export function VerifyEmailClient() {
   const { data: user, refetch } = useCurrentUser();
@@ -38,10 +39,18 @@ export function VerifyEmailClient() {
             description: res.message || "Email verified successfully!",
           });
           // Refetch current user to update cache
-          await refetch();
-          router.push("/dashboard");
-        } catch (err: any) {
-          const errMsg = err?.response?.data?.detail || "Invalid or expired verification link.";
+          const { data: verifiedUser } = await refetch();
+          // The link is usually opened from a mail client with no session, so
+          // /dashboard would only bounce back to /login. Send those users
+          // straight there; already-signed-in users continue to the app.
+          router.push(verifiedUser ? "/dashboard" : "/login");
+        } catch (err) {
+          // apiClient's interceptor already flattens the axios error to
+          // { message, details, status } — reaching for err.response.data.detail
+          // here always came back undefined, so every failure showed the
+          // generic fallback instead of the backend's reason.
+          const errMsg =
+            (err as ApiError)?.message || "Invalid or expired verification link.";
           setVerificationError(errMsg);
           toast({
             variant: "destructive",
@@ -101,8 +110,9 @@ export function VerifyEmailClient() {
         title: t("auth.verifyEmail.resendSuccess"),
         description: res.message,
       });
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.detail || t("auth.verifyEmail.resendFailed");
+    } catch (err) {
+      const errMsg =
+        (err as ApiError)?.message || t("auth.verifyEmail.resendFailed");
       toast({
         variant: "destructive",
         title: t("auth.verifyEmail.resendFailed"),

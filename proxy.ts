@@ -151,8 +151,14 @@ export async function proxy(request: NextRequest) {
   const postKycTarget =
     safeNextPath(request.nextUrl.searchParams.get("next")) ?? authRedirectTarget;
 
-  // Redirect unauthenticated users away from /verify-email to login.
-  if (!isAuthenticated && pathname === "/verify-email") {
+  // Redirect unauthenticated users away from /verify-email to login — unless
+  // they arrived on the emailed link, which carries its own credential in
+  // ?token= and is opened from a mail client with no session cookie (same
+  // shape as the /kyc/mobile handoff above). Redirecting those to /login threw
+  // the token away, so the first verification email appeared to do nothing and
+  // only a resend — clicked while already logged in — could verify an account.
+  const hasVerificationToken = !!request.nextUrl.searchParams.get("token");
+  if (!isAuthenticated && pathname === "/verify-email" && !hasVerificationToken) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("from", pathname);
     return NextResponse.redirect(loginUrl);
