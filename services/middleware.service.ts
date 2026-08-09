@@ -10,25 +10,77 @@ export type CurrentUser = {
   email_verified?: boolean;
 };
 
+type MaintenanceFlag = { enabled?: boolean } | null;
+
+// The maintenance flag is global — same answer for every visitor — so it's
+// cached in module scope rather than re-fetched per request.
+//
+// Without this the proxy hit GET /system/maintenance on every request to
+// /login or /register, including the RSC prefetches Next fires when those
+// links merely scroll into view on a public page. That produced a continuous
+// stream of requests against the API for a value that changes maybe twice a
+// year. Prefetches can't be filtered out instead: Next strips `rsc`,
+// `next-router-state-tree` and `next-router-prefetch` from `request.headers`
+// in Proxy by design, so a prefetch is indistinguishable from a real
+// navigation there.
+//
+// TTL matches the backend's own maintenance cache (app/system/service.py,
+// _MAINT_TTL_SECONDS = 5), so toggling maintenance still takes effect within
+// seconds — the ceiling on staleness is the sum of the two, not minutes.
+const MAINTENANCE_TTL_MS = 5_000;
+
+let maintenanceCache: { value: MaintenanceFlag; expiresAt: number } | null = null;
+// Concurrent proxy invocations share one in-flight request instead of each
+// starting its own — a burst of prefetches collapses to a single call.
+let maintenanceInFlight: Promise<MaintenanceFlag> | null = null;
+
+async function fetchMaintenance(): Promise<MaintenanceFlag> {
+  try {
+    const response = await fetch(new URL("/system/maintenance", API_BASE_URL), {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return (await response.json()) as { enabled?: boolean };
+  } catch {
+    return null;
+  }
+}
+
 export const middlewareService = {
   // Reads the platform maintenance flag from the public maintenance endpoint
   // (GET /system/maintenance — readable without auth so the gate can apply to
   // anonymous visitors). Fails open (returns null) on any error so a backend
   // hiccup never locks the whole site out.
-  async getMaintenance() {
-    try {
-      const response = await fetch(new URL("/system/maintenance", API_BASE_URL), {
-        cache: "no-store",
+  //
+  // Only the auth entry points (/login, /register) and /maintenance itself
+  // call this — public pages are never gated, so they never trigger a lookup.
+  async getMaintenance(): Promise<MaintenanceFlag> {
+    const now = Date.now();
+
+    if (maintenanceCache && maintenanceCache.expiresAt > now) {
+      return maintenanceCache.value;
+    }
+    if (maintenanceInFlight) {
+      return maintenanceInFlight;
+    }
+
+    maintenanceInFlight = fetchMaintenance()
+      .then((value) => {
+        // A failed lookup is cached too, for the same short window: when the
+        // API is down, failing open on every single request would hammer it
+        // while it's trying to recover.
+        maintenanceCache = { value, expiresAt: Date.now() + MAINTENANCE_TTL_MS };
+        return value;
+      })
+      .finally(() => {
+        maintenanceInFlight = null;
       });
 
-      if (!response.ok) {
-        return null;
-      }
-
-      return (await response.json()) as { enabled?: boolean };
-    } catch {
-      return null;
-    }
+    return maintenanceInFlight;
   },
 
   // Returns the currently authenticated user

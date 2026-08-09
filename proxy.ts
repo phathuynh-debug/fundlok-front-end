@@ -97,6 +97,13 @@ export async function proxy(request: NextRequest) {
   // --- Maintenance gate ---
   // During maintenance only the auth entry points (login/register) are blocked;
   // public pages stay fully accessible. System admins are never blocked.
+  //
+  // Scope is deliberate and load-bearing: the flag is only READ on those two
+  // routes and /maintenance itself. The public marketing pages (/why-us, /faq,
+  // /contact, …) aren't in the matcher at all, and `/` is matched but never
+  // reaches this branch — so browsing the site costs zero maintenance lookups.
+  // The lookup itself is cached in middleware.service.ts; see the note there
+  // for why prefetches can't simply be skipped instead.
   const isMaintenancePage = pathname === MAINTENANCE_ROUTE;
   const isBlockedDuringMaintenance = MAINTENANCE_BLOCKED_ROUTES.some(
     (r) => pathname === r || pathname.startsWith(`${r}/`)
