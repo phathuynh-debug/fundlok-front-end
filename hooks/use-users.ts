@@ -3,6 +3,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   usersService,
+  type SetPasswordRequest,
+  type SetPasswordResponse,
   type UpdateProfileRequest,
 } from '@/services/users.service';
 import { authKeys } from '@/hooks/use-authentication';
@@ -38,6 +40,21 @@ export function useUpdateProfile() {
     mutationFn: (payload) => usersService.updateProfile(payload),
     onSuccess: (user) => {
       queryClient.setQueryData(authKeys.currentUser(), user);
+    },
+  });
+}
+
+// POST /users/me/password. The response is an ack rather than a user, so
+// there's nothing to seed — but the account has just gained a password, so
+// invalidate currentUser to pick up has_password and swap the profile card
+// over to the forgot-password route.
+export function useSetPassword() {
+  const queryClient = useQueryClient();
+
+  return useMutation<SetPasswordResponse, ApiError, SetPasswordRequest>({
+    mutationFn: (payload) => usersService.setPassword(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: authKeys.currentUser() });
     },
   });
 }

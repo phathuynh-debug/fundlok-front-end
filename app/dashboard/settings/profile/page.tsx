@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
@@ -28,6 +29,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useTranslations } from "@/lib/i18n"
 import { getInitials } from "@/lib/utils"
 import { AvatarUploadDialog } from "../_components/AvatarUploadDialog"
+import { SetPasswordDialog } from "../_components/SetPasswordDialog"
 import { profileFormSchema, type ProfileFormValues } from "./form-schema"
 
 // Best-effort browser name from the UA string — purely cosmetic for the UI mock.
@@ -49,11 +51,15 @@ export default function ProfilePage() {
     const updateProfile = useUpdateProfile()
 
     const [avatarOpen, setAvatarOpen] = useState(false)
+    const [passwordOpen, setPasswordOpen] = useState(false)
     const [isEditing, setIsEditing] = useState(false)
 
     // Client-only read; server renders "—" so suppress the hydration diff below.
     const browser = detectBrowser()
     const emailVerified = user?.email_verified ?? false
+    // Default true so the dialog asks for the current password while the
+    // profile is still loading — never the other way round.
+    const hasPassword = user?.has_password ?? true
     const avatarInitials = getInitials(user?.full_name)
 
     // Member Since — formatted from the user's created_at timestamp.
@@ -380,12 +386,30 @@ export default function ProfilePage() {
                             {t("dashboard.settings.profile.password")}
                             <span className="inline-flex items-center gap-1 text-primary">
                                 <KeyRound className="h-3 w-3" />
-                                {t("dashboard.settings.profile.passwordSet")}
+                                {hasPassword
+                                    ? t("dashboard.settings.profile.passwordSet")
+                                    : t("dashboard.settings.profile.passwordNotSet")}
                             </span>
                         </p>
-                        <Button variant="outline" size="sm">
-                            {t("dashboard.settings.profile.changePassword")}
-                        </Button>
+                        {/* Only a FIRST password is set here. Changing an
+                            existing one goes through forgot-password, where
+                            the emailed token proves the mailbox — a session
+                            alone can't overwrite a password. */}
+                        {hasPassword ? (
+                            <Button variant="outline" size="sm" asChild>
+                                <Link href="/forgot-password">
+                                    {t("dashboard.settings.profile.changePassword")}
+                                </Link>
+                            </Button>
+                        ) : (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setPasswordOpen(true)}
+                            >
+                                {t("dashboard.settings.profile.setPassword")}
+                            </Button>
+                        )}
                     </div>
 
                     <div className="rounded-xl border border-border/60 bg-muted/20 p-5 space-y-2">
@@ -402,6 +426,12 @@ export default function ProfilePage() {
                     </div>
                 </div>
             </Card>
+
+            <SetPasswordDialog
+                open={passwordOpen}
+                onOpenChange={setPasswordOpen}
+                t={t}
+            />
 
             <AvatarUploadDialog
                 open={avatarOpen}

@@ -25,6 +25,9 @@ export const USER_ENDPOINTS = {
   selectRole: "/users/me/role",
   avatarPresign: "/users/me/avatar/presign",
   avatarConfirm: "/users/me/avatar/confirm",
+  // Sets a FIRST password on an account created without one (OAuth sign-in).
+  // Changing an existing password is /auth/forgot-password → reset-password.
+  setPassword: "/users/me/password",
 } as const;
 
 export const PROJECT_ENDPOINTS = {

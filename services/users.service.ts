@@ -32,6 +32,24 @@ export interface RoleSelectRequest {
   role: SelectableRole;
 }
 
+// Mirrors backend SetPasswordRequest (POST /users/me/password) — sets a FIRST
+// password on an account created without one. There's no current_password:
+// changing an existing password goes through /forgot-password, where the
+// emailed token is the proof. The backend rejects any account that already
+// has one.
+export interface SetPasswordRequest {
+  new_password: string;
+}
+
+export interface SetPasswordResponse {
+  status: string;
+  message: string;
+}
+
+// Matches the backend's `new_password: str = Field(..., min_length=8)`, so the
+// dialog can say so before spending a round trip.
+export const PASSWORD_MIN_LENGTH = 8;
+
 // Same three-step flow as the loan document upload:
 // presign → direct PUT to R2 → confirm. The file never touches the API server.
 export const AVATAR_RULES = {
@@ -56,6 +74,15 @@ export const usersService = {
   // Returns the refreshed user (user_me_payload) with the chosen role.
   selectRole(role: SelectableRole) {
     return apiClient.patch<User>(USER_ENDPOINTS.selectRole, { role });
+  },
+
+  // POST /users/me/password. Returns an ack, not the user — the caller
+  // refreshes currentUser so has_password flips to true.
+  setPassword(payload: SetPasswordRequest) {
+    return apiClient.post<SetPasswordResponse>(
+      USER_ENDPOINTS.setPassword,
+      payload
+    );
   },
 
   presignAvatar(payload: AvatarPresignRequest) {

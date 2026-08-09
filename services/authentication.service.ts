@@ -28,6 +28,10 @@ export interface User {
   role?: UserRole | null;
   status?: UserStatus;
   email_verified?: boolean;
+  // False for OAuth-only accounts, which set a first password instead of
+  // changing one — the change-password dialog uses this to decide whether to
+  // ask for the current password.
+  has_password?: boolean;
   created_at?: string | null;
 }
 
