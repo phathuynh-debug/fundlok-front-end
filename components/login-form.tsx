@@ -16,7 +16,11 @@ export function LoginForm() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const { turnstileToken, turnstileContainerRef } = useTurnstile();
+  const {
+    turnstileToken,
+    turnstileContainerRef,
+    reset: resetTurnstile,
+  } = useTurnstile();
 
   const { toast } = useToast();
   const { login, googleLogin, isPending, isGooglePending } = useLogin();
@@ -44,6 +48,11 @@ export function LoginForm() {
           });
         },
         onError: (error) => {
+          // A Turnstile token is single-use: the backend already redeemed it
+          // on this attempt. Without a reset, retrying resubmits the spent
+          // token and Cloudflare rejects it with `timeout-or-duplicate` (400),
+          // masking the real error the user was trying to correct.
+          resetTurnstile();
           toast({
             variant: "destructive",
             title: t("auth.login.failedTitle"),

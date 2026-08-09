@@ -52,7 +52,11 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Cloudflare Turnstile Hook
-  const { turnstileToken, turnstileContainerRef } = useTurnstile();
+  const {
+    turnstileToken,
+    turnstileContainerRef,
+    reset: resetTurnstile,
+  } = useTurnstile();
 
   const router = useRouter();
   const { toast } = useToast();
@@ -112,6 +116,9 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
           }
         },
         onError: (error) => {
+          // See login-form.tsx: the token is spent, so a retry without a
+          // reset fails on `timeout-or-duplicate` instead of the real error.
+          resetTurnstile();
           toast({
             variant: "destructive",
             title: t("auth.register.failedTitle"),
