@@ -15,6 +15,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { useToast } from "@/hooks/use-toast";
@@ -127,11 +128,13 @@ export function GVerifyKycClient() {
           <Button
             variant="ghost"
             size="sm"
+            asChild
             className="text-muted-foreground hover:text-foreground"
-            onClick={() => router.push(landing)}
           >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            {t("kyc.returnBtn")}
+            <Link href="/dashboard">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              {t("kyc.returnBtn")}
+            </Link>
           </Button>
           <LocaleSwitcher />
         </div>
