@@ -11,7 +11,6 @@ import {
   XCircle,
   AlertTriangle,
   RotateCcw,
-  LogOut,
   Smartphone,
   ArrowLeft,
 } from "lucide-react";
@@ -20,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
-import { useCurrentUser, useLogout } from "@/hooks/use-authentication";
+import { useCurrentUser } from "@/hooks/use-authentication";
 import { useGVerifyHandoff, useGVerifyStatus } from "@/hooks/use-gverify";
 import { postVerificationTarget } from "../../kyc-landing";
 import { StatusBlock } from "../status-block";
@@ -38,7 +37,6 @@ export function GVerifyKycClient() {
   const { toast } = useToast();
   const { t } = useTranslations();
   const { data: user } = useCurrentUser();
-  const { mutate: logout, isPending: loggingOut } = useLogout();
   const { images, setFile, reset, allReady, submit, submitting } =
     useGVerifyKyc();
   const { mutateAsync: createHandoff, isPending: creatingHandoff } =
@@ -129,16 +127,11 @@ export function GVerifyKycClient() {
           <Button
             variant="ghost"
             size="sm"
-            className="text-muted-foreground hover:text-destructive"
-            disabled={loggingOut}
-            onClick={() => logout()}
+            className="text-muted-foreground hover:text-foreground"
+            onClick={() => router.push(landing)}
           >
-            {loggingOut ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <LogOut className="mr-2 h-4 w-4" />
-            )}
-            {t("common.logout")}
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            {t("kyc.returnBtn")}
           </Button>
           <LocaleSwitcher />
         </div>

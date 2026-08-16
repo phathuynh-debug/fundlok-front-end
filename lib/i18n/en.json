@@ -763,6 +763,7 @@
     "resubmitTitle": "A few steps to redo",
     "resumeBtn": "Continue verification",
     "retryBtn": "Try again",
+    "returnBtn": "Return",
     "startBtn": "Verify my identity",
     "startErrorDescription": "Something went wrong starting verification. Please try again.",
     "startErrorTitle": "Couldn't start verification",

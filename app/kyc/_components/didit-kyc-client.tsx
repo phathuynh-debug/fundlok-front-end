@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   ShieldCheck,
@@ -9,24 +9,24 @@ import {
   Camera,
   Clock,
   ArrowRight,
+  ArrowLeft,
   CheckCircle2,
   XCircle,
   RotateCcw,
   RefreshCw,
-  LogOut,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
-import { useCurrentUser, useLogout } from "@/hooks/use-authentication";
+import { useCurrentUser } from "@/hooks/use-authentication";
 import {
   useVerificationStatus,
   useStartVerification,
   useSyncVerification,
 } from "@/hooks/use-verification";
-import { kycLandingForRole } from "../kyc-landing";
+import { postVerificationTarget } from "../kyc-landing";
 import { StatusBlock } from "./status-block";
 import type { ApiError } from "@/lib/types";
 
@@ -36,16 +36,16 @@ import type { ApiError } from "@/lib/types";
 // on approval, and retry for terminal failures.
 export function DiditKycClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
   const { t, locale } = useTranslations();
   const { data: user } = useCurrentUser();
-  const { mutate: logout, isPending: loggingOut } = useLogout();
   const { data: status } = useVerificationStatus({ poll: true });
   const { mutateAsync: start, isPending: starting } = useStartVerification();
   const { mutate: sync, isPending: syncing } = useSyncVerification();
   const syncedRef = useRef(false);
 
-  const landing = kycLandingForRole(user?.role);
+  const landing = postVerificationTarget(searchParams.get("next"), user?.role);
   const s = status?.status;
   const isApproved = status?.is_approved === true;
 
@@ -104,16 +104,11 @@ export function DiditKycClient() {
           <Button
             variant="ghost"
             size="sm"
-            className="text-muted-foreground hover:text-destructive"
-            disabled={loggingOut}
-            onClick={() => logout()}
+            className="text-muted-foreground hover:text-foreground"
+            onClick={() => router.push(landing)}
           >
-            {loggingOut ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <LogOut className="mr-2 h-4 w-4" />
-            )}
-            {t("common.logout")}
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            {t("kyc.returnBtn")}
           </Button>
           <LocaleSwitcher />
         </div>
