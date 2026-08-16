@@ -12,6 +12,8 @@
     "i18n:sort": "bun scripts/sort-i18n.ts",
     "i18n:check": "bun scripts/sort-i18n.ts --check",
     "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint:style": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
     "prepare": "husky install"
