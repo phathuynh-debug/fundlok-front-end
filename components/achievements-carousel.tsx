@@ -37,6 +37,7 @@ export function AchievementsCarousel({
 
   // Auto-reset activeImageIndex when activeAchievement changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveImageIndex(0);
   }, [activeAchievement]);
 

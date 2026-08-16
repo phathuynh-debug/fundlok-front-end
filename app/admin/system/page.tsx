@@ -28,6 +28,7 @@ export default function AdminSystemPage() {
   // Seed local form state once the current maintenance state loads.
   useEffect(() => {
     if (maintenance) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEnabled(maintenance.enabled);
       setMessage(maintenance.message ?? "");
     }

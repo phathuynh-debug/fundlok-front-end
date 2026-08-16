@@ -1081,7 +1081,7 @@ export function InteractiveFlow() {
 
                 {/* Main H3 Title */}
                 <h3 className="font-sans text-3xl font-extrabold text-foreground mb-4 leading-tight tracking-tight">
-                  {(currentStepData as any).detailTitle ||
+                  {(currentStepData as { detailTitle?: string }).detailTitle ||
                     currentStepData.title}
                 </h3>
 

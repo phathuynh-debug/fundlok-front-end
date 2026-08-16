@@ -417,8 +417,8 @@ export default function ProjectsClient() {
             <span>
               {marketType === "primary"
                 ? t("dashboard.projects.opportunitiesAvailable", {
-                  count: publicProjects.length,
-                })
+                    count: publicProjects.length,
+                  })
                 : `Showing ${filteredItems.length} of ${mockSecondaryMarket.length} listings`}
             </span>
           </div>
@@ -428,20 +428,22 @@ export default function ProjectsClient() {
         <div className="p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-800/40 w-fit flex items-center gap-1">
           <button
             onClick={() => handleMarketToggle("primary")}
-            className={`px-4 py-2.5 rounded-lg text-xs font-mono tracking-wider font-bold uppercase transition-all duration-200 flex items-center gap-2 cursor-pointer ${marketType === "primary"
-              ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
-              : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white bg-transparent border border-transparent"
-              }`}
+            className={`px-4 py-2.5 rounded-lg text-xs font-mono tracking-wider font-bold uppercase transition-all duration-200 flex items-center gap-2 cursor-pointer ${
+              marketType === "primary"
+                ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
+                : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white bg-transparent border border-transparent"
+            }`}
           >
             <Building2 className="w-3.5 h-3.5" />
             <span>Primary Market</span>
           </button>
           <button
             onClick={() => handleMarketToggle("secondary")}
-            className={`px-4 py-2.5 rounded-lg text-xs font-mono tracking-wider font-bold uppercase transition-all duration-200 flex items-center gap-2 cursor-pointer ${marketType === "secondary"
-              ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
-              : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white bg-transparent border border-transparent"
-              }`}
+            className={`px-4 py-2.5 rounded-lg text-xs font-mono tracking-wider font-bold uppercase transition-all duration-200 flex items-center gap-2 cursor-pointer ${
+              marketType === "secondary"
+                ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
+                : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white bg-transparent border border-transparent"
+            }`}
           >
             <ShoppingCart className="w-3.5 h-3.5" />
             <span>Secondary Market</span>
@@ -468,10 +470,11 @@ export default function ProjectsClient() {
               <Badge
                 key={industry}
                 variant={activeIndustry === industry ? "default" : "outline"}
-                className={`cursor-pointer rounded-full transition-all ${activeIndustry === industry
-                  ? "bg-black text-white hover:bg-black/90 dark:bg-white dark:text-slate-950"
-                  : "hover:bg-accent"
-                  }`}
+                className={`cursor-pointer rounded-full transition-all ${
+                  activeIndustry === industry
+                    ? "bg-black text-white hover:bg-black/90 dark:bg-white dark:text-slate-950"
+                    : "hover:bg-accent"
+                }`}
                 onClick={() => setSelectedIndustry(industry)}
               >
                 {industry}
@@ -512,27 +515,27 @@ export default function ProjectsClient() {
               >
                 {marketType === "primary"
                   ? (filteredItems as Project[]).map((project) => (
-                    <motion.div
-                      key={project.id}
-                      variants={springItemVariants}
-                    >
-                      <ProjectCard
-                        project={project}
-                        role="INVESTOR"
-                        actionLabel={t("dashboard.projects.investNow")}
-                      />
-                    </motion.div>
-                  ))
-                  : (filteredItems as SecondaryMarketListing[]).map(
-                    (listing) => (
                       <motion.div
-                        key={listing.id}
+                        key={project.id}
                         variants={springItemVariants}
                       >
-                        <SecondaryMarketCard listing={listing} />
+                        <ProjectCard
+                          project={project}
+                          role="INVESTOR"
+                          actionLabel={t("dashboard.projects.investNow")}
+                        />
                       </motion.div>
-                    ),
-                  )}
+                    ))
+                  : (filteredItems as SecondaryMarketListing[]).map(
+                      (listing) => (
+                        <motion.div
+                          key={listing.id}
+                          variants={springItemVariants}
+                        >
+                          <SecondaryMarketCard listing={listing} />
+                        </motion.div>
+                      ),
+                    )}
               </motion.div>
             ) : (
               <motion.div

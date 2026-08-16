@@ -59,12 +59,12 @@ export function ContactForm() {
       setMessage("");
       // Reset Turnstile widget visually
       resetTurnstile();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         variant: "destructive",
         title: t("contactPage.form.failedToSendMessage"),
         description:
-          error?.message ||
+          (error as Error)?.message ||
           (locale === "vi"
             ? "Đã có lỗi xảy ra. Vui lòng thử lại."
             : "Something went wrong. Please try again."),
