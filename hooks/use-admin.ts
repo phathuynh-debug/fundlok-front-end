@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
 import {
   keepPreviousData,
   useMutation,
   useQuery,
   useQueryClient,
-} from '@tanstack/react-query';
-import type { ApiError } from '@/lib/types';
+} from "@tanstack/react-query";
+import type { ApiError } from "@/lib/types";
 import {
   adminService,
   type AdminOverview,
@@ -15,20 +15,20 @@ import {
   type AuditLogParams,
   type MaintenanceState,
   type MaintenanceUpdate,
-} from '@/services/admin.service';
+} from "@/services/admin.service";
 
 export const adminKeys = {
-  all: ['admin'] as const,
+  all: ["admin"] as const,
   overview: (params: AdminOverviewParams) =>
-    [...adminKeys.all, 'overview', params] as const,
+    [...adminKeys.all, "overview", params] as const,
   auditLogs: (params: AuditLogParams) =>
-    [...adminKeys.all, 'audit-logs', params] as const,
-  maintenance: () => [...adminKeys.all, 'maintenance'] as const,
+    [...adminKeys.all, "audit-logs", params] as const,
+  maintenance: () => [...adminKeys.all, "maintenance"] as const,
 };
 
 export function useAdminOverview(
   params: AdminOverviewParams = {},
-  enabled = true
+  enabled = true,
 ) {
   return useQuery<AdminOverview, ApiError>({
     queryKey: adminKeys.overview(params),

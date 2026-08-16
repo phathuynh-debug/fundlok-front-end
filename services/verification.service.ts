@@ -1,21 +1,21 @@
-import { apiClient } from '@/lib/api-client';
-import { verificationEndpoints, type VerificationKind } from '@/lib/endpoints';
-import type { UserRole } from '@/services/authentication.service';
+import { apiClient } from "@/lib/api-client";
+import { verificationEndpoints, type VerificationKind } from "@/lib/endpoints";
+import type { UserRole } from "@/services/authentication.service";
 
 export type { VerificationKind };
 
 // Didit's exact, case-sensitive status strings.
 export type VerificationStatus =
-  | 'Not Started'
-  | 'In Progress'
-  | 'Awaiting User'
-  | 'In Review'
-  | 'Resubmitted'
-  | 'Approved'
-  | 'Declined'
-  | 'Abandoned'
-  | 'Expired'
-  | 'Kyc Expired';
+  | "Not Started"
+  | "In Progress"
+  | "Awaiting User"
+  | "In Review"
+  | "Resubmitted"
+  | "Approved"
+  | "Declined"
+  | "Abandoned"
+  | "Expired"
+  | "Kyc Expired";
 
 // POST /{kyc|kyb}/start — creates (or resumes) a Didit session.
 export interface VerificationStartResponse {
@@ -43,17 +43,19 @@ export interface VerificationStatusResponse {
 export function verificationKindForRole(
   role?: UserRole | string | null,
 ): VerificationKind | null {
-  if (role === 'INVESTOR') return 'KYC';
-  if (role === 'SME') return 'KYB';
+  if (role === "INVESTOR") return "KYC";
+  if (role === "SME") return "KYB";
   return null;
 }
 
 // Synthetic status for a user who has never started (the endpoint 404s).
-export function notStartedStatus(kind: VerificationKind): VerificationStatusResponse {
+export function notStartedStatus(
+  kind: VerificationKind,
+): VerificationStatusResponse {
   return {
-    verification_id: '',
-    session_id: '',
-    status: 'Not Started',
+    verification_id: "",
+    session_id: "",
+    status: "Not Started",
     verification_type: kind,
     is_terminal: false,
     is_approved: false,
@@ -72,11 +74,15 @@ export const verificationService = {
 
   // Latest decision, read from our DB (cheap — use this for polling).
   getStatus(kind: VerificationKind) {
-    return apiClient.get<VerificationStatusResponse>(verificationEndpoints(kind).status);
+    return apiClient.get<VerificationStatusResponse>(
+      verificationEndpoints(kind).status,
+    );
   },
 
   // Force-refresh directly from Didit (fallback when the webhook is delayed).
   sync(kind: VerificationKind) {
-    return apiClient.post<VerificationStatusResponse>(verificationEndpoints(kind).sync);
+    return apiClient.post<VerificationStatusResponse>(
+      verificationEndpoints(kind).sync,
+    );
   },
 };

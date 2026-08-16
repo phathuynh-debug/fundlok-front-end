@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
@@ -11,37 +11,46 @@ import {
   LogOut,
   Loader2,
   type LucideIcon,
-} from "lucide-react"
-import { cn } from "@/lib/utils"
-import { useCurrentUser, useLogout } from "@/hooks/use-authentication"
-import { useTranslations } from "@/lib/i18n"
-import Logo from "@/components/logo"
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useCurrentUser, useLogout } from "@/hooks/use-authentication";
+import { useTranslations } from "@/lib/i18n";
+import Logo from "@/components/logo";
 
 interface NavItem {
-  labelKey: string
-  href: string
-  icon: LucideIcon
+  labelKey: string;
+  href: string;
+  icon: LucideIcon;
   // When true, only SYSTEM_ADMIN sees this entry.
-  systemAdminOnly?: boolean
+  systemAdminOnly?: boolean;
 }
 
 const navItems: NavItem[] = [
   { labelKey: "admin.sidebar.overview", href: "/admin", icon: LayoutDashboard },
   { labelKey: "admin.sidebar.users", href: "/admin/users", icon: Users },
-  { labelKey: "admin.sidebar.auditLogs", href: "/admin/audit-logs", icon: ScrollText },
-  { labelKey: "admin.sidebar.systemSettings", href: "/admin/system", icon: ServerCog, systemAdminOnly: true },
-]
+  {
+    labelKey: "admin.sidebar.auditLogs",
+    href: "/admin/audit-logs",
+    icon: ScrollText,
+  },
+  {
+    labelKey: "admin.sidebar.systemSettings",
+    href: "/admin/system",
+    icon: ServerCog,
+    systemAdminOnly: true,
+  },
+];
 
 export function AdminSidebar() {
-  const pathname = usePathname()
-  const { mutate: logout, isPending: isLoggingOut } = useLogout()
-  const { data: user } = useCurrentUser()
-  const { t } = useTranslations()
+  const pathname = usePathname();
+  const { mutate: logout, isPending: isLoggingOut } = useLogout();
+  const { data: user } = useCurrentUser();
+  const { t } = useTranslations();
 
-  const isSystemAdmin = user?.role === "SYSTEM_ADMIN"
+  const isSystemAdmin = user?.role === "SYSTEM_ADMIN";
   const visibleNavItems = navItems.filter(
-    (item) => !item.systemAdminOnly || isSystemAdmin
-  )
+    (item) => !item.systemAdminOnly || isSystemAdmin,
+  );
 
   return (
     <div className="hidden border-r bg-card md:flex md:w-64 md:flex-col h-screen">
@@ -69,7 +78,7 @@ export function AdminSidebar() {
             const active =
               item.href === "/admin"
                 ? pathname === "/admin"
-                : pathname.startsWith(item.href)
+                : pathname.startsWith(item.href);
 
             return (
               <Link
@@ -79,7 +88,7 @@ export function AdminSidebar() {
                   "group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200",
                   active
                     ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
                 )}
               >
                 <item.icon
@@ -87,12 +96,12 @@ export function AdminSidebar() {
                     "mr-3 h-5 w-5 shrink-0",
                     active
                       ? "text-primary"
-                      : "text-muted-foreground group-hover:text-accent-foreground"
+                      : "text-muted-foreground group-hover:text-accent-foreground",
                   )}
                 />
                 {t(item.labelKey)}
               </Link>
-            )
+            );
           })}
         </nav>
 
@@ -114,5 +123,5 @@ export function AdminSidebar() {
         </div>
       </div>
     </div>
-  )
+  );
 }

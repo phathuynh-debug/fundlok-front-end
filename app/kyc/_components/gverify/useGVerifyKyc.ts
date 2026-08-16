@@ -1,20 +1,23 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useGVerifyVerify, useGVerifyVerifyWithToken } from '@/hooks/use-gverify';
-import type { GVerifyVerifyResponse } from '@/services/gverify.service';
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useGVerifyVerify,
+  useGVerifyVerifyWithToken,
+} from "@/hooks/use-gverify";
+import type { GVerifyVerifyResponse } from "@/services/gverify.service";
 
-export type CaptureSlot = 'front' | 'back' | 'portrait';
+export type CaptureSlot = "front" | "back" | "portrait";
 
-export const CAPTURE_SLOTS: CaptureSlot[] = ['front', 'back', 'portrait'];
+export const CAPTURE_SLOTS: CaptureSlot[] = ["front", "back", "portrait"];
 
 // Mirror of the backend limits (app/gverify re-validates server-side).
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
-const ACCEPTED_TYPES = ['image/jpeg', 'image/png'];
-export const CAPTURE_ACCEPT = ACCEPTED_TYPES.join(',');
+const ACCEPTED_TYPES = ["image/jpeg", "image/png"];
+export const CAPTURE_ACCEPT = ACCEPTED_TYPES.join(",");
 
 // i18n key suffix under kyc.gv.* — translated where rendered.
-export type CaptureError = 'invalidType' | 'tooLarge' | 'processFailed' | null;
+export type CaptureError = "invalidType" | "tooLarge" | "processFailed" | null;
 
 // Phone cameras produce 4-6MB photos; three of them base64-encoded blow past
 // the Next dev proxy's 10MB body limit (and waste mobile bandwidth). OCR and
@@ -28,18 +31,23 @@ export async function compressImage(file: File): Promise<File> {
   if (file.size <= COMPRESS_ABOVE_BYTES) return file;
   const bitmap = await createImageBitmap(file);
   try {
-    const scale = Math.min(1, MAX_DIMENSION / Math.max(bitmap.width, bitmap.height));
-    const canvas = document.createElement('canvas');
+    const scale = Math.min(
+      1,
+      MAX_DIMENSION / Math.max(bitmap.width, bitmap.height),
+    );
+    const canvas = document.createElement("canvas");
     canvas.width = Math.round(bitmap.width * scale);
     canvas.height = Math.round(bitmap.height * scale);
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return file;
     ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
     const blob = await new Promise<Blob | null>((resolve) =>
-      canvas.toBlob(resolve, 'image/jpeg', JPEG_QUALITY),
+      canvas.toBlob(resolve, "image/jpeg", JPEG_QUALITY),
     );
     if (!blob) return file;
-    return new File([blob], file.name.replace(/\.\w+$/, '.jpg'), { type: 'image/jpeg' });
+    return new File([blob], file.name.replace(/\.\w+$/, ".jpg"), {
+      type: "image/jpeg",
+    });
   } finally {
     bitmap.close();
   }
@@ -51,14 +59,18 @@ export interface StagedImage {
   error: CaptureError;
 }
 
-const emptySlot = (): StagedImage => ({ file: null, previewUrl: null, error: null });
+const emptySlot = (): StagedImage => ({
+  file: null,
+  previewUrl: null,
+  error: null,
+});
 
 export function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     // readAsDataURL yields "data:image/jpeg;base64,<payload>" — backend wants
     // only the payload.
-    reader.onload = () => resolve(String(reader.result).split(',')[1] ?? '');
+    reader.onload = () => resolve(String(reader.result).split(",")[1] ?? "");
     reader.onerror = () => reject(reader.error);
     reader.readAsDataURL(file);
   });
@@ -71,14 +83,18 @@ export function fileToBase64(file: File): Promise<string> {
 //
 // Pass `handoffToken` on the phone capture page (/kyc/mobile): the submit then
 // authenticates with the QR token instead of the session cookie.
-export function useGVerifyKyc({ handoffToken }: { handoffToken?: string } = {}) {
+export function useGVerifyKyc({
+  handoffToken,
+}: { handoffToken?: string } = {}) {
   const [images, setImages] = useState<Record<CaptureSlot, StagedImage>>({
     front: emptySlot(),
     back: emptySlot(),
     portrait: emptySlot(),
   });
-  const { mutateAsync: verifySession, isPending: sessionPending } = useGVerifyVerify();
-  const { mutateAsync: verifyToken, isPending: tokenPending } = useGVerifyVerifyWithToken();
+  const { mutateAsync: verifySession, isPending: sessionPending } =
+    useGVerifyVerify();
+  const { mutateAsync: verifyToken, isPending: tokenPending } =
+    useGVerifyVerifyWithToken();
   const submitting = sessionPending || tokenPending;
 
   // Track every object URL we minted so unmount can revoke stragglers.
@@ -91,7 +107,11 @@ export function useGVerifyKyc({ handoffToken }: { handoffToken?: string } = {}) 
   }, []);
 
   // Guards against a slow compression landing after the user re-picked.
-  const pickSeqRef = useRef<Record<CaptureSlot, number>>({ front: 0, back: 0, portrait: 0 });
+  const pickSeqRef = useRef<Record<CaptureSlot, number>>({
+    front: 0,
+    back: 0,
+    portrait: 0,
+  });
 
   const setFile = useCallback((slot: CaptureSlot, file: File | null) => {
     const seq = ++pickSeqRef.current[slot];
@@ -113,7 +133,7 @@ export function useGVerifyKyc({ handoffToken }: { handoffToken?: string } = {}) 
       return;
     }
     if (!ACCEPTED_TYPES.includes(file.type)) {
-      stage({ file: null, previewUrl: null, error: 'invalidType' });
+      stage({ file: null, previewUrl: null, error: "invalidType" });
       return;
     }
 
@@ -121,14 +141,16 @@ export function useGVerifyKyc({ handoffToken }: { handoffToken?: string } = {}) 
       .catch(() => file) // un-decodable but well-typed: fall through to size check
       .then((staged) => {
         if (staged.size > MAX_IMAGE_BYTES) {
-          stage({ file: null, previewUrl: null, error: 'tooLarge' });
+          stage({ file: null, previewUrl: null, error: "tooLarge" });
           return;
         }
         const previewUrl = URL.createObjectURL(staged);
         urlsRef.current.add(previewUrl);
         stage({ file: staged, previewUrl, error: null });
       })
-      .catch(() => stage({ file: null, previewUrl: null, error: 'processFailed' }));
+      .catch(() =>
+        stage({ file: null, previewUrl: null, error: "processFailed" }),
+      );
   }, []);
 
   const reset = useCallback(() => {
@@ -143,8 +165,14 @@ export function useGVerifyKyc({ handoffToken }: { handoffToken?: string } = {}) 
     const [front, back, portrait] = await Promise.all(
       CAPTURE_SLOTS.map((slot) => fileToBase64(images[slot].file as File)),
     );
-    const payload = { id_front_b64: front, id_back_b64: back, portrait_b64: portrait };
-    return handoffToken ? verifyToken({ payload, token: handoffToken }) : verifySession(payload);
+    const payload = {
+      id_front_b64: front,
+      id_back_b64: back,
+      portrait_b64: portrait,
+    };
+    return handoffToken
+      ? verifyToken({ payload, token: handoffToken })
+      : verifySession(payload);
   }, [images, handoffToken, verifySession, verifyToken]);
 
   return { images, setFile, reset, allReady, submit, submitting };

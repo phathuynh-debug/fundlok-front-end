@@ -522,7 +522,9 @@ export default function ProjectApplicationClient() {
                     >
                       <SelectTrigger id="city" className="w-full">
                         <SelectValue
-                          placeholder={t("projectApplication.placeholders.city")}
+                          placeholder={t(
+                            "projectApplication.placeholders.city",
+                          )}
                         />
                       </SelectTrigger>
                       <SelectContent>
@@ -584,7 +586,9 @@ export default function ProjectApplicationClient() {
                   >
                     <SelectTrigger id="country" className="w-full">
                       <SelectValue
-                        placeholder={t("projectApplication.placeholders.country")}
+                        placeholder={t(
+                          "projectApplication.placeholders.country",
+                        )}
                       />
                     </SelectTrigger>
                     <SelectContent>

@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useMutation } from '@tanstack/react-query';
-import type { ApiError } from '@/lib/types';
+import { useMutation } from "@tanstack/react-query";
+import type { ApiError } from "@/lib/types";
 import {
   uploadsService,
   type ConfirmUploadsPayload,
   type ConfirmUploadsResponse,
   type LoanDocumentType,
   type UploadedDocument,
-} from '@/services/uploads.service';
+} from "@/services/uploads.service";
 
 export interface UploadLoanDocumentVariables {
   loanApplicationId: string;

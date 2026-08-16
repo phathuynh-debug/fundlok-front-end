@@ -1,18 +1,18 @@
-import axios from 'axios';
-import { apiClient } from '@/lib/api-client';
-import { UPLOADS_ENDPOINTS } from '@/lib/endpoints';
+import axios from "axios";
+import { apiClient } from "@/lib/api-client";
+import { UPLOADS_ENDPOINTS } from "@/lib/endpoints";
 
 // Document upload flow for loan applications:
 // init-upload (per file) → PUT raw bytes to R2 via presigned URL → confirm (batched).
 // Files never go through the API server; only metadata does.
 
 export type LoanDocumentType =
-  | 'legal_charter'
-  | 'business_registration'
-  | 'vat_tax_zip'
-  | 'financial_report'
-  | 'e_invoice_data'
-  | 'cic_report';
+  | "legal_charter"
+  | "business_registration"
+  | "vat_tax_zip"
+  | "financial_report"
+  | "e_invoice_data"
+  | "cic_report";
 
 export interface InitUploadPayload {
   loan_application_id: string;
@@ -61,24 +61,24 @@ export const DOCUMENT_TYPE_RULES: Record<
   LoanDocumentType,
   { extensions: string[]; maxSizeMb: number }
 > = {
-  legal_charter: { extensions: ['pdf'], maxSizeMb: 25 },
-  business_registration: { extensions: ['pdf'], maxSizeMb: 25 },
-  vat_tax_zip: { extensions: ['zip'], maxSizeMb: 200 },
-  financial_report: { extensions: ['pdf'], maxSizeMb: 25 },
-  e_invoice_data: { extensions: ['zip', 'xlsx', 'csv', 'xml'], maxSizeMb: 100 },
-  cic_report: { extensions: ['pdf'], maxSizeMb: 25 },
+  legal_charter: { extensions: ["pdf"], maxSizeMb: 25 },
+  business_registration: { extensions: ["pdf"], maxSizeMb: 25 },
+  vat_tax_zip: { extensions: ["zip"], maxSizeMb: 200 },
+  financial_report: { extensions: ["pdf"], maxSizeMb: 25 },
+  e_invoice_data: { extensions: ["zip", "xlsx", "csv", "xml"], maxSizeMb: 100 },
+  cic_report: { extensions: ["pdf"], maxSizeMb: 25 },
 };
 
 const CONTENT_TYPES_BY_EXTENSION: Record<string, string[]> = {
-  pdf: ['application/pdf'],
-  zip: ['application/zip', 'application/x-zip-compressed'],
-  xlsx: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
-  csv: ['text/csv'],
-  xml: ['application/xml', 'text/xml'],
+  pdf: ["application/pdf"],
+  zip: ["application/zip", "application/x-zip-compressed"],
+  xlsx: ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
+  csv: ["text/csv"],
+  xml: ["application/xml", "text/xml"],
 };
 
 function getExtension(filename: string): string {
-  return filename.split('.').pop()?.toLowerCase() ?? '';
+  return filename.split(".").pop()?.toLowerCase() ?? "";
 }
 
 // The content_type sent to init-upload must match the file's extension, and the
@@ -92,22 +92,22 @@ export function resolveContentType(file: File): string | null {
 }
 
 export type FileValidationError =
-  | { code: 'invalid_extension'; allowedExtensions: string }
-  | { code: 'file_too_large'; maxSizeMb: number };
+  | { code: "invalid_extension"; allowedExtensions: string }
+  | { code: "file_too_large"; maxSizeMb: number };
 
 export function validateLoanDocumentFile(
   documentType: LoanDocumentType,
-  file: File
+  file: File,
 ): FileValidationError | null {
   const rules = DOCUMENT_TYPE_RULES[documentType];
   if (!rules.extensions.includes(getExtension(file.name))) {
     return {
-      code: 'invalid_extension',
-      allowedExtensions: rules.extensions.map((ext) => `.${ext}`).join(', '),
+      code: "invalid_extension",
+      allowedExtensions: rules.extensions.map((ext) => `.${ext}`).join(", "),
     };
   }
   if (file.size > rules.maxSizeMb * 1024 * 1024) {
-    return { code: 'file_too_large', maxSizeMb: rules.maxSizeMb };
+    return { code: "file_too_large", maxSizeMb: rules.maxSizeMb };
   }
   return null;
 }
@@ -116,7 +116,7 @@ export const uploadsService = {
   async initUpload(payload: InitUploadPayload) {
     return apiClient.post<InitUploadResponse>(
       UPLOADS_ENDPOINTS.initUpload,
-      payload
+      payload,
     );
   },
 
@@ -126,10 +126,10 @@ export const uploadsService = {
     uploadUrl: string,
     file: File,
     contentType: string,
-    onProgress?: (percent: number) => void
+    onProgress?: (percent: number) => void,
   ) {
     await axios.put(uploadUrl, file, {
-      headers: { 'Content-Type': contentType },
+      headers: { "Content-Type": contentType },
       withCredentials: false,
       timeout: 0,
       onUploadProgress: (event) => {
@@ -143,7 +143,7 @@ export const uploadsService = {
   async confirm(payload: ConfirmUploadsPayload) {
     return apiClient.post<ConfirmUploadsResponse>(
       UPLOADS_ENDPOINTS.confirm,
-      payload
+      payload,
     );
   },
 
@@ -162,7 +162,7 @@ export const uploadsService = {
     if (!contentType) {
       const rules = DOCUMENT_TYPE_RULES[documentType];
       throw {
-        message: `Extension not allowed for ${documentType} (allowed: ${rules.extensions.join(', ')})`,
+        message: `Extension not allowed for ${documentType} (allowed: ${rules.extensions.join(", ")})`,
       };
     }
 

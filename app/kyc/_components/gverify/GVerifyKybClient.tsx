@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
 import {
   Building2,
   Loader2,
@@ -15,22 +15,22 @@ import {
   ArrowRight,
   FileText,
   Clock,
-} from 'lucide-react';
+} from "lucide-react";
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { LocaleSwitcher } from '@/components/locale-switcher';
-import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
-import { useTranslations } from '@/lib/i18n';
-import { useCurrentUser, useLogout } from '@/hooks/use-authentication';
-import { useGVerifyKybStatus } from '@/hooks/use-gverify';
-import type { GVerifyKybDocumentType } from '@/services/gverify.service';
-import { postVerificationTarget } from '../../kyc-landing';
-import { StatusBlock } from '../status-block';
-import { DocumentCaptureField } from './DocumentCaptureField';
-import { useGVerifyKyb } from './useGVerifyKyb';
-import type { ApiError } from '@/lib/types';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { LocaleSwitcher } from "@/components/locale-switcher";
+import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
+import { useTranslations } from "@/lib/i18n";
+import { useCurrentUser, useLogout } from "@/hooks/use-authentication";
+import { useGVerifyKybStatus } from "@/hooks/use-gverify";
+import type { GVerifyKybDocumentType } from "@/services/gverify.service";
+import { postVerificationTarget } from "../../kyc-landing";
+import { StatusBlock } from "../status-block";
+import { DocumentCaptureField } from "./DocumentCaptureField";
+import { useGVerifyKyb } from "./useGVerifyKyb";
+import type { ApiError } from "@/lib/types";
 
 // HOUSEHOLD was dropped 2026-07-15 per the provider integration guide — OCR X
 // business verification covers company and branch certificates.
@@ -39,11 +39,15 @@ const DOCUMENT_TYPES: Array<{
   labelKey: string;
   docLabelKey: string;
 }> = [
-  { value: 'COMPANY', labelKey: 'kyc.kyb.typeCompany', docLabelKey: 'kyc.kyb.docLabelCompany' },
   {
-    value: 'COMPANY_BRANCH',
-    labelKey: 'kyc.kyb.typeBranch',
-    docLabelKey: 'kyc.kyb.docLabelBranch',
+    value: "COMPANY",
+    labelKey: "kyc.kyb.typeCompany",
+    docLabelKey: "kyc.kyb.docLabelCompany",
+  },
+  {
+    value: "COMPANY_BRANCH",
+    labelKey: "kyc.kyb.typeBranch",
+    docLabelKey: "kyc.kyb.docLabelBranch",
   },
 ];
 
@@ -79,7 +83,7 @@ export function GVerifyKybClient() {
   // Step 2 is reachable only once a document is staged.
   const [step, setStep] = useState<1 | 2>(1);
 
-  const landing = postVerificationTarget(searchParams.get('next'), user?.role);
+  const landing = postVerificationTarget(searchParams.get("next"), user?.role);
   const isApproved = status?.is_approved === true;
 
   useEffect(() => {
@@ -93,7 +97,7 @@ export function GVerifyKybClient() {
     try {
       const verdict = await submit();
       setRetaking(false);
-      if (verdict.status === 'REJECTED') {
+      if (verdict.status === "REJECTED") {
         reset();
         setStep(1);
       }
@@ -102,15 +106,15 @@ export function GVerifyKybClient() {
       setRetaking(false);
       setStep(1);
       toast({
-        variant: 'destructive',
-        title: t('kyc.gv.errorTitle'),
-        description: apiError?.message || t('kyc.startErrorDescription'),
+        variant: "destructive",
+        title: t("kyc.gv.errorTitle"),
+        description: apiError?.message || t("kyc.startErrorDescription"),
       });
     }
   };
 
   const showResult =
-    !retaking && (status?.status === 'REJECTED' || status?.status === 'FAILED');
+    !retaking && (status?.status === "REJECTED" || status?.status === "FAILED");
 
   // The review step is only ever rendered with a staged document — if the
   // file vanishes (reset after rejection, type switch), fall back to step 1.
@@ -121,7 +125,7 @@ export function GVerifyKybClient() {
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, ease: 'easeOut' }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
         className="w-full max-w-lg space-y-6 rounded-2xl border border-border bg-card p-8 text-center text-card-foreground shadow-lg"
       >
         <div className="flex items-center justify-between">
@@ -137,7 +141,7 @@ export function GVerifyKybClient() {
             ) : (
               <LogOut className="mr-2 h-4 w-4" />
             )}
-            {t('common.logout')}
+            {t("common.logout")}
           </Button>
           <LocaleSwitcher />
         </div>
@@ -146,36 +150,40 @@ export function GVerifyKybClient() {
         {isApproved ? (
           <StatusBlock
             icon={<CheckCircle2 className="h-12 w-12 text-emerald-500" />}
-            title={t('kyc.kyb.approvedTitle')}
-            hint={t('kyc.kyb.approvedHint')}
+            title={t("kyc.kyb.approvedTitle")}
+            hint={t("kyc.kyb.approvedHint")}
           />
         ) : /* --- Loading the latest attempt --- */ !status ? (
           <StatusBlock
             icon={<Loader2 className="h-12 w-12 animate-spin text-primary" />}
-            title={t('kyc.inProgress')}
-            hint={t('kyc.checking')}
+            title={t("kyc.inProgress")}
+            hint={t("kyc.checking")}
           />
         ) : /* --- Parked for ops review (borderline OCR / registry mismatch) --- */ status.status ===
-          'MANUAL_REVIEW' ? (
+          "MANUAL_REVIEW" ? (
           <StatusBlock
             icon={<Clock className="h-12 w-12 text-amber-500" />}
-            title={t('kyc.inReviewTitle')}
-            hint={t('kyc.inReviewHint')}
+            title={t("kyc.inReviewTitle")}
+            hint={t("kyc.inReviewHint")}
           />
         ) : /* --- Last attempt rejected / provider failure --- */ showResult ? (
           <StatusBlock
             icon={
-              status.status === 'REJECTED' ? (
+              status.status === "REJECTED" ? (
                 <XCircle className="h-12 w-12 text-destructive" />
               ) : (
                 <AlertTriangle className="h-12 w-12 text-amber-500" />
               )
             }
-            title={t(status.status === 'REJECTED' ? 'kyc.kyb.declinedTitle' : 'kyc.gv.failedTitle')}
+            title={t(
+              status.status === "REJECTED"
+                ? "kyc.kyb.declinedTitle"
+                : "kyc.gv.failedTitle",
+            )}
             hint={
-              status.status === 'REJECTED'
-                ? status.rejection_reason || t('kyc.declinedHint')
-                : t('kyc.gv.failedHint')
+              status.status === "REJECTED"
+                ? status.rejection_reason || t("kyc.declinedHint")
+                : t("kyc.gv.failedHint")
             }
           >
             <Button
@@ -186,7 +194,7 @@ export function GVerifyKybClient() {
               }}
             >
               <RotateCcw className="mr-2 h-4 w-4" />
-              {t('kyc.retryBtn')}
+              {t("kyc.retryBtn")}
             </Button>
           </StatusBlock>
         ) : (
@@ -198,9 +206,9 @@ export function GVerifyKybClient() {
               </div>
               <div className="space-y-1.5">
                 <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
-                  {t('kyc.kyb.title')}
+                  {t("kyc.kyb.title")}
                 </h1>
-                <p className="text-muted-foreground">{t('kyc.kyb.subtitle')}</p>
+                <p className="text-muted-foreground">{t("kyc.kyb.subtitle")}</p>
               </div>
             </div>
 
@@ -213,10 +221,10 @@ export function GVerifyKybClient() {
                 disabled={submitting}
                 onClick={() => setStep(1)}
                 className={cn(
-                  'flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2.5 text-xs font-medium transition-colors',
+                  "flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2.5 text-xs font-medium transition-colors",
                   activeStep === 1
-                    ? 'border-primary bg-primary/10 text-foreground'
-                    : 'border-border bg-muted/20 text-muted-foreground hover:border-primary/40',
+                    ? "border-primary bg-primary/10 text-foreground"
+                    : "border-border bg-muted/20 text-muted-foreground hover:border-primary/40",
                 )}
               >
                 {ready ? (
@@ -224,7 +232,7 @@ export function GVerifyKybClient() {
                 ) : (
                   <FileText className="h-3.5 w-3.5 shrink-0" />
                 )}
-                {t('kyc.kyb.stepDocument')}
+                {t("kyc.kyb.stepDocument")}
               </button>
               <button
                 type="button"
@@ -233,14 +241,14 @@ export function GVerifyKybClient() {
                 disabled={!ready || submitting}
                 onClick={() => setStep(2)}
                 className={cn(
-                  'flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2.5 text-xs font-medium transition-colors',
+                  "flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2.5 text-xs font-medium transition-colors",
                   activeStep === 2
-                    ? 'border-primary bg-primary/10 text-foreground'
-                    : 'border-border bg-muted/20 text-muted-foreground hover:border-primary/40',
-                  !ready && 'cursor-not-allowed opacity-50',
+                    ? "border-primary bg-primary/10 text-foreground"
+                    : "border-border bg-muted/20 text-muted-foreground hover:border-primary/40",
+                  !ready && "cursor-not-allowed opacity-50",
                 )}
               >
-                {t('kyc.kyb.stepReview')}
+                {t("kyc.kyb.stepReview")}
               </button>
             </div>
 
@@ -249,14 +257,14 @@ export function GVerifyKybClient() {
               <>
                 <div className="space-y-2 text-left">
                   <label className="text-sm font-semibold text-foreground">
-                    {t('kyc.kyb.typeLabel')}
+                    {t("kyc.kyb.typeLabel")}
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     {DOCUMENT_TYPES.map(({ value, labelKey }) => (
                       <Button
                         key={value}
                         type="button"
-                        variant={documentType === value ? 'default' : 'outline'}
+                        variant={documentType === value ? "default" : "outline"}
                         className="h-auto whitespace-normal px-2 py-2 text-xs"
                         disabled={submitting}
                         onClick={() => selectDocumentType(value)}
@@ -272,8 +280,8 @@ export function GVerifyKybClient() {
                   disabled={submitting}
                   onSelect={setFile}
                   label={t(
-                    DOCUMENT_TYPES.find((d) => d.value === documentType)?.docLabelKey ??
-                      'kyc.kyb.docLabelCompany',
+                    DOCUMENT_TYPES.find((d) => d.value === documentType)
+                      ?.docLabelKey ?? "kyc.kyb.docLabelCompany",
                   )}
                 />
 
@@ -282,7 +290,7 @@ export function GVerifyKybClient() {
                     htmlFor="kyb-tax-code"
                     className="text-sm font-semibold text-foreground"
                   >
-                    {t('kyc.kyb.taxCodeLabel')}
+                    {t("kyc.kyb.taxCodeLabel")}
                   </label>
                   <Input
                     id="kyb-tax-code"
@@ -291,9 +299,11 @@ export function GVerifyKybClient() {
                     placeholder="1501167629"
                     value={details.taxCode}
                     disabled={submitting}
-                    onChange={(e) => setDetail('taxCode', e.target.value)}
+                    onChange={(e) => setDetail("taxCode", e.target.value)}
                   />
-                  <p className="text-xs text-muted-foreground">{t('kyc.kyb.taxCodeHint')}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {t("kyc.kyb.taxCodeHint")}
+                  </p>
                 </div>
 
                 <div className="space-y-1.5 text-left">
@@ -301,7 +311,7 @@ export function GVerifyKybClient() {
                     htmlFor="kyb-license-code"
                     className="text-sm font-semibold text-foreground"
                   >
-                    {t('kyc.kyb.licenseCodeLabel')}
+                    {t("kyc.kyb.licenseCodeLabel")}
                   </label>
                   <Input
                     id="kyb-license-code"
@@ -309,9 +319,11 @@ export function GVerifyKybClient() {
                     placeholder="41M8041297"
                     value={details.licenseCode}
                     disabled={submitting}
-                    onChange={(e) => setDetail('licenseCode', e.target.value)}
+                    onChange={(e) => setDetail("licenseCode", e.target.value)}
                   />
-                  <p className="text-xs text-muted-foreground">{t('kyc.kyb.licenseCodeHint')}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {t("kyc.kyb.licenseCodeHint")}
+                  </p>
                 </div>
 
                 <Button
@@ -320,7 +332,7 @@ export function GVerifyKybClient() {
                   disabled={!ready || submitting}
                   onClick={() => setStep(2)}
                 >
-                  {t('kyc.continueBtn')}
+                  {t("kyc.continueBtn")}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </>
@@ -329,11 +341,13 @@ export function GVerifyKybClient() {
               <>
                 <div className="space-y-3 rounded-xl border border-border bg-muted/30 p-4 text-left">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">{t('kyc.kyb.typeLabel')}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {t("kyc.kyb.typeLabel")}
+                    </span>
                     <span className="text-sm font-medium text-foreground">
                       {t(
-                        DOCUMENT_TYPES.find((d) => d.value === documentType)?.labelKey ??
-                          'kyc.kyb.typeCompany',
+                        DOCUMENT_TYPES.find((d) => d.value === documentType)
+                          ?.labelKey ?? "kyc.kyb.typeCompany",
                       )}
                     </span>
                   </div>
@@ -342,7 +356,7 @@ export function GVerifyKybClient() {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={document.previewUrl}
-                        alt={t('kyc.kyb.stepDocument')}
+                        alt={t("kyc.kyb.stepDocument")}
                         className="h-16 w-24 shrink-0 rounded-lg border border-border object-cover"
                       />
                     ) : (
@@ -353,14 +367,17 @@ export function GVerifyKybClient() {
                         {document.file?.name}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {document.file ? (document.file.size / (1024 * 1024)).toFixed(2) : '0'} MB
+                        {document.file
+                          ? (document.file.size / (1024 * 1024)).toFixed(2)
+                          : "0"}{" "}
+                        MB
                       </p>
                     </div>
                   </div>
                 </div>
 
                 <p className="text-xs leading-relaxed text-muted-foreground">
-                  {t('kyc.kyb.consent')}
+                  {t("kyc.kyb.consent")}
                 </p>
 
                 <div className="flex gap-2">
@@ -372,7 +389,7 @@ export function GVerifyKybClient() {
                     onClick={() => setStep(1)}
                   >
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    {t('kyc.kyb.backBtn')}
+                    {t("kyc.kyb.backBtn")}
                   </Button>
                   <Button
                     type="button"
@@ -383,10 +400,10 @@ export function GVerifyKybClient() {
                     {submitting ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {t('kyc.gv.submitting')}
+                        {t("kyc.gv.submitting")}
                       </>
                     ) : (
-                      t('kyc.gv.submitBtn')
+                      t("kyc.gv.submitBtn")
                     )}
                   </Button>
                 </div>

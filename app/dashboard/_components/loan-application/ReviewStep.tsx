@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { ReviewRow } from "./ReviewRow"
-import { useLoanApplicationContext } from "./LoanApplicationContext"
-import type { DocumentKey } from "./useLoanApplication"
+import { motion } from "framer-motion";
+import { ReviewRow } from "./ReviewRow";
+import { useLoanApplicationContext } from "./LoanApplicationContext";
+import type { DocumentKey } from "./useLoanApplication";
 
 // Review-list label per document (reuses the existing per-step strings).
 const DOCUMENT_LABEL_KEYS: Record<DocumentKey, string> = {
@@ -13,7 +13,7 @@ const DOCUMENT_LABEL_KEYS: Record<DocumentKey, string> = {
   financialStatement: "dashboard.sme.annualFinancialStatement",
   eInvoiceData: "dashboard.sme.eInvoiceData",
   cicReport: "dashboard.sme.cicCreditReport",
-}
+};
 
 // The final wizard step: lists every document with its status and an overall
 // send-progress bar. Sending is triggered from the orchestrator's Send button.
@@ -26,15 +26,19 @@ export function ReviewStep() {
     uploadedCount,
     totalDocuments,
     t,
-  } = useLoanApplicationContext()
+  } = useLoanApplicationContext();
 
-  const showProgress = isSending || isFinalizing || uploadedCount > 0
+  const showProgress = isSending || isFinalizing || uploadedCount > 0;
 
   return (
     <div className="mx-auto max-w-2xl space-y-5 p-2">
       <div className="text-center space-y-1.5">
-        <h4 className="text-lg font-bold text-foreground">{t("dashboard.sme.reviewTitle")}</h4>
-        <p className="text-sm text-muted-foreground">{t("dashboard.sme.reviewSubtitle")}</p>
+        <h4 className="text-lg font-bold text-foreground">
+          {t("dashboard.sme.reviewTitle")}
+        </h4>
+        <p className="text-sm text-muted-foreground">
+          {t("dashboard.sme.reviewSubtitle")}
+        </p>
       </div>
 
       {showProgress && (
@@ -56,13 +60,19 @@ export function ReviewStep() {
 
       <div className="space-y-2.5">
         {documentKeys.map((key) => (
-          <ReviewRow key={key} docKey={key} label={t(DOCUMENT_LABEL_KEYS[key])} />
+          <ReviewRow
+            key={key}
+            docKey={key}
+            label={t(DOCUMENT_LABEL_KEYS[key])}
+          />
         ))}
       </div>
 
       <p className="text-center text-xs text-muted-foreground">
-        {canSend ? t("dashboard.sme.reviewAllReadyHint") : t("dashboard.sme.reviewMissingHint")}
+        {canSend
+          ? t("dashboard.sme.reviewAllReadyHint")
+          : t("dashboard.sme.reviewMissingHint")}
       </p>
     </div>
-  )
+  );
 }

@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { useRequireAuth } from "@/hooks/use-authentication"
-import { useAdminOverview } from "@/hooks/use-admin"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useRequireAuth } from "@/hooks/use-authentication";
+import { useAdminOverview } from "@/hooks/use-admin";
 import type {
   AdminMode,
   AdminProjectRow,
   AdminUserRow,
-} from "@/services/admin.service"
-import { isAdminRole } from "@/services/authentication.service"
+} from "@/services/admin.service";
+import { isAdminRole } from "@/services/authentication.service";
 import {
   Loader2,
   Users,
@@ -18,42 +18,45 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DataTable, type Column } from "./_components/DataTable"
-import { useTranslations } from "@/lib/i18n"
-import { getInitials } from "@/lib/utils"
+} from "@/components/ui/select";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { DataTable, type Column } from "./_components/DataTable";
+import { useTranslations } from "@/lib/i18n";
+import { getInitials } from "@/lib/utils";
 
-const PAGE_SIZE = 14
+const PAGE_SIZE = 14;
 
-type TranslateFn = (key: string, values?: Record<string, string | number>) => string
+type TranslateFn = (
+  key: string,
+  values?: Record<string, string | number>,
+) => string;
 
 function formatDate(value?: string | null) {
-  if (!value) return "—"
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return "—"
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "—";
   return date.toLocaleDateString(undefined, {
     year: "numeric",
     month: "short",
     day: "numeric",
-  })
+  });
 }
 
 function statusVariant(status: string) {
-  const s = status?.toUpperCase()
-  if (s === "ACTIVE") return "default" as const
-  if (s === "SUSPENDED" || s === "INACTIVE") return "destructive" as const
-  return "secondary" as const
+  const s = status?.toUpperCase();
+  if (s === "ACTIVE") return "default" as const;
+  if (s === "SUSPENDED" || s === "INACTIVE") return "destructive" as const;
+  return "secondary" as const;
 }
 
 // Column configs — each table just declares how to render its cells.
@@ -65,12 +68,17 @@ const buildUserColumns = (t: TranslateFn): Column<AdminUserRow>[] => [
     render: (u) => (
       <div className="flex items-center gap-3">
         <Avatar className="h-8 w-8 shrink-0">
-          <AvatarImage src={u.avatar_url ?? undefined} alt={u.full_name ?? ""} />
+          <AvatarImage
+            src={u.avatar_url ?? undefined}
+            alt={u.full_name ?? ""}
+          />
           <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
             {getInitials(u.full_name)}
           </AvatarFallback>
         </Avatar>
-        <span className="font-medium text-foreground">{u.full_name || "—"}</span>
+        <span className="font-medium text-foreground">
+          {u.full_name || "—"}
+        </span>
       </div>
     ),
   },
@@ -96,7 +104,7 @@ const buildUserColumns = (t: TranslateFn): Column<AdminUserRow>[] => [
     cellClassName: "text-muted-foreground",
     render: (u) => formatDate(u.created_at),
   },
-]
+];
 
 const buildProjectColumns = (t: TranslateFn): Column<AdminProjectRow>[] => [
   {
@@ -122,45 +130,49 @@ const buildProjectColumns = (t: TranslateFn): Column<AdminProjectRow>[] => [
     cellClassName: "text-muted-foreground",
     render: (p) => formatDate(p.created_at),
   },
-]
+];
 
 export default function AdminPage() {
-  const { user, isLoading } = useRequireAuth()
-  const router = useRouter()
-  const { t } = useTranslations()
-  const isAdmin = !isLoading && isAdminRole(user?.role)
+  const { user, isLoading } = useRequireAuth();
+  const router = useRouter();
+  const { t } = useTranslations();
+  const isAdmin = !isLoading && isAdminRole(user?.role);
 
-  const userColumns = buildUserColumns(t)
-  const projectColumns = buildProjectColumns(t)
+  const userColumns = buildUserColumns(t);
+  const projectColumns = buildProjectColumns(t);
 
-  const [mode, setMode] = useState<AdminMode>("users")
-  const [page, setPage] = useState(1)
-  const [searchInput, setSearchInput] = useState("")
-  const [search, setSearch] = useState("")
+  const [mode, setMode] = useState<AdminMode>("users");
+  const [page, setPage] = useState(1);
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
   // "all" = no filter (Radix Select can't use an empty-string value).
-  const [status, setStatus] = useState("all")
-  const [role, setRole] = useState("all")
-  const [industryInput, setIndustryInput] = useState("")
-  const [industry, setIndustry] = useState("")
+  const [status, setStatus] = useState("all");
+  const [role, setRole] = useState("all");
+  const [industryInput, setIndustryInput] = useState("");
+  const [industry, setIndustry] = useState("");
 
   // Debounce the free-text inputs; reset to the first page whenever they change.
   useEffect(() => {
     const id = setTimeout(() => {
-      setSearch(searchInput.trim())
-      setPage(1)
-    }, 350)
-    return () => clearTimeout(id)
-  }, [searchInput])
+      setSearch(searchInput.trim());
+      setPage(1);
+    }, 350);
+    return () => clearTimeout(id);
+  }, [searchInput]);
 
   useEffect(() => {
     const id = setTimeout(() => {
-      setIndustry(industryInput.trim())
-      setPage(1)
-    }, 350)
-    return () => clearTimeout(id)
-  }, [industryInput])
+      setIndustry(industryInput.trim());
+      setPage(1);
+    }, 350);
+    return () => clearTimeout(id);
+  }, [industryInput]);
 
-  const { data, isLoading: isOverviewLoading, isFetching } = useAdminOverview(
+  const {
+    data,
+    isLoading: isOverviewLoading,
+    isFetching,
+  } = useAdminOverview(
     {
       mode,
       page,
@@ -171,16 +183,16 @@ export default function AdminPage() {
       role: mode === "users" && role !== "all" ? role : undefined,
       industry: mode === "projects" && industry ? industry : undefined,
     },
-    isAdmin
-  )
+    isAdmin,
+  );
 
   // Fallback guard: middleware blocks non-admins server-side, but if the
   // session changes between the request and render, bounce them out.
   useEffect(() => {
     if (!isLoading && user && !isAdminRole(user.role)) {
-      router.replace("/dashboard")
+      router.replace("/dashboard");
     }
-  }, [isLoading, user, router])
+  }, [isLoading, user, router]);
 
   if (isLoading || !user || !isAdminRole(user.role)) {
     return (
@@ -192,31 +204,32 @@ export default function AdminPage() {
           </span>
         </div>
       </div>
-    )
+    );
   }
 
-  const stats = data?.stats
-  const table = data?.table
-  const rows = table?.items ?? []
-  const total = table?.total ?? rows.length
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
+  const stats = data?.stats;
+  const table = data?.table;
+  const rows = table?.items ?? [];
+  const total = table?.total ?? rows.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   // Filter options come from the stats maps (global counts, so they stay
   // stable while filtering) — only keys that exist in the DB are present.
   const statusOptions = Object.keys(
-    (mode === "users" ? stats?.users_by_status : stats?.projects_by_status) ?? {}
-  )
-  const roleOptions = Object.keys(stats?.users_by_role ?? {})
+    (mode === "users" ? stats?.users_by_status : stats?.projects_by_status) ??
+      {},
+  );
+  const roleOptions = Object.keys(stats?.users_by_role ?? {});
 
   function switchMode(next: AdminMode) {
-    if (next === mode) return
-    setMode(next)
-    setPage(1)
+    if (next === mode) return;
+    setMode(next);
+    setPage(1);
     // Reset filters that don't apply to / don't carry over to the other mode.
-    setStatus("all")
-    setRole("all")
-    setIndustry("")
-    setIndustryInput("")
+    setStatus("all");
+    setRole("all");
+    setIndustry("");
+    setIndustryInput("");
   }
 
   return (
@@ -235,7 +248,9 @@ export default function AdminPage() {
         <div className="rounded-lg border bg-card p-5">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Users className="h-4 w-4" />
-            <span className="text-sm font-medium">{t("admin.stats.users")}</span>
+            <span className="text-sm font-medium">
+              {t("admin.stats.users")}
+            </span>
           </div>
           <p className="mt-2 text-2xl font-bold text-foreground">
             {isOverviewLoading ? (
@@ -249,7 +264,9 @@ export default function AdminPage() {
         <div className="rounded-lg border bg-card p-5">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Briefcase className="h-4 w-4" />
-            <span className="text-sm font-medium">{t("admin.stats.projects")}</span>
+            <span className="text-sm font-medium">
+              {t("admin.stats.projects")}
+            </span>
           </div>
           <p className="mt-2 text-2xl font-bold text-foreground">
             {isOverviewLoading ? (
@@ -302,15 +319,17 @@ export default function AdminPage() {
             <Select
               value={status}
               onValueChange={(v) => {
-                setStatus(v)
-                setPage(1)
+                setStatus(v);
+                setPage(1);
               }}
             >
               <SelectTrigger size="sm" className="w-full sm:w-40">
                 <SelectValue placeholder={t("admin.table.status")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{t("admin.table.allStatuses")}</SelectItem>
+                <SelectItem value="all">
+                  {t("admin.table.allStatuses")}
+                </SelectItem>
                 {statusOptions.map((s) => (
                   <SelectItem key={s} value={s}>
                     {s}
@@ -324,15 +343,17 @@ export default function AdminPage() {
               <Select
                 value={role}
                 onValueChange={(v) => {
-                  setRole(v)
-                  setPage(1)
+                  setRole(v);
+                  setPage(1);
                 }}
               >
                 <SelectTrigger size="sm" className="w-full sm:w-40">
                   <SelectValue placeholder={t("admin.table.role")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{t("admin.table.allRoles")}</SelectItem>
+                  <SelectItem value="all">
+                    {t("admin.table.allRoles")}
+                  </SelectItem>
                   {roleOptions.map((r) => (
                     <SelectItem key={r} value={r}>
                       {r}
@@ -436,5 +457,5 @@ export default function AdminPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

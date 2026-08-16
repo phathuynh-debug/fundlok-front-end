@@ -1,5 +1,5 @@
-import { apiClient } from '@/lib/api-client';
-import { LOANS_ENDPOINTS } from '@/lib/endpoints';
+import { apiClient } from "@/lib/api-client";
+import { LOANS_ENDPOINTS } from "@/lib/endpoints";
 
 export interface LoanApplicationSubmitResponse {
   id: string;
@@ -9,7 +9,7 @@ export interface LoanApplicationSubmitResponse {
 export const loansService = {
   async submitApplication(applicationId: string) {
     return apiClient.post<LoanApplicationSubmitResponse>(
-      LOANS_ENDPOINTS.submit(applicationId)
+      LOANS_ENDPOINTS.submit(applicationId),
     );
   },
 };

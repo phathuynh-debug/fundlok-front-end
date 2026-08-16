@@ -255,7 +255,9 @@ export default async function Page() {
                           src={logo.src}
                           alt={logo.alt}
                           className={`max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105 ${
-                            logo.invertOnDark ? "dark:brightness-0 dark:invert" : ""
+                            logo.invertOnDark
+                              ? "dark:brightness-0 dark:invert"
+                              : ""
                           }`}
                         />
                       </a>

@@ -9,7 +9,11 @@ import { Building2, TrendingUp, Loader2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { useToast } from "@/hooks/use-toast";
-import { authKeys, useCurrentUser, useSelectRole } from "@/hooks/use-authentication";
+import {
+  authKeys,
+  useCurrentUser,
+  useSelectRole,
+} from "@/hooks/use-authentication";
 import { useTranslations } from "@/lib/i18n";
 import type { SelectableRole } from "@/services/authentication.service";
 
@@ -67,7 +71,9 @@ export function SelectRoleClient() {
         // the page was reached with a stale session). Nothing to retry — sync
         // the cached user and continue; the middleware routes from there.
         if (error?.status === 409) {
-          void queryClient.invalidateQueries({ queryKey: authKeys.currentUser() });
+          void queryClient.invalidateQueries({
+            queryKey: authKeys.currentUser(),
+          });
           router.push("/dashboard");
           return;
         }
@@ -106,7 +112,10 @@ export function SelectRoleClient() {
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-muted/50 p-6">
       {/* Decorative background — keeps the page from feeling empty. Purely
           visual, so it's hidden from assistive tech and ignores pointer events. */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 overflow-hidden"
+      >
         {/* Faint dot grid */}
         <div
           className="absolute inset-0 opacity-[0.4]"
@@ -159,7 +168,11 @@ export function SelectRoleClient() {
                 <motion.span
                   className="absolute inset-0 rounded-full bg-primary/10"
                   animate={{ scale: [1, 1.25, 1], opacity: [0.6, 0.2, 0.6] }}
-                  transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{
+                    duration: 1.8,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
                 />
                 <Loader2 className="h-12 w-12 animate-spin text-primary" />
               </motion.div>
@@ -187,7 +200,10 @@ export function SelectRoleClient() {
                 <LocaleSwitcher />
               </motion.div>
 
-              <motion.div variants={itemVariants} className="space-y-4 text-center">
+              <motion.div
+                variants={itemVariants}
+                className="space-y-4 text-center"
+              >
                 <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
                   {t("auth.selectRole.title")}
                 </h1>
@@ -208,13 +224,19 @@ export function SelectRoleClient() {
                   >
                     <motion.div
                       whileHover={{ rotate: -6, scale: 1.08 }}
-                      transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 15,
+                      }}
                       className="flex h-20 w-20 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground"
                     >
                       <Icon className="h-9 w-9" />
                     </motion.div>
 
-                    <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
+                    <h2 className="text-2xl font-bold tracking-tight">
+                      {title}
+                    </h2>
                     <p className="flex-1 text-base leading-relaxed text-muted-foreground">
                       {description}
                     </p>

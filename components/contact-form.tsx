@@ -16,7 +16,11 @@ export function ContactForm() {
   const [isPending, setIsPending] = useState(false);
 
   // Cloudflare Turnstile Hook
-  const { turnstileToken, turnstileContainerRef, reset: resetTurnstile } = useTurnstile();
+  const {
+    turnstileToken,
+    turnstileContainerRef,
+    reset: resetTurnstile,
+  } = useTurnstile();
 
   const { toast } = useToast();
 
@@ -123,7 +127,9 @@ export function ContactForm() {
         className="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-emerald-500 px-6 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white transition-colors hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
       >
         {isPending && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
-        {isPending ? t("contactPage.form.sending") : t("contactPage.form.sendMessage")}
+        {isPending
+          ? t("contactPage.form.sending")
+          : t("contactPage.form.sendMessage")}
       </button>
     </form>
   );

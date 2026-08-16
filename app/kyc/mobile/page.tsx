@@ -4,7 +4,8 @@ import { MobileKycClient } from "./mobile-kyc-client";
 
 export const metadata: Metadata = {
   title: "Verify your identity",
-  description: "Take photos of your ID card and a selfie to verify your identity.",
+  description:
+    "Take photos of your ID card and a selfie to verify your identity.",
 };
 
 // The client reads the handoff token from the query string, which requires a

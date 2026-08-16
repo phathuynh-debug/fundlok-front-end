@@ -1,15 +1,16 @@
-import type { Metadata } from 'next'
-import { Sidebar } from "@/components/sidebar"
+import type { Metadata } from "next";
+import { Sidebar } from "@/components/sidebar";
 
 export const metadata: Metadata = {
-  title: 'Dashboard',
-  description: 'Manage your capital requirements, review matching projects, and track on-chain investments.',
-}
+  title: "Dashboard",
+  description:
+    "Manage your capital requirements, review matching projects, and track on-chain investments.",
+};
 
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <div className="flex h-screen overflow-hidden">
@@ -25,5 +26,5 @@ export default function DashboardLayout({
         </div>
       </main>
     </div>
-  )
+  );
 }

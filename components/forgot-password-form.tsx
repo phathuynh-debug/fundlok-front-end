@@ -14,7 +14,11 @@ import { useForgotPassword } from "@/app/forgot-password/use-forgot-password";
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
 
-  const { turnstileToken, turnstileContainerRef, reset: resetTurnstile } = useTurnstile();
+  const {
+    turnstileToken,
+    turnstileContainerRef,
+    reset: resetTurnstile,
+  } = useTurnstile();
   const { toast } = useToast();
   const { t } = useTranslations();
   const { forgotPassword, isPending, isSuccess } = useForgotPassword();
@@ -22,7 +26,10 @@ export function ForgotPasswordForm() {
   const handleForgotPassword = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (process.env.NEXT_PUBLIC_DISABLE_TURNSTILE !== "true" && !turnstileToken) {
+    if (
+      process.env.NEXT_PUBLIC_DISABLE_TURNSTILE !== "true" &&
+      !turnstileToken
+    ) {
       toast({
         variant: "destructive",
         title: t("auth.forgotPassword.failedTitle"),
@@ -44,11 +51,12 @@ export function ForgotPasswordForm() {
           toast({
             variant: "destructive",
             title: t("auth.forgotPassword.failedTitle"),
-            description: error?.message || t("auth.forgotPassword.failedDescription"),
+            description:
+              error?.message || t("auth.forgotPassword.failedDescription"),
           });
           resetTurnstile();
         },
-      }
+      },
     );
   };
 
@@ -116,7 +124,11 @@ export function ForgotPasswordForm() {
         <Button
           type="submit"
           className="w-full h-11"
-          disabled={isPending || (process.env.NEXT_PUBLIC_DISABLE_TURNSTILE !== "true" && !turnstileToken)}
+          disabled={
+            isPending ||
+            (process.env.NEXT_PUBLIC_DISABLE_TURNSTILE !== "true" &&
+              !turnstileToken)
+          }
         >
           {isPending ? (
             <>

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 
 export function useTurnstile() {
   const [turnstileToken, setTurnstileToken] = useState<string | null>(
-    process.env.NEXT_PUBLIC_DISABLE_TURNSTILE === "true" ? "mock-token" : null
+    process.env.NEXT_PUBLIC_DISABLE_TURNSTILE === "true" ? "mock-token" : null,
   );
   const turnstileContainerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
@@ -26,20 +26,23 @@ export function useTurnstile() {
 
     const initializeTurnstile = () => {
       if (window.turnstile && turnstileContainerRef.current) {
-        widgetIdRef.current = window.turnstile.render(turnstileContainerRef.current, {
-          sitekey:
-            process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY ||
-            "0x4AAAAAAADgp22IT7NjMKXhN",
-          callback: (token: string) => {
-            setTurnstileToken(token);
+        widgetIdRef.current = window.turnstile.render(
+          turnstileContainerRef.current,
+          {
+            sitekey:
+              process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY ||
+              "0x4AAAAAAADgp22IT7NjMKXhN",
+            callback: (token: string) => {
+              setTurnstileToken(token);
+            },
+            "expired-callback": () => {
+              setTurnstileToken(null);
+            },
+            "error-callback": () => {
+              setTurnstileToken(null);
+            },
           },
-          "expired-callback": () => {
-            setTurnstileToken(null);
-          },
-          "error-callback": () => {
-            setTurnstileToken(null);
-          },
-        });
+        );
       }
     };
 

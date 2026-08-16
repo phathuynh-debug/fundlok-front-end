@@ -1,6 +1,6 @@
-import { apiClient } from '@/lib/api-client';
-import { PROJECT_ENDPOINTS } from '@/lib/endpoints';
-import type { ApplicationDocument } from '@/services/uploads.service';
+import { apiClient } from "@/lib/api-client";
+import { PROJECT_ENDPOINTS } from "@/lib/endpoints";
+import type { ApplicationDocument } from "@/services/uploads.service";
 
 export interface ProjectAddress {
   street: string;

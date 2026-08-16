@@ -1,38 +1,48 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRequireAuth } from "@/hooks/use-authentication"
-import { usePublicProjects } from "@/hooks/use-projects"
-import { ProjectCard } from "../_components/ProjectCard"
-import { DashboardHeader } from "../_components/DashboardHeader"
-import { Loader2, Search, SlidersHorizontal, Briefcase, Building2, ShoppingCart, Clock, ArrowRightLeft, CheckCircle2 } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { useTranslations } from "@/lib/i18n"
+import { useState } from "react";
+import { useRequireAuth } from "@/hooks/use-authentication";
+import { usePublicProjects } from "@/hooks/use-projects";
+import { ProjectCard } from "../_components/ProjectCard";
+import { DashboardHeader } from "../_components/DashboardHeader";
+import {
+  Loader2,
+  Search,
+  SlidersHorizontal,
+  Briefcase,
+  Building2,
+  ShoppingCart,
+  Clock,
+  ArrowRightLeft,
+  CheckCircle2,
+} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { useTranslations } from "@/lib/i18n";
 
 interface SecondaryMarketListing {
-  id: string
-  legalName: string
-  industry: string
-  status: string
-  riskLevel: string
-  grade: string
-  listedDate: string
-  reason: string
-  askingPrice: number
-  askingPricePremium: number
-  originalInvestment: number
-  loanPercentage: number
-  timeRemainingDays: number
-  totalActiveDays: number
-  actualRoi: number
-  actualRoiVsExpected: number
-  principalProgressPercent: number
-  dailyRevenueRate: number
-  consecutivePayments: number
-  totalPaymentsMade: number
-  totalPaymentsMissed: number
-  revenueShareTerms: string
+  id: string;
+  legalName: string;
+  industry: string;
+  status: string;
+  riskLevel: string;
+  grade: string;
+  listedDate: string;
+  reason: string;
+  askingPrice: number;
+  askingPricePremium: number;
+  originalInvestment: number;
+  loanPercentage: number;
+  timeRemainingDays: number;
+  totalActiveDays: number;
+  actualRoi: number;
+  actualRoiVsExpected: number;
+  principalProgressPercent: number;
+  dailyRevenueRate: number;
+  consecutivePayments: number;
+  totalPaymentsMade: number;
+  totalPaymentsMissed: number;
+  revenueShareTerms: string;
 }
 
 const mockSecondaryMarket: SecondaryMarketListing[] = [
@@ -108,11 +118,11 @@ const mockSecondaryMarket: SecondaryMarketListing[] = [
     totalPaymentsMissed: 0,
     revenueShareTerms: "9.5% daily until principal paid",
   },
-]
+];
 
 function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
   const isPremium = listing.askingPricePremium >= 0;
-  const premiumText = isPremium 
+  const premiumText = isPremium
     ? `+${listing.askingPricePremium.toFixed(1)}% premium`
     : `${listing.askingPricePremium.toFixed(1)}% discount`;
 
@@ -122,11 +132,19 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-xl font-bold tracking-tight">{listing.legalName}</h3>
-            <Badge variant="outline" className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-mono text-[10px] uppercase font-bold tracking-wider rounded-md border-zinc-200 dark:border-zinc-700">
+            <h3 className="text-xl font-bold tracking-tight">
+              {listing.legalName}
+            </h3>
+            <Badge
+              variant="outline"
+              className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-mono text-[10px] uppercase font-bold tracking-wider rounded-md border-zinc-200 dark:border-zinc-700"
+            >
               {listing.industry}
             </Badge>
-            <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono text-[10px] uppercase font-bold tracking-wider rounded-md border-emerald-500/20 flex items-center gap-1">
+            <Badge
+              variant="outline"
+              className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono text-[10px] uppercase font-bold tracking-wider rounded-md border-emerald-500/20 flex items-center gap-1"
+            >
               <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
               {listing.status}
             </Badge>
@@ -140,7 +158,10 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
           <Badge className="bg-zinc-900 text-white dark:bg-white dark:text-slate-950 font-mono text-[10px] uppercase font-bold tracking-wider rounded-full px-2.5 py-0.5 border-none">
             {listing.riskLevel}
           </Badge>
-          <Badge variant="outline" className="bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-zinc-300 dark:border-zinc-700 font-mono text-[10px] uppercase font-bold tracking-wider rounded-full px-2.5 py-0.5">
+          <Badge
+            variant="outline"
+            className="bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-zinc-300 dark:border-zinc-700 font-mono text-[10px] uppercase font-bold tracking-wider rounded-full px-2.5 py-0.5"
+          >
             {listing.grade}
           </Badge>
         </div>
@@ -150,20 +171,34 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
       <div className="grid grid-cols-2 md:grid-cols-5 gap-6 pt-2">
         {/* Asking Price */}
         <div className="space-y-1">
-          <span className="text-xs font-semibold text-muted-foreground uppercase font-mono tracking-wider block">Asking Price</span>
+          <span className="text-xs font-semibold text-muted-foreground uppercase font-mono tracking-wider block">
+            Asking Price
+          </span>
           <div className="text-xl font-black text-foreground">
-            {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(listing.askingPrice)}
+            {new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "USD",
+              maximumFractionDigits: 0,
+            }).format(listing.askingPrice)}
           </div>
-          <span className={`text-xs font-bold font-mono ${isPremium ? "text-orange-500" : "text-emerald-500"}`}>
+          <span
+            className={`text-xs font-bold font-mono ${isPremium ? "text-orange-500" : "text-emerald-500"}`}
+          >
             {premiumText}
           </span>
         </div>
 
         {/* Original Investment */}
         <div className="space-y-1">
-          <span className="text-xs font-semibold text-muted-foreground uppercase font-mono tracking-wider block">Original Investment</span>
+          <span className="text-xs font-semibold text-muted-foreground uppercase font-mono tracking-wider block">
+            Original Investment
+          </span>
           <div className="text-xl font-black text-foreground">
-            {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(listing.originalInvestment)}
+            {new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "USD",
+              maximumFractionDigits: 0,
+            }).format(listing.originalInvestment)}
           </div>
           <span className="text-xs font-medium text-muted-foreground font-mono">
             {listing.loanPercentage}% of loan
@@ -172,7 +207,9 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
 
         {/* Time Remaining */}
         <div className="space-y-1">
-          <span className="text-xs font-semibold text-muted-foreground uppercase font-mono tracking-wider block">Time Remaining</span>
+          <span className="text-xs font-semibold text-muted-foreground uppercase font-mono tracking-wider block">
+            Time Remaining
+          </span>
           <div className="text-xl font-black text-foreground flex items-center gap-1.5">
             <Clock className="w-4 h-4 text-muted-foreground/70 shrink-0" />
             <span>{listing.timeRemainingDays} days</span>
@@ -184,7 +221,9 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
 
         {/* Actual ROI */}
         <div className="space-y-1">
-          <span className="text-xs font-semibold text-muted-foreground uppercase font-mono tracking-wider block">Actual ROI</span>
+          <span className="text-xs font-semibold text-muted-foreground uppercase font-mono tracking-wider block">
+            Actual ROI
+          </span>
           <div className="text-xl font-black text-emerald-600 dark:text-emerald-400">
             {listing.actualRoi.toFixed(1)}%
           </div>
@@ -195,7 +234,9 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
 
         {/* Principal Progress */}
         <div className="space-y-1">
-          <span className="text-xs font-semibold text-muted-foreground uppercase font-mono tracking-wider block">Principal Progress</span>
+          <span className="text-xs font-semibold text-muted-foreground uppercase font-mono tracking-wider block">
+            Principal Progress
+          </span>
           <div className="text-xl font-black text-foreground">
             {listing.principalProgressPercent}%
           </div>
@@ -208,16 +249,21 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
       {/* Gray Details Boxes Block */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl bg-zinc-50 dark:bg-slate-900/50 border border-zinc-200/50 dark:border-zinc-800/40">
         <div className="space-y-1">
-          <h4 className="text-xs font-bold text-foreground font-mono uppercase tracking-wider">Payment History</h4>
+          <h4 className="text-xs font-bold text-foreground font-mono uppercase tracking-wider">
+            Payment History
+          </h4>
           <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
             {listing.consecutivePayments} consecutive on-time payments
           </p>
           <p className="text-[10px] text-muted-foreground">
-            {listing.totalPaymentsMade} made, {listing.totalPaymentsMissed} missed
+            {listing.totalPaymentsMade} made, {listing.totalPaymentsMissed}{" "}
+            missed
           </p>
         </div>
         <div className="space-y-1">
-          <h4 className="text-xs font-bold text-foreground font-mono uppercase tracking-wider">Revenue Share</h4>
+          <h4 className="text-xs font-bold text-foreground font-mono uppercase tracking-wider">
+            Revenue Share
+          </h4>
           <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
             {listing.revenueShareTerms}
           </p>
@@ -236,19 +282,20 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
         </button>
       </div>
     </div>
-  )
+  );
 }
 
 export default function ProjectsPage() {
-  const { user, isLoading: isAuthLoading } = useRequireAuth()
-  const { t } = useTranslations()
-  const { data: publicProjects = [], isLoading: isProjectsLoading } = usePublicProjects(
-    !isAuthLoading && user?.role === "INVESTOR"
-  )
+  const { user, isLoading: isAuthLoading } = useRequireAuth();
+  const { t } = useTranslations();
+  const { data: publicProjects = [], isLoading: isProjectsLoading } =
+    usePublicProjects(!isAuthLoading && user?.role === "INVESTOR");
 
-  const [marketType, setMarketType] = useState<"primary" | "secondary">("primary")
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedIndustry, setSelectedIndustry] = useState(t("common.all"))
+  const [marketType, setMarketType] = useState<"primary" | "secondary">(
+    "primary",
+  );
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedIndustry, setSelectedIndustry] = useState(t("common.all"));
 
   if (isAuthLoading || isProjectsLoading) {
     return (
@@ -260,33 +307,45 @@ export default function ProjectsPage() {
           </span>
         </div>
       </div>
-    )
+    );
   }
 
   // Active datasource based on selection
-  const activeDataSource = marketType === "primary" ? publicProjects : mockSecondaryMarket
+  const activeDataSource =
+    marketType === "primary" ? publicProjects : mockSecondaryMarket;
 
   const industries = [
-    t("common.all"), 
-    ...Array.from(new Set(activeDataSource.map((p) => ('legal_name' in p ? p.industry : p.industry)).filter(Boolean)))
-  ]
-  const activeIndustry = industries.includes(selectedIndustry) ? selectedIndustry : t("common.all")
+    t("common.all"),
+    ...Array.from(
+      new Set(
+        activeDataSource
+          .map((p) => ("legal_name" in p ? p.industry : p.industry))
+          .filter(Boolean),
+      ),
+    ),
+  ];
+  const activeIndustry = industries.includes(selectedIndustry)
+    ? selectedIndustry
+    : t("common.all");
 
-  const filteredItems = (marketType === "primary" ? publicProjects : mockSecondaryMarket).filter((item) => {
-    const name = 'legal_name' in item ? item.legal_name : item.legalName
+  const filteredItems = (
+    marketType === "primary" ? publicProjects : mockSecondaryMarket
+  ).filter((item) => {
+    const name = "legal_name" in item ? item.legal_name : item.legalName;
     const matchesSearch =
       name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.industry?.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesIndustry = activeIndustry === t("common.all") || item.industry === activeIndustry
-    return matchesSearch && matchesIndustry
-  })
+      item.industry?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesIndustry =
+      activeIndustry === t("common.all") || item.industry === activeIndustry;
+    return matchesSearch && matchesIndustry;
+  });
 
   // Handle active marketplace toggle to reset filters
   const handleMarketToggle = (type: "primary" | "secondary") => {
-    setMarketType(type)
-    setSearchTerm("")
-    setSelectedIndustry(t("common.all"))
-  }
+    setMarketType(type);
+    setSearchTerm("");
+    setSelectedIndustry(t("common.all"));
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -297,11 +356,13 @@ export default function ProjectsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h2 className="text-3xl font-bold tracking-tight">
-              {marketType === "primary" ? t("dashboard.projects.title") : "Investment Marketplace"}
+              {marketType === "primary"
+                ? t("dashboard.projects.title")
+                : "Investment Marketplace"}
             </h2>
             <p className="text-sm text-muted-foreground mt-2">
-              {marketType === "primary" 
-                ? t("dashboard.projects.subtitle") 
+              {marketType === "primary"
+                ? t("dashboard.projects.subtitle")
                 : "Browse pre-funded loan investments available for purchase"}
             </p>
           </div>
@@ -309,7 +370,9 @@ export default function ProjectsPage() {
             <Briefcase className="h-4 w-4" />
             <span>
               {marketType === "primary"
-                ? t("dashboard.projects.opportunitiesAvailable", { count: publicProjects.length })
+                ? t("dashboard.projects.opportunitiesAvailable", {
+                    count: publicProjects.length,
+                  })
                 : `Showing ${filteredItems.length} of ${mockSecondaryMarket.length} listings`}
             </span>
           </div>
@@ -383,30 +446,25 @@ export default function ProjectsPage() {
         <div className="space-y-6">
           {filteredItems.length > 0 ? (
             <div className="grid gap-6">
-              {marketType === "primary" ? (
-                (filteredItems as any[]).map((project) => (
-                  <ProjectCard
-                    key={project.id}
-                    project={project}
-                    role="INVESTOR"
-                    actionLabel={t("dashboard.projects.investNow")}
-                  />
-                ))
-              ) : (
-                (filteredItems as SecondaryMarketListing[]).map((listing) => (
-                  <SecondaryMarketCard
-                    key={listing.id}
-                    listing={listing}
-                  />
-                ))
-              )}
+              {marketType === "primary"
+                ? (filteredItems as any[]).map((project) => (
+                    <ProjectCard
+                      key={project.id}
+                      project={project}
+                      role="INVESTOR"
+                      actionLabel={t("dashboard.projects.investNow")}
+                    />
+                  ))
+                : (filteredItems as SecondaryMarketListing[]).map((listing) => (
+                    <SecondaryMarketCard key={listing.id} listing={listing} />
+                  ))}
             </div>
           ) : (
             <div className="text-center py-16 bg-muted/30 rounded-lg border border-dashed flex flex-col items-center justify-center p-6">
               <Briefcase className="h-10 w-10 text-muted-foreground/60 mb-4" />
               <h3 className="text-lg font-semibold text-foreground mb-2">
-                {marketType === "primary" 
-                  ? t("dashboard.projects.noProjectsTitle") 
+                {marketType === "primary"
+                  ? t("dashboard.projects.noProjectsTitle")
                   : "No Secondary Market Listings Match"}
               </h3>
               <p className="text-muted-foreground max-w-md">
@@ -419,5 +477,5 @@ export default function ProjectsPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

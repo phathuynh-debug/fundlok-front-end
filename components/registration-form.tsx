@@ -4,21 +4,12 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTurnstile } from "@/hooks/use-turnstile";
 
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useRegister } from "@/hooks/use-authentication";
-import {
-  User,
-  Mail,
-  Lock,
-  Phone,
-  Loader2,
-  Eye,
-  EyeOff,
-} from "lucide-react";
+import { User, Mail, Lock, Phone, Loader2, Eye, EyeOff } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
 
 const normalizePhoneNumber = (value: string) =>

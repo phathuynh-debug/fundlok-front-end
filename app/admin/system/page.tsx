@@ -1,44 +1,44 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { useRequireAuth } from "@/hooks/use-authentication"
-import { useMaintenance, useSetMaintenance } from "@/hooks/use-admin"
-import { Loader2, ServerCog, AlertTriangle, CheckCircle2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { cn } from "@/lib/utils"
-import { useTranslations } from "@/lib/i18n"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useRequireAuth } from "@/hooks/use-authentication";
+import { useMaintenance, useSetMaintenance } from "@/hooks/use-admin";
+import { Loader2, ServerCog, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+import { useTranslations } from "@/lib/i18n";
 
 export default function AdminSystemPage() {
-  const { user, isLoading } = useRequireAuth()
-  const router = useRouter()
-  const { t } = useTranslations()
-  const isSystemAdmin = !isLoading && user?.role === "SYSTEM_ADMIN"
+  const { user, isLoading } = useRequireAuth();
+  const router = useRouter();
+  const { t } = useTranslations();
+  const isSystemAdmin = !isLoading && user?.role === "SYSTEM_ADMIN";
 
   const { data: maintenance, isLoading: isMaintenanceLoading } =
-    useMaintenance(isSystemAdmin)
-  const { mutate: save, isPending, isSuccess, isError } = useSetMaintenance()
+    useMaintenance(isSystemAdmin);
+  const { mutate: save, isPending, isSuccess, isError } = useSetMaintenance();
 
-  const [enabled, setEnabled] = useState(false)
-  const [message, setMessage] = useState("")
+  const [enabled, setEnabled] = useState(false);
+  const [message, setMessage] = useState("");
 
   // Seed local form state once the current maintenance state loads.
   useEffect(() => {
     if (maintenance) {
-      setEnabled(maintenance.enabled)
-      setMessage(maintenance.message ?? "")
+      setEnabled(maintenance.enabled);
+      setMessage(maintenance.message ?? "");
     }
-  }, [maintenance])
+  }, [maintenance]);
 
   // Fallback guard: middleware already restricts /admin/system to SYSTEM_ADMIN.
   useEffect(() => {
     if (!isLoading && user && user.role !== "SYSTEM_ADMIN") {
-      router.replace("/admin")
+      router.replace("/admin");
     }
-  }, [isLoading, user, router])
+  }, [isLoading, user, router]);
 
   if (isLoading || !user || user.role !== "SYSTEM_ADMIN") {
     return (
@@ -50,7 +50,7 @@ export default function AdminSystemPage() {
           </span>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -90,7 +90,7 @@ export default function AdminSystemPage() {
                 <span
                   className={cn(
                     "inline-flex items-center gap-2 text-sm font-medium",
-                    enabled ? "text-destructive" : "text-muted-foreground"
+                    enabled ? "text-destructive" : "text-muted-foreground",
                   )}
                 >
                   {enabled ? (
@@ -160,5 +160,5 @@ export default function AdminSystemPage() {
         )}
       </div>
     </div>
-  )
+  );
 }

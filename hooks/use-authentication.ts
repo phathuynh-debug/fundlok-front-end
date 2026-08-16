@@ -1,22 +1,22 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   authenticationService,
   type LoginPayload,
   type RegisterPayload,
   type SelectableRole,
   type User,
-} from '@/services/authentication.service';
-import { usersService } from '@/services/users.service';
-import type { ApiError } from '@/lib/types';
+} from "@/services/authentication.service";
+import { usersService } from "@/services/users.service";
+import type { ApiError } from "@/lib/types";
 
 // ---------- Query keys ----------
 export const authKeys = {
-  all: ['auth'] as const,
-  currentUser: () => [...authKeys.all, 'me'] as const,
+  all: ["auth"] as const,
+  currentUser: () => [...authKeys.all, "me"] as const,
 };
 
 // ---------- Mutations ----------
@@ -76,7 +76,7 @@ export function useLogout() {
     onSettled: () => {
       // Clear cache regardless of server response — session must end locally.
       queryClient.removeQueries({ queryKey: authKeys.all });
-      router.push('/login');
+      router.push("/login");
     },
   });
 }
@@ -100,7 +100,7 @@ export function useCurrentUser() {
  * Middleware handles the redirect server-side before the page loads.
  * This hook just provides the user data and loading state.
  */
-export function useRequireAuth(redirectTo = '/login') {
+export function useRequireAuth(redirectTo = "/login") {
   const router = useRouter();
   const { data: user, isError, isFetched } = useCurrentUser();
 

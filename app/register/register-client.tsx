@@ -32,11 +32,15 @@ export function RegisterClient() {
               <h1 className="text-3xl font-bold tracking-tight">
                 {t("common.createAnAccount")}
               </h1>
-              <p className="text-muted-foreground">{t("auth.hero.description")}</p>
+              <p className="text-muted-foreground">
+                {t("auth.hero.description")}
+              </p>
             </div>
 
             {/* Main registration logic component */}
-            <RegistrationForm onSuccess={(email) => setRegisteredEmail(email)} />
+            <RegistrationForm
+              onSuccess={(email) => setRegisteredEmail(email)}
+            />
           </>
         )}
       </div>

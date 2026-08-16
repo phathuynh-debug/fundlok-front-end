@@ -1,10 +1,11 @@
-import type { ReactNode } from 'react';
-import type { Metadata } from 'next';
+import type { ReactNode } from "react";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'Apply for Funding',
-  description: 'Submit a new funding application for your business. FundLok connects SMEs with private credit line investors.',
-}
+  title: "Apply for Funding",
+  description:
+    "Submit a new funding application for your business. FundLok connects SMEs with private credit line investors.",
+};
 
 export default function ProjectApplicationLayout({
   children,

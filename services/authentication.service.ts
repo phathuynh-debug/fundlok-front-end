@@ -1,20 +1,20 @@
-import { apiClient } from '@/lib/api-client';
-import { AUTH_ENDPOINTS } from '@/lib/endpoints';
+import { apiClient } from "@/lib/api-client";
+import { AUTH_ENDPOINTS } from "@/lib/endpoints";
 
-export type UserRole = 'SME' | 'INVESTOR' | 'ADMIN' | 'SYSTEM_ADMIN';
+export type UserRole = "SME" | "INVESTOR" | "ADMIN" | "SYSTEM_ADMIN";
 
 // The roles a user may pick for themselves on the select-role screen.
 // ADMIN / SYSTEM_ADMIN are backend-assigned and never self-selectable.
-export type SelectableRole = Extract<UserRole, 'SME' | 'INVESTOR'>;
+export type SelectableRole = Extract<UserRole, "SME" | "INVESTOR">;
 
 // Roles allowed into the /admin area (mirrors the backend's require_admin).
-export const ADMIN_ROLES: UserRole[] = ['ADMIN', 'SYSTEM_ADMIN'];
+export const ADMIN_ROLES: UserRole[] = ["ADMIN", "SYSTEM_ADMIN"];
 
 export function isAdminRole(role?: UserRole | string | null): boolean {
-  return role === 'ADMIN' || role === 'SYSTEM_ADMIN';
+  return role === "ADMIN" || role === "SYSTEM_ADMIN";
 }
-export type UserStatus = 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
-export type OAuthProvider = 'google';
+export type UserStatus = "ACTIVE" | "INACTIVE" | "SUSPENDED";
+export type OAuthProvider = "google";
 
 export interface User {
   id: string;
@@ -77,7 +77,10 @@ export const authenticationService = {
   },
 
   oauthLogin(payload: OAuthLoginPayload) {
-    return apiClient.post<OAuthTokenResponse>(AUTH_ENDPOINTS.oauthLogin, payload);
+    return apiClient.post<OAuthTokenResponse>(
+      AUTH_ENDPOINTS.oauthLogin,
+      payload,
+    );
   },
 
   // Returns the created User. No tokens — caller redirects to login.
@@ -98,28 +101,28 @@ export const authenticationService = {
 
   verifyEmail(token: string) {
     return apiClient.get<{ status: string; message: string }>(
-      AUTH_ENDPOINTS.verifyEmail(token)
+      AUTH_ENDPOINTS.verifyEmail(token),
     );
   },
 
   resendVerification(email: string) {
     return apiClient.post<{ status: string; message: string }>(
       AUTH_ENDPOINTS.resendVerification,
-      { email }
+      { email },
     );
   },
 
   forgotPassword(payload: ForgotPasswordPayload) {
     return apiClient.post<{ status: string; message: string }>(
       AUTH_ENDPOINTS.forgotPassword,
-      payload
+      payload,
     );
   },
 
   resetPassword(payload: ResetPasswordPayload) {
     return apiClient.post<{ status: string; message: string }>(
       AUTH_ENDPOINTS.resetPassword,
-      payload
+      payload,
     );
   },
 };

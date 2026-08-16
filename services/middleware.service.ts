@@ -29,7 +29,8 @@ type MaintenanceFlag = { enabled?: boolean } | null;
 // seconds — the ceiling on staleness is the sum of the two, not minutes.
 const MAINTENANCE_TTL_MS = 5_000;
 
-let maintenanceCache: { value: MaintenanceFlag; expiresAt: number } | null = null;
+let maintenanceCache: { value: MaintenanceFlag; expiresAt: number } | null =
+  null;
 // Concurrent proxy invocations share one in-flight request instead of each
 // starting its own — a burst of prefetches collapses to a single call.
 let maintenanceInFlight: Promise<MaintenanceFlag> | null = null;
@@ -73,7 +74,10 @@ export const middlewareService = {
         // A failed lookup is cached too, for the same short window: when the
         // API is down, failing open on every single request would hammer it
         // while it's trying to recover.
-        maintenanceCache = { value, expiresAt: Date.now() + MAINTENANCE_TTL_MS };
+        maintenanceCache = {
+          value,
+          expiresAt: Date.now() + MAINTENANCE_TTL_MS,
+        };
         return value;
       })
       .finally(() => {
@@ -118,7 +122,8 @@ export const middlewareService = {
     request: NextRequest,
     role?: string,
   ): Promise<boolean> {
-    const statusPath = role === "SME" ? "/gverify/kyb/status" : "/gverify/kyc/status";
+    const statusPath =
+      role === "SME" ? "/gverify/kyb/status" : "/gverify/kyc/status";
     try {
       const response = await fetch(new URL(statusPath, API_BASE_URL), {
         headers: { cookie: request.headers.get("cookie") ?? "" },

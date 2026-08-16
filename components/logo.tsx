@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import React from "react"
+import Image from "next/image";
+import React from "react";
 
 type LogoProps = {
-  alt?: string
-  containerClassName?: string
-  lightScaleClassName?: string // Custom scale for light mode (default: scale-125)
-  darkScaleClassName?: string  // Custom scale for dark mode (default: scale-100)
-}
+  alt?: string;
+  containerClassName?: string;
+  lightScaleClassName?: string; // Custom scale for light mode (default: scale-125)
+  darkScaleClassName?: string; // Custom scale for dark mode (default: scale-100)
+};
 
-export default function Logo({ 
-  alt = "FundLok", 
+export default function Logo({
+  alt = "FundLok",
   containerClassName = "relative w-40 h-10 overflow-hidden",
   lightScaleClassName = "scale-100",
-  darkScaleClassName = "scale-100"
+  darkScaleClassName = "scale-100",
 }: LogoProps) {
   return (
     <div className={containerClassName}>
@@ -37,5 +37,5 @@ export default function Logo({
         priority
       />
     </div>
-  )
+  );
 }

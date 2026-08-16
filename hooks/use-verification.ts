@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   verificationService,
   verificationKindForRole,
@@ -8,16 +8,16 @@ import {
   type VerificationKind,
   type VerificationStartResponse,
   type VerificationStatusResponse,
-} from '@/services/verification.service';
-import { useCurrentUser } from '@/hooks/use-authentication';
-import type { ApiError } from '@/lib/types';
+} from "@/services/verification.service";
+import { useCurrentUser } from "@/hooks/use-authentication";
+import type { ApiError } from "@/lib/types";
 
 // ---------- Query keys ----------
 export const verificationKeys = {
-  all: ['verification'] as const,
+  all: ["verification"] as const,
   // Keyed by kind so KYC and KYB caches never collide.
   status: (kind: VerificationKind | null) =>
-    [...verificationKeys.all, 'status', kind] as const,
+    [...verificationKeys.all, "status", kind] as const,
 };
 
 // Resolves the prefix for the logged-in user: INVESTOR → KYC, SME → KYB.
@@ -46,7 +46,8 @@ export function useVerificationStatus({
       try {
         return await verificationService.getStatus(kind as VerificationKind);
       } catch (err) {
-        if ((err as ApiError)?.status === 404) return notStartedStatus(kind as VerificationKind);
+        if ((err as ApiError)?.status === 404)
+          return notStartedStatus(kind as VerificationKind);
         throw err;
       }
     },
@@ -54,14 +55,18 @@ export function useVerificationStatus({
     retry: false,
     refetchInterval: poll
       ? (query) => {
-        const data = query.state.data;
-        if (!data) return 3000;
-        // Stop once decided, under human review, or not yet started.
-        if (data.is_terminal || data.status === 'In Review' || data.status === 'Not Started') {
-          return false;
+          const data = query.state.data;
+          if (!data) return 3000;
+          // Stop once decided, under human review, or not yet started.
+          if (
+            data.is_terminal ||
+            data.status === "In Review" ||
+            data.status === "Not Started"
+          ) {
+            return false;
+          }
+          return 3000;
         }
-        return 3000;
-      }
       : false,
   });
 }
@@ -71,7 +76,8 @@ export function useVerificationStatus({
 export function useStartVerification() {
   const kind = useVerificationKind();
   return useMutation<VerificationStartResponse, ApiError, string | undefined>({
-    mutationFn: (language) => verificationService.start(kind as VerificationKind, language),
+    mutationFn: (language) =>
+      verificationService.start(kind as VerificationKind, language),
   });
 }
 
@@ -81,6 +87,7 @@ export function useSyncVerification() {
   const queryClient = useQueryClient();
   return useMutation<VerificationStatusResponse, ApiError, void>({
     mutationFn: () => verificationService.sync(kind as VerificationKind),
-    onSuccess: (data) => queryClient.setQueryData(verificationKeys.status(kind), data),
+    onSuccess: (data) =>
+      queryClient.setQueryData(verificationKeys.status(kind), data),
   });
 }

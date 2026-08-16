@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
-import { X, Camera, ImageIcon, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { useTranslations } from '@/lib/i18n';
+import { useCallback, useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
+import { X, Camera, ImageIcon, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useTranslations } from "@/lib/i18n";
 
 // CCCD/CMND cards are ISO/IEC 7810 ID-1: 85.6 × 53.98 mm.
 const CARD_ASPECT = 85.6 / 53.98;
 
-export type CaptureGuide = 'card' | 'face';
+export type CaptureGuide = "card" | "face";
 
 interface CameraCaptureDialogProps {
   guide: CaptureGuide;
@@ -26,9 +26,9 @@ interface CameraCaptureDialogProps {
 
 export function cameraSupported(): boolean {
   return (
-    typeof navigator !== 'undefined' &&
-    typeof navigator.mediaDevices?.getUserMedia === 'function' &&
-    (typeof window === 'undefined' || window.isSecureContext)
+    typeof navigator !== "undefined" &&
+    typeof navigator.mediaDevices?.getUserMedia === "function" &&
+    (typeof window === "undefined" || window.isSecureContext)
   );
 }
 
@@ -58,7 +58,7 @@ export function CameraCaptureDialog({
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: {
-            facingMode: guide === 'face' ? 'user' : 'environment',
+            facingMode: guide === "face" ? "user" : "environment",
             width: { ideal: 1920 },
             height: { ideal: 1080 },
           },
@@ -109,14 +109,14 @@ export function CameraCaptureDialog({
       const sw = guideRect.width / scale;
       const sh = guideRect.height / scale;
 
-      const canvas = document.createElement('canvas');
+      const canvas = document.createElement("canvas");
       canvas.width = Math.round(sw);
       canvas.height = Math.round(sh);
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext("2d");
       if (!ctx) return;
       // The selfie preview is mirrored for natural framing — un-mirror the
       // actual capture so it matches the ID photo orientation.
-      if (guide === 'face') {
+      if (guide === "face") {
         ctx.translate(canvas.width, 0);
         ctx.scale(-1, 1);
         ctx.drawImage(video, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
@@ -124,10 +124,12 @@ export function CameraCaptureDialog({
         ctx.drawImage(video, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
       }
       const blob = await new Promise<Blob | null>((resolve) =>
-        canvas.toBlob(resolve, 'image/jpeg', 0.92),
+        canvas.toBlob(resolve, "image/jpeg", 0.92),
       );
       if (blob) {
-        onCapture(new File([blob], `${guide}-capture.jpg`, { type: 'image/jpeg' }));
+        onCapture(
+          new File([blob], `${guide}-capture.jpg`, { type: "image/jpeg" }),
+        );
       }
     } finally {
       setCapturing(false);
@@ -150,8 +152,8 @@ export function CameraCaptureDialog({
           muted
           onLoadedMetadata={() => setReady(true)}
           className={cn(
-            'absolute inset-0 h-full w-full object-cover',
-            guide === 'face' && '-scale-x-100', // mirror the selfie preview
+            "absolute inset-0 h-full w-full object-cover",
+            guide === "face" && "-scale-x-100", // mirror the selfie preview
           )}
         />
 
@@ -159,12 +161,16 @@ export function CameraCaptureDialog({
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-6">
           <div
             ref={guideRef}
-            style={guide === 'card' ? { aspectRatio: String(CARD_ASPECT) } : undefined}
+            style={
+              guide === "card"
+                ? { aspectRatio: String(CARD_ASPECT) }
+                : undefined
+            }
             className={cn(
-              'border-2 border-white/90 shadow-[0_0_0_9999px_rgba(0,0,0,0.55)]',
-              guide === 'card'
-                ? 'w-[88%] max-w-xl rounded-xl'
-                : 'aspect-[3/4] h-[60%] max-h-[28rem] rounded-[50%]',
+              "border-2 border-white/90 shadow-[0_0_0_9999px_rgba(0,0,0,0.55)]",
+              guide === "card"
+                ? "w-[88%] max-w-xl rounded-xl"
+                : "aspect-[3/4] h-[60%] max-h-[28rem] rounded-[50%]",
             )}
           />
         </div>
@@ -180,7 +186,7 @@ export function CameraCaptureDialog({
             size="icon"
             className="rounded-full bg-black/50 text-white hover:bg-black/70 hover:text-white"
             onClick={onClose}
-            aria-label={t('kyc.gv.cameraClose')}
+            aria-label={t("kyc.gv.cameraClose")}
           >
             <X className="h-5 w-5" />
           </Button>
@@ -188,7 +194,11 @@ export function CameraCaptureDialog({
 
         {/* Hint above the controls */}
         <p className="absolute inset-x-0 bottom-28 px-8 text-center text-sm font-medium text-white drop-shadow">
-          {t(guide === 'card' ? 'kyc.gv.cameraHintCard' : 'kyc.gv.cameraHintFace')}
+          {t(
+            guide === "card"
+              ? "kyc.gv.cameraHintCard"
+              : "kyc.gv.cameraHintFace",
+          )}
         </p>
 
         {!ready && (
@@ -207,13 +217,13 @@ export function CameraCaptureDialog({
           onClick={onPickFile}
         >
           <ImageIcon className="mr-2 h-4 w-4" />
-          {t('kyc.gv.chooseFromLibrary')}
+          {t("kyc.gv.chooseFromLibrary")}
         </Button>
         <button
           type="button"
           disabled={!ready || capturing}
           onClick={capture}
-          aria-label={t('kyc.gv.captureBtn')}
+          aria-label={t("kyc.gv.captureBtn")}
           className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-white/20 transition-transform active:scale-90 disabled:opacity-40"
         >
           {capturing ? (

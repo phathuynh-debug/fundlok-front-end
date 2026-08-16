@@ -1,43 +1,43 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { useRequireAuth } from "@/hooks/use-authentication"
-import { useAuditLogs } from "@/hooks/use-admin"
-import type { AuditLog, AuditUserRef } from "@/services/admin.service"
-import { isAdminRole } from "@/services/authentication.service"
-import { Loader2, ScrollText } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useRequireAuth } from "@/hooks/use-authentication";
+import { useAuditLogs } from "@/hooks/use-admin";
+import type { AuditLog, AuditUserRef } from "@/services/admin.service";
+import { isAdminRole } from "@/services/authentication.service";
+import { Loader2, ScrollText } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { DataTable, type Column } from "../_components/DataTable"
-import { useTranslations } from "@/lib/i18n"
+} from "@/components/ui/select";
+import { DataTable, type Column } from "../_components/DataTable";
+import { useTranslations } from "@/lib/i18n";
 
-const LIMIT_OPTIONS = [50, 100, 200, 500]
+const LIMIT_OPTIONS = [50, 100, 200, 500];
 
 function formatDateTime(value?: string | null) {
-  if (!value) return "—"
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return "—"
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "—";
   return date.toLocaleString(undefined, {
     year: "numeric",
     month: "short",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-  })
+  });
 }
 
 // UUIDs are long — show a short, copy-friendly prefix with the full value on hover.
 function shortId(id?: string | null) {
-  if (!id) return "—"
-  return id.length > 12 ? `${id.slice(0, 8)}…` : id
+  if (!id) return "—";
+  return id.length > 12 ? `${id.slice(0, 8)}…` : id;
 }
 
 // A resolved user (name + email); falls back to the short raw id when the
@@ -46,8 +46,8 @@ function UserCell({
   user,
   fallbackId,
 }: {
-  user: AuditUserRef | null
-  fallbackId: string | null
+  user: AuditUserRef | null;
+  fallbackId: string | null;
 }) {
   if (!user) {
     return (
@@ -57,7 +57,7 @@ function UserCell({
       >
         {shortId(fallbackId)}
       </span>
-    )
+    );
   }
   return (
     <div className="flex flex-col">
@@ -66,10 +66,13 @@ function UserCell({
       </span>
       <span className="text-xs text-muted-foreground">{user.email}</span>
     </div>
-  )
+  );
 }
 
-type TranslateFn = (key: string, values?: Record<string, string | number>) => string
+type TranslateFn = (
+  key: string,
+  values?: Record<string, string | number>,
+) => string;
 
 const buildColumns = (t: TranslateFn): Column<AuditLog>[] => [
   {
@@ -119,35 +122,36 @@ const buildColumns = (t: TranslateFn): Column<AuditLog>[] => [
     cellClassName: "font-mono text-xs text-muted-foreground whitespace-nowrap",
     render: (log) => log.ip_address || "—",
   },
-]
+];
 
 export default function AdminAuditLogsPage() {
-  const { user, isLoading } = useRequireAuth()
-  const router = useRouter()
-  const { t } = useTranslations()
-  const isAdmin = !isLoading && isAdminRole(user?.role)
+  const { user, isLoading } = useRequireAuth();
+  const router = useRouter();
+  const { t } = useTranslations();
+  const isAdmin = !isLoading && isAdminRole(user?.role);
 
-  const [entityInput, setEntityInput] = useState("")
-  const [entityType, setEntityType] = useState("")
-  const [limit, setLimit] = useState(100)
+  const [entityInput, setEntityInput] = useState("");
+  const [entityType, setEntityType] = useState("");
+  const [limit, setLimit] = useState(100);
 
   // Debounce the entity-type filter.
   useEffect(() => {
-    const id = setTimeout(() => setEntityType(entityInput.trim()), 350)
-    return () => clearTimeout(id)
-  }, [entityInput])
+    const id = setTimeout(() => setEntityType(entityInput.trim()), 350);
+    return () => clearTimeout(id);
+  }, [entityInput]);
 
-  const { data: logs = [], isLoading: isLogsLoading, isFetching } = useAuditLogs(
-    { entity_type: entityType || undefined, limit },
-    isAdmin
-  )
+  const {
+    data: logs = [],
+    isLoading: isLogsLoading,
+    isFetching,
+  } = useAuditLogs({ entity_type: entityType || undefined, limit }, isAdmin);
 
   // Fallback guard: middleware blocks non-admins server-side.
   useEffect(() => {
     if (!isLoading && user && !isAdminRole(user.role)) {
-      router.replace("/dashboard")
+      router.replace("/dashboard");
     }
-  }, [isLoading, user, router])
+  }, [isLoading, user, router]);
 
   if (isLoading || !user || !isAdminRole(user.role)) {
     return (
@@ -159,10 +163,10 @@ export default function AdminAuditLogsPage() {
           </span>
         </div>
       </div>
-    )
+    );
   }
 
-  const columns = buildColumns(t)
+  const columns = buildColumns(t);
 
   return (
     <div className="flex flex-col gap-6">
@@ -214,5 +218,5 @@ export default function AdminAuditLogsPage() {
         />
       </div>
     </div>
-  )
+  );
 }

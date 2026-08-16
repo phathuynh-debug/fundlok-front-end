@@ -66,11 +66,16 @@ describe("ReviewRow", () => {
   });
 
   it("prompts to add the document and jumps to its step when none is selected", async () => {
-    const { goToStep } = mockContext("cicReport", { status: "idle", file: null });
+    const { goToStep } = mockContext("cicReport", {
+      status: "idle",
+      file: null,
+    });
 
     render(<ReviewRow docKey="cicReport" label="CIC Credit Report" />);
 
-    expect(screen.getByText("dashboard.sme.notSelectedYet")).toBeInTheDocument();
+    expect(
+      screen.getByText("dashboard.sme.notSelectedYet"),
+    ).toBeInTheDocument();
     await userEvent.click(
       screen.getByRole("button", { name: /dashboard\.sme\.clickToUpload/ }),
     );

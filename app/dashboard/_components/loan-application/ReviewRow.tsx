@@ -1,15 +1,22 @@
-"use client"
+"use client";
 
-import { CheckCircle2, FileText, Loader2, AlertCircle, RotateCcw, Eye } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import { isPreviewable } from "./DocumentPreviewDialog"
-import { useLoanApplicationContext } from "./LoanApplicationContext"
-import type { DocumentKey } from "./useLoanApplication"
+import {
+  CheckCircle2,
+  FileText,
+  Loader2,
+  AlertCircle,
+  RotateCcw,
+  Eye,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { isPreviewable } from "./DocumentPreviewDialog";
+import { useLoanApplicationContext } from "./LoanApplicationContext";
+import type { DocumentKey } from "./useLoanApplication";
 
 interface ReviewRowProps {
-  docKey: DocumentKey
-  label: string
+  docKey: DocumentKey;
+  label: string;
 }
 
 // One document line on the review step: icon + name/size + live status, with a
@@ -25,8 +32,8 @@ export function ReviewRow({ docKey, label }: ReviewRowProps) {
     retryUpload,
     goToStep,
     stepForDocument,
-  } = useLoanApplicationContext()
-  const { file, status, progress, error } = documents[docKey]
+  } = useLoanApplicationContext();
+  const { file, status, progress, error } = documents[docKey];
 
   return (
     <div
@@ -35,7 +42,8 @@ export function ReviewRow({ docKey, label }: ReviewRowProps) {
         status === "uploaded" && "border-emerald-500/40 bg-emerald-500/5",
         status === "uploading" && "border-primary/40 bg-primary/5",
         status === "error" && "border-destructive/50 bg-destructive/5",
-        (status === "ready" || status === "idle") && "border-border bg-muted/20"
+        (status === "ready" || status === "idle") &&
+          "border-border bg-muted/20",
       )}
     >
       <div className="shrink-0">
@@ -53,13 +61,17 @@ export function ReviewRow({ docKey, label }: ReviewRowProps) {
       </div>
 
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold text-foreground truncate">{label}</p>
+        <p className="text-sm font-semibold text-foreground truncate">
+          {label}
+        </p>
         {file ? (
           <p className="text-xs text-muted-foreground truncate">
             {file.name} · {(file.size / (1024 * 1024)).toFixed(2)} MB
           </p>
         ) : (
-          <p className="text-xs text-muted-foreground">{t("dashboard.sme.notSelectedYet")}</p>
+          <p className="text-xs text-muted-foreground">
+            {t("dashboard.sme.notSelectedYet")}
+          </p>
         )}
         {status === "uploading" && (
           <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-border">
@@ -84,7 +96,9 @@ export function ReviewRow({ docKey, label }: ReviewRowProps) {
             onClick={() => openPreview(file)}
           >
             <Eye className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">{t("dashboard.sme.preview")}</span>
+            <span className="hidden sm:inline">
+              {t("dashboard.sme.preview")}
+            </span>
           </Button>
         )}
         {status === "uploaded" ? (
@@ -92,7 +106,9 @@ export function ReviewRow({ docKey, label }: ReviewRowProps) {
             {t("dashboard.sme.sentStatus")}
           </span>
         ) : status === "uploading" ? (
-          <span className="text-xs font-medium text-muted-foreground">{progress}%</span>
+          <span className="text-xs font-medium text-muted-foreground">
+            {progress}%
+          </span>
         ) : status === "error" ? (
           <Button
             type="button"
@@ -123,5 +139,5 @@ export function ReviewRow({ docKey, label }: ReviewRowProps) {
         )}
       </div>
     </div>
-  )
+  );
 }

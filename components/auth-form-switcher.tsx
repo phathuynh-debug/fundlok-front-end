@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 
-import { AnimatePresence, motion } from "framer-motion"
-import { LoginForm } from "@/components/login-form"
-import { RegistrationForm } from "@/components/registration-form"
-import { VerifyEmailNotice } from "@/components/verify-email-notice"
-import { cn } from "@/lib/utils"
-import { useTranslations } from "@/lib/i18n"
+import { AnimatePresence, motion } from "framer-motion";
+import { LoginForm } from "@/components/login-form";
+import { RegistrationForm } from "@/components/registration-form";
+import { VerifyEmailNotice } from "@/components/verify-email-notice";
+import { cn } from "@/lib/utils";
+import { useTranslations } from "@/lib/i18n";
 
-type Mode = "login" | "register" | "verify"
-type Direction = 1 | -1
+type Mode = "login" | "register" | "verify";
+type Direction = 1 | -1;
 
 const formVariants = {
   initial: (direction: Direction) => ({
@@ -25,50 +25,49 @@ const formVariants = {
     opacity: 0,
     x: direction === 1 ? -100 : 100,
   }),
-}
+};
 
 const formTransition = {
   duration: 0.22,
   ease: "easeOut" as const,
-}
+};
 
 interface AuthFormSwitcherProps {
-  initialMode: Mode
+  initialMode: Mode;
 }
 
 export function AuthFormSwitcher({ initialMode }: AuthFormSwitcherProps) {
-
-  const [mode, setMode] = useState<Mode>(initialMode)
-  const [direction, setDirection] = useState<Direction>(1)
-  const [isAnimating, setIsAnimating] = useState(false)
-  const [registeredEmail, setRegisteredEmail] = useState("")
-  const { t } = useTranslations()
+  const [mode, setMode] = useState<Mode>(initialMode);
+  const [direction, setDirection] = useState<Direction>(1);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
+  const { t } = useTranslations();
 
   const switchTo = (next: Mode) => {
-    if (next === mode || isAnimating) return
+    if (next === mode || isAnimating) return;
 
-    setDirection(next === "login" ? -1 : 1)
-    setIsAnimating(true)
-    setMode(next)
+    setDirection(next === "login" ? -1 : 1);
+    setIsAnimating(true);
+    setMode(next);
 
     // Keep the URL in sync for login/register (no dedicated route for the
     // post-register verify step — it stays on the current URL).
     if (next === "login" || next === "register") {
       // Update URL without triggering full Next.js navigation to prevent double animation
-      window.history.pushState(null, "", next === "login" ? "/login" : "/")
+      window.history.pushState(null, "", next === "login" ? "/login" : "/");
     }
 
     // Duration matches transition + a little buffer
-    window.setTimeout(() => setIsAnimating(false), 300)
-  }
+    window.setTimeout(() => setIsAnimating(false), 300);
+  };
 
   const handleRegistered = (email: string) => {
-    setRegisteredEmail(email)
-    switchTo("verify")
-  }
+    setRegisteredEmail(email);
+    switchTo("verify");
+  };
 
-  const isLogin = mode === "login"
-  const isVerify = mode === "verify"
+  const isLogin = mode === "login";
+  const isVerify = mode === "verify";
 
   return (
     <div className="relative overflow-hidden">
@@ -81,7 +80,10 @@ export function AuthFormSwitcher({ initialMode }: AuthFormSwitcherProps) {
           animate="animate"
           exit="exit"
           transition={formTransition}
-          className={cn("flex flex-col gap-8", isAnimating && "pointer-events-none")}
+          className={cn(
+            "flex flex-col gap-8",
+            isAnimating && "pointer-events-none",
+          )}
         >
           {isVerify ? (
             <VerifyEmailNotice
@@ -92,12 +94,14 @@ export function AuthFormSwitcher({ initialMode }: AuthFormSwitcherProps) {
             <>
               <div className="flex flex-col gap-2">
                 <h2 className="text-2xl lg:text-3xl font-bold text-foreground">
-                  {isLogin ? t("auth.switcher.welcomeBack") : t("auth.switcher.createAccount")}
+                  {isLogin
+                    ? t("auth.switcher.welcomeBack")
+                    : t("auth.switcher.createAccount")}
                 </h2>
                 <p className="text-muted-foreground">
                   {isLogin ? (
                     <>
-                      {t("auth.switcher.dontHaveAccount")} {" "}
+                      {t("auth.switcher.dontHaveAccount")}{" "}
                       <button
                         type="button"
                         onClick={() => switchTo("register")}
@@ -108,7 +112,7 @@ export function AuthFormSwitcher({ initialMode }: AuthFormSwitcherProps) {
                     </>
                   ) : (
                     <>
-                      {t("auth.switcher.alreadyHaveAccount")} {" "}
+                      {t("auth.switcher.alreadyHaveAccount")}{" "}
                       <button
                         type="button"
                         onClick={() => switchTo("login")}
@@ -131,5 +135,5 @@ export function AuthFormSwitcher({ initialMode }: AuthFormSwitcherProps) {
         </motion.div>
       </AnimatePresence>
     </div>
-  )
+  );
 }

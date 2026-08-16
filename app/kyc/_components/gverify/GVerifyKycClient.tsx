@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { motion } from 'framer-motion';
-import QRCode from 'react-qr-code';
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
+import QRCode from "react-qr-code";
 import {
   ShieldCheck,
   Loader2,
@@ -14,19 +14,19 @@ import {
   LogOut,
   Smartphone,
   ArrowLeft,
-} from 'lucide-react';
+} from "lucide-react";
 
-import { Button } from '@/components/ui/button';
-import { LocaleSwitcher } from '@/components/locale-switcher';
-import { useToast } from '@/hooks/use-toast';
-import { useTranslations } from '@/lib/i18n';
-import { useCurrentUser, useLogout } from '@/hooks/use-authentication';
-import { useGVerifyHandoff, useGVerifyStatus } from '@/hooks/use-gverify';
-import { postVerificationTarget } from '../../kyc-landing';
-import { StatusBlock } from '../status-block';
-import { CaptureTabs } from './CaptureTabs';
-import { useGVerifyKyc } from './useGVerifyKyc';
-import type { ApiError } from '@/lib/types';
+import { Button } from "@/components/ui/button";
+import { LocaleSwitcher } from "@/components/locale-switcher";
+import { useToast } from "@/hooks/use-toast";
+import { useTranslations } from "@/lib/i18n";
+import { useCurrentUser, useLogout } from "@/hooks/use-authentication";
+import { useGVerifyHandoff, useGVerifyStatus } from "@/hooks/use-gverify";
+import { postVerificationTarget } from "../../kyc-landing";
+import { StatusBlock } from "../status-block";
+import { CaptureTabs } from "./CaptureTabs";
+import { useGVerifyKyc } from "./useGVerifyKyc";
+import type { ApiError } from "@/lib/types";
 
 // Investor KYC via GVerify (Datatrust) — the in-app replacement for the Didit
 // hosted redirect. The user stages ID front/back + a portrait, we submit them
@@ -39,8 +39,10 @@ export function GVerifyKycClient() {
   const { t } = useTranslations();
   const { data: user } = useCurrentUser();
   const { mutate: logout, isPending: loggingOut } = useLogout();
-  const { images, setFile, reset, allReady, submit, submitting } = useGVerifyKyc();
-  const { mutateAsync: createHandoff, isPending: creatingHandoff } = useGVerifyHandoff();
+  const { images, setFile, reset, allReady, submit, submitting } =
+    useGVerifyKyc();
+  const { mutateAsync: createHandoff, isPending: creatingHandoff } =
+    useGVerifyHandoff();
 
   // After a REJECTED/FAILED verdict the result screen shows first; "try again"
   // flips into capture mode for a fresh attempt (a new attempt row server-side).
@@ -50,7 +52,10 @@ export function GVerifyKycClient() {
   // was current when the QR was minted — the phone's submission creates a NEW
   // attempt, so a different id with a terminal status means "the phone is done"
   // (a previous rejection must not be mistaken for the fresh verdict).
-  const [phone, setPhone] = useState<{ url: string; baselineId: string } | null>(null);
+  const [phone, setPhone] = useState<{
+    url: string;
+    baselineId: string;
+  } | null>(null);
   const { data: status } = useGVerifyStatus({ poll: phone !== null });
 
   // The phone produced a fresh verdict → the QR panel yields to the normal
@@ -67,18 +72,19 @@ export function GVerifyKycClient() {
       const { token } = await createHandoff();
       setPhone({
         url: `${window.location.origin}/kyc/mobile?token=${encodeURIComponent(token)}`,
-        baselineId: status?.verification_id ?? '',
+        baselineId: status?.verification_id ?? "",
       });
     } catch (err) {
       toast({
-        variant: 'destructive',
-        title: t('kyc.gv.errorTitle'),
-        description: (err as ApiError)?.message || t('kyc.startErrorDescription'),
+        variant: "destructive",
+        title: t("kyc.gv.errorTitle"),
+        description:
+          (err as ApiError)?.message || t("kyc.startErrorDescription"),
       });
     }
   };
 
-  const landing = postVerificationTarget(searchParams.get('next'), user?.role);
+  const landing = postVerificationTarget(searchParams.get("next"), user?.role);
   const isApproved = status?.is_approved === true;
 
   // Once approved, head into the app after a brief confirmation.
@@ -93,14 +99,14 @@ export function GVerifyKycClient() {
     try {
       const verdict = await submit();
       setRetaking(false);
-      if (verdict.status === 'REJECTED') reset();
+      if (verdict.status === "REJECTED") reset();
     } catch (err) {
       const apiError = err as ApiError;
       setRetaking(false);
       toast({
-        variant: 'destructive',
-        title: t('kyc.gv.errorTitle'),
-        description: apiError?.message || t('kyc.startErrorDescription'),
+        variant: "destructive",
+        title: t("kyc.gv.errorTitle"),
+        description: apiError?.message || t("kyc.startErrorDescription"),
       });
     }
   };
@@ -109,14 +115,14 @@ export function GVerifyKycClient() {
   // capture mode when the phone finished on their behalf.
   const showResult =
     (!retaking || phoneVerdictArrived) &&
-    (status?.status === 'REJECTED' || status?.status === 'FAILED');
+    (status?.status === "REJECTED" || status?.status === "FAILED");
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/50 p-6">
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, ease: 'easeOut' }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
         className="w-full max-w-lg space-y-6 rounded-2xl border border-border bg-card p-8 text-center text-card-foreground shadow-lg"
       >
         <div className="flex items-center justify-between">
@@ -132,7 +138,7 @@ export function GVerifyKycClient() {
             ) : (
               <LogOut className="mr-2 h-4 w-4" />
             )}
-            {t('common.logout')}
+            {t("common.logout")}
           </Button>
           <LocaleSwitcher />
         </div>
@@ -141,21 +147,24 @@ export function GVerifyKycClient() {
         {isApproved ? (
           <StatusBlock
             icon={<CheckCircle2 className="h-12 w-12 text-emerald-500" />}
-            title={t('kyc.approvedTitle')}
-            hint={t('kyc.approvedHint')}
+            title={t("kyc.approvedTitle")}
+            hint={t("kyc.approvedHint")}
           />
         ) : /* --- Loading the latest attempt --- */ !status ? (
           <StatusBlock
             icon={<Loader2 className="h-12 w-12 animate-spin text-primary" />}
-            title={t('kyc.inProgress')}
-            hint={t('kyc.checking')}
+            title={t("kyc.inProgress")}
+            hint={t("kyc.checking")}
           />
-        ) : /* --- Phone handoff: QR + wait for the phone's verdict --- */ phoneActive && phone ? (
+        ) : /* --- Phone handoff: QR + wait for the phone's verdict --- */ phoneActive &&
+          phone ? (
           <div className="space-y-5">
             <div className="space-y-1.5">
-              <h1 className="text-xl font-bold tracking-tight">{t('kyc.gv.qrTitle')}</h1>
+              <h1 className="text-xl font-bold tracking-tight">
+                {t("kyc.gv.qrTitle")}
+              </h1>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                {t('kyc.gv.qrHint')}
+                {t("kyc.gv.qrHint")}
               </p>
             </div>
             {/* QR needs a light background to stay scannable in dark mode. */}
@@ -164,28 +173,38 @@ export function GVerifyKycClient() {
             </div>
             <p className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin" />
-              {t('kyc.gv.qrWaiting')}
+              {t("kyc.gv.qrWaiting")}
             </p>
-            <p className="text-xs text-muted-foreground">{t('kyc.gv.qrExpiry')}</p>
-            <Button variant="outline" className="h-11 w-full" onClick={() => setPhone(null)}>
+            <p className="text-xs text-muted-foreground">
+              {t("kyc.gv.qrExpiry")}
+            </p>
+            <Button
+              variant="outline"
+              className="h-11 w-full"
+              onClick={() => setPhone(null)}
+            >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              {t('kyc.gv.qrBack')}
+              {t("kyc.gv.qrBack")}
             </Button>
           </div>
         ) : /* --- Last attempt rejected / provider failure --- */ showResult ? (
           <StatusBlock
             icon={
-              status.status === 'REJECTED' ? (
+              status.status === "REJECTED" ? (
                 <XCircle className="h-12 w-12 text-destructive" />
               ) : (
                 <AlertTriangle className="h-12 w-12 text-amber-500" />
               )
             }
-            title={t(status.status === 'REJECTED' ? 'kyc.declinedTitle' : 'kyc.gv.failedTitle')}
+            title={t(
+              status.status === "REJECTED"
+                ? "kyc.declinedTitle"
+                : "kyc.gv.failedTitle",
+            )}
             hint={
-              status.status === 'REJECTED'
-                ? status.rejection_reason || t('kyc.declinedHint')
-                : t('kyc.gv.failedHint')
+              status.status === "REJECTED"
+                ? status.rejection_reason || t("kyc.declinedHint")
+                : t("kyc.gv.failedHint")
             }
           >
             <Button
@@ -196,7 +215,7 @@ export function GVerifyKycClient() {
               }}
             >
               <RotateCcw className="mr-2 h-4 w-4" />
-              {t('kyc.retryBtn')}
+              {t("kyc.retryBtn")}
             </Button>
           </StatusBlock>
         ) : (
@@ -208,9 +227,9 @@ export function GVerifyKycClient() {
               </div>
               <div className="space-y-1.5">
                 <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
-                  {t('kyc.title')}
+                  {t("kyc.title")}
                 </h1>
-                <p className="text-muted-foreground">{t('kyc.gv.subtitle')}</p>
+                <p className="text-muted-foreground">{t("kyc.gv.subtitle")}</p>
               </div>
             </div>
 
@@ -225,7 +244,7 @@ export function GVerifyKycClient() {
             />
 
             <p className="text-xs leading-relaxed text-muted-foreground">
-              {t('kyc.gv.consent')}
+              {t("kyc.gv.consent")}
             </p>
 
             <Button
@@ -237,16 +256,18 @@ export function GVerifyKycClient() {
               {submitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t('kyc.gv.submitting')}
+                  {t("kyc.gv.submitting")}
                 </>
               ) : (
-                t('kyc.gv.submitBtn')
+                t("kyc.gv.submitBtn")
               )}
             </Button>
 
             <div className="flex items-center gap-3" aria-hidden>
               <span className="h-px flex-1 bg-border" />
-              <span className="text-xs uppercase text-muted-foreground">{t('kyc.gv.or')}</span>
+              <span className="text-xs uppercase text-muted-foreground">
+                {t("kyc.gv.or")}
+              </span>
               <span className="h-px flex-1 bg-border" />
             </div>
 
@@ -262,7 +283,7 @@ export function GVerifyKycClient() {
               ) : (
                 <Smartphone className="mr-2 h-4 w-4" />
               )}
-              {t('kyc.gv.phoneBtn')}
+              {t("kyc.gv.phoneBtn")}
             </Button>
           </>
         )}

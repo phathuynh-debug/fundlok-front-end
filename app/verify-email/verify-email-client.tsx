@@ -17,12 +17,14 @@ export function VerifyEmailClient() {
   const { toast } = useToast();
   const { t } = useTranslations();
   const router = useRouter();
-  
+
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
   const [isVerifyingToken, setIsVerifyingToken] = useState(!!token);
-  const [verificationError, setVerificationError] = useState<string | null>(null);
+  const [verificationError, setVerificationError] = useState<string | null>(
+    null,
+  );
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isResending, setIsResending] = useState(false);
 
@@ -50,7 +52,8 @@ export function VerifyEmailClient() {
           // here always came back undefined, so every failure showed the
           // generic fallback instead of the backend's reason.
           const errMsg =
-            (err as ApiError)?.message || "Invalid or expired verification link.";
+            (err as ApiError)?.message ||
+            "Invalid or expired verification link.";
           setVerificationError(errMsg);
           toast({
             variant: "destructive",
@@ -79,14 +82,16 @@ export function VerifyEmailClient() {
         toast({
           variant: "destructive",
           title: "Verification pending",
-          description: "We couldn't confirm your verification. Please check your inbox and click the verification link first.",
+          description:
+            "We couldn't confirm your verification. Please check your inbox and click the verification link first.",
         });
       }
     } catch {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "An error occurred while checking status. Please try again.",
+        description:
+          "An error occurred while checking status. Please try again.",
       });
     } finally {
       setIsRefreshing(false);
@@ -102,7 +107,7 @@ export function VerifyEmailClient() {
       });
       return;
     }
-    
+
     setIsResending(true);
     try {
       const res = await authenticationService.resendVerification(user.email);
@@ -128,8 +133,12 @@ export function VerifyEmailClient() {
       <div className="flex flex-col items-center justify-center space-y-6 text-center py-8">
         <Loader2 className="h-12 w-12 text-emerald-500 animate-spin" />
         <div className="space-y-2">
-          <h3 className="text-xl font-bold text-foreground">Verifying email...</h3>
-          <p className="text-sm text-muted-foreground">Please wait while we confirm your verification token.</p>
+          <h3 className="text-xl font-bold text-foreground">
+            Verifying email...
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Please wait while we confirm your verification token.
+          </p>
         </div>
       </div>
     );
@@ -142,13 +151,18 @@ export function VerifyEmailClient() {
           <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/20">
             <XCircle className="h-8 w-8" />
           </div>
-          <h2 className="text-2xl font-bold text-foreground">Verification Failed</h2>
+          <h2 className="text-2xl font-bold text-foreground">
+            Verification Failed
+          </h2>
           <p className="text-muted-foreground text-sm max-w-sm leading-relaxed">
             {verificationError}
           </p>
         </div>
         <div className="space-y-3 pt-4">
-          <Button onClick={() => setVerificationError(null)} className="w-full h-11">
+          <Button
+            onClick={() => setVerificationError(null)}
+            className="w-full h-11"
+          >
             Back to verification options
           </Button>
           <Button
@@ -185,14 +199,16 @@ export function VerifyEmailClient() {
         <h2 className="text-2xl lg:text-3xl font-bold text-foreground">
           {t("auth.verifyEmail.title")}
         </h2>
-        
+
         <p className="text-muted-foreground text-sm lg:text-base max-w-sm leading-relaxed">
           {t("auth.verifyEmail.description")}
         </p>
 
         {user?.email && (
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-900 border border-border text-xs lg:text-sm text-slate-700 dark:text-slate-300">
-            <span className="font-semibold text-muted-foreground">{t("auth.verifyEmail.statusLabel")}:</span>
+            <span className="font-semibold text-muted-foreground">
+              {t("auth.verifyEmail.statusLabel")}:
+            </span>
             <span className="font-mono">{user.email}</span>
           </div>
         )}

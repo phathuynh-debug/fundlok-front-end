@@ -16,7 +16,9 @@ export default function ResetPasswordPage() {
         fallback={
           <div className="flex flex-col items-center justify-center py-12 space-y-4 animate-in fade-in duration-300">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-sm text-muted-foreground">Loading reset form...</p>
+            <p className="text-sm text-muted-foreground">
+              Loading reset form...
+            </p>
           </div>
         }
       >

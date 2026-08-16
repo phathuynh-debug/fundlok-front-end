@@ -1,55 +1,61 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import Link from "next/link"
-import { ArrowLeft, CheckCircle2, DollarSign, Loader2, ShieldCheck } from "lucide-react"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { useToast } from "@/hooks/use-toast"
-import { useRequireAuth } from "@/hooks/use-authentication"
-import { useTranslations } from "@/lib/i18n"
+import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  DollarSign,
+  Loader2,
+  ShieldCheck,
+} from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { useRequireAuth } from "@/hooks/use-authentication";
+import { useTranslations } from "@/lib/i18n";
 
 // Mock "invest" route. Its real purpose is to be a KYC-gated destination: the
 // proxy only lets an approved INVESTOR reach it, bouncing anyone unverified to
 // /kyc?next=/dashboard/invest first. Reached from the Invest button on a
 // project's detail page, carrying the amount (and projectId) as query params.
 export default function InvestPage() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const { toast } = useToast()
-  const { t, locale } = useTranslations()
-  const { isLoading } = useRequireAuth()
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { toast } = useToast();
+  const { t, locale } = useTranslations();
+  const { isLoading } = useRequireAuth();
 
-  const amount = Number(searchParams.get("amount") || 0)
-  const [isPending, setIsPending] = useState(false)
-  const [done, setDone] = useState(false)
+  const amount = Number(searchParams.get("amount") || 0);
+  const [isPending, setIsPending] = useState(false);
+  const [done, setDone] = useState(false);
 
-  const formattedAmount = `$${amount.toLocaleString(locale)}`
+  const formattedAmount = `$${amount.toLocaleString(locale)}`;
 
   const handleConfirm = () => {
-    setIsPending(true)
+    setIsPending(true);
     // Mock settlement — no real order is placed yet. Kept as a stand-in until
     // the marketplace order endpoint exists.
     setTimeout(() => {
-      setIsPending(false)
-      setDone(true)
+      setIsPending(false);
+      setDone(true);
       toast({
         title: t("investConfirm.successTitle"),
         description: t("investConfirm.successDescription").replace(
           "{amount}",
           formattedAmount,
         ),
-      })
-    }, 1200)
-  }
+      });
+    }, 1200);
+  };
 
   if (isLoading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
-    )
+    );
   }
 
   return (
@@ -126,5 +132,5 @@ export default function InvestPage() {
         )}
       </Card>
     </div>
-  )
+  );
 }

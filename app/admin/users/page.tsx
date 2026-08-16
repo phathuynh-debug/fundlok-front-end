@@ -1,22 +1,22 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { useRequireAuth } from "@/hooks/use-authentication"
-import { isAdminRole } from "@/services/authentication.service"
-import { useTranslations } from "@/lib/i18n"
-import { Loader2 } from "lucide-react"
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useRequireAuth } from "@/hooks/use-authentication";
+import { isAdminRole } from "@/services/authentication.service";
+import { useTranslations } from "@/lib/i18n";
+import { Loader2 } from "lucide-react";
 
 export default function AdminUsersPage() {
-  const { user, isLoading } = useRequireAuth()
-  const router = useRouter()
-  const { t } = useTranslations()
+  const { user, isLoading } = useRequireAuth();
+  const router = useRouter();
+  const { t } = useTranslations();
 
   useEffect(() => {
     if (!isLoading && user && !isAdminRole(user.role)) {
-      router.replace("/dashboard")
+      router.replace("/dashboard");
     }
-  }, [isLoading, user, router])
+  }, [isLoading, user, router]);
 
   if (isLoading || !user || !isAdminRole(user.role)) {
     return (
@@ -28,7 +28,7 @@ export default function AdminUsersPage() {
           </span>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -46,5 +46,5 @@ export default function AdminUsersPage() {
         {t("admin.usersPage.comingSoon")}
       </div>
     </div>
-  )
+  );
 }

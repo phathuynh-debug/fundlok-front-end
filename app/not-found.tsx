@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { ArrowLeft, Compass } from "lucide-react"
-import { LocaleSwitcher } from "@/components/locale-switcher"
-import { ThemeToggle } from "@/components/theme-toggle"
-import { useTranslations } from "@/lib/i18n"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Compass } from "lucide-react";
+import { LocaleSwitcher } from "@/components/locale-switcher";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { useTranslations } from "@/lib/i18n";
 
 export default function NotFound() {
-  const { t } = useTranslations()
+  const { t } = useTranslations();
 
   return (
     <div className="min-h-screen flex">
@@ -21,9 +21,13 @@ export default function NotFound() {
           <div>
             <Link href="/" className="flex items-center gap-2">
               <div className="h-10 w-10 rounded-lg bg-accent flex items-center justify-center">
-                <span className="text-accent-foreground font-bold text-lg">F</span>
+                <span className="text-accent-foreground font-bold text-lg">
+                  F
+                </span>
               </div>
-              <span className="text-2xl font-bold text-primary-foreground">FundLok</span>
+              <span className="text-2xl font-bold text-primary-foreground">
+                FundLok
+              </span>
             </Link>
           </div>
 
@@ -85,9 +89,7 @@ export default function NotFound() {
 
             <div className="flex flex-col sm:flex-row gap-3 w-full">
               <Button asChild className="flex-1 h-11">
-                <Link href="/">
-                  {t("notFound.goHome")}
-                </Link>
+                <Link href="/">{t("notFound.goHome")}</Link>
               </Button>
               <Button asChild variant="outline" className="flex-1 h-11">
                 <Link href="/dashboard">
@@ -102,7 +104,7 @@ export default function NotFound() {
         {/* Desktop Footer */}
         <div className="hidden lg:flex items-center justify-center p-6 border-t border-border">
           <p className="text-sm text-muted-foreground">
-            {t("common.needHelp")} {" "}
+            {t("common.needHelp")}{" "}
             <Link
               href="#"
               className="text-foreground font-medium underline underline-offset-2 hover:text-accent transition-colors"
@@ -113,5 +115,5 @@ export default function NotFound() {
         </div>
       </div>
     </div>
-  )
+  );
 }

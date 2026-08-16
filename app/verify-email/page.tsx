@@ -12,12 +12,16 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <AuthLayout>
-      <Suspense fallback={
-        <div className="flex flex-col items-center justify-center space-y-4 py-8">
-          <Loader2 className="h-8 w-8 text-emerald-500 animate-spin" />
-          <p className="text-sm text-muted-foreground">Loading verification screen...</p>
-        </div>
-      }>
+      <Suspense
+        fallback={
+          <div className="flex flex-col items-center justify-center space-y-4 py-8">
+            <Loader2 className="h-8 w-8 text-emerald-500 animate-spin" />
+            <p className="text-sm text-muted-foreground">
+              Loading verification screen...
+            </p>
+          </div>
+        }
+      >
         <VerifyEmailClient />
       </Suspense>
     </AuthLayout>

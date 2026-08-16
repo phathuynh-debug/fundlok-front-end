@@ -1,8 +1,8 @@
-import { apiClient } from '@/lib/api-client';
-import { ADMIN_ENDPOINTS } from '@/lib/endpoints';
+import { apiClient } from "@/lib/api-client";
+import { ADMIN_ENDPOINTS } from "@/lib/endpoints";
 
 // Which table the BFF /admin/overview endpoint should return alongside stats.
-export type AdminMode = 'users' | 'projects';
+export type AdminMode = "users" | "projects";
 
 // Mirrors backend get_stats().
 // The *_by_* maps only contain keys that exist in the DB — a bucket with zero

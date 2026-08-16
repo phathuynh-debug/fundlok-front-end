@@ -1,21 +1,21 @@
-"use client"
+"use client";
 
-import Link from "next/link"
+import Link from "next/link";
 // Image handled by Logo component
-import { motion } from "framer-motion"
-import { Shield, Zap, Users, TrendingUp } from "lucide-react"
-import type { ReactNode } from "react"
-import { LocaleSwitcher } from "@/components/locale-switcher"
-import { ThemeToggle } from "@/components/theme-toggle"
-import { useTranslations } from "@/lib/i18n"
-import Logo from "@/components/logo"
+import { motion } from "framer-motion";
+import { Shield, Zap, Users, TrendingUp } from "lucide-react";
+import type { ReactNode } from "react";
+import { LocaleSwitcher } from "@/components/locale-switcher";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { useTranslations } from "@/lib/i18n";
+import Logo from "@/components/logo";
 
 interface AuthLayoutProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 export function AuthLayout({ children }: AuthLayoutProps) {
-  const { t } = useTranslations()
+  const { t } = useTranslations();
 
   return (
     <motion.div
@@ -41,7 +41,10 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           <div>
             <Link href="/" className="flex items-center gap-2">
-              <Logo alt={t("common.brandName")} containerClassName="relative w-40 h-10" />
+              <Logo
+                alt={t("common.brandName")}
+                containerClassName="relative w-40 h-10"
+              />
             </Link>
           </div>
 
@@ -86,7 +89,10 @@ export function AuthLayout({ children }: AuthLayoutProps) {
       <div className="flex-1 flex flex-col">
         {/* Mobile Header */}
         <header className="lg:hidden flex items-center justify-between p-6 border-b border-border bg-background/50 backdrop-blur-md">
-          <Link href="/" className="flex items-center gap-2 group relative z-40">
+          <Link
+            href="/"
+            className="flex items-center gap-2 group relative z-40"
+          >
             <Logo alt={t("common.brandName")} />
           </Link>
           <div className="flex items-center gap-3">
@@ -103,7 +109,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         {/* Desktop Footer */}
         <div className="hidden lg:flex items-center justify-center p-6 border-t border-border">
           <p className="text-sm text-muted-foreground">
-            {t("auth.footer.helpPrefix")} {" "}
+            {t("auth.footer.helpPrefix")}{" "}
             <Link
               href="#"
               className="text-foreground font-medium underline underline-offset-2 hover:text-accent transition-colors"
@@ -114,7 +120,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         </div>
       </div>
     </motion.div>
-  )
+  );
 }
 
 function Feature({
@@ -122,9 +128,9 @@ function Feature({
   title,
   subtitle,
 }: {
-  icon: ReactNode
-  title: string
-  subtitle: string
+  icon: ReactNode;
+  title: string;
+  subtitle: string;
 }) {
   return (
     <div className="flex items-center gap-4">
@@ -136,5 +142,5 @@ function Feature({
         <p className="text-sm text-slate-400">{subtitle}</p>
       </div>
     </div>
-  )
+  );
 }

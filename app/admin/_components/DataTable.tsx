@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Loader2 } from "lucide-react"
+import * as React from "react";
+import { Loader2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -9,29 +9,29 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 
 // A single column definition: how to label the header and render each cell.
 export interface Column<T> {
   // Stable key for React and header identity.
-  key: string
-  header: string
+  key: string;
+  header: string;
   // Optional Tailwind classes for the header cell / body cells.
-  headClassName?: string
-  cellClassName?: string
+  headClassName?: string;
+  cellClassName?: string;
   // Turns a row into the cell content.
-  render: (row: T) => React.ReactNode
+  render: (row: T) => React.ReactNode;
 }
 
 interface DataTableProps<T> {
-  columns: Column<T>[]
-  rows: T[]
-  getRowKey: (row: T) => string
+  columns: Column<T>[];
+  rows: T[];
+  getRowKey: (row: T) => string;
   // First load — shows a centered spinner in place of rows.
-  isLoading?: boolean
+  isLoading?: boolean;
   // Background refetch (paging/filtering) — shows a subtle corner spinner.
-  isFetching?: boolean
-  emptyMessage?: string
+  isFetching?: boolean;
+  emptyMessage?: string;
 }
 
 // Generic, presentational table. Pass the data plus a column config describing
@@ -44,7 +44,7 @@ export function DataTable<T>({
   isFetching,
   emptyMessage = "No results found.",
 }: DataTableProps<T>) {
-  const colCount = columns.length
+  const colCount = columns.length;
 
   return (
     <div className="relative overflow-x-auto">
@@ -97,5 +97,5 @@ export function DataTable<T>({
         </TableBody>
       </Table>
     </div>
-  )
+  );
 }

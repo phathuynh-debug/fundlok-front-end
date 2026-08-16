@@ -1,22 +1,25 @@
-"use client"
+"use client";
 
-import { cn } from "@/lib/utils"
-import { useTranslations } from "@/lib/i18n"
+import { cn } from "@/lib/utils";
+import { useTranslations } from "@/lib/i18n";
 
 interface LocaleSwitcherProps {
   // "inverted" is for placement on a dark panel (e.g. the 404 / auth hero side).
-  tone?: "default" | "inverted"
-  className?: string
+  tone?: "default" | "inverted";
+  className?: string;
 }
 
-export function LocaleSwitcher({ tone = "default", className }: LocaleSwitcherProps) {
-  const { locale, setLocale, t } = useTranslations()
-  const inverted = tone === "inverted"
+export function LocaleSwitcher({
+  tone = "default",
+  className,
+}: LocaleSwitcherProps) {
+  const { locale, setLocale, t } = useTranslations();
+  const inverted = tone === "inverted";
 
   const options = [
     { value: "en", label: t("localeSwitcher.english") },
     { value: "vi", label: t("localeSwitcher.vietnamese") },
-  ] as const
+  ] as const;
 
   return (
     <div
@@ -29,7 +32,7 @@ export function LocaleSwitcher({ tone = "default", className }: LocaleSwitcherPr
       )}
     >
       {options.map((opt) => {
-        const active = locale === opt.value
+        const active = locale === opt.value;
         return (
           <button
             key={opt.value}
@@ -49,8 +52,8 @@ export function LocaleSwitcher({ tone = "default", className }: LocaleSwitcherPr
           >
             {opt.label}
           </button>
-        )
+        );
       })}
     </div>
-  )
+  );
 }

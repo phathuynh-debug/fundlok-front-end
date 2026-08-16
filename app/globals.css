@@ -76,8 +76,8 @@
 }
 
 @theme inline {
-  --font-sans: 'Geist', 'Geist Fallback';
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --font-sans: "Geist", "Geist Fallback";
+  --font-mono: "Geist Mono", "Geist Mono Fallback";
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -133,8 +133,8 @@ input.thumb-sm::-webkit-slider-thumb {
   height: 10px;
   border-radius: 9999px;
   background: #10b981; /* emerald-500 */
-  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
-  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   margin-top: -3px; /* vertically center on a 4px (h-1) track */
 }
 input.thumb-sm::-moz-range-thumb {
@@ -142,16 +142,16 @@ input.thumb-sm::-moz-range-thumb {
   height: 10px;
   border-radius: 9999px;
   background: #10b981;
-  border: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 input.thumb-sm::-ms-thumb {
   width: 10px;
   height: 10px;
   border-radius: 9999px;
   background: #10b981;
-  border: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 /* Add left padding for the label column in the matrix tables to avoid overlap */
@@ -164,4 +164,3 @@ input.thumb-sm {
   -webkit-appearance: none;
   appearance: none;
 }
-

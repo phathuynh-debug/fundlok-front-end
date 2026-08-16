@@ -40,31 +40,49 @@ app/**/_components/*     →  UI consumes the hooks (never calls services direct
 endpoints + `apiClient`. Don't call `apiClient` or `fetch` from a component.
 
 ### 1. Endpoints — `lib/endpoints.ts`
+
 Path constants grouped by domain. Functions for path params.
+
 ```ts
-export const PROJECT_ENDPOINTS = { list: "/projects", create: "/projects" } as const;
-export const FILES_ENDPOINTS = { commit: (id: string) => `/files/${id}/commit` } as const;
+export const PROJECT_ENDPOINTS = {
+  list: "/projects",
+  create: "/projects",
+} as const;
+export const FILES_ENDPOINTS = {
+  commit: (id: string) => `/files/${id}/commit`,
+} as const;
 ```
 
 ### 2. Services — `services/<domain>.service.ts`
+
 A pure data-access object plus the TypeScript interfaces for that domain. No
 React, no hooks. This is also where shared types live (`User`, `UserRole`, …).
+
 ```ts
-export interface RegisterPayload { full_name: string; email: string; /* … */ }
+export interface RegisterPayload {
+  full_name: string;
+  email: string; /* … */
+}
 
 export const authenticationService = {
-  login(payload: LoginPayload) { return apiClient.post<User>(AUTH_ENDPOINTS.login, payload); },
-  register(payload: RegisterPayload) { return apiClient.post<User>(AUTH_ENDPOINTS.register, payload); },
+  login(payload: LoginPayload) {
+    return apiClient.post<User>(AUTH_ENDPOINTS.login, payload);
+  },
+  register(payload: RegisterPayload) {
+    return apiClient.post<User>(AUTH_ENDPOINTS.register, payload);
+  },
 };
 ```
 
 ### 3. Hooks — `hooks/use-<domain>.ts`
+
 React Query wrappers. **Every domain exports a query-key factory** named
 `<domain>Keys` so caches invalidate consistently:
+
 ```ts
 export const projectKeys = {
-  all: ['projects'] as const,
-  mine: () => [...projectKeys.all, 'mine'] as const,
+  all: ["projects"] as const,
+  mine: () => [...projectKeys.all, "mine"] as const,
 };
 
 export function useMyProjects(enabled = true) {
@@ -85,6 +103,7 @@ export function useSelectRole() {
   });
 }
 ```
+
 - Mutations seed/invalidate the cache in `onSuccess` (e.g. `setQueryData`).
 - Error type is always `ApiError` from `@/lib/types`.
 - The global client config lives in `lib/query-client.ts` (staleTime 60s,
@@ -115,6 +134,7 @@ export function useSelectRole() {
   feature truly outgrows Context.
 
 ### Sharing local state without prop-drilling → Context provider
+
 When a feature splits into many sub-components that all need the same local
 state, create a Context provider instead of threading props. Reference
 implementation: `app/dashboard/_components/loan-application/`.
@@ -128,11 +148,14 @@ export function useLoanApplicationContext() {
   return v;
 }
 export function LoanApplicationProvider({ /* inputs */ children }) {
-  const state = useLoanApplication(/* … */);   // the hook with all logic
-  const value = { ...state, /* presentation: locale, theme, t, derived flags */ };
+  const state = useLoanApplication(/* … */); // the hook with all logic
+  const value = {
+    ...state /* presentation: locale, theme, t, derived flags */,
+  };
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 ```
+
 - The orchestrator component renders `<Provider><Wizard/></Provider>`; a
   component **cannot** consume a context it provides in the same render, so the
   consumer must be a child.
@@ -166,7 +189,9 @@ export function LoanApplicationProvider({ /* inputs */ children }) {
 - Keys are dot-paths: `t("dashboard.sme.reviewTitle")`.
 - Placeholders use `{name}` and are filled with `.replace()` at the call site:
   ```tsx
-  t("dashboard.sme.sendProgress").replace("{done}", String(done)).replace("{total}", String(total))
+  t("dashboard.sme.sendProgress")
+    .replace("{done}", String(done))
+    .replace("{total}", String(total));
   ```
 - Reuse existing keys where one fits; group new keys under the relevant
   namespace (`auth`, `dashboard.sme`, `common`, …). `locale === "vi"` inline

@@ -25,12 +25,36 @@ import { useTranslations } from "@/lib/i18n";
 import { cn, getInitials } from "@/lib/utils";
 
 const navItems = [
-  { labelKey: "dashboard.sidebar.overview", href: "/dashboard", icon: LayoutDashboard },
-  { labelKey: "dashboard.sidebar.investmentProjects", href: "/dashboard/projects", icon: Briefcase },
-  { labelKey: "dashboard.sidebar.transactions", href: "/dashboard/transactions", icon: History },
-  { labelKey: "dashboard.sidebar.analytics", href: "/dashboard/analytics", icon: PieChart },
-  { labelKey: "dashboard.sidebar.security", href: "/dashboard/security", icon: ShieldCheck },
-  { labelKey: "dashboard.sidebar.settings", href: "/dashboard/settings", icon: Settings },
+  {
+    labelKey: "dashboard.sidebar.overview",
+    href: "/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    labelKey: "dashboard.sidebar.investmentProjects",
+    href: "/dashboard/projects",
+    icon: Briefcase,
+  },
+  {
+    labelKey: "dashboard.sidebar.transactions",
+    href: "/dashboard/transactions",
+    icon: History,
+  },
+  {
+    labelKey: "dashboard.sidebar.analytics",
+    href: "/dashboard/analytics",
+    icon: PieChart,
+  },
+  {
+    labelKey: "dashboard.sidebar.security",
+    href: "/dashboard/security",
+    icon: ShieldCheck,
+  },
+  {
+    labelKey: "dashboard.sidebar.settings",
+    href: "/dashboard/settings",
+    icon: Settings,
+  },
 ];
 
 export function DashboardHeader() {
@@ -138,14 +162,19 @@ export function DashboardHeader() {
       <div
         className={cn(
           "md:hidden overflow-hidden border-t border-border/50 bg-background/98 backdrop-blur-lg transition-all duration-300 ease-in-out",
-          mobileMenuOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0 border-t-0"
+          mobileMenuOpen
+            ? "max-h-[500px] opacity-100"
+            : "max-h-0 opacity-0 border-t-0",
         )}
       >
         <div className="px-4 py-3 space-y-1">
           {/* User info */}
           <div className="flex items-center gap-2.5 py-2 px-1">
             <Avatar className="h-8 w-8 shrink-0">
-              <AvatarImage src={user?.avatar_url ?? undefined} alt={user?.full_name ?? ""} />
+              <AvatarImage
+                src={user?.avatar_url ?? undefined}
+                alt={user?.full_name ?? ""}
+              />
               <AvatarFallback className="bg-primary/10 text-[11px] font-semibold text-primary">
                 {getInitials(user?.full_name)}
               </AvatarFallback>
@@ -175,13 +204,15 @@ export function DashboardHeader() {
                     "flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
                     isActive
                       ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
                   )}
                 >
-                  <item.icon className={cn(
-                    "h-[18px] w-[18px] shrink-0",
-                    isActive ? "text-primary" : "text-muted-foreground"
-                  )} />
+                  <item.icon
+                    className={cn(
+                      "h-[18px] w-[18px] shrink-0",
+                      isActive ? "text-primary" : "text-muted-foreground",
+                    )}
+                  />
                   {t(item.labelKey)}
                 </Link>
               );

@@ -1,17 +1,17 @@
-import type { Metadata } from 'next'
-import { AdminSidebar } from "./_components/AdminSidebar"
-import { LocaleSwitcher } from "@/components/locale-switcher"
-import { ThemeToggle } from "@/components/theme-toggle"
+import type { Metadata } from "next";
+import { AdminSidebar } from "./_components/AdminSidebar";
+import { LocaleSwitcher } from "@/components/locale-switcher";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export const metadata: Metadata = {
-  title: 'Admin',
-  description: 'Fundlok administration area.',
-}
+  title: "Admin",
+  description: "Fundlok administration area.",
+};
 
 export default function AdminLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <div className="flex h-screen overflow-hidden">
@@ -33,5 +33,5 @@ export default function AdminLayout({
         </div>
       </main>
     </div>
-  )
+  );
 }

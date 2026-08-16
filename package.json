@@ -8,7 +8,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "lint:fix": "eslint . --fix && prettier --write .",
+    "i18n:sort": "bun scripts/sort-i18n.ts",
+    "i18n:check": "bun scripts/sort-i18n.ts --check",
+    "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
     "prepare": "husky install"
@@ -80,6 +83,7 @@
     "husky": "^8.0.3",
     "jsdom": "^29.1.1",
     "lint-staged": "^14.0.1",
+    "prettier": "^3.9.6",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^3.2.6"

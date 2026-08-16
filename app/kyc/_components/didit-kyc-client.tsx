@@ -80,13 +80,17 @@ export function DiditKycClient() {
       toast({
         variant: "destructive",
         title: t("kyc.startErrorTitle"),
-        description: (err as ApiError)?.message || t("kyc.startErrorDescription"),
+        description:
+          (err as ApiError)?.message || t("kyc.startErrorDescription"),
       });
     }
   };
 
   const terminalFailed =
-    s === "Declined" || s === "Abandoned" || s === "Expired" || s === "Kyc Expired";
+    s === "Declined" ||
+    s === "Abandoned" ||
+    s === "Expired" ||
+    s === "Kyc Expired";
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/50 p-6">
@@ -147,12 +151,22 @@ export function DiditKycClient() {
             title={t("kyc.inReviewTitle")}
             hint={t("kyc.inReviewHint")}
           >
-            <Button variant="outline" className="h-11 w-full" disabled={syncing} onClick={() => sync()}>
-              {syncing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+            <Button
+              variant="outline"
+              className="h-11 w-full"
+              disabled={syncing}
+              onClick={() => sync()}
+            >
+              {syncing ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="mr-2 h-4 w-4" />
+              )}
               {t("kyc.refreshBtn")}
             </Button>
           </StatusBlock>
-        ) : /* --- Terminal failure / resubmit: offer retry --- */ terminalFailed || s === "Resubmitted" ? (
+        ) : /* --- Terminal failure / resubmit: offer retry --- */ terminalFailed ||
+          s === "Resubmitted" ? (
           <StatusBlock
             icon={
               s === "Resubmitted" ? (
@@ -180,7 +194,11 @@ export function DiditKycClient() {
                     : "kyc.expiredHint",
             )}
           >
-            <Button className="h-11 w-full" disabled={starting} onClick={handleStart}>
+            <Button
+              className="h-11 w-full"
+              disabled={starting}
+              onClick={handleStart}
+            >
               {starting ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
@@ -197,21 +215,31 @@ export function DiditKycClient() {
                 <ShieldCheck className="h-8 w-8" />
               </div>
               <div className="space-y-1.5">
-                <h1 className="text-2xl font-bold tracking-tight md:text-3xl">{t("kyc.title")}</h1>
+                <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+                  {t("kyc.title")}
+                </h1>
                 <p className="text-muted-foreground">{t("kyc.subtitle")}</p>
               </div>
             </div>
 
             <div className="space-y-3 rounded-xl border border-border bg-muted/30 p-4 text-left">
-              <p className="text-sm font-semibold text-foreground">{t("kyc.consentTitle")}</p>
-              <p className="text-sm leading-relaxed text-muted-foreground">{t("kyc.consent")}</p>
+              <p className="text-sm font-semibold text-foreground">
+                {t("kyc.consentTitle")}
+              </p>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t("kyc.consent")}
+              </p>
               <p className="flex items-center gap-2 text-xs text-muted-foreground">
                 <Camera className="h-3.5 w-3.5" />
                 {t("kyc.cameraNote")}
               </p>
             </div>
 
-            <Button className="h-12 w-full text-base font-medium" disabled={starting} onClick={handleStart}>
+            <Button
+              className="h-12 w-full text-base font-medium"
+              disabled={starting}
+              onClick={handleStart}
+            >
               {starting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

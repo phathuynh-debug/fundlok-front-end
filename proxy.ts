@@ -85,7 +85,9 @@ export async function proxy(request: NextRequest) {
   }
   const accessToken = request.cookies.get("access_token")?.value;
   const isAuthenticated = !!accessToken;
-  const currentUser = isAuthenticated ? await middlewareService.getCurrentUser(request) : null;
+  const currentUser = isAuthenticated
+    ? await middlewareService.getCurrentUser(request)
+    : null;
   const isSystemAdmin = currentUser?.role === "SYSTEM_ADMIN";
   const isAdmin = currentUser?.role === "ADMIN";
   // Both ADMIN and SYSTEM_ADMIN may enter the /admin area (mirrors require_admin).
@@ -106,7 +108,7 @@ export async function proxy(request: NextRequest) {
   // for why prefetches can't simply be skipped instead.
   const isMaintenancePage = pathname === MAINTENANCE_ROUTE;
   const isBlockedDuringMaintenance = MAINTENANCE_BLOCKED_ROUTES.some(
-    (r) => pathname === r || pathname.startsWith(`${r}/`)
+    (r) => pathname === r || pathname.startsWith(`${r}/`),
   );
   if (isMaintenancePage || isBlockedDuringMaintenance) {
     const maintenance = await middlewareService.getMaintenance();
@@ -142,7 +144,10 @@ export async function proxy(request: NextRequest) {
   // null = not looked up / unreadable; only a definite `false` blocks a route
   // and only a definite `true` releases /kyc, so a backend hiccup can't loop.
   const isApproved = shouldCheckApproval
-    ? await middlewareService.getVerificationApproved(request, currentUser?.role)
+    ? await middlewareService.getVerificationApproved(
+        request,
+        currentUser?.role,
+      )
     : null;
 
   // Post-login landing no longer depends on KYC or project count — users land on
@@ -156,7 +161,8 @@ export async function proxy(request: NextRequest) {
   // Where to send the user out of /kyc: back to the action they were attempting
   // (?next=), else their normal landing.
   const postKycTarget =
-    safeNextPath(request.nextUrl.searchParams.get("next")) ?? authRedirectTarget;
+    safeNextPath(request.nextUrl.searchParams.get("next")) ??
+    authRedirectTarget;
 
   // Redirect unauthenticated users away from /verify-email to login — unless
   // they arrived on the emailed link, which carries its own credential in
@@ -165,7 +171,11 @@ export async function proxy(request: NextRequest) {
   // the token away, so the first verification email appeared to do nothing and
   // only a resend — clicked while already logged in — could verify an account.
   const hasVerificationToken = !!request.nextUrl.searchParams.get("token");
-  if (!isAuthenticated && pathname === "/verify-email" && !hasVerificationToken) {
+  if (
+    !isAuthenticated &&
+    pathname === "/verify-email" &&
+    !hasVerificationToken
+  ) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("from", pathname);
     return NextResponse.redirect(loginUrl);
@@ -233,7 +243,10 @@ export async function proxy(request: NextRequest) {
   }
 
   // Redirect unauthenticated users away from protected pages to login.
-  if (!isAuthenticated && PROTECTED_ROUTES.some((r) => pathname.startsWith(r))) {
+  if (
+    !isAuthenticated &&
+    PROTECTED_ROUTES.some((r) => pathname.startsWith(r))
+  ) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("from", pathname);
     return NextResponse.redirect(loginUrl);

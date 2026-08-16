@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import { Card } from "@/components/ui/card"
-import { CheckCircle2, FileText } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { useLoanApplicationContext } from "./LoanApplicationContext"
+import { Card } from "@/components/ui/card";
+import { CheckCircle2, FileText } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useLoanApplicationContext } from "./LoanApplicationContext";
 
 // The "why we need this / how to obtain it" panel shown beside each collection
 // step. Content is keyed off the current step.
 export function DocumentInfoPanel() {
-  const { currentStep, theme, t } = useLoanApplicationContext()
+  const { currentStep, theme, t } = useLoanApplicationContext();
 
   return (
     <Card className="p-5 bg-muted/40 border border-border/50 rounded-2xl shadow-inner space-y-4">
@@ -40,7 +40,9 @@ export function DocumentInfoPanel() {
           <ul className="space-y-2 text-xs text-muted-foreground">
             {[1, 2, 3, 4].map((n) => (
               <li key={n} className="flex items-start gap-1.5">
-                <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-black/5 dark:bg-white/10 text-[9px] font-bold text-foreground">{n}</span>
+                <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-black/5 dark:bg-white/10 text-[9px] font-bold text-foreground">
+                  {n}
+                </span>
                 <span>{t(`dashboard.sme.cicStep${n}`)}</span>
               </li>
             ))}
@@ -48,5 +50,5 @@ export function DocumentInfoPanel() {
         </div>
       )}
     </Card>
-  )
+  );
 }

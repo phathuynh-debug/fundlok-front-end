@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   usersService,
   type SetPasswordRequest,
   type SetPasswordResponse,
   type UpdateProfileRequest,
-} from '@/services/users.service';
-import { authKeys } from '@/hooks/use-authentication';
-import type { User } from '@/services/authentication.service';
-import type { ApiError } from '@/lib/types';
+} from "@/services/users.service";
+import { authKeys } from "@/hooks/use-authentication";
+import type { User } from "@/services/authentication.service";
+import type { ApiError } from "@/lib/types";
 
 export interface UpdateAvatarVariables {
   file: File;

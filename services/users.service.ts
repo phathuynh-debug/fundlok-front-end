@@ -1,7 +1,7 @@
-import { apiClient } from '@/lib/api-client';
-import { USER_ENDPOINTS } from '@/lib/endpoints';
-import { uploadsService } from '@/services/uploads.service';
-import type { SelectableRole, User } from './authentication.service';
+import { apiClient } from "@/lib/api-client";
+import { USER_ENDPOINTS } from "@/lib/endpoints";
+import { uploadsService } from "@/services/uploads.service";
+import type { SelectableRole, User } from "./authentication.service";
 
 // Mirrors backend AvatarPresignRequest / AvatarPresignResponse.
 export interface AvatarPresignRequest {
@@ -54,7 +54,7 @@ export const PASSWORD_MIN_LENGTH = 8;
 // presign → direct PUT to R2 → confirm. The file never touches the API server.
 export const AVATAR_RULES = {
   // Browser-reported MIME types we accept; the R2 PUT reuses file.type verbatim.
-  contentTypes: ['image/jpeg', 'image/png', 'image/webp'] as const,
+  contentTypes: ["image/jpeg", "image/png", "image/webp"] as const,
   maxSizeMb: 5,
 };
 
@@ -81,14 +81,14 @@ export const usersService = {
   setPassword(payload: SetPasswordRequest) {
     return apiClient.post<SetPasswordResponse>(
       USER_ENDPOINTS.setPassword,
-      payload
+      payload,
     );
   },
 
   presignAvatar(payload: AvatarPresignRequest) {
     return apiClient.post<AvatarPresignResponse>(
       USER_ENDPOINTS.avatarPresign,
-      payload
+      payload,
     );
   },
 
@@ -103,7 +103,7 @@ export const usersService = {
     onProgress?: (percent: number) => void;
   }): Promise<User> {
     const { file, onProgress } = params;
-    const contentType = file.type || 'application/octet-stream';
+    const contentType = file.type || "application/octet-stream";
 
     const presign = await this.presignAvatar({
       filename: file.name,
@@ -117,7 +117,7 @@ export const usersService = {
       presign.upload_url,
       file,
       contentType,
-      onProgress
+      onProgress,
     );
 
     return this.confirmAvatar({ file_key: presign.file_key });

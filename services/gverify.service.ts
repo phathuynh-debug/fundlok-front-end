@@ -1,12 +1,13 @@
-import { apiClient } from '@/lib/api-client';
-import { GVERIFY_ENDPOINTS } from '@/lib/endpoints';
+import { apiClient } from "@/lib/api-client";
+import { GVERIFY_ENDPOINTS } from "@/lib/endpoints";
 
 // GVerify attempt statuses (backend spec:
 // docs/specs/gverify/ekyc-kyc-verification.md). Every attempt ends terminal
 // within the request that created it; "NOT_STARTED" is our synthetic value for
 // a user with no attempts (the status endpoint 404s). MANUAL_REVIEW is
 // KYB-only: borderline results parked for an ops decision.
-export type GVerifyStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'FAILED' | 'MANUAL_REVIEW';
+export type GVerifyStatus =
+  "PENDING" | "APPROVED" | "REJECTED" | "FAILED" | "MANUAL_REVIEW";
 
 export interface GVerifyVerifyPayload {
   id_front_b64: string;
@@ -30,7 +31,7 @@ export interface GVerifyVerifyResponse {
 // GET /gverify/kyc/status — the caller's latest attempt.
 export interface GVerifyStatusResponse {
   verification_id: string;
-  status: GVerifyStatus | 'NOT_STARTED';
+  status: GVerifyStatus | "NOT_STARTED";
   is_terminal: boolean;
   is_approved: boolean;
   rejection_reason: string | null;
@@ -42,8 +43,8 @@ export interface GVerifyStatusResponse {
 // Synthetic status for a user who has never attempted (the endpoint 404s).
 export function gverifyNotStarted(): GVerifyStatusResponse {
   return {
-    verification_id: '',
-    status: 'NOT_STARTED',
+    verification_id: "",
+    status: "NOT_STARTED",
     is_terminal: false,
     is_approved: false,
     rejection_reason: null,
@@ -54,7 +55,9 @@ export function gverifyNotStarted(): GVerifyStatusResponse {
 }
 
 // A verify response reshaped so it can seed the status query cache.
-export function verifyResponseToStatus(data: GVerifyVerifyResponse): GVerifyStatusResponse {
+export function verifyResponseToStatus(
+  data: GVerifyVerifyResponse,
+): GVerifyStatusResponse {
   return {
     verification_id: data.verification_id,
     status: data.status,
@@ -76,7 +79,7 @@ export interface GVerifyHandoffResponse {
 // ---------- KYB (business verification, SME) ----------
 
 // Certificate variant, matching GVerify OCR X's `type` parameter.
-export type GVerifyKybDocumentType = 'COMPANY' | 'COMPANY_BRANCH';
+export type GVerifyKybDocumentType = "COMPANY" | "COMPANY_BRANCH";
 
 export interface GVerifyKybVerifyPayload {
   document_b64: string; // JPEG | PNG | PDF, decoded size ≤ 10MB
@@ -108,7 +111,7 @@ export interface GVerifyKybVerifyResponse {
 // GET /gverify/kyb/status — the caller's latest attempt.
 export interface GVerifyKybStatusResponse {
   verification_id: string;
-  status: GVerifyStatus | 'NOT_STARTED';
+  status: GVerifyStatus | "NOT_STARTED";
   is_terminal: boolean;
   is_approved: boolean;
   rejection_reason: string | null;
@@ -120,8 +123,8 @@ export interface GVerifyKybStatusResponse {
 // Synthetic status for an SME who has never attempted (the endpoint 404s).
 export function gverifyKybNotStarted(): GVerifyKybStatusResponse {
   return {
-    verification_id: '',
-    status: 'NOT_STARTED',
+    verification_id: "",
+    status: "NOT_STARTED",
     is_terminal: false,
     is_approved: false,
     rejection_reason: null,
@@ -156,9 +159,13 @@ export const gverifyService = {
   // outcome is still a 2xx — the business verdict is in the body. Only
   // provider failures surface as 502.
   verify(payload: GVerifyVerifyPayload) {
-    return apiClient.post<GVerifyVerifyResponse>(GVERIFY_ENDPOINTS.verify, payload, {
-      timeout: VERIFY_TIMEOUT_MS,
-    });
+    return apiClient.post<GVerifyVerifyResponse>(
+      GVERIFY_ENDPOINTS.verify,
+      payload,
+      {
+        timeout: VERIFY_TIMEOUT_MS,
+      },
+    );
   },
 
   // Mint the phone-handoff token (requires the logged-in desktop session).
@@ -169,10 +176,14 @@ export const gverifyService = {
   // Same as verify, but authenticated with the handoff token — used on the
   // phone, which has no login cookie.
   verifyWithToken(payload: GVerifyVerifyPayload, token: string) {
-    return apiClient.post<GVerifyVerifyResponse>(GVERIFY_ENDPOINTS.handoffVerify, payload, {
-      timeout: VERIFY_TIMEOUT_MS,
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    return apiClient.post<GVerifyVerifyResponse>(
+      GVERIFY_ENDPOINTS.handoffVerify,
+      payload,
+      {
+        timeout: VERIFY_TIMEOUT_MS,
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
   },
 
   // Latest attempt, read from our DB. 404 = never attempted.
@@ -182,9 +193,13 @@ export const gverifyService = {
 
   // KYB: OCR the registration certificate + tax-registry cross-check.
   kybVerify(payload: GVerifyKybVerifyPayload) {
-    return apiClient.post<GVerifyKybVerifyResponse>(GVERIFY_ENDPOINTS.kybVerify, payload, {
-      timeout: VERIFY_TIMEOUT_MS,
-    });
+    return apiClient.post<GVerifyKybVerifyResponse>(
+      GVERIFY_ENDPOINTS.kybVerify,
+      payload,
+      {
+        timeout: VERIFY_TIMEOUT_MS,
+      },
+    );
   },
 
   kybGetStatus() {

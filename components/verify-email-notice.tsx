@@ -20,7 +20,10 @@ interface VerifyEmailNoticeProps {
 // session, so this is a self-contained "check your inbox" panel — the actual
 // verification happens when the user clicks the link in their email, which
 // opens /verify-email?token=… . Resend only needs the email address.
-export function VerifyEmailNotice({ email, onBackToLogin }: VerifyEmailNoticeProps) {
+export function VerifyEmailNotice({
+  email,
+  onBackToLogin,
+}: VerifyEmailNoticeProps) {
   const { toast } = useToast();
   const { t } = useTranslations();
   const [isResending, setIsResending] = useState(false);
@@ -38,7 +41,9 @@ export function VerifyEmailNotice({ email, onBackToLogin }: VerifyEmailNoticePro
         variant: "destructive",
         title: t("auth.verifyEmail.resendFailed"),
         description:
-          err instanceof Error ? err.message : t("auth.verifyEmail.resendFailed"),
+          err instanceof Error
+            ? err.message
+            : t("auth.verifyEmail.resendFailed"),
       });
     } finally {
       setIsResending(false);
@@ -51,7 +56,12 @@ export function VerifyEmailNotice({ email, onBackToLogin }: VerifyEmailNoticePro
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.1 }}
+          transition={{
+            type: "spring",
+            stiffness: 260,
+            damping: 20,
+            delay: 0.1,
+          }}
           className="flex h-16 w-16 items-center justify-center rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-500"
         >
           <Mail className="h-8 w-8" />
