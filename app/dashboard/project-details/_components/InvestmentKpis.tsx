@@ -2,8 +2,9 @@
 
 import { Card } from "@/components/ui/card";
 import { DollarSign, Percent, Calendar, ShieldCheck } from "lucide-react";
-import { motion, type Variants } from "framer-motion";
+import { motion } from "framer-motion";
 import { useTranslations } from "@/lib/i18n";
+import { staggerContainerVariants, springItemVariants } from "@/lib/animations";
 
 interface InvestmentKpisProps {
   loanAmount?: string;
@@ -11,30 +12,6 @@ interface InvestmentKpisProps {
   paybackPeriod?: string;
   revenueShareRate?: string;
 }
-
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.06,
-    },
-  },
-};
-
-const cardVariants: Variants = {
-  hidden: { opacity: 0, y: 16, scale: 0.96 },
-  show: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: {
-      type: "spring",
-      stiffness: 350,
-      damping: 25,
-    },
-  },
-};
 
 export function InvestmentKpis({
   loanAmount = "$50,000",
@@ -46,13 +23,13 @@ export function InvestmentKpis({
 
   return (
     <motion.div
-      variants={containerVariants}
+      variants={staggerContainerVariants}
       initial="hidden"
       animate="show"
       className="grid gap-4 grid-cols-2 md:grid-cols-4"
     >
       {/* Loan Amount */}
-      <motion.div variants={cardVariants}>
+      <motion.div variants={springItemVariants}>
         <Card className="p-6 bg-card border flex flex-col justify-between h-32 rounded-2xl shadow-sm">
           <div className="flex items-center gap-2 text-muted-foreground">
             <DollarSign className="h-4 w-4" />
@@ -67,7 +44,7 @@ export function InvestmentKpis({
       </motion.div>
 
       {/* Expected ROI */}
-      <motion.div variants={cardVariants}>
+      <motion.div variants={springItemVariants}>
         <Card className="p-6 bg-card border flex flex-col justify-between h-32 rounded-2xl shadow-sm">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Percent className="h-4 w-4" />
@@ -82,7 +59,7 @@ export function InvestmentKpis({
       </motion.div>
 
       {/* Est. Payback Period */}
-      <motion.div variants={cardVariants}>
+      <motion.div variants={springItemVariants}>
         <Card className="p-6 bg-card border flex flex-col justify-between h-32 rounded-2xl shadow-sm">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Calendar className="h-4 w-4" />
@@ -97,7 +74,7 @@ export function InvestmentKpis({
       </motion.div>
 
       {/* Revenue Share Rate */}
-      <motion.div variants={cardVariants}>
+      <motion.div variants={springItemVariants}>
         <Card className="p-6 bg-card border flex flex-col justify-between h-32 rounded-2xl shadow-sm">
           <div className="flex items-center gap-2 text-muted-foreground">
             <ShieldCheck className="h-4 w-4" />

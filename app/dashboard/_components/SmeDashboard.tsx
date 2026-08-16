@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MapPin, CheckCircle2, Rocket, ArrowRight } from "lucide-react";
@@ -34,7 +35,12 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
   // through /kyc first, then returned to the application form.
   if (!project) {
     return (
-      <div className="flex-1 p-4 md:p-8 pt-6">
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
+        className="flex-1 p-4 md:p-8 pt-6"
+      >
         <Card className="mx-auto flex max-w-2xl flex-col items-center gap-6 rounded-2xl border border-dashed bg-card p-8 text-center md:p-12">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <Rocket className="h-8 w-8" />
@@ -54,7 +60,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
             </Link>
           </Button>
         </Card>
-      </div>
+      </motion.div>
     );
   }
 
@@ -68,7 +74,12 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
   );
 
   return (
-    <div className="flex-1 space-y-6 md:space-y-8 p-4 md:p-8 pt-6 relative overflow-hidden">
+    <motion.div
+      initial={{ opacity: 0, y: -12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
+      className="flex-1 space-y-6 md:space-y-8 p-4 md:p-8 pt-6 relative overflow-hidden"
+    >
       {/* Dynamic Industry Ambient Background Decoration */}
       <div
         className={cn(
@@ -305,6 +316,6 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
             t={t}
           />
         ))}
-    </div>
+    </motion.div>
   );
 }

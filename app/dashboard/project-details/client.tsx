@@ -14,6 +14,11 @@ import { InvestmentKpis } from "./_components/InvestmentKpis";
 import { RiskAssessmentTab } from "./_components/RiskAssessmentTab";
 import { DueDiligenceTab } from "./_components/DueDiligenceTab";
 import { useTranslations } from "@/lib/i18n";
+import {
+  pageTransitionProps,
+  fadeInUpProps,
+  tabContentAnimation,
+} from "@/lib/animations";
 
 type TabType = "risk" | "diligence";
 
@@ -82,9 +87,7 @@ export default function ProjectDetailsClient() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: -12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: "easeOut" }}
+      {...pageTransitionProps}
       className="flex-1 space-y-8 p-4 md:p-8 pt-6 max-w-5xl mx-auto"
     >
       {/* Back button */}
@@ -103,12 +106,7 @@ export default function ProjectDetailsClient() {
       </div>
 
       {/* Header section */}
-      <motion.div
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.05 }}
-        className="flex flex-col gap-4"
-      >
+      <motion.div {...fadeInUpProps} className="flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-3">
@@ -138,11 +136,7 @@ export default function ProjectDetailsClient() {
       </motion.div>
 
       {/* KPI Cards Row */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35, delay: 0.1 }}
-      >
+      <motion.div {...fadeInUpProps}>
         <InvestmentKpis />
       </motion.div>
 
@@ -179,23 +173,11 @@ export default function ProjectDetailsClient() {
       <div className="mt-8">
         <AnimatePresence mode="wait">
           {activeTab === "risk" ? (
-            <motion.div
-              key="risk"
-              initial={{ opacity: 0, y: 16, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -16, scale: 0.98 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
-            >
+            <motion.div key="risk" {...tabContentAnimation}>
               <RiskAssessmentTab />
             </motion.div>
           ) : (
-            <motion.div
-              key="diligence"
-              initial={{ opacity: 0, y: 16, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -16, scale: 0.98 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
-            >
+            <motion.div key="diligence" {...tabContentAnimation}>
               <DueDiligenceTab />
             </motion.div>
           )}

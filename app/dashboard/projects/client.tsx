@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { usePublicProjects } from "@/hooks/use-projects";
 import type { Project } from "@/services/projects.service";
@@ -332,30 +332,11 @@ function ProjectsSkeletonList() {
   );
 }
 
-const listContainerVariants: Variants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.05,
-    },
-  },
-};
-
-const listItemVariants: Variants = {
-  hidden: { opacity: 0, y: 24, scale: 0.97 },
-  show: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: {
-      type: "spring",
-      stiffness: 350,
-      damping: 25,
-    },
-  },
-};
+import {
+  pageTransitionProps,
+  staggerContainerVariants,
+  springItemVariants,
+} from "@/lib/animations";
 
 export default function ProjectsClient() {
   const { user, isLoading: isAuthLoading } = useRequireAuth();
@@ -414,9 +395,7 @@ export default function ProjectsClient() {
       <DashboardHeader />
 
       <motion.div
-        initial={{ opacity: 0, y: -12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
+        {...pageTransitionProps}
         className="flex-1 space-y-6 md:space-y-8 p-4 md:p-8 pt-6"
       >
         {/* Header */}
@@ -529,14 +508,17 @@ export default function ProjectsClient() {
             ) : filteredItems.length > 0 ? (
               <motion.div
                 key={`${marketType}-${activeIndustry}-${searchTerm}`}
-                variants={listContainerVariants}
+                variants={staggerContainerVariants}
                 initial="hidden"
                 animate="show"
                 className="grid gap-6"
               >
                 {marketType === "primary"
                   ? (filteredItems as Project[]).map((project) => (
-                      <motion.div key={project.id} variants={listItemVariants}>
+                      <motion.div
+                        key={project.id}
+                        variants={springItemVariants}
+                      >
                         <ProjectCard
                           project={project}
                           role="INVESTOR"
@@ -548,7 +530,7 @@ export default function ProjectsClient() {
                       (listing) => (
                         <motion.div
                           key={listing.id}
-                          variants={listItemVariants}
+                          variants={springItemVariants}
                         >
                           <SecondaryMarketCard listing={listing} />
                         </motion.div>
