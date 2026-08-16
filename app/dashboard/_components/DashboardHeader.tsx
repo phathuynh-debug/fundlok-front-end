@@ -22,7 +22,6 @@ import { useRouter, usePathname } from "next/navigation";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useTranslations } from "@/lib/i18n";
-import Logo from "@/components/logo";
 import { cn, getInitials } from "@/lib/utils";
 
 const navItems = [
@@ -72,15 +71,9 @@ export function DashboardHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="flex h-14 md:h-16 items-center justify-between px-4 md:px-8">
-        {/* Left: Logo + role badge */}
+        {/* Left: Role badge */}
         <div className="flex items-center gap-2 min-w-0">
-          <div className="flex items-center gap-2 font-bold text-lg md:text-xl tracking-tight shrink-0">
-            <Logo
-              alt={t("common.brandName")}
-              containerClassName="relative w-28 h-8 md:w-40 md:h-10 overflow-hidden"
-            />
-          </div>
-          <span className="hidden sm:inline-flex text-xs font-semibold text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full border border-border/50 whitespace-nowrap">
+          <span className="inline-flex text-xs font-semibold text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full border border-border/50 whitespace-nowrap">
             {portalLabel}
           </span>
         </div>
