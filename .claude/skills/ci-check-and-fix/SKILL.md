@@ -1,62 +1,51 @@
 ---
 name: ci-check-and-fix
-description: Automatically run all CI pipeline checks (i18n sorting, styling/Prettier, ESLint, TypeScript type checking, unit tests, build) and auto-fix any issues found.
+description: Automatically run all CI pipeline checks (i18n sorting, styling/Prettier, ESLint, TypeScript type checking, unit tests, build) and auto-fix any issues found using the CLI tool.
 ---
 
 # CI Check and Auto-Fix Skill
 
-This skill automates running all continuous integration (CI) pipeline checks for the `fundlok-frontend` repository, automatically fixing any styling, formatting, i18n, or linting issues, and guiding the resolution of any remaining errors.
+This skill automates running all continuous integration (CI) pipeline checks for the `fundlok-frontend` repository using the unified CI CLI tool (`scripts/ci.ts`), automatically fixing any styling, formatting, i18n, or linting issues, and guiding the resolution of any remaining errors.
+
+## CLI Commands Quick Reference
+
+- **Run all CI checks**:
+  ```bash
+  bun run ci
+  # or
+  bun run ci:check
+  ```
+
+- **Auto-fix and run all CI checks**:
+  ```bash
+  bun run ci:fix
+  ```
 
 ## Workflow Instructions
 
 When activated (or when the user prompts to check CI or auto-fix CI), follow these steps in order:
 
-### Step 1: Run Auto-Fixers
-Run the automated repair commands first to eliminate formatting, styling, and i18n sorting errors automatically:
+### Step 1: Run Auto-Fixers & Pipeline Checks via CLI
+Execute the unified CI CLI in auto-fix mode:
 
-1. **Auto-Sort i18n JSON Keys**:
-   ```bash
-   bun run i18n:sort
-   ```
-2. **Auto-Format Code with Prettier**:
-   ```bash
-   bun run format
-   ```
-3. **Auto-Fix ESLint Issues**:
-   ```bash
-   bun run lint:fix
-   ```
+```bash
+bun run ci:fix
+```
 
-### Step 2: Run CI Validation Pipeline Checks
-Run each CI pipeline check to ensure full compliance:
+This command automatically:
+1. Sorts all i18n translation JSON keys.
+2. Formats all files with Prettier code styling.
+3. Applies ESLint auto-fixes.
+4. Executes all 6 CI pipeline checks:
+   - i18n Sorting Check
+   - Code Styling Check (Prettier)
+   - ESLint Linting Check
+   - TypeScript Type Check
+   - Vitest Unit Tests Check
+   - Next.js Production Build Check
 
-1. **i18n Sorting Check**:
-   ```bash
-   bun run i18n:check
-   ```
-2. **Code Styling Check (Prettier)**:
-   ```bash
-   bun run lint:style
-   ```
-3. **ESLint Linting Check**:
-   ```bash
-   bun run lint
-   ```
-4. **TypeScript Type Check**:
-   ```bash
-   npx tsc --noEmit
-   ```
-5. **Unit Tests Check**:
-   ```bash
-   bun run test
-   ```
-6. **Next.js Production Build Check**:
-   ```bash
-   bun run build
-   ```
-
-### Step 3: Resolve Remaining Failures
-If any check in Step 2 fails:
-1. Inspect the command output for exact file names and error tracebacks.
+### Step 2: Resolve Remaining Failures
+If any check fails:
+1. Inspect the CLI output for exact file names and error tracebacks.
 2. Fix the underlying root causes (e.g., fix TypeScript type mismatches, unhandled errors, or failing test assertions).
-3. Re-run the failing check to verify clean exit with code 0.
+3. Re-run `bun run ci:check` to verify clean exit with code 0.

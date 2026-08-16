@@ -14,6 +14,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint:style": "prettier --check .",
+    "ci": "bun scripts/ci.ts",
+    "ci:check": "bun scripts/ci.ts",
+    "ci:fix": "bun scripts/ci.ts --fix",
     "test": "vitest run",
     "test:watch": "vitest",
     "prepare": "husky install"
