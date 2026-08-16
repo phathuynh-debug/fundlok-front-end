@@ -72,10 +72,10 @@ export function ProfileClient() {
   // Member Since — formatted from the user's created_at timestamp.
   const memberSince = user?.created_at
     ? new Date(user.created_at).toLocaleDateString(locale, {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
     : "—";
 
   // --- Edit form (full_name + phone + bio via PATCH /users/me) ---
