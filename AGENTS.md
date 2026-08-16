@@ -46,8 +46,8 @@ notably:
 - Building/changing UI → `frontend-ui-engineering`
 - Implementing logic or fixing a bug → `test-driven-development`,
   `incremental-implementation`
-- Before merging → `code-review-and-quality`, `code-simplification`,
-  `security-and-hardening`
+- Before merging / checking CI → `ci-check-and-fix`, `code-review-and-quality`,
+  `code-simplification`, `security-and-hardening`
 - Debugging → `debugging-and-error-recovery`
 - Planning a larger change → `spec-driven-development`,
   `planning-and-task-breakdown`
