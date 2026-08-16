@@ -19,6 +19,10 @@
     "ci:fix": "bun scripts/ci.ts --fix",
     "test": "vitest run",
     "test:watch": "vitest",
+    "security": "bun run security:sca && bun run security:sast",
+    "security:sca": "npx --yes snyk test --file=package-lock.json --package-manager=npm --severity-threshold=high",
+    "security:sast": "npx --yes snyk code test --severity-threshold=high",
+    "security:monitor": "npx --yes snyk monitor --file=package-lock.json --package-manager=npm --project-name=fundlok-frontend",
     "prepare": "husky install"
   },
   "dependencies": {
