@@ -516,6 +516,50 @@
       "vatDeclarationsHelpTitle": "48 files required:",
       "vatZipLabel": "Upload .zip containing all 48 VAT files (24 declarations + 24 confirmations)",
       "whyWeNeedThis": "Why we need this"
+    },
+    "transactions": {
+      "count": "{count} transactions",
+      "empty": {
+        "description": "We couldn't find any transactions matching your search or filters. Try clearing them to see the full history.",
+        "title": "No transactions match"
+      },
+      "filterByType": "Filter by type",
+      "mockNotice": "Sample data, shown while this screen is built out. It is not connected to the backend yet, so these figures are not your real balances.",
+      "searchPlaceholder": "Search by project, reference or method",
+      "showing": "Showing {shown} of {total} transactions",
+      "status": {
+        "completed": "Completed",
+        "failed": "Failed",
+        "pending": "Pending"
+      },
+      "subtitle": "Every movement of funds across your FundLok account.",
+      "summary": {
+        "moneyIn": "Money In",
+        "moneyInHint": "Returns, repayments and deposits",
+        "moneyOut": "Money Out",
+        "moneyOutHint": "Investments, withdrawals and fees",
+        "net": "Net Position",
+        "netHint": "Money in minus money out",
+        "pending": "Pending",
+        "pendingHint": "Awaiting settlement"
+      },
+      "table": {
+        "amount": "Amount",
+        "date": "Date",
+        "method": "Method",
+        "reference": "Reference",
+        "status": "Status",
+        "transaction": "Transaction"
+      },
+      "title": "Transactions",
+      "types": {
+        "deposit": "Deposit",
+        "fee": "Fee",
+        "investment": "Investment",
+        "repayment": "Repayment",
+        "return": "Return",
+        "withdrawal": "Withdrawal"
+      }
     }
   },
   "faqPage": {
