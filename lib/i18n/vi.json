@@ -261,6 +261,50 @@
     "title": "Trao đổi với đội ngũ FundLok"
   },
   "dashboard": {
+    "analytics": {
+      "charts": {
+        "allocationDesc": "Vốn của bạn hiện đang nằm ở đâu, theo từng ngành.",
+        "allocationTitle": "Vốn theo ngành",
+        "capitalFlowDesc": "Số liệu lũy kế đến hiện tại, đều tính bằng đô la Mỹ.",
+        "capitalFlowTitle": "Vốn giải ngân so với lợi nhuận nhận được",
+        "monthlyReturnsDesc": "Lợi nhuận nhận được trong từng tháng riêng lẻ.",
+        "monthlyReturnsTitle": "Lợi nhuận theo tháng"
+      },
+      "kpi": {
+        "deltaIn": "{amount} trong {range} gần nhất",
+        "deployed": "Vốn đã giải ngân",
+        "positions": "Khoản đầu tư đang hoạt động",
+        "positionsHint": "Các dự án đang được cấp vốn",
+        "returns": "Lợi nhuận nhận được",
+        "roi": "Tỷ suất trên vốn",
+        "roiHint": "Lợi nhuận so với vốn đã giải ngân"
+      },
+      "mockNotice": "Dữ liệu mẫu, hiển thị trong lúc màn hình này đang được hoàn thiện. Trang chưa kết nối với hệ thống backend, nên các số liệu bên dưới không phải danh mục thực tế của bạn.",
+      "range": {
+        "12M": "12 tháng",
+        "3M": "3 tháng",
+        "6M": "6 tháng"
+      },
+      "rangeLabel": "Khoảng thời gian",
+      "series": {
+        "deployed": "Vốn đã giải ngân",
+        "monthlyReturns": "Lợi nhuận tháng này",
+        "returns": "Lợi nhuận nhận được"
+      },
+      "subtitle": "Vốn của bạn đã được giải ngân ra sao và mang lại kết quả gì.",
+      "table": {
+        "industry": "Ngành",
+        "month": "Tháng",
+        "share": "Tỷ trọng"
+      },
+      "tableHint": "Muốn xem số liệu gốc? Chuyển sang chế độ bảng ở trên — mọi giá trị trên biểu đồ đều có ở đó.",
+      "title": "Phân tích",
+      "view": {
+        "charts": "Biểu đồ",
+        "table": "Bảng"
+      },
+      "viewLabel": "Hiển thị dạng"
+    },
     "header": {
       "home": "Trang chủ",
       "loading": "Đang tải thanh tiêu đề...",

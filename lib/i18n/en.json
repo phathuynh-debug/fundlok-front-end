@@ -261,6 +261,50 @@
     "title": "Talk to the FundLok team"
   },
   "dashboard": {
+    "analytics": {
+      "charts": {
+        "allocationDesc": "Where your capital currently sits, by sector.",
+        "allocationTitle": "Capital by industry",
+        "capitalFlowDesc": "Cumulative totals to date, both in US dollars.",
+        "capitalFlowTitle": "Capital deployed vs returns received",
+        "monthlyReturnsDesc": "Returns received in each individual month.",
+        "monthlyReturnsTitle": "Returns by month"
+      },
+      "kpi": {
+        "deltaIn": "{amount} in the last {range}",
+        "deployed": "Capital deployed",
+        "positions": "Active positions",
+        "positionsHint": "Projects currently funded",
+        "returns": "Returns received",
+        "roi": "Return on capital",
+        "roiHint": "Returns as a share of capital deployed"
+      },
+      "mockNotice": "Sample data, shown while this screen is built out. It is not connected to the backend yet, so these figures are not your real portfolio.",
+      "range": {
+        "12M": "12 months",
+        "3M": "3 months",
+        "6M": "6 months"
+      },
+      "rangeLabel": "Time range",
+      "series": {
+        "deployed": "Capital deployed",
+        "monthlyReturns": "Returns this month",
+        "returns": "Returns received"
+      },
+      "subtitle": "How your capital has been deployed and what it has returned.",
+      "table": {
+        "industry": "Industry",
+        "month": "Month",
+        "share": "Share"
+      },
+      "tableHint": "Prefer the raw numbers? Switch to the table view above — every plotted value is listed there.",
+      "title": "Analytics",
+      "view": {
+        "charts": "Charts",
+        "table": "Table"
+      },
+      "viewLabel": "View as"
+    },
     "header": {
       "home": "Home",
       "loading": "Loading header...",
