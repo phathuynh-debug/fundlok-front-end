@@ -361,6 +361,88 @@
       "subtitle": "Khám phá các dự án SME đã được thẩm định và thực hiện khoản đầu tư tiếp theo của bạn",
       "title": "Cơ hội đầu tư"
     },
+    "security": {
+      "activity": {
+        "events": {
+          "failedAttempts": "{count} lần đăng nhập thất bại từ {location}.",
+          "newDevice": "Lần đầu đăng nhập từ {device} tại {location}.",
+          "passwordChanged": "Đã đổi mật khẩu.",
+          "payoutAccountAdded": "Tài khoản nhận tiền được đổi sang {bank}.",
+          "signIn": "Đăng nhập từ {device} tại {location}.",
+          "twoFactorEnabled": "Đã bật xác thực hai lớp."
+        },
+        "severity": {
+          "critical": "Cần xử lý",
+          "info": "Bình thường",
+          "warning": "Nên xem lại"
+        },
+        "subtitle": "Các lần đăng nhập và thay đổi liên quan đến dòng tiền của bạn.",
+        "title": "Hoạt động gần đây"
+      },
+      "mockNotice": "Dữ liệu mẫu, hiển thị trong lúc trang này còn được hoàn thiện. Trang chưa kết nối với backend — các công tắc và nút đăng xuất chỉ thay đổi trên trang này và không phản ánh tài khoản thật của bạn.",
+      "posture": {
+        "band": {
+          "fair": "Trung bình",
+          "strong": "Vững",
+          "weak": "Rủi ro"
+        },
+        "bandHint": {
+          "fair": "Tạm ổn, nhưng kẻ tấn công có chủ đích vẫn còn khe hở. Hãy bật những mục còn lại bên dưới.",
+          "strong": "Tài khoản của bạn đã có các lớp bảo vệ chúng tôi khuyến nghị cho nhà đầu tư.",
+          "weak": "Các lớp bảo vệ quan trọng đang tắt. Ai có mật khẩu của bạn đều có thể đăng nhập và chuyển tiền."
+        },
+        "password": "Đổi mật khẩu",
+        "passwordHint": "Lần cập nhật gần nhất",
+        "protections": "Lớp bảo vệ đã bật",
+        "protectionsHint": "Trên tổng số được khuyến nghị",
+        "scoreLabel": "Điểm bảo mật",
+        "sessions": "Phiên đang hoạt động",
+        "sessionsHint": "Thiết bị đang đăng nhập"
+      },
+      "protections": {
+        "action": {
+          "managed": "Đổi mật khẩu",
+          "turnOff": "Tắt",
+          "turnOn": "Bật"
+        },
+        "desc": {
+          "loginAlerts": "Gửi email cho bạn mỗi khi có đăng nhập từ thiết bị lạ.",
+          "passkey": "Đăng nhập bằng Face ID, Touch ID hoặc khóa bảo mật thay vì nhập mật khẩu.",
+          "password": "Dùng cùng với lớp xác thực thứ hai mỗi lần đăng nhập.",
+          "totp": "Mã sáu số từ ứng dụng xác thực, bắt buộc ở mỗi lần đăng nhập.",
+          "withdrawalLock": "Đổi tài khoản ngân hàng nhận tiền sẽ tạm giữ 24 giờ trước khi chi trả bất kỳ khoản nào."
+        },
+        "items": {
+          "loginAlerts": "Cảnh báo đăng nhập",
+          "passkey": "Passkey",
+          "password": "Mật khẩu",
+          "totp": "Xác thực hai lớp",
+          "withdrawalLock": "Khóa tài khoản nhận tiền"
+        },
+        "state": {
+          "off": "Đang tắt",
+          "on": "Đang bật",
+          "recommended": "Nên bật"
+        },
+        "subtitle": "Những gì ngăn cách tài khoản của bạn với người khác.",
+        "title": "Bảo vệ tài khoản",
+        "updated": "Cập nhật {date}"
+      },
+      "protectionsBadge": "Đã bật {on}/{total} lớp bảo vệ",
+      "sessions": {
+        "currentAction": "Đang dùng",
+        "lastActive": "Hoạt động lần cuối {when}",
+        "onlyThisDevice": "Đây là thiết bị duy nhất đang đăng nhập.",
+        "revoke": "Đăng xuất",
+        "revokeAll": "Đăng xuất mọi nơi khác",
+        "subtitle": "Mọi nơi tài khoản của bạn đang mở.",
+        "thisDevice": "Thiết bị này",
+        "title": "Thiết bị đã đăng nhập",
+        "unrecognized": "Không nhận diện được"
+      },
+      "subtitle": "Xem các lớp bảo vệ của tài khoản, thiết bị đang đăng nhập và những hoạt động bất thường.",
+      "title": "Bảo mật"
+    },
     "settings": {
       "profile": {
         "accountDetails": "Chi tiết tài khoản",

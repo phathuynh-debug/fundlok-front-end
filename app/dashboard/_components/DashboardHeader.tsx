@@ -119,16 +119,6 @@ export function DashboardHeader() {
           <div className="h-5 w-px bg-border/60" />
 
           <Button
-            variant="ghost"
-            size="sm"
-            className="gap-1.5 text-sm"
-            onClick={() => router.push("/dashboard")}
-          >
-            <Home className="h-4 w-4" />
-            {t("dashboard.header.home")}
-          </Button>
-
-          <Button
             variant="outline"
             size="sm"
             onClick={() => logout()}

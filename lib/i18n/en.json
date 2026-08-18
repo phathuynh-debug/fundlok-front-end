@@ -361,6 +361,88 @@
       "subtitle": "Explore vetted SME projects and make your next investment",
       "title": "Investment Opportunities"
     },
+    "security": {
+      "activity": {
+        "events": {
+          "failedAttempts": "{count} failed sign-in attempts from {location}.",
+          "newDevice": "First sign-in from {device} in {location}.",
+          "passwordChanged": "Password changed.",
+          "payoutAccountAdded": "Payout account changed to {bank}.",
+          "signIn": "Signed in from {device} in {location}.",
+          "twoFactorEnabled": "Two-factor authentication turned on."
+        },
+        "severity": {
+          "critical": "Needs attention",
+          "info": "Routine",
+          "warning": "Worth a look"
+        },
+        "subtitle": "Sign-ins and changes to anything that affects your money.",
+        "title": "Recent activity"
+      },
+      "mockNotice": "Sample data, shown while this screen is built out. It is not connected to the backend yet — the toggles and revoke buttons change this page only, and none of it reflects your real account.",
+      "posture": {
+        "band": {
+          "fair": "Fair",
+          "strong": "Strong",
+          "weak": "At risk"
+        },
+        "bandHint": {
+          "fair": "Workable, but a determined attacker still has an opening. Turn on what is left below.",
+          "strong": "Your account has the protections we recommend for an investor account.",
+          "weak": "Key protections are off. Anyone with your password could sign in and move funds."
+        },
+        "password": "Password changed",
+        "passwordHint": "Last update on record",
+        "protections": "Protections on",
+        "protectionsHint": "Of the ones we recommend",
+        "scoreLabel": "Security score",
+        "sessions": "Active sessions",
+        "sessionsHint": "Devices currently signed in"
+      },
+      "protections": {
+        "action": {
+          "managed": "Change password",
+          "turnOff": "Turn off",
+          "turnOn": "Turn on"
+        },
+        "desc": {
+          "loginAlerts": "Email us on every sign-in from a device you have not used before.",
+          "passkey": "Sign in with Face ID, Touch ID, or a security key instead of typing a password.",
+          "password": "Used together with your second factor at every sign-in.",
+          "totp": "A six-digit code from your authenticator app, required on every sign-in.",
+          "withdrawalLock": "Changing your payout bank account starts a 24-hour hold before any distribution is sent."
+        },
+        "items": {
+          "loginAlerts": "Sign-in alerts",
+          "passkey": "Passkey",
+          "password": "Password",
+          "totp": "Two-factor authentication",
+          "withdrawalLock": "Payout account lock"
+        },
+        "state": {
+          "off": "Off",
+          "on": "On",
+          "recommended": "Recommended"
+        },
+        "subtitle": "What stands between your account and someone else.",
+        "title": "Account protection",
+        "updated": "Updated {date}"
+      },
+      "protectionsBadge": "{on} of {total} protections on",
+      "sessions": {
+        "currentAction": "In use",
+        "lastActive": "Last active {when}",
+        "onlyThisDevice": "This is the only device signed in.",
+        "revoke": "Sign out",
+        "revokeAll": "Sign out everywhere else",
+        "subtitle": "Everywhere your account is currently open.",
+        "thisDevice": "This device",
+        "title": "Signed-in devices",
+        "unrecognized": "Unrecognized"
+      },
+      "subtitle": "Review the protections on your account, the devices signed in, and anything that looked unusual.",
+      "title": "Security"
+    },
     "settings": {
       "profile": {
         "accountDetails": "Account Details",
