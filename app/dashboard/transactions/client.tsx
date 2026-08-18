@@ -19,6 +19,7 @@ import {
   type TransactionStatus,
   type TransactionType,
 } from "./_components/mock-transactions";
+import { CONTROL_HOVER, CONTROL_IDLE } from "@/lib/ui-tokens";
 
 const TYPE_FILTERS: TransactionType[] = [
   "INVESTMENT",
@@ -167,7 +168,7 @@ export default function TransactionsClient() {
                     className={`px-3 py-2 rounded-lg text-[10px] font-mono tracking-wider font-bold uppercase transition-all duration-200 cursor-pointer ${
                       selectedStatus === status
                         ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
-                        : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white bg-transparent border border-transparent"
+                        : `${CONTROL_IDLE} bg-transparent border border-transparent`
                     }`}
                   >
                     {status === "ALL"
@@ -191,7 +192,7 @@ export default function TransactionsClient() {
                   className={`cursor-pointer rounded-full transition-all ${
                     selectedType === type
                       ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                      : "hover:bg-accent"
+                      : CONTROL_HOVER
                   }`}
                   onClick={() => setSelectedType(type)}
                 >

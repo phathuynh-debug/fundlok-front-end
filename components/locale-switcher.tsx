@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { useTranslations } from "@/lib/i18n";
+import { CONTROL_IDLE } from "@/lib/ui-tokens";
 
 interface LocaleSwitcherProps {
   // "inverted" is for placement on a dark panel (e.g. the 404 / auth hero side).
@@ -47,7 +48,7 @@ export function LocaleSwitcher({
                   : "bg-primary text-primary-foreground shadow-sm"
                 : inverted
                   ? "text-white/70 hover:bg-white/15 hover:text-white"
-                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                  : CONTROL_IDLE,
             )}
           >
             {opt.label}

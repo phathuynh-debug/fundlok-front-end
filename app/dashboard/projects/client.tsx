@@ -278,7 +278,7 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
           <ShoppingCart className="w-4 h-4 shrink-0" />
           <span>View Details & Purchase</span>
         </button>
-        <button className="rounded-xl border border-border hover:bg-accent text-foreground px-6 py-3 text-xs font-mono tracking-widest font-bold uppercase transition-all duration-300 active:scale-98 flex items-center justify-center gap-2 cursor-pointer">
+        <button className="rounded-xl border border-border hover:bg-muted text-foreground px-6 py-3 text-xs font-mono tracking-widest font-bold uppercase transition-all duration-300 active:scale-98 flex items-center justify-center gap-2 cursor-pointer">
           <ArrowRightLeft className="w-4 h-4 shrink-0" />
           <span>Compare</span>
         </button>
@@ -337,6 +337,7 @@ import {
   staggerContainerVariants,
   springItemVariants,
 } from "@/lib/animations";
+import { CONTROL_HOVER, CONTROL_IDLE } from "@/lib/ui-tokens";
 
 export default function ProjectsClient() {
   const { user, isLoading: isAuthLoading } = useRequireAuth();
@@ -431,7 +432,7 @@ export default function ProjectsClient() {
             className={`px-4 py-2.5 rounded-lg text-xs font-mono tracking-wider font-bold uppercase transition-all duration-200 flex items-center gap-2 cursor-pointer ${
               marketType === "primary"
                 ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
-                : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white bg-transparent border border-transparent"
+                : `${CONTROL_IDLE} bg-transparent border border-transparent`
             }`}
           >
             <Building2 className="w-3.5 h-3.5" />
@@ -442,7 +443,7 @@ export default function ProjectsClient() {
             className={`px-4 py-2.5 rounded-lg text-xs font-mono tracking-wider font-bold uppercase transition-all duration-200 flex items-center gap-2 cursor-pointer ${
               marketType === "secondary"
                 ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
-                : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white bg-transparent border border-transparent"
+                : `${CONTROL_IDLE} bg-transparent border border-transparent`
             }`}
           >
             <ShoppingCart className="w-3.5 h-3.5" />
@@ -473,7 +474,7 @@ export default function ProjectsClient() {
                 className={`cursor-pointer rounded-full transition-all ${
                   activeIndustry === industry
                     ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                    : "hover:bg-accent"
+                    : CONTROL_HOVER
                 }`}
                 onClick={() => setSelectedIndustry(industry)}
               >

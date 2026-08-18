@@ -19,6 +19,8 @@ import {
   fadeInUpProps,
   tabContentAnimation,
 } from "@/lib/animations";
+import { CONTROL_IDLE } from "@/lib/ui-tokens";
+import { cn } from "@/lib/utils";
 
 type TabType = "risk" | "diligence";
 
@@ -96,7 +98,7 @@ export default function ProjectDetailsClient() {
           variant="ghost"
           size="sm"
           asChild
-          className="gap-2 text-muted-foreground hover:text-foreground -ml-2"
+          className={cn("gap-2 -ml-2", CONTROL_IDLE)}
         >
           <Link href="/dashboard/projects">
             <ArrowLeft className="h-4 w-4" />
@@ -152,7 +154,7 @@ export default function ProjectDetailsClient() {
           className={`py-2.5 px-4 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${
             activeTab === "risk"
               ? "bg-background text-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
+              : CONTROL_IDLE
           }`}
         >
           {t("dashboard.projectDetails.riskAssessment")}
@@ -162,7 +164,7 @@ export default function ProjectDetailsClient() {
           className={`py-2.5 px-4 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${
             activeTab === "diligence"
               ? "bg-background text-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
+              : CONTROL_IDLE
           }`}
         >
           {t("dashboard.projectDetails.dueDiligence")}

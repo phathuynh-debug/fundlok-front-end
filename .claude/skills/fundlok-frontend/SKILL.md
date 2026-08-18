@@ -216,11 +216,19 @@ export function LoanApplicationProvider({ /* inputs */ children }) {
   near-black in light and near-white in dark. The eight hardcoded black pills
   that used to exist all needed a hand-written `dark:` inversion to survive;
   the token needs none.
-- **`--accent` is the emerald brand color in light mode but a neutral gray in
-  dark** (see `app/globals.css`). So `hover:bg-accent` is a saturated green
-  fill on light desktops — fine on a small chip, too loud on a full-width
-  outline button. Prefer `hover:bg-muted hover:text-foreground` for large
-  quiet controls.
+- **Dashboard controls hover to a neutral fill — import `CONTROL_HOVER` /
+  `CONTROL_IDLE` / `CONTROL_ICON_IDLE` from `@/lib/ui-tokens`.** Never retype
+  the classes and never invent a per-component hover
+  (`hover:text-zinc-950 dark:hover:text-white`, `hover:bg-card`, …); every such
+  one-off had to be cleaned up once already. `CONTROL_IDLE` is the idle half of
+  a control that also has a selected state (nav items, segmented pills, tabs);
+  `CONTROL_HOVER` is for controls with no selected state.
+  Why not the shadcn default: **`--accent` is the emerald brand color in light
+  mode** and a neutral gray in dark (see `app/globals.css`), so
+  `hover:bg-accent` paints a saturated green over a whole button. Fine for a
+  brand CTA, wrong for a quiet secondary control — so dashboard controls
+  override it. Outline/ghost `Button`s need the override explicitly, since the
+  cva variants ship `hover:bg-accent`.
 
 ### Color & identity tiers
 

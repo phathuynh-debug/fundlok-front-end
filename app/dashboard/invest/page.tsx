@@ -15,6 +15,8 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { useTranslations } from "@/lib/i18n";
+import { CONTROL_IDLE } from "@/lib/ui-tokens";
+import { cn } from "@/lib/utils";
 
 // Mock "invest" route. Its real purpose is to be a KYC-gated destination: the
 // proxy only lets an approved INVESTOR reach it, bouncing anyone unverified to
@@ -64,7 +66,7 @@ export default function InvestPage() {
         variant="ghost"
         size="sm"
         asChild
-        className="-ml-2 gap-2 text-muted-foreground hover:text-foreground"
+        className={cn("-ml-2 gap-2", CONTROL_IDLE)}
       >
         <Link href="/dashboard/projects">
           <ArrowLeft className="h-4 w-4" />

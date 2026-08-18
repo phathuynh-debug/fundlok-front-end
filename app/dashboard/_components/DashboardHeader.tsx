@@ -23,6 +23,7 @@ import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useTranslations } from "@/lib/i18n";
 import { cn, getInitials } from "@/lib/utils";
+import { CONTROL_IDLE } from "@/lib/ui-tokens";
 
 const navItems = [
   {
@@ -202,9 +203,7 @@ export function DashboardHeader() {
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
                     "flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
-                    isActive
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                    isActive ? "bg-primary/10 text-primary" : CONTROL_IDLE,
                   )}
                 >
                   <item.icon

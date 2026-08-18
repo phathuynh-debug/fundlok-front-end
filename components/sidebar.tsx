@@ -25,6 +25,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useCurrentUser } from "@/hooks/use-authentication";
 import { useTranslations } from "@/lib/i18n";
 import Logo from "@/components/logo";
+import { CONTROL_ICON_IDLE, CONTROL_IDLE } from "@/lib/ui-tokens";
 
 interface NavItem {
   labelKey: string;
@@ -106,17 +107,13 @@ function NavLink({
       href={href}
       className={cn(
         "group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200",
-        active
-          ? "bg-primary/10 text-primary"
-          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+        active ? "bg-primary/10 text-primary" : CONTROL_IDLE,
       )}
     >
       <Icon
         className={cn(
           "mr-3 h-5 w-5 shrink-0",
-          active
-            ? "text-primary"
-            : "text-muted-foreground group-hover:text-accent-foreground",
+          active ? "text-primary" : CONTROL_ICON_IDLE,
         )}
       />
       {label}
@@ -183,7 +180,7 @@ export function Sidebar() {
                   "group flex w-full items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200",
                   pathname.startsWith(SETTINGS_HREF)
                     ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                    : CONTROL_IDLE,
                 )}
               >
                 <Settings
@@ -191,7 +188,7 @@ export function Sidebar() {
                     "mr-3 h-5 w-5 shrink-0",
                     pathname.startsWith(SETTINGS_HREF)
                       ? "text-primary"
-                      : "text-muted-foreground group-hover:text-accent-foreground",
+                      : CONTROL_ICON_IDLE,
                   )}
                 />
                 {t("dashboard.sidebar.settings")}
@@ -205,7 +202,7 @@ export function Sidebar() {
               <button
                 type="button"
                 onClick={() => setShowSettings(false)}
-                className="group flex w-full items-center px-3 py-2 mb-1 text-sm font-semibold rounded-md text-foreground transition-all duration-200 hover:bg-accent"
+                className="group flex w-full items-center px-3 py-2 mb-1 text-sm font-semibold rounded-md text-foreground transition-all duration-200 hover:bg-muted"
               >
                 <ChevronLeft className="mr-2 h-5 w-5 shrink-0 text-muted-foreground transition-transform group-hover:-translate-x-0.5" />
                 {t("dashboard.sidebar.settings")}

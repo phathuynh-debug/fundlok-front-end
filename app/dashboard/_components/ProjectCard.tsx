@@ -8,6 +8,7 @@ import { useTranslations } from "@/lib/i18n";
 import { formatDate } from "@/lib/format-date";
 import { cn } from "@/lib/utils";
 import { getIndustryChrome } from "./sme-dashboard-config";
+import { CONTROL_IDLE } from "@/lib/ui-tokens";
 
 interface ProjectCardProps {
   project: Project;
@@ -133,7 +134,10 @@ export function ProjectCard({
           <Button
             asChild
             variant="outline"
-            className="group/details flex-1 w-full sm:w-auto justify-between text-muted-foreground hover:bg-muted hover:text-foreground"
+            className={cn(
+              "group/details flex-1 w-full sm:w-auto justify-between",
+              CONTROL_IDLE,
+            )}
           >
             <Link href={`/dashboard/project-details?id=${project.id}`}>
               {t("dashboard.projectCard.viewDetails")}
@@ -143,7 +147,7 @@ export function ProjectCard({
           {role === "SME" ? (
             <Button
               variant="outline"
-              className="w-full sm:w-auto px-4 text-muted-foreground hover:bg-muted hover:text-foreground"
+              className={cn("w-full sm:w-auto px-4", CONTROL_IDLE)}
             >
               <Pencil className="h-4 w-4 mr-2" />
               {t("dashboard.projectCard.edit")}
