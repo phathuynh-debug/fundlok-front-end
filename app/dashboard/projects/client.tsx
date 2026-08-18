@@ -157,7 +157,7 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
         </div>
 
         <div className="flex items-center gap-2 self-start sm:self-center">
-          <Badge className="bg-zinc-900 text-white dark:bg-white dark:text-slate-950 font-mono text-[10px] uppercase font-bold tracking-wider rounded-full px-2.5 py-0.5 border-none">
+          <Badge className="bg-primary text-primary-foreground font-mono text-[10px] uppercase font-bold tracking-wider rounded-full px-2.5 py-0.5 border-none">
             {listing.riskLevel}
           </Badge>
           <Badge
@@ -472,7 +472,7 @@ export default function ProjectsClient() {
                 variant={activeIndustry === industry ? "default" : "outline"}
                 className={`cursor-pointer rounded-full transition-all ${
                   activeIndustry === industry
-                    ? "bg-black text-white hover:bg-black/90 dark:bg-white dark:text-slate-950"
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
                     : "hover:bg-accent"
                 }`}
                 onClick={() => setSelectedIndustry(industry)}

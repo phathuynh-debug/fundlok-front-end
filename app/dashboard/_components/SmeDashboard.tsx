@@ -144,7 +144,12 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
                   variant={
                     project.status === "ACTIVE" ? "default" : "secondary"
                   }
-                  className="text-xs px-2.5 py-0.5 bg-black text-white rounded-full"
+                  className={cn(
+                    "text-xs px-2.5 py-0.5 rounded-full",
+                    project.status === "ACTIVE"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground",
+                  )}
                 >
                   {project.status || t("dashboard.projectCard.status.draft")}
                 </Badge>

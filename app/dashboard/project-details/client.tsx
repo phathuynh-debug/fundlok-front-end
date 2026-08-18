@@ -114,7 +114,7 @@ export default function ProjectDetailsClient() {
                 {displayName}
               </h1>
               <div className="flex items-center gap-2">
-                <Badge className="bg-black text-white hover:bg-black/80 dark:bg-white dark:text-slate-950 rounded-full px-3 py-0.5 text-xs font-semibold">
+                <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-3 py-0.5 text-xs font-semibold">
                   {t("dashboard.projectDetails.lowRisk")}
                 </Badge>
                 <Badge

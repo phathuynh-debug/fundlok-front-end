@@ -61,7 +61,7 @@ export function StepIndicator() {
                 className={cn(
                   "w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs transition-all duration-300 border-2 bg-background disabled:cursor-not-allowed",
                   isActive
-                    ? "bg-black text-white border-black dark:bg-white dark:text-black dark:border-white scale-110 shadow-lg ring-4 ring-black/10 dark:ring-white/10"
+                    ? "bg-primary text-primary-foreground border-primary scale-110 shadow-lg ring-4 ring-primary/10"
                     : isCompleted
                       ? "bg-emerald-500 text-white border-emerald-500 shadow-sm"
                       : "text-muted-foreground border-border hover:border-muted-foreground",

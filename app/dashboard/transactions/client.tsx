@@ -190,7 +190,7 @@ export default function TransactionsClient() {
                   variant={selectedType === type ? "default" : "outline"}
                   className={`cursor-pointer rounded-full transition-all ${
                     selectedType === type
-                      ? "bg-black text-white hover:bg-black/90 dark:bg-white dark:text-slate-950"
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
                       : "hover:bg-accent"
                   }`}
                   onClick={() => setSelectedType(type)}

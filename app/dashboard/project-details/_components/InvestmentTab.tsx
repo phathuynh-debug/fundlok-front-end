@@ -141,7 +141,7 @@ export function InvestmentTab() {
           <div className="space-y-3">
             <Button
               type="submit"
-              className="w-full bg-black text-white hover:bg-black/90 py-5 h-12 rounded-xl text-base font-semibold flex items-center justify-center gap-2"
+              className="w-full py-5 h-12 rounded-xl text-base font-semibold flex items-center justify-center gap-2"
               disabled={isPending}
             >
               <DollarSign className="h-4 w-4" />

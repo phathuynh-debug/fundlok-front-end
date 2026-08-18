@@ -127,11 +127,10 @@ export default function AnalyticsClient() {
                     type="button"
                     onClick={() => setRange(option)}
                     aria-pressed={range === option}
-                    className={`px-3 py-2 rounded-lg text-[10px] font-mono tracking-wider font-bold uppercase transition-all duration-200 cursor-pointer ${
-                      range === option
+                    className={`px-3 py-2 rounded-lg text-[10px] font-mono tracking-wider font-bold uppercase transition-all duration-200 cursor-pointer ${range === option
                         ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
                         : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white bg-transparent border border-transparent"
-                    }`}
+                      }`}
                   >
                     {t(`dashboard.analytics.range.${option}`)}
                   </button>
@@ -154,11 +153,10 @@ export default function AnalyticsClient() {
                     type="button"
                     onClick={() => setView(key)}
                     aria-pressed={view === key}
-                    className={`px-3 py-2 rounded-lg text-[10px] font-mono tracking-wider font-bold uppercase transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
-                      view === key
+                    className={`px-3 py-2 rounded-lg text-[10px] font-mono tracking-wider font-bold uppercase transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${view === key
                         ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
                         : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white bg-transparent border border-transparent"
-                    }`}
+                      }`}
                   >
                     <Icon className="w-3.5 h-3.5" aria-hidden="true" />
                     {t(`dashboard.analytics.view.${key}`)}

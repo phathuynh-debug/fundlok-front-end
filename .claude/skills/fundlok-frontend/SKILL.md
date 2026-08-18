@@ -211,6 +211,40 @@ export function LoanApplicationProvider({ /* inputs */ children }) {
   mode and its foreground text vanishes. (This was a real bug on the role
   picker.) Emerald/amber accent tints (`bg-emerald-500/10`, `text-amber-600`)
   are fine for status semantics since they read on both themes.
+- **`bg-black text-white` is never the answer for an emphasis pill or a
+  selected chip** — `bg-primary text-primary-foreground` is already
+  near-black in light and near-white in dark. The eight hardcoded black pills
+  that used to exist all needed a hand-written `dark:` inversion to survive;
+  the token needs none.
+- **`--accent` is the emerald brand color in light mode but a neutral gray in
+  dark** (see `app/globals.css`). So `hover:bg-accent` is a saturated green
+  fill on light desktops — fine on a small chip, too loud on a full-width
+  outline button. Prefer `hover:bg-muted hover:text-foreground` for large
+  quiet controls.
+
+### Color & identity tiers
+
+Industry color is an *identity* signal, and how loudly a surface may wear it
+depends on how many peers sit next to it. `getIndustryChrome(industry, tier)`
+in `app/dashboard/_components/sme-dashboard-config.ts` returns only the classes
+legal at each tier — call it instead of reading `getIndustryTheme` directly, so
+the tier is declared at the call site rather than drifting.
+
+| Tier     | When | Gets |
+|---|---|---|
+| `hero`   | one entity owns the screen (SME dashboard hero) | tinted gradient surface, pattern, glow, tinted border |
+| `list`   | one row among many (project lists, search results) | neutral `bg-card` + colored icon, pill, and a 2px left rail |
+| `inline` | a table cell or a line of text | icon/text color only |
+
+Why: a list exists so rows can be **compared**, and comparison needs a constant
+background. Five differently tinted cards read as five different apps — that
+mistake was made and reverted on the investor projects list. The hero gets away
+with full immersion because it has no neighbor.
+
+**One meaning per color channel.** Industry hue = industry, and nothing else
+(don't accent an unrelated date with it). Status = `primary` / `muted` /
+`destructive` tokens. Emerald = brand actions. If a reader has to ask what a
+color means, it's carrying two jobs.
 
 ## Animation — framer-motion
 
