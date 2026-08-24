@@ -38,12 +38,43 @@ const MAINTENANCE_BLOCKED_ROUTES = ["/login", "/register"];
 const INVESTOR_KYC_ROUTES = ["/dashboard/invest"];
 const SME_KYB_ROUTES = [APPLICATION_ROUTE];
 
+// --- Local-development bypass for the verification gates ---
+// The KYB/KYC flows call the GVerify partner API, and app/gverify/client.py
+// raises as soon as GVERIFY_BASE_URL / GVERIFY_API_KEY / GVERIFY_PARTNER_CODE
+// are unset — so with no partner credentials the screen cannot be passed at
+// all locally, which strands SMEs before /project-application.
+//
+// Two deliberate constraints:
+//   * Server-only variable, NOT NEXT_PUBLIC_ — proxy.ts runs on the server, so
+//     keeping it off the client bundle means it can never be flipped from the
+//     browser.
+//   * Hard-guarded on NODE_ENV. These gates enforce a Decree 94 obligation, so
+//     a bypass that could be switched on in production would be a real
+//     vulnerability rather than a convenience.
+//
+// This skips the ROUTE GATE only. It does not approve anyone: /gverify/kyb
+// still reports the user as unverified, and any backend check stays in force.
+const SKIP_VERIFICATION_GATES =
+  process.env.NODE_ENV !== "production" &&
+  process.env.SKIP_VERIFICATION_GATES === "true";
+
+if (SKIP_VERIFICATION_GATES) {
+  console.warn(
+    "[proxy] SKIP_VERIFICATION_GATES is on — KYC/KYB route gates are bypassed. " +
+      "Local development only; this is inert when NODE_ENV=production.",
+  );
+}
+
 // The verification kind a route requires for a given role, or null if the route
 // is ungated for that role. Matches the exact path and any nested sub-path.
 function requiredVerificationForPath(
   pathname: string,
   role?: string,
 ): "KYC" | "KYB" | null {
+  // Returning null here also skips the /gverify/*/status fetch below, since
+  // nothing on this request depends on the answer.
+  if (SKIP_VERIFICATION_GATES) return null;
+
   const matches = (routes: string[]) =>
     routes.some((r) => pathname === r || pathname.startsWith(`${r}/`));
   if (role === "INVESTOR" && matches(INVESTOR_KYC_ROUTES)) return "KYC";

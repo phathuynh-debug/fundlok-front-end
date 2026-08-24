@@ -7,6 +7,10 @@ import {
   Truck,
   HardHat,
   Briefcase,
+  Sprout,
+  Hammer,
+  Sparkles,
+  GraduationCap,
   HelpCircle,
   LucideIcon,
 } from "lucide-react";
@@ -173,6 +177,78 @@ export const INDUSTRY_THEMES: Record<string, IndustryTheme> = {
     taglineVi: "Cung cấp dịch vụ tư vấn uy tín và chuyên môn chuyên nghiệp.",
     patternClass:
       "bg-[radial-gradient(#8b5cf610_1.5px,transparent_1.5px)] [bg-size:24px_24px]",
+  },
+  "Agriculture & Farming": {
+    gradient:
+      "from-green-500/15 via-lime-500/5 to-transparent dark:from-green-500/10 dark:via-lime-950/20 dark:to-transparent",
+    borderColor:
+      "border-green-500/30 dark:border-green-500/20 hover:border-green-500/50",
+    accentColor: "text-green-600 dark:text-green-400",
+    badgeBg: "bg-green-500/10 text-green-600 border border-green-500/20",
+    hoverAccent:
+      "hover:bg-green-500/10 hover:text-green-700 dark:hover:bg-green-500/15 dark:hover:text-green-200",
+    pulseColor: "bg-green-500",
+    glowColor: "bg-green-500/20 blur-3xl",
+    icon: Sprout,
+    animationClass: "hover:-translate-y-1 transition-transform duration-300",
+    tagline: "Growing the crops and livestock the food chain starts with.",
+    taglineVi: "Nuôi trồng nông sản, khởi đầu của chuỗi cung ứng thực phẩm.",
+    patternClass:
+      "bg-[radial-gradient(#22c55e10_1.5px,transparent_1.5px)] [bg-size:18px_18px]",
+  },
+  "Furniture & Woodwork": {
+    gradient:
+      "from-orange-500/15 via-amber-500/5 to-transparent dark:from-orange-500/10 dark:via-amber-950/20 dark:to-transparent",
+    borderColor:
+      "border-orange-500/30 dark:border-orange-500/20 hover:border-orange-500/50",
+    accentColor: "text-orange-600 dark:text-orange-400",
+    badgeBg: "bg-orange-500/10 text-orange-600 border border-orange-500/20",
+    hoverAccent:
+      "hover:bg-orange-500/10 hover:text-orange-700 dark:hover:bg-orange-500/15 dark:hover:text-orange-200",
+    pulseColor: "bg-orange-500",
+    glowColor: "bg-orange-500/20 blur-3xl",
+    icon: Hammer,
+    animationClass: "hover:rotate-3 transition-transform duration-300",
+    tagline: "Crafting durable furniture and finished wood products.",
+    taglineVi: "Chế tác nội thất bền vững và sản phẩm gỗ hoàn thiện.",
+    patternClass:
+      "bg-[linear-gradient(45deg,#ea580c08_25%,transparent_25%,transparent_75%,#ea580c08_75%,#ea580c08)] [bg-size:16px_16px]",
+  },
+  "Beauty & Personal Care": {
+    gradient:
+      "from-pink-500/15 via-rose-500/5 to-transparent dark:from-pink-500/10 dark:via-rose-950/20 dark:to-transparent",
+    borderColor:
+      "border-pink-500/30 dark:border-pink-500/20 hover:border-pink-500/50",
+    accentColor: "text-pink-600 dark:text-pink-400",
+    badgeBg: "bg-pink-500/10 text-pink-600 border border-pink-500/20",
+    hoverAccent:
+      "hover:bg-pink-500/10 hover:text-pink-700 dark:hover:bg-pink-500/15 dark:hover:text-pink-200",
+    pulseColor: "bg-pink-500",
+    glowColor: "bg-pink-500/20 blur-3xl",
+    icon: Sparkles,
+    animationClass: "hover:scale-105 transition-transform duration-300",
+    tagline: "Serving everyday grooming and personal care routines.",
+    taglineVi: "Phục vụ nhu cầu chăm sóc cá nhân và sắc đẹp hằng ngày.",
+    patternClass:
+      "bg-[radial-gradient(#ec489910_1.5px,transparent_1.5px)] [bg-size:14px_14px]",
+  },
+  "Education & Training": {
+    gradient:
+      "from-indigo-500/15 via-blue-500/5 to-transparent dark:from-indigo-500/10 dark:via-blue-950/20 dark:to-transparent",
+    borderColor:
+      "border-indigo-500/30 dark:border-indigo-500/20 hover:border-indigo-500/50",
+    accentColor: "text-indigo-600 dark:text-indigo-400",
+    badgeBg: "bg-indigo-500/10 text-indigo-600 border border-indigo-500/20",
+    hoverAccent:
+      "hover:bg-indigo-500/10 hover:text-indigo-700 dark:hover:bg-indigo-500/15 dark:hover:text-indigo-200",
+    pulseColor: "bg-indigo-500",
+    glowColor: "bg-indigo-500/20 blur-3xl",
+    icon: GraduationCap,
+    animationClass: "hover:-translate-y-0.5 transition-transform duration-300",
+    tagline: "Teaching the skills local employers are hiring for.",
+    taglineVi: "Đào tạo kỹ năng mà doanh nghiệp địa phương đang cần.",
+    patternClass:
+      "bg-[linear-gradient(to_right,#6366f10a_1px,transparent_1px),linear-gradient(to_bottom,#6366f10a_1px,transparent_1px)] [bg-size:22px_22px]",
   },
 };
 
