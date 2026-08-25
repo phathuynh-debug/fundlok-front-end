@@ -268,7 +268,11 @@
         "capitalFlowDesc": "Số liệu lũy kế đến hiện tại, đều tính bằng đô la Mỹ.",
         "capitalFlowTitle": "Vốn giải ngân so với lợi nhuận nhận được",
         "monthlyReturnsDesc": "Lợi nhuận nhận được trong từng tháng riêng lẻ.",
-        "monthlyReturnsTitle": "Lợi nhuận theo tháng"
+        "monthlyReturnsTitle": "Lợi nhuận theo tháng",
+        "otherIndustries": "Khác",
+        "splitDesc": "Tỷ trọng vốn đã giải ngân theo từng ngành.",
+        "splitTitle": "Mức độ tập trung danh mục",
+        "totalDeployed": "Tổng đã giải ngân"
       },
       "kpi": {
         "deltaIn": "{amount} trong {range} gần nhất",

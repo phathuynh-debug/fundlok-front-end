@@ -268,7 +268,11 @@
         "capitalFlowDesc": "Cumulative totals to date, both in US dollars.",
         "capitalFlowTitle": "Capital deployed vs returns received",
         "monthlyReturnsDesc": "Returns received in each individual month.",
-        "monthlyReturnsTitle": "Returns by month"
+        "monthlyReturnsTitle": "Returns by month",
+        "otherIndustries": "Other",
+        "splitDesc": "Share of deployed capital held in each sector.",
+        "splitTitle": "Portfolio concentration",
+        "totalDeployed": "Total deployed"
       },
       "kpi": {
         "deltaIn": "{amount} in the last {range}",

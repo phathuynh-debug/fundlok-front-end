@@ -12,6 +12,7 @@ import { AnalyticsKpiCards } from "./_components/AnalyticsKpiCards";
 import { AnalyticsTableView } from "./_components/AnalyticsTableView";
 import { CapitalFlowChart } from "./_components/CapitalFlowChart";
 import { IndustryAllocationChart } from "./_components/IndustryAllocationChart";
+import { IndustrySplitChart } from "./_components/IndustrySplitChart";
 import { MonthlyReturnsChart } from "./_components/MonthlyReturnsChart";
 import {
   deriveKpis,
@@ -194,6 +195,18 @@ export default function AnalyticsClient() {
                     description={t("dashboard.analytics.charts.allocationDesc")}
                   >
                     <IndustryAllocationChart
+                      allocation={MOCK_ALLOCATION}
+                      total={allocationTotal}
+                    />
+                  </ChartCard>
+
+                  {/* Same data as the bars above, different question: those
+                      compare magnitudes, this shows concentration. */}
+                  <ChartCard
+                    title={t("dashboard.analytics.charts.splitTitle")}
+                    description={t("dashboard.analytics.charts.splitDesc")}
+                  >
+                    <IndustrySplitChart
                       allocation={MOCK_ALLOCATION}
                       total={allocationTotal}
                     />
