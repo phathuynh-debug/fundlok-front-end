@@ -17,6 +17,19 @@ export interface ProjectLoanApplication {
   project_id: string;
   // Decimal on the backend — serialized as a JSON string by FastAPI.
   requested_amount: string | number;
+  /**
+   * Loan term in months. Optional because the backend has no column for it yet
+   * — the SME form collects it and the API drops it (grading-input-sources spec
+   * §3.3). The marketplace card shows "pending" until the column lands.
+   */
+  duration_months?: number | null;
+  /**
+   * Expected return for an investor, from the grading engine's priced rate.
+   * Absent until POST /underwriting/score-runs actually calls grade() — today
+   * it returns a hardcoded mock, so the card shows "pending grading" rather
+   * than inventing a number.
+   */
+  interest_rate_pct?: number | null;
   purpose: string | null;
   repayment_preference: string | null;
   status: string;

@@ -6,6 +6,8 @@ import type { Project } from "@/services/projects.service";
 import Link from "next/link";
 import { useTranslations } from "@/lib/i18n";
 import { formatDate } from "@/lib/format-date";
+import { formatCurrency } from "@/lib/format-currency";
+import { industryLabel } from "@/lib/industry-label";
 import { cn } from "@/lib/utils";
 import { getIndustryChrome } from "./sme-dashboard-config";
 import { CONTROL_IDLE } from "@/lib/ui-tokens";
@@ -43,6 +45,23 @@ export function ProjectCard({
   const incorporationDate = project.incorporation_date
     ? formatDate(project.incorporation_date, locale)
     : t("common.unknown");
+
+  // Deal terms for the investor view. The marketplace listing carries the loan
+  // application (GET /projects/public), so the asking amount is real data.
+  //
+  // Duration and expected ROI are not available yet and render as "pending"
+  // rather than a fabricated number: `loan_applications` has no term column,
+  // and the rate comes from the grading engine, which is not wired into
+  // POST /underwriting/score-runs yet. Both are tracked in
+  // docs/specs/underwriting/grading-input-sources.md §3.3.
+  const loanApplication = project.loan_application;
+  const askingAmount =
+    loanApplication?.requested_amount === undefined ||
+    loanApplication?.requested_amount === null
+      ? undefined
+      : Number(loanApplication.requested_amount);
+  const durationMonths = loanApplication?.duration_months ?? undefined;
+  const expectedRoiPct = loanApplication?.interest_rate_pct ?? undefined;
 
   // Assuming address has city and country based on log
   const address = project.address as ProjectAddress | null | undefined;
@@ -92,7 +111,13 @@ export function ProjectCard({
           </Badge>
         </div>
 
-        {/* Metrics Row */}
+        {/* Metrics row.
+            FE-008: an investor scanning the marketplace needs the DEAL, not the
+            company's paperwork — industry, asking amount, term, expected
+            return. Tax ID / incorporation / location are compliance details and
+            stay on the details page, where they are still one click away. An
+            SME looking at its own project sees the paperwork instead: it is the
+            record it just filed. */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <div className="flex flex-col gap-1">
             <span className="text-sm font-medium text-muted-foreground">
@@ -106,27 +131,80 @@ export function ProjectCard({
               )}
             >
               <IndustryIcon className="shrink-0" />
-              <span className="truncate">{project.industry}</span>
+              <span className="truncate">
+                {industryLabel(project.industry, t)}
+              </span>
             </Badge>
           </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-muted-foreground">
-              {t("dashboard.projectCard.taxId")}
-            </span>
-            <span className="text-base font-semibold">{project.tax_id}</span>
-          </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-muted-foreground">
-              {t("dashboard.projectCard.incorporation")}
-            </span>
-            <span className="text-base font-semibold">{incorporationDate}</span>
-          </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-muted-foreground">
-              {t("dashboard.projectCard.location")}
-            </span>
-            <span className="text-base font-semibold">{location}</span>
-          </div>
+
+          {role === "INVESTOR" ? (
+            <>
+              <div className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-muted-foreground">
+                  {t("dashboard.projectCard.askingAmount")}
+                </span>
+                <span className="text-base font-semibold">
+                  {askingAmount === undefined
+                    ? t("dashboard.projectCard.pending")
+                    : formatCurrency(askingAmount, locale)}
+                </span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-muted-foreground">
+                  {t("dashboard.projectCard.duration")}
+                </span>
+                <span className="text-base font-semibold">
+                  {durationMonths === undefined
+                    ? t("dashboard.projectCard.pending")
+                    : t("dashboard.projectCard.months", {
+                        count: durationMonths,
+                      })}
+                </span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-muted-foreground">
+                  {t("dashboard.projectCard.expectedRoi")}
+                </span>
+                <span
+                  className={cn(
+                    "text-base font-semibold",
+                    expectedRoiPct === undefined
+                      ? undefined
+                      : "text-emerald-600 dark:text-emerald-400",
+                  )}
+                >
+                  {expectedRoiPct === undefined
+                    ? t("dashboard.projectCard.pendingGrading")
+                    : `${expectedRoiPct.toFixed(1)}%`}
+                </span>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-muted-foreground">
+                  {t("dashboard.projectCard.taxId")}
+                </span>
+                <span className="text-base font-semibold">
+                  {project.tax_id}
+                </span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-muted-foreground">
+                  {t("dashboard.projectCard.incorporation")}
+                </span>
+                <span className="text-base font-semibold">
+                  {incorporationDate}
+                </span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-muted-foreground">
+                  {t("dashboard.projectCard.location")}
+                </span>
+                <span className="text-base font-semibold">{location}</span>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Actions */}

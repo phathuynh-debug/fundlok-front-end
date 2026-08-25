@@ -330,12 +330,18 @@
       "totalReturns": "Tổng lợi nhuận"
     },
     "projectCard": {
+      "askingAmount": "Số tiền cần huy động",
       "created": "Tạo ngày {date}",
+      "duration": "Thời hạn",
       "edit": "Chỉnh sửa",
+      "expectedRoi": "ROI dự kiến",
       "incorporation": "Thành lập",
       "industry": "Ngành",
       "invest": "Đầu tư",
       "location": "Vị trí",
+      "months": "{count} tháng",
+      "pending": "Chưa có",
+      "pendingGrading": "Chờ xếp hạng",
       "status": {
         "active": "ĐANG HOẠT ĐỘNG",
         "draft": "BẢN NHÁP"

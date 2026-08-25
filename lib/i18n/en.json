@@ -330,12 +330,18 @@
       "totalReturns": "Total Returns"
     },
     "projectCard": {
+      "askingAmount": "Asking amount",
       "created": "Created {date}",
+      "duration": "Duration",
       "edit": "Edit",
+      "expectedRoi": "Expected ROI",
       "incorporation": "Incorporation",
       "industry": "Industry",
       "invest": "Invest",
       "location": "Location",
+      "months": "{count} months",
+      "pending": "Pending",
+      "pendingGrading": "Pending grading",
       "status": {
         "active": "ACTIVE",
         "draft": "DRAFT"
