@@ -14,7 +14,7 @@ export function AnalyticsKpiCards({
   kpis: AnalyticsKpis;
   range: RangeKey;
 }) {
-  const { t } = useTranslations();
+  const { locale, t } = useTranslations();
   const rangeLabel = t(`dashboard.analytics.range.${range}`);
 
   // Stat tile contract: label, value, and a delta named against the period the
@@ -24,9 +24,9 @@ export function AnalyticsKpiCards({
     {
       key: "deployed",
       label: t("dashboard.analytics.kpi.deployed"),
-      value: formatCurrency(kpis.deployed, "USD", 0),
+      value: formatCurrency(kpis.deployed, locale),
       delta: t("dashboard.analytics.kpi.deltaIn", {
-        amount: formatCurrency(kpis.deployedInRange, "USD", 0),
+        amount: formatCurrency(kpis.deployedInRange, locale),
         range: rangeLabel,
       }),
       icon: Coins,
@@ -35,9 +35,9 @@ export function AnalyticsKpiCards({
     {
       key: "returns",
       label: t("dashboard.analytics.kpi.returns"),
-      value: formatCurrency(kpis.returns, "USD", 0),
+      value: formatCurrency(kpis.returns, locale),
       delta: t("dashboard.analytics.kpi.deltaIn", {
-        amount: formatCurrency(kpis.returnsInRange, "USD", 0),
+        amount: formatCurrency(kpis.returnsInRange, locale),
         range: rangeLabel,
       }),
       icon: TrendingUp,

@@ -11,13 +11,13 @@ export function TransactionSummaryCards({
 }: {
   summary: TransactionSummary;
 }) {
-  const { t } = useTranslations();
+  const { locale, t } = useTranslations();
 
   const cards = [
     {
       key: "in",
       label: t("dashboard.transactions.summary.moneyIn"),
-      value: formatCurrency(summary.totalIn, "USD", 0),
+      value: formatCurrency(summary.totalIn, locale),
       hint: t("dashboard.transactions.summary.moneyInHint"),
       icon: ArrowDownLeft,
       valueClassName: "text-emerald-600 dark:text-emerald-400",
@@ -25,7 +25,7 @@ export function TransactionSummaryCards({
     {
       key: "out",
       label: t("dashboard.transactions.summary.moneyOut"),
-      value: formatCurrency(summary.totalOut, "USD", 0),
+      value: formatCurrency(summary.totalOut, locale),
       hint: t("dashboard.transactions.summary.moneyOutHint"),
       icon: ArrowUpRight,
       valueClassName: "text-foreground",
@@ -33,7 +33,7 @@ export function TransactionSummaryCards({
     {
       key: "net",
       label: t("dashboard.transactions.summary.net"),
-      value: `${summary.net < 0 ? "−" : ""}${formatCurrency(summary.net, "USD", 0)}`,
+      value: `${summary.net < 0 ? "−" : ""}${formatCurrency(summary.net, locale)}`,
       hint: t("dashboard.transactions.summary.netHint"),
       icon: Scale,
       valueClassName:

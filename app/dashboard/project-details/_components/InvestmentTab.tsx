@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { DollarSign } from "lucide-react";
+import { Banknote } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
+import { formatCurrency } from "@/lib/format-currency";
 
 export function InvestmentTab() {
   const router = useRouter();
@@ -17,7 +18,8 @@ export function InvestmentTab() {
   const { toast } = useToast();
   const { t, locale } = useTranslations();
 
-  const maxAmount = 15000;
+  // VND, matching every other money surface. 375M is the mock per-investor cap.
+  const maxAmount = 375_000_000;
   const progressPercent = 70.0;
 
   // Investing requires an approved KYC. Rather than gate the button here, we
@@ -42,7 +44,7 @@ export function InvestmentTab() {
         variant: "destructive",
         title: t("investment.tab.validationErrorTitle"),
         description: t("investment.tab.maxRemainingAmount", {
-          amount: `$${maxAmount.toLocaleString(locale)}`,
+          amount: formatCurrency(maxAmount, locale),
         }),
       });
       return;
@@ -144,7 +146,7 @@ export function InvestmentTab() {
               className="w-full py-5 h-12 rounded-xl text-base font-semibold flex items-center justify-center gap-2"
               disabled={isPending}
             >
-              <DollarSign className="h-4 w-4" />
+              <Banknote className="h-4 w-4" />
               {isPending
                 ? t("investment.tab.processing")
                 : t("investment.tab.investNow")}

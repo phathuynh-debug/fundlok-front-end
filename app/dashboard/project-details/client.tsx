@@ -14,6 +14,7 @@ import { InvestmentKpis } from "./_components/InvestmentKpis";
 import { RiskAssessmentTab } from "./_components/RiskAssessmentTab";
 import { DueDiligenceTab } from "./_components/DueDiligenceTab";
 import { useTranslations } from "@/lib/i18n";
+import { industryLabel } from "@/lib/industry-label";
 import {
   pageTransitionProps,
   fadeInUpProps,
@@ -85,7 +86,16 @@ export default function ProjectDetailsClient() {
   const displayName =
     project?.legal_name || t("dashboard.projectDetails.fallbackName");
   const displayIndustry =
-    project?.industry || t("dashboard.projectDetails.fallbackIndustry");
+    industryLabel(project?.industry, t) ||
+    t("dashboard.projectDetails.fallbackIndustry");
+
+  // The loan application rides along on the project payload. Absent for a
+  // project with no application yet, in which case the KPI shows its mock.
+  const requestedAmount = project?.loan_application?.requested_amount;
+  const loanAmountVnd =
+    requestedAmount === undefined || requestedAmount === null
+      ? undefined
+      : Number(requestedAmount);
 
   return (
     <motion.div
@@ -139,7 +149,7 @@ export default function ProjectDetailsClient() {
 
       {/* KPI Cards Row */}
       <motion.div {...fadeInUpProps}>
-        <InvestmentKpis />
+        <InvestmentKpis loanAmountVnd={loanAmountVnd} />
       </motion.div>
 
       {/* Tab pill selectors */}

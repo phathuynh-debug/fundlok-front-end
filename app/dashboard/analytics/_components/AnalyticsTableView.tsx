@@ -62,13 +62,13 @@ export function AnalyticsTableView({
                     {monthTickLabel(point.month, locale)} {year}
                   </TableCell>
                   <TableCell className="text-right font-mono text-sm tabular-nums whitespace-nowrap">
-                    {formatCurrency(point.deployed_cumulative, "USD", 0)}
+                    {formatCurrency(point.deployed_cumulative, locale)}
                   </TableCell>
                   <TableCell className="text-right font-mono text-sm tabular-nums whitespace-nowrap">
-                    {formatCurrency(point.returns_cumulative, "USD", 0)}
+                    {formatCurrency(point.returns_cumulative, locale)}
                   </TableCell>
                   <TableCell className="text-right font-mono text-sm tabular-nums whitespace-nowrap">
-                    {formatCurrency(point.returns_monthly, "USD", 0)}
+                    {formatCurrency(point.returns_monthly, locale)}
                   </TableCell>
                 </TableRow>
               );
@@ -102,7 +102,7 @@ export function AnalyticsTableView({
                   {row.industry}
                 </TableCell>
                 <TableCell className="text-right font-mono text-sm tabular-nums whitespace-nowrap">
-                  {formatCurrency(row.deployed, "USD", 0)}
+                  {formatCurrency(row.deployed, locale)}
                 </TableCell>
                 <TableCell className="text-right font-mono text-sm tabular-nums whitespace-nowrap">
                   {((row.deployed / total) * 100).toFixed(1)}%

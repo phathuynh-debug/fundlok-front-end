@@ -47,7 +47,7 @@ export function MonthlyReturnsChart({ points }: { points: MonthlyPoint[] }) {
     ...point,
     peak_label:
       i === peakIndex
-        ? formatCompactCurrency(point.returns_monthly)
+        ? formatCompactCurrency(point.returns_monthly, locale)
         : undefined,
   }));
 
@@ -74,7 +74,9 @@ export function MonthlyReturnsChart({ points }: { points: MonthlyPoint[] }) {
           axisLine={false}
           tickMargin={8}
           width={56}
-          tickFormatter={(value: number) => formatCompactCurrency(value)}
+          tickFormatter={(value: number) =>
+            formatCompactCurrency(value, locale)
+          }
         />
         <ChartTooltip
           content={(props) => (

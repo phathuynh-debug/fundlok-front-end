@@ -2,10 +2,11 @@
 
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Layers, TrendingUp, DollarSign } from "lucide-react";
+import { Layers, TrendingUp, Banknote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useTranslations } from "@/lib/i18n";
+import { formatCurrency } from "@/lib/format-currency";
 import {
   pageTransitionProps,
   fadeInUpProps,
@@ -14,7 +15,7 @@ import {
 } from "@/lib/animations";
 
 export function InvestorDashboard() {
-  const { t } = useTranslations();
+  const { locale, t } = useTranslations();
 
   return (
     <motion.div
@@ -46,8 +47,10 @@ export function InvestorDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent className="flex items-center gap-2">
-              <DollarSign className="h-6 w-6 text-blue-500" />
-              <div className="text-3xl font-bold">$0.00</div>
+              <Banknote className="h-6 w-6 text-blue-500" />
+              <div className="text-3xl font-bold">
+                {formatCurrency(0, locale)}
+              </div>
             </CardContent>
           </Card>
         </motion.div>

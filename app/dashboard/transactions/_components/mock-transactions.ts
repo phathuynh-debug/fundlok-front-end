@@ -34,7 +34,7 @@ export interface Transaction {
    * plain sum.
    */
   amount: number;
-  currency: "USD";
+  currency: "VND";
   /** Project or company the movement relates to; "—" for account-level items. */
   counterparty: string;
   method: string;
@@ -47,8 +47,8 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     type: "RETURN",
     status: "PENDING",
     created_at: "2026-08-17T09:12:00",
-    amount: 1850.0,
-    currency: "USD",
+    amount: 46250000,
+    currency: "VND",
     counterparty: "TechStart Solutions",
     method: "Wallet balance",
   },
@@ -58,8 +58,8 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     type: "INVESTMENT",
     status: "COMPLETED",
     created_at: "2026-08-16T14:38:00",
-    amount: -25000.0,
-    currency: "USD",
+    amount: -625000000,
+    currency: "VND",
     counterparty: "Mekong Agri Export",
     method: "Wallet balance",
   },
@@ -69,8 +69,8 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     type: "DEPOSIT",
     status: "COMPLETED",
     created_at: "2026-08-12T08:05:00",
-    amount: 40000.0,
-    currency: "USD",
+    amount: 1000000000,
+    currency: "VND",
     counterparty: "—",
     method: "Bank transfer • Vietcombank",
   },
@@ -80,8 +80,8 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     type: "RETURN",
     status: "COMPLETED",
     created_at: "2026-08-09T16:47:00",
-    amount: 2320.5,
-    currency: "USD",
+    amount: 58012500,
+    currency: "VND",
     counterparty: "GreenEnergy Corp",
     method: "Wallet balance",
   },
@@ -91,8 +91,8 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     type: "FEE",
     status: "COMPLETED",
     created_at: "2026-08-05T11:20:00",
-    amount: -120.0,
-    currency: "USD",
+    amount: -3000000,
+    currency: "VND",
     counterparty: "—",
     method: "Platform service fee",
   },
@@ -102,8 +102,8 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     type: "WITHDRAWAL",
     status: "FAILED",
     created_at: "2026-08-03T19:03:00",
-    amount: -8000.0,
-    currency: "USD",
+    amount: -200000000,
+    currency: "VND",
     counterparty: "—",
     method: "Bank transfer • Techcombank",
   },
@@ -113,8 +113,8 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     type: "REPAYMENT",
     status: "COMPLETED",
     created_at: "2026-07-29T10:15:00",
-    amount: 4750.0,
-    currency: "USD",
+    amount: 118750000,
+    currency: "VND",
     counterparty: "BioMed Labs",
     method: "Revenue share • daily",
   },
@@ -124,8 +124,8 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     type: "INVESTMENT",
     status: "COMPLETED",
     created_at: "2026-07-22T13:52:00",
-    amount: -15000.0,
-    currency: "USD",
+    amount: -375000000,
+    currency: "VND",
     counterparty: "BioMed Labs",
     method: "Wallet balance",
   },
@@ -135,8 +135,8 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     type: "RETURN",
     status: "COMPLETED",
     created_at: "2026-07-18T09:41:00",
-    amount: 1180.25,
-    currency: "USD",
+    amount: 29506250,
+    currency: "VND",
     counterparty: "TechStart Solutions",
     method: "Wallet balance",
   },
@@ -146,8 +146,8 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     type: "WITHDRAWAL",
     status: "COMPLETED",
     created_at: "2026-07-11T17:26:00",
-    amount: -12000.0,
-    currency: "USD",
+    amount: -300000000,
+    currency: "VND",
     counterparty: "—",
     method: "Bank transfer • Vietcombank",
   },
@@ -157,8 +157,8 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     type: "INVESTMENT",
     status: "COMPLETED",
     created_at: "2026-07-03T12:09:00",
-    amount: -20000.0,
-    currency: "USD",
+    amount: -500000000,
+    currency: "VND",
     counterparty: "GreenEnergy Corp",
     method: "Wallet balance",
   },
@@ -168,8 +168,8 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     type: "FEE",
     status: "COMPLETED",
     created_at: "2026-06-28T15:33:00",
-    amount: -95.5,
-    currency: "USD",
+    amount: -2387500,
+    currency: "VND",
     counterparty: "—",
     method: "Platform service fee",
   },
@@ -179,8 +179,8 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     type: "DEPOSIT",
     status: "COMPLETED",
     created_at: "2026-06-20T07:58:00",
-    amount: 60000.0,
-    currency: "USD",
+    amount: 1500000000,
+    currency: "VND",
     counterparty: "—",
     method: "Bank transfer • Vietcombank",
   },
@@ -190,34 +190,23 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     type: "INVESTMENT",
     status: "COMPLETED",
     created_at: "2026-06-15T10:02:00",
-    amount: -30000.0,
-    currency: "USD",
+    amount: -750000000,
+    currency: "VND",
     counterparty: "TechStart Solutions",
     method: "Wallet balance",
   },
 ];
 
-// USD to match the other investor-facing dashboard surfaces (see
-// app/dashboard/projects/client.tsx). Signed amounts render with an explicit
-// +/- so an outflow is readable without relying on colour alone.
-export function formatCurrency(
-  amount: number,
-  currency: Transaction["currency"] = "USD",
-  maximumFractionDigits = 2,
-) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-    minimumFractionDigits: maximumFractionDigits === 0 ? 0 : 2,
-    maximumFractionDigits,
-  }).format(Math.abs(amount));
-}
+// Money formatting is shared with every other dashboard surface — see
+// lib/format-currency.ts. Re-exported here so the transactions components keep
+// importing from one place, rather than half of them switching import paths.
+export { formatCurrency } from "@/lib/format-currency";
+import { formatCurrency } from "@/lib/format-currency";
 
-export function formatAmount(
-  amount: number,
-  currency: Transaction["currency"],
-) {
-  const formatted = formatCurrency(amount, currency);
+// Signed amounts render with an explicit +/- so an outflow is readable without
+// relying on colour alone.
+export function formatAmount(amount: number, locale?: string) {
+  const formatted = formatCurrency(amount, locale);
   return amount < 0 ? `−${formatted}` : `+${formatted}`;
 }
 

@@ -6,7 +6,7 @@ import Link from "next/link";
 import {
   ArrowLeft,
   CheckCircle2,
-  DollarSign,
+  Banknote,
   Loader2,
   ShieldCheck,
 } from "lucide-react";
@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { useTranslations } from "@/lib/i18n";
+import { formatCurrency } from "@/lib/format-currency";
 import { CONTROL_IDLE } from "@/lib/ui-tokens";
 import { cn } from "@/lib/utils";
 
@@ -33,7 +34,7 @@ export default function InvestPage() {
   const [isPending, setIsPending] = useState(false);
   const [done, setDone] = useState(false);
 
-  const formattedAmount = `$${amount.toLocaleString(locale)}`;
+  const formattedAmount = formatCurrency(amount, locale);
 
   const handleConfirm = () => {
     setIsPending(true);
@@ -94,8 +95,8 @@ export default function InvestPage() {
             {t("investConfirm.amountLabel")}
           </p>
           <p className="mt-1 flex items-center gap-1 text-3xl font-bold text-foreground">
-            <DollarSign className="h-6 w-6" />
-            {amount.toLocaleString(locale)}
+            <Banknote className="h-6 w-6" />
+            {formatCurrency(amount, locale)}
           </p>
         </div>
 

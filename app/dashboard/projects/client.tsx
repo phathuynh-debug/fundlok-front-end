@@ -21,21 +21,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslations } from "@/lib/i18n";
-import { INDUSTRY_OPTIONS } from "@/lib/constants/industries";
-
-// Industry strings arrive as data — the engine's canonical values on the
-// primary market, mock labels on the secondary one. Translate the ones we have
-// a label for and pass anything else through unchanged, so a new backend
-// industry shows as itself rather than a raw i18n key.
-function translateIndustry(
-  industry: string,
-  t: (key: string, values?: Record<string, string | number>) => string,
-): string {
-  const option = INDUSTRY_OPTIONS.find((entry) => entry.value === industry);
-  return option
-    ? t(`projectApplication.industries.${option.labelKey}`)
-    : industry;
-}
+import { formatCurrency } from "@/lib/format-currency";
+import { industryLabel } from "@/lib/industry-label";
 
 interface SecondaryMarketListing {
   id: string;
@@ -75,9 +62,9 @@ const mockSecondaryMarket: SecondaryMarketListing[] = [
     grade: "A+",
     listedDate: "4/28/2026",
     reasonKey: "rebalancing",
-    askingPrice: 21500,
+    askingPrice: 537500000,
     askingPricePremium: 7.5,
-    originalInvestment: 20000,
+    originalInvestment: 500000000,
     loanPercentage: 100,
     timeRemainingDays: 120,
     totalActiveDays: 180,
@@ -98,9 +85,9 @@ const mockSecondaryMarket: SecondaryMarketListing[] = [
     grade: "B",
     listedDate: "5/10/2026",
     reasonKey: "liquidity",
-    askingPrice: 9200,
+    askingPrice: 230000000,
     askingPricePremium: -8.0,
-    originalInvestment: 10000,
+    originalInvestment: 250000000,
     loanPercentage: 50,
     timeRemainingDays: 95,
     totalActiveDays: 120,
@@ -121,9 +108,9 @@ const mockSecondaryMarket: SecondaryMarketListing[] = [
     grade: "AA",
     listedDate: "5/20/2026",
     reasonKey: "profitTaking",
-    askingPrice: 31200,
+    askingPrice: 780000000,
     askingPricePremium: 4.0,
-    originalInvestment: 30000,
+    originalInvestment: 750000000,
     loanPercentage: 75,
     timeRemainingDays: 145,
     totalActiveDays: 200,
@@ -138,7 +125,7 @@ const mockSecondaryMarket: SecondaryMarketListing[] = [
 ];
 
 function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
-  const { t } = useTranslations();
+  const { locale, t } = useTranslations();
   const isPremium = listing.askingPricePremium >= 0;
   const premiumText = t(
     `dashboard.projects.secondary.${isPremium ? "premium" : "discount"}`,
@@ -160,7 +147,7 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
               variant="outline"
               className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-mono text-[10px] uppercase font-bold tracking-wider rounded-md border-zinc-200 dark:border-zinc-700"
             >
-              {translateIndustry(listing.industry, t)}
+              {industryLabel(listing.industry, t)}
             </Badge>
             <Badge
               variant="outline"
@@ -203,11 +190,7 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
             {t("dashboard.projects.secondary.askingPrice")}
           </span>
           <div className="text-xl font-black text-foreground">
-            {new Intl.NumberFormat("en-US", {
-              style: "currency",
-              currency: "USD",
-              maximumFractionDigits: 0,
-            }).format(listing.askingPrice)}
+            {formatCurrency(listing.askingPrice, locale)}
           </div>
           <span
             className={`text-xs font-bold font-mono ${isPremium ? "text-orange-500" : "text-emerald-500"}`}
@@ -222,11 +205,7 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
             {t("dashboard.projects.secondary.originalInvestment")}
           </span>
           <div className="text-xl font-black text-foreground">
-            {new Intl.NumberFormat("en-US", {
-              style: "currency",
-              currency: "USD",
-              maximumFractionDigits: 0,
-            }).format(listing.originalInvestment)}
+            {formatCurrency(listing.originalInvestment, locale)}
           </div>
           <span className="text-xs font-medium text-muted-foreground font-mono">
             {t("dashboard.projects.secondary.ofLoan", {
@@ -527,7 +506,7 @@ export default function ProjectsClient() {
               >
                 {industry === t("common.all")
                   ? industry
-                  : translateIndustry(industry, t)}
+                  : industryLabel(industry, t)}
               </Badge>
             ))}
           </div>

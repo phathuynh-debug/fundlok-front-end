@@ -33,7 +33,7 @@ export function IndustryAllocationChart({
   allocation: IndustryAllocation[];
   total: number;
 }) {
-  const { t } = useTranslations();
+  const { locale, t } = useTranslations();
 
   const deployedLabel = t("dashboard.analytics.series.deployed");
 
@@ -81,7 +81,7 @@ export function IndustryAllocationChart({
             offset={10}
             className="fill-foreground text-[11px] font-semibold"
             formatter={(value) =>
-              `${formatCompactCurrency(Number(value))} · ${Math.round((Number(value) / total) * 100)}%`
+              `${formatCompactCurrency(Number(value), locale)} · ${Math.round((Number(value) / total) * 100)}%`
             }
           />
         </Bar>

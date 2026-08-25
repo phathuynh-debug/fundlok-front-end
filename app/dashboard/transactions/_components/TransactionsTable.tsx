@@ -76,7 +76,7 @@ export function TransactionsTable({
                 <TableCell
                   className={`text-right font-mono text-sm font-bold whitespace-nowrap align-middle ${amountClassName}`}
                 >
-                  {formatAmount(txn.amount, txn.currency)}
+                  {formatAmount(txn.amount, locale)}
                 </TableCell>
                 <TableCell className="align-middle">
                   <TransactionStatusBadge status={txn.status} />

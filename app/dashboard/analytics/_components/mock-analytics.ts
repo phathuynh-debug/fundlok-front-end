@@ -10,17 +10,17 @@
 export interface MonthlyPoint {
   /** ISO year-month, e.g. "2026-08". */
   month: string;
-  /** Cumulative capital deployed to date, USD. */
+  /** Cumulative capital deployed to date, VND. */
   deployed_cumulative: number;
-  /** Cumulative returns received to date, USD. */
+  /** Cumulative returns received to date, VND. */
   returns_cumulative: number;
-  /** Returns received in this month alone, USD. */
+  /** Returns received in this month alone, VND. */
   returns_monthly: number;
 }
 
 export interface IndustryAllocation {
   industry: string;
-  /** Capital currently deployed into this industry, USD. */
+  /** Capital currently deployed into this industry, VND. */
   deployed: number;
 }
 
@@ -29,85 +29,85 @@ export interface IndustryAllocation {
 export const MOCK_MONTHLY: MonthlyPoint[] = [
   {
     month: "2025-09",
-    deployed_cumulative: 30000,
+    deployed_cumulative: 750000000,
     returns_cumulative: 0,
     returns_monthly: 0,
   },
   {
     month: "2025-10",
-    deployed_cumulative: 30000,
-    returns_cumulative: 1200,
-    returns_monthly: 1200,
+    deployed_cumulative: 750000000,
+    returns_cumulative: 30000000,
+    returns_monthly: 30000000,
   },
   {
     month: "2025-11",
-    deployed_cumulative: 50000,
-    returns_cumulative: 3300,
-    returns_monthly: 2100,
+    deployed_cumulative: 1250000000,
+    returns_cumulative: 82500000,
+    returns_monthly: 52500000,
   },
   {
     month: "2025-12",
-    deployed_cumulative: 50000,
-    returns_cumulative: 5900,
-    returns_monthly: 2600,
+    deployed_cumulative: 1250000000,
+    returns_cumulative: 147500000,
+    returns_monthly: 65000000,
   },
   {
     month: "2026-01",
-    deployed_cumulative: 65000,
-    returns_cumulative: 8800,
-    returns_monthly: 2900,
+    deployed_cumulative: 1625000000,
+    returns_cumulative: 220000000,
+    returns_monthly: 72500000,
   },
   {
     month: "2026-02",
-    deployed_cumulative: 65000,
-    returns_cumulative: 12100,
-    returns_monthly: 3300,
+    deployed_cumulative: 1625000000,
+    returns_cumulative: 302500000,
+    returns_monthly: 82500000,
   },
   {
     month: "2026-03",
-    deployed_cumulative: 90000,
-    returns_cumulative: 15700,
-    returns_monthly: 3600,
+    deployed_cumulative: 2250000000,
+    returns_cumulative: 392500000,
+    returns_monthly: 90000000,
   },
   {
     month: "2026-04",
-    deployed_cumulative: 90000,
-    returns_cumulative: 19900,
-    returns_monthly: 4200,
+    deployed_cumulative: 2250000000,
+    returns_cumulative: 497500000,
+    returns_monthly: 105000000,
   },
   {
     month: "2026-05",
-    deployed_cumulative: 100000,
-    returns_cumulative: 24400,
-    returns_monthly: 4500,
+    deployed_cumulative: 2500000000,
+    returns_cumulative: 610000000,
+    returns_monthly: 112500000,
   },
   {
     month: "2026-06",
-    deployed_cumulative: 130000,
-    returns_cumulative: 29200,
-    returns_monthly: 4800,
+    deployed_cumulative: 3250000000,
+    returns_cumulative: 730000000,
+    returns_monthly: 120000000,
   },
   {
     month: "2026-07",
-    deployed_cumulative: 145000,
-    returns_cumulative: 34600,
-    returns_monthly: 5400,
+    deployed_cumulative: 3625000000,
+    returns_cumulative: 865000000,
+    returns_monthly: 135000000,
   },
   {
     month: "2026-08",
-    deployed_cumulative: 170000,
-    returns_cumulative: 40500,
-    returns_monthly: 5900,
+    deployed_cumulative: 4250000000,
+    returns_cumulative: 1012500000,
+    returns_monthly: 147500000,
   },
 ];
 
 // Sums to the final deployed_cumulative above (170,000).
 export const MOCK_ALLOCATION: IndustryAllocation[] = [
-  { industry: "Technology", deployed: 52000 },
-  { industry: "Agriculture", deployed: 38000 },
-  { industry: "Manufacturing", deployed: 32000 },
-  { industry: "Healthcare", deployed: 28000 },
-  { industry: "Energy", deployed: 20000 },
+  { industry: "Technology", deployed: 1300000000 },
+  { industry: "Agriculture", deployed: 950000000 },
+  { industry: "Manufacturing", deployed: 800000000 },
+  { industry: "Healthcare", deployed: 700000000 },
+  { industry: "Energy", deployed: 500000000 },
 ];
 
 export const MOCK_ACTIVE_POSITIONS = 8;

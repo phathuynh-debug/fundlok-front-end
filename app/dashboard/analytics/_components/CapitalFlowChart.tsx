@@ -14,7 +14,7 @@ import { SERIES_COLORS } from "./chart-colors";
 import { CurrencyChartTooltip } from "./CurrencyChartTooltip";
 import { monthTickLabel, type MonthlyPoint } from "./mock-analytics";
 
-// Both series are USD on one scale -- never a second y-axis, which would invent
+// Both series are VND on one scale -- never a second y-axis, which would invent
 // a relationship between two differently-scaled measures.
 export function CapitalFlowChart({ points }: { points: MonthlyPoint[] }) {
   const { t, locale } = useTranslations();
@@ -68,7 +68,7 @@ export function CapitalFlowChart({ points }: { points: MonthlyPoint[] }) {
             dominantBaseline="middle"
             className="fill-foreground text-[11px] font-semibold"
           >
-            {formatCompactCurrency(payload[key])}
+            {formatCompactCurrency(payload[key], locale)}
           </text>
         </g>
       );
@@ -101,7 +101,9 @@ export function CapitalFlowChart({ points }: { points: MonthlyPoint[] }) {
           axisLine={false}
           tickMargin={8}
           width={56}
-          tickFormatter={(value: number) => formatCompactCurrency(value)}
+          tickFormatter={(value: number) =>
+            formatCompactCurrency(value, locale)
+          }
         />
         <ChartTooltip
           content={(props) => (

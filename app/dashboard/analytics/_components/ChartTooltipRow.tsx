@@ -1,6 +1,7 @@
 "use client";
 
 import { formatCurrency } from "@/lib/format-currency";
+import { useTranslations } from "@/lib/i18n";
 
 // One row inside a chart tooltip. ChartTooltipContent's own `formatter` hook
 // replaces the entire row, so this rebuilds the parts worth keeping: the colour
@@ -18,6 +19,8 @@ export function ChartTooltipRow({
   label: string;
   value: number;
 }) {
+  const { locale } = useTranslations();
+
   return (
     <>
       <span
@@ -28,7 +31,7 @@ export function ChartTooltipRow({
       <div className="flex flex-1 items-center justify-between gap-3 leading-none">
         <span className="text-muted-foreground">{label}</span>
         <span className="text-foreground font-mono font-medium tabular-nums">
-          {formatCurrency(value, "USD", 0)}
+          {formatCurrency(value, locale)}
         </span>
       </div>
     </>
