@@ -5,7 +5,10 @@ import { Card } from "@/components/ui/card";
 import { formatDateTime } from "@/lib/format-date";
 import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
-import type { ActivityEvent, ActivitySeverity } from "./mock-security";
+import type {
+  SecurityEvent,
+  SecurityEventSeverity,
+} from "@/services/authentication.service";
 
 const SEVERITY = {
   info: { icon: Info, dot: "bg-muted-foreground/40", text: "text-foreground" },
