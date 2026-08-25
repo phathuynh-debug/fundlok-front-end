@@ -39,6 +39,13 @@ export interface LoginPayload {
   email: string;
   password: string;
   turnstile_token?: string | null;
+  /**
+   * "Keep me signed in". Controls how long the browser holds the auth cookies,
+   * not the token lifetimes: true issues them with a Max-Age so the session
+   * survives a browser restart, false issues session cookies that the browser
+   * drops on close. Omitted behaves as false — the safer default.
+   */
+  remember_me?: boolean;
 }
 
 export interface RegisterPayload {

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useTurnstile } from "@/hooks/use-turnstile";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useLogin } from "@/app/login/use-login";
 import { Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
@@ -14,6 +15,9 @@ import { useTranslations } from "@/lib/i18n";
 export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  // Unticked by default: a shared machine should forget the session on
+  // close unless the user explicitly asks otherwise.
+  const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -39,7 +43,12 @@ export function LoginForm() {
     }
 
     login(
-      { email, password, turnstile_token: turnstileToken },
+      {
+        email,
+        password,
+        turnstile_token: turnstileToken,
+        remember_me: rememberMe,
+      },
       {
         onSuccess: () => {
           toast({
@@ -150,7 +159,18 @@ export function LoginForm() {
                 <Eye className="h-4 w-4" />
               )}
             </button>
-            <div className="flex justify-end">
+            <div className="flex items-center justify-between gap-3 pt-2.5">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <Checkbox
+                  id="rememberMe"
+                  checked={rememberMe}
+                  onCheckedChange={(checked) => setRememberMe(checked === true)}
+                  disabled={isPending || isGooglePending}
+                />
+                <span className="text-xs text-muted-foreground">
+                  {t("auth.login.rememberMe")}
+                </span>
+              </label>
               <Link
                 href="/forgot-password"
                 className="text-xs text-muted-foreground hover:text-foreground hover:underline transition-colors"

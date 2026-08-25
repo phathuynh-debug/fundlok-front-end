@@ -120,6 +120,7 @@
       "or": "or",
       "passwordLabel": "Password",
       "passwordPlaceholder": "••••••••",
+      "rememberMe": "Keep me signed in",
       "signInWithGoogle": "Sign in with Google",
       "submit": "Sign In",
       "submitting": "Signing In...",
