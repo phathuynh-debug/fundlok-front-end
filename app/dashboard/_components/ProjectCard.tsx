@@ -15,7 +15,6 @@ import { CONTROL_IDLE } from "@/lib/ui-tokens";
 interface ProjectCardProps {
   project: Project;
   role?: "SME" | "INVESTOR";
-  actionLabel?: string;
 }
 
 type ProjectAddress = {
@@ -23,11 +22,7 @@ type ProjectAddress = {
   country?: string;
 };
 
-export function ProjectCard({
-  project,
-  role = "SME",
-  actionLabel,
-}: ProjectCardProps) {
+export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
   const { locale, t } = useTranslations();
 
   // List tier: neutral surface, industry identity limited to the rail + pill.
@@ -207,13 +202,17 @@ export function ProjectCard({
           )}
         </div>
 
-        {/* Actions */}
+        {/* Actions.
+            One full-width action for an investor: the card is a summary, and
+            investing happens on the details page where the terms, risk
+            assessment and due-diligence documents are in front of them — not
+            from a list where the only visible number is the asking amount. */}
         <div className="flex flex-col sm:flex-row items-center gap-3 mt-2">
           <Button
             asChild
             variant="outline"
             className={cn(
-              "group/details flex-1 w-full sm:w-auto justify-between",
+              "group/details w-full flex-1 justify-between",
               CONTROL_IDLE,
             )}
           >
@@ -230,11 +229,7 @@ export function ProjectCard({
               <Pencil className="h-4 w-4 mr-2" />
               {t("dashboard.projectCard.edit")}
             </Button>
-          ) : (
-            <Button className="w-full sm:w-auto px-6">
-              {actionLabel || t("dashboard.projectCard.invest")}
-            </Button>
-          )}
+          ) : null}
         </div>
       </div>
     </Card>

@@ -696,6 +696,63 @@
       "vatZipLabel": "Tải lên tệp .zip chứa tất cả 48 tệp thuế GTGT (24 tờ khai + 24 xác nhận)",
       "whyWeNeedThis": "Lý do cần hồ sơ"
     },
+    "smeAnalytics": {
+      "charts": {
+        "gradeDesc": "Bốn nhóm yếu tố tạo nên điểm {grade} của bạn, và nơi cần cải thiện.",
+        "gradeTitle": "Điều gì quyết định hạng của bạn",
+        "repaymentDesc": "Số đã trả so với tổng phải trả trong suốt thời hạn.",
+        "repaymentTitle": "Tiến độ trả nợ",
+        "revenueShareDesc": "Từng tháng so với ngưỡng an toàn {ceiling}%.",
+        "revenueShareTitle": "Tỷ lệ doanh thu dùng để trả nợ"
+      },
+      "factorHints": {
+        "bcq": "Tỷ suất lợi nhuận, khả năng linh hoạt chi phí và quy mô khoản vay so với doanh thu.",
+        "behavioral": "Điểm tín dụng CIC, các khoản rút của chủ sở hữu và lịch sử trả nợ.",
+        "rsg": "Mức ổn định của doanh thu hằng tháng, xu hướng và mức tập trung khách hàng.",
+        "sector": "Điều kiện ngành của bạn — dựa trên dữ liệu ngành, không phải số liệu riêng của bạn."
+      },
+      "factors": {
+        "bcq": "Chất lượng chi phí kinh doanh",
+        "behavioral": "Hành vi tín dụng",
+        "rsg": "Ổn định & tăng trưởng doanh thu",
+        "sector": "Triển vọng ngành"
+      },
+      "grade": {
+        "band": {
+          "fair": "Trung bình",
+          "strong": "Tốt",
+          "weak": "Cần cải thiện"
+        },
+        "focusBody": "{factor} là nhóm yếu nhất của bạn với {score} điểm. Cải thiện nhóm này sẽ nâng hạng — và giảm lãi suất — nhiều hơn bất kỳ việc nào khác bạn có thể làm ngay.",
+        "focusTitle": "Nên tập trung vào đâu",
+        "outOf": "trên 100",
+        "weight": "{percent}% của điểm"
+      },
+      "kpi": {
+        "costOfCapital": "Chi phí khoản vay",
+        "costOfCapitalHint": "Tổng lãi ở mức {rate}% trong {months} tháng",
+        "earlySaving": "Tiết kiệm khi trả sớm",
+        "earlySavingHint": "Số lãi bạn không phải trả nếu tất toán hôm nay",
+        "nextPayment": "Kỳ trả tiếp theo",
+        "nextPaymentHint": "Đến hạn {date}",
+        "outstanding": "Còn phải trả",
+        "outstandingHint": "Đã trả {percent}% khoản vay"
+      },
+      "mockNotice": "Dữ liệu mẫu, hiển thị trong lúc trang này còn được hoàn thiện. Trang chưa kết nối backend — chưa có module lịch trả nợ và engine xếp hạng chưa được nối vào các lần chấm điểm, nên các số liệu này không phản ánh khoản vay thật của bạn.",
+      "overCeiling": "Tháng trước, khoản trả nợ chiếm {percent}% doanh thu, cao hơn mức {ceiling}% mà chúng tôi cho là an toàn. Hãy trao đổi với chúng tôi về việc gia hạn nếu điều này gây áp lực cho hoạt động của bạn.",
+      "progress": {
+        "label": "Đã trả đến nay",
+        "remaining": "Còn {days} ngày làm việc"
+      },
+      "series": {
+        "ceiling": "Ngưỡng an toàn {percent}%",
+        "repaid": "Đã trả đến nay",
+        "revenueShare": "Tỷ lệ trên doanh thu",
+        "totalOwed": "Tổng phải trả"
+      },
+      "subtitle": "Tình trạng khoản vay, chi phí và những yếu tố ảnh hưởng đến hạng của bạn.",
+      "title": "Phân tích khoản vay"
+    },
     "transactions": {
       "count": "{count} giao dịch",
       "empty": {

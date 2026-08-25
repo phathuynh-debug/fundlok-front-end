@@ -551,11 +551,7 @@ export default function ProjectsClient() {
                         key={project.id}
                         variants={springItemVariants}
                       >
-                        <ProjectCard
-                          project={project}
-                          role="INVESTOR"
-                          actionLabel={t("dashboard.projects.investNow")}
-                        />
+                        <ProjectCard project={project} role="INVESTOR" />
                       </motion.div>
                     ))
                   : (filteredItems as SecondaryMarketListing[]).map(

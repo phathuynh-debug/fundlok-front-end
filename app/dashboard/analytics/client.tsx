@@ -14,6 +14,7 @@ import { CapitalFlowChart } from "./_components/CapitalFlowChart";
 import { IndustryAllocationChart } from "./_components/IndustryAllocationChart";
 import { IndustrySplitChart } from "./_components/IndustrySplitChart";
 import { MonthlyReturnsChart } from "./_components/MonthlyReturnsChart";
+import { SmeAnalyticsView } from "./_components/sme/SmeAnalyticsView";
 import {
   deriveKpis,
   MOCK_ALLOCATION,
@@ -71,8 +72,13 @@ function ChartCard({
 }
 
 export default function AnalyticsClient() {
-  const { isLoading: isAuthLoading } = useRequireAuth();
+  const { user, isLoading: isAuthLoading } = useRequireAuth();
   const { t } = useTranslations();
+
+  // FE-013: an SME gets a different screen, not this one relabelled. A borrower
+  // has one loan and no portfolio, so capital-deployed / returns / allocation
+  // answer nothing for them — see _components/sme/mock-sme-analytics.ts.
+  const isSme = user?.role === "SME";
 
   // Local UI state only -- nothing here round-trips to the server.
   const [range, setRange] = useState<RangeKey>("12M");
@@ -94,10 +100,18 @@ export default function AnalyticsClient() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h2 className="text-3xl font-bold tracking-tight">
-              {t("dashboard.analytics.title")}
+              {t(
+                isSme
+                  ? "dashboard.smeAnalytics.title"
+                  : "dashboard.analytics.title",
+              )}
             </h2>
             <p className="text-sm text-muted-foreground mt-2">
-              {t("dashboard.analytics.subtitle")}
+              {t(
+                isSme
+                  ? "dashboard.smeAnalytics.subtitle"
+                  : "dashboard.analytics.subtitle",
+              )}
             </p>
           </div>
         </div>
@@ -107,12 +121,18 @@ export default function AnalyticsClient() {
         <div className="flex items-start gap-2.5 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3">
           <FlaskConical className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
           <p className="text-xs text-amber-700 dark:text-amber-300">
-            {t("dashboard.analytics.mockNotice")}
+            {t(
+              isSme
+                ? "dashboard.smeAnalytics.mockNotice"
+                : "dashboard.analytics.mockNotice",
+            )}
           </p>
         </div>
 
         {isAuthLoading ? (
           <AnalyticsSkeleton />
+        ) : isSme ? (
+          <SmeAnalyticsView />
         ) : (
           <>
             {/* One filter row above everything it scopes -- the range applies to

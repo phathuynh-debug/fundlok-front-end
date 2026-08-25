@@ -696,6 +696,63 @@
       "vatZipLabel": "Upload .zip containing all 48 VAT files (24 declarations + 24 confirmations)",
       "whyWeNeedThis": "Why we need this"
     },
+    "smeAnalytics": {
+      "charts": {
+        "gradeDesc": "The four groups behind your {grade} score, and where to focus.",
+        "gradeTitle": "What drives your grade",
+        "repaymentDesc": "What you have repaid against the total owed over the term.",
+        "repaymentTitle": "Repayment progress",
+        "revenueShareDesc": "Each month against the {ceiling}% level we consider comfortable.",
+        "revenueShareTitle": "Share of revenue going to repayment"
+      },
+      "factorHints": {
+        "bcq": "Your margins, cost flexibility, and how large the loan is against revenue.",
+        "behavioral": "Your CIC credit score, owner withdrawals, and repayment record.",
+        "rsg": "How steady your monthly revenue is, its trend, and customer concentration.",
+        "sector": "Conditions in your industry — set by sector data, not by your own numbers."
+      },
+      "factors": {
+        "bcq": "Business cost quality",
+        "behavioral": "Credit behaviour",
+        "rsg": "Revenue stability & growth",
+        "sector": "Sector outlook"
+      },
+      "grade": {
+        "band": {
+          "fair": "Fair",
+          "strong": "Strong",
+          "weak": "Needs work"
+        },
+        "focusBody": "{factor} is your weakest group at {score}. Improving it moves your grade — and your rate — more than anything else you can act on right now.",
+        "focusTitle": "Where to focus",
+        "outOf": "out of 100",
+        "weight": "{percent}% of grade"
+      },
+      "kpi": {
+        "costOfCapital": "Cost of this loan",
+        "costOfCapitalHint": "Total interest at {rate}% over {months} months",
+        "earlySaving": "Save by repaying early",
+        "earlySavingHint": "Interest you avoid by closing today",
+        "nextPayment": "Next payment",
+        "nextPaymentHint": "Due {date}",
+        "outstanding": "Still owed",
+        "outstandingHint": "{percent}% of the loan repaid so far"
+      },
+      "mockNotice": "Sample data, shown while this screen is built out. It is not connected to the backend yet — there is no repayment schedule module, and the grading engine is not wired into score runs, so none of these figures reflect your real loan.",
+      "overCeiling": "Repayment took {percent}% of your revenue last month, above the {ceiling}% level we consider comfortable. Talk to us about extending the term if that is squeezing your operations.",
+      "progress": {
+        "label": "Repaid to date",
+        "remaining": "{days} working days left"
+      },
+      "series": {
+        "ceiling": "{percent}% comfort ceiling",
+        "repaid": "Repaid to date",
+        "revenueShare": "Share of revenue",
+        "totalOwed": "Total owed"
+      },
+      "subtitle": "Where your loan stands, what it costs, and what moves your grade.",
+      "title": "Loan analytics"
+    },
     "transactions": {
       "count": "{count} transactions",
       "empty": {
