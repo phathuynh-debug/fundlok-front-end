@@ -17,6 +17,11 @@ export const AUTH_ENDPOINTS = {
   resendVerification: "/auth/resend-verification",
   forgotPassword: "/auth/forgot-password",
   resetPassword: "/auth/reset-password",
+  // Security screen: live sign-ins and the account's security history.
+  sessions: "/auth/sessions",
+  revokeSession: (sessionId: string) => `/auth/sessions/${sessionId}/revoke`,
+  revokeOtherSessions: "/auth/sessions/revoke-others",
+  securityEvents: "/auth/security-events",
 } as const;
 
 export const USER_ENDPOINTS = {

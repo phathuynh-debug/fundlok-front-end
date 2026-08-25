@@ -418,10 +418,13 @@
     "security": {
       "activity": {
         "events": {
+          "failedAttempt": "Một lần đăng nhập thất bại.",
           "failedAttempts": "{count} lần đăng nhập thất bại từ {location}.",
           "newDevice": "Lần đầu đăng nhập từ {device} tại {location}.",
           "passwordChanged": "Đã đổi mật khẩu.",
           "payoutAccountAdded": "Tài khoản nhận tiền được đổi sang {bank}.",
+          "sessionRevoked": "Một thiết bị đã bị đăng xuất.",
+          "sessionsRevokedOthers": "Đã đăng xuất khỏi tất cả thiết bị khác.",
           "signIn": "Đăng nhập từ {device} tại {location}.",
           "twoFactorEnabled": "Đã bật xác thực hai lớp."
         },
@@ -489,6 +492,11 @@
         "onlyThisDevice": "Đây là thiết bị duy nhất đang đăng nhập.",
         "revoke": "Đăng xuất",
         "revokeAll": "Đăng xuất mọi nơi khác",
+        "revokeFailedTitle": "Không thể đăng xuất thiết bị đó",
+        "revokedAllDescription": "Đã kết thúc {count} phiên khác.",
+        "revokedAllTitle": "Đã đăng xuất ở mọi nơi khác",
+        "revokedDescription": "Thiết bị đó sẽ cần đăng nhập lại.",
+        "revokedTitle": "Đã đăng xuất thiết bị",
         "subtitle": "Mọi nơi tài khoản của bạn đang mở.",
         "thisDevice": "Thiết bị này",
         "title": "Thiết bị đã đăng nhập",

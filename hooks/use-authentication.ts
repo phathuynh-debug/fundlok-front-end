@@ -5,8 +5,11 @@ import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   authenticationService,
+  type DeviceSession,
   type LoginPayload,
   type RegisterPayload,
+  type RevokeResult,
+  type SecurityEvent,
   type SelectableRole,
   type User,
 } from "@/services/authentication.service";
@@ -17,6 +20,8 @@ import type { ApiError } from "@/lib/types";
 export const authKeys = {
   all: ["auth"] as const,
   currentUser: () => [...authKeys.all, "me"] as const,
+  sessions: () => [...authKeys.all, "sessions"] as const,
+  securityEvents: () => [...authKeys.all, "security-events"] as const,
 };
 
 // ---------- Mutations ----------
@@ -113,4 +118,58 @@ export function useRequireAuth(redirectTo = "/login") {
   }, [isFetched, isError, router, redirectTo]);
 
   return { user, isLoading: !isFetched };
+}
+
+// ---------- Security screen ----------
+
+/**
+ * Devices currently signed in. Short staleTime: revoking on another tab (or
+ * another device signing in) should show up quickly, and the payload is small.
+ */
+export function useSessions(enabled = true) {
+  return useQuery<DeviceSession[], ApiError>({
+    queryKey: authKeys.sessions(),
+    queryFn: () => authenticationService.listSessions(),
+    staleTime: 30 * 1000,
+    retry: false,
+    enabled,
+  });
+}
+
+export function useSecurityEvents(enabled = true) {
+  return useQuery<SecurityEvent[], ApiError>({
+    queryKey: authKeys.securityEvents(),
+    queryFn: () => authenticationService.listSecurityEvents(),
+    staleTime: 60 * 1000,
+    retry: false,
+    enabled,
+  });
+}
+
+/**
+ * Sign one device out. Both lists are invalidated: revoking is itself an
+ * audited event, so the activity feed changes too.
+ */
+export function useRevokeSession() {
+  const queryClient = useQueryClient();
+
+  return useMutation<RevokeResult, ApiError, string>({
+    mutationFn: (sessionId) => authenticationService.revokeSession(sessionId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: authKeys.sessions() });
+      queryClient.invalidateQueries({ queryKey: authKeys.securityEvents() });
+    },
+  });
+}
+
+export function useRevokeOtherSessions() {
+  const queryClient = useQueryClient();
+
+  return useMutation<RevokeResult, ApiError, void>({
+    mutationFn: () => authenticationService.revokeOtherSessions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: authKeys.sessions() });
+      queryClient.invalidateQueries({ queryKey: authKeys.securityEvents() });
+    },
+  });
 }

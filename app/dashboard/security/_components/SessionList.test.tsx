@@ -3,7 +3,30 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { SessionList } from "./SessionList";
-import { MOCK_SESSIONS } from "./mock-security";
+import type { DeviceSession } from "@/services/authentication.service";
+
+// Two live sign-ins as /auth/sessions returns them: the caller's own device
+// and one other.
+const SESSIONS: DeviceSession[] = [
+  {
+    session_id: "sess-current",
+    device: "Mac",
+    browser: "Chrome 141",
+    ip_address: "113.161.44.18",
+    created_at: "2026-08-18T08:42:00Z",
+    last_used_at: "2026-08-18T08:42:00Z",
+    current: true,
+  },
+  {
+    session_id: "sess-other",
+    device: "iPhone",
+    browser: "Safari 17",
+    ip_address: "27.75.219.4",
+    created_at: "2026-08-17T21:05:00Z",
+    last_used_at: "2026-08-17T21:05:00Z",
+    current: false,
+  },
+];
 
 // Echo translation keys so assertions read against stable identifiers rather
 // than copy that may be reworded.
@@ -15,7 +38,7 @@ vi.mock("@/lib/i18n", () => ({
   }),
 }));
 
-function setup(sessions = MOCK_SESSIONS) {
+function setup(sessions = SESSIONS) {
   const onRevoke = vi.fn();
   const onRevokeAll = vi.fn();
   render(
@@ -44,15 +67,15 @@ describe("SessionList", () => {
     const buttons = screen.getAllByRole("button", {
       name: "dashboard.security.sessions.revoke",
     });
-    // two of the three sample sessions are revocable
-    expect(buttons).toHaveLength(2);
+    // one of the two sessions is revocable — never the current one
+    expect(buttons).toHaveLength(1);
 
     await userEvent.click(buttons[0]);
-    expect(onRevoke).toHaveBeenCalledExactlyOnceWith("sess-2");
+    expect(onRevoke).toHaveBeenCalledExactlyOnceWith("sess-other");
   });
 
   it("disables sign-out-everywhere when only this device is left", () => {
-    const { onRevokeAll } = setup(MOCK_SESSIONS.filter((s) => s.current));
+    const { onRevokeAll } = setup(SESSIONS.filter((s) => s.current));
     expect(
       screen.getByRole("button", {
         name: "dashboard.security.sessions.revokeAll",
@@ -62,12 +85,5 @@ describe("SessionList", () => {
       screen.getByText("dashboard.security.sessions.onlyThisDevice"),
     ).toBeInTheDocument();
     expect(onRevokeAll).not.toHaveBeenCalled();
-  });
-
-  it("flags a session from an unrecognized device", () => {
-    setup();
-    expect(
-      screen.getByText("dashboard.security.sessions.unrecognized"),
-    ).toBeInTheDocument();
   });
 });

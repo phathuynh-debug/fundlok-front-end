@@ -20,11 +20,30 @@ const SEVERITY = {
     text: "text-destructive",
   },
 } satisfies Record<
-  ActivitySeverity,
+  SecurityEventSeverity,
   { icon: typeof Info; dot: string; text: string }
 >;
 
-export function ActivityFeed({ events }: { events: ActivityEvent[] }) {
+// Known audit actions -> i18n keys. Anything unmapped shows its code, so a new
+// backend action never renders as a broken translation key.
+const ACTION_KEYS: Record<string, string> = {
+  SIGN_IN: "dashboard.security.activity.events.signIn",
+  SIGN_IN_FAILED: "dashboard.security.activity.events.failedAttempt",
+  SESSION_REVOKED: "dashboard.security.activity.events.sessionRevoked",
+  SESSIONS_REVOKED_OTHERS:
+    "dashboard.security.activity.events.sessionsRevokedOthers",
+  PASSWORD_RESET: "dashboard.security.activity.events.passwordChanged",
+};
+
+function actionLabel(
+  action: string,
+  t: (key: string, values?: Record<string, string | number>) => string,
+): string {
+  const key = ACTION_KEYS[action];
+  return key ? t(key) : action;
+}
+
+export function ActivityFeed({ events }: { events: SecurityEvent[] }) {
   const { locale, t } = useTranslations();
 
   return (
@@ -65,10 +84,10 @@ export function ActivityFeed({ events }: { events: ActivityEvent[] }) {
 
               <div className="min-w-0 pt-1">
                 <p className="text-sm text-foreground">
-                  {t(
-                    `dashboard.security.activity.events.${event.key}`,
-                    event.params,
-                  )}
+                  {/* Action codes come from the audit log. An action with no
+                      translation falls back to the code itself rather than
+                      rendering a raw i18n key at the user. */}
+                  {actionLabel(event.action, t)}
                 </p>
                 <p className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
                   <span
@@ -80,7 +99,11 @@ export function ActivityFeed({ events }: { events: ActivityEvent[] }) {
                     )}
                   </span>
                   <span aria-hidden>·</span>
-                  <span>{formatDateTime(event.at, locale)}</span>
+                  <span>
+                    {event.created_at
+                      ? formatDateTime(event.created_at, locale)
+                      : ""}
+                  </span>
                 </p>
               </div>
             </li>

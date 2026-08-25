@@ -418,10 +418,13 @@
     "security": {
       "activity": {
         "events": {
+          "failedAttempt": "A failed sign-in attempt.",
           "failedAttempts": "{count} failed sign-in attempts from {location}.",
           "newDevice": "First sign-in from {device} in {location}.",
           "passwordChanged": "Password changed.",
           "payoutAccountAdded": "Payout account changed to {bank}.",
+          "sessionRevoked": "A device was signed out.",
+          "sessionsRevokedOthers": "Signed out of all other devices.",
           "signIn": "Signed in from {device} in {location}.",
           "twoFactorEnabled": "Two-factor authentication turned on."
         },
@@ -489,6 +492,11 @@
         "onlyThisDevice": "This is the only device signed in.",
         "revoke": "Sign out",
         "revokeAll": "Sign out everywhere else",
+        "revokeFailedTitle": "Could not sign that device out",
+        "revokedAllDescription": "{count} other session(s) ended.",
+        "revokedAllTitle": "Signed out everywhere else",
+        "revokedDescription": "That device will need to sign in again.",
+        "revokedTitle": "Device signed out",
         "subtitle": "Everywhere your account is currently open.",
         "thisDevice": "This device",
         "title": "Signed-in devices",

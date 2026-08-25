@@ -4,7 +4,14 @@ import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { FlaskConical, ShieldCheck } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useRequireAuth } from "@/hooks/use-authentication";
+import {
+  useRequireAuth,
+  useRevokeOtherSessions,
+  useRevokeSession,
+  useSecurityEvents,
+  useSessions,
+} from "@/hooks/use-authentication";
+import { useToast } from "@/hooks/use-toast";
 import { pageTransitionProps } from "@/lib/animations";
 import { formatDate } from "@/lib/format-date";
 import { useTranslations } from "@/lib/i18n";
@@ -15,9 +22,7 @@ import { SecurityPostureCard } from "./_components/SecurityPostureCard";
 import { SessionList } from "./_components/SessionList";
 import {
   deriveScore,
-  MOCK_ACTIVITY,
   MOCK_PROTECTIONS,
-  MOCK_SESSIONS,
   type ProtectionItem,
 } from "./_components/mock-security";
 
@@ -44,13 +49,27 @@ function SecuritySkeleton() {
 export default function SecurityClient() {
   const { isLoading: isAuthLoading } = useRequireAuth();
   const { locale, t } = useTranslations();
+  const { toast } = useToast();
 
-  // Local UI state only: toggling a protection or revoking a session is mock
-  // behaviour with no endpoint behind it, so it never round-trips to React
-  // Query. When the API lands this becomes a mutation + cache invalidation.
+  // Sessions and activity are real server state: /auth/sessions is backed by
+  // refresh_tokens and /auth/security-events by audit_logs, so they belong in
+  // React Query, keyed by authKeys.
+  const { data: sessions = [], isLoading: isSessionsLoading } =
+    useSessions(!isAuthLoading);
+  const { data: activity = [], isLoading: isActivityLoading } =
+    useSecurityEvents(!isAuthLoading);
+  const {
+    mutate: revokeSession,
+    isPending: isRevoking,
+    variables: revokingId,
+  } = useRevokeSession();
+  const { mutate: revokeOthers, isPending: isRevokingAll } =
+    useRevokeOtherSessions();
+
+  // Protections stay local: 2FA, passkeys and the payout lock have no endpoints
+  // yet, so this half of the screen is still a mockup and says so.
   const [protections, setProtections] =
     useState<ProtectionItem[]>(MOCK_PROTECTIONS);
-  const [sessions, setSessions] = useState(MOCK_SESSIONS);
 
   const score = useMemo(() => deriveScore(protections), [protections]);
   const protectionsOn = protections.filter((p) => p.state === "on").length;
@@ -71,11 +90,37 @@ export default function SecurityClient() {
       ),
     );
 
-  const handleRevoke = (id: string) =>
-    setSessions((current) => current.filter((session) => session.id !== id));
+  const handleRevoke = (sessionId: string) =>
+    revokeSession(sessionId, {
+      onSuccess: () =>
+        toast({
+          title: t("dashboard.security.sessions.revokedTitle"),
+          description: t("dashboard.security.sessions.revokedDescription"),
+        }),
+      onError: (error) =>
+        toast({
+          variant: "destructive",
+          title: t("dashboard.security.sessions.revokeFailedTitle"),
+          description: error?.message,
+        }),
+    });
 
   const handleRevokeAll = () =>
-    setSessions((current) => current.filter((session) => session.current));
+    revokeOthers(undefined, {
+      onSuccess: (result) =>
+        toast({
+          title: t("dashboard.security.sessions.revokedAllTitle"),
+          description: t("dashboard.security.sessions.revokedAllDescription", {
+            count: result.revoked,
+          }),
+        }),
+      onError: (error) =>
+        toast({
+          variant: "destructive",
+          title: t("dashboard.security.sessions.revokeFailedTitle"),
+          description: error?.message,
+        }),
+    });
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -115,7 +160,7 @@ export default function SecurityClient() {
           </p>
         </div>
 
-        {isAuthLoading ? (
+        {isAuthLoading || isSessionsLoading || isActivityLoading ? (
           <SecuritySkeleton />
         ) : (
           <div className="space-y-6">
@@ -134,8 +179,10 @@ export default function SecurityClient() {
                 sessions={sessions}
                 onRevoke={handleRevoke}
                 onRevokeAll={handleRevokeAll}
+                revokingId={isRevoking ? revokingId : null}
+                isRevokingAll={isRevokingAll}
               />
-              <ActivityFeed events={MOCK_ACTIVITY} />
+              <ActivityFeed events={activity} />
             </div>
           </div>
         )}

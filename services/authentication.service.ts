@@ -76,6 +76,36 @@ export interface ResetPasswordPayload {
   new_password: string;
 }
 
+/** One live sign-in, as /auth/sessions returns it. */
+export interface DeviceSession {
+  session_id: string;
+  /** Parsed from the user agent server-side, e.g. "Mac", "iPhone". */
+  device: string;
+  /** e.g. "Chrome 141". */
+  browser: string;
+  ip_address: string | null;
+  created_at: string | null;
+  last_used_at: string | null;
+  /** The session making the request — cannot be revoked from here. */
+  current: boolean;
+}
+
+export type SecurityEventSeverity = "info" | "warning" | "critical";
+
+export interface SecurityEvent {
+  id: string;
+  /** e.g. SIGN_IN, SESSION_REVOKED. Translated at the call site. */
+  action: string;
+  entity_type: string;
+  severity: SecurityEventSeverity;
+  ip_address: string | null;
+  created_at: string | null;
+}
+
+export interface RevokeResult {
+  revoked: number;
+}
+
 export const authenticationService = {
   // Backend sets httpOnly cookies and returns the User object.
   // During transition the backend may still return Token shape — we handle both.
@@ -91,6 +121,24 @@ export const authenticationService = {
   },
 
   // Returns the created User. No tokens — caller redirects to login.
+  listSessions() {
+    return apiClient.get<DeviceSession[]>(AUTH_ENDPOINTS.sessions);
+  },
+
+  revokeSession(sessionId: string) {
+    return apiClient.post<RevokeResult>(
+      AUTH_ENDPOINTS.revokeSession(sessionId),
+    );
+  },
+
+  revokeOtherSessions() {
+    return apiClient.post<RevokeResult>(AUTH_ENDPOINTS.revokeOtherSessions);
+  },
+
+  listSecurityEvents() {
+    return apiClient.get<SecurityEvent[]>(AUTH_ENDPOINTS.securityEvents);
+  },
+
   register(payload: RegisterPayload) {
     return apiClient.post<User>(AUTH_ENDPOINTS.register, payload);
   },
