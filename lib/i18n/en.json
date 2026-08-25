@@ -763,6 +763,19 @@
       "mockNotice": "Sample data, shown while this screen is built out. It is not connected to the backend yet, so these figures are not your real balances.",
       "searchPlaceholder": "Search by project, reference or method",
       "showing": "Showing {shown} of {total} transactions",
+      "smeMockNotice": "Sample data, shown while this screen is built out. It is not connected to the backend yet — there is no ledger API or repayment schedule module, so none of these movements are real.",
+      "smeSubtitle": "Every movement on your loan — what you received, what you have repaid, and what FundLok took.",
+      "smeSummary": {
+        "disbursed": "Disbursed to you",
+        "disbursedHint": "Loan principal paid into your account",
+        "fees": "Platform fees",
+        "feesHint": "Deducted from the disbursement, not invoiced",
+        "pending": "In flight",
+        "pendingHint": "Payments not yet settled",
+        "repaid": "Repaid so far",
+        "repaidHint": "Instalments plus any early repayments"
+      },
+      "smeTitle": "Loan transactions",
       "status": {
         "completed": "Completed",
         "failed": "Failed",
@@ -790,6 +803,8 @@
       "title": "Transactions",
       "types": {
         "deposit": "Deposit",
+        "disbursement": "Disbursement",
+        "earlyRepayment": "Early repayment",
         "fee": "Fee",
         "investment": "Investment",
         "repayment": "Repayment",

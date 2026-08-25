@@ -12,6 +12,12 @@ import { useTranslations } from "@/lib/i18n";
 import { DashboardHeader } from "../_components/DashboardHeader";
 import { TransactionSummaryCards } from "./_components/TransactionSummaryCards";
 import { TransactionsTable } from "./_components/TransactionsTable";
+import { SmeTransactionSummaryCards } from "./_components/sme/SmeTransactionSummaryCards";
+import {
+  MOCK_SME_TRANSACTIONS,
+  SME_TYPE_FILTERS,
+  summarizeSme,
+} from "./_components/sme/mock-sme-transactions";
 import { transactionTypeLabelKey } from "./_components/TransactionTypeCell";
 import {
   MOCK_TRANSACTIONS,
@@ -68,8 +74,16 @@ function TransactionsSkeleton() {
 }
 
 export default function TransactionsClient() {
-  const { isLoading: isAuthLoading } = useRequireAuth();
+  const { user, isLoading: isAuthLoading } = useRequireAuth();
   const { t } = useTranslations();
+
+  // FE-013: a borrower's ledger is the other half of the omnibus flow —
+  // disbursement in, repayments and fees out. Investments, returns and
+  // distributions describe an investor, so the SME gets its own dataset,
+  // summary tiles and filter chips rather than the investor screen relabelled.
+  const isSme = user?.role === "SME";
+  const transactions = isSme ? MOCK_SME_TRANSACTIONS : MOCK_TRANSACTIONS;
+  const typeFilters = isSme ? SME_TYPE_FILTERS : TYPE_FILTERS;
 
   // All local UI state: none of this round-trips to the server, so it stays in
   // useState rather than React Query.
@@ -84,7 +98,7 @@ export default function TransactionsClient() {
   const filteredTransactions = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
 
-    return MOCK_TRANSACTIONS.filter((txn) => {
+    return transactions.filter((txn) => {
       const matchesSearch =
         query === "" ||
         txn.counterparty.toLowerCase().includes(query) ||
@@ -96,11 +110,15 @@ export default function TransactionsClient() {
 
       return matchesSearch && matchesType && matchesStatus;
     });
-  }, [searchTerm, selectedType, selectedStatus]);
+  }, [transactions, searchTerm, selectedType, selectedStatus]);
 
   // Totals reflect what is on screen, so they stay consistent with the filters.
   const summary = useMemo(
     () => summarize(filteredTransactions),
+    [filteredTransactions],
+  );
+  const smeSummary = useMemo(
+    () => summarizeSme(filteredTransactions),
     [filteredTransactions],
   );
 
@@ -116,17 +134,25 @@ export default function TransactionsClient() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h2 className="text-3xl font-bold tracking-tight">
-              {t("dashboard.transactions.title")}
+              {t(
+                isSme
+                  ? "dashboard.transactions.smeTitle"
+                  : "dashboard.transactions.title",
+              )}
             </h2>
             <p className="text-sm text-muted-foreground mt-2">
-              {t("dashboard.transactions.subtitle")}
+              {t(
+                isSme
+                  ? "dashboard.transactions.smeSubtitle"
+                  : "dashboard.transactions.subtitle",
+              )}
             </p>
           </div>
           <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-600 px-3 py-1.5 rounded-full text-xs font-semibold w-fit border border-emerald-500/20">
             <History className="h-4 w-4" />
             <span>
               {t("dashboard.transactions.count", {
-                count: MOCK_TRANSACTIONS.length,
+                count: transactions.length,
               })}
             </span>
           </div>
@@ -137,7 +163,11 @@ export default function TransactionsClient() {
         <div className="flex items-start gap-2.5 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3">
           <FlaskConical className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
           <p className="text-xs text-amber-700 dark:text-amber-300">
-            {t("dashboard.transactions.mockNotice")}
+            {t(
+              isSme
+                ? "dashboard.transactions.smeMockNotice"
+                : "dashboard.transactions.mockNotice",
+            )}
           </p>
         </div>
 
@@ -145,7 +175,11 @@ export default function TransactionsClient() {
           <TransactionsSkeleton />
         ) : (
           <>
-            <TransactionSummaryCards summary={summary} />
+            {isSme ? (
+              <SmeTransactionSummaryCards summary={smeSummary} />
+            ) : (
+              <TransactionSummaryCards summary={summary} />
+            )}
 
             {/* Search + status filter */}
             <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
@@ -185,7 +219,7 @@ export default function TransactionsClient() {
                 <SlidersHorizontal className="h-3.5 w-3.5" />
                 {t("dashboard.transactions.filterByType")}
               </span>
-              {(["ALL", ...TYPE_FILTERS] as const).map((type) => (
+              {(["ALL", ...typeFilters] as const).map((type) => (
                 <Badge
                   key={type}
                   variant={selectedType === type ? "default" : "outline"}

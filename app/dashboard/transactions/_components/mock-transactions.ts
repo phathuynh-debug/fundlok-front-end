@@ -15,7 +15,16 @@
 // component code does not have to change when the real thing arrives.
 
 export type TransactionType =
-  "INVESTMENT" | "RETURN" | "DEPOSIT" | "WITHDRAWAL" | "REPAYMENT" | "FEE";
+  | "INVESTMENT"
+  | "RETURN"
+  | "DEPOSIT"
+  | "WITHDRAWAL"
+  | "REPAYMENT"
+  | "FEE"
+  // Borrower-side movements. An SME never invests or receives a distribution;
+  // it receives a disbursement and repays. See sme/mock-sme-transactions.ts.
+  | "DISBURSEMENT"
+  | "EARLY_REPAYMENT";
 
 export type TransactionStatus = "COMPLETED" | "PENDING" | "FAILED";
 

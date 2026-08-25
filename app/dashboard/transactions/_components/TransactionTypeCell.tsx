@@ -4,6 +4,7 @@ import {
   ArrowDownLeft,
   ArrowUpRight,
   Banknote,
+  PiggyBank,
   Receipt,
   TrendingUp,
   Wallet,
@@ -33,6 +34,14 @@ const TYPE_CONFIG: Record<
     labelKey: "dashboard.transactions.types.repayment",
   },
   FEE: { icon: Receipt, labelKey: "dashboard.transactions.types.fee" },
+  DISBURSEMENT: {
+    icon: ArrowDownLeft,
+    labelKey: "dashboard.transactions.types.disbursement",
+  },
+  EARLY_REPAYMENT: {
+    icon: PiggyBank,
+    labelKey: "dashboard.transactions.types.earlyRepayment",
+  },
 };
 
 export function transactionTypeLabelKey(type: TransactionType) {

@@ -763,6 +763,19 @@
       "mockNotice": "Dữ liệu mẫu, hiển thị trong lúc màn hình này đang được hoàn thiện. Trang chưa kết nối với hệ thống backend, nên các số liệu bên dưới không phải số dư thực tế của bạn.",
       "searchPlaceholder": "Tìm theo dự án, mã tham chiếu hoặc phương thức",
       "showing": "Hiển thị {shown} trong tổng số {total} giao dịch",
+      "smeMockNotice": "Dữ liệu mẫu, hiển thị trong lúc trang này còn được hoàn thiện. Trang chưa kết nối backend — chưa có API sổ cái hay module lịch trả nợ, nên các giao dịch này không phải giao dịch thật.",
+      "smeSubtitle": "Toàn bộ dòng tiền của khoản vay — số bạn đã nhận, số đã trả và phí FundLok đã thu.",
+      "smeSummary": {
+        "disbursed": "Đã giải ngân cho bạn",
+        "disbursedHint": "Tiền gốc đã chuyển vào tài khoản của bạn",
+        "fees": "Phí nền tảng",
+        "feesHint": "Trừ trực tiếp khi giải ngân, không xuất hóa đơn riêng",
+        "pending": "Đang xử lý",
+        "pendingHint": "Các khoản chưa hoàn tất",
+        "repaid": "Đã trả đến nay",
+        "repaidHint": "Các kỳ trả cùng các lần trả sớm"
+      },
+      "smeTitle": "Giao dịch khoản vay",
       "status": {
         "completed": "Hoàn tất",
         "failed": "Thất bại",
@@ -790,9 +803,11 @@
       "title": "Giao dịch",
       "types": {
         "deposit": "Nạp tiền",
+        "disbursement": "Giải ngân",
+        "earlyRepayment": "Trả sớm",
         "fee": "Phí",
         "investment": "Đầu tư",
-        "repayment": "Hoàn vốn",
+        "repayment": "Kỳ trả nợ",
         "return": "Lợi nhuận",
         "withdrawal": "Rút tiền"
       }
