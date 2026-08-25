@@ -15,7 +15,6 @@ import {
   ChevronRight,
   UserRound,
   UserCog,
-  Bell,
   Palette,
   CreditCard,
   type LucideIcon,
@@ -25,6 +24,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useCurrentUser } from "@/hooks/use-authentication";
 import { useTranslations } from "@/lib/i18n";
 import Logo from "@/components/logo";
+import { NotificationsPanel } from "@/components/notifications-panel";
 import { CONTROL_ICON_IDLE, CONTROL_IDLE } from "@/lib/ui-tokens";
 
 interface NavItem {
@@ -73,11 +73,6 @@ const settingsItems: NavItem[] = [
     labelKey: "dashboard.sidebar.settingsAccount",
     href: "/dashboard/settings/account",
     icon: UserCog,
-  },
-  {
-    labelKey: "dashboard.sidebar.settingsNotifications",
-    href: "/dashboard/settings/notifications",
-    icon: Bell,
   },
   {
     labelKey: "dashboard.sidebar.settingsAppearance",
@@ -235,7 +230,7 @@ export function Sidebar() {
                 {getInitials(user?.full_name)}
               </AvatarFallback>
             </Avatar>
-            <div className="flex flex-col min-w-0">
+            <div className="flex flex-col min-w-0 flex-1">
               <p className="text-sm font-medium text-foreground truncate">
                 {user?.full_name || t("common.fundlokUser")}
               </p>
@@ -245,6 +240,11 @@ export function Sidebar() {
                   : t("dashboard.sidebar.verifiedMember")}
               </p>
             </div>
+
+            {/* Notifications live on the user row, and open as a hover
+                preview rather than a page: you check notifications, you do not
+                configure them — and there is no notifications route. */}
+            <NotificationsPanel />
           </div>
         </div>
       </div>

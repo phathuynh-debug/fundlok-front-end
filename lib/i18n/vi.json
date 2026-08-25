@@ -581,13 +581,13 @@
       "analytics": "Phân tích",
       "investmentProjects": "Dự án đầu tư",
       "memberSuffix": "Thành viên",
+      "notifications": "Thông báo",
       "overview": "Tổng quan",
       "security": "Bảo mật",
       "settings": "Cài đặt",
       "settingsAccount": "Tài khoản",
       "settingsAppearance": "Giao diện",
       "settingsBilling": "Thanh toán",
-      "settingsNotifications": "Thông báo",
       "settingsProfile": "Hồ sơ",
       "transactions": "Giao dịch",
       "verifiedMember": "Thành viên đã xác thực"
@@ -1132,6 +1132,20 @@
     "goHome": "Về trang chủ",
     "headline": "Có vẻ bạn đã đi nhầm hướng",
     "pageTitle": "Không tìm thấy trang"
+  },
+  "notifications": {
+    "ariaLabel": "Thông báo",
+    "ariaLabelUnread": "Thông báo, {count} chưa đọc",
+    "empty": "Hiện chưa có thông báo mới.",
+    "items": {
+      "gradeUpdated": "Hạng FundLok của bạn đã được cập nhật.",
+      "newDevice": "Lần đầu đăng nhập từ thiết bị mới.",
+      "newListing": "Có dự án mới đang mở huy động vốn.",
+      "repaymentReceived": "Một khoản trả nợ đã vào tài khoản của bạn."
+    },
+    "markAllRead": "Đánh dấu đã đọc tất cả",
+    "mockNotice": "Thông báo mẫu — chưa kết nối hệ thống gửi thông báo và trạng thái đã đọc không được lưu.",
+    "title": "Thông báo"
   },
   "projectApplication": {
     "card": {
