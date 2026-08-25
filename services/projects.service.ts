@@ -1,5 +1,6 @@
 import { apiClient } from "@/lib/api-client";
 import { PROJECT_ENDPOINTS } from "@/lib/endpoints";
+import type { CompanySize } from "@/lib/constants/company-size";
 import type { ApplicationDocument } from "@/services/uploads.service";
 
 export interface ProjectAddress {
@@ -41,6 +42,14 @@ export interface Project {
 // created in the same request as the project.
 export interface CreateLoanApplicationPayload {
   requested_amount: number;
+  /**
+   * Loan term in months, one of 3 / 6 / 9 / 12 — the grading engine's
+   * `allowed_durations_months`. The backend has no column for this yet
+   * (`loan_applications` stores amount, purpose and repayment_preference only)
+   * and Pydantic drops unknown fields, so this is sent but not yet persisted.
+   * See lib/constants/loan-constraints.ts.
+   */
+  duration_months: number;
   purpose?: string | null;
   repayment_preference?: string | null;
 }
@@ -49,6 +58,17 @@ export interface CreateProjectPayload {
   legal_name: string;
   tax_id: string;
   industry: string;
+  /**
+   * Headcount as entered by the SME, and the band derived from it. The grading
+   * engine takes `company_size` (one of micro / small / medium, per
+   * `company_sizes` in grading_params_v1.yaml) and never a raw count, but the
+   * count is what the applicant actually knows — so both are sent.
+   *
+   * Neither is persisted yet: `projects` has no column for either and Pydantic
+   * drops unknown fields. See lib/constants/company-size.ts.
+   */
+  employee_count: number;
+  company_size: CompanySize;
   incorporation_date: string;
   address: ProjectAddress;
   loan_application?: CreateLoanApplicationPayload | null;

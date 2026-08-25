@@ -1005,10 +1005,20 @@
       "submitting": "Submitting application...",
       "title": "Application form"
     },
+    "companySizes": {
+      "medium": "Medium (51–200)",
+      "micro": "Micro (1–10)",
+      "small": "Small (11–50)"
+    },
+    "durationOptions": {
+      "months": "{count} months"
+    },
     "eyebrow": "Project Application",
     "fields": {
       "city": "City",
       "country": "Country",
+      "durationMonths": "Loan term",
+      "employeeCount": "Number of employees",
       "incorporationDate": "Incorporation date",
       "industry": "Industry",
       "legalName": "Legal name",
@@ -1020,16 +1030,28 @@
       "street": "Street",
       "taxId": "Tax ID"
     },
+    "hints": {
+      "companySizeDerived": "Classified as {size}",
+      "durationMonths": "The only terms available on the platform. Longer terms lower the daily repayment.",
+      "employeeCount": "Full-time headcount, between 1 and 200.",
+      "requestedAmountRange": "Between {min} and {max} VND."
+    },
     "industries": {
-      "construction": "Construction & Real Estate",
-      "foodBev": "Food & Beverage / Hospitality",
-      "healthcare": "Healthcare & Medical",
-      "logistics": "Logistics & Transportation",
+      "agricultureFarming": "Agriculture & farming",
+      "beautyPersonalCare": "Beauty & personal care",
+      "constructionMaterials": "Construction materials",
+      "educationTraining": "Education & training",
+      "electronicsRetail": "Electronics retail",
+      "foodBeverage": "Food & beverage",
+      "furnitureWoodwork": "Furniture & woodwork",
+      "healthcarePharmacy": "Healthcare & pharmacy",
+      "itServices": "IT services",
+      "logisticsTransport": "Logistics & transport",
       "manufacturing": "Manufacturing",
-      "other": "Other",
-      "professional": "Professional Services",
-      "retail": "Retail & E-commerce",
-      "tech": "Technology & Software"
+      "professionalServices": "Professional services",
+      "retailTrade": "Retail trade",
+      "textileGarment": "Textile & garment",
+      "tourismHospitality": "Tourism & hospitality"
     },
     "info": {
       "businessText": "Tell us who you are and what you do.",
@@ -1046,6 +1068,7 @@
     "placeholders": {
       "city": "Select a province / city",
       "country": "Vietnam",
+      "employeeCount": "e.g. 25",
       "industry": "Fintech",
       "legalName": "Acme Holdings Limited",
       "loanPurpose": "Working capital to fulfil new orders",
@@ -1072,12 +1095,15 @@
     "validation": {
       "city": "City is required",
       "country": "Country is required",
+      "durationMonths": "Choose a loan term of 3, 6, 9 or 12 months",
+      "employeeCount": "Enter a headcount between 1 and 200 — this platform funds SMEs only",
       "incorporationDate": "Incorporation date is required",
       "industry": "Industry is required",
       "legalName": "Legal name is required",
       "postalCode": "Postal code is required",
       "repaymentPreference": "Repayment preference is required",
       "requestedAmount": "Enter a requested amount greater than 0",
+      "requestedAmountRange": "Enter an amount between 200,000,000 and 5,000,000,000 VND",
       "street": "Street is required",
       "taxId": "Tax ID is required"
     }

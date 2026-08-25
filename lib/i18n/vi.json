@@ -1005,10 +1005,20 @@
       "submitting": "Đang gửi đơn đăng ký...",
       "title": "Biểu mẫu đăng ký"
     },
+    "companySizes": {
+      "medium": "Vừa (51–200)",
+      "micro": "Siêu nhỏ (1–10)",
+      "small": "Nhỏ (11–50)"
+    },
+    "durationOptions": {
+      "months": "{count} tháng"
+    },
     "eyebrow": "Đơn đăng ký dự án",
     "fields": {
       "city": "Thành phố",
       "country": "Quốc gia",
+      "durationMonths": "Thời hạn vay",
+      "employeeCount": "Số lượng nhân viên",
       "incorporationDate": "Ngày thành lập",
       "industry": "Ngành",
       "legalName": "Tên pháp lý",
@@ -1020,16 +1030,28 @@
       "street": "Đường",
       "taxId": "Mã số thuế"
     },
+    "hints": {
+      "companySizeDerived": "Được xếp loại {size}",
+      "durationMonths": "Đây là các thời hạn nền tảng hỗ trợ. Thời hạn dài hơn giúp giảm mức trả hằng ngày.",
+      "employeeCount": "Số nhân viên toàn thời gian, từ 1 đến 200.",
+      "requestedAmountRange": "Từ {min} đến {max} VND."
+    },
     "industries": {
-      "construction": "Xây dựng & Bất động sản",
-      "foodBev": "Thực phẩm & Đồ uống / Khách sạn",
-      "healthcare": "Y tế & Chăm sóc sức khỏe",
-      "logistics": "Logistics & Vận tải",
+      "agricultureFarming": "Nông nghiệp & trồng trọt",
+      "beautyPersonalCare": "Sắc đẹp & chăm sóc cá nhân",
+      "constructionMaterials": "Vật liệu xây dựng",
+      "educationTraining": "Giáo dục & đào tạo",
+      "electronicsRetail": "Bán lẻ điện tử",
+      "foodBeverage": "Thực phẩm & đồ uống",
+      "furnitureWoodwork": "Nội thất & gỗ",
+      "healthcarePharmacy": "Y tế & dược phẩm",
+      "itServices": "Dịch vụ CNTT",
+      "logisticsTransport": "Logistics & vận tải",
       "manufacturing": "Sản xuất",
-      "other": "Khác",
-      "professional": "Dịch vụ chuyên nghiệp (Tư vấn, Marketing...)",
-      "retail": "Bán lẻ & Thương mại điện tử",
-      "tech": "Công nghệ & Phần mềm"
+      "professionalServices": "Dịch vụ chuyên môn",
+      "retailTrade": "Bán lẻ",
+      "textileGarment": "Dệt may",
+      "tourismHospitality": "Du lịch & lưu trú"
     },
     "info": {
       "businessText": "Cho chúng tôi biết bạn là ai và bạn làm gì.",
@@ -1046,6 +1068,7 @@
     "placeholders": {
       "city": "Chọn tỉnh / thành phố",
       "country": "Việt Nam",
+      "employeeCount": "ví dụ 25",
       "industry": "Fintech",
       "legalName": "Acme Holdings Limited",
       "loanPurpose": "Vốn lưu động cho các đơn hàng mới",
@@ -1072,12 +1095,15 @@
     "validation": {
       "city": "Vui lòng nhập thành phố",
       "country": "Vui lòng nhập quốc gia",
+      "durationMonths": "Chọn thời hạn vay 3, 6, 9 hoặc 12 tháng",
+      "employeeCount": "Nhập số nhân viên từ 1 đến 200 — nền tảng chỉ tài trợ doanh nghiệp SME",
       "incorporationDate": "Vui lòng nhập ngày thành lập",
       "industry": "Vui lòng nhập ngành",
       "legalName": "Vui lòng nhập tên pháp lý",
       "postalCode": "Vui lòng nhập mã bưu chính",
       "repaymentPreference": "Vui lòng chọn hình thức trả nợ",
       "requestedAmount": "Vui lòng nhập số tiền vay lớn hơn 0",
+      "requestedAmountRange": "Nhập số tiền từ 200.000.000 đến 5.000.000.000 VND",
       "street": "Vui lòng nhập đường",
       "taxId": "Vui lòng nhập mã số thuế"
     }
