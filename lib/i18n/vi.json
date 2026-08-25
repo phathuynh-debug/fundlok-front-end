@@ -1033,7 +1033,8 @@
     "hints": {
       "companySizeDerived": "Được xếp loại {size}",
       "durationMonths": "Đây là các thời hạn nền tảng hỗ trợ. Thời hạn dài hơn giúp giảm mức trả hằng ngày.",
-      "employeeCount": "Số nhân viên toàn thời gian, từ 1 đến 200."
+      "employeeCount": "Số nhân viên toàn thời gian, từ 1 đến 200.",
+      "requestedAmountRange": "Từ {min} đến {max} VND."
     },
     "industries": {
       "agricultureFarming": "Nông nghiệp & trồng trọt",
@@ -1102,6 +1103,7 @@
       "postalCode": "Vui lòng nhập mã bưu chính",
       "repaymentPreference": "Vui lòng chọn hình thức trả nợ",
       "requestedAmount": "Vui lòng nhập số tiền vay lớn hơn 0",
+      "requestedAmountRange": "Nhập số tiền từ 200.000.000 đến 5.000.000.000 VND",
       "street": "Vui lòng nhập đường",
       "taxId": "Vui lòng nhập mã số thuế"
     }

@@ -1033,7 +1033,8 @@
     "hints": {
       "companySizeDerived": "Classified as {size}",
       "durationMonths": "The only terms available on the platform. Longer terms lower the daily repayment.",
-      "employeeCount": "Full-time headcount, between 1 and 200."
+      "employeeCount": "Full-time headcount, between 1 and 200.",
+      "requestedAmountRange": "Between {min} and {max} VND."
     },
     "industries": {
       "agricultureFarming": "Agriculture & farming",
@@ -1102,6 +1103,7 @@
       "postalCode": "Postal code is required",
       "repaymentPreference": "Repayment preference is required",
       "requestedAmount": "Enter a requested amount greater than 0",
+      "requestedAmountRange": "Enter an amount between 200,000,000 and 5,000,000,000 VND",
       "street": "Street is required",
       "taxId": "Tax ID is required"
     }

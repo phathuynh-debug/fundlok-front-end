@@ -40,7 +40,11 @@ import {
   DEFAULT_COUNTRY,
 } from "@/lib/vn-provinces";
 import { INDUSTRY_OPTIONS } from "@/lib/constants/industries";
-import { LOAN_DURATIONS_MONTHS } from "@/lib/constants/loan-constraints";
+import {
+  LOAN_DURATIONS_MONTHS,
+  LOAN_MAX_VND,
+  LOAN_MIN_VND,
+} from "@/lib/constants/loan-constraints";
 import {
   companySizeForHeadcount,
   MAX_EMPLOYEES,
@@ -126,14 +130,17 @@ export default function ProjectApplicationClient() {
         .min(2, t("projectApplication.validation.country")),
     }),
     loan: z.object({
+      // Engine bounds, not house style: loan_constraints in
+      // grading_params_v1.yaml refuses anything outside 200M-5bn before it
+      // scores, so catch it here rather than as a 500 at scoring time.
       requested_amount: z
         .string()
         .trim()
         .min(1, t("projectApplication.validation.requestedAmount"))
-        .refine(
-          (value) => Number(value) > 0,
-          t("projectApplication.validation.requestedAmount"),
-        ),
+        .refine((value) => {
+          const amount = Number(value);
+          return amount >= LOAN_MIN_VND && amount <= LOAN_MAX_VND;
+        }, t("projectApplication.validation.requestedAmountRange")),
       // The grading engine accepts only these four terms, so anything else is
       // rejected here rather than at scoring time.
       duration_months: z
@@ -704,6 +711,12 @@ export default function ProjectApplicationClient() {
                     }
                     disabled={isPending}
                   />
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {t("projectApplication.hints.requestedAmountRange", {
+                      min: formatAmountInput(String(LOAN_MIN_VND), locale),
+                      max: formatAmountInput(String(LOAN_MAX_VND), locale),
+                    })}
+                  </p>
                 </Field>
 
                 <Field
