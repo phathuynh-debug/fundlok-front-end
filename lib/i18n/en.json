@@ -357,7 +357,50 @@
       "noProjectsDescription": "We couldn't find any opportunities matching your criteria. Try adjusting your search query or filters.",
       "noProjectsTitle": "No Projects Match",
       "opportunitiesAvailable": "{count} Opportunities Available",
+      "primaryMarket": "Primary market",
       "searchPlaceholder": "Search projects by name or industry...",
+      "secondary": {
+        "actualRoi": "Actual ROI",
+        "askingPrice": "Asking price",
+        "compare": "Compare",
+        "consecutivePayments": "{count} consecutive on-time payments",
+        "dailyRate": "{percent}% daily",
+        "days": "{count} days",
+        "daysActive": "{count} days active",
+        "discount": "-{percent}% discount",
+        "grade": "Grade {grade}",
+        "listedOn": "Listed {date}",
+        "madeMissed": "{made} made, {missed} missed",
+        "ofLoan": "{percent}% of loan",
+        "originalInvestment": "Original investment",
+        "paymentHistory": "Payment history",
+        "premium": "+{percent}% premium",
+        "principalProgress": "Principal progress",
+        "reasons": {
+          "liquidity": "Liquidity required for expansion venture",
+          "profitTaking": "Profit taking and reallocating capital",
+          "rebalancing": "Portfolio rebalancing to diversify holdings"
+        },
+        "revenueShare": "Revenue share",
+        "revenueShareTerms": "{percent}% daily until principal paid",
+        "risk": {
+          "high": "High risk",
+          "low": "Low risk",
+          "medium": "Medium risk"
+        },
+        "status": {
+          "performing": "Performing"
+        },
+        "timeRemaining": "Time remaining",
+        "viewAndPurchase": "View details & purchase",
+        "vsExpected": "+{percent}% vs expected"
+      },
+      "secondaryEmptyDescription": "We couldn't find any pre-funded loan listings matching your criteria. Try adjusting your search query or filters.",
+      "secondaryEmptyTitle": "No secondary market listings match",
+      "secondaryMarket": "Secondary market",
+      "secondarySubtitle": "Browse pre-funded loan investments available for purchase",
+      "secondaryTitle": "Investment marketplace",
+      "showingListings": "Showing {shown} of {total} listings",
       "subtitle": "Explore vetted SME projects and make your next investment",
       "title": "Investment Opportunities"
     },

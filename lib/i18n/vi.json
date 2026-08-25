@@ -357,7 +357,50 @@
       "noProjectsDescription": "Chúng tôi không tìm thấy cơ hội nào phù hợp với tiêu chí của bạn. Hãy thử điều chỉnh truy vấn tìm kiếm hoặc bộ lọc.",
       "noProjectsTitle": "Không có dự án phù hợp",
       "opportunitiesAvailable": "Có {count} cơ hội",
+      "primaryMarket": "Thị trường sơ cấp",
       "searchPlaceholder": "Tìm dự án theo tên hoặc ngành...",
+      "secondary": {
+        "actualRoi": "ROI thực tế",
+        "askingPrice": "Giá chào bán",
+        "compare": "So sánh",
+        "consecutivePayments": "{count} kỳ trả đúng hạn liên tiếp",
+        "dailyRate": "{percent}% mỗi ngày",
+        "days": "{count} ngày",
+        "daysActive": "Đã hoạt động {count} ngày",
+        "discount": "Thấp hơn {percent}%",
+        "grade": "Hạng {grade}",
+        "listedOn": "Đăng ngày {date}",
+        "madeMissed": "Đã trả {made}, trễ {missed}",
+        "ofLoan": "{percent}% khoản vay",
+        "originalInvestment": "Vốn đầu tư ban đầu",
+        "paymentHistory": "Lịch sử thanh toán",
+        "premium": "Cao hơn {percent}%",
+        "principalProgress": "Tiến độ trả gốc",
+        "reasons": {
+          "liquidity": "Cần thanh khoản cho kế hoạch mở rộng",
+          "profitTaking": "Chốt lời và phân bổ lại vốn",
+          "rebalancing": "Tái cân bằng danh mục để đa dạng hóa"
+        },
+        "revenueShare": "Chia sẻ doanh thu",
+        "revenueShareTerms": "{percent}% mỗi ngày cho đến khi trả hết gốc",
+        "risk": {
+          "high": "Rủi ro cao",
+          "low": "Rủi ro thấp",
+          "medium": "Rủi ro trung bình"
+        },
+        "status": {
+          "performing": "Đang trả tốt"
+        },
+        "timeRemaining": "Thời gian còn lại",
+        "viewAndPurchase": "Xem chi tiết & mua",
+        "vsExpected": "+{percent}% so với dự kiến"
+      },
+      "secondaryEmptyDescription": "Chúng tôi không tìm thấy khoản vay nào phù hợp với tiêu chí của bạn. Hãy thử điều chỉnh từ khóa hoặc bộ lọc.",
+      "secondaryEmptyTitle": "Không có tin nào trên thị trường thứ cấp",
+      "secondaryMarket": "Thị trường thứ cấp",
+      "secondarySubtitle": "Xem các khoản vay đã được tài trợ đang mở bán lại",
+      "secondaryTitle": "Sàn giao dịch đầu tư",
+      "showingListings": "Đang hiển thị {shown} trong {total} tin",
       "subtitle": "Khám phá các dự án SME đã được thẩm định và thực hiện khoản đầu tư tiếp theo của bạn",
       "title": "Cơ hội đầu tư"
     },
