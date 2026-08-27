@@ -946,7 +946,7 @@ export default function ProjectApplicationClient() {
                   className="h-11 px-6 flex items-center gap-2"
                 >
                   <ArrowLeft className="h-4 w-4" />
-                  <span>Back</span>
+                  <span>{t("projectApplication.card.back")}</span>
                 </Button>
               )}
 
@@ -957,7 +957,7 @@ export default function ProjectApplicationClient() {
                   onClick={handleNextStep}
                   className="h-11 px-6 ml-auto flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
                 >
-                  <span>Next</span>
+                  <span>{t("projectApplication.card.next")}</span>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               ) : (

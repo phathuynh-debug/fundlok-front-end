@@ -1191,7 +1191,9 @@
   },
   "projectApplication": {
     "card": {
+      "back": "Quay lại",
       "description": "Điền vào các trường bên dưới để tạo dự án đầu tiên của bạn.",
+      "next": "Tiếp theo",
       "submit": "Gửi đơn đăng ký dự án",
       "submitting": "Đang gửi đơn đăng ký...",
       "title": "Biểu mẫu đăng ký"

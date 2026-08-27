@@ -51,12 +51,10 @@ test.describe("/dashboard/invest", () => {
   });
 });
 
-// The wizard's Back/Next buttons are HARDCODED ENGLISH in
-// project-application-client.tsx — not i18n keys — so a Vietnamese applicant
-// sees English navigation. Asserted with literals here on purpose; when the
-// strings are translated, these become t() calls and this note goes away.
 const next = (page: import("@playwright/test").Page) =>
-  page.getByRole("button", { name: "Next" }).click();
+  page
+    .getByRole("button", { name: t("projectApplication.card.next") })
+    .click();
 
 async function fillStepOne(page: import("@playwright/test").Page) {
   await page

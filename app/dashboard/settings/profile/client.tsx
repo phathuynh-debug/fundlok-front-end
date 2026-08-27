@@ -258,6 +258,7 @@ export function ProfileClient() {
                         </>
                       ) : (
                         <Input
+                          id="fullName"
                           readOnly
                           value={user?.full_name ?? ""}
                           placeholder={t(
@@ -268,11 +269,15 @@ export function ProfileClient() {
                       )}
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      <Label
+                        htmlFor="email"
+                        className="text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+                      >
                         {t("dashboard.settings.profile.emailAddress")}
                       </Label>
                       {/* Email is not editable here */}
                       <Input
+                        id="email"
                         readOnly
                         value={user?.email ?? ""}
                         placeholder={t(
@@ -308,6 +313,7 @@ export function ProfileClient() {
                         </>
                       ) : (
                         <Input
+                          id="phone"
                           readOnly
                           value={user?.phone ?? ""}
                           placeholder={t(
@@ -347,6 +353,7 @@ export function ProfileClient() {
                       </>
                     ) : (
                       <Textarea
+                        id="bio"
                         readOnly
                         rows={4}
                         value={user?.bio ?? ""}

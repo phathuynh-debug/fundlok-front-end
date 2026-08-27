@@ -9,17 +9,13 @@ import { toast } from "../support/ui";
 // sidebar also links to /account, /appearance and /billing, which do not; the
 // last test here pins that gap so it is visible rather than discovered by a
 // user hitting a 404.
-//
-// ACCESSIBILITY DEFECT, worked around below: the inputs on this page have no
-// programmatic label. The visible "Full Name" / "Email Address" text is not
-// associated with its input (no htmlFor/id pairing), so each field's accessible
-// name falls back to the placeholder — every one of them announces as "Not
-// provided" to a screen reader. getByLabel() therefore cannot find them, and
-// these tests locate by field order instead. Once the labels are wired up, the
-// locators below should become getByLabel() and this note should go.
 
-const fullNameField = (page: Page) => page.getByRole("textbox").nth(0);
-const emailField = (page: Page) => page.getByRole("textbox").nth(1);
+const fullNameField = (page: Page) =>
+  page.getByLabel(t("dashboard.settings.profile.fullName"), { exact: true });
+const emailField = (page: Page) =>
+  page.getByLabel(t("dashboard.settings.profile.emailAddress"), {
+    exact: true,
+  });
 
 test.beforeEach(async ({ context, page }) => {
   await signInAs(context, "investor");

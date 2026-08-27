@@ -1191,7 +1191,9 @@
   },
   "projectApplication": {
     "card": {
+      "back": "Back",
       "description": "Fill in the fields below to create your first project.",
+      "next": "Next",
       "submit": "Submit project application",
       "submitting": "Submitting application...",
       "title": "Application form"
