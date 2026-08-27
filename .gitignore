@@ -41,3 +41,12 @@ yarn-error.log*
 next-env.d.ts
 
 certificates
+
+# Playwright
+/e2e/.artifacts/
+/playwright-report/
+/blob-report/
+/test-results/
+
+# E2E build output
+/.next-e2e/

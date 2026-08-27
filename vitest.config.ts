@@ -12,7 +12,16 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./vitest.setup.ts"],
     include: ["**/*.{test,spec}.{ts,tsx}"],
-    exclude: ["node_modules", ".next", "dist", ".claude"],
+    exclude: [
+      "node_modules",
+      ".next",
+      ".next-e2e",
+      "dist",
+      ".claude",
+      // Playwright owns e2e/ — its specs import @playwright/test and
+      // cannot run under Vitest. `bun run test:e2e` runs them.
+      "e2e/**",
+    ],
   },
   resolve: {
     // Mirror tsconfig "@/*" -> "./*" so imports resolve in tests.
