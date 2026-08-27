@@ -65,7 +65,12 @@ export default defineConfig({
       command: `bun e2e/stub-api/server.ts`,
       port: STUB_API_PORT,
       env: { PORT: String(STUB_API_PORT) },
-      reuseExistingServer: !process.env.CI,
+      // Never reused, even locally. It starts in milliseconds, so reuse buys
+      // nothing — and an orphaned stub from an interrupted run would silently
+      // serve stale fixtures, which cost real debugging time once already. With
+      // reuse off, a leftover process fails loudly as "port in use" instead:
+      //   lsof -ti:8100 | xargs kill
+      reuseExistingServer: false,
       stdout: "pipe",
       stderr: "pipe",
     },

@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 import { signInAs } from "../support/auth";
+import { settle } from "../support/ui";
 
 /**
  * Regression guard for horizontal page overflow.
@@ -43,7 +44,7 @@ for (const route of ROUTES) {
       await signInAs(context, route.as);
       await page.setViewportSize({ width, height: 900 });
       await page.goto(route.path);
-      await page.waitForLoadState("networkidle");
+      await settle(page);
 
       const overflow = await page.evaluate(() => {
         const root = document.documentElement;
@@ -73,7 +74,7 @@ test("a wide table scrolls inside its own container, not the page", async ({
   await signInAs(context, "investor");
   await page.setViewportSize({ width: 1210, height: 900 });
   await page.goto("/dashboard/transactions");
-  await page.waitForLoadState("networkidle");
+  await settle(page);
 
   const table = page.getByRole("table");
   await expect(table).toBeVisible();

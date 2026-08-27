@@ -1,6 +1,7 @@
 import type { BrowserContext, Page } from "@playwright/test";
 
 import type { StubUserKey } from "../stub-api/fixtures";
+import { settle } from "./ui";
 
 /**
  * Sign in as one of the stub accounts by seeding the session cookie.
@@ -55,5 +56,5 @@ export async function useLocale(
  * the greeting is on screen. Guards against asserting on a skeleton.
  */
 export async function waitForDashboard(page: Page): Promise<void> {
-  await page.waitForLoadState("networkidle");
+  await settle(page);
 }

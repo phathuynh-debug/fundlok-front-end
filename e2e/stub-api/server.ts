@@ -28,6 +28,9 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "http";
 
 import {
+  STUB_ADMIN_STATS,
+  STUB_ADMIN_USERS,
+  STUB_AUDIT_LOGS,
   STUB_PASSWORD,
   STUB_PUBLIC_PROJECTS,
   STUB_USERS,
@@ -107,8 +110,9 @@ const server = createServer(async (req, res) => {
 
   // --- Public ---------------------------------------------------------------
 
-  // Read by proxy.ts on /login, /register and /maintenance only.
-  if (path === "/system/maintenance") {
+  // Read by proxy.ts on /login, /register and /maintenance only. GET only: the
+  // authenticated PUT (admin toggle) is handled further down.
+  if (path === "/system/maintenance" && method === "GET") {
     return json(res, 200, { enabled: false });
   }
 
@@ -166,20 +170,74 @@ const server = createServer(async (req, res) => {
     return json(res, 200, user);
   }
 
+  // Profile edit (/dashboard/settings/profile). Echoes the patch back rather
+  // than persisting: the stub is stateless so parallel workers cannot interfere
+  // with each other, which matters more here than round-trip fidelity.
+  if (path === "/users/me" && method === "PATCH") {
+    const body = await readBody(req);
+    return json(res, 200, { ...user, ...body });
+  }
+
+  // Role selection (/select-role).
+  if (path === "/users/me/role" && method === "PATCH") {
+    const body = await readBody(req);
+    return json(res, 200, { ...user, role: body.role });
+  }
+
+  if (path === "/users/me/password/change" && method === "POST") {
+    const body = await readBody(req);
+    if (body.current_password !== STUB_PASSWORD) {
+      return detail(res, 400, "Current password is incorrect");
+    }
+    if (body.new_password === STUB_PASSWORD) {
+      return detail(res, 400, "New password must differ from the current one");
+    }
+    return json(res, 200, { sessions_revoked: 2 });
+  }
+
+  if (path === "/auth/resend-verification" && method === "POST") {
+    return json(res, 200, { detail: "Verification email sent" });
+  }
+
+  if (path.startsWith("/auth/sessions/") && method === "POST") {
+    // Both /revoke and /revoke-others.
+    return json(res, 200, { revoked: path.endsWith("/revoke") ? 1 : 3 });
+  }
+
   if (path === "/users/me/security-preferences") {
+    // PATCH echoes the requested value back, so the UI toggle settles in the
+    // new state instead of snapping back on refetch.
+    if (method === "PATCH") {
+      const body = await readBody(req);
+      return json(res, 200, {
+        signin_alerts_enabled: body.signin_alerts_enabled === true,
+      });
+    }
     return json(res, 200, { signin_alerts_enabled: false });
   }
 
   if (path === "/auth/sessions" && method === "GET") {
+    // Two sessions, one of them current. `current` (not `is_current`) is the
+    // field DeviceSession declares — getting it wrong hides the "In use" badge
+    // and makes the revoke button appear on the user's own session.
     return json(res, 200, [
       {
         session_id: "session-current",
         device: "Mac",
-        browser: "Chrome",
+        browser: "Chrome 141",
         ip_address: "127.0.0.1",
         created_at: "2026-08-20T09:00:00+07:00",
         last_used_at: "2026-08-27T09:00:00+07:00",
-        is_current: true,
+        current: true,
+      },
+      {
+        session_id: "session-other",
+        device: "iPhone",
+        browser: "Safari 18",
+        ip_address: "203.0.113.7",
+        created_at: "2026-08-25T19:30:00+07:00",
+        last_used_at: "2026-08-26T21:05:00+07:00",
+        current: false,
       },
     ]);
   }
@@ -211,6 +269,61 @@ const server = createServer(async (req, res) => {
 
   if (path === "/projects/public" && method === "GET") {
     return json(res, 200, STUB_PUBLIC_PROJECTS);
+  }
+
+  // --- Admin ---------------------------------------------------------------
+  // Guarded like the real backend: a non-admin session must get a 403 here, so
+  // a test can prove the API is not the only thing keeping them out.
+  if (path.startsWith("/admin/")) {
+    if (user.role !== "ADMIN" && user.role !== "SYSTEM_ADMIN") {
+      return detail(res, 403, "Not enough permissions");
+    }
+
+    if (path === "/admin/overview" && method === "GET") {
+      const mode =
+        url.searchParams.get("mode") === "projects" ? "projects" : "users";
+      const items =
+        mode === "projects" ? STUB_PUBLIC_PROJECTS : STUB_ADMIN_USERS;
+      const search = url.searchParams.get("search");
+      const filtered = search
+        ? items.filter((row) =>
+            JSON.stringify(row).toLowerCase().includes(search.toLowerCase()),
+          )
+        : items;
+
+      return json(res, 200, {
+        stats: STUB_ADMIN_STATS,
+        mode,
+        table: {
+          items: filtered,
+          total: filtered.length,
+          page: Number(url.searchParams.get("page") ?? 1),
+          page_size: Number(url.searchParams.get("page_size") ?? 20),
+        },
+      });
+    }
+
+    if (path === "/admin/audit-logs" && method === "GET") {
+      return json(res, 200, STUB_AUDIT_LOGS);
+    }
+  }
+
+  // Maintenance toggle. Deliberately NOT persisted: the flag is global to the
+  // app server and cached for 5s in middleware.service.ts, so a test that
+  // flipped it would change every other test running in parallel. The write is
+  // accepted and echoed so the admin screen's happy path can be exercised
+  // without turning maintenance on for anyone else.
+  if (path === "/system/maintenance" && method === "PUT") {
+    if (user.role !== "SYSTEM_ADMIN") {
+      return detail(res, 403, "Not enough permissions");
+    }
+    const body = await readBody(req);
+    return json(res, 200, {
+      enabled: body.enabled === true,
+      message: (body.message as string | null) ?? null,
+      updated_at: "2026-08-27T09:00:00+07:00",
+      updated_by: user.email,
+    });
   }
 
   // Loud on purpose: a 404 here means the frontend reads an endpoint the stub

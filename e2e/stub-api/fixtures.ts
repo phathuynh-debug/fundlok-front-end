@@ -167,3 +167,86 @@ export function projectsFor(key: StubUserKey) {
   if (key === "sme" || key === "unapprovedSme") return [STUB_PROJECT];
   return [];
 }
+
+/** Rows for the admin overview table (mode=users). */
+export const STUB_ADMIN_USERS = [
+  {
+    id: STUB_USERS.investor.id,
+    email: STUB_USERS.investor.email,
+    full_name: STUB_USERS.investor.full_name,
+    role: "INVESTOR",
+    status: "ACTIVE",
+    email_verified: true,
+    avatar_url: null,
+    created_at: "2026-03-14T10:00:00+07:00",
+  },
+  {
+    id: STUB_USERS.sme.id,
+    email: STUB_USERS.sme.email,
+    full_name: STUB_USERS.sme.full_name,
+    role: "SME",
+    status: "ACTIVE",
+    email_verified: true,
+    avatar_url: null,
+    created_at: "2026-04-02T10:00:00+07:00",
+  },
+  {
+    id: STUB_USERS.unverifiedEmail.id,
+    email: STUB_USERS.unverifiedEmail.email,
+    full_name: STUB_USERS.unverifiedEmail.full_name,
+    role: "INVESTOR",
+    status: "PENDING",
+    email_verified: false,
+    avatar_url: null,
+    created_at: "2026-08-20T10:00:00+07:00",
+  },
+];
+
+export const STUB_ADMIN_STATS = {
+  total_users: STUB_ADMIN_USERS.length,
+  total_projects: 2,
+  users_by_role: { INVESTOR: 2, SME: 1 },
+  users_by_status: { ACTIVE: 2, PENDING: 1 },
+  projects_by_status: { ACTIVE: 1, DRAFT: 1 },
+};
+
+export const STUB_AUDIT_LOGS = [
+  {
+    id: "40000000-0000-0000-0000-000000000001",
+    entity_type: "USER",
+    entity_id: STUB_USERS.investor.id,
+    action: "SIGN_IN",
+    actor_id: STUB_USERS.investor.id,
+    actor: {
+      id: STUB_USERS.investor.id,
+      full_name: STUB_USERS.investor.full_name,
+      email: STUB_USERS.investor.email,
+    },
+    entity_user: {
+      id: STUB_USERS.investor.id,
+      full_name: STUB_USERS.investor.full_name,
+      email: STUB_USERS.investor.email,
+    },
+    before_state: null,
+    after_state: null,
+    ip_address: "127.0.0.1",
+    created_at: "2026-08-27T09:00:00+07:00",
+  },
+  {
+    id: "40000000-0000-0000-0000-000000000002",
+    entity_type: "PROJECT",
+    entity_id: STUB_PROJECT.id,
+    action: "PROJECT_CREATED",
+    actor_id: STUB_USERS.sme.id,
+    actor: {
+      id: STUB_USERS.sme.id,
+      full_name: STUB_USERS.sme.full_name,
+      email: STUB_USERS.sme.email,
+    },
+    entity_user: null,
+    before_state: null,
+    after_state: { status: "ACTIVE" },
+    ip_address: "127.0.0.1",
+    created_at: "2026-05-02T08:30:00+07:00",
+  },
+];

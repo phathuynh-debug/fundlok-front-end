@@ -2,6 +2,7 @@ import { test, expect } from "@playwright/test";
 
 import { signInAs, useLocale } from "../support/auth";
 import { t } from "../support/i18n";
+import { settle } from "../support/ui";
 
 /**
  * Vietnamese is the production market, so a screen that only works in English
@@ -47,7 +48,7 @@ test.describe("Vietnamese", () => {
 
   test("leaks no raw i18n keys onto the page", async ({ page }) => {
     await page.goto("/dashboard");
-    await page.waitForLoadState("networkidle");
+    await settle(page);
 
     const body = (await page.locator("body").innerText()) ?? "";
     // Matches an unresolved dot-path such as "dashboard.investor.totalInvested"
