@@ -1,0 +1,228 @@
+"use client";
+
+import { useMemo } from "react";
+import { motion } from "framer-motion";
+import { Banknote, CalendarClock, Landmark, Users, Zap } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { formatCurrency } from "@/lib/format-currency";
+import { formatDate } from "@/lib/format-date";
+import { useTranslations } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
+import { getIndustryChrome } from "./sme-dashboard-config";
+import { SampleDataNotice } from "./SampleDataNotice";
+import {
+  MOCK_INSTALLMENTS,
+  MOCK_SME_FUNDING,
+  summarizeFunding,
+  type InstallmentStatus,
+} from "./mock-sme-funding";
+
+// Settled rows recede, the next one owed is emphasised, and EARLY gets its own
+// emerald treatment because early repayment is a platform value worth showing
+// off rather than flattening into "paid".
+const STATUS_STYLES: Record<InstallmentStatus, string> = {
+  PAID: "border-border bg-muted text-muted-foreground",
+  EARLY:
+    "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+  DUE: "border-primary/20 bg-primary/10 text-primary",
+  UPCOMING: "border-border bg-muted text-muted-foreground",
+};
+
+export function SmeFundingPanel({ industry }: { industry?: string | null }) {
+  const { locale, t } = useTranslations();
+
+  const funding = MOCK_SME_FUNDING;
+  const installments = MOCK_INSTALLMENTS;
+  const summary = useMemo(
+    () => summarizeFunding(funding, installments),
+    [funding, installments],
+  );
+
+  // `inline` tier — icon/text color only. The hero card above already wears the
+  // full industry treatment; a second tinted surface would compete with it.
+  const accent = getIndustryChrome(industry, "inline").accent;
+
+  const stats = [
+    {
+      key: "outstanding",
+      label: t("dashboard.smeFunding.outstanding"),
+      value: formatCurrency(summary.outstanding, locale),
+      icon: Landmark,
+    },
+    {
+      key: "repaid",
+      label: t("dashboard.smeFunding.repaid"),
+      value: formatCurrency(summary.repaid, locale),
+      icon: Banknote,
+    },
+    {
+      key: "nextPayment",
+      label: t("dashboard.smeFunding.nextPayment"),
+      value: summary.next
+        ? formatCurrency(summary.next.principal + summary.next.interest, locale)
+        : t("common.na"),
+      hint: summary.next
+        ? formatDate(summary.next.due_date, locale)
+        : undefined,
+      icon: CalendarClock,
+    },
+    {
+      key: "rate",
+      label: t("dashboard.smeFunding.rate"),
+      value: t("dashboard.smeFunding.rateValue", {
+        rate: funding.interest_rate_pct.toFixed(1),
+        grade: funding.grade,
+      }),
+      icon: Zap,
+    },
+  ];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, delay: 0.15 }}
+      className="space-y-4"
+    >
+      <SampleDataNotice message={t("dashboard.smeFunding.mockNotice")} />
+
+      <Card className="gap-0 p-5 md:p-6">
+        <div className="flex flex-col gap-1 pb-5">
+          <h3 className="text-base font-semibold text-foreground">
+            {t("dashboard.smeFunding.title")}
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            {t("dashboard.smeFunding.subtitle")}
+          </p>
+        </div>
+
+        {/* Funding progress against the ask */}
+        <div className="space-y-2 border-t border-border pt-5">
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                {t("dashboard.smeFunding.raised")}
+              </p>
+              <p className="min-w-0 truncate text-xl font-bold text-foreground">
+                {formatCurrency(funding.funded, locale)}
+                <span className="ml-1.5 text-sm font-medium text-muted-foreground">
+                  {t("dashboard.smeFunding.ofTarget", {
+                    target: formatCurrency(funding.requested, locale),
+                  })}
+                </span>
+              </p>
+            </div>
+            <div className="flex items-center gap-3 text-sm">
+              <span className="flex items-center gap-1.5 text-muted-foreground">
+                <Users className={cn("h-4 w-4", accent)} />
+                {t("dashboard.smeFunding.investors", {
+                  count: funding.investor_count,
+                })}
+              </span>
+              <span className="font-bold text-foreground">
+                {summary.funded_pct}%
+              </span>
+            </div>
+          </div>
+          <div
+            className="h-2.5 w-full overflow-hidden rounded-full bg-muted"
+            role="progressbar"
+            aria-valuenow={summary.funded_pct}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={t("dashboard.smeFunding.raised")}
+          >
+            <div
+              className="h-full rounded-full bg-primary transition-all duration-500"
+              style={{ width: `${summary.funded_pct}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Money summary. Two across on small screens, four only from xl — a
+            VND figure cannot wrap, so four narrow columns clip it at zoom. */}
+        <dl className="mt-5 grid grid-cols-2 gap-4 border-t border-border pt-5 xl:grid-cols-4">
+          {stats.map((stat) => (
+            <div key={stat.key} className="min-w-0">
+              <dt className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <stat.icon className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">{stat.label}</span>
+              </dt>
+              <dd className="mt-1 min-w-0 truncate text-lg font-bold text-foreground">
+                {stat.value}
+              </dd>
+              {stat.hint && (
+                <p className="truncate text-xs text-muted-foreground">
+                  {stat.hint}
+                </p>
+              )}
+            </div>
+          ))}
+        </dl>
+
+        {/* Amortization schedule */}
+        <div className="mt-5 border-t border-border pt-5">
+          <div className="flex flex-wrap items-center justify-between gap-2 pb-3">
+            <h4 className="text-sm font-semibold text-foreground">
+              {t("dashboard.smeFunding.scheduleTitle")}
+            </h4>
+            <span className="text-xs text-muted-foreground">
+              {t("dashboard.smeFunding.scheduleProgress", {
+                done: summary.settled_count,
+                total: summary.total_count,
+              })}
+            </span>
+          </div>
+
+          <ul className="divide-y divide-border border-t border-border">
+            {installments.map((installment) => (
+              <li
+                key={installment.number}
+                className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-bold text-muted-foreground">
+                    {installment.number}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-foreground">
+                      {formatDate(installment.due_date, locale)}
+                    </p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {t("dashboard.smeFunding.split", {
+                        principal: formatCurrency(
+                          installment.principal,
+                          locale,
+                        ),
+                        interest: formatCurrency(installment.interest, locale),
+                      })}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 pl-10 sm:pl-0">
+                  <span className="min-w-0 truncate text-sm font-bold text-foreground">
+                    {formatCurrency(
+                      installment.principal + installment.interest,
+                      locale,
+                    )}
+                  </span>
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      "shrink-0 rounded-full px-2 text-[11px] font-semibold",
+                      STATUS_STYLES[installment.status],
+                    )}
+                  >
+                    {t(`dashboard.smeFunding.status.${installment.status}`)}
+                  </Badge>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </Card>
+    </motion.div>
+  );
+}

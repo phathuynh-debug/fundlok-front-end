@@ -324,12 +324,28 @@
     "investor": {
       "activeInvestments": "Active Investments",
       "browseProjects": "Browse Investment Projects",
+      "holdingInvested": "Invested",
+      "holdingNextPayout": "Next Payout",
+      "holdingProgress": "Repayment progress",
+      "holdingReturned": "Returned",
+      "holdingRoi": "Yield / Term",
+      "holdingRoiValue": "{rate}% · {months}m",
+      "holdingStatus": {
+        "ACTIVE": "Disbursed",
+        "COMPLETED": "Completed",
+        "FUNDING": "Funding",
+        "REPAYING": "Repaying"
+      },
+      "holdingViewDetails": "View project details",
+      "holdingsTitle": "Your Positions ({count})",
+      "mockNotice": "Sample data, shown while this screen is built out. It is not connected to the backend yet, so these positions and figures are not your real portfolio.",
       "noInvestmentsDescription": "You currently have no investment for now. Browse the available opportunities to start your investment journey.",
       "noInvestmentsTitle": "No Investments Found",
       "subtitle": "Track and manage your current investments",
       "title": "Investment Portfolio",
       "totalInvested": "Total Invested",
-      "totalReturns": "Total Returns"
+      "totalReturns": "Total Returns",
+      "weightedRoi": "Avg. Expected Yield"
     },
     "projectCard": {
       "askingAmount": "Asking amount",
@@ -765,6 +781,28 @@
       },
       "subtitle": "Where your loan stands, what it costs, and what moves your grade.",
       "title": "Loan analytics"
+    },
+    "smeFunding": {
+      "investors": "{count} lenders",
+      "mockNotice": "Sample data, shown while this screen is built out. Your company profile above is real; the funding and repayment figures below are not yet connected to the backend.",
+      "nextPayment": "Next payment",
+      "ofTarget": "of {target}",
+      "outstanding": "Outstanding",
+      "raised": "Raised",
+      "rate": "Rate / Grade",
+      "rateValue": "{rate}% · {grade}",
+      "repaid": "Repaid to date",
+      "scheduleProgress": "{done} of {total} installments settled",
+      "scheduleTitle": "Repayment schedule",
+      "split": "Principal {principal} · Interest {interest}",
+      "status": {
+        "DUE": "Due next",
+        "EARLY": "Paid early",
+        "PAID": "Paid",
+        "UPCOMING": "Upcoming"
+      },
+      "subtitle": "How much of your ask has been raised, and where you are in the repayment schedule.",
+      "title": "Funding & Repayment"
     },
     "transactions": {
       "count": "{count} transactions",

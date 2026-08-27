@@ -324,12 +324,28 @@
     "investor": {
       "activeInvestments": "Khoản đầu tư đang hoạt động",
       "browseProjects": "Khám phá dự án đầu tư",
+      "holdingInvested": "Đã đầu tư",
+      "holdingNextPayout": "Kỳ nhận tiếp theo",
+      "holdingProgress": "Tiến độ trả nợ",
+      "holdingReturned": "Đã nhận về",
+      "holdingRoi": "Lợi suất / Kỳ hạn",
+      "holdingRoiValue": "{rate}% · {months} tháng",
+      "holdingStatus": {
+        "ACTIVE": "Đã giải ngân",
+        "COMPLETED": "Đã tất toán",
+        "FUNDING": "Đang gọi vốn",
+        "REPAYING": "Đang trả nợ"
+      },
+      "holdingViewDetails": "Xem chi tiết dự án",
+      "holdingsTitle": "Khoản đầu tư của bạn ({count})",
+      "mockNotice": "Dữ liệu mẫu, hiển thị trong lúc màn hình này đang được hoàn thiện. Trang chưa kết nối với hệ thống backend, nên các khoản đầu tư và số liệu bên dưới không phải danh mục thực tế của bạn.",
       "noInvestmentsDescription": "Hiện tại bạn chưa có khoản đầu tư nào. Hãy khám phá các cơ hội có sẵn để bắt đầu hành trình đầu tư.",
       "noInvestmentsTitle": "Chưa có khoản đầu tư nào",
       "subtitle": "Theo dõi và quản lý các khoản đầu tư hiện tại của bạn",
       "title": "Danh mục đầu tư",
       "totalInvested": "Tổng đã đầu tư",
-      "totalReturns": "Tổng lợi nhuận"
+      "totalReturns": "Tổng lợi nhuận",
+      "weightedRoi": "Lợi suất kỳ vọng TB"
     },
     "projectCard": {
       "askingAmount": "Số tiền cần huy động",
@@ -765,6 +781,28 @@
       },
       "subtitle": "Tình trạng khoản vay, chi phí và những yếu tố ảnh hưởng đến hạng của bạn.",
       "title": "Phân tích khoản vay"
+    },
+    "smeFunding": {
+      "investors": "{count} nhà đầu tư",
+      "mockNotice": "Dữ liệu mẫu, hiển thị trong lúc màn hình này đang được hoàn thiện. Thông tin doanh nghiệp phía trên là thật; các số liệu gọi vốn và trả nợ bên dưới chưa kết nối với hệ thống backend.",
+      "nextPayment": "Kỳ trả tiếp theo",
+      "ofTarget": "trên {target}",
+      "outstanding": "Còn phải trả",
+      "raised": "Đã gọi được",
+      "rate": "Lãi suất / Hạng",
+      "rateValue": "{rate}% · {grade}",
+      "repaid": "Đã trả đến nay",
+      "scheduleProgress": "Đã trả {done} trong {total} kỳ",
+      "scheduleTitle": "Lịch trả nợ",
+      "split": "Gốc {principal} · Lãi {interest}",
+      "status": {
+        "DUE": "Đến hạn",
+        "EARLY": "Trả trước hạn",
+        "PAID": "Đã trả",
+        "UPCOMING": "Sắp tới"
+      },
+      "subtitle": "Bạn đã gọi được bao nhiêu so với số tiền đề nghị, và đang ở đâu trong lịch trả nợ.",
+      "title": "Gọi vốn & Trả nợ"
     },
     "transactions": {
       "count": "{count} giao dịch",
