@@ -5,6 +5,7 @@ import { Briefcase, Coins, Percent, TrendingUp } from "lucide-react";
 import { springItemVariants, staggerContainerVariants } from "@/lib/animations";
 import { formatCurrency } from "@/lib/format-currency";
 import { useTranslations } from "@/lib/i18n";
+import { TruncatedFigure } from "@/components/truncated-figure";
 import type { AnalyticsKpis, RangeKey } from "./mock-analytics";
 
 export function AnalyticsKpiCards({
@@ -91,11 +92,10 @@ export function AnalyticsKpiCards({
               wider than the viewport -- which is what clipped the ₫ here and
               cut the last table column off screen. min-w-0 + truncate lets the
               card shrink; the smaller step keeps the figure whole in practice. */}
-          <div
-            className={`min-w-0 truncate text-xl font-black ${tile.valueClassName}`}
-          >
-            {tile.value}
-          </div>
+          <TruncatedFigure
+            value={tile.value}
+            className={`text-xl font-black ${tile.valueClassName}`}
+          />
           <p className="text-xs text-muted-foreground">{tile.delta}</p>
         </motion.div>
       ))}

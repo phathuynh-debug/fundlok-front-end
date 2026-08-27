@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Banknote, CalendarClock, Landmark, Users, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { TruncatedFigure } from "@/components/truncated-figure";
 import { formatCurrency } from "@/lib/format-currency";
 import { formatDate } from "@/lib/format-date";
 import { useTranslations } from "@/lib/i18n";
@@ -104,7 +105,11 @@ export function SmeFundingPanel({ industry }: { industry?: string | null }) {
               <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                 {t("dashboard.smeFunding.raised")}
               </p>
-              <p className="min-w-0 truncate text-xl font-bold text-foreground">
+              {/* Deliberately wraps instead of truncating: this line carries
+                  two separate facts (raised and target), and clipping it would
+                  hide one of them behind an ellipsis with no way to see it.
+                  Wrapping loses nothing. */}
+              <p className="text-xl font-bold text-foreground">
                 {formatCurrency(funding.funded, locale)}
                 <span className="ml-1.5 text-sm font-medium text-muted-foreground">
                   {t("dashboard.smeFunding.ofTarget", {
@@ -149,8 +154,11 @@ export function SmeFundingPanel({ industry }: { industry?: string | null }) {
                 <stat.icon className="h-3.5 w-3.5 shrink-0" />
                 <span className="truncate">{stat.label}</span>
               </dt>
-              <dd className="mt-1 min-w-0 truncate text-lg font-bold text-foreground">
-                {stat.value}
+              <dd className="mt-1 min-w-0">
+                <TruncatedFigure
+                  value={stat.value}
+                  className="text-lg font-bold text-foreground"
+                />
               </dd>
               {stat.hint && (
                 <p className="truncate text-xs text-muted-foreground">

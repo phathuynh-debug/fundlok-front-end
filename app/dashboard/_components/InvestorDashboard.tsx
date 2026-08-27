@@ -14,6 +14,7 @@ import {
   staggerContainerVariants,
   springItemVariants,
 } from "@/lib/animations";
+import { TruncatedFigure } from "@/components/truncated-figure";
 import { HoldingsList } from "./HoldingsList";
 import { SampleDataNotice } from "./SampleDataNotice";
 import { MOCK_HOLDINGS, summarizePortfolio } from "./mock-investor-dashboard";
@@ -95,9 +96,10 @@ export function InvestorDashboard() {
               </CardHeader>
               <CardContent className="flex min-w-0 items-center gap-2">
                 <kpi.icon className={`h-6 w-6 shrink-0 ${kpi.iconClassName}`} />
-                <div className="min-w-0 truncate text-2xl font-bold">
-                  {kpi.value}
-                </div>
+                <TruncatedFigure
+                  value={kpi.value}
+                  className="text-2xl font-bold"
+                />
               </CardContent>
             </Card>
           </motion.div>

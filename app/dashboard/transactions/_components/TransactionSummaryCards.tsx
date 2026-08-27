@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowDownLeft, ArrowUpRight, Clock, Scale } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
 import { staggerContainerVariants, springItemVariants } from "@/lib/animations";
+import { TruncatedFigure } from "@/components/truncated-figure";
 import { formatCurrency, type TransactionSummary } from "./mock-transactions";
 
 export function TransactionSummaryCards({
@@ -81,11 +82,10 @@ export function TransactionSummaryCards({
               wider than the viewport -- which is what clipped the ₫ here and
               cut the last table column off screen. min-w-0 + truncate lets the
               card shrink; the smaller step keeps the figure whole in practice. */}
-          <div
-            className={`min-w-0 truncate text-xl font-black ${card.valueClassName}`}
-          >
-            {card.value}
-          </div>
+          <TruncatedFigure
+            value={card.value}
+            className={`text-xl font-black ${card.valueClassName}`}
+          />
           <p className="text-xs text-muted-foreground">{card.hint}</p>
         </motion.div>
       ))}
