@@ -46,9 +46,9 @@ export function InvestorDashboard() {
                 {t("dashboard.investor.totalInvested")}
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex items-center gap-2">
+            <CardContent className="flex min-w-0 items-center gap-2">
               <Banknote className="h-6 w-6 text-blue-500" />
-              <div className="text-3xl font-bold">
+              <div className="min-w-0 truncate text-2xl font-bold xl:text-3xl">
                 {formatCurrency(0, locale)}
               </div>
             </CardContent>
@@ -62,7 +62,7 @@ export function InvestorDashboard() {
                 {t("dashboard.investor.activeInvestments")}
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex items-center gap-2">
+            <CardContent className="flex min-w-0 items-center gap-2">
               <Layers className="h-6 w-6 text-emerald-500" />
               <div className="text-3xl font-bold">0</div>
             </CardContent>
@@ -76,9 +76,11 @@ export function InvestorDashboard() {
                 {t("dashboard.investor.totalReturns")}
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex items-center gap-2">
+            <CardContent className="flex min-w-0 items-center gap-2">
               <TrendingUp className="h-6 w-6 text-purple-500" />
-              <div className="text-3xl font-bold">$0.00</div>
+              <div className="min-w-0 truncate text-2xl font-bold xl:text-3xl">
+                {formatCurrency(0, locale)}
+              </div>
             </CardContent>
           </Card>
         </motion.div>

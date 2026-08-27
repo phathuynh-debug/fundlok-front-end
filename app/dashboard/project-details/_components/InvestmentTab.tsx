@@ -22,6 +22,13 @@ export function InvestmentTab() {
   const maxAmount = 375_000_000;
   const progressPercent = 70.0;
 
+  // Derived, not hardcoded: the funded/remaining figures used to be literal
+  // "$35,000"/"$15,000" strings, which both missed the VND conversion and could
+  // silently disagree with the progress bar above them.
+  const targetAmount = 1_250_000_000;
+  const fundedAmount = (targetAmount * progressPercent) / 100;
+  const remainingAmount = targetAmount - fundedAmount;
+
   // Investing requires an approved KYC. Rather than gate the button here, we
   // hand off to the /dashboard/invest route, which the proxy hard-gates: an
   // unverified investor is bounced to /kyc?next=… and returned here after
@@ -89,17 +96,21 @@ export function InvestmentTab() {
 
         {/* Funded / Remaining Labels */}
         <div className="grid grid-cols-2 gap-4 pt-2 border-t">
-          <div>
+          <div className="min-w-0">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               {t("investment.tab.funded")}
             </p>
-            <p className="text-2xl font-bold text-foreground mt-1">$35,000</p>
+            <p className="mt-1 min-w-0 truncate text-xl font-bold text-foreground">
+              {formatCurrency(fundedAmount, locale)}
+            </p>
           </div>
-          <div>
+          <div className="min-w-0">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
               {t("investment.tab.remaining")}
             </p>
-            <p className="text-2xl font-bold text-foreground mt-1">$15,000</p>
+            <p className="mt-1 min-w-0 truncate text-xl font-bold text-foreground">
+              {formatCurrency(remainingAmount, locale)}
+            </p>
           </div>
         </div>
       </Card>
@@ -120,15 +131,18 @@ export function InvestmentTab() {
             <Label htmlFor="investmentAmount" className="text-sm font-semibold">
               {t("investment.tab.investmentAmount")}
             </Label>
+            {/* Trailing ₫, not a leading $: Vietnamese writes the symbol after
+                the amount, and this input takes VND like every other money
+                field on the platform. */}
             <div className="relative">
-              <span className="absolute left-3.5 top-3 text-muted-foreground font-medium">
-                $
+              <span className="absolute right-3.5 top-3 text-muted-foreground font-medium">
+                ₫
               </span>
               <Input
                 id="investmentAmount"
                 type="number"
                 placeholder={t("investment.tab.placeholder")}
-                className="pl-8 bg-muted/20 border-muted focus-visible:ring-1 focus-visible:ring-foreground py-5 rounded-xl text-base"
+                className="pr-8 bg-muted/20 border-muted focus-visible:ring-1 focus-visible:ring-foreground py-5 rounded-xl text-base"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 disabled={isPending}

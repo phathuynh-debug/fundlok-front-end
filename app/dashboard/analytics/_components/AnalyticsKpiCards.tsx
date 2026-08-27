@@ -66,13 +66,13 @@ export function AnalyticsKpiCards({
       variants={staggerContainerVariants}
       initial="hidden"
       animate="show"
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+      className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"
     >
       {tiles.map((tile) => (
         <motion.div
           key={tile.key}
           variants={springItemVariants}
-          className="bg-card text-card-foreground border border-border rounded-xl shadow-xs p-5 space-y-1"
+          className="min-w-0 bg-card text-card-foreground border border-border rounded-xl shadow-xs p-5 space-y-1"
         >
           <div className="flex items-center justify-between gap-2">
             <span className="text-xs font-semibold text-muted-foreground uppercase font-mono tracking-wider">
@@ -83,7 +83,17 @@ export function AnalyticsKpiCards({
               aria-hidden="true"
             />
           </div>
-          <div className={`text-2xl font-black ${tile.valueClassName}`}>
+          {/* A VND figure is 15-16 characters and Intl puts a NON-BREAKING
+              space before the ₫, so the string can never wrap. Left alone it
+              sets a 192px min-content width on the card (measured in Geist at the
+              old text-2xl/900), the grid refuses to
+              shrink below it, and at 125% browser zoom the whole page becomes
+              wider than the viewport -- which is what clipped the ₫ here and
+              cut the last table column off screen. min-w-0 + truncate lets the
+              card shrink; the smaller step keeps the figure whole in practice. */}
+          <div
+            className={`min-w-0 truncate text-xl font-black ${tile.valueClassName}`}
+          >
             {tile.value}
           </div>
           <p className="text-xs text-muted-foreground">{tile.delta}</p>
