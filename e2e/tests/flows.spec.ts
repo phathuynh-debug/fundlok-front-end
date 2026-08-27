@@ -52,9 +52,7 @@ test.describe("/dashboard/invest", () => {
 });
 
 const next = (page: import("@playwright/test").Page) =>
-  page
-    .getByRole("button", { name: t("projectApplication.card.next") })
-    .click();
+  page.getByRole("button", { name: t("projectApplication.card.next") }).click();
 
 async function fillStepOne(page: import("@playwright/test").Page) {
   await page
