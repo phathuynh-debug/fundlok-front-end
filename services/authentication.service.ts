@@ -96,10 +96,14 @@ export interface SecurityEvent {
   id: string;
   /** e.g. SIGN_IN, SESSION_REVOKED. Translated at the call site. */
   action: string;
-  entity_type: string;
+  entity_type?: string;
   severity: SecurityEventSeverity;
-  ip_address: string | null;
-  created_at: string | null;
+  ip_address?: string | null;
+  created_at?: string | null;
+  device?: string | null;
+  location?: string | null;
+  details?: Record<string, unknown> | null;
+  metadata?: Record<string, unknown> | null;
 }
 
 export interface RevokeResult {

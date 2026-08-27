@@ -443,6 +443,7 @@
           "sessionRevoked": "Một thiết bị đã bị đăng xuất.",
           "sessionsRevokedOthers": "Đã đăng xuất khỏi tất cả thiết bị khác.",
           "signIn": "Đăng nhập từ {device} tại {location}.",
+          "signInAlertsChanged": "Cập nhật cài đặt thông báo đăng nhập.",
           "twoFactorEnabled": "Đã bật xác thực hai lớp."
         },
         "severity": {
@@ -451,7 +452,9 @@
           "warning": "Nên xem lại"
         },
         "subtitle": "Các lần đăng nhập và thay đổi liên quan đến dòng tiền của bạn.",
-        "title": "Hoạt động gần đây"
+        "title": "Hoạt động gần đây",
+        "unknownDevice": "Thiết bị không xác định",
+        "unknownLocation": "Vị trí không xác định"
       },
       "mockNotice": "Dữ liệu mẫu, hiển thị trong lúc trang này còn được hoàn thiện. Trang chưa kết nối với backend — các công tắc và nút đăng xuất chỉ thay đổi trên trang này và không phản ánh tài khoản thật của bạn.",
       "posture": {

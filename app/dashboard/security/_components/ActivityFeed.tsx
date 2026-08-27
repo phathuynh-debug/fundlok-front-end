@@ -27,23 +27,84 @@ const SEVERITY = {
   { icon: typeof Info; dot: string; text: string }
 >;
 
-// Known audit actions -> i18n keys. Anything unmapped shows its code, so a new
-// backend action never renders as a broken translation key.
 const ACTION_KEYS: Record<string, string> = {
   SIGN_IN: "dashboard.security.activity.events.signIn",
+  LOGIN: "dashboard.security.activity.events.signIn",
   SIGN_IN_FAILED: "dashboard.security.activity.events.failedAttempt",
+  FAILED_ATTEMPT: "dashboard.security.activity.events.failedAttempt",
+  LOGIN_FAILED: "dashboard.security.activity.events.failedAttempt",
+  NEW_DEVICE: "dashboard.security.activity.events.newDevice",
   SESSION_REVOKED: "dashboard.security.activity.events.sessionRevoked",
   SESSIONS_REVOKED_OTHERS:
     "dashboard.security.activity.events.sessionsRevokedOthers",
+  REVOKE_ALL_SESSIONS:
+    "dashboard.security.activity.events.sessionsRevokedOthers",
   PASSWORD_RESET: "dashboard.security.activity.events.passwordChanged",
+  PASSWORD_CHANGED: "dashboard.security.activity.events.passwordChanged",
+  SIGNIN_ALERTS_CHANGED:
+    "dashboard.security.activity.events.signInAlertsChanged",
+  SIGN_IN_ALERTS_CHANGED:
+    "dashboard.security.activity.events.signInAlertsChanged",
+  LOGIN_ALERTS_CHANGED:
+    "dashboard.security.activity.events.signInAlertsChanged",
+  LOGIN_ALERTS_TOGGLED:
+    "dashboard.security.activity.events.signInAlertsChanged",
+  PAYOUT_ACCOUNT_ADDED: "dashboard.security.activity.events.payoutAccountAdded",
+  PAYOUT_ACCOUNT_CHANGED:
+    "dashboard.security.activity.events.payoutAccountAdded",
+  TWO_FACTOR_ENABLED: "dashboard.security.activity.events.twoFactorEnabled",
 };
 
+function getEventContext(
+  event: SecurityEvent,
+  t: (key: string, values?: Record<string, string | number>) => string,
+) {
+  const details = (event.details || event.metadata || {}) as Record<
+    string,
+    unknown
+  >;
+
+  const rawDevice =
+    event.device ||
+    (typeof details.device === "string" ? details.device : null) ||
+    (typeof details.user_agent === "string" ? details.user_agent : null) ||
+    (typeof details.browser === "string" ? details.browser : null);
+
+  const rawLocation =
+    event.location ||
+    (typeof details.location === "string" ? details.location : null) ||
+    (typeof details.city === "string" ? details.city : null);
+
+  const device = rawDevice || t("dashboard.security.activity.unknownDevice");
+
+  const location =
+    rawLocation ||
+    (event.ip_address
+      ? `IP ${event.ip_address}`
+      : t("dashboard.security.activity.unknownLocation"));
+
+  const bank =
+    typeof details.bank === "string"
+      ? details.bank
+      : typeof details.bank_name === "string"
+        ? details.bank_name
+        : "Bank Account";
+
+  const count = typeof details.count === "number" ? details.count : 1;
+
+  return { device, location, bank, count };
+}
+
 function actionLabel(
-  action: string,
+  event: SecurityEvent,
   t: (key: string, values?: Record<string, string | number>) => string,
 ): string {
-  const key = ACTION_KEYS[action];
-  return key ? t(key) : action;
+  const key = ACTION_KEYS[event.action];
+  if (!key) {
+    return event.action.replace(/_/g, " ");
+  }
+  const context = getEventContext(event, t);
+  return t(key, context);
 }
 
 export function ActivityFeed({ events }: { events: SecurityEvent[] }) {
@@ -90,7 +151,7 @@ export function ActivityFeed({ events }: { events: SecurityEvent[] }) {
                   {/* Action codes come from the audit log. An action with no
                       translation falls back to the code itself rather than
                       rendering a raw i18n key at the user. */}
-                  {actionLabel(event.action, t)}
+                  {actionLabel(event, t)}
                 </p>
                 <p className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
                   <span

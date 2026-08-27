@@ -443,6 +443,7 @@
           "sessionRevoked": "A device was signed out.",
           "sessionsRevokedOthers": "Signed out of all other devices.",
           "signIn": "Signed in from {device} in {location}.",
+          "signInAlertsChanged": "Sign-in alert preferences updated.",
           "twoFactorEnabled": "Two-factor authentication turned on."
         },
         "severity": {
@@ -451,7 +452,9 @@
           "warning": "Worth a look"
         },
         "subtitle": "Sign-ins and changes to anything that affects your money.",
-        "title": "Recent activity"
+        "title": "Recent activity",
+        "unknownDevice": "Unknown device",
+        "unknownLocation": "Unknown location"
       },
       "mockNotice": "Sample data, shown while this screen is built out. It is not connected to the backend yet — the toggles and revoke buttons change this page only, and none of it reflects your real account.",
       "posture": {
