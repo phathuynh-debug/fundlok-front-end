@@ -59,6 +59,21 @@ export const AVATAR_RULES = {
 };
 
 // Pure data-access layer for /users endpoints.
+export interface ChangePasswordRequest {
+  current_password: string;
+  new_password: string;
+}
+
+export interface ChangePasswordResponse {
+  status: string;
+  /** Other sessions ended by the change — the UI tells the user. */
+  sessions_revoked: number;
+}
+
+export interface SecurityPreferences {
+  signin_alerts_enabled: boolean;
+}
+
 export const usersService = {
   // GET /users/me — returns the currently authenticated user
   getCurrentUser() {
@@ -78,6 +93,26 @@ export const usersService = {
 
   // POST /users/me/password. Returns an ack, not the user — the caller
   // refreshes currentUser so has_password flips to true.
+  changePassword(payload: ChangePasswordRequest) {
+    return apiClient.post<ChangePasswordResponse>(
+      USER_ENDPOINTS.changePassword,
+      payload,
+    );
+  },
+
+  getSecurityPreferences() {
+    return apiClient.get<SecurityPreferences>(
+      USER_ENDPOINTS.securityPreferences,
+    );
+  },
+
+  updateSecurityPreferences(payload: SecurityPreferences) {
+    return apiClient.patch<SecurityPreferences>(
+      USER_ENDPOINTS.securityPreferences,
+      payload,
+    );
+  },
+
   setPassword(payload: SetPasswordRequest) {
     return apiClient.post<SetPasswordResponse>(
       USER_ENDPOINTS.setPassword,

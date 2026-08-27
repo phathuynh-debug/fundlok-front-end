@@ -202,6 +202,7 @@
     "all": "All",
     "backToHome": "Go to home",
     "brandName": "FundLok",
+    "cancel": "Cancel",
     "checkingProjectAccess": "Checking your project access...",
     "chooseFile": "Choose File",
     "contactSupport": "Contact support",
@@ -460,7 +461,8 @@
         "action": {
           "managed": "Change password",
           "turnOff": "Turn off",
-          "turnOn": "Turn on"
+          "turnOn": "Turn on",
+          "unavailable": "Coming soon"
         },
         "desc": {
           "loginAlerts": "Email us on every sign-in from a device you have not used before.",
@@ -476,10 +478,12 @@
           "totp": "Two-factor authentication",
           "withdrawalLock": "Payout account lock"
         },
+        "saveFailedTitle": "Could not save that change",
         "state": {
           "off": "Off",
           "on": "On",
-          "recommended": "Recommended"
+          "recommended": "Recommended",
+          "unavailable": "Not available yet"
         },
         "subtitle": "What stands between your account and someone else.",
         "title": "Account protection",
@@ -1255,6 +1259,26 @@
       "requestedAmountRange": "Enter an amount between 200,000,000 and 5,000,000,000 VND",
       "street": "Street is required",
       "taxId": "Tax ID is required"
+    }
+  },
+  "security": {
+    "changePassword": {
+      "confirmLabel": "Confirm new password",
+      "currentLabel": "Current password",
+      "description": "You will need your current password. Other devices are signed out.",
+      "errorCurrent": "Enter your current password",
+      "errorGeneric": "Could not change your password",
+      "errorLength": "New password must be at least {min} characters",
+      "errorMismatch": "The two new passwords do not match",
+      "hide": "Hide passwords",
+      "hint": "At least {min} characters.",
+      "newLabel": "New password",
+      "revokeNotice": "Changing your password signs you out on every other device.",
+      "show": "Show passwords",
+      "submit": "Change password",
+      "successDescription": "{count} other session(s) were signed out.",
+      "successTitle": "Password changed",
+      "title": "Change password"
     }
   },
   "specialPage": {

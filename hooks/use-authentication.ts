@@ -13,7 +13,12 @@ import {
   type SelectableRole,
   type User,
 } from "@/services/authentication.service";
-import { usersService } from "@/services/users.service";
+import {
+  usersService,
+  type ChangePasswordRequest,
+  type ChangePasswordResponse,
+  type SecurityPreferences,
+} from "@/services/users.service";
 import type { ApiError } from "@/lib/types";
 
 // ---------- Query keys ----------
@@ -21,6 +26,7 @@ export const authKeys = {
   all: ["auth"] as const,
   currentUser: () => [...authKeys.all, "me"] as const,
   sessions: () => [...authKeys.all, "sessions"] as const,
+  securityPreferences: () => [...authKeys.all, "security-preferences"] as const,
   securityEvents: () => [...authKeys.all, "security-events"] as const,
 };
 
@@ -167,6 +173,46 @@ export function useRevokeOtherSessions() {
 
   return useMutation<RevokeResult, ApiError, void>({
     mutationFn: () => authenticationService.revokeOtherSessions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: authKeys.sessions() });
+      queryClient.invalidateQueries({ queryKey: authKeys.securityEvents() });
+    },
+  });
+}
+
+/** Sign-in alert preference. */
+export function useSecurityPreferences(enabled = true) {
+  return useQuery<SecurityPreferences, ApiError>({
+    queryKey: authKeys.securityPreferences(),
+    queryFn: () => usersService.getSecurityPreferences(),
+    staleTime: 60 * 1000,
+    retry: false,
+    enabled,
+  });
+}
+
+export function useUpdateSecurityPreferences() {
+  const queryClient = useQueryClient();
+
+  return useMutation<SecurityPreferences, ApiError, SecurityPreferences>({
+    mutationFn: (payload) => usersService.updateSecurityPreferences(payload),
+    onSuccess: (prefs) => {
+      queryClient.setQueryData(authKeys.securityPreferences(), prefs);
+      // Toggling is audited, so the activity feed changes too.
+      queryClient.invalidateQueries({ queryKey: authKeys.securityEvents() });
+    },
+  });
+}
+
+/**
+ * Change an existing password. The backend revokes every other session as part
+ * of the change, so the sessions list is invalidated alongside the history.
+ */
+export function useChangePassword() {
+  const queryClient = useQueryClient();
+
+  return useMutation<ChangePasswordResponse, ApiError, ChangePasswordRequest>({
+    mutationFn: (payload) => usersService.changePassword(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authKeys.sessions() });
       queryClient.invalidateQueries({ queryKey: authKeys.securityEvents() });

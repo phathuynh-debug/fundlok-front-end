@@ -29,14 +29,20 @@ const STATE_STYLES: Record<ProtectionState, string> = {
   recommended:
     "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400",
   off: "bg-muted text-muted-foreground",
+  unavailable: "bg-muted text-muted-foreground",
 };
 
 export function ProtectionList({
   items,
   onToggle,
+  onChangePassword,
+  pendingKey,
 }: {
   items: ProtectionItem[];
   onToggle: (key: string) => void;
+  onChangePassword: () => void;
+  /** Row whose toggle is in flight, so only it shows as busy. */
+  pendingKey?: string | null;
 }) {
   const { locale, t } = useTranslations();
 
@@ -101,19 +107,34 @@ export function ProtectionList({
                 </div>
               </div>
 
+              {/* Three kinds of row: one that opens a dialog (password), one
+                  that toggles through the API (sign-in alerts), and ones with
+                  no backend, which say so instead of offering a dead switch. */}
               <Button
-                variant={isOn ? "outline" : "default"}
+                variant={
+                  item.key === "password" || isOn ? "outline" : "default"
+                }
                 size="sm"
-                disabled={!item.toggleable}
-                onClick={() => onToggle(item.key)}
+                disabled={
+                  item.state === "unavailable" ||
+                  (!item.toggleable && item.key !== "password") ||
+                  pendingKey === item.key
+                }
+                onClick={() =>
+                  item.key === "password"
+                    ? onChangePassword()
+                    : onToggle(item.key)
+                }
                 className="shrink-0 sm:w-32"
               >
                 {t(
-                  item.toggleable
-                    ? isOn
-                      ? "dashboard.security.protections.action.turnOff"
-                      : "dashboard.security.protections.action.turnOn"
-                    : "dashboard.security.protections.action.managed",
+                  item.state === "unavailable"
+                    ? "dashboard.security.protections.action.unavailable"
+                    : item.key === "password"
+                      ? "dashboard.security.protections.action.managed"
+                      : isOn
+                        ? "dashboard.security.protections.action.turnOff"
+                        : "dashboard.security.protections.action.turnOn",
                 )}
               </Button>
             </li>

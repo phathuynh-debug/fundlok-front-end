@@ -202,6 +202,7 @@
     "all": "Tất cả",
     "backToHome": "Về trang chủ",
     "brandName": "FundLok",
+    "cancel": "Hủy",
     "checkingProjectAccess": "Đang kiểm tra quyền truy cập dự án của bạn...",
     "chooseFile": "Chọn tệp",
     "contactSupport": "Liên hệ hỗ trợ",
@@ -460,7 +461,8 @@
         "action": {
           "managed": "Đổi mật khẩu",
           "turnOff": "Tắt",
-          "turnOn": "Bật"
+          "turnOn": "Bật",
+          "unavailable": "Sắp có"
         },
         "desc": {
           "loginAlerts": "Gửi email cho bạn mỗi khi có đăng nhập từ thiết bị lạ.",
@@ -476,10 +478,12 @@
           "totp": "Xác thực hai lớp",
           "withdrawalLock": "Khóa tài khoản nhận tiền"
         },
+        "saveFailedTitle": "Không thể lưu thay đổi",
         "state": {
           "off": "Đang tắt",
           "on": "Đang bật",
-          "recommended": "Nên bật"
+          "recommended": "Nên bật",
+          "unavailable": "Chưa khả dụng"
         },
         "subtitle": "Những gì ngăn cách tài khoản của bạn với người khác.",
         "title": "Bảo vệ tài khoản",
@@ -1255,6 +1259,26 @@
       "requestedAmountRange": "Nhập số tiền từ 200.000.000 đến 5.000.000.000 VND",
       "street": "Vui lòng nhập đường",
       "taxId": "Vui lòng nhập mã số thuế"
+    }
+  },
+  "security": {
+    "changePassword": {
+      "confirmLabel": "Xác nhận mật khẩu mới",
+      "currentLabel": "Mật khẩu hiện tại",
+      "description": "Bạn cần nhập mật khẩu hiện tại. Các thiết bị khác sẽ bị đăng xuất.",
+      "errorCurrent": "Nhập mật khẩu hiện tại của bạn",
+      "errorGeneric": "Không thể đổi mật khẩu",
+      "errorLength": "Mật khẩu mới phải có tối thiểu {min} ký tự",
+      "errorMismatch": "Hai mật khẩu mới không khớp",
+      "hide": "Ẩn mật khẩu",
+      "hint": "Tối thiểu {min} ký tự.",
+      "newLabel": "Mật khẩu mới",
+      "revokeNotice": "Đổi mật khẩu sẽ đăng xuất bạn trên mọi thiết bị khác.",
+      "show": "Hiện mật khẩu",
+      "submit": "Đổi mật khẩu",
+      "successDescription": "Đã đăng xuất {count} phiên khác.",
+      "successTitle": "Đã đổi mật khẩu",
+      "title": "Đổi mật khẩu"
     }
   },
   "specialPage": {

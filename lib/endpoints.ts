@@ -33,6 +33,11 @@ export const USER_ENDPOINTS = {
   // Sets a FIRST password on an account created without one (OAuth sign-in).
   // Changing an existing password is /auth/forgot-password → reset-password.
   setPassword: "/users/me/password",
+  // Changing an EXISTING password is a different endpoint: it requires the
+  // current one, because a session alone must not be enough to take an account
+  // over. See app/users/router.py.
+  changePassword: "/users/me/password/change",
+  securityPreferences: "/users/me/security-preferences",
 } as const;
 
 export const PROJECT_ENDPOINTS = {

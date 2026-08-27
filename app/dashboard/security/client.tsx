@@ -9,7 +9,9 @@ import {
   useRevokeOtherSessions,
   useRevokeSession,
   useSecurityEvents,
+  useSecurityPreferences,
   useSessions,
+  useUpdateSecurityPreferences,
 } from "@/hooks/use-authentication";
 import { useToast } from "@/hooks/use-toast";
 import { pageTransitionProps } from "@/lib/animations";
@@ -20,11 +22,8 @@ import { ActivityFeed } from "./_components/ActivityFeed";
 import { ProtectionList } from "./_components/ProtectionList";
 import { SecurityPostureCard } from "./_components/SecurityPostureCard";
 import { SessionList } from "./_components/SessionList";
-import {
-  deriveScore,
-  MOCK_PROTECTIONS,
-  type ProtectionItem,
-} from "./_components/mock-security";
+import { buildProtections, deriveScore } from "./_components/mock-security";
+import { ChangePasswordDialog } from "./_components/ChangePasswordDialog";
 
 function SecuritySkeleton() {
   return (
@@ -66,29 +65,51 @@ export default function SecurityClient() {
   const { mutate: revokeOthers, isPending: isRevokingAll } =
     useRevokeOtherSessions();
 
-  // Protections stay local: 2FA, passkeys and the payout lock have no endpoints
-  // yet, so this half of the screen is still a mockup and says so.
-  const [protections, setProtections] =
-    useState<ProtectionItem[]>(MOCK_PROTECTIONS);
+  // Sign-in alerts are a real preference; the password row opens a dialog.
+  // 2FA and passkeys have no backend, so buildProtections marks them
+  // unavailable rather than pretending they are on.
+  const { data: preferences, isLoading: isPrefsLoading } =
+    useSecurityPreferences(!isAuthLoading);
+  const { mutate: updatePreferences, isPending: isSavingPreference } =
+    useUpdateSecurityPreferences();
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+
+  const protections = useMemo(
+    () => buildProtections(preferences?.signin_alerts_enabled ?? false),
+    [preferences?.signin_alerts_enabled],
+  );
 
   const score = useMemo(() => deriveScore(protections), [protections]);
   const protectionsOn = protections.filter((p) => p.state === "on").length;
 
+  // The password row no longer carries a date: nothing stores when a password
+  // last changed. The security history does show PASSWORD_CHANGED events, which
+  // is the honest answer to "when did I change it".
   const lastPasswordChange = useMemo(() => {
-    const password = protections.find((p) => p.key === "password");
-    return password?.updated_at
-      ? formatDate(password.updated_at, locale)
-      : t("common.unknown");
-  }, [protections, locale, t]);
-
-  const handleToggle = (key: string) =>
-    setProtections((current) =>
-      current.map((item) =>
-        item.key === key && item.toggleable
-          ? { ...item, state: item.state === "on" ? "off" : "on" }
-          : item,
-      ),
+    const changed = activity.find(
+      (event) => event.action === "PASSWORD_CHANGED",
     );
+    return changed?.created_at
+      ? formatDate(changed.created_at, locale)
+      : t("common.unknown");
+  }, [activity, locale, t]);
+
+  const handleToggle = (key: string) => {
+    // Only sign-in alerts are toggleable today; the rest are dialogs or
+    // unavailable, and ProtectionList disables their buttons.
+    if (key !== "loginAlerts") return;
+    updatePreferences(
+      { signin_alerts_enabled: !(preferences?.signin_alerts_enabled ?? false) },
+      {
+        onError: (error) =>
+          toast({
+            variant: "destructive",
+            title: t("dashboard.security.protections.saveFailedTitle"),
+            description: error?.message,
+          }),
+      },
+    );
+  };
 
   const handleRevoke = (sessionId: string) =>
     revokeSession(sessionId, {
@@ -160,7 +181,10 @@ export default function SecurityClient() {
           </p>
         </div>
 
-        {isAuthLoading || isSessionsLoading || isActivityLoading ? (
+        {isAuthLoading ||
+        isSessionsLoading ||
+        isActivityLoading ||
+        isPrefsLoading ? (
           <SecuritySkeleton />
         ) : (
           <div className="space-y-6">
@@ -172,7 +196,12 @@ export default function SecurityClient() {
               lastPasswordChange={lastPasswordChange}
             />
 
-            <ProtectionList items={protections} onToggle={handleToggle} />
+            <ProtectionList
+              items={protections}
+              onToggle={handleToggle}
+              onChangePassword={() => setPasswordDialogOpen(true)}
+              pendingKey={isSavingPreference ? "loginAlerts" : null}
+            />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <SessionList
@@ -187,6 +216,11 @@ export default function SecurityClient() {
           </div>
         )}
       </motion.div>
+
+      <ChangePasswordDialog
+        open={passwordDialogOpen}
+        onOpenChange={setPasswordDialogOpen}
+      />
     </div>
   );
 }

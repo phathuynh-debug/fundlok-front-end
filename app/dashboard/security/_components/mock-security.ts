@@ -18,7 +18,14 @@
 // renders identically on every load and in screenshots.
 
 /** A protection the account can have on or off. */
-export type ProtectionState = "on" | "off" | "recommended";
+export type ProtectionState =
+  | "on"
+  | "off"
+  | "recommended"
+  // No backend at all yet. Rendered as a disabled row rather than a toggle:
+  // a switch that claims to arm two-factor auth and does nothing is worse than
+  // no switch, and a badge reading "on" would be a straight lie.
+  | "unavailable";
 
 export interface ProtectionItem {
   key: string;
@@ -31,31 +38,42 @@ export interface ProtectionItem {
   weight: number;
 }
 
-export const MOCK_PROTECTIONS: ProtectionItem[] = [
-  {
-    key: "password",
-    state: "on",
-    updated_at: "2026-05-14T09:20:00+07:00",
-    toggleable: false,
-    weight: 25,
-  },
-  {
-    key: "totp",
-    state: "on",
-    updated_at: "2026-05-14T09:34:00+07:00",
-    toggleable: true,
-    weight: 30,
-  },
-  {
-    key: "withdrawalLock",
-    state: "on",
-    updated_at: "2026-06-02T15:10:00+07:00",
-    toggleable: true,
-    weight: 20,
-  },
-  { key: "passkey", state: "recommended", toggleable: true, weight: 15 },
-  { key: "loginAlerts", state: "off", toggleable: true, weight: 10 },
-];
+/**
+ * The protection rows, with only the states we can actually stand behind.
+ *
+ *   password    real  — always set for a password account; the row opens the
+ *                       change-password dialog
+ *   loginAlerts real  — users.signin_alerts_enabled, toggled through the API
+ *   totp        none  — needs a TOTP library, secret storage and a login-flow
+ *                       change; shown as unavailable, never as "on"
+ *   passkey     none  — needs WebAuthn on both sides
+ *   payoutLock  mock  — deliberately left as-is for now
+ *
+ * `signinAlertsEnabled` comes from the API, so the list is built per render
+ * rather than being a constant.
+ */
+export function buildProtections(
+  signinAlertsEnabled: boolean,
+): ProtectionItem[] {
+  return [
+    { key: "password", state: "on", toggleable: false, weight: 25 },
+    { key: "totp", state: "unavailable", toggleable: false, weight: 30 },
+    {
+      key: "withdrawalLock",
+      state: "on",
+      updated_at: "2026-06-02T15:10:00+07:00",
+      toggleable: false,
+      weight: 20,
+    },
+    { key: "passkey", state: "unavailable", toggleable: false, weight: 15 },
+    {
+      key: "loginAlerts",
+      state: signinAlertsEnabled ? "on" : "off",
+      toggleable: true,
+      weight: 10,
+    },
+  ];
+}
 
 /**
  * Posture score out of 100: the share of protection weight that is switched on.

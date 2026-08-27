@@ -3,7 +3,7 @@ import { describe, it, expect } from "vitest";
 import {
   deriveScore,
   scoreBand,
-  MOCK_PROTECTIONS,
+  buildProtections,
   type ProtectionItem,
 } from "./mock-security";
 
@@ -53,12 +53,16 @@ describe("deriveScore", () => {
     expect(deriveScore([])).toBe(0);
   });
 
-  it("scores the shipped sample data in the fair band", () => {
-    // Guards the mock itself: the screen is meant to demo a mid-range posture
-    // with room to improve, not a perfect or alarming one.
-    const score = deriveScore(MOCK_PROTECTIONS);
-    expect(score).toBe(75);
-    expect(scoreBand(score)).toBe("fair");
+  it("scores only the protections that are actually on", () => {
+    // With alerts off, `password` (25) and the payout lock (20) are the only
+    // "on" rows: 2FA and passkeys are unavailable, not enabled, so they must
+    // not count toward the score. Claiming otherwise was the bug.
+    const withoutAlerts = deriveScore(buildProtections(false));
+    expect(withoutAlerts).toBe(45);
+    expect(scoreBand(withoutAlerts)).toBe("weak");
+
+    // Turning sign-in alerts on adds its 10 points.
+    expect(deriveScore(buildProtections(true))).toBe(55);
   });
 });
 
