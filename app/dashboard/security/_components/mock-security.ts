@@ -3,8 +3,9 @@
 // Sessions and activity are real now: /auth/sessions reads refresh_tokens and
 // /auth/security-events reads audit_logs, both via
 // hooks/use-authentication.ts. What remains mocked is the protection list —
-// 2FA, passkeys, sign-in alerts and the payout-account lock have no backend at
-// all yet, so the toggles change this screen only.
+// passkeys and the payout-account lock have no backend yet, so those two rows
+// change this screen only. Password, sign-in alerts and two-factor auth are all
+// real.
 //
 // Same reasoning as app/dashboard/analytics/_components/mock-analytics.ts:
 // there is no backend security API yet (no sessions endpoint, no audit-log
@@ -44,20 +45,29 @@ export interface ProtectionItem {
  *   password    real  — always set for a password account; the row opens the
  *                       change-password dialog
  *   loginAlerts real  — users.signin_alerts_enabled, toggled through the API
- *   totp        none  — needs a TOTP library, secret storage and a login-flow
- *                       change; shown as unavailable, never as "on"
+ *   totp        real  — users.totp_enabled, enrolled through /auth/2fa/*; the
+ *                       row opens the setup or disable dialog
  *   passkey     none  — needs WebAuthn on both sides
  *   payoutLock  mock  — deliberately left as-is for now
  *
- * `signinAlertsEnabled` comes from the API, so the list is built per render
- * rather than being a constant.
+ * `signinAlertsEnabled` and `totpEnabled` both come from the API, so the list is
+ * built per render rather than being a constant.
  */
 export function buildProtections(
   signinAlertsEnabled: boolean,
+  totpEnabled = false,
 ): ProtectionItem[] {
   return [
     { key: "password", state: "on", toggleable: false, weight: 25 },
-    { key: "totp", state: "unavailable", toggleable: false, weight: 30 },
+    // Real now: users.totp_enabled via GET /auth/2fa. It used to be hardcoded
+    // "unavailable" because there was no backend; there is one, so the row
+    // reflects the account instead of the roadmap.
+    {
+      key: "totp",
+      state: totpEnabled ? "on" : "off",
+      toggleable: true,
+      weight: 30,
+    },
     {
       key: "withdrawalLock",
       state: "on",

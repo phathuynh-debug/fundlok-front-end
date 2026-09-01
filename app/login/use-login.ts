@@ -1,12 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useGoogleLogin } from "@react-oauth/google";
 import {
   authenticationService,
   isAdminRole,
+  isTotpChallenge,
   type LoginPayload,
+  type LoginResult,
   type OAuthLoginPayload,
   type OAuthTokenResponse,
   type User,
@@ -53,14 +56,52 @@ export function useLogin() {
   const queryClient = useQueryClient();
   const router = useRouter();
 
-  const emailPasswordLogin = useMutation<User, ApiError, LoginPayload>({
+  // Local, not server state: a pending second factor is a step in this form,
+  // has no query key and never outlives the page. The remembered `remember_me`
+  // rides along because step two needs it and the challenge token is no place
+  // for a UI preference.
+  const [challenge, setChallenge] = useState<{
+    token: string;
+    remember: boolean;
+  } | null>(null);
+
+  const finishSignIn = async (user: User) => {
+    // Seed for an instant paint, then reconcile against /users/me.
+    queryClient.setQueryData(authKeys.currentUser(), user);
+    const current = await hydrateCurrentUser(queryClient);
+    router.push(landingRouteFor(current ?? user));
+  };
+
+  const emailPasswordLogin = useMutation<LoginResult, ApiError, LoginPayload>({
     mutationFn: (payload) => authenticationService.login(payload),
-    onSuccess: async (user) => {
-      // Seed for an instant paint, then reconcile against /users/me.
-      queryClient.setQueryData(authKeys.currentUser(), user);
-      const current = await hydrateCurrentUser(queryClient);
-      router.push(landingRouteFor(current ?? user));
+    onSuccess: async (result, payload) => {
+      // 2FA accounts get a challenge, not a session — nothing is cached and no
+      // navigation happens until the code is verified.
+      if (isTotpChallenge(result)) {
+        setChallenge({
+          token: result.challenge_token,
+          remember: payload.remember_me ?? false,
+        });
+        return;
+      }
+      await finishSignIn(result);
     },
+  });
+
+  const totpLogin = useMutation<User, ApiError, string>({
+    mutationFn: (code) => {
+      if (!challenge) {
+        // Unreachable through the UI (the step only renders with a challenge),
+        // but throwing beats sending `undefined` as a credential.
+        throw new Error("No two-factor challenge in progress");
+      }
+      return authenticationService.completeTotpLogin({
+        challenge_token: challenge.token,
+        code,
+        remember_me: challenge.remember,
+      });
+    },
+    onSuccess: finishSignIn,
   });
 
   const googleLogin = useMutation<
@@ -103,5 +144,17 @@ export function useLogin() {
     googleLoginAsync: googleLogin.mutateAsync,
     isPending: emailPasswordLogin.isPending,
     isGooglePending: googleLogin.isPending,
+
+    // --- second factor ---
+    totpRequired: challenge !== null,
+    submitTotpCode: totpLogin.mutate,
+    isVerifyingCode: totpLogin.isPending,
+    totpError: totpLogin.error,
+    // Back to the password step. Clearing the challenge is the point: an
+    // abandoned code prompt must not leave a usable token in memory.
+    cancelTotp: () => {
+      setChallenge(null);
+      totpLogin.reset();
+    },
   };
 }

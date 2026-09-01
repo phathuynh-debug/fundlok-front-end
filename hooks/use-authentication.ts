@@ -5,12 +5,18 @@ import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   authenticationService,
+  isTotpChallenge,
   type DeviceSession,
   type LoginPayload,
+  type LoginResult,
   type RegisterPayload,
   type RevokeResult,
   type SecurityEvent,
   type SelectableRole,
+  type TotpDisablePayload,
+  type TotpEnableResult,
+  type TotpSetup,
+  type TotpStatus,
   type User,
 } from "@/services/authentication.service";
 import {
@@ -28,6 +34,7 @@ export const authKeys = {
   sessions: () => [...authKeys.all, "sessions"] as const,
   securityPreferences: () => [...authKeys.all, "security-preferences"] as const,
   securityEvents: () => [...authKeys.all, "security-events"] as const,
+  twoFactor: () => [...authKeys.all, "two-factor"] as const,
 };
 
 // ---------- Mutations ----------
@@ -39,11 +46,14 @@ export const authKeys = {
 export function useLogin() {
   const queryClient = useQueryClient();
 
-  return useMutation<User, ApiError, LoginPayload>({
+  return useMutation<LoginResult, ApiError, LoginPayload>({
     mutationFn: (payload) => authenticationService.login(payload),
-    onSuccess: (user) => {
-      // Seed the cache immediately so useCurrentUser doesn't need to refetch.
-      queryClient.setQueryData(authKeys.currentUser(), user);
+    onSuccess: (result) => {
+      // A 2FA account returns a challenge, not a user — there is no session to
+      // cache yet. app/login/use-login.ts drives that flow; this hook only
+      // seeds the cache when a session actually exists.
+      if (isTotpChallenge(result)) return;
+      queryClient.setQueryData(authKeys.currentUser(), result);
     },
   });
 }
@@ -216,6 +226,63 @@ export function useChangePassword() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authKeys.sessions() });
       queryClient.invalidateQueries({ queryKey: authKeys.securityEvents() });
+    },
+  });
+}
+
+// ---------- Two-factor authentication ----------
+
+/**
+ * Current 2FA state for the signed-in user.
+ *
+ * Server state, so React Query owns it — the security screen renders directly
+ * from this rather than mirroring it into component state, and every mutation
+ * below invalidates this key so the row cannot show a stale "off".
+ */
+export function useTwoFactorStatus(enabled = true) {
+  return useQuery<TotpStatus, ApiError>({
+    queryKey: authKeys.twoFactor(),
+    queryFn: () => authenticationService.getTwoFactorStatus(),
+    staleTime: 30 * 1000,
+    retry: false,
+    enabled,
+  });
+}
+
+/**
+ * Step one of enrolment: mint a secret and get the otpauth:// URI for the QR.
+ *
+ * Not a query: it has a side effect (it writes a new secret) and must only run
+ * when the user opens the dialog, never on a refetch or a window focus.
+ */
+export function useStartTwoFactorSetup() {
+  return useMutation<TotpSetup, ApiError, void>({
+    mutationFn: () => authenticationService.startTwoFactorSetup(),
+  });
+}
+
+/** Step two: prove possession of a code. Returns the one-time recovery codes. */
+export function useEnableTwoFactor() {
+  const queryClient = useQueryClient();
+
+  return useMutation<TotpEnableResult, ApiError, string>({
+    mutationFn: (code) => authenticationService.enableTwoFactor(code),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: authKeys.twoFactor() });
+    },
+  });
+}
+
+export function useDisableTwoFactor() {
+  const queryClient = useQueryClient();
+
+  return useMutation<TotpStatus, ApiError, TotpDisablePayload>({
+    mutationFn: (payload) => authenticationService.disableTwoFactor(payload),
+    onSuccess: (status) => {
+      // Seed then invalidate: the row flips immediately, and the count is
+      // reconciled from the server.
+      queryClient.setQueryData(authKeys.twoFactor(), status);
+      queryClient.invalidateQueries({ queryKey: authKeys.twoFactor() });
     },
   });
 }

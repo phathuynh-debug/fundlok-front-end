@@ -11,6 +11,7 @@ import {
   useSecurityEvents,
   useSecurityPreferences,
   useSessions,
+  useTwoFactorStatus,
   useUpdateSecurityPreferences,
 } from "@/hooks/use-authentication";
 import { useToast } from "@/hooks/use-toast";
@@ -24,6 +25,8 @@ import { SecurityPostureCard } from "./_components/SecurityPostureCard";
 import { SessionList } from "./_components/SessionList";
 import { buildProtections, deriveScore } from "./_components/mock-security";
 import { ChangePasswordDialog } from "./_components/ChangePasswordDialog";
+import { TwoFactorDisableDialog } from "./_components/TwoFactorDisableDialog";
+import { TwoFactorSetupDialog } from "./_components/TwoFactorSetupDialog";
 
 function SecuritySkeleton() {
   return (
@@ -72,11 +75,19 @@ export default function SecurityClient() {
     useSecurityPreferences(!isAuthLoading);
   const { mutate: updatePreferences, isPending: isSavingPreference } =
     useUpdateSecurityPreferences();
+  const { data: twoFactor, isLoading: isTwoFactorLoading } =
+    useTwoFactorStatus(!isAuthLoading);
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+  const [totpSetupOpen, setTotpSetupOpen] = useState(false);
+  const [totpDisableOpen, setTotpDisableOpen] = useState(false);
 
   const protections = useMemo(
-    () => buildProtections(preferences?.signin_alerts_enabled ?? false),
-    [preferences?.signin_alerts_enabled],
+    () =>
+      buildProtections(
+        preferences?.signin_alerts_enabled ?? false,
+        twoFactor?.enabled ?? false,
+      ),
+    [preferences?.signin_alerts_enabled, twoFactor?.enabled],
   );
 
   const score = useMemo(() => deriveScore(protections), [protections]);
@@ -95,8 +106,14 @@ export default function SecurityClient() {
   }, [activity, locale, t]);
 
   const handleToggle = (key: string) => {
-    // Only sign-in alerts are toggleable today; the rest are dialogs or
-    // unavailable, and ProtectionList disables their buttons.
+    // Two-factor auth opens a dialog rather than toggling in place: enrolling
+    // needs a QR scan and a verified code, and turning it off needs the
+    // password. A one-click switch could not ask for either.
+    if (key === "totp") {
+      if (twoFactor?.enabled) setTotpDisableOpen(true);
+      else setTotpSetupOpen(true);
+      return;
+    }
     if (key !== "loginAlerts") return;
     updatePreferences(
       { signin_alerts_enabled: !(preferences?.signin_alerts_enabled ?? false) },
@@ -184,7 +201,8 @@ export default function SecurityClient() {
         {isAuthLoading ||
         isSessionsLoading ||
         isActivityLoading ||
-        isPrefsLoading ? (
+        isPrefsLoading ||
+        isTwoFactorLoading ? (
           <SecuritySkeleton />
         ) : (
           <div className="space-y-6">
@@ -220,6 +238,16 @@ export default function SecurityClient() {
       <ChangePasswordDialog
         open={passwordDialogOpen}
         onOpenChange={setPasswordDialogOpen}
+      />
+
+      <TwoFactorSetupDialog
+        open={totpSetupOpen}
+        onOpenChange={setTotpSetupOpen}
+      />
+
+      <TwoFactorDisableDialog
+        open={totpDisableOpen}
+        onOpenChange={setTotpDisableOpen}
       />
     </div>
   );

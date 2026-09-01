@@ -22,6 +22,13 @@ export const AUTH_ENDPOINTS = {
   revokeSession: (sessionId: string) => `/auth/sessions/${sessionId}/revoke`,
   revokeOtherSessions: "/auth/sessions/revoke-others",
   securityEvents: "/auth/security-events",
+  // Two-factor auth. `twoFactorLogin` is the only one reachable without a
+  // session: it trades the challenge token from POST /auth/login for one.
+  twoFactor: "/auth/2fa",
+  twoFactorSetup: "/auth/2fa/setup",
+  twoFactorEnable: "/auth/2fa/enable",
+  twoFactorDisable: "/auth/2fa/disable",
+  twoFactorLogin: "/auth/login/2fa",
 } as const;
 
 export const USER_ENDPOINTS = {

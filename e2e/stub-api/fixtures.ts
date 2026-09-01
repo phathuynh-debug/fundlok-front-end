@@ -15,7 +15,8 @@ export type StubUserKey =
   | "unverifiedEmail"
   | "noRole"
   | "unapprovedInvestor"
-  | "unapprovedSme";
+  | "unapprovedSme"
+  | "twoFactor";
 
 export interface StubUser {
   id: string;
@@ -83,6 +84,17 @@ export const STUB_USERS: Record<StubUserKey, StubUser> = {
     ...base,
     id: "00000000-0000-0000-0000-0000000000a7",
     email: "norole@e2e.test",
+  },
+  // Dedicated to the 2FA spec. That spec MUTATES stub state (enrolment is a
+  // state machine), and the stub is one process shared by every parallel
+  // worker — so enrolling `investor` would have switched 2FA on for every
+  // other spec that signs in as them. Its own identity keeps that contained.
+  twoFactor: {
+    ...base,
+    id: "00000000-0000-0000-0000-0000000000b1",
+    email: "twofactor@e2e.test",
+    full_name: "Two Factor Test",
+    role: "INVESTOR",
   },
   // Verification-gate cases: role is fine, KYC/KYB is not approved, so the
   // action routes (/dashboard/invest, /project-application) must divert to /kyc.

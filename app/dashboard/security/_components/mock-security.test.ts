@@ -64,6 +64,20 @@ describe("deriveScore", () => {
     // Turning sign-in alerts on adds its 10 points.
     expect(deriveScore(buildProtections(true))).toBe(55);
   });
+
+  it("counts two-factor auth once it is actually enabled", () => {
+    // 2FA carries the largest weight (30) because it is the strongest control
+    // on the list. It used to be permanently uncountable — the row was
+    // hardcoded "unavailable" while there was no backend.
+    expect(deriveScore(buildProtections(false, true))).toBe(75);
+    expect(scoreBand(deriveScore(buildProtections(false, true)))).toBe("fair");
+
+    // Everything the user can currently turn on: password 25 + payout lock 20
+    // + alerts 10 + 2FA 30 = 85. Passkeys (15) remain unavailable, so 100 is
+    // still unreachable — deliberately, rather than flattering the score.
+    expect(deriveScore(buildProtections(true, true))).toBe(85);
+    expect(scoreBand(deriveScore(buildProtections(true, true)))).toBe("strong");
+  });
 });
 
 describe("scoreBand", () => {
