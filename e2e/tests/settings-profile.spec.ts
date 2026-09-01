@@ -106,13 +106,13 @@ test("an empty name is rejected", async ({ page }) => {
 test("the sidebar links to settings routes that do not exist yet", async ({
   page,
 }) => {
-  // Deliberately asserts the CURRENT truth: /account, /appearance and /billing
-  // are linked from the nav but unimplemented. When one is built, this test
-  // fails and should be updated — that is the point, so the gap cannot be
-  // quietly forgotten.
+  // Deliberately asserts the CURRENT truth: /account and /billing are linked
+  // from the nav but unimplemented. When one is built, this test fails and
+  // should be updated — that is the point, so the gap cannot be quietly
+  // forgotten. /appearance was on this list until it was built; its coverage
+  // now lives in settings-appearance.spec.ts.
   for (const path of [
     "/dashboard/settings/account",
-    "/dashboard/settings/appearance",
     "/dashboard/settings/billing",
   ]) {
     const response = await page.request.get(path);

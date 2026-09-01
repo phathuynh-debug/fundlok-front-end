@@ -529,6 +529,33 @@
       "title": "Bảo mật"
     },
     "settings": {
+      "appearance": {
+        "language": {
+          "description": "Thay đổi toàn bộ nhãn, định dạng ngày và tiền tệ trong ứng dụng.",
+          "enHint": "Amounts appear as ₫1,250,000,000.",
+          "heading": "Ngôn ngữ",
+          "viHint": "Số tiền hiển thị dạng 1.250.000.000 ₫."
+        },
+        "motion": {
+          "description": "Kiểm soát hiệu ứng chuyển động trên bảng điều khiển và hộp thoại.",
+          "heading": "Chuyển động",
+          "reduceHint": "Tắt hiệu ứng trượt và phóng to. Vẫn giữ hiệu ứng mờ dần để nội dung không xuất hiện đột ngột.",
+          "reduceLabel": "Giảm chuyển động",
+          "systemNote": "Nếu thiết bị của bạn đã yêu cầu giảm chuyển động, FundLok luôn tôn trọng cài đặt đó."
+        },
+        "subtitle": "Chọn cách FundLok hiển thị và chuyển động trên thiết bị này",
+        "theme": {
+          "dark": "Tối",
+          "darkHint": "Dịu mắt hơn khi thiếu sáng.",
+          "description": "Áp dụng ngay và được ghi nhớ trên thiết bị này.",
+          "heading": "Chủ đề",
+          "light": "Sáng",
+          "lightHint": "Phù hợp phòng nhiều ánh sáng và khi in.",
+          "system": "Theo hệ thống",
+          "systemHint": "Tự động theo cài đặt của thiết bị."
+        },
+        "title": "Giao diện"
+      },
       "profile": {
         "accountDetails": "Chi tiết tài khoản",
         "avatar": {

@@ -529,6 +529,33 @@
       "title": "Security"
     },
     "settings": {
+      "appearance": {
+        "language": {
+          "description": "Changes every label, date and currency format across the app.",
+          "enHint": "Amounts appear as ₫1,250,000,000.",
+          "heading": "Language",
+          "viHint": "Số tiền hiển thị dạng 1.250.000.000 ₫."
+        },
+        "motion": {
+          "description": "Control the animation used across dashboards and dialogs.",
+          "heading": "Motion",
+          "reduceHint": "Turns off sliding and scaling animations. Fades are kept, so nothing appears without warning.",
+          "reduceLabel": "Reduce motion",
+          "systemNote": "If your device already requests reduced motion, FundLok honours it whether or not this is on."
+        },
+        "subtitle": "Choose how FundLok looks and moves on this device",
+        "theme": {
+          "dark": "Dark",
+          "darkHint": "Easier on the eyes in low light.",
+          "description": "Applies immediately and is remembered on this device.",
+          "heading": "Theme",
+          "light": "Light",
+          "lightHint": "Best in bright rooms and for printing.",
+          "system": "System",
+          "systemHint": "Follows your device setting automatically."
+        },
+        "title": "Appearance"
+      },
       "profile": {
         "accountDetails": "Account Details",
         "avatar": {

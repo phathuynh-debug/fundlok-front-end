@@ -4,6 +4,11 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
+import { AppearanceProvider } from "@/components/appearance-provider";
+import {
+  REDUCE_MOTION_COOKIE_NAME,
+  parseReduceMotionCookie,
+} from "@/lib/appearance";
 import { QueryProvider } from "@/providers/query-provider";
 import { LocaleProvider } from "@/lib/i18n";
 import { GoogleOAuthProvider } from "@react-oauth/google";
@@ -73,6 +78,11 @@ export default async function RootLayout({
 }>) {
   const cookieStore = await cookies();
   const locale = getLocaleFromCookie(cookieStore.get("NEXT_LOCALE")?.value);
+  // Read server-side so the first paint already respects the preference —
+  // see the note in components/appearance-provider.tsx.
+  const reduceMotion = parseReduceMotionCookie(
+    cookieStore.get(REDUCE_MOTION_COOKIE_NAME)?.value,
+  );
 
   const localBusinessSchema = {
     "@context": "https://schema.org",
@@ -117,7 +127,9 @@ export default async function RootLayout({
                 defaultTheme="system"
                 enableSystem
               >
-                <main>{children}</main>
+                <AppearanceProvider initialReduceMotion={reduceMotion}>
+                  <main>{children}</main>
+                </AppearanceProvider>
               </ThemeProvider>
             </LocaleProvider>
           </QueryProvider>
