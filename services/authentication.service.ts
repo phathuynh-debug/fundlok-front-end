@@ -35,6 +35,56 @@ export interface User {
   created_at?: string | null;
 }
 
+/**
+ * POST /auth/login returns one of two shapes.
+ *
+ * When the account has 2FA enabled the response carries NO session — no
+ * cookies, no user — only a five-minute challenge token to trade at
+ * /auth/login/2fa. `totp_required` is the discriminant; the type guard below is
+ * how callers tell the two apart without inspecting fields by hand.
+ */
+export interface TotpChallenge {
+  totp_required: true;
+  challenge_token: string;
+}
+
+export type LoginResult = User | TotpChallenge;
+
+export function isTotpChallenge(result: LoginResult): result is TotpChallenge {
+  return (result as TotpChallenge)?.totp_required === true;
+}
+
+export interface TotpLoginPayload {
+  challenge_token: string;
+  code: string;
+  remember_me?: boolean;
+}
+
+export interface TotpStatus {
+  enabled: boolean;
+  confirmed_at: string | null;
+  recovery_codes_remaining: number;
+}
+
+export interface TotpSetup {
+  /** Base32 secret, for manual entry when a camera is unavailable. */
+  secret: string;
+  /** otpauth:// URI — the string the QR code encodes. */
+  provisioning_uri: string;
+}
+
+export interface TotpEnableResult {
+  enabled: boolean;
+  /** Shown exactly once. There is no endpoint that can retrieve them again. */
+  recovery_codes: string[];
+}
+
+export interface TotpDisablePayload {
+  password: string;
+  /** A code from the app, or a recovery code — the backend accepts either. */
+  code: string;
+}
+
 export interface LoginPayload {
   email: string;
   password: string;
@@ -114,7 +164,31 @@ export const authenticationService = {
   // Backend sets httpOnly cookies and returns the User object.
   // During transition the backend may still return Token shape — we handle both.
   login(payload: LoginPayload) {
-    return apiClient.post<User>(AUTH_ENDPOINTS.login, payload);
+    // LoginResult, not User: an account with 2FA enabled answers with a
+    // challenge instead. Callers narrow with isTotpChallenge().
+    return apiClient.post<LoginResult>(AUTH_ENDPOINTS.login, payload);
+  },
+
+  completeTotpLogin(payload: TotpLoginPayload) {
+    return apiClient.post<User>(AUTH_ENDPOINTS.twoFactorLogin, payload);
+  },
+
+  getTwoFactorStatus() {
+    return apiClient.get<TotpStatus>(AUTH_ENDPOINTS.twoFactor);
+  },
+
+  startTwoFactorSetup() {
+    return apiClient.post<TotpSetup>(AUTH_ENDPOINTS.twoFactorSetup, {});
+  },
+
+  enableTwoFactor(code: string) {
+    return apiClient.post<TotpEnableResult>(AUTH_ENDPOINTS.twoFactorEnable, {
+      code,
+    });
+  },
+
+  disableTwoFactor(payload: TotpDisablePayload) {
+    return apiClient.post<TotpStatus>(AUTH_ENDPOINTS.twoFactorDisable, payload);
   },
 
   oauthLogin(payload: OAuthLoginPayload) {

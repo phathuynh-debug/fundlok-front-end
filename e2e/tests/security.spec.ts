@@ -5,11 +5,11 @@ import { signInAs } from "../support/auth";
 import { t } from "../support/i18n";
 import { toast } from "../support/ui";
 
-// /dashboard/security is half real and half mocked, and the split matters: the
-// session list and activity feed come from the API (refresh_tokens and
-// audit_logs), while the protection rows for 2FA and passkeys have no backend
-// at all. The tests below pin that boundary — a future change that starts
-// claiming 2FA is "on" should fail here.
+// /dashboard/security is mostly real, and the remaining split matters. Sessions
+// and activity come from the API (refresh_tokens and audit_logs); password,
+// sign-in alerts and two-factor auth are all real controls. Only passkeys and
+// the payout-account lock still have no backend, and the tests below pin that
+// boundary so a row can never claim a protection the account does not have.
 
 test.beforeEach(async ({ context, page }) => {
   await signInAs(context, "investor");
@@ -39,25 +39,43 @@ test("shows the security posture and protection list", async ({ page }) => {
   }
 });
 
-test("never claims two-factor auth or passkeys are enabled", async ({
+test("never claims passkeys are enabled", async ({ page }) => {
+  // WebAuthn exists on neither side, so this row must read "unavailable" and
+  // its button must be dead. A switch that pretends to arm a security control
+  // is worse than no switch.
+  //
+  // Two-factor auth used to be asserted here too. It is real now — enrolment
+  // and the login step-up live in two-factor.spec.ts — so pinning it as
+  // unavailable would assert the opposite of the truth.
+  const row = page.getByRole("listitem").filter({
+    hasText: t("dashboard.security.protections.items.passkey"),
+  });
+  await expect(row).toContainText(
+    t("dashboard.security.protections.state.unavailable"),
+  );
+  await expect(
+    row.getByRole("button", {
+      name: t("dashboard.security.protections.action.unavailable"),
+    }),
+  ).toBeDisabled();
+});
+
+test("offers two-factor auth as something the user can turn on", async ({
   page,
 }) => {
-  // There is no TOTP library and no WebAuthn on either side, so these rows must
-  // read "unavailable" and their buttons must be dead. A switch that pretends
-  // to arm 2FA is worse than no switch.
-  for (const key of ["totp", "passkey"]) {
-    const row = page.getByRole("listitem").filter({
-      hasText: t(`dashboard.security.protections.items.${key}`),
-    });
-    await expect(row).toContainText(
-      t("dashboard.security.protections.state.unavailable"),
-    );
-    await expect(
-      row.getByRole("button", {
-        name: t("dashboard.security.protections.action.unavailable"),
-      }),
-    ).toBeDisabled();
-  }
+  // The counterpart to the row above: 2FA has a backend, so the row must be
+  // actionable rather than a roadmap note.
+  const row = page.getByRole("listitem").filter({
+    hasText: t("dashboard.security.protections.items.totp"),
+  });
+  await expect(row).not.toContainText(
+    t("dashboard.security.protections.state.unavailable"),
+  );
+  await expect(
+    row.getByRole("button", {
+      name: t("dashboard.security.protections.action.turnOn"),
+    }),
+  ).toBeEnabled();
 });
 
 test("lists the signed-in device from the API", async ({ page }) => {

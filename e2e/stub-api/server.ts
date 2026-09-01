@@ -40,6 +40,40 @@ import {
 } from "./fixtures";
 
 const PORT = Number(process.env.PORT ?? 8100);
+
+/**
+ * 2FA state, in memory and per stub user.
+ *
+ * The one place this stub keeps mutable state, because the feature is a state
+ * machine — off, mid-enrolment, on — and a stateless stub could not tell the
+ * three apart. Reset per process, and the stub is never reused between runs
+ * (playwright.config.ts sets reuseExistingServer: false for exactly this kind
+ * of reason).
+ *
+ * `STUB_TOTP_CODE` stands in for a real authenticator: the frontend cannot
+ * compute an RFC 6238 code, and wiring a TOTP library into the test suite would
+ * be testing pyotp rather than the UI.
+ */
+const STUB_TOTP_CODE = "123456";
+const STUB_RECOVERY_CODE = "RECOVERY01";
+const twoFactor = new Map<
+  string,
+  { enabled: boolean; pendingSecret: string | null; recoveryRemaining: number }
+>();
+
+/** Forced-503 switch for the unconfigured-server case. */
+let setupUnavailable = false;
+
+function totpState(key: string) {
+  if (!twoFactor.has(key)) {
+    twoFactor.set(key, {
+      enabled: false,
+      pendingSecret: null,
+      recoveryRemaining: 0,
+    });
+  }
+  return twoFactor.get(key)!;
+}
 const COOKIE_NAME = "access_token";
 
 function readCookie(req: IncomingMessage, name: string): string | null {
@@ -120,6 +154,28 @@ const server = createServer(async (req, res) => {
     return json(res, 200, { status: "ok" });
   }
 
+  // Test-only. The 2FA endpoints below are the stub's only mutable state, and
+  // one stub process serves every parallel worker — so a spec that enrols has
+  // to be able to put it back. Namespaced under /_test/ and obviously absent
+  // from the real API.
+  // Test-only: makes POST /auth/2fa/setup answer 503, the way a server with no
+  // TOTP_ENCRYPTION_KEY does. Exists because that exact case shipped as a hung
+  // dialog once — the skeleton spun forever instead of reporting the failure.
+  if (path === "/_test/2fa/unavailable" && method === "POST") {
+    const body = await readBody(req);
+    setupUnavailable = body.unavailable === true;
+    return json(res, 200, { unavailable: setupUnavailable });
+  }
+
+  if (path === "/_test/2fa/reset" && method === "POST") {
+    const body = await readBody(req);
+    const target = String(body.user ?? "");
+    if (target) twoFactor.delete(target);
+    else twoFactor.clear();
+    setupUnavailable = false;
+    return json(res, 200, { reset: true });
+  }
+
   // --- Auth -----------------------------------------------------------------
 
   if (path === "/auth/login" && method === "POST") {
@@ -133,8 +189,47 @@ const server = createServer(async (req, res) => {
       return detail(res, 401, "Incorrect email or password");
     }
 
+    // 2FA on: no cookies, only a challenge — same contract as the real
+    // backend, so the frontend's two-step flow is exercised for real.
+    if (totpState(key).enabled) {
+      return json(res, 200, {
+        totp_required: true,
+        challenge_token: `challenge-${key}`,
+      });
+    }
+
     // `remember_me` drives cookie lifetime on the real backend; mirrored here
     // so a test can assert the persistent-vs-session distinction.
+    const remember = body.remember_me === true;
+    return json(res, 200, STUB_USERS[key], {
+      "set-cookie": sessionCookie(key, remember ? 60 * 60 * 24 * 30 : 60 * 60),
+    });
+  }
+
+  if (path === "/auth/login/2fa" && method === "POST") {
+    const body = await readBody(req);
+    const token = String(body.challenge_token ?? "");
+    const key = token.startsWith("challenge-")
+      ? (token.slice("challenge-".length) as StubUserKey)
+      : null;
+
+    if (!key || !(key in STUB_USERS)) {
+      return detail(res, 401, "Invalid or expired two-factor challenge");
+    }
+
+    const submitted = String(body.code ?? "").toUpperCase();
+    const state = totpState(key);
+    if (submitted === STUB_TOTP_CODE) {
+      // fine
+    } else if (
+      submitted === STUB_RECOVERY_CODE &&
+      state.recoveryRemaining > 0
+    ) {
+      state.recoveryRemaining -= 1;
+    } else {
+      return detail(res, 401, "That code is not valid");
+    }
+
     const remember = body.remember_me === true;
     return json(res, 200, STUB_USERS[key], {
       "set-cookie": sessionCookie(key, remember ? 60 * 60 * 24 * 30 : 60 * 60),
@@ -202,6 +297,93 @@ const server = createServer(async (req, res) => {
   if (path.startsWith("/auth/sessions/") && method === "POST") {
     // Both /revoke and /revoke-others.
     return json(res, 200, { revoked: path.endsWith("/revoke") ? 1 : 3 });
+  }
+
+  if (path === "/auth/2fa" && method === "GET") {
+    const state = totpState(key);
+    return json(res, 200, {
+      enabled: state.enabled,
+      confirmed_at: state.enabled ? "2026-08-27T09:00:00+07:00" : null,
+      recovery_codes_remaining: state.recoveryRemaining,
+    });
+  }
+
+  if (path === "/auth/2fa/setup" && method === "POST") {
+    if (setupUnavailable) {
+      return detail(
+        res,
+        503,
+        "Two-factor authentication is temporarily unavailable.",
+      );
+    }
+    const state = totpState(key);
+    if (state.enabled) {
+      return detail(res, 409, "Two-factor authentication is already enabled");
+    }
+    state.pendingSecret = "JBSWY3DPEHPK3PXP";
+    return json(res, 201, {
+      secret: state.pendingSecret,
+      provisioning_uri: `otpauth://totp/FundLok:${encodeURIComponent(
+        user.email,
+      )}?secret=${state.pendingSecret}&issuer=FundLok`,
+    });
+  }
+
+  if (path === "/auth/2fa/enable" && method === "POST") {
+    const body = await readBody(req);
+    const state = totpState(key);
+    if (!state.pendingSecret) {
+      return detail(res, 400, "Start two-factor setup before enabling it");
+    }
+    if (String(body.code ?? "") !== STUB_TOTP_CODE) {
+      return detail(
+        res,
+        400,
+        "That code is not valid. Check your authenticator app and try again.",
+      );
+    }
+    state.enabled = true;
+    state.recoveryRemaining = 8;
+    return json(res, 200, {
+      enabled: true,
+      recovery_codes: [
+        STUB_RECOVERY_CODE,
+        "RECOVERY02",
+        "RECOVERY03",
+        "RECOVERY04",
+        "RECOVERY05",
+        "RECOVERY06",
+        "RECOVERY07",
+        "RECOVERY08",
+      ],
+    });
+  }
+
+  if (path === "/auth/2fa/disable" && method === "POST") {
+    const body = await readBody(req);
+    const state = totpState(key);
+    if (!state.enabled) {
+      return detail(res, 400, "Two-factor authentication is not enabled");
+    }
+    if (body.password !== STUB_PASSWORD) {
+      return detail(res, 400, "Password is incorrect");
+    }
+    const submitted = String(body.code ?? "").toUpperCase();
+    if (submitted !== STUB_TOTP_CODE && submitted !== STUB_RECOVERY_CODE) {
+      return detail(
+        res,
+        400,
+        "That code is not valid. Use a code from your app or a recovery code.",
+      );
+    }
+    state.enabled = false;
+    state.pendingSecret = null;
+    state.recoveryRemaining = 0;
+    return json(res, 200, {
+      enabled: false,
+      confirmed_at: null,
+      recovery_codes_remaining: 0,
+    });
   }
 
   if (path === "/users/me/security-preferences") {

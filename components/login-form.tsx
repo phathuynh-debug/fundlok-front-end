@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useTurnstile } from "@/hooks/use-turnstile";
+import { TwoFactorStep } from "@/components/two-factor-step";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -27,7 +28,17 @@ export function LoginForm() {
   } = useTurnstile();
 
   const { toast } = useToast();
-  const { login, googleLogin, isPending, isGooglePending } = useLogin();
+  const {
+    login,
+    googleLogin,
+    isPending,
+    isGooglePending,
+    totpRequired,
+    submitTotpCode,
+    isVerifyingCode,
+    totpError,
+    cancelTotp,
+  } = useLogin();
   const { t } = useTranslations();
 
   const handleLogin = (e: React.FormEvent) => {
@@ -71,6 +82,24 @@ export function LoginForm() {
       },
     );
   };
+
+  // A pending second factor replaces the form entirely — see TwoFactorStep for
+  // why it is not rendered alongside it.
+  if (totpRequired) {
+    return (
+      <TwoFactorStep
+        onSubmit={submitTotpCode}
+        onCancel={() => {
+          cancelTotp();
+          // The Turnstile token was spent on the first attempt; without a reset
+          // the retry would resubmit a used token and Cloudflare rejects it.
+          resetTurnstile();
+        }}
+        isVerifying={isVerifyingCode}
+        error={totpError}
+      />
+    );
+  }
 
   return (
     <div className="space-y-4">
