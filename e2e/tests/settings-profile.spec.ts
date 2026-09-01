@@ -102,23 +102,3 @@ test("an empty name is rejected", async ({ page }) => {
     page.getByText(t("dashboard.settings.profile.fullNameRequired")).first(),
   ).toBeVisible();
 });
-
-test("the sidebar links to settings routes that do not exist yet", async ({
-  page,
-}) => {
-  // Deliberately asserts the CURRENT truth: /account and /billing are linked
-  // from the nav but unimplemented. When one is built, this test fails and
-  // should be updated — that is the point, so the gap cannot be quietly
-  // forgotten. /appearance was on this list until it was built; its coverage
-  // now lives in settings-appearance.spec.ts.
-  for (const path of [
-    "/dashboard/settings/account",
-    "/dashboard/settings/billing",
-  ]) {
-    const response = await page.request.get(path);
-    expect(
-      response.status(),
-      `${path} is linked in the sidebar — implement it or remove the link`,
-    ).toBe(404);
-  }
-});

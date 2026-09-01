@@ -14,9 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   UserRound,
-  UserCog,
   Palette,
-  CreditCard,
   type LucideIcon,
 } from "lucide-react";
 import { cn, getInitials } from "@/lib/utils";
@@ -63,6 +61,18 @@ const navItems: NavItem[] = [
   },
 ];
 
+// Only routes that exist. "Account" was removed rather than built: every
+// account capability the API exposes already lives on the profile page
+// (identity, email, role, password) or on /dashboard/security (sessions,
+// alerts), so a third page would only re-render the other two. "Billing" was
+// removed because the product has no per-user billing — FundLok's fee is
+// deducted from each disbursement through the omnibus account, so a user never
+// enters a payment method or receives an invoice.
+//
+// An Account page earns its place once the backend can change an email (with
+// re-verification), unlink an OAuth provider, export data, or close an account
+// — none of which have endpoints today, and account closure is a Decree 94
+// retention question before it is a UI one.
 const settingsItems: NavItem[] = [
   {
     labelKey: "dashboard.sidebar.settingsProfile",
@@ -70,19 +80,9 @@ const settingsItems: NavItem[] = [
     icon: UserRound,
   },
   {
-    labelKey: "dashboard.sidebar.settingsAccount",
-    href: "/dashboard/settings/account",
-    icon: UserCog,
-  },
-  {
     labelKey: "dashboard.sidebar.settingsAppearance",
     href: "/dashboard/settings/appearance",
     icon: Palette,
-  },
-  {
-    labelKey: "dashboard.sidebar.settingsBilling",
-    href: "/dashboard/settings/billing",
-    icon: CreditCard,
   },
 ];
 
