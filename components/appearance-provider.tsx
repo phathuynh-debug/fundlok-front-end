@@ -3,7 +3,13 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { MotionConfig } from "framer-motion";
 
-import { REDUCE_MOTION_COOKIE_NAME } from "@/lib/appearance";
+import {
+  ACCENT_COOKIE_NAME,
+  RADIUS_COOKIE_NAME,
+  REDUCE_MOTION_COOKIE_NAME,
+  type AccentId,
+  type RadiusId,
+} from "@/lib/appearance";
 
 /**
  * The "reduce motion" preference, and the MotionConfig that enforces it.
@@ -29,28 +35,63 @@ import { REDUCE_MOTION_COOKIE_NAME } from "@/lib/appearance";
 type AppearanceContextValue = {
   reduceMotion: boolean;
   setReduceMotion: (value: boolean) => void;
+  accent: AccentId;
+  setAccent: (value: AccentId) => void;
+  radius: RadiusId;
+  setRadius: (value: RadiusId) => void;
 };
+
+/** One cookie write, one <html> attribute — the two halves of persisting a
+ *  preference that CSS reads. The attribute is what takes effect now; the
+ *  cookie is what makes the server render it on the next request. */
+function persist(attribute: string, cookieName: string, value: string) {
+  document.documentElement.setAttribute(attribute, value);
+  document.cookie = `${cookieName}=${value}; path=/; max-age=31536000; samesite=lax`;
+}
 
 const AppearanceContext = createContext<AppearanceContextValue | null>(null);
 
 export function AppearanceProvider({
   initialReduceMotion,
+  initialAccent,
+  initialRadius,
   children,
 }: {
   initialReduceMotion: boolean;
+  initialAccent: AccentId;
+  initialRadius: RadiusId;
   children: React.ReactNode;
 }) {
   const [reduceMotion, setReduceMotionState] = useState(initialReduceMotion);
+  const [accent, setAccentState] = useState(initialAccent);
+  const [radius, setRadiusState] = useState(initialRadius);
 
+  // Effects, not the setters, own persistence — so a preference restored from
+  // the server is also re-affirmed, and the cookie can never drift from state.
   useEffect(() => {
     document.cookie = `${REDUCE_MOTION_COOKIE_NAME}=${
       reduceMotion ? "1" : "0"
     }; path=/; max-age=31536000; samesite=lax`;
   }, [reduceMotion]);
 
+  useEffect(() => {
+    persist("data-accent", ACCENT_COOKIE_NAME, accent);
+  }, [accent]);
+
+  useEffect(() => {
+    persist("data-radius", RADIUS_COOKIE_NAME, radius);
+  }, [radius]);
+
   const value = useMemo<AppearanceContextValue>(
-    () => ({ reduceMotion, setReduceMotion: setReduceMotionState }),
-    [reduceMotion],
+    () => ({
+      reduceMotion,
+      setReduceMotion: setReduceMotionState,
+      accent,
+      setAccent: setAccentState,
+      radius,
+      setRadius: setRadiusState,
+    }),
+    [reduceMotion, accent, radius],
   );
 
   return (

@@ -6,7 +6,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AppearanceProvider } from "@/components/appearance-provider";
 import {
+  ACCENT_COOKIE_NAME,
+  RADIUS_COOKIE_NAME,
   REDUCE_MOTION_COOKIE_NAME,
+  parseAccentCookie,
+  parseRadiusCookie,
   parseReduceMotionCookie,
 } from "@/lib/appearance";
 import { QueryProvider } from "@/providers/query-provider";
@@ -83,6 +87,8 @@ export default async function RootLayout({
   const reduceMotion = parseReduceMotionCookie(
     cookieStore.get(REDUCE_MOTION_COOKIE_NAME)?.value,
   );
+  const accent = parseAccentCookie(cookieStore.get(ACCENT_COOKIE_NAME)?.value);
+  const radius = parseRadiusCookie(cookieStore.get(RADIUS_COOKIE_NAME)?.value);
 
   const localBusinessSchema = {
     "@context": "https://schema.org",
@@ -106,7 +112,14 @@ export default async function RootLayout({
   };
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html
+      lang={locale}
+      // Rendered server-side so the accent and radius are correct on the
+      // first paint; the CSS in globals.css keys off these attributes.
+      data-accent={accent}
+      data-radius={radius}
+      suppressHydrationWarning
+    >
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
       >
@@ -127,7 +140,11 @@ export default async function RootLayout({
                 defaultTheme="system"
                 enableSystem
               >
-                <AppearanceProvider initialReduceMotion={reduceMotion}>
+                <AppearanceProvider
+                  initialReduceMotion={reduceMotion}
+                  initialAccent={accent}
+                  initialRadius={radius}
+                >
                   <main>{children}</main>
                 </AppearanceProvider>
               </ThemeProvider>

@@ -530,6 +530,19 @@
     },
     "settings": {
       "appearance": {
+        "accent": {
+          "colors": {
+            "amber": "Amber",
+            "blue": "Blue",
+            "emerald": "Emerald",
+            "graphite": "Graphite",
+            "rose": "Rose",
+            "violet": "Violet"
+          },
+          "description": "Sets the colour of buttons, the active sidebar item, focus rings and selected states.",
+          "heading": "Accent colour",
+          "scopeNote": "Status colours are not affected — money received stays green and overdue stays red, whichever accent you pick."
+        },
         "language": {
           "description": "Changes every label, date and currency format across the app.",
           "enHint": "Amounts appear as ₫1,250,000,000.",
@@ -542,6 +555,21 @@
           "reduceHint": "Turns off sliding and scaling animations. Fades are kept, so nothing appears without warning.",
           "reduceLabel": "Reduce motion",
           "systemNote": "If your device already requests reduced motion, FundLok honours it whether or not this is on."
+        },
+        "preview": {
+          "action": "Continue",
+          "badge": "Active",
+          "fieldLabel": "Amount",
+          "label": "Preview"
+        },
+        "radius": {
+          "description": "Applies to every card, button, input and dialog in the app.",
+          "heading": "Corners",
+          "options": {
+            "default": "Default",
+            "rounded": "Rounded",
+            "sharp": "Sharp"
+          }
         },
         "subtitle": "Choose how FundLok looks and moves on this device",
         "theme": {

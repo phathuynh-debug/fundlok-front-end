@@ -3,13 +3,23 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { motion } from "framer-motion";
-import { Globe, Laptop, Moon, Sparkles, Sun, Zap } from "lucide-react";
+import {
+  Globe,
+  Laptop,
+  Moon,
+  Palette,
+  Sparkles,
+  Square,
+  Sun,
+  Zap,
+} from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAppearance } from "@/components/appearance-provider";
+import { RADII } from "@/lib/appearance";
 import { useTranslations } from "@/lib/i18n";
 import {
   fadeInUpProps,
@@ -17,6 +27,8 @@ import {
   springItemVariants,
   staggerContainerVariants,
 } from "@/lib/animations";
+import { AccentPicker } from "./_components/AccentPicker";
+import { ChromePreview } from "./_components/ChromePreview";
 import { OptionCard } from "./_components/OptionCard";
 import { ThemePreview } from "./_components/ThemePreview";
 
@@ -31,6 +43,8 @@ import { ThemePreview } from "./_components/ThemePreview";
  * Persistence differs per preference and that is deliberate:
  *   theme        next-themes (localStorage) + the `class` attribute
  *   language     NEXT_LOCALE cookie, read by app/layout.tsx during SSR
+ *   accent       fl_accent cookie + a data-accent attribute on <html>
+ *   radius       fl_radius cookie + a data-radius attribute on <html>
  *   reduce motion  fl_reduce_motion cookie, likewise (see appearance-provider)
  * None of the three round-trips to the backend: there is no user-preferences
  * API, and inventing one here would mean a column, a migration and a shared
@@ -40,7 +54,14 @@ import { ThemePreview } from "./_components/ThemePreview";
 export function AppearanceClient() {
   const { t, locale, setLocale } = useTranslations();
   const { theme, setTheme } = useTheme();
-  const { reduceMotion, setReduceMotion } = useAppearance();
+  const {
+    reduceMotion,
+    setReduceMotion,
+    accent,
+    setAccent,
+    radius,
+    setRadius,
+  } = useAppearance();
 
   // next-themes cannot know the resolved theme until it has read localStorage,
   // so rendering a selection before mount would flash the wrong option. Same
@@ -146,6 +167,71 @@ export function AppearanceClient() {
                 ))}
               </div>
             )}
+          </Card>
+        </motion.div>
+
+        {/* Accent + radius: the two knobs that restyle the whole app */}
+        <motion.div variants={springItemVariants}>
+          <Card className="p-6 md:p-8">
+            <div className="mb-5">
+              <h2 className="flex items-center gap-2.5 text-lg font-semibold text-foreground">
+                <Palette className="h-5 w-5 text-primary" />
+                {t("dashboard.settings.appearance.accent.heading")}
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {t("dashboard.settings.appearance.accent.description")}
+              </p>
+            </div>
+
+            <AccentPicker value={accent} onChange={setAccent} />
+
+            <p className="mt-4 text-xs text-muted-foreground">
+              {t("dashboard.settings.appearance.accent.scopeNote")}
+            </p>
+          </Card>
+        </motion.div>
+
+        <motion.div variants={springItemVariants}>
+          <Card className="p-6 md:p-8">
+            <div className="mb-5">
+              <h2 className="flex items-center gap-2.5 text-lg font-semibold text-foreground">
+                <Square className="h-5 w-5 text-primary" />
+                {t("dashboard.settings.appearance.radius.heading")}
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {t("dashboard.settings.appearance.radius.description")}
+              </p>
+            </div>
+
+            <div
+              role="radiogroup"
+              aria-label={t("dashboard.settings.appearance.radius.heading")}
+              className="grid gap-3 sm:grid-cols-3"
+            >
+              {RADII.map((option) => (
+                <OptionCard
+                  key={option.id}
+                  id={`radius-${option.id}`}
+                  label={t(
+                    `dashboard.settings.appearance.radius.options.${option.labelKey}`,
+                  )}
+                  icon={Square}
+                  selected={radius === option.id}
+                  onSelect={() => setRadius(option.id)}
+                  preview={
+                    <span
+                      aria-hidden="true"
+                      style={{ borderRadius: option.value }}
+                      className="block h-10 w-full border-2 border-primary/40 bg-primary/10"
+                    />
+                  }
+                />
+              ))}
+            </div>
+
+            <div className="mt-5">
+              <ChromePreview />
+            </div>
           </Card>
         </motion.div>
 
