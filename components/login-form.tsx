@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useTurnstile } from "@/hooks/use-turnstile";
 import { TwoFactorStep } from "@/components/two-factor-step";
+import { isGoogleSignInConfigured } from "@/lib/google-oauth";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -103,45 +104,52 @@ export function LoginForm() {
 
   return (
     <div className="space-y-4">
-      <Button
-        type="button"
-        onClick={() => googleLogin()}
-        disabled={isGooglePending}
-        className="w-full h-11 bg-white text-black flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-colors"
-      >
-        <svg
-          className="mr-3 h-4 w-4"
-          viewBox="0 0 533.5 544.3"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden
-        >
-          <path
-            fill="#4285F4"
-            d="M533.5 278.4c0-18.5-1.5-37.3-4.7-55.3H272v104.8h147.5c-6.3 34.1-25.1 62.9-53.6 82.2v68.2h86.6c50.7-46.7 80-115.4 80-199.9z"
-          />
-          <path
-            fill="#34A853"
-            d="M272 544.3c72.6 0 133.6-23.9 178.2-64.8l-86.6-68.2c-24.1 16.2-55 25.8-91.6 25.8-70 0-129.3-47.2-150.5-110.5H32.3v69.5C76.9 489.5 167.6 544.3 272 544.3z"
-          />
-          <path
-            fill="#FBBC05"
-            d="M121.5 325c-10.7-32-10.7-66.2 0-98.2V157.3H32.3c-43 85.4-43 187.2 0 272.6l89.2-69.9z"
-          />
-          <path
-            fill="#EA4335"
-            d="M272 109.7c38.8 0 73.6 13.4 101 39l75.7-75.7C405.8 28.2 349.6 0 272 0 167.6 0 76.9 54.8 32.3 137.8l89.2 69.5c21.2-63.3 80.5-110.5 150.5-110.5z"
-          />
-        </svg>
-        <span>{t("auth.login.signInWithGoogle")}</span>
-      </Button>
+      {/* Hidden when the build has no NEXT_PUBLIC_GOOGLE_CLIENT_ID. A button
+          that cannot work is worse than no button, and the provider behind it
+          is running on a placeholder id in that case — see lib/google-oauth.ts. */}
+      {isGoogleSignInConfigured && (
+        <>
+          <Button
+            type="button"
+            onClick={() => googleLogin()}
+            disabled={isGooglePending}
+            className="w-full h-11 bg-white text-black flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-colors"
+          >
+            <svg
+              className="mr-3 h-4 w-4"
+              viewBox="0 0 533.5 544.3"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden
+            >
+              <path
+                fill="#4285F4"
+                d="M533.5 278.4c0-18.5-1.5-37.3-4.7-55.3H272v104.8h147.5c-6.3 34.1-25.1 62.9-53.6 82.2v68.2h86.6c50.7-46.7 80-115.4 80-199.9z"
+              />
+              <path
+                fill="#34A853"
+                d="M272 544.3c72.6 0 133.6-23.9 178.2-64.8l-86.6-68.2c-24.1 16.2-55 25.8-91.6 25.8-70 0-129.3-47.2-150.5-110.5H32.3v69.5C76.9 489.5 167.6 544.3 272 544.3z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M121.5 325c-10.7-32-10.7-66.2 0-98.2V157.3H32.3c-43 85.4-43 187.2 0 272.6l89.2-69.9z"
+              />
+              <path
+                fill="#EA4335"
+                d="M272 109.7c38.8 0 73.6 13.4 101 39l75.7-75.7C405.8 28.2 349.6 0 272 0 167.6 0 76.9 54.8 32.3 137.8l89.2 69.5c21.2-63.3 80.5-110.5 150.5-110.5z"
+              />
+            </svg>
+            <span>{t("auth.login.signInWithGoogle")}</span>
+          </Button>
 
-      <div className="flex items-center gap-3">
-        <span className="flex-1 h-px bg-border" />
-        <span className="text-sm text-muted-foreground">
-          {t("auth.login.or")}
-        </span>
-        <span className="flex-1 h-px bg-border" />
-      </div>
+          <div className="flex items-center gap-3">
+            <span className="flex-1 h-px bg-border" />
+            <span className="text-sm text-muted-foreground">
+              {t("auth.login.or")}
+            </span>
+            <span className="flex-1 h-px bg-border" />
+          </div>
+        </>
+      )}
 
       <form onSubmit={handleLogin} className="space-y-4">
         <div className="space-y-2">

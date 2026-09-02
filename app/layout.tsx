@@ -5,6 +5,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AppearanceProvider } from "@/components/appearance-provider";
+import { GOOGLE_CLIENT_ID_OR_PLACEHOLDER } from "@/lib/google-oauth";
 import {
   ACCENT_COOKIE_NAME,
   RADIUS_COOKIE_NAME,
@@ -130,9 +131,10 @@ export default async function RootLayout({
             __html: JSON.stringify(localBusinessSchema),
           }}
         />
-        <GoogleOAuthProvider
-          clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}
-        >
+        {/* Never an empty string: @react-oauth/google throws on init with one,
+            and Next turns that hydration error into a full-page crash — taking
+            password sign-in down with it. See lib/google-oauth.ts. */}
+        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID_OR_PLACEHOLDER}>
           <QueryProvider>
             <LocaleProvider initialLocale={locale}>
               <ThemeProvider

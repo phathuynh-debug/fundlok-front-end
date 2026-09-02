@@ -11,6 +11,15 @@ import { toast } from "../support/ui";
  * file is what proves the form, the API call and the cookie handshake actually
  * work, so the shortcut elsewhere stands on something tested.
  *
+ * Google sign-in: CI builds WITHOUT NEXT_PUBLIC_GOOGLE_CLIENT_ID (it only lives
+ * in a developer's .env.local), so these tests run the unconfigured path — the
+ * Google button is absent and password sign-in carries the screen. That is not
+ * incidental: an empty client id used to make @react-oauth/google throw during
+ * hydration, Next replaced the whole page with its error boundary, and every
+ * test here failed on a detached input. lib/google-oauth.ts is the guard, and
+ * these tests are what prove it holds. Locally .env.local supplies a real id,
+ * so between a dev machine and CI both configurations get exercised.
+ *
  * Turnstile: the suite runs with NEXT_PUBLIC_DISABLE_TURNSTILE=true, the app's
  * own escape hatch in hooks/use-turnstile.ts, which supplies a "mock-token" and
  * renders no widget. No CAPTCHA is being solved or circumvented — the real
