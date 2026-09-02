@@ -89,6 +89,7 @@ export function TwoFactorStep({
         <Button
           type="button"
           onClick={submit}
+          aria-label={t("auth.login.twoFactorVerify")}
           disabled={isVerifying || !code.trim()}
           className="h-11 w-full"
         >

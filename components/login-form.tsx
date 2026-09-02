@@ -220,6 +220,7 @@ export function LoginForm() {
         <Button
           type="submit"
           className="w-full h-11"
+          aria-label={t("auth.login.submit")}
           disabled={isPending || !turnstileToken || isGooglePending}
         >
           {isPending ? (
