@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useLogout, useRequireAuth } from "@/hooks/use-authentication";
 import {
   LogOut,
-  Home,
   Loader2,
   Menu,
   X,
@@ -18,7 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useTranslations } from "@/lib/i18n";
@@ -61,7 +60,6 @@ const navItems = [
 export function DashboardHeader() {
   const { user, isLoading } = useRequireAuth();
   const { mutate: logout } = useLogout();
-  const router = useRouter();
   const pathname = usePathname();
   const { t } = useTranslations();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

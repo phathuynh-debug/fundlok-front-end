@@ -11,6 +11,22 @@ const nextConfig: NextConfig = {
   // QR handoff opens the app on a phone via the Mac's LAN address, so allow
   // private-network origins in dev (no effect on production builds).
   allowedDevOrigins: ["192.168.*.*", "10.*.*.*", "*.ngrok-free.app"],
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(self), microphone=(), geolocation=()",
+          },
+        ],
+      },
+    ];
+  },
   async rewrites() {
     return [
       {

@@ -17,6 +17,23 @@ export function postVerificationTarget(
   next: string | null | undefined,
   role?: UserRole | string | null,
 ): string {
-  if (next && next.startsWith("/") && !next.startsWith("//")) return next;
+  if (
+    next &&
+    next.startsWith("/") &&
+    !next.startsWith("//") &&
+    !next.startsWith("/\\")
+  ) {
+    try {
+      const parsed = new URL(next, "http://localhost");
+      if (
+        parsed.origin === "http://localhost" &&
+        parsed.pathname.startsWith("/")
+      ) {
+        return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+      }
+    } catch {
+      // Invalid URL - fall through to fallback
+    }
+  }
   return kycLandingForRole(role);
 }

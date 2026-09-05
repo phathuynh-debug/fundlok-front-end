@@ -11,7 +11,7 @@ const PROTECTED_ROUTES = [
 ];
 
 // Routes that should redirect based on whether the user already has projects.
-const AUTH_ROUTES = ["/login", "/"];
+const AUTH_ROUTES = ["/login", "/register", "/"];
 const APPLICATION_ROUTE = "/project-application";
 const DASHBOARD_ROUTE = "/dashboard";
 const ADMIN_ROUTE = "/admin";
@@ -85,8 +85,26 @@ function requiredVerificationForPath(
 // Only accept same-origin absolute paths as a post-verification redirect target,
 // so a crafted ?next= can't turn /kyc into an open redirect.
 function safeNextPath(next: string | null): string | null {
-  if (!next || !next.startsWith("/") || next.startsWith("//")) return null;
-  return next;
+  if (
+    !next ||
+    !next.startsWith("/") ||
+    next.startsWith("//") ||
+    next.startsWith("/\\")
+  ) {
+    return null;
+  }
+  try {
+    const parsed = new URL(next, "http://localhost");
+    if (
+      parsed.origin === "http://localhost" &&
+      parsed.pathname.startsWith("/")
+    ) {
+      return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+    }
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 // Paths whose auth/role rules are handled below. The matcher only runs
@@ -95,6 +113,7 @@ function isHandledRoute(pathname: string) {
   return (
     pathname === "/" ||
     pathname === "/login" ||
+    pathname === "/register" ||
     pathname === "/verify-email" ||
     pathname === SELECT_ROLE_ROUTE ||
     pathname.startsWith(KYC_ROUTE) ||
