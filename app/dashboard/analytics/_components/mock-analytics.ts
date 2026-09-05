@@ -110,6 +110,18 @@ export const MOCK_ALLOCATION: IndustryAllocation[] = [
   { industry: "Energy", deployed: 500000000 },
 ];
 
+export interface CapitalStatusAllocation {
+  statusKey: "active" | "repaying" | "completed";
+  amount: number;
+}
+
+// Breakdown of deployed capital across loan lifecycle stages. Sums to 4,250,000,000 VND.
+export const MOCK_CAPITAL_STATUS: CapitalStatusAllocation[] = [
+  { statusKey: "active", amount: 2450000000 },
+  { statusKey: "repaying", amount: 1120000000 },
+  { statusKey: "completed", amount: 680000000 },
+];
+
 export const MOCK_ACTIVE_POSITIONS = 8;
 
 export type RangeKey = "3M" | "6M" | "12M";

@@ -12,20 +12,23 @@ import { formatCurrency } from "@/lib/format-currency";
 import { useTranslations } from "@/lib/i18n";
 import {
   monthTickLabel,
+  type CapitalStatusAllocation,
   type IndustryAllocation,
   type MonthlyPoint,
 } from "./mock-analytics";
 
-// The table twin of the three charts. Every value plotted above is readable
+// The table twin of the charts. Every value plotted above is readable
 // here without hovering anything, which is what keeps the tooltips an
 // enhancement rather than the only way to get at the numbers.
 export function AnalyticsTableView({
   points,
   allocation,
+  capitalStatus,
   total,
 }: {
   points: MonthlyPoint[];
   allocation: IndustryAllocation[];
+  capitalStatus: CapitalStatusAllocation[];
   total: number;
 }) {
   const { t, locale } = useTranslations();
@@ -106,6 +109,42 @@ export function AnalyticsTableView({
                 </TableCell>
                 <TableCell className="text-right font-mono text-sm tabular-nums whitespace-nowrap">
                   {((row.deployed / total) * 100).toFixed(1)}%
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </section>
+
+      <section className="bg-card text-card-foreground border border-border rounded-xl shadow-xs overflow-hidden">
+        <h3 className="px-5 pt-5 pb-3 text-sm font-semibold">
+          {t("dashboard.analytics.charts.capitalStatusTitle")}
+        </h3>
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="font-mono text-[10px] uppercase tracking-wider">
+                {t("dashboard.analytics.table.status")}
+              </TableHead>
+              <TableHead className="font-mono text-[10px] uppercase tracking-wider text-right">
+                {t("dashboard.analytics.series.deployed")}
+              </TableHead>
+              <TableHead className="font-mono text-[10px] uppercase tracking-wider text-right">
+                {t("dashboard.analytics.table.share")}
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {capitalStatus.map((row) => (
+              <TableRow key={row.statusKey}>
+                <TableCell className="text-sm font-medium whitespace-nowrap">
+                  {t(`dashboard.analytics.charts.status.${row.statusKey}`)}
+                </TableCell>
+                <TableCell className="text-right font-mono text-sm tabular-nums whitespace-nowrap">
+                  {formatCurrency(row.amount, locale)}
+                </TableCell>
+                <TableCell className="text-right font-mono text-sm tabular-nums whitespace-nowrap">
+                  {((row.amount / total) * 100).toFixed(1)}%
                 </TableCell>
               </TableRow>
             ))}

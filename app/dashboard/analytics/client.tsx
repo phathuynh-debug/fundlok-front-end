@@ -11,6 +11,7 @@ import { DashboardHeader } from "../_components/DashboardHeader";
 import { AnalyticsKpiCards } from "./_components/AnalyticsKpiCards";
 import { AnalyticsTableView } from "./_components/AnalyticsTableView";
 import { CapitalFlowChart } from "./_components/CapitalFlowChart";
+import { CapitalStatusChart } from "./_components/CapitalStatusChart";
 import { IndustryAllocationChart } from "./_components/IndustryAllocationChart";
 import { IndustrySplitChart } from "./_components/IndustrySplitChart";
 import { MonthlyReturnsChart } from "./_components/MonthlyReturnsChart";
@@ -18,6 +19,7 @@ import { SmeAnalyticsView } from "./_components/sme/SmeAnalyticsView";
 import {
   deriveKpis,
   MOCK_ALLOCATION,
+  MOCK_CAPITAL_STATUS,
   MOCK_MONTHLY,
   sliceByRange,
   totalAllocated,
@@ -44,6 +46,8 @@ function AnalyticsSkeleton() {
       </div>
       <Skeleton className="h-[360px] w-full rounded-xl" />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Skeleton className="h-[360px] w-full rounded-xl" />
+        <Skeleton className="h-[360px] w-full rounded-xl" />
         <Skeleton className="h-[360px] w-full rounded-xl" />
         <Skeleton className="h-[360px] w-full rounded-xl" />
       </div>
@@ -231,6 +235,18 @@ export default function AnalyticsClient() {
                       total={allocationTotal}
                     />
                   </ChartCard>
+
+                  <ChartCard
+                    title={t("dashboard.analytics.charts.capitalStatusTitle")}
+                    description={t(
+                      "dashboard.analytics.charts.capitalStatusDesc",
+                    )}
+                  >
+                    <CapitalStatusChart
+                      statusAllocation={MOCK_CAPITAL_STATUS}
+                      total={allocationTotal}
+                    />
+                  </ChartCard>
                 </div>
 
                 <p className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -245,6 +261,7 @@ export default function AnalyticsClient() {
               <AnalyticsTableView
                 points={points}
                 allocation={MOCK_ALLOCATION}
+                capitalStatus={MOCK_CAPITAL_STATUS}
                 total={allocationTotal}
               />
             )}

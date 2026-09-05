@@ -277,11 +277,18 @@
         "allocationTitle": "Capital by industry",
         "capitalFlowDesc": "Cumulative totals to date, both in US dollars.",
         "capitalFlowTitle": "Capital deployed vs returns received",
+        "capitalStatusDesc": "Share of deployed capital across loan lifecycle stages.",
+        "capitalStatusTitle": "Capital status distribution",
         "monthlyReturnsDesc": "Returns received in each individual month.",
         "monthlyReturnsTitle": "Returns by month",
         "otherIndustries": "Other",
         "splitDesc": "Share of deployed capital held in each sector.",
         "splitTitle": "Portfolio concentration",
+        "status": {
+          "active": "Active & performing",
+          "completed": "Fully repaid",
+          "repaying": "In repayment"
+        },
         "totalDeployed": "Total deployed"
       },
       "kpi": {
@@ -309,7 +316,8 @@
       "table": {
         "industry": "Industry",
         "month": "Month",
-        "share": "Share"
+        "share": "Share",
+        "status": "Status"
       },
       "tableHint": "Prefer the raw numbers? Switch to the table view above — every plotted value is listed there.",
       "title": "Analytics",

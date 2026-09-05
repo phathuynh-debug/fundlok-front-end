@@ -277,11 +277,18 @@
         "allocationTitle": "Vốn theo ngành",
         "capitalFlowDesc": "Số liệu lũy kế đến hiện tại, đều tính bằng đô la Mỹ.",
         "capitalFlowTitle": "Vốn giải ngân so với lợi nhuận nhận được",
+        "capitalStatusDesc": "Tỷ trọng vốn giải ngân theo các giai đoạn khoản vay.",
+        "capitalStatusTitle": "Phân bổ trạng thái nguồn vốn",
         "monthlyReturnsDesc": "Lợi nhuận nhận được trong từng tháng riêng lẻ.",
         "monthlyReturnsTitle": "Lợi nhuận theo tháng",
         "otherIndustries": "Khác",
         "splitDesc": "Tỷ trọng vốn đã giải ngân theo từng ngành.",
         "splitTitle": "Mức độ tập trung danh mục",
+        "status": {
+          "active": "Đang hoạt động & sinh lời",
+          "completed": "Đã tất toán hoàn toàn",
+          "repaying": "Đang trong kỳ hoàn trả"
+        },
         "totalDeployed": "Tổng đã giải ngân"
       },
       "kpi": {
@@ -309,7 +316,8 @@
       "table": {
         "industry": "Ngành",
         "month": "Tháng",
-        "share": "Tỷ trọng"
+        "share": "Tỷ trọng",
+        "status": "Trạng thái"
       },
       "tableHint": "Muốn xem số liệu gốc? Chuyển sang chế độ bảng ở trên — mọi giá trị trên biểu đồ đều có ở đó.",
       "title": "Phân tích",
