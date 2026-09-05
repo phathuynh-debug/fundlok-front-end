@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
 export const isTurnstileDisabled =
-  process.env.NODE_ENV !== "production" &&
   process.env.NEXT_PUBLIC_DISABLE_TURNSTILE === "true";
 
 export function useTurnstile() {
