@@ -44,6 +44,10 @@ export interface Holding {
   /** Next scheduled distribution, or null once COMPLETED. */
   next_payout_date: string | null;
   status: HoldingStatus;
+  /** Credit grade from underwriting engine. */
+  grade?: string;
+  /** Risk classification tier. */
+  risk_rating?: "LOW" | "MEDIUM";
 }
 
 // Six positions spanning the whole lifecycle, so every status badge and the
@@ -62,6 +66,8 @@ export const MOCK_HOLDINGS: Holding[] = [
     progress_pct: 35,
     next_payout_date: "2026-09-05",
     status: "REPAYING",
+    grade: "A+",
+    risk_rating: "LOW",
   },
   {
     id: "10000000-0000-0000-0000-000000000002",
@@ -74,6 +80,8 @@ export const MOCK_HOLDINGS: Holding[] = [
     progress_pct: 10,
     next_payout_date: "2026-09-12",
     status: "REPAYING",
+    grade: "AAA",
+    risk_rating: "LOW",
   },
   {
     id: "10000000-0000-0000-0000-000000000003",
@@ -86,6 +94,8 @@ export const MOCK_HOLDINGS: Holding[] = [
     progress_pct: 100,
     next_payout_date: null,
     status: "COMPLETED",
+    grade: "AA",
+    risk_rating: "LOW",
   },
   {
     id: "10000000-0000-0000-0000-000000000004",
@@ -98,6 +108,8 @@ export const MOCK_HOLDINGS: Holding[] = [
     progress_pct: 0,
     next_payout_date: "2026-09-28",
     status: "ACTIVE",
+    grade: "A",
+    risk_rating: "LOW",
   },
   {
     id: "10000000-0000-0000-0000-000000000005",
@@ -110,6 +122,8 @@ export const MOCK_HOLDINGS: Holding[] = [
     progress_pct: 45,
     next_payout_date: "2026-09-08",
     status: "REPAYING",
+    grade: "A+",
+    risk_rating: "LOW",
   },
   {
     id: "10000000-0000-0000-0000-000000000006",
@@ -122,6 +136,8 @@ export const MOCK_HOLDINGS: Holding[] = [
     progress_pct: 0,
     next_payout_date: null,
     status: "FUNDING",
+    grade: "A",
+    risk_rating: "LOW",
   },
 ];
 

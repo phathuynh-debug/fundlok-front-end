@@ -340,10 +340,14 @@
     "investor": {
       "activeInvestments": "Active Investments",
       "browseProjects": "Browse Investment Projects",
+      "holdingExpectedRoi": "Expected ROI",
+      "holdingGrade": "Grade {grade}",
       "holdingInvested": "Invested",
       "holdingNextPayout": "Next Payout",
       "holdingProgress": "Repayment progress",
+      "holdingRank": "Rank #{rank}",
       "holdingReturned": "Returned",
+      "holdingRiskLow": "Low Risk",
       "holdingRoi": "Yield / Term",
       "holdingRoiValue": "{rate}% · {months}m",
       "holdingStatus": {
@@ -352,6 +356,7 @@
         "FUNDING": "Funding",
         "REPAYING": "Repaying"
       },
+      "holdingTopYield": "Top Yield #{rank}",
       "holdingViewDetails": "View project details",
       "holdingsTitle": "Your Positions ({count})",
       "mockNotice": "Sample data, shown while this screen is built out. It is not connected to the backend yet, so these positions and figures are not your real portfolio.",
@@ -369,6 +374,7 @@
       "duration": "Duration",
       "edit": "Edit",
       "expectedRoi": "Expected ROI",
+      "grade": "Grade {grade}",
       "incorporation": "Incorporation",
       "industry": "Industry",
       "invest": "Invest",

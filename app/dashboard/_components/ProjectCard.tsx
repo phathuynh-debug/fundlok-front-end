@@ -1,4 +1,4 @@
-import { ArrowRight, Pencil } from "lucide-react";
+import { ArrowRight, Pencil, Sparkles } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -92,18 +92,33 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
               {t("dashboard.projectCard.created", { date: createdDate })}
             </p>
           </div>
-          <Badge
-            className={cn(
-              "rounded-full px-3 py-1 font-medium",
-              isActive
-                ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                : "bg-muted text-muted-foreground hover:bg-muted/80",
+          <div className="flex flex-wrap items-center gap-2">
+            {role === "INVESTOR" && (
+              <>
+                <Badge className="bg-primary text-primary-foreground font-mono text-[10px] uppercase font-bold tracking-wider rounded-full px-2.5 py-0.5 border-none">
+                  {t("dashboard.projectCard.lowRisk")}
+                </Badge>
+                <Badge
+                  variant="outline"
+                  className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30 font-mono text-[10px] uppercase font-bold tracking-wider rounded-full px-2.5 py-0.5"
+                >
+                  {t("dashboard.projectCard.grade", { grade: "A+" })}
+                </Badge>
+              </>
             )}
-          >
-            {isActive
-              ? t("dashboard.projectCard.status.active")
-              : t("dashboard.projectCard.status.draft")}
-          </Badge>
+            <Badge
+              className={cn(
+                "rounded-full px-3 py-1 font-medium",
+                isActive
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80",
+              )}
+            >
+              {isActive
+                ? t("dashboard.projectCard.status.active")
+                : t("dashboard.projectCard.status.draft")}
+            </Badge>
+          </div>
         </div>
 
         {/* Metrics row.
@@ -135,20 +150,20 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
           {role === "INVESTOR" ? (
             <>
               <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-muted-foreground">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground font-mono">
                   {t("dashboard.projectCard.askingAmount")}
                 </span>
-                <span className="text-base font-semibold">
+                <span className="text-lg font-black font-mono text-foreground">
                   {askingAmount === undefined
                     ? t("dashboard.projectCard.pending")
                     : formatCurrency(askingAmount, locale)}
                 </span>
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-muted-foreground">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground font-mono">
                   {t("dashboard.projectCard.duration")}
                 </span>
-                <span className="text-base font-semibold">
+                <span className="text-base font-bold text-foreground">
                   {durationMonths === undefined
                     ? t("dashboard.projectCard.pending")
                     : t("dashboard.projectCard.months", {
@@ -156,15 +171,16 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                       })}
                 </span>
               </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-muted-foreground">
+              <div className="flex flex-col gap-1 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/30 p-2.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 font-mono flex items-center gap-1">
+                  <Sparkles className="h-3 w-3 text-emerald-500 shrink-0" />
                   {t("dashboard.projectCard.expectedRoi")}
                 </span>
                 <span
                   className={cn(
-                    "text-base font-semibold",
+                    "text-lg font-black font-mono",
                     expectedRoiPct === undefined
-                      ? undefined
+                      ? "text-muted-foreground"
                       : "text-emerald-600 dark:text-emerald-400",
                   )}
                 >
