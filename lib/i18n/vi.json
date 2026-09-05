@@ -369,25 +369,35 @@
       "weightedRoi": "Lợi suất kỳ vọng TB"
     },
     "projectCard": {
+      "annualizedReturn": "Lợi suất cố định/năm",
       "askingAmount": "Số tiền cần huy động",
+      "assetBacked": "Đảm bảo tài sản",
+      "backers": "{count} Nhà đầu tư",
       "created": "Tạo ngày {date}",
+      "daysLeft": "Còn {count} ngày",
       "duration": "Thời hạn",
       "edit": "Chỉnh sửa",
       "expectedRoi": "ROI dự kiến",
+      "fundedPercent": "Đã huy động {percent}%",
       "grade": "Hạng {grade}",
+      "hotDeal": "Dự án HOT",
       "incorporation": "Thành lập",
       "industry": "Ngành",
       "invest": "Đầu tư",
       "location": "Vị trí",
       "lowRisk": "Rủi ro thấp",
+      "minTicket": "Tối thiểu: {amount}",
+      "monthlyAmortized": "Gốc + lãi hàng tháng",
       "months": "{count} tháng",
       "pending": "Chưa có",
       "pendingGrading": "Chờ xếp hạng",
+      "raisedOfTarget": "Đã gọi {raised} / {target}",
       "status": {
         "active": "ĐANG HOẠT ĐỘNG",
         "draft": "BẢN NHÁP"
       },
       "taxId": "Mã số thuế",
+      "verifiedSme": "SME đã xác thực",
       "viewDetails": "Xem chi tiết dự án"
     },
     "projectDetails": {

@@ -369,24 +369,35 @@
       "weightedRoi": "Avg. Expected Yield"
     },
     "projectCard": {
+      "annualizedReturn": "Fixed Annual Rate",
       "askingAmount": "Asking amount",
+      "assetBacked": "Asset-Backed",
+      "backers": "{count} Investors",
       "created": "Created {date}",
+      "daysLeft": "{count} days left",
       "duration": "Duration",
       "edit": "Edit",
       "expectedRoi": "Expected ROI",
+      "fundedPercent": "{percent}% funded",
       "grade": "Grade {grade}",
+      "hotDeal": "Hot Deal",
       "incorporation": "Incorporation",
       "industry": "Industry",
       "invest": "Invest",
       "location": "Location",
+      "lowRisk": "Low Risk",
+      "minTicket": "Min: {amount}",
+      "monthlyAmortized": "Monthly P+I",
       "months": "{count} months",
       "pending": "Pending",
       "pendingGrading": "Pending grading",
+      "raisedOfTarget": "{raised} raised of {target}",
       "status": {
         "active": "ACTIVE",
         "draft": "DRAFT"
       },
       "taxId": "Tax ID",
+      "verifiedSme": "Verified SME",
       "viewDetails": "View Project Details"
     },
     "projectDetails": {
