@@ -47,6 +47,16 @@ test.describe("/select-role", () => {
 
     await expect(toast(page, t("auth.selectRole.successTitle"))).toBeVisible();
   });
+
+  test("allows the user to log out from the select-role page", async ({
+    page,
+  }) => {
+    await expect(
+      page.getByRole("button", { name: t("common.logout") }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: t("common.logout") }).click();
+    await expect(page).toHaveURL(/\/login/);
+  });
 });
 
 test.describe("/verify-email", () => {

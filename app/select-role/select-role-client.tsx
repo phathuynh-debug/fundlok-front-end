@@ -4,7 +4,13 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
-import { Building2, TrendingUp, Loader2, ArrowRight } from "lucide-react";
+import {
+  Building2,
+  TrendingUp,
+  Loader2,
+  ArrowRight,
+  LogOut,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { LocaleSwitcher } from "@/components/locale-switcher";
@@ -12,6 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   authKeys,
   useCurrentUser,
+  useLogout,
   useSelectRole,
 } from "@/hooks/use-authentication";
 import { useTranslations } from "@/lib/i18n";
@@ -42,6 +49,7 @@ export function SelectRoleClient() {
   const queryClient = useQueryClient();
   const { data: user } = useCurrentUser();
   const { mutate: selectRole } = useSelectRole();
+  const { mutate: logout, isPending: isLoggingOut } = useLogout();
   // The chosen role; once set we swap the cards for the onboarding loader.
   const [selectedRole, setSelectedRole] = useState<SelectableRole | null>(null);
 
@@ -196,8 +204,25 @@ export function SelectRoleClient() {
               exit={{ opacity: 0, y: -16, transition: { duration: 0.2 } }}
               className="space-y-12"
             >
-              <motion.div variants={itemVariants} className="flex justify-end">
+              <motion.div
+                variants={itemVariants}
+                className="flex items-center justify-end gap-3"
+              >
                 <LocaleSwitcher />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => logout()}
+                  disabled={isLoggingOut}
+                  className="gap-1.5 text-sm rounded-full border-border/80 hover:bg-muted/80 shadow-xs cursor-pointer"
+                >
+                  {isLoggingOut ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <LogOut className="h-4 w-4" />
+                  )}
+                  <span>{t("common.logout")}</span>
+                </Button>
               </motion.div>
 
               <motion.div
