@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { backendSecretHeaders } from "@/lib/backend-secret";
 
 // Same fallback as the /api rewrite in next.config.ts — without it, every
 // server-side lookup here throws on new URL(..., undefined) and the proxy
@@ -38,6 +39,9 @@ let maintenanceInFlight: Promise<MaintenanceFlag> | null = null;
 async function fetchMaintenance(): Promise<MaintenanceFlag> {
   try {
     const response = await fetch(new URL("/system/maintenance", API_BASE_URL), {
+      // Server-to-server hop, so it needs the shared secret like every other
+      // Next → FastAPI call. These three bypass the /api rewrite entirely.
+      headers: { ...backendSecretHeaders() },
       cache: "no-store",
     });
 
@@ -99,6 +103,7 @@ export const middlewareService = {
       const response = await fetch(new URL("/users/me", API_BASE_URL), {
         headers: {
           cookie: request.headers.get("cookie") ?? "",
+          ...backendSecretHeaders(),
         },
         cache: "no-store",
       });
@@ -126,7 +131,10 @@ export const middlewareService = {
       role === "SME" ? "/gverify/kyb/status" : "/gverify/kyc/status";
     try {
       const response = await fetch(new URL(statusPath, API_BASE_URL), {
-        headers: { cookie: request.headers.get("cookie") ?? "" },
+        headers: {
+          cookie: request.headers.get("cookie") ?? "",
+          ...backendSecretHeaders(),
+        },
         cache: "no-store",
       });
 

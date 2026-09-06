@@ -5,6 +5,8 @@ import { defineConfig, devices } from "@playwright/test";
 const APP_PORT = Number(process.env.E2E_APP_PORT ?? 3100);
 const STUB_API_PORT = Number(process.env.E2E_STUB_API_PORT ?? 8100);
 const baseURL = `http://127.0.0.1:${APP_PORT}`;
+/** Shared between the app build and the stub, which asserts what it received. */
+const E2E_BACKEND_SECRET = "e2e-backend-secret-not-a-real-key";
 
 const appEnv = {
   // Point the /api rewrite AND proxy.ts's server-side lookups at the stub.
@@ -19,6 +21,10 @@ const appEnv = {
   // Keep the E2E production build out of `.next`, so a run never corrupts a
   // dev server that happens to be running (see next.config.ts).
   NEXT_DIST_DIR: ".next-e2e",
+  // A known value, so a spec can assert the proxy actually attaches
+  // X-Backend-Secret rather than trusting that it does. Server-only, and this
+  // is a throwaway build — it never reaches a bundle or a deployment.
+  BACKEND_SECRET_KEY: E2E_BACKEND_SECRET,
   PORT: String(APP_PORT),
 };
 
@@ -64,7 +70,10 @@ export default defineConfig({
     {
       command: `bun e2e/stub-api/server.ts`,
       port: STUB_API_PORT,
-      env: { PORT: String(STUB_API_PORT) },
+      env: {
+        PORT: String(STUB_API_PORT),
+        BACKEND_SECRET_KEY: E2E_BACKEND_SECRET,
+      },
       // Never reused, even locally. It starts in milliseconds, so reuse buys
       // nothing — and an orphaned stub from an interrupted run would silently
       // serve stale fixtures, which cost real debugging time once already. With

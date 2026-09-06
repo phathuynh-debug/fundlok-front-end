@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { middlewareService } from "@/services/middleware.service";
+import { applyBackendSecret } from "@/lib/backend-secret";
+
+// Same default as next.config.ts and middleware.service.ts. Kept in step with
+// both: they all describe one hop, Next → FastAPI.
+const API_ORIGIN = process.env.API_URL || "http://127.0.0.1:8000";
 
 // Routes that require a valid session cookie to access.
 const PROTECTED_ROUTES = [
@@ -125,6 +130,33 @@ function isHandledRoute(pathname: string) {
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // --- /api/* → FastAPI, stamped with the shared secret --------------------
+  //
+  // This rewrite duplicates the one in next.config.ts because a config rewrite
+  // CANNOT add a request header to its destination — `headers()` sets response
+  // headers, and `rewrites()` takes `has`/`missing` conditions but nothing that
+  // injects one. Doing the rewrite here is the only way to put
+  // X-Backend-Secret on browser-originated API traffic without exposing the
+  // secret to the browser.
+  //
+  // MUST stay the first thing in this function: everything below calls the
+  // backend to resolve the session, and letting an /api request fall through to
+  // that would have the proxy fetch through itself.
+  //
+  // The next.config.ts rewrite is deliberately left in place as a fallback. If
+  // this branch ever stops matching, API calls still reach the backend but
+  // without the header — Cloudflare then rejects them loudly, which is a far
+  // better failure than every request 404ing.
+  if (pathname.startsWith("/api/")) {
+    const target = new URL(
+      pathname.slice("/api".length) + request.nextUrl.search,
+      API_ORIGIN,
+    );
+    return NextResponse.rewrite(target, {
+      request: { headers: applyBackendSecret(new Headers(request.headers)) },
+    });
+  }
 
   // Phone side of the KYC QR handoff. Opened by scanning a QR on another
   // device, so there is no session cookie here — auth is the short-lived
@@ -339,6 +371,10 @@ export const config = {
   // pages (/faq, /why-us, /contact, …) are intentionally absent so maintenance
   // never blocks them.
   matcher: [
+    // Every backend call the browser makes. Listed first because without it the
+    // /api branch above never runs and the secret is never attached — the
+    // failure would be silent, since next.config.ts still proxies the traffic.
+    "/api/:path*",
     "/",
     "/login",
     "/register",

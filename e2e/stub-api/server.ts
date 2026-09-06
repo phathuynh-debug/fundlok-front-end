@@ -136,11 +136,39 @@ function sessionCookie(token: string, maxAge: number) {
   return `${COOKIE_NAME}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}`;
 }
 
+/**
+ * Per-path tally of requests that arrived with a correct X-Backend-Secret vs
+ * without one.
+ *
+ * Exists because proxy.ts makes its own server-side fetches (/users/me, the
+ * GVerify status endpoints, /system/maintenance) that never pass through the
+ * /api rewrite, so the browser cannot observe them. Counters rather than a flag:
+ * they are monotonic, which makes them safe to read while parallel workers are
+ * still writing — the assertion is "none were ever missing", and that can only
+ * become more true, never flap.
+ */
+const secretAudit = new Map<string, { ok: number; missing: number }>();
+
+function auditSecret(path: string, req: IncomingMessage) {
+  const expected = process.env.BACKEND_SECRET_KEY;
+  if (!expected) return;
+  const row = secretAudit.get(path) ?? { ok: 0, missing: 0 };
+  if (req.headers["x-backend-secret"] === expected) row.ok += 1;
+  else row.missing += 1;
+  secretAudit.set(path, row);
+}
+
 const server = createServer(async (req, res) => {
   const url = new URL(req.url ?? "/", `http://localhost:${PORT}`);
   const path = url.pathname;
   const method = req.method ?? "GET";
   const session = currentUser(req);
+
+  if (!path.startsWith("/_test/")) auditSecret(path, req);
+
+  if (path === "/_test/secret-audit" && method === "GET") {
+    return json(res, 200, Object.fromEntries(secretAudit));
+  }
 
   // --- Public ---------------------------------------------------------------
 
@@ -152,6 +180,19 @@ const server = createServer(async (req, res) => {
 
   if (path === "/health") {
     return json(res, 200, { status: "ok" });
+  }
+
+  // Test-only. Reports what this hop actually received, so a spec can prove the
+  // proxy attaches X-Backend-Secret to browser-originated /api traffic. The
+  // header is added server-side and stripped from responses, so it is otherwise
+  // invisible from the browser — asserting on the code that sets it would only
+  // restate the implementation.
+  if (path === "/_test/echo-backend-secret" && method === "GET") {
+    const received = req.headers["x-backend-secret"];
+    return json(res, 200, {
+      received: typeof received === "string" ? received : null,
+      matches: received === process.env.BACKEND_SECRET_KEY,
+    });
   }
 
   // Test-only. The 2FA endpoints below are the stub's only mutable state, and
