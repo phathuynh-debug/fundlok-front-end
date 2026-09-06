@@ -275,12 +275,12 @@
       "charts": {
         "allocationDesc": "Vốn của bạn hiện đang nằm ở đâu, theo từng ngành.",
         "allocationTitle": "Vốn theo ngành",
-        "capitalFlowDesc": "Số liệu lũy kế đến hiện tại, đều tính bằng đô la Mỹ.",
+        "capitalFlowDesc": "Lũy kế đến hiện tại, cả hai đều tính bằng đồng Việt Nam.",
         "capitalFlowTitle": "Vốn giải ngân so với lợi nhuận nhận được",
         "capitalStatusDesc": "Tỷ trọng vốn giải ngân theo các giai đoạn khoản vay.",
         "capitalStatusTitle": "Phân bổ trạng thái nguồn vốn",
-        "monthlyReturnsDesc": "Lợi nhuận nhận được trong từng tháng riêng lẻ.",
-        "monthlyReturnsTitle": "Lợi nhuận theo tháng",
+        "monthlyReturnsDesc": "Gốc và lãi nhận về trong từng tháng.",
+        "monthlyReturnsTitle": "Tổng tiền nhận về theo tháng",
         "otherIndustries": "Khác",
         "splitDesc": "Tỷ trọng vốn đã giải ngân theo từng ngành.",
         "splitTitle": "Mức độ tập trung danh mục",
@@ -309,8 +309,9 @@
       "rangeLabel": "Khoảng thời gian",
       "series": {
         "deployed": "Vốn đã giải ngân",
-        "monthlyReturns": "Lợi nhuận tháng này",
-        "returns": "Lợi nhuận nhận được"
+        "monthlyReturns": "Tổng nhận về trong tháng",
+        "returns": "Lợi nhuận nhận được",
+        "totalReturned": "Tổng tiền nhận về"
       },
       "subtitle": "Vốn của bạn đã được giải ngân ra sao và mang lại kết quả gì.",
       "table": {
@@ -377,7 +378,7 @@
       "daysLeft": "Còn {count} ngày",
       "duration": "Thời hạn",
       "edit": "Chỉnh sửa",
-      "expectedRoi": "ROI dự kiến",
+      "expectedRoi": "Tỷ suất lợi nhuận năm",
       "fundedPercent": "Đã huy động {percent}%",
       "grade": "Hạng {grade}",
       "hotDeal": "Dự án HOT",
@@ -1051,7 +1052,7 @@
     },
     "kpis": {
       "estPaybackPeriod": "Thời hạn vay",
-      "expectedRoi": "ROI kỳ vọng",
+      "expectedRoi": "Tỷ suất lợi nhuận năm",
       "loanAmount": "Số tiền vay",
       "months": "{count} tháng",
       "ofDailyRevenue": "trên doanh thu hằng ngày",

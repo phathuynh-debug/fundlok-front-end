@@ -12,10 +12,30 @@ export interface MonthlyPoint {
   month: string;
   /** Cumulative capital deployed to date, VND. */
   deployed_cumulative: number;
-  /** Cumulative returns received to date, VND. */
+  /**
+   * Cumulative money received back to date, VND — principal AND yield, not
+   * yield alone. On an amortising loan most of every instalment is the
+   * investor's own capital coming home.
+   */
   returns_cumulative: number;
-  /** Returns received in this month alone, VND. */
+  /** Money received back in this month alone, VND. Principal + yield. */
   returns_monthly: number;
+  /**
+   * The principal half of `returns_monthly`, VND — capital returned, which is
+   * not profit.
+   */
+  principal_monthly: number;
+  /**
+   * The interest half of `returns_monthly`, VND — the only part that is
+   * actually earnings.
+   *
+   * `principal_monthly + yield_monthly === returns_monthly` for every row;
+   * mock-analytics.test.ts enforces it. Split out because "how much came back"
+   * and "how much did I make" are different questions and a single number
+   * cannot answer both — reading a repayment as profit overstates returns by
+   * roughly 15x at these ratios.
+   */
+  yield_monthly: number;
 }
 
 export interface IndustryAllocation {
@@ -32,72 +52,96 @@ export const MOCK_MONTHLY: MonthlyPoint[] = [
     deployed_cumulative: 750000000,
     returns_cumulative: 0,
     returns_monthly: 0,
+    principal_monthly: 0,
+    yield_monthly: 0,
   },
   {
     month: "2025-10",
     deployed_cumulative: 750000000,
     returns_cumulative: 30000000,
     returns_monthly: 30000000,
+    principal_monthly: 28000000,
+    yield_monthly: 2000000,
   },
   {
     month: "2025-11",
     deployed_cumulative: 1250000000,
     returns_cumulative: 82500000,
     returns_monthly: 52500000,
+    principal_monthly: 49000000,
+    yield_monthly: 3500000,
   },
   {
     month: "2025-12",
     deployed_cumulative: 1250000000,
     returns_cumulative: 147500000,
     returns_monthly: 65000000,
+    principal_monthly: 60800000,
+    yield_monthly: 4200000,
   },
   {
     month: "2026-01",
     deployed_cumulative: 1625000000,
     returns_cumulative: 220000000,
     returns_monthly: 72500000,
+    principal_monthly: 67800000,
+    yield_monthly: 4700000,
   },
   {
     month: "2026-02",
     deployed_cumulative: 1625000000,
     returns_cumulative: 302500000,
     returns_monthly: 82500000,
+    principal_monthly: 77100000,
+    yield_monthly: 5400000,
   },
   {
     month: "2026-03",
     deployed_cumulative: 2250000000,
     returns_cumulative: 392500000,
     returns_monthly: 90000000,
+    principal_monthly: 84100000,
+    yield_monthly: 5900000,
   },
   {
     month: "2026-04",
     deployed_cumulative: 2250000000,
     returns_cumulative: 497500000,
     returns_monthly: 105000000,
+    principal_monthly: 98200000,
+    yield_monthly: 6800000,
   },
   {
     month: "2026-05",
     deployed_cumulative: 2500000000,
     returns_cumulative: 610000000,
     returns_monthly: 112500000,
+    principal_monthly: 105200000,
+    yield_monthly: 7300000,
   },
   {
     month: "2026-06",
     deployed_cumulative: 3250000000,
     returns_cumulative: 730000000,
     returns_monthly: 120000000,
+    principal_monthly: 112200000,
+    yield_monthly: 7800000,
   },
   {
     month: "2026-07",
     deployed_cumulative: 3625000000,
     returns_cumulative: 865000000,
     returns_monthly: 135000000,
+    principal_monthly: 126200000,
+    yield_monthly: 8800000,
   },
   {
     month: "2026-08",
     deployed_cumulative: 4250000000,
     returns_cumulative: 1012500000,
     returns_monthly: 147500000,
+    principal_monthly: 137900000,
+    yield_monthly: 9600000,
   },
 ];
 

@@ -61,6 +61,40 @@ test.describe("Vietnamese", () => {
       `untranslated keys on screen: ${leaked?.join(", ")}`,
     ).toBeNull();
   });
+
+  test("the annualised ROI label fits the marketplace card", async ({
+    page,
+  }) => {
+    // "Tỷ suất lợi nhuận năm" is nearly twice the length of the "ROI dự kiến"
+    // it replaced, and it sits in a fixed-height callout on every project
+    // card. Long copy in a small box is the exact failure this file exists to
+    // catch, so the check is a measurement rather than a visibility assertion:
+    // the label must not be wider than the box that holds it.
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/dashboard/projects");
+    await settle(page);
+
+    const label = page
+      .getByText(t("dashboard.projectCard.expectedRoi", undefined, "vi"), {
+        exact: true,
+      })
+      .first();
+    await expect(label).toBeVisible();
+
+    const overflow = await label.evaluate(
+      (el) => el.scrollWidth - el.clientWidth,
+    );
+    expect(
+      overflow,
+      "ROI label is wider than its container",
+    ).toBeLessThanOrEqual(1);
+
+    // And the card it sits in must not push the page sideways.
+    const scrollsSideways = await page.evaluate(
+      () => document.documentElement.scrollWidth > window.innerWidth + 1,
+    );
+    expect(scrollsSideways, "marketplace scrolls horizontally").toBe(false);
+  });
 });
 
 test("the same screen works in English", async ({ page, context }) => {

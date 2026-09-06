@@ -275,12 +275,12 @@
       "charts": {
         "allocationDesc": "Where your capital currently sits, by sector.",
         "allocationTitle": "Capital by industry",
-        "capitalFlowDesc": "Cumulative totals to date, both in US dollars.",
+        "capitalFlowDesc": "Cumulative totals to date, both in Vietnamese dong.",
         "capitalFlowTitle": "Capital deployed vs returns received",
         "capitalStatusDesc": "Share of deployed capital across loan lifecycle stages.",
         "capitalStatusTitle": "Capital status distribution",
-        "monthlyReturnsDesc": "Returns received in each individual month.",
-        "monthlyReturnsTitle": "Returns by month",
+        "monthlyReturnsDesc": "Principal and yield received back in each individual month.",
+        "monthlyReturnsTitle": "Total returned by month",
         "otherIndustries": "Other",
         "splitDesc": "Share of deployed capital held in each sector.",
         "splitTitle": "Portfolio concentration",
@@ -309,8 +309,9 @@
       "rangeLabel": "Time range",
       "series": {
         "deployed": "Capital deployed",
-        "monthlyReturns": "Returns this month",
-        "returns": "Returns received"
+        "monthlyReturns": "Total returned this month",
+        "returns": "Returns received",
+        "totalReturned": "Total returned"
       },
       "subtitle": "How your capital has been deployed and what it has returned.",
       "table": {
@@ -377,7 +378,7 @@
       "daysLeft": "{count} days left",
       "duration": "Duration",
       "edit": "Edit",
-      "expectedRoi": "Expected ROI",
+      "expectedRoi": "Annualized ROI",
       "fundedPercent": "{percent}% funded",
       "grade": "Grade {grade}",
       "hotDeal": "Hot Deal",
@@ -1051,7 +1052,7 @@
     },
     "kpis": {
       "estPaybackPeriod": "Loan Duration",
-      "expectedRoi": "Expected ROI",
+      "expectedRoi": "Annualized ROI",
       "loanAmount": "Loan Amount",
       "months": "{count} mo",
       "ofDailyRevenue": "of daily revenue",

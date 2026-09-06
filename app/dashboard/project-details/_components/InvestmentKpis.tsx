@@ -22,7 +22,10 @@ export function InvestmentKpis({
   // inside the engine's 200M-5bn range, so it reads as a plausible loan.
   loanAmountVnd = 1_250_000_000,
   expectedRoi = "10.2%",
-  paybackMonths = 10,
+  // 12, not an arbitrary number: the grading engine only accepts 3/6/9/12
+  // (LOAN_DURATIONS_MONTHS), so a 10-month fallback showed investors a term the
+  // platform cannot actually originate.
+  paybackMonths = 12,
   revenueShareRate = "8.5%",
 }: InvestmentKpisProps) {
   const { locale, t } = useTranslations();

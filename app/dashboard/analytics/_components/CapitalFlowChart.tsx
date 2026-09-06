@@ -1,6 +1,13 @@
 "use client";
 
-import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  LabelList,
+  XAxis,
+  YAxis,
+} from "recharts";
 import {
   ChartContainer,
   ChartLegend,
@@ -16,6 +23,13 @@ import { monthTickLabel, type MonthlyPoint } from "./mock-analytics";
 
 // Both series are VND on one scale -- never a second y-axis, which would invent
 // a relationship between two differently-scaled measures.
+//
+// GROUPED bars, not stacked. Stacking asserts the segments are parts of one
+// whole, and these are not: returns are not a subset of deployed capital, so a
+// stack would draw a combined total that means nothing. Side-by-side pairs put
+// the two figures on a shared baseline, which is what "how much of what I put
+// out has come back" actually asks -- and a height comparison at a common
+// baseline is read far more accurately than the gap between two lines.
 export function CapitalFlowChart({ points }: { points: MonthlyPoint[] }) {
   const { t, locale } = useTranslations();
 
@@ -32,60 +46,38 @@ export function CapitalFlowChart({ points }: { points: MonthlyPoint[] }) {
 
   const lastIndex = points.length - 1;
 
-  // Direct-label only the endpoint of each line. A value on every point is
-  // noise; the axis and the tooltip carry the rest. The dot gets a 2px ring in
-  // the surface colour so it stays readable where it crosses the line, and the
-  // label wears a text token -- never the series colour, which is illegible as
-  // text at this size.
-  const renderEndPoint = (key: "deployed_cumulative" | "returns_cumulative") =>
-    // Named rather than anonymous: recharts treats this as a component, and an
-    // arrow returned from a factory trips react/display-name.
-    function EndPointDot(props: {
-      cx?: number;
-      cy?: number;
-      index?: number;
-      payload?: MonthlyPoint;
-    }) {
-      const { cx, cy, index, payload } = props;
-
-      if (index !== lastIndex || cx == null || cy == null || !payload) {
-        return <g key={`empty-${key}-${index}`} />;
-      }
-
-      return (
-        <g key={`end-${key}`}>
-          <circle
-            cx={cx}
-            cy={cy}
-            r={4}
-            fill={`var(--color-${key})`}
-            stroke="var(--card)"
-            strokeWidth={2}
-          />
-          <text
-            x={cx + 10}
-            y={cy}
-            dominantBaseline="middle"
-            className="fill-foreground text-[11px] font-semibold"
-          >
-            {formatCompactCurrency(payload[key], locale)}
-          </text>
-        </g>
-      );
-    };
-
-  const endPointDeployed = renderEndPoint("deployed_cumulative");
-  const endPointReturns = renderEndPoint("returns_cumulative");
+  // Direct-label the latest pair only. A value on every bar is noise; the axis
+  // and the tooltip carry the rest, and the number a reader actually wants off
+  // this chart is where the two series stand today.
+  //
+  // Carried as fields on the row rather than filtered inside a LabelList
+  // `content`: recharts only renders a label where the dataKey has a value, so
+  // leaving them undefined elsewhere is all the selectivity needed.
+  const chartData = points.map((point, i) => ({
+    ...point,
+    deployed_label:
+      i === lastIndex
+        ? formatCompactCurrency(point.deployed_cumulative, locale)
+        : undefined,
+    returns_label:
+      i === lastIndex
+        ? formatCompactCurrency(point.returns_cumulative, locale)
+        : undefined,
+  }));
 
   return (
     <ChartContainer
       config={chartConfig}
       className="aspect-auto h-[300px] w-full"
     >
-      <LineChart
+      <BarChart
         accessibilityLayer
-        data={points}
-        margin={{ top: 12, right: 60, left: 4, bottom: 4 }}
+        data={chartData}
+        margin={{ top: 24, right: 8, left: 4, bottom: 4 }}
+        // Pairs read as pairs: bars within a month nearly touch, and the gap
+        // between months is wide enough that the grouping is unambiguous.
+        barGap={2}
+        barCategoryGap="22%"
       >
         {/* Solid hairline grid, horizontal only -- never dashed. */}
         <CartesianGrid vertical={false} />
@@ -120,29 +112,37 @@ export function CapitalFlowChart({ points }: { points: MonthlyPoint[] }) {
           )}
         />
         <ChartLegend content={<ChartLegendContent />} />
-        <Line
+        <Bar
           dataKey="deployed_cumulative"
           name={deployedLabel}
-          type="monotone"
-          stroke="var(--color-deployed_cumulative)"
-          strokeWidth={2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          dot={endPointDeployed}
-          activeDot={{ r: 5, strokeWidth: 2, stroke: "var(--card)" }}
-        />
-        <Line
+          fill="var(--color-deployed_cumulative)"
+          // 4px rounded cap, square at the baseline -- matches the by-month
+          // chart, so the two cards read as one family.
+          radius={[4, 4, 0, 0]}
+          maxBarSize={18}
+        >
+          <LabelList
+            dataKey="deployed_label"
+            position="top"
+            offset={8}
+            className="fill-foreground text-[11px] font-semibold"
+          />
+        </Bar>
+        <Bar
           dataKey="returns_cumulative"
           name={returnsLabel}
-          type="monotone"
-          stroke="var(--color-returns_cumulative)"
-          strokeWidth={2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          dot={endPointReturns}
-          activeDot={{ r: 5, strokeWidth: 2, stroke: "var(--card)" }}
-        />
-      </LineChart>
+          fill="var(--color-returns_cumulative)"
+          radius={[4, 4, 0, 0]}
+          maxBarSize={18}
+        >
+          <LabelList
+            dataKey="returns_label"
+            position="top"
+            offset={8}
+            className="fill-foreground text-[11px] font-semibold"
+          />
+        </Bar>
+      </BarChart>
     </ChartContainer>
   );
 }

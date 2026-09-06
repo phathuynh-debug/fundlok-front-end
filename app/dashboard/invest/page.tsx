@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { TruncatedFigure } from "@/components/truncated-figure";
 import { useToast } from "@/hooks/use-toast";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { useTranslations } from "@/lib/i18n";
@@ -94,10 +95,22 @@ export default function InvestPage() {
           <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
             {t("investConfirm.amountLabel")}
           </p>
-          <p className="mt-1 flex items-center gap-1 text-3xl font-bold text-foreground">
-            <Banknote className="h-6 w-6" />
-            {formatCurrency(amount, locale)}
-          </p>
+          {/* `vi-VN` puts a non-breaking space before the ₫, so the whole
+              figure is one unbreakable token — at 3xl a ten-digit amount is
+              wider than this card and pushes the page into horizontal scroll.
+              The responsive scale keeps the largest allowed loan (5bn VND)
+              inside the card at every breakpoint; TruncatedFigure is the
+              last-resort guard, and it keeps the full number reachable on
+              hover/focus rather than hiding it behind an ellipsis — which
+              matters here more than anywhere, since this is the figure the
+              investor is confirming. */}
+          <div className="mt-1 flex items-center gap-1 text-foreground">
+            <Banknote className="h-6 w-6 shrink-0" />
+            <TruncatedFigure
+              value={formattedAmount}
+              className="text-2xl font-bold sm:text-3xl"
+            />
+          </div>
         </div>
 
         {done ? (
