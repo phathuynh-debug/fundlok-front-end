@@ -13,6 +13,8 @@ import {
 import { DocumentPreviewDialog } from "./DocumentPreviewDialog";
 import { StepIndicator } from "./StepIndicator";
 import { UploadField } from "./UploadField";
+import { FigureField } from "./FigureField";
+import { figureFieldsForStep } from "./lite-grading-fields";
 import { DocumentInfoPanel } from "./DocumentInfoPanel";
 import { ReviewStep } from "./ReviewStep";
 
@@ -71,6 +73,15 @@ function LoanApplicationWizard() {
         </p>
       </div>
 
+      {/* Shown on every step, not just the review screen: the warning has to
+          reach the applicant before they enter anything, not after. */}
+      <div className="flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3.5 text-left">
+        <AlertCircle className="h-5 w-5 mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
+        <p className="text-sm text-amber-800 dark:text-amber-200 leading-relaxed">
+          {t("dashboard.sme.legitInfoNotice")}
+        </p>
+      </div>
+
       {/* The form never submits on its own — sending is only triggered by an
           explicit click on the Send button below. */}
       <form onSubmit={(e) => e.preventDefault()} className="space-y-6 mt-6">
@@ -110,36 +121,37 @@ function LoanApplicationWizard() {
                       </div>
                     )}
 
+                    {/* Steps 2-3 are typed figures, not uploads. Rendered from
+                        LITE_FIGURE_FIELDS so the field set is data, not markup. */}
                     {currentStep === 2 && (
                       <div className="space-y-4">
                         <h4 className="text-lg font-bold text-foreground">
-                          {t("dashboard.sme.vatDeclarations")}
+                          {t("dashboard.sme.lite.revenueTitle")}
                         </h4>
-                        <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/20 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-900/30 flex items-start gap-3">
-                          <AlertCircle className="h-5 w-5 mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
-                          <div className="text-xs sm:text-sm leading-relaxed">
-                            <strong className="font-bold text-amber-950 dark:text-amber-100">
-                              {t("dashboard.sme.vatDeclarationsHelpTitle")}
-                            </strong>{" "}
-                            {t("dashboard.sme.vatDeclarationsHelpText")}
-                          </div>
+                        <p className="text-sm text-muted-foreground">
+                          {t("dashboard.sme.lite.revenueSubtitle")}
+                        </p>
+                        <div className="space-y-5">
+                          {figureFieldsForStep(2).map((field) => (
+                            <FigureField key={field.key} field={field} />
+                          ))}
                         </div>
-                        <UploadField
-                          docKey="vatDeclarations"
-                          label={t("dashboard.sme.vatZipLabel")}
-                        />
                       </div>
                     )}
 
                     {currentStep === 3 && (
                       <div className="space-y-4">
                         <h4 className="text-lg font-bold text-foreground">
-                          {t("dashboard.sme.annualFinancialStatement")}
+                          {t("dashboard.sme.lite.costsTitle")}
                         </h4>
-                        <UploadField
-                          docKey="financialStatement"
-                          label={t("dashboard.sme.annualFinancialStatement")}
-                        />
+                        <p className="text-sm text-muted-foreground">
+                          {t("dashboard.sme.lite.costsSubtitle")}
+                        </p>
+                        <div className="space-y-5">
+                          {figureFieldsForStep(3).map((field) => (
+                            <FigureField key={field.key} field={field} />
+                          ))}
+                        </div>
                       </div>
                     )}
 

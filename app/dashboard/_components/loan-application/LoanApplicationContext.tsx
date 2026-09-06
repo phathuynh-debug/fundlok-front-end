@@ -8,8 +8,6 @@ import { useLoanApplication, type DocumentKey } from "./useLoanApplication";
 const STEP_FOR_DOCUMENT: Record<DocumentKey, number> = {
   companyCharter: 1,
   companyRegistration: 1,
-  vatDeclarations: 2,
-  financialStatement: 3,
   eInvoiceData: 4,
   cicReport: 5,
 };
@@ -71,8 +69,10 @@ export function LoanApplicationProvider({
 
   const stepLabel = (step: number) => {
     if (step === 1) return locale === "vi" ? "Hồ sơ pháp lý" : "Legal Docs";
-    if (step === 2) return locale === "vi" ? "Thuế GTGT" : "VAT";
-    if (step === 3) return locale === "vi" ? "Báo cáo TC" : "Financials";
+    // Steps 2-3 collect typed figures now, so the labels name the numbers
+    // being asked for rather than the documents that used to carry them.
+    if (step === 2) return locale === "vi" ? "Doanh thu" : "Revenue";
+    if (step === 3) return locale === "vi" ? "Chi phí" : "Costs";
     if (step === 4) return locale === "vi" ? "Hóa đơn ĐT" : "E-Invoice";
     if (step === 5) return "CIC";
     return t("dashboard.sme.reviewStepLabel");

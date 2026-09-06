@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, CheckCircle2, Rocket, ArrowRight } from "lucide-react";
+import { MapPin, CheckCircle2, Rocket, ArrowRight, Target } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Project } from "@/services/projects.service";
 import { useTranslations } from "@/lib/i18n";
@@ -258,6 +258,27 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
                   </p>
                 </div>
               </div>
+            </div>
+
+            {/* Loan purpose. Prose, not a metric — it gets its own full-width
+                row rather than a cell in the four-column grid above, which is
+                sized for short values like a tax ID. */}
+            <div className="space-y-2 pt-4 border-t border-border/40 text-sm">
+              <h4 className="font-semibold text-foreground flex items-center gap-2">
+                <Target className={cn("h-4 w-4", theme.accentColor)} />
+                {t("dashboard.sme.loanPurpose")}
+              </h4>
+              <p
+                className={cn(
+                  "text-xs leading-relaxed",
+                  project.loan_application?.purpose
+                    ? "text-muted-foreground"
+                    : "text-muted-foreground/70 italic",
+                )}
+              >
+                {project.loan_application?.purpose?.trim() ||
+                  t("dashboard.sme.noLoanPurpose")}
+              </p>
             </div>
           </div>
 

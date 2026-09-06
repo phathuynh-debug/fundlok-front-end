@@ -66,6 +66,15 @@ export const UPLOADS_ENDPOINTS = {
 export const LOANS_ENDPOINTS = {
   submit: (applicationId: string) =>
     `/loans/applications/${applicationId}/submit`,
+  /**
+   * Self-reported figures for the Lite grading path (replaces the VAT and
+   * annual-financials uploads). NOTE: not implemented on the backend yet —
+   * `loan_applications` has no columns for these (see
+   * app/lending/models.py), so this needs a migration + route before it
+   * returns anything but 404.
+   */
+  figures: (applicationId: string) =>
+    `/loans/applications/${applicationId}/figures`,
 } as const;
 
 export const ADMIN_ENDPOINTS = {

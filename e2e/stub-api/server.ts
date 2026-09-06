@@ -453,6 +453,39 @@ const server = createServer(async (req, res) => {
     return json(res, 200, STUB_PUBLIC_PROJECTS);
   }
 
+  // --- Lite grading figures ------------------------------------------------
+  // PUT /loans/applications/:id/figures. Echoes the body back the way the real
+  // endpoint does, and enforces the one rule a test could otherwise not see
+  // fail: required figures must actually be present. Everything finer-grained
+  // (bounds, cross-field consistency) is the backend's job and is covered by
+  // tests/loans/test_lite_grading_figures.py — duplicating it here would only
+  // let the stub and the backend drift apart.
+  if (
+    /^\/loans\/applications\/[^/]+\/figures$/.test(path) &&
+    method === "PUT"
+  ) {
+    const figures = await readBody(req);
+    const required = [
+      "revenue_last_12m",
+      "revenue_prior_12m",
+      "cogs_y1",
+      "fixed_cost_y1",
+      "variable_cost_excl_cogs_y1",
+    ];
+    const missing = required.filter(
+      (field) => figures[field] === undefined || figures[field] === null,
+    );
+    if (missing.length > 0) {
+      return json(res, 422, {
+        detail: `Missing required figures: ${missing.join(", ")}`,
+      });
+    }
+    return json(res, 200, {
+      ...figures,
+      figures_updated_at: "2026-09-06T23:59:00+07:00",
+    });
+  }
+
   // --- Admin ---------------------------------------------------------------
   // Guarded like the real backend: a non-admin session must get a 403 here, so
   // a test can prove the API is not the only thing keeping them out.

@@ -9,6 +9,7 @@ import {
   TrendingUp,
   Flame,
   Calendar,
+  Target,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -285,6 +286,28 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
               </div>
             </>
           )}
+        </div>
+
+        {/* Loan purpose. Prose, so it gets its own row rather than a cell in
+            the metrics grid above — that grid is sized for short values and is
+            already full at four columns for an investor. Clamped to two lines
+            so a long purpose cannot push the cards in a list out of rhythm. */}
+        <div className="flex flex-col gap-1 pt-1">
+          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground font-mono flex items-center gap-1.5">
+            <Target className="h-3.5 w-3.5 shrink-0" />
+            {t("dashboard.projectCard.loanPurpose")}
+          </span>
+          <p
+            className={cn(
+              "text-sm leading-relaxed line-clamp-2",
+              loanApplication?.purpose
+                ? "text-foreground/90"
+                : "text-muted-foreground italic",
+            )}
+          >
+            {loanApplication?.purpose?.trim() ||
+              t("dashboard.projectCard.noLoanPurpose")}
+          </p>
         </div>
 
         {/* Funding Progress Bar (Investor View with active loan) */}

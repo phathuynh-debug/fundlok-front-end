@@ -1,16 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 import { ReviewRow } from "./ReviewRow";
 import { useLoanApplicationContext } from "./LoanApplicationContext";
 import type { DocumentKey } from "./useLoanApplication";
+import { LITE_FIGURE_FIELDS, parseFigure } from "./lite-grading-fields";
 
 // Review-list label per document (reuses the existing per-step strings).
 const DOCUMENT_LABEL_KEYS: Record<DocumentKey, string> = {
   companyCharter: "dashboard.sme.companyCharter",
   companyRegistration: "dashboard.sme.companyRegistration",
-  vatDeclarations: "dashboard.sme.vatDeclarations",
-  financialStatement: "dashboard.sme.annualFinancialStatement",
   eInvoiceData: "dashboard.sme.eInvoiceData",
   cicReport: "dashboard.sme.cicCreditReport",
 };
@@ -20,11 +20,14 @@ const DOCUMENT_LABEL_KEYS: Record<DocumentKey, string> = {
 export function ReviewStep() {
   const {
     documentKeys,
+    figures,
     canSend,
     isSending,
     isFinalizing,
     uploadedCount,
     totalDocuments,
+    goToStep,
+    locale,
     t,
   } = useLoanApplicationContext();
 
@@ -66,6 +69,53 @@ export function ReviewStep() {
             label={t(DOCUMENT_LABEL_KEYS[key])}
           />
         ))}
+      </div>
+
+      {/* The typed figures. These are the grading inputs, so they get read back
+          verbatim before sending — a mistyped zero is the likeliest error in
+          the whole flow and the only place to catch it is here. */}
+      <div className="space-y-2 rounded-xl border border-border bg-muted/20 p-4">
+        <h5 className="text-sm font-bold text-foreground">
+          {t("dashboard.sme.lite.reviewFiguresTitle")}
+        </h5>
+        <dl className="divide-y divide-border/60">
+          {LITE_FIGURE_FIELDS.map((field) => {
+            const value = parseFigure(figures[field.key]);
+            return (
+              <div
+                key={field.key}
+                className="flex items-baseline justify-between gap-3 py-1.5"
+              >
+                <dt className="text-xs text-muted-foreground">
+                  {t(field.labelKey)}
+                </dt>
+                <dd
+                  className={cn(
+                    "shrink-0 font-mono text-sm",
+                    value === null
+                      ? "text-muted-foreground italic"
+                      : "font-semibold text-foreground",
+                  )}
+                >
+                  {value === null
+                    ? t("dashboard.sme.lite.notProvided")
+                    : field.unit === "pct"
+                      ? `${value}%`
+                      : `${value.toLocaleString(
+                          locale === "vi" ? "vi-VN" : "en-US",
+                        )} ₫`}
+                </dd>
+              </div>
+            );
+          })}
+        </dl>
+        <button
+          type="button"
+          onClick={() => goToStep(2)}
+          className="text-xs font-semibold text-primary underline-offset-4 hover:underline"
+        >
+          {t("dashboard.sme.lite.editFigures")}
+        </button>
       </div>
 
       <p className="text-center text-xs text-muted-foreground">

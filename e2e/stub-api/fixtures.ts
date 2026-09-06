@@ -16,6 +16,7 @@ export type StubUserKey =
   | "noRole"
   | "unapprovedInvestor"
   | "unapprovedSme"
+  | "smeDraftApplication"
   | "twoFactor";
 
 export interface StubUser {
@@ -50,6 +51,16 @@ export const STUB_USERS: Record<StubUserKey, StubUser> = {
     id: "00000000-0000-0000-0000-0000000000a2",
     email: "sme@e2e.test",
     full_name: "SME Test",
+    role: "SME",
+  },
+  // An SME whose application is still DRAFT, so the dashboard renders the
+  // application wizard rather than the read-only status panel. Kept separate
+  // from `sme` so the existing SUBMITTED-state tests are unaffected.
+  smeDraftApplication: {
+    ...base,
+    id: "00000000-0000-0000-0000-0000000000a9",
+    email: "sme-draft@e2e.test",
+    full_name: "SME With Draft",
     role: "SME",
   },
   // Same role, but /projects comes back empty — the dashboard's "apply for
@@ -175,8 +186,30 @@ export const STUB_PUBLIC_PROJECTS = [
   },
 ];
 
+/**
+ * The same company, but with the application still in DRAFT.
+ *
+ * The DRAFT branch of SmeDashboard renders the application wizard. That used
+ * to be untestable because every step demanded a file, but steps 2 and 3 now
+ * collect typed figures and the uploads on the remaining steps are staged
+ * locally until Send — so the wizard can be driven end-to-end without the stub
+ * pretending to be R2.
+ */
+export const STUB_PROJECT_DRAFT_APPLICATION = {
+  ...STUB_PROJECT,
+  id: "20000000-0000-0000-0000-000000000009",
+  loan_application: {
+    ...STUB_PROJECT.loan_application,
+    id: "30000000-0000-0000-0000-000000000009",
+    project_id: "20000000-0000-0000-0000-000000000009",
+    status: "DRAFT",
+    submitted_at: null,
+  },
+};
+
 export function projectsFor(key: StubUserKey) {
   if (key === "sme" || key === "unapprovedSme") return [STUB_PROJECT];
+  if (key === "smeDraftApplication") return [STUB_PROJECT_DRAFT_APPLICATION];
   return [];
 }
 
