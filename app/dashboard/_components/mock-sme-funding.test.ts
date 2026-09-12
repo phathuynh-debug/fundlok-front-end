@@ -1,29 +1,40 @@
 import { describe, it, expect } from "vitest";
 
 import {
-  MOCK_INSTALLMENTS,
+  BUSINESS_DAYS_PER_PERIOD,
+  MOCK_REPAYMENT_PERIODS,
   MOCK_SME_FUNDING,
+  periodTotal,
+  RATE_CEILING_PCT,
   summarizeFunding,
-  type Installment,
+  type RepaymentPeriod,
   type SmeFunding,
 } from "./mock-sme-funding";
+
+// summarizeFunding is the logic that survives the move to a real repayment
+// API. The MOCK_SME_FUNDING block at the bottom asserts the fundlok-domain
+// invariants directly, so sample data cannot quietly drift back into
+// bank-loan mechanics (monthly instalments, a letter grade, a term over 12).
 
 const funding = (overrides: Partial<SmeFunding> = {}): SmeFunding => ({
   requested: 1_000_000_000,
   funded: 500_000_000,
   investor_count: 5,
-  grade: "B",
+  score: 70,
   interest_rate_pct: 14,
-  term_months: 12,
+  term_months: 6,
+  total_repayable: 536_250_000,
+  daily_amount: 4_255_952,
   disbursed_at: null,
   ...overrides,
 });
 
-const installment = (overrides: Partial<Installment> = {}): Installment => ({
+const period = (overrides: Partial<RepaymentPeriod> = {}): RepaymentPeriod => ({
   number: 1,
-  due_date: "2026-09-18",
-  principal: 80_000_000,
-  interest: 20_000_000,
+  start_date: "2026-05-18",
+  end_date: "2026-06-16",
+  business_days: BUSINESS_DAYS_PER_PERIOD,
+  daily_amount: 1_000_000,
   status: "UPCOMING",
   ...overrides,
 });
@@ -37,123 +48,140 @@ describe("summarizeFunding", () => {
     expect(summary.funded_pct).toBe(70);
   });
 
-  it("keeps one decimal of funded percentage", () => {
-    const summary = summarizeFunding(
-      funding({ requested: 300_000_000, funded: 100_000_000 }),
-      [],
-    );
-    expect(summary.funded_pct).toBe(33.3);
-  });
-
   it("does not divide by zero when nothing was requested", () => {
     expect(summarizeFunding(funding({ requested: 0 }), []).funded_pct).toBe(0);
   });
 
-  it("counts an early repayment as settled", () => {
-    // Early repayment is a platform value, so EARLY must count toward repaid
-    // and progress — treating it as unpaid was the bug worth guarding.
+  it("counts a collected period as daily amount times business days", () => {
     const summary = summarizeFunding(funding(), [
-      installment({ number: 1, status: "PAID" }),
-      installment({ number: 2, status: "EARLY" }),
-      installment({ number: 3, status: "DUE" }),
+      period({ daily_amount: 1_000_000, business_days: 21, status: "SETTLED" }),
+    ]);
+    expect(summary.repaid).toBe(21_000_000);
+  });
+
+  it("derives outstanding from the fixed total, not from future rows", () => {
+    // THE load-bearing assertion. The total repayable is fixed at signing, so
+    // what is still owed is total minus collected — never the sum of the
+    // remaining schedule, which a relief period would understate.
+    const summary = summarizeFunding(
+      funding({ total_repayable: 500_000_000 }),
+      [
+        period({
+          number: 1,
+          daily_amount: 1_000_000,
+          business_days: 21,
+          status: "SETTLED",
+        }),
+        // Relief: this period collects far less...
+        period({
+          number: 2,
+          daily_amount: 200_000,
+          business_days: 21,
+          contractual_daily_amount: 1_000_000,
+          status: "RELIEF_APPLIED",
+        }),
+      ],
+    );
+    expect(summary.repaid).toBe(21_000_000 + 4_200_000);
+    // ...and the amount still owed is unchanged by that fact.
+    expect(summary.outstanding).toBe(500_000_000 - 25_200_000);
+  });
+
+  it("treats a relief period as collected, not as still owing", () => {
+    const summary = summarizeFunding(funding(), [
+      period({ number: 1, status: "SETTLED" }),
+      period({ number: 2, status: "RELIEF_APPLIED" }),
+      period({ number: 3, status: "CURRENT" }),
     ]);
     expect(summary.settled_count).toBe(2);
-    expect(summary.repaid).toBe(200_000_000);
-    expect(summary.outstanding).toBe(100_000_000);
+    expect(summary.current?.number).toBe(3);
   });
 
-  it("splits repaid and outstanding across principal and interest", () => {
+  it("returns a null current period once every period is collected", () => {
     const summary = summarizeFunding(funding(), [
-      installment({
-        number: 1,
-        principal: 70_000_000,
-        interest: 15_000_000,
-        status: "PAID",
-      }),
-      installment({ number: 2, principal: 71_000_000, interest: 14_000_000 }),
+      period({ status: "SETTLED" }),
     ]);
-    expect(summary.repaid).toBe(85_000_000);
-    expect(summary.outstanding).toBe(85_000_000);
+    expect(summary.current).toBeNull();
   });
 
-  it("takes the next owed installment in schedule order", () => {
-    const summary = summarizeFunding(funding(), [
-      installment({ number: 1, status: "PAID" }),
-      installment({ number: 2, status: "DUE" }),
-      installment({ number: 3, status: "UPCOMING" }),
-    ]);
-    expect(summary.next?.number).toBe(2);
+  it("derives the backstop date from the declared term", () => {
+    const summary = summarizeFunding(
+      funding({ disbursed_at: "2026-05-18", term_months: 6 }),
+      [],
+    );
+    expect(summary.backstop_date).toBe("2027-01-18");
   });
 
-  it("reports no next installment once the schedule is settled", () => {
-    const summary = summarizeFunding(funding(), [
-      installment({ number: 1, status: "PAID" }),
-      installment({ number: 2, status: "EARLY" }),
-    ]);
-    expect(summary.next).toBeNull();
-    expect(summary.outstanding).toBe(0);
-  });
-
-  it("handles an empty schedule", () => {
-    const summary = summarizeFunding(funding(), []);
-    expect(summary).toMatchObject({
-      repaid: 0,
-      outstanding: 0,
-      settled_count: 0,
-      total_count: 0,
-      next: null,
-    });
+  it("has no backstop date while the listing is still funding", () => {
+    expect(
+      summarizeFunding(funding({ disbursed_at: null }), []).backstop_date,
+    ).toBeNull();
   });
 });
 
-describe("MOCK_SME_FUNDING / MOCK_INSTALLMENTS", () => {
-  it("cannot have raised more than it asked for", () => {
-    expect(MOCK_SME_FUNDING.funded).toBeLessThanOrEqual(
-      MOCK_SME_FUNDING.requested,
+describe("MOCK_SME_FUNDING", () => {
+  it("declares a 6 or 12 month term", () => {
+    expect([6, 12]).toContain(MOCK_SME_FUNDING.term_months);
+  });
+
+  it("never quotes a rate above the statutory ceiling", () => {
+    // Handbook §2: capped at 20%/yr, and the quoted rate is all-in.
+    expect(MOCK_SME_FUNDING.interest_rate_pct).toBeLessThanOrEqual(
+      RATE_CEILING_PCT,
     );
   });
 
-  it("amortizes: principal rises and interest falls across the schedule", () => {
-    // Flat columns would betray hand-typed numbers rather than a schedule.
-    for (let i = 1; i < MOCK_INSTALLMENTS.length; i += 1) {
-      expect(MOCK_INSTALLMENTS[i].principal).toBeGreaterThan(
-        MOCK_INSTALLMENTS[i - 1].principal,
-      );
-      expect(MOCK_INSTALLMENTS[i].interest).toBeLessThan(
-        MOCK_INSTALLMENTS[i - 1].interest,
-      );
+  it("scores the business 0-100 rather than lettering it", () => {
+    expect(MOCK_SME_FUNDING.score).toBeGreaterThanOrEqual(0);
+    expect(MOCK_SME_FUNDING.score).toBeLessThanOrEqual(100);
+  });
+
+  it("reconciles the total repayable with the daily amount and the term", () => {
+    // The total is the daily amount charged across every business day of the
+    // term. If these drift apart the screen shows two contradictory numbers.
+    const businessDays =
+      MOCK_SME_FUNDING.term_months * BUSINESS_DAYS_PER_PERIOD;
+    expect(MOCK_SME_FUNDING.daily_amount * businessDays).toBe(
+      MOCK_SME_FUNDING.total_repayable,
+    );
+  });
+
+  it("prices the total above the principal by roughly the quoted rate", () => {
+    const implied =
+      (MOCK_SME_FUNDING.total_repayable / MOCK_SME_FUNDING.funded - 1) * 100;
+    const expected =
+      (MOCK_SME_FUNDING.interest_rate_pct * MOCK_SME_FUNDING.term_months) / 12;
+    expect(Math.abs(implied - expected)).toBeLessThan(0.1);
+  });
+});
+
+describe("MOCK_REPAYMENT_PERIODS", () => {
+  it("charges a flat amount per business day within a period", () => {
+    // Not an amortisation table: there is no shifting principal/interest
+    // split, because the product does not have one.
+    for (const p of MOCK_REPAYMENT_PERIODS) {
+      expect(p.business_days).toBe(BUSINESS_DAYS_PER_PERIOD);
+      expect(periodTotal(p)).toBe(p.daily_amount * p.business_days);
     }
   });
 
-  it("numbers installments consecutively from 1", () => {
-    MOCK_INSTALLMENTS.forEach((item, index) => {
-      expect(item.number).toBe(index + 1);
-    });
-  });
-
-  it("carries a paid_date on settled rows only", () => {
-    for (const item of MOCK_INSTALLMENTS) {
-      const settled = item.status === "PAID" || item.status === "EARLY";
-      expect(Boolean(item.paid_date)).toBe(settled);
-    }
-  });
-
-  it("settles an EARLY row before its due date", () => {
-    for (const item of MOCK_INSTALLMENTS) {
-      if (item.status === "EARLY") {
-        expect(new Date(item.paid_date!).getTime()).toBeLessThan(
-          new Date(item.due_date).getTime(),
-        );
+  it("only ever applies relief downward", () => {
+    // Handbook §2: if revenue was strong we never ask for more.
+    for (const p of MOCK_REPAYMENT_PERIODS) {
+      if (p.contractual_daily_amount) {
+        expect(p.daily_amount).toBeLessThan(p.contractual_daily_amount);
+        expect(p.status).toBe("RELIEF_APPLIED");
       }
     }
   });
 
-  it("keeps exactly one DUE row, and places it after every settled row", () => {
-    const due = MOCK_INSTALLMENTS.filter((i) => i.status === "DUE");
-    expect(due).toHaveLength(1);
-    const lastSettled = MOCK_INSTALLMENTS.filter(
-      (i) => i.status === "PAID" || i.status === "EARLY",
-    ).at(-1);
-    expect(due[0].number).toBeGreaterThan(lastSettled!.number);
+  it("covers the periods in order with no gaps in numbering", () => {
+    MOCK_REPAYMENT_PERIODS.forEach((p, index) => {
+      expect(p.number).toBe(index + 1);
+    });
+  });
+
+  it("has one period per month of the declared term", () => {
+    expect(MOCK_REPAYMENT_PERIODS).toHaveLength(MOCK_SME_FUNDING.term_months);
   });
 });

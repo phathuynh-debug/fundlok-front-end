@@ -74,19 +74,46 @@ test("lists every position with its project and industry", async ({ page }) => {
   }
 });
 
-test("a completed position shows no next payout date", async ({ page }) => {
+test("a repaid position shows no next payout date", async ({ page }) => {
   await page.goto("/dashboard");
 
-  const completed = MOCK_HOLDINGS.find((h) => h.status === "COMPLETED")!;
+  const repaid = MOCK_HOLDINGS.find((h) => h.status === "REPAID_EARLY")!;
   const row = page
     .getByRole("listitem")
-    .filter({ hasText: completed.project_name });
+    .filter({ hasText: repaid.project_name });
 
   await expect(row).toContainText(
-    t("dashboard.investor.holdingStatus.COMPLETED"),
+    t("dashboard.investor.holdingStatus.REPAID_EARLY"),
   );
   await expect(row).toContainText(t("common.na"));
   await expect(row).toContainText("100%");
+});
+
+test("shows a written-down position and who bears the loss", async ({
+  page,
+}) => {
+  // The portfolio must not read as though every position returns capital
+  // (fundlok-domain §1, §5).
+  await page.goto("/dashboard");
+
+  const written = MOCK_HOLDINGS.find((h) => h.status === "WRITTEN_DOWN")!;
+  const row = page
+    .getByRole("listitem")
+    .filter({ hasText: written.project_name });
+
+  await expect(row).toContainText(
+    t("dashboard.investor.holdingStatus.WRITTEN_DOWN"),
+  );
+  await expect(
+    page.getByText(t("dashboard.investor.investorBearsLoss")),
+  ).toBeVisible();
+});
+
+test("qualifies every target return as a target", async ({ page }) => {
+  await page.goto("/dashboard");
+  await expect(
+    page.getByText(t("dashboard.projectCard.notGuaranteed")).first(),
+  ).toBeVisible();
 });
 
 test("each position links to its project details", async ({ page }) => {

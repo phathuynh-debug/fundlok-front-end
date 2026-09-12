@@ -14,8 +14,8 @@ export interface MonthlyPoint {
   deployed_cumulative: number;
   /**
    * Cumulative money received back to date, VND — principal AND yield, not
-   * yield alone. On an amortising loan most of every instalment is the
-   * investor's own capital coming home.
+   * yield alone. Most of what arrives on any given day is the investor's own
+   * capital coming home, not earnings.
    */
   returns_cumulative: number;
   /** Money received back in this month alone, VND. Principal + yield. */
@@ -145,25 +145,37 @@ export const MOCK_MONTHLY: MonthlyPoint[] = [
   },
 ];
 
-// Sums to the final deployed_cumulative above (170,000).
+// Sums to the final deployed_cumulative above: 4,250,000,000 VND.
+//
+// Industry values are the grading engine's canonical strings from
+// lib/constants/industries.ts. A made-up label ("Technology", "Energy") renders
+// an untinted card and stays in English under the Vietnamese locale, and
+// "Energy" is not something the engine can score at all.
 export const MOCK_ALLOCATION: IndustryAllocation[] = [
-  { industry: "Technology", deployed: 1300000000 },
-  { industry: "Agriculture", deployed: 950000000 },
+  { industry: "IT Services", deployed: 1300000000 },
+  { industry: "Agriculture & Farming", deployed: 950000000 },
   { industry: "Manufacturing", deployed: 800000000 },
-  { industry: "Healthcare", deployed: 700000000 },
-  { industry: "Energy", deployed: 500000000 },
+  { industry: "Healthcare & Pharmacy", deployed: 700000000 },
+  { industry: "Logistics & Transport", deployed: 500000000 },
 ];
 
 export interface CapitalStatusAllocation {
-  statusKey: "active" | "repaying" | "completed";
+  statusKey: "active" | "repaying" | "completed" | "writtenDown";
   amount: number;
 }
 
-// Breakdown of deployed capital across loan lifecycle stages. Sums to 4,250,000,000 VND.
+// Breakdown of deployed capital across facility lifecycle stages. Sums to
+// 4,250,000,000 VND.
+//
+// The written-down slice is deliberate. A status chart with only healthy
+// stages tells an investor that capital either performs or is still working,
+// which is an implied floor the product does not offer (fundlok-domain §5) —
+// the investor bears the loss when a business underperforms.
 export const MOCK_CAPITAL_STATUS: CapitalStatusAllocation[] = [
   { statusKey: "active", amount: 2450000000 },
-  { statusKey: "repaying", amount: 1120000000 },
+  { statusKey: "repaying", amount: 1020000000 },
   { statusKey: "completed", amount: 680000000 },
+  { statusKey: "writtenDown", amount: 100000000 },
 ];
 
 export const MOCK_ACTIVE_POSITIONS = 8;

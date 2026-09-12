@@ -2,7 +2,13 @@
 
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { FlaskConical, PiggyBank, ShieldCheck, Wallet } from "lucide-react";
+import {
+  FlaskConical,
+  PiggyBank,
+  ShieldAlert,
+  ShieldCheck,
+  Wallet,
+} from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { springItemVariants, staggerContainerVariants } from "@/lib/animations";
 import { formatCurrency } from "@/lib/format-currency";
@@ -11,12 +17,12 @@ import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { RepaymentProgressChart } from "./RepaymentProgressChart";
 import { RevenueShareChart } from "./RevenueShareChart";
-import { GradeFactorsPanel } from "./GradeFactorsPanel";
+import { ScoreFactorsPanel } from "./ScoreFactorsPanel";
 import {
   deriveRepaymentSummary,
-  MOCK_GRADE_FACTORS,
+  MOCK_SCORE_FACTORS,
   MOCK_REPAYMENT_MONTHS,
-  MOCK_SME_LOAN,
+  MOCK_SME_FACILITY,
   REVENUE_SHARE_CEILING,
 } from "./mock-sme-analytics";
 
@@ -42,12 +48,12 @@ function ChartCard({
 
 // FE-013. A borrower's screen, not the investor screen relabelled: one loan,
 // what is left on it, how much of daily revenue it eats, and what moves the
-// grade. Nothing here is a portfolio.
+// score. Nothing here is a portfolio.
 export function SmeAnalyticsView() {
   const { locale, t } = useTranslations();
 
   const summary = useMemo(
-    () => deriveRepaymentSummary(MOCK_SME_LOAN, MOCK_REPAYMENT_MONTHS),
+    () => deriveRepaymentSummary(MOCK_SME_FACILITY, MOCK_REPAYMENT_MONTHS),
     [],
   );
 
@@ -65,13 +71,26 @@ export function SmeAnalyticsView() {
       valueClassName: "text-foreground",
     },
     {
-      key: "nextPayment",
-      label: t("dashboard.smeAnalytics.kpi.nextPayment"),
-      value: formatCurrency(MOCK_SME_LOAN.next_payment, locale),
-      hint: t("dashboard.smeAnalytics.kpi.nextPaymentHint", {
-        date: formatDate(MOCK_SME_LOAN.next_payment_date, locale),
+      // The unit of repayment is the business day, not the month. Showing a
+      // monthly "next payment" describes a product we do not sell.
+      key: "dailyRepayment",
+      label: t("dashboard.smeAnalytics.kpi.dailyRepayment"),
+      value: formatCurrency(MOCK_SME_FACILITY.target_daily, locale),
+      hint: t("dashboard.smeAnalytics.kpi.dailyRepaymentHint", {
+        total: formatCurrency(MOCK_SME_FACILITY.current_period_total, locale),
+        date: formatDate(MOCK_SME_FACILITY.current_period_end_date, locale),
       }),
       icon: PiggyBank,
+      valueClassName: "text-foreground",
+    },
+    {
+      // The SME has known this date since signing; the screen should not be
+      // the place they find out it exists.
+      key: "backstop",
+      label: t("dashboard.smeAnalytics.kpi.backstop"),
+      value: formatDate(summary.backstop_date, locale),
+      hint: t("dashboard.smeAnalytics.kpi.backstopHint"),
+      icon: ShieldAlert,
       valueClassName: "text-foreground",
     },
     {
@@ -79,8 +98,8 @@ export function SmeAnalyticsView() {
       label: t("dashboard.smeAnalytics.kpi.costOfCapital"),
       value: formatCurrency(summary.cost_of_capital, locale),
       hint: t("dashboard.smeAnalytics.kpi.costOfCapitalHint", {
-        rate: MOCK_SME_LOAN.interest_rate_pct.toFixed(2),
-        months: MOCK_SME_LOAN.term_months,
+        rate: MOCK_SME_FACILITY.interest_rate_pct.toFixed(2),
+        months: MOCK_SME_FACILITY.term_months,
       }),
       icon: FlaskConical,
       valueClassName: "text-foreground",
@@ -114,13 +133,13 @@ export function SmeAnalyticsView() {
               {formatCurrency(summary.repaid, locale)}
               <span className="text-sm font-medium text-muted-foreground">
                 {" / "}
-                {formatCurrency(MOCK_SME_LOAN.total_obligation, locale)}
+                {formatCurrency(MOCK_SME_FACILITY.total_obligation, locale)}
               </span>
             </p>
           </div>
           <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
             {t("dashboard.smeAnalytics.progress.remaining", {
-              days: MOCK_SME_LOAN.days_remaining,
+              days: MOCK_SME_FACILITY.days_remaining,
             })}
           </p>
         </div>
@@ -146,7 +165,7 @@ export function SmeAnalyticsView() {
         variants={staggerContainerVariants}
         initial="hidden"
         animate="show"
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4"
       >
         {tiles.map((tile) => (
           <motion.div key={tile.key} variants={springItemVariants}>
@@ -191,7 +210,7 @@ export function SmeAnalyticsView() {
         >
           <RepaymentProgressChart
             months={MOCK_REPAYMENT_MONTHS}
-            totalObligation={MOCK_SME_LOAN.total_obligation}
+            totalObligation={MOCK_SME_FACILITY.total_obligation}
           />
         </ChartCard>
 
@@ -206,14 +225,14 @@ export function SmeAnalyticsView() {
       </div>
 
       <ChartCard
-        title={t("dashboard.smeAnalytics.charts.gradeTitle")}
-        description={t("dashboard.smeAnalytics.charts.gradeDesc", {
-          grade: MOCK_SME_LOAN.grade.toFixed(2),
+        title={t("dashboard.smeAnalytics.charts.scoreTitle")}
+        description={t("dashboard.smeAnalytics.charts.scoreDesc", {
+          score: MOCK_SME_FACILITY.score.toFixed(2),
         })}
       >
-        <GradeFactorsPanel
-          factors={MOCK_GRADE_FACTORS}
-          grade={MOCK_SME_LOAN.grade}
+        <ScoreFactorsPanel
+          factors={MOCK_SCORE_FACTORS}
+          score={MOCK_SME_FACILITY.score}
         />
       </ChartCard>
     </div>

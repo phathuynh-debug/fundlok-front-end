@@ -298,7 +298,8 @@
         "status": {
           "active": "Đang hoạt động & sinh lời",
           "completed": "Đã tất toán hoàn toàn",
-          "repaying": "Đang trong kỳ hoàn trả"
+          "repaying": "Đang trong kỳ hoàn trả",
+          "writtenDown": "Đã ghi giảm"
         },
         "totalDeployed": "Tổng đã giải ngân"
       },
@@ -352,24 +353,32 @@
     "investor": {
       "activeInvestments": "Khoản đầu tư đang hoạt động",
       "browseProjects": "Khám phá dự án đầu tư",
-      "holdingExpectedRoi": "Lợi nhuận kỳ vọng",
-      "holdingGrade": "Hạng {grade}",
+      "capitalWrittenDown": "Vốn đã ghi giảm",
+      "holdingBackstop": "Hạn chót {date}",
       "holdingInvested": "Đã đầu tư",
       "holdingNextPayout": "Kỳ nhận tiếp theo",
       "holdingProgress": "Tiến độ trả nợ",
       "holdingRank": "Hạng #{rank}",
       "holdingReturned": "Đã nhận về",
-      "holdingRoi": "Lợi suất / Kỳ hạn",
-      "holdingRoiValue": "{rate}% · {months} tháng",
+      "holdingRoi": "Lợi suất mục tiêu / Kỳ hạn",
+      "holdingRoiValue": "{min}–{max}% · {months} tháng",
+      "holdingScore": "Điểm {score}/100",
       "holdingStatus": {
         "ACTIVE": "Đã giải ngân",
-        "COMPLETED": "Đã tất toán",
+        "EXTENDED": "Đã gia hạn",
         "FUNDING": "Đang gọi vốn",
-        "REPAYING": "Đang trả nợ"
+        "RELIEF": "Đã giảm nghĩa vụ",
+        "REPAID": "Đã tất toán",
+        "REPAID_EARLY": "Tất toán sớm",
+        "REPAYING": "Đang hoàn trả",
+        "SETTLED_AT_BACKSTOP": "Tất toán tại hạn chót",
+        "WATCHLIST": "Đang theo dõi",
+        "WRITTEN_DOWN": "Đã ghi giảm"
       },
       "holdingTopYield": "Top Lợi Nhuận #{rank}",
       "holdingViewDetails": "Xem chi tiết dự án",
       "holdingsTitle": "Khoản đầu tư của bạn ({count})",
+      "investorBearsLoss": "Nhà đầu tư chịu khoản lỗ này.",
       "mockNotice": "Dữ liệu mẫu, hiển thị trong lúc màn hình này đang được hoàn thiện. Trang chưa kết nối với hệ thống backend, nên các khoản đầu tư và số liệu bên dưới không phải danh mục thực tế của bạn.",
       "noInvestmentsDescription": "Hiện tại bạn chưa có khoản đầu tư nào. Hãy khám phá các cơ hội có sẵn để bắt đầu hành trình đầu tư.",
       "noInvestmentsTitle": "Chưa có khoản đầu tư nào",
@@ -377,7 +386,8 @@
       "title": "Danh mục đầu tư",
       "totalInvested": "Tổng đã đầu tư",
       "totalReturns": "Tổng lợi nhuận",
-      "weightedRoi": "Lợi suất kỳ vọng TB"
+      "weightedRoi": "Lợi suất mục tiêu TB (đang mở)",
+      "weightedRoiValue": "{min}–{max}%"
     },
     "projectCard": {
       "annualizedReturn": "Lợi suất mục tiêu/năm",
@@ -402,7 +412,7 @@
       "noLoanPurpose": "Chưa cung cấp",
       "notGuaranteed": "Mục tiêu, không phải cam kết",
       "pending": "Chưa có",
-      "pendingGrading": "Chờ xếp hạng",
+      "pendingGrading": "Chờ điểm doanh nghiệp",
       "raisedOfTarget": "Đã gọi {raised} / {target}",
       "status": {
         "active": "ĐANG HOẠT ĐỘNG",
@@ -869,12 +879,12 @@
     },
     "smeAnalytics": {
       "charts": {
-        "gradeDesc": "Bốn nhóm yếu tố tạo nên điểm {grade} của bạn, và nơi cần cải thiện.",
-        "gradeTitle": "Điều gì quyết định hạng của bạn",
         "repaymentDesc": "Số đã trả so với tổng phải trả trong suốt thời hạn.",
         "repaymentTitle": "Tiến độ trả nợ",
         "revenueShareDesc": "Từng tháng so với ngưỡng an toàn {ceiling}%.",
-        "revenueShareTitle": "Tỷ lệ doanh thu dùng để trả nợ"
+        "revenueShareTitle": "Tỷ lệ doanh thu dùng để trả nợ",
+        "scoreDesc": "Bốn nhóm yếu tố tạo nên điểm {score} của bạn, và nơi cần cải thiện.",
+        "scoreTitle": "Điều gì quyết định điểm doanh nghiệp của bạn"
       },
       "factorHints": {
         "bcq": "Tỷ suất lợi nhuận, khả năng linh hoạt chi phí và quy mô khoản vay so với doanh thu.",
@@ -888,32 +898,34 @@
         "rsg": "Ổn định & tăng trưởng doanh thu",
         "sector": "Triển vọng ngành"
       },
-      "grade": {
+      "kpi": {
+        "backstop": "Hạn chót cuối cùng",
+        "backstopHint": "Mọi khoản còn lại sẽ đến hạn thanh toán đầy đủ vào ngày này.",
+        "costOfCapital": "Chi phí khoản vay",
+        "costOfCapitalHint": "Tổng lãi ở mức {rate}% trong {months} tháng",
+        "dailyRepayment": "Khoản trả mỗi ngày",
+        "dailyRepaymentHint": "Mỗi ngày làm việc. Kỳ này tổng cộng {total} đến ngày {date}.",
+        "earlyPayoff": "Tất toán sớm",
+        "earlyPayoffHint": "Số tiền để tất toán khoản này hôm nay. Không có phí trả trước — tổng số tiền phải trả không thay đổi.",
+        "outstanding": "Còn phải trả",
+        "outstandingHint": "Đã trả {percent}% khoản vay"
+      },
+      "mockNotice": "Dữ liệu mẫu, hiển thị trong lúc trang này còn được hoàn thiện. Trang chưa kết nối backend — chưa có module lịch trả nợ và engine tính điểm chưa được nối vào các lần tính điểm doanh nghiệp, nên các số liệu này không phản ánh khoản vốn thật của bạn.",
+      "overCeiling": "Tháng trước, khoản trả nợ chiếm {percent}% doanh thu, cao hơn mức {ceiling}% mà chúng tôi cho là an toàn. Hãy trao đổi với chúng tôi về việc gia hạn nếu điều này gây áp lực cho hoạt động của bạn.",
+      "progress": {
+        "label": "Đã trả đến nay",
+        "remaining": "Còn {days} ngày làm việc"
+      },
+      "score": {
         "band": {
           "fair": "Trung bình",
           "strong": "Tốt",
           "weak": "Cần cải thiện"
         },
-        "focusBody": "{factor} là nhóm yếu nhất của bạn với {score} điểm. Cải thiện nhóm này sẽ nâng hạng — và giảm lãi suất — nhiều hơn bất kỳ việc nào khác bạn có thể làm ngay.",
+        "focusBody": "{factor} là nhóm yếu nhất của bạn với {score} điểm. Cải thiện nhóm này sẽ nâng điểm doanh nghiệp — và lãi suất tham khảo đi kèm — nhiều hơn bất kỳ việc nào khác bạn có thể làm ngay.",
         "focusTitle": "Nên tập trung vào đâu",
         "outOf": "trên 100",
         "weight": "{percent}% của điểm"
-      },
-      "kpi": {
-        "costOfCapital": "Chi phí khoản vay",
-        "costOfCapitalHint": "Tổng lãi ở mức {rate}% trong {months} tháng",
-        "earlyPayoff": "Tất toán sớm",
-        "earlyPayoffHint": "Số tiền để tất toán khoản này hôm nay. Không có phí trả trước — tổng số tiền phải trả không thay đổi.",
-        "nextPayment": "Kỳ trả tiếp theo",
-        "nextPaymentHint": "Đến hạn {date}",
-        "outstanding": "Còn phải trả",
-        "outstandingHint": "Đã trả {percent}% khoản vay"
-      },
-      "mockNotice": "Dữ liệu mẫu, hiển thị trong lúc trang này còn được hoàn thiện. Trang chưa kết nối backend — chưa có module lịch trả nợ và engine xếp hạng chưa được nối vào các lần tính điểm doanh nghiệp, nên các số liệu này không phản ánh khoản vay thật của bạn.",
-      "overCeiling": "Tháng trước, khoản trả nợ chiếm {percent}% doanh thu, cao hơn mức {ceiling}% mà chúng tôi cho là an toàn. Hãy trao đổi với chúng tôi về việc gia hạn nếu điều này gây áp lực cho hoạt động của bạn.",
-      "progress": {
-        "label": "Đã trả đến nay",
-        "remaining": "Còn {days} ngày làm việc"
       },
       "series": {
         "ceiling": "Ngưỡng an toàn {percent}%",
@@ -921,30 +933,39 @@
         "revenueShare": "Tỷ lệ trên doanh thu",
         "totalOwed": "Tổng phải trả"
       },
-      "subtitle": "Tình trạng khoản vay, chi phí và những yếu tố ảnh hưởng đến hạng của bạn.",
-      "title": "Phân tích khoản vay"
+      "subtitle": "Tình trạng khoản vốn, chi phí và những yếu tố ảnh hưởng đến điểm doanh nghiệp của bạn.",
+      "title": "Phân tích khoản vốn"
     },
     "smeFunding": {
+      "allInRate": "Lãi suất năm trọn gói",
+      "backstopDate": "Hạn chót cuối cùng",
+      "backstopHint": "Mọi khoản còn lại sẽ đến hạn thanh toán đầy đủ vào ngày này.",
+      "dailyAmount": "Khoản trả mỗi ngày",
+      "earlyRepaymentNote": "Tất toán sớm không bị phạt trả trước. Việc này thanh toán phần còn lại của tổng số tiền — không làm giảm tổng đó.",
+      "fixedAtSigning": "Ấn định khi ký. Không thay đổi.",
       "investors": "{count} nhà đầu tư",
       "mockNotice": "Dữ liệu mẫu, hiển thị trong lúc màn hình này đang được hoàn thiện. Thông tin doanh nghiệp phía trên là thật; các số liệu gọi vốn và trả nợ bên dưới chưa kết nối với hệ thống backend.",
-      "nextPayment": "Kỳ trả tiếp theo",
       "ofTarget": "trên {target}",
       "outstanding": "Còn phải trả",
+      "perBusinessDay": "Thu vào mỗi ngày làm việc",
+      "perDay": "{amount} × {days} ngày làm việc",
+      "periodRange": "{start} – {end}",
       "raised": "Đã gọi được",
-      "rate": "Lãi suất / Hạng",
-      "rateValue": "{rate}% · {grade}",
+      "rate": "Lãi suất / Điểm doanh nghiệp",
+      "rateValue": "{rate}% · điểm {score}",
+      "reliefApplied": "Đã giảm nghĩa vụ kỳ — từ {from}/ngày. Tổng số tiền phải trả không đổi; thời gian thu kéo dài hơn.",
       "repaid": "Đã trả đến nay",
-      "scheduleProgress": "Đã trả {done} trong {total} kỳ",
-      "scheduleTitle": "Lịch trả nợ",
-      "split": "Gốc {principal} · Lãi {interest}",
+      "scheduleProgress": "Đã thu {done}/{total} kỳ",
+      "scheduleTitle": "Các kỳ hoàn trả",
       "status": {
-        "DUE": "Đến hạn",
-        "EARLY": "Trả trước hạn",
-        "PAID": "Đã trả",
+        "CURRENT": "Đang thu",
+        "RELIEF_APPLIED": "Đã giảm nghĩa vụ",
+        "SETTLED": "Đã thu",
         "UPCOMING": "Sắp tới"
       },
-      "subtitle": "Bạn đã gọi được bao nhiêu so với số tiền đề nghị, và đang ở đâu trong lịch trả nợ.",
-      "title": "Gọi vốn & Trả nợ"
+      "subtitle": "Bạn đã huy động được bao nhiêu, mỗi ngày làm việc phải trả bao nhiêu, và ngày mà mọi khoản còn lại đến hạn.",
+      "title": "Gọi vốn & Trả nợ",
+      "totalRepayable": "Tổng số tiền phải trả"
     },
     "transactions": {
       "count": "{count} giao dịch",
@@ -953,6 +974,14 @@
         "title": "Không có giao dịch phù hợp"
       },
       "filterByType": "Lọc theo loại",
+      "methods": {
+        "bankTransfer": "Chuyển khoản ngân hàng",
+        "businessAccount": "Tài khoản doanh nghiệp",
+        "custodialAccount": "Tài khoản lưu ký",
+        "dailyRepayment": "Khoản trả hằng ngày",
+        "deductedFromDisbursement": "Khấu trừ khi giải ngân",
+        "platformFee": "Phí dịch vụ nền tảng"
+      },
       "mockNotice": "Dữ liệu mẫu, hiển thị trong lúc màn hình này đang được hoàn thiện. Trang chưa kết nối với hệ thống backend, nên các số liệu bên dưới không phải số dư thực tế của bạn.",
       "searchPlaceholder": "Tìm theo dự án, mã tham chiếu hoặc phương thức",
       "showing": "Hiển thị {shown} trong tổng số {total} giao dịch",
@@ -1098,7 +1127,7 @@
       ],
       "download": "Tải xuống",
       "downloadingFile": "Đang tải tệp",
-      "reminderText": "Hãy xem xét kỹ tất cả tài liệu trước khi đầu tư. Cân nhắc mức độ rủi ro và xếp hạng khi ra quyết định đầu tư.",
+      "reminderText": "Hãy xem xét kỹ tất cả tài liệu trước khi đầu tư. Cân nhắc mức độ rủi ro và điểm doanh nghiệp khi ra quyết định đầu tư, và lưu ý rằng nhà đầu tư chịu khoản lỗ nếu doanh nghiệp không đạt kỳ vọng.",
       "reminderTitle": "Nhắc nhở thẩm định",
       "startingDownload": "Bắt đầu tải {filename}...",
       "subtitle": "Xem lại các tài liệu SME đã nộp để thẩm định",
@@ -1266,41 +1295,41 @@
     "adjustInv": "← Điều chỉnh thông số đầu tư",
     "adjustShort": "← Điều chỉnh",
     "adjustSme": "← Điều chỉnh thông số vay",
-    "approved": "ĐÃ DUYỆT",
-    "assignedApr": "Lãi suất Gán",
     "borrowerSpecs": "Thông số Người vay",
-    "calculateInv": "Tính lợi suất & ROI",
-    "calculateSme": "Tính lãi suất & APY",
-    "creditAssessment": "Đánh giá Tín dụng",
-    "creditStatus": "Trạng thái tín dụng",
+    "calculateInvNew": "Xem khoảng mục tiêu",
+    "calculateSmeNew": "Xem lãi suất tham khảo",
     "desiredLoanShort": "Khoản vay",
     "desiredLoanSize": "Khoản vay mong muốn",
     "durationMonths": "{months} Tháng",
     "durationMos": "{months} Tháng",
     "durationTerms": "Kỳ hạn đầu tư",
-    "estApyShort": "APY DỰ KIẾN",
-    "estProfitReturn": "Lợi nhuận dự kiến",
-    "estProfitShort": "LỢI NHUẬN",
+    "illustrationNote": "Chỉ mang tính minh họa. Đây là số liệu tham khảo, không phải đề nghị, không phải báo giá và không phải cam kết — lãi suất và điểm doanh nghiệp thực tế được tính từ hồ sơ thuế đã xác minh.",
+    "indicativeCheck": "Kiểm tra sơ bộ",
+    "indicativeFit": "NẰM TRONG NGƯỠNG",
+    "indicativeRate": "Lãi suất trọn gói tham khảo",
+    "indicativeStatus": "Mức độ phù hợp sơ bộ",
     "invShort": "NĐT",
     "investmentShort": "Khoản đầu tư",
     "investmentSize": "Khoản đầu tư",
     "investmentSpecs": "Thông số Đầu tư",
     "investorPortal": "CỔNG NHÀ ĐẦU TƯ",
-    "leverageRatio": "Tỷ lệ Đòn bẩy",
     "loanDuration": "Thời hạn vay",
     "loanDurationShort": "Thời hạn",
     "locked": "ĐÃ KHÓA",
     "monthlyRevShort": "Doanh thu tháng",
     "monthlyRevenue": "Doanh thu hàng tháng",
+    "notEligible": "NGOÀI NGƯỠNG",
+    "notGuaranteedShort": "Mục tiêu, không phải cam kết",
     "pending": "ĐANG XỬ LÝ...",
-    "rejected": "TỪ CHỐI",
+    "revenueCoverage": "Khoản vốn so với doanh thu kỳ hạn",
     "riskTolerance": "Mức độ rủi ro",
+    "scenarioRange": "Khoảng kịch bản",
+    "scenarioShort": "KỊCH BẢN",
     "scoreLabel": "ĐIỂM SỐ",
-    "sigmoidIntRate": "Lãi suất Sigmoid",
     "smePortal": "CỔNG DOANH NGHIỆP",
     "smeShort": "SME",
-    "yearlyRoiRate": "ROI hàng năm",
-    "yearlyRoiShort": "ROI HÀNG NĂM",
+    "targetYieldRange": "Lợi suất mục tiêu hằng năm",
+    "targetYieldShort": "LỢI SUẤT MỤC TIÊU",
     "yieldReturnProjection": "Dự phóng Lợi nhuận"
   },
   "notFound": {

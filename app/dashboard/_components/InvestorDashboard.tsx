@@ -3,7 +3,14 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Layers, TrendingUp, Banknote, Percent } from "lucide-react";
+import {
+  Layers,
+  TrendingUp,
+  TrendingDown,
+  Banknote,
+  Percent,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useTranslations } from "@/lib/i18n";
@@ -28,7 +35,16 @@ export function InvestorDashboard() {
   const holdings = MOCK_HOLDINGS;
   const summary = useMemo(() => summarizePortfolio(holdings), [holdings]);
 
-  const kpis = [
+  // `caption` carries the qualifier a figure cannot be shown without — a
+  // target range needs "not guaranteed", a loss figure needs who bears it.
+  const kpis: {
+    key: string;
+    label: string;
+    value: string;
+    caption?: string;
+    icon: LucideIcon;
+    iconClassName: string;
+  }[] = [
     {
       key: "totalInvested",
       label: t("dashboard.investor.totalInvested"),
@@ -53,9 +69,25 @@ export function InvestorDashboard() {
     {
       key: "weightedRoi",
       label: t("dashboard.investor.weightedRoi"),
-      value: `${summary.weighted_roi_pct.toFixed(1)}%`,
+      // A range, not a point figure, and captioned as a target — a single
+      // headline percent on a portfolio reads as what the portfolio pays.
+      value: t("dashboard.investor.weightedRoiValue", {
+        min: summary.weighted_target_min_pct.toFixed(1),
+        max: summary.weighted_target_max_pct.toFixed(1),
+      }),
+      caption: t("dashboard.projectCard.notGuaranteed"),
       icon: Percent,
       iconClassName: "text-amber-500",
+    },
+    {
+      // Sits beside the returns figure on purpose: "total returned" alone
+      // implies every position returns something.
+      key: "capitalWrittenDown",
+      label: t("dashboard.investor.capitalWrittenDown"),
+      value: formatCurrency(summary.capital_written_down, locale),
+      caption: t("dashboard.investor.investorBearsLoss"),
+      icon: TrendingDown,
+      iconClassName: "text-destructive",
     },
   ];
 
@@ -84,6 +116,9 @@ export function InvestorDashboard() {
         variants={staggerContainerVariants}
         initial="hidden"
         animate="show"
+        // Stays at four across even though there are now five KPIs: a VND
+        // figure cannot wrap, and a fifth column narrows every card enough to
+        // clip it. The fifth tile wraps to a second row instead.
         className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
       >
         {kpis.map((kpi) => (
@@ -94,12 +129,21 @@ export function InvestorDashboard() {
                   {kpi.label}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="flex min-w-0 items-center gap-2">
-                <kpi.icon className={`h-6 w-6 shrink-0 ${kpi.iconClassName}`} />
-                <TruncatedFigure
-                  value={kpi.value}
-                  className="text-2xl font-bold"
-                />
+              <CardContent className="min-w-0 space-y-1">
+                <div className="flex min-w-0 items-center gap-2">
+                  <kpi.icon
+                    className={`h-6 w-6 shrink-0 ${kpi.iconClassName}`}
+                  />
+                  <TruncatedFigure
+                    value={kpi.value}
+                    className="text-2xl font-bold"
+                  />
+                </div>
+                {kpi.caption && (
+                  <p className="text-[11px] leading-snug text-muted-foreground">
+                    {kpi.caption}
+                  </p>
+                )}
               </CardContent>
             </Card>
           </motion.div>

@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 import {
-  MOCK_INSTALLMENTS,
+  MOCK_REPAYMENT_PERIODS,
   MOCK_SME_FUNDING,
   summarizeFunding,
 } from "../../app/dashboard/_components/mock-sme-funding";
@@ -10,7 +10,7 @@ import { STUB_PROJECT } from "../stub-api/fixtures";
 import { signInAs } from "../support/auth";
 import { normalizeSpaces, t } from "../support/i18n";
 
-const summary = summarizeFunding(MOCK_SME_FUNDING, MOCK_INSTALLMENTS);
+const summary = summarizeFunding(MOCK_SME_FUNDING, MOCK_REPAYMENT_PERIODS);
 
 test.describe("an SME with a project", () => {
   test.beforeEach(async ({ context }) => {
@@ -59,10 +59,10 @@ test.describe("an SME with a project", () => {
     await page.goto("/dashboard");
 
     const schedule = page.getByRole("list").filter({
-      hasText: t("dashboard.smeFunding.status.DUE"),
+      hasText: t("dashboard.smeFunding.status.CURRENT"),
     });
     await expect(schedule.getByRole("listitem")).toHaveCount(
-      MOCK_INSTALLMENTS.length,
+      MOCK_REPAYMENT_PERIODS.length,
     );
 
     await expect(
@@ -75,14 +75,31 @@ test.describe("an SME with a project", () => {
     ).toBeVisible();
   });
 
-  test("shows early repayment as its own state, not just paid", async ({
+  test("shows relief as its own state, and says the total did not move", async ({
     page,
   }) => {
-    // Early repayment is a platform value (CLAUDE.md); flattening it into
-    // "paid" would erase it from the borrower's view.
+    // Relief is the mechanic an SME most needs to understand: the daily
+    // amount came down, the total owed did not. Flattening it into "paid"
+    // would erase the distinction the handbook insists on (fundlok-domain §2).
     await page.goto("/dashboard");
     await expect(
-      page.getByText(t("dashboard.smeFunding.status.EARLY")),
+      page.getByText(t("dashboard.smeFunding.status.RELIEF_APPLIED")).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByText(t("dashboard.smeFunding.fixedAtSigning")),
+    ).toBeVisible();
+  });
+
+  test("discloses the backstop date and the early-settlement rule", async ({
+    page,
+  }) => {
+    // Both are things an SME is entitled to know from the day they sign.
+    await page.goto("/dashboard");
+    await expect(
+      page.getByText(t("dashboard.smeFunding.backstopHint")),
+    ).toBeVisible();
+    await expect(
+      page.getByText(t("dashboard.smeFunding.earlyRepaymentNote")),
     ).toBeVisible();
   });
 

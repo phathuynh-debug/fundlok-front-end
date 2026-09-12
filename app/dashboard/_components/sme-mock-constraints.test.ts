@@ -7,7 +7,8 @@ import {
   isAllowedLoanDuration,
 } from "@/lib/constants/loan-constraints";
 import { MOCK_SME_FUNDING } from "./mock-sme-funding";
-import { MOCK_SME_LOAN } from "../analytics/_components/sme/mock-sme-analytics";
+import { MOCK_SME_FACILITY } from "../analytics/_components/sme/mock-sme-analytics";
+import { ALLOWED_TERM_MONTHS } from "@/lib/facility-terms";
 
 // The SME demo surfaces are driven entirely by hardcoded mocks, and those mocks
 // drifted outside the shapes the grading engine will actually accept — a loan
@@ -28,9 +29,9 @@ const SME_MOCK_LOANS = [
     term_months: MOCK_SME_FUNDING.term_months,
   },
   {
-    label: "MOCK_SME_LOAN (SME analytics)",
-    principal: MOCK_SME_LOAN.principal,
-    term_months: MOCK_SME_LOAN.term_months,
+    label: "MOCK_SME_FACILITY (SME analytics)",
+    principal: MOCK_SME_FACILITY.principal,
+    term_months: MOCK_SME_FACILITY.term_months,
   },
 ];
 
@@ -72,4 +73,19 @@ describe("SME mock loans obey the grading engine's constraints", () => {
     expect(isAllowedLoanDuration(10)).toBe(false);
     expect(LOAN_DURATIONS_MONTHS).toEqual([3, 6, 9, 12]);
   });
+});
+
+// The engine's YAML still accepts 3- and 9-month terms, but the FundLok
+// Handbook v3 §2 says an SME declares 6 or 12 months and twelve is the
+// maximum. The two disagree, and that disagreement is for the CEO to settle —
+// not for a mock file. Until it is settled these mocks sit in the INTERSECTION
+// of both rules, which is always safe: a 6 or 12 month term satisfies the
+// handbook and the engine at once.
+describe("SME mock terms also satisfy the handbook, not just the engine", () => {
+  it.each(SME_MOCK_LOANS)(
+    "$label declares 6 or 12 months",
+    ({ term_months }) => {
+      expect(ALLOWED_TERM_MONTHS as readonly number[]).toContain(term_months);
+    },
+  );
 });

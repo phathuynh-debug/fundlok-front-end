@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, Lock } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
+import { formatCompactCurrency } from "@/lib/format-currency";
+import { indicativeFigures } from "@/lib/indicative-figures";
 
 type MockupProps = {
   onMouseMove: (e: React.MouseEvent<HTMLDivElement>) => void;
@@ -20,17 +22,18 @@ type MockupProps = {
 };
 
 export default function Mockup(props: MockupProps) {
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const [device, setDevice] = useState<"phone" | "laptop">("phone");
   const [view, setView] = useState<"investor" | "sme">("sme");
 
-  // SME Calculator states
-  const [smeRevenue, setSmeRevenue] = useState<number>(50000);
-  const [smeLoanSize, setSmeLoanSize] = useState<number>(100000);
+  // SME Calculator states. VND, matching lib/constants/loan-constraints.ts —
+  // there is no USD anywhere in the product (see lib/format-currency.ts).
+  const [smeRevenue, setSmeRevenue] = useState<number>(500_000_000);
+  const [smeLoanSize, setSmeLoanSize] = useState<number>(1_000_000_000);
   const [smeDuration, setSmeDuration] = useState<number>(12);
 
   // Investor Calculator states
-  const [invSize, setInvSize] = useState<number>(150000);
+  const [invSize, setInvSize] = useState<number>(300_000_000);
   const [invRisk, setInvRisk] = useState<number>(5.0);
   const [invDuration, setInvDuration] = useState<number>(6);
 
@@ -51,161 +54,180 @@ export default function Mockup(props: MockupProps) {
 
   const partner = props.activePartner;
 
-  // SME Calculations
-  const grade = smeLoanSize / (smeRevenue * smeDuration);
-  const isSmeRejected = grade > 0.5;
-  const exponent = -(1.88656 * grade - 1.07237);
-  const interestRate = 43.37647 / (1 + Math.exp(exponent));
-
-  const gradeText = grade.toFixed(4);
-  const interestRateText = interestRate.toFixed(2) + "%";
-
-  // Investor Calculations
-  let roiTranslation = 13.5;
-  if (invRisk < 2) roiTranslation = 10.5;
-  else if (invRisk < 4) roiTranslation = 11.5;
-  else if (invRisk < 6) roiTranslation = 13.5;
-  else if (invRisk < 8) roiTranslation = 16.5;
-  else roiTranslation = 17.5;
-
-  let adjustment = 0.4;
-  if (invDuration <= 3) adjustment = 0;
-  else if (invDuration <= 6) adjustment = 0.2;
-  else if (invDuration <= 12) adjustment = 0.4;
-  else adjustment = 0.6;
-
-  const yearlyRoi = roiTranslation + adjustment;
-  const yearlyRoiText = yearlyRoi.toFixed(1) + "%";
-  const roiProfit = ((invSize * (yearlyRoi / 100)) / 12) * invDuration;
-  const roiProfitText =
-    "$" +
-    roiProfit.toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+  // Illustrative figures only — see lib/indicative-figures.ts for why this is
+  // deliberately NOT our pricing model, and for the test that pins the
+  // statutory ceiling so it cannot regress.
+  const { coverage, businessScore, indicativeRate, isSmeIneligible } = (() => {
+    const figures = indicativeFigures({
+      monthlyRevenue: smeRevenue,
+      amount: smeLoanSize,
+      termMonths: smeDuration,
     });
+    return { ...figures, isSmeIneligible: figures.isIneligible };
+  })();
+
+  const indicativeRateText = indicativeRate.toFixed(1) + "%";
+
+  // Investor calculations. A RANGE, never a single figure — a bare percent on
+  // a marketing page reads as the return the investor will receive (§3).
+  let targetCentre = 13.5;
+  if (invRisk < 2) targetCentre = 11;
+  else if (invRisk < 4) targetCentre = 12;
+  else if (invRisk < 6) targetCentre = 13.5;
+  else if (invRisk < 8) targetCentre = 15;
+  else targetCentre = 16;
+
+  const targetMinPct = targetCentre - 1.5;
+  const targetMaxPct = targetCentre + 1.5;
+  const targetRangeText = `${targetMinPct.toFixed(1)}–${targetMaxPct.toFixed(1)}%`;
+
+  const scenarioLow = ((invSize * (targetMinPct / 100)) / 12) * invDuration;
+  const scenarioHigh = ((invSize * (targetMaxPct / 100)) / 12) * invDuration;
+  const scenarioText = `${formatCompactCurrency(scenarioLow, locale)} – ${formatCompactCurrency(scenarioHigh, locale)}`;
+
+  const scoreText = String(businessScore);
+  const coverageText = coverage.toFixed(2) + "x";
+  // The disclaimer lives inside the matrix rather than beside it so it cannot
+  // be dropped by a layout that renders the table on its own. An indicative
+  // figure without "this is not an offer" beside it reads as a quote.
+  const illustrationNote = (
+    <p className="pt-2 text-[7px] leading-snug text-zinc-500 font-sans">
+      {t("mockup.illustrationNote")}
+    </p>
+  );
 
   const matrixSme = (showResults: boolean) => (
-    <table className="w-full text-left text-[10px] md:text-[11px] matrix-table">
-      <tbody>
-        <tr className="border-b border-zinc-900/40">
-          <td className="py-2 font-semibold text-zinc-400">
-            {t("mockup.monthlyRevenue")}
-          </td>
-          <td className="py-2 text-right font-mono font-bold text-white">
-            ${smeRevenue.toLocaleString()}
-          </td>
-        </tr>
-        <tr className="border-b border-zinc-900/40">
-          <td className="py-2 font-semibold text-zinc-400">
-            {t("mockup.desiredLoanSize")}
-          </td>
-          <td className="py-2 text-right font-mono font-bold text-white">
-            ${smeLoanSize.toLocaleString()}
-          </td>
-        </tr>
-        <tr className="border-b border-zinc-900/40">
-          <td className="py-2 font-semibold text-zinc-400">
-            {t("mockup.loanDuration")}
-          </td>
-          <td className="py-2 text-right font-mono font-bold text-zinc-300">
-            {t("mockup.durationMonths", { months: smeDuration })}
-          </td>
-        </tr>
-        <tr className="border-b border-zinc-900/40">
-          <td className="py-2 font-semibold text-zinc-400">
-            {t("mockup.sigmoidIntRate")}
-          </td>
-          <td className="py-2 text-right font-mono font-bold">
-            {showResults ? (
-              <span className="text-emerald-400">{interestRateText}</span>
-            ) : (
-              <span className="text-zinc-650 font-sans text-[8.5px] flex items-center justify-end gap-1">
-                <Lock className="w-2.5 h-2.5 text-zinc-650" />{" "}
-                {t("mockup.pending")}
-              </span>
-            )}
-          </td>
-        </tr>
-        <tr>
-          <td className="py-2 font-semibold text-zinc-400">
-            {t("mockup.creditStatus")}
-          </td>
-          <td className="py-2 text-right font-sans font-extrabold uppercase tracking-wide">
-            {showResults ? (
-              <span
-                className={isSmeRejected ? "text-red-400" : "text-emerald-400"}
-              >
-                {isSmeRejected ? t("mockup.rejected") : t("mockup.approved")}
-              </span>
-            ) : (
-              <span className="text-zinc-650 font-mono text-[8.5px] font-bold">
-                {t("mockup.locked")}
-              </span>
-            )}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <>
+      <table className="w-full text-left text-[10px] md:text-[11px] matrix-table">
+        <tbody>
+          <tr className="border-b border-zinc-900/40">
+            <td className="py-2 font-semibold text-zinc-400">
+              {t("mockup.monthlyRevenue")}
+            </td>
+            <td className="py-2 text-right font-mono font-bold text-white">
+              {formatCompactCurrency(smeRevenue, locale)}
+            </td>
+          </tr>
+          <tr className="border-b border-zinc-900/40">
+            <td className="py-2 font-semibold text-zinc-400">
+              {t("mockup.desiredLoanSize")}
+            </td>
+            <td className="py-2 text-right font-mono font-bold text-white">
+              {formatCompactCurrency(smeLoanSize, locale)}
+            </td>
+          </tr>
+          <tr className="border-b border-zinc-900/40">
+            <td className="py-2 font-semibold text-zinc-400">
+              {t("mockup.loanDuration")}
+            </td>
+            <td className="py-2 text-right font-mono font-bold text-zinc-300">
+              {t("mockup.durationMonths", { months: smeDuration })}
+            </td>
+          </tr>
+          <tr className="border-b border-zinc-900/40">
+            <td className="py-2 font-semibold text-zinc-400">
+              {t("mockup.indicativeRate")}
+            </td>
+            <td className="py-2 text-right font-mono font-bold">
+              {showResults ? (
+                <span className="text-emerald-400">{indicativeRateText}</span>
+              ) : (
+                <span className="text-zinc-650 font-sans text-[8.5px] flex items-center justify-end gap-1">
+                  <Lock className="w-2.5 h-2.5 text-zinc-650" />{" "}
+                  {t("mockup.pending")}
+                </span>
+              )}
+            </td>
+          </tr>
+          <tr>
+            <td className="py-2 font-semibold text-zinc-400">
+              {t("mockup.indicativeStatus")}
+            </td>
+            <td className="py-2 text-right font-sans font-extrabold uppercase tracking-wide">
+              {showResults ? (
+                <span
+                  className={
+                    isSmeIneligible ? "text-red-400" : "text-emerald-400"
+                  }
+                >
+                  {isSmeIneligible
+                    ? t("mockup.notEligible")
+                    : t("mockup.indicativeFit")}
+                </span>
+              ) : (
+                <span className="text-zinc-650 font-mono text-[8.5px] font-bold">
+                  {t("mockup.locked")}
+                </span>
+              )}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      {showResults && illustrationNote}
+    </>
   );
 
   const matrixInvestor = (showResults: boolean) => (
-    <table className="w-full text-left text-[10px] md:text-[11px] matrix-table">
-      <tbody>
-        <tr className="border-b border-zinc-900/40">
-          <td className="py-2 font-semibold text-zinc-400">
-            {t("mockup.investmentSize")}
-          </td>
-          <td className="py-2 text-right font-mono font-bold text-white">
-            ${invSize.toLocaleString()}
-          </td>
-        </tr>
-        <tr className="border-b border-zinc-900/40">
-          <td className="py-2 font-semibold text-zinc-400">
-            {t("mockup.riskTolerance")}
-          </td>
-          <td className="py-2 text-right font-mono font-bold text-white">
-            {invRisk.toFixed(1)} / 10
-          </td>
-        </tr>
-        <tr className="border-b border-zinc-900/40">
-          <td className="py-2 font-semibold text-zinc-400">
-            {t("mockup.durationTerms")}
-          </td>
-          <td className="py-2 text-right font-mono font-bold text-zinc-300">
-            {t("mockup.durationMonths", { months: invDuration })}
-          </td>
-        </tr>
-        <tr className="border-b border-zinc-900/40">
-          <td className="py-2 font-semibold text-zinc-400">
-            {t("mockup.yearlyRoiRate")}
-          </td>
-          <td className="py-2 text-right font-mono font-bold">
-            {showResults ? (
-              <span className="text-emerald-400">{yearlyRoiText}</span>
-            ) : (
-              <span className="text-zinc-650 font-sans text-[8.5px] flex items-center justify-end gap-1">
-                <Lock className="w-2.5 h-2.5 text-zinc-650" />{" "}
-                {t("mockup.pending")}
-              </span>
-            )}
-          </td>
-        </tr>
-        <tr>
-          <td className="py-2 font-semibold text-zinc-400">
-            {t("mockup.estProfitReturn")}
-          </td>
-          <td className="py-2 text-right font-mono font-bold">
-            {showResults ? (
-              <span className="text-emerald-400">{roiProfitText}</span>
-            ) : (
-              <span className="text-zinc-650 font-mono text-[8.5px] font-bold">
-                {t("mockup.locked")}
-              </span>
-            )}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <>
+      <table className="w-full text-left text-[10px] md:text-[11px] matrix-table">
+        <tbody>
+          <tr className="border-b border-zinc-900/40">
+            <td className="py-2 font-semibold text-zinc-400">
+              {t("mockup.investmentSize")}
+            </td>
+            <td className="py-2 text-right font-mono font-bold text-white">
+              {formatCompactCurrency(invSize, locale)}
+            </td>
+          </tr>
+          <tr className="border-b border-zinc-900/40">
+            <td className="py-2 font-semibold text-zinc-400">
+              {t("mockup.riskTolerance")}
+            </td>
+            <td className="py-2 text-right font-mono font-bold text-white">
+              {invRisk.toFixed(1)} / 10
+            </td>
+          </tr>
+          <tr className="border-b border-zinc-900/40">
+            <td className="py-2 font-semibold text-zinc-400">
+              {t("mockup.durationTerms")}
+            </td>
+            <td className="py-2 text-right font-mono font-bold text-zinc-300">
+              {t("mockup.durationMonths", { months: invDuration })}
+            </td>
+          </tr>
+          <tr className="border-b border-zinc-900/40">
+            <td className="py-2 font-semibold text-zinc-400">
+              {t("mockup.targetYieldRange")}
+            </td>
+            <td className="py-2 text-right font-mono font-bold">
+              {showResults ? (
+                <span className="text-emerald-400">{targetRangeText}</span>
+              ) : (
+                <span className="text-zinc-650 font-sans text-[8.5px] flex items-center justify-end gap-1">
+                  <Lock className="w-2.5 h-2.5 text-zinc-650" />{" "}
+                  {t("mockup.pending")}
+                </span>
+              )}
+            </td>
+          </tr>
+          <tr>
+            <td className="py-2 font-semibold text-zinc-400">
+              {t("mockup.scenarioRange")}
+            </td>
+            <td className="py-2 text-right font-mono font-bold">
+              {showResults ? (
+                <span className="text-emerald-400">{scenarioText}</span>
+              ) : (
+                <span className="text-zinc-650 font-mono text-[8.5px] font-bold">
+                  {t("mockup.locked")}
+                </span>
+              )}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      {showResults && illustrationNote}
+    </>
   );
 
   if (device === "laptop") {
@@ -316,14 +338,14 @@ export default function Mockup(props: MockupProps) {
                             <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
                               <span>{t("mockup.desiredLoanSize")}</span>
                               <span className="text-emerald-400 font-mono font-semibold text-[9px]">
-                                ${(smeLoanSize / 1000).toFixed(0)}k
+                                {formatCompactCurrency(smeLoanSize, locale)}
                               </span>
                             </div>
                             <input
                               type="range"
-                              min="10000"
-                              max="500000"
-                              step="5000"
+                              min="200000000"
+                              max="5000000000"
+                              step="100000000"
                               value={smeLoanSize}
                               onChange={(e) =>
                                 setSmeLoanSize(Number(e.target.value))
@@ -337,14 +359,14 @@ export default function Mockup(props: MockupProps) {
                             <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
                               <span>{t("mockup.monthlyRevenue")}</span>
                               <span className="text-emerald-400 font-mono font-semibold text-[9px]">
-                                ${(smeRevenue / 1000).toFixed(0)}k
+                                {formatCompactCurrency(smeRevenue, locale)}
                               </span>
                             </div>
                             <input
                               type="range"
-                              min="10000"
-                              max="200000"
-                              step="5000"
+                              min="100000000"
+                              max="2000000000"
+                              step="50000000"
                               value={smeRevenue}
                               onChange={(e) =>
                                 setSmeRevenue(Number(e.target.value))
@@ -365,9 +387,9 @@ export default function Mockup(props: MockupProps) {
                             </div>
                             <input
                               type="range"
-                              min="1"
-                              max="24"
-                              step="1"
+                              min="6"
+                              max="12"
+                              step="6"
                               value={smeDuration}
                               onChange={(e) =>
                                 setSmeDuration(Number(e.target.value))
@@ -381,23 +403,23 @@ export default function Mockup(props: MockupProps) {
                           onClick={() => setSmeShowResults(true)}
                           className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 transition-all text-[8.5px] font-sans font-bold uppercase tracking-widest text-white shadow-lg shadow-emerald-900/20 cursor-pointer flex items-center justify-center gap-1.5"
                         >
-                          {t("mockup.calculateSme")}
+                          {t("mockup.calculateSmeNew")}
                         </button>
                       </>
                     ) : (
                       <div className="bg-zinc-950/45 border border-zinc-900/50 rounded-xl p-3 flex flex-col justify-between shadow-lg backdrop-blur-sm flex-1 h-full">
                         <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider border-b border-zinc-900/40 pb-1.5">
-                          <span>{t("mockup.creditAssessment")}</span>
+                          <span>{t("mockup.indicativeCheck")}</span>
                           <span
                             className={
-                              isSmeRejected
+                              isSmeIneligible
                                 ? "text-red-400"
                                 : "text-emerald-400"
                             }
                           >
-                            {isSmeRejected
-                              ? t("mockup.rejected")
-                              : t("mockup.approved")}
+                            {isSmeIneligible
+                              ? t("mockup.notEligible")
+                              : t("mockup.indicativeFit")}
                           </span>
                         </div>
 
@@ -420,9 +442,9 @@ export default function Mockup(props: MockupProps) {
                                 cy="36"
                                 r="30"
                                 className={`transition-all duration-500 ${
-                                  isSmeRejected
+                                  isSmeIneligible
                                     ? "stroke-red-500"
-                                    : 1 - grade >= 0.7
+                                    : businessScore >= 70
                                       ? "stroke-emerald-500"
                                       : "stroke-amber-500"
                                 }`}
@@ -430,26 +452,14 @@ export default function Mockup(props: MockupProps) {
                                 fill="transparent"
                                 strokeDasharray={188.4}
                                 strokeDashoffset={
-                                  188.4 -
-                                  (Math.max(
-                                    0,
-                                    Math.min(
-                                      100,
-                                      Math.round((1 - grade) * 100),
-                                    ),
-                                  ) /
-                                    100) *
-                                    188.4
+                                  188.4 - (businessScore / 100) * 188.4
                                 }
                                 strokeLinecap="round"
                               />
                             </svg>
                             <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-0.5">
                               <span className="text-sm font-mono font-bold text-white leading-none">
-                                {Math.max(
-                                  0,
-                                  Math.min(100, Math.round((1 - grade) * 100)),
-                                )}
+                                {businessScore}
                               </span>
                               <span className="text-[5px] text-zinc-500 font-sans font-bold uppercase tracking-wider mt-0.5">
                                 {t("mockup.scoreLabel")}
@@ -461,18 +471,18 @@ export default function Mockup(props: MockupProps) {
                           <div className="flex flex-col gap-1.5 text-[9px]">
                             <div className="flex flex-col">
                               <span className="text-zinc-550 text-[6px] font-sans font-bold uppercase tracking-wider">
-                                {t("mockup.leverageRatio")}
+                                {t("mockup.revenueCoverage")}
                               </span>
                               <span className="font-mono text-white font-bold">
-                                {gradeText}
+                                {coverageText}
                               </span>
                             </div>
                             <div className="flex flex-col">
                               <span className="text-zinc-550 text-[6px] font-sans font-bold uppercase tracking-wider">
-                                {t("mockup.assignedApr")}
+                                {t("mockup.indicativeRate")}
                               </span>
                               <span className="font-mono text-emerald-400 font-bold">
-                                {interestRateText}
+                                {indicativeRateText}
                               </span>
                             </div>
                           </div>
@@ -495,14 +505,14 @@ export default function Mockup(props: MockupProps) {
                           <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
                             <span>{t("mockup.investmentShort")}</span>
                             <span className="text-emerald-400 font-mono font-semibold text-[9px]">
-                              ${(invSize / 1000).toFixed(0)}k
+                              {formatCompactCurrency(invSize, locale)}
                             </span>
                           </div>
                           <input
                             type="range"
-                            min="10000"
-                            max="1000000"
-                            step="10000"
+                            min="50000000"
+                            max="2000000000"
+                            step="50000000"
                             value={invSize}
                             onChange={(e) => setInvSize(Number(e.target.value))}
                             className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none thumb-sm"
@@ -540,9 +550,9 @@ export default function Mockup(props: MockupProps) {
                           </div>
                           <input
                             type="range"
-                            min="1"
-                            max="24"
-                            step="1"
+                            min="6"
+                            max="12"
+                            step="6"
                             value={invDuration}
                             onChange={(e) =>
                               setInvDuration(Number(e.target.value))
@@ -556,7 +566,7 @@ export default function Mockup(props: MockupProps) {
                         onClick={() => setInvShowResults(true)}
                         className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 transition-all text-[8.5px] font-sans font-bold uppercase tracking-widest text-white shadow-lg shadow-emerald-900/20 cursor-pointer flex items-center justify-center gap-1.5"
                       >
-                        {t("mockup.calculateInv")}
+                        {t("mockup.calculateInvNew")}
                       </button>
                     </>
                   ) : (
@@ -564,47 +574,26 @@ export default function Mockup(props: MockupProps) {
                       <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider border-b border-zinc-900/40 pb-1.5">
                         <span>{t("mockup.yieldReturnProjection")}</span>
                         <span className="text-emerald-400 font-bold font-mono">
-                          APY: {yearlyRoiText}
+                          {targetRangeText}
                         </span>
                       </div>
 
                       {/* Chart bars */}
                       <div className="h-20 flex items-end justify-between gap-1.5 px-1 py-1">
-                        {[3, 6, 12, 18, 24].map((dur) => {
-                          let rTranslation = 13.5;
-                          if (invRisk < 2) rTranslation = 10.5;
-                          else if (invRisk < 4) rTranslation = 11.5;
-                          else if (invRisk < 6) rTranslation = 13.5;
-                          else if (invRisk < 8) rTranslation = 16.5;
-                          else rTranslation = 17.5;
-
-                          let adj = 0.4;
-                          if (dur <= 3) adj = 0;
-                          else if (dur <= 6) adj = 0.2;
-                          else if (dur <= 12) adj = 0.4;
-                          else adj = 0.6;
-
-                          const roi = rTranslation + adj;
-                          const profit = ((invSize * (roi / 100)) / 12) * dur;
+                        {[6, 12].map((dur) => {
+                          // Midpoint of the target range, only to size the
+                          // bar. The figure printed under it is the range.
+                          const profit =
+                            ((invSize * (targetCentre / 100)) / 12) * dur;
                           const maxProfit =
-                            ((1000000 * (18.1 / 100)) / 12) * 24;
+                            ((invSize * (17.5 / 100)) / 12) * 12;
                           const heightPct = Math.min(
                             100,
                             Math.max(15, (profit / maxProfit) * 150),
                           );
 
                           const isHighlighted =
-                            (dur === 3 && invDuration <= 3) ||
-                            (dur === 6 &&
-                              invDuration > 3 &&
-                              invDuration <= 6) ||
-                            (dur === 12 &&
-                              invDuration > 6 &&
-                              invDuration <= 12) ||
-                            (dur === 18 &&
-                              invDuration > 12 &&
-                              invDuration <= 18) ||
-                            (dur === 24 && invDuration > 18);
+                            dur === 6 ? invDuration <= 6 : invDuration > 6;
 
                           return (
                             <div
@@ -614,7 +603,10 @@ export default function Mockup(props: MockupProps) {
                               <span
                                 className={`text-[6px] font-mono mb-0.5 ${isHighlighted ? "text-emerald-400 font-bold" : "text-zinc-500"}`}
                               >
-                                ${Math.round(profit).toLocaleString()}
+                                {formatCompactCurrency(
+                                  Math.round(profit),
+                                  locale,
+                                )}
                               </span>
                               <div
                                 className={`w-full rounded-t-sm transition-all duration-300 ${isHighlighted ? "bg-emerald-400 shadow-[0_0_5px_#10b981]" : "bg-emerald-500/25"}`}
@@ -713,16 +705,18 @@ export default function Mockup(props: MockupProps) {
                   ? smeShowResults && (
                       <span
                         className={
-                          isSmeRejected ? "text-red-400" : "text-emerald-400"
+                          isSmeIneligible ? "text-red-400" : "text-emerald-400"
                         }
                       >
-                        {isSmeRejected
-                          ? t("mockup.rejected")
-                          : t("mockup.approved")}
+                        {isSmeIneligible
+                          ? t("mockup.notEligible")
+                          : t("mockup.indicativeFit")}
                       </span>
                     )
                   : invShowResults && (
-                      <span className="text-emerald-400">{yearlyRoiText}</span>
+                      <span className="text-emerald-400">
+                        {targetRangeText}
+                      </span>
                     )}
               </div>
               {view === "sme"
@@ -741,14 +735,14 @@ export default function Mockup(props: MockupProps) {
                         <div className="flex justify-between items-center text-[7px] text-zinc-400 font-bold uppercase tracking-wider">
                           <span>{t("mockup.desiredLoanShort")}</span>
                           <span className="text-emerald-400 font-mono font-semibold text-[8px]">
-                            ${(smeLoanSize / 1000).toFixed(0)}k
+                            {formatCompactCurrency(smeLoanSize, locale)}
                           </span>
                         </div>
                         <input
                           type="range"
-                          min="10000"
-                          max="500000"
-                          step="5000"
+                          min="200000000"
+                          max="5000000000"
+                          step="100000000"
                           value={smeLoanSize}
                           onChange={(e) =>
                             setSmeLoanSize(Number(e.target.value))
@@ -762,14 +756,14 @@ export default function Mockup(props: MockupProps) {
                         <div className="flex justify-between items-center text-[7px] text-zinc-400 font-bold uppercase tracking-wider">
                           <span>{t("mockup.monthlyRevShort")}</span>
                           <span className="text-emerald-400 font-mono font-semibold text-[8px]">
-                            ${(smeRevenue / 1000).toFixed(0)}k
+                            {formatCompactCurrency(smeRevenue, locale)}
                           </span>
                         </div>
                         <input
                           type="range"
-                          min="10000"
-                          max="200000"
-                          step="5000"
+                          min="100000000"
+                          max="2000000000"
+                          step="50000000"
                           value={smeRevenue}
                           onChange={(e) =>
                             setSmeRevenue(Number(e.target.value))
@@ -788,9 +782,9 @@ export default function Mockup(props: MockupProps) {
                         </div>
                         <input
                           type="range"
-                          min="1"
-                          max="24"
-                          step="1"
+                          min="6"
+                          max="12"
+                          step="6"
                           value={smeDuration}
                           onChange={(e) =>
                             setSmeDuration(Number(e.target.value))
@@ -804,7 +798,7 @@ export default function Mockup(props: MockupProps) {
                       onClick={() => setSmeShowResults(true)}
                       className="w-full py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:scale-98 transition-all text-[8px] font-sans font-bold uppercase tracking-widest text-white shadow-lg cursor-pointer flex items-center justify-center"
                     >
-                      {t("mockup.calculateSme")}
+                      {t("mockup.calculateSmeNew")}
                     </button>
                   </>
                 ) : (
@@ -825,28 +819,19 @@ export default function Mockup(props: MockupProps) {
                             cx="28"
                             cy="28"
                             r="23"
-                            className={`transition-all duration-500 ${isSmeRejected ? "stroke-red-500" : 1 - grade >= 0.7 ? "stroke-emerald-500" : "stroke-amber-500"}`}
+                            className={`transition-all duration-500 ${isSmeIneligible ? "stroke-red-500" : businessScore >= 70 ? "stroke-emerald-500" : "stroke-amber-500"}`}
                             strokeWidth="4"
                             fill="transparent"
                             strokeDasharray={144.4}
                             strokeDashoffset={
-                              144.4 -
-                              (Math.max(
-                                0,
-                                Math.min(100, Math.round((1 - grade) * 100)),
-                              ) /
-                                100) *
-                                144.4
+                              144.4 - (businessScore / 100) * 144.4
                             }
                             strokeLinecap="round"
                           />
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-0.5">
                           <span className="text-xs font-mono font-bold text-white leading-none">
-                            {Math.max(
-                              0,
-                              Math.min(100, Math.round((1 - grade) * 100)),
-                            )}
+                            {businessScore}
                           </span>
                           <span className="text-[4px] text-zinc-550 font-sans font-bold uppercase tracking-wider mt-0.5">
                             {t("mockup.scoreLabel")}
@@ -857,18 +842,18 @@ export default function Mockup(props: MockupProps) {
                       <div className="flex flex-col gap-1 text-[8px]">
                         <div className="flex flex-col">
                           <span className="text-zinc-555 text-[6px] font-sans font-bold uppercase tracking-wider">
-                            {t("mockup.leverageRatio")}
+                            {t("mockup.revenueCoverage")}
                           </span>
                           <span className="font-mono text-white font-bold">
-                            {gradeText}
+                            {scoreText}
                           </span>
                         </div>
                         <div className="flex flex-col">
                           <span className="text-zinc-555 text-[6px] font-sans font-bold uppercase tracking-wider">
-                            {t("mockup.assignedApr")}
+                            {t("mockup.indicativeRate")}
                           </span>
                           <span className="font-mono text-emerald-400 font-bold">
-                            {interestRateText}
+                            {indicativeRateText}
                           </span>
                         </div>
                       </div>
@@ -890,14 +875,14 @@ export default function Mockup(props: MockupProps) {
                       <div className="flex justify-between items-center text-[7px] text-zinc-400 font-bold uppercase tracking-wider">
                         <span>{t("mockup.investmentShort")}</span>
                         <span className="text-emerald-400 font-mono font-semibold text-[8px]">
-                          ${(invSize / 1000).toFixed(0)}k
+                          {formatCompactCurrency(invSize, locale)}
                         </span>
                       </div>
                       <input
                         type="range"
-                        min="10000"
-                        max="1000000"
-                        step="10000"
+                        min="50000000"
+                        max="2000000000"
+                        step="50000000"
                         value={invSize}
                         onChange={(e) => setInvSize(Number(e.target.value))}
                         className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none thumb-sm"
@@ -933,9 +918,9 @@ export default function Mockup(props: MockupProps) {
                       </div>
                       <input
                         type="range"
-                        min="1"
-                        max="24"
-                        step="1"
+                        min="6"
+                        max="12"
+                        step="6"
                         value={invDuration}
                         onChange={(e) => setInvDuration(Number(e.target.value))}
                         className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none thumb-sm"
@@ -947,7 +932,7 @@ export default function Mockup(props: MockupProps) {
                     onClick={() => setInvShowResults(true)}
                     className="w-full py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:scale-98 transition-all text-[8px] font-sans font-bold uppercase tracking-widest text-white shadow-lg cursor-pointer flex items-center justify-center"
                   >
-                    {t("mockup.calculateInv")}
+                    {t("mockup.calculateInvNew")}
                   </button>
                 </>
               ) : (
@@ -955,38 +940,17 @@ export default function Mockup(props: MockupProps) {
                   <div className="bg-zinc-900/20 border border-zinc-900/60 rounded-xl p-2 flex flex-col justify-between flex-1 overflow-hidden">
                     {/* Chart bars */}
                     <div className="h-14 flex items-end justify-between gap-1 px-0.5 pt-2">
-                      {[3, 6, 12, 18, 24].map((dur) => {
-                        let rTranslation = 13.5;
-                        if (invRisk < 2) rTranslation = 10.5;
-                        else if (invRisk < 4) rTranslation = 11.5;
-                        else if (invRisk < 6) rTranslation = 13.5;
-                        else if (invRisk < 8) rTranslation = 16.5;
-                        else rTranslation = 17.5;
-
-                        let adj = 0.4;
-                        if (dur <= 3) adj = 0;
-                        else if (dur <= 6) adj = 0.2;
-                        else if (dur <= 12) adj = 0.4;
-                        else adj = 0.6;
-
-                        const roi = rTranslation + adj;
-                        const profit = ((invSize * (roi / 100)) / 12) * dur;
-                        const maxProfit = ((1000000 * (18.1 / 100)) / 12) * 24;
+                      {[6, 12].map((dur) => {
+                        const profit =
+                          ((invSize * (targetCentre / 100)) / 12) * dur;
+                        const maxProfit = ((invSize * (17.5 / 100)) / 12) * 12;
                         const heightPct = Math.min(
                           100,
                           Math.max(15, (profit / maxProfit) * 150),
                         );
 
                         const isHighlighted =
-                          (dur === 3 && invDuration <= 3) ||
-                          (dur === 6 && invDuration > 3 && invDuration <= 6) ||
-                          (dur === 12 &&
-                            invDuration > 6 &&
-                            invDuration <= 12) ||
-                          (dur === 18 &&
-                            invDuration > 12 &&
-                            invDuration <= 18) ||
-                          (dur === 24 && invDuration > 18);
+                          dur === 6 ? invDuration <= 6 : invDuration > 6;
 
                         return (
                           <div
@@ -996,7 +960,10 @@ export default function Mockup(props: MockupProps) {
                             <span
                               className={`text-[5px] font-mono mb-0.5 ${isHighlighted ? "text-emerald-400 font-bold" : "text-zinc-555"}`}
                             >
-                              ${Math.round(profit).toLocaleString()}
+                              {formatCompactCurrency(
+                                Math.round(profit),
+                                locale,
+                              )}
                             </span>
                             <div
                               className={`w-full rounded-t-sm transition-all duration-300 ${isHighlighted ? "bg-emerald-400 shadow-[0_0_3px_#10b981]" : "bg-emerald-500/20"}`}

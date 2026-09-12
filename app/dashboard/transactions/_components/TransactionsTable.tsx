@@ -71,7 +71,8 @@ export function TransactionsTable({
                   />
                 </TableCell>
                 <TableCell className="text-xs text-muted-foreground hidden md:table-cell align-middle">
-                  {txn.method}
+                  {t(`dashboard.transactions.methods.${txn.method_key}`)}
+                  {txn.method_ref ? ` ${txn.method_ref}` : ""}
                 </TableCell>
                 <TableCell
                   className={`text-right font-mono text-sm font-bold whitespace-nowrap align-middle ${amountClassName}`}

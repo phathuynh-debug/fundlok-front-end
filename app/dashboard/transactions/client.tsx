@@ -103,7 +103,7 @@ export default function TransactionsClient() {
         query === "" ||
         txn.counterparty.toLowerCase().includes(query) ||
         txn.reference.toLowerCase().includes(query) ||
-        txn.method.toLowerCase().includes(query);
+        (txn.method_ref ?? "").toLowerCase().includes(query);
       const matchesType = selectedType === "ALL" || txn.type === selectedType;
       const matchesStatus =
         selectedStatus === "ALL" || txn.status === selectedStatus;

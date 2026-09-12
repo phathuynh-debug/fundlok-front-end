@@ -21,28 +21,45 @@ import { staggerContainerVariants, springItemVariants } from "@/lib/animations";
 import { cn } from "@/lib/utils";
 import { CONTROL_HOVER } from "@/lib/ui-tokens";
 import { getIndustryChrome } from "./sme-dashboard-config";
-import type { Holding, HoldingStatus } from "./mock-investor-dashboard";
+import {
+  backstopDate,
+  type Holding,
+  type HoldingStatus,
+} from "./mock-investor-dashboard";
 
 // Status is a state, not an identity, so it uses the semantic tokens rather
 // than an industry hue — one meaning per color channel. Emerald is reserved for
-// "money is actually coming back".
+// "money is actually coming back"; amber for "needs attention, not a default";
+// destructive only for the endings that cost the investor money.
 const STATUS_STYLES: Record<HoldingStatus, string> = {
   FUNDING:
     "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400",
   ACTIVE: "border-border bg-muted text-muted-foreground",
   REPAYING:
     "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-  COMPLETED: "border-border bg-muted text-muted-foreground",
+  WATCHLIST:
+    "border-amber-500/30 bg-amber-500/15 text-amber-700 dark:text-amber-400",
+  RELIEF:
+    "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400",
+  EXTENDED:
+    "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400",
+  REPAID: "border-border bg-muted text-muted-foreground",
+  REPAID_EARLY:
+    "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+  SETTLED_AT_BACKSTOP: "border-border bg-muted text-muted-foreground",
+  WRITTEN_DOWN:
+    "border-destructive/30 bg-destructive/10 text-destructive dark:text-destructive",
 };
 
 export function HoldingsList({ holdings }: { holdings: Holding[] }) {
   const { locale, t } = useTranslations();
 
-  // Dynamic ranking based on expected ROI descending
+  // Ranked on the midpoint of the target range — there is no single expected
+  // figure to sort on, and the midpoint keeps the ordering stable.
   const rankMap = useMemo(() => {
-    const sorted = [...holdings].sort(
-      (a, b) => b.expected_roi_pct - a.expected_roi_pct,
-    );
+    const midpoint = (h: Holding) =>
+      (h.target_return_pct_min + h.target_return_pct_max) / 2;
+    const sorted = [...holdings].sort((a, b) => midpoint(b) - midpoint(a));
     const map = new Map<string, number>();
     sorted.forEach((h, idx) => map.set(h.id, idx + 1));
     return map;
@@ -132,13 +149,13 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
                     </Badge>
                   )}
 
-                  {/* Credit Grade Badge */}
+                  {/* Business score — a 0-100 reference input, not a rating */}
                   <Badge
                     variant="outline"
                     className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30 font-mono text-[11px] font-bold px-2.5 py-0.5 rounded-full"
                   >
-                    {t("dashboard.investor.holdingGrade", {
-                      grade: holding.grade ?? "A+",
+                    {t("dashboard.investor.holdingScore", {
+                      score: holding.score,
                     })}
                   </Badge>
 
@@ -183,10 +200,15 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
                   </dt>
                   <dd className="truncate text-base font-black text-emerald-600 dark:text-emerald-400 font-mono">
                     {t("dashboard.investor.holdingRoiValue", {
-                      rate: holding.expected_roi_pct.toFixed(1),
+                      min: holding.target_return_pct_min.toFixed(1),
+                      max: holding.target_return_pct_max.toFixed(1),
                       months: holding.term_months,
                     })}
                   </dd>
+                  {/* A range on its own still reads as a promise without this */}
+                  <p className="truncate text-[9px] font-medium text-emerald-700/80 dark:text-emerald-300/80">
+                    {t("dashboard.projectCard.notGuaranteed")}
+                  </p>
                 </div>
 
                 <div className="min-w-0 space-y-1">
@@ -205,6 +227,21 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
                       </span>
                     )}
                   </dd>
+                  {/* Disclosed on every position: the date at which everything
+                      still outstanding falls due in full. */}
+                  {holding.disbursed_at && (
+                    <p className="truncate text-[10px] text-muted-foreground">
+                      {t("dashboard.investor.holdingBackstop", {
+                        date: formatDate(
+                          backstopDate(
+                            holding.disbursed_at,
+                            holding.term_months,
+                          ),
+                          locale,
+                        ),
+                      })}
+                    </p>
+                  )}
                 </div>
               </dl>
 
@@ -229,9 +266,15 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
                   <div
                     className={cn(
                       "h-full rounded-full transition-all duration-500",
-                      holding.progress_pct === 100
-                        ? "bg-emerald-500"
-                        : "bg-primary",
+                      // A full bar is only "good" when the money actually came
+                      // back. Painting a backstop settlement or a write-down
+                      // emerald would read as a successful outcome.
+                      holding.status === "WRITTEN_DOWN"
+                        ? "bg-destructive"
+                        : holding.progress_pct === 100 &&
+                            holding.status !== "SETTLED_AT_BACKSTOP"
+                          ? "bg-emerald-500"
+                          : "bg-primary",
                     )}
                     style={{ width: `${holding.progress_pct}%` }}
                   />

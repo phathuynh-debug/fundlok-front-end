@@ -49,7 +49,8 @@ export const MOCK_SME_TRANSACTIONS: Transaction[] = [
     amount: -INSTALMENT,
     currency: "VND",
     counterparty: PROJECT,
-    method: "Vietcombank ••••4417",
+    method_key: "businessAccount",
+    method_ref: "••••4417",
   },
   {
     id: "sme-txn-0008",
@@ -60,7 +61,8 @@ export const MOCK_SME_TRANSACTIONS: Transaction[] = [
     amount: -INSTALMENT,
     currency: "VND",
     counterparty: PROJECT,
-    method: "Vietcombank ••••4417",
+    method_key: "businessAccount",
+    method_ref: "••••4417",
   },
   {
     id: "sme-txn-0007",
@@ -71,7 +73,8 @@ export const MOCK_SME_TRANSACTIONS: Transaction[] = [
     amount: -50_000_000,
     currency: "VND",
     counterparty: PROJECT,
-    method: "Vietcombank ••••4417",
+    method_key: "businessAccount",
+    method_ref: "••••4417",
   },
   {
     id: "sme-txn-0006",
@@ -82,7 +85,8 @@ export const MOCK_SME_TRANSACTIONS: Transaction[] = [
     amount: -INSTALMENT,
     currency: "VND",
     counterparty: PROJECT,
-    method: "Vietcombank ••••4417",
+    method_key: "businessAccount",
+    method_ref: "••••4417",
   },
   {
     id: "sme-txn-0005",
@@ -93,7 +97,8 @@ export const MOCK_SME_TRANSACTIONS: Transaction[] = [
     amount: -INSTALMENT,
     currency: "VND",
     counterparty: PROJECT,
-    method: "Vietcombank ••••4417",
+    method_key: "businessAccount",
+    method_ref: "••••4417",
   },
   {
     id: "sme-txn-0004",
@@ -104,7 +109,8 @@ export const MOCK_SME_TRANSACTIONS: Transaction[] = [
     amount: -INSTALMENT,
     currency: "VND",
     counterparty: PROJECT,
-    method: "Vietcombank ••••4417",
+    method_key: "businessAccount",
+    method_ref: "••••4417",
   },
   {
     id: "sme-txn-0003",
@@ -115,7 +121,8 @@ export const MOCK_SME_TRANSACTIONS: Transaction[] = [
     amount: -INSTALMENT,
     currency: "VND",
     counterparty: PROJECT,
-    method: "Vietcombank ••••4417",
+    method_key: "businessAccount",
+    method_ref: "••••4417",
   },
   {
     id: "sme-txn-0002",
@@ -128,7 +135,7 @@ export const MOCK_SME_TRANSACTIONS: Transaction[] = [
     amount: -12_000_000,
     currency: "VND",
     counterparty: "FundLok",
-    method: "Deducted from disbursement",
+    method_key: "deductedFromDisbursement",
   },
   {
     id: "sme-txn-0001",
@@ -139,7 +146,8 @@ export const MOCK_SME_TRANSACTIONS: Transaction[] = [
     amount: 800_000_000,
     currency: "VND",
     counterparty: PROJECT,
-    method: "Vietcombank ••••4417",
+    method_key: "businessAccount",
+    method_ref: "••••4417",
   },
 ];
 

@@ -46,7 +46,17 @@ export interface Transaction {
   currency: "VND";
   /** Project or company the movement relates to; "—" for account-level items. */
   counterparty: string;
-  method: string;
+  /**
+   * How the money moved, as an i18n key under
+   * `dashboard.transactions.methods`. A key rather than a literal for two
+   * reasons: the column was rendering untranslated English under the
+   * Vietnamese locale, and free text here is how a named bank ends up on
+   * screen. We never name a custodial bank — funds sit with custodial bank
+   * partners, plural and unnamed (fundlok-domain §4).
+   */
+  method_key: string;
+  /** Masked account reference shown after the method, e.g. "••••4417". */
+  method_ref?: string;
 }
 
 export const MOCK_TRANSACTIONS: Transaction[] = [
@@ -59,7 +69,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     amount: 46250000,
     currency: "VND",
     counterparty: "TechStart Solutions",
-    method: "Wallet balance",
+    method_key: "custodialAccount",
   },
   {
     id: "txn-0013",
@@ -70,7 +80,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     amount: -625000000,
     currency: "VND",
     counterparty: "Mekong Agri Export",
-    method: "Wallet balance",
+    method_key: "custodialAccount",
   },
   {
     id: "txn-0012",
@@ -81,7 +91,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     amount: 1000000000,
     currency: "VND",
     counterparty: "—",
-    method: "Bank transfer • Vietcombank",
+    method_key: "bankTransfer",
   },
   {
     id: "txn-0011",
@@ -92,7 +102,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     amount: 58012500,
     currency: "VND",
     counterparty: "GreenEnergy Corp",
-    method: "Wallet balance",
+    method_key: "custodialAccount",
   },
   {
     id: "txn-0010",
@@ -103,7 +113,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     amount: -3000000,
     currency: "VND",
     counterparty: "—",
-    method: "Platform service fee",
+    method_key: "platformFee",
   },
   {
     id: "txn-0009",
@@ -114,7 +124,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     amount: -200000000,
     currency: "VND",
     counterparty: "—",
-    method: "Bank transfer • Techcombank",
+    method_key: "bankTransfer",
   },
   {
     id: "txn-0008",
@@ -125,7 +135,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     amount: 118750000,
     currency: "VND",
     counterparty: "BioMed Labs",
-    method: "Revenue share • daily",
+    method_key: "dailyRepayment",
   },
   {
     id: "txn-0007",
@@ -136,7 +146,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     amount: -375000000,
     currency: "VND",
     counterparty: "BioMed Labs",
-    method: "Wallet balance",
+    method_key: "custodialAccount",
   },
   {
     id: "txn-0006",
@@ -147,7 +157,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     amount: 29506250,
     currency: "VND",
     counterparty: "TechStart Solutions",
-    method: "Wallet balance",
+    method_key: "custodialAccount",
   },
   {
     id: "txn-0005",
@@ -158,7 +168,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     amount: -300000000,
     currency: "VND",
     counterparty: "—",
-    method: "Bank transfer • Vietcombank",
+    method_key: "bankTransfer",
   },
   {
     id: "txn-0004",
@@ -169,7 +179,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     amount: -500000000,
     currency: "VND",
     counterparty: "GreenEnergy Corp",
-    method: "Wallet balance",
+    method_key: "custodialAccount",
   },
   {
     id: "txn-0003",
@@ -180,7 +190,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     amount: -2387500,
     currency: "VND",
     counterparty: "—",
-    method: "Platform service fee",
+    method_key: "platformFee",
   },
   {
     id: "txn-0002",
@@ -191,7 +201,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     amount: 1500000000,
     currency: "VND",
     counterparty: "—",
-    method: "Bank transfer • Vietcombank",
+    method_key: "bankTransfer",
   },
   {
     id: "txn-0001",
@@ -202,7 +212,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
     amount: -750000000,
     currency: "VND",
     counterparty: "TechStart Solutions",
-    method: "Wallet balance",
+    method_key: "custodialAccount",
   },
 ];
 

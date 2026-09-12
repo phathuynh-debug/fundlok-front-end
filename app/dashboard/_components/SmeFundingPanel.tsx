@@ -2,7 +2,14 @@
 
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { Banknote, CalendarClock, Landmark, Users, Zap } from "lucide-react";
+import {
+  Banknote,
+  CalendarClock,
+  Landmark,
+  ShieldAlert,
+  Users,
+  Zap,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { TruncatedFigure } from "@/components/truncated-figure";
@@ -13,20 +20,21 @@ import { cn } from "@/lib/utils";
 import { getIndustryChrome } from "./sme-dashboard-config";
 import { SampleDataNotice } from "./SampleDataNotice";
 import {
-  MOCK_INSTALLMENTS,
+  MOCK_REPAYMENT_PERIODS,
   MOCK_SME_FUNDING,
+  periodTotal,
   summarizeFunding,
-  type InstallmentStatus,
+  type RepaymentPeriodStatus,
 } from "./mock-sme-funding";
 
-// Settled rows recede, the next one owed is emphasised, and EARLY gets its own
-// emerald treatment because early repayment is a platform value worth showing
-// off rather than flattening into "paid".
-const STATUS_STYLES: Record<InstallmentStatus, string> = {
-  PAID: "border-border bg-muted text-muted-foreground",
-  EARLY:
-    "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-  DUE: "border-primary/20 bg-primary/10 text-primary",
+// Collected periods recede and the current one is emphasised. Relief gets its
+// own amber treatment — it is neither a success nor a failure, it is the
+// facility doing what it promised when revenue came in short.
+const STATUS_STYLES: Record<RepaymentPeriodStatus, string> = {
+  SETTLED: "border-border bg-muted text-muted-foreground",
+  RELIEF_APPLIED:
+    "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400",
+  CURRENT: "border-primary/20 bg-primary/10 text-primary",
   UPCOMING: "border-border bg-muted text-muted-foreground",
 };
 
@@ -34,10 +42,10 @@ export function SmeFundingPanel({ industry }: { industry?: string | null }) {
   const { locale, t } = useTranslations();
 
   const funding = MOCK_SME_FUNDING;
-  const installments = MOCK_INSTALLMENTS;
+  const periods = MOCK_REPAYMENT_PERIODS;
   const summary = useMemo(
-    () => summarizeFunding(funding, installments),
-    [funding, installments],
+    () => summarizeFunding(funding, periods),
+    [funding, periods],
   );
 
   // `inline` tier — icon/text color only. The hero card above already wears the
@@ -58,14 +66,14 @@ export function SmeFundingPanel({ industry }: { industry?: string | null }) {
       icon: Banknote,
     },
     {
-      key: "nextPayment",
-      label: t("dashboard.smeFunding.nextPayment"),
-      value: summary.next
-        ? formatCurrency(summary.next.principal + summary.next.interest, locale)
-        : t("common.na"),
-      hint: summary.next
-        ? formatDate(summary.next.due_date, locale)
-        : undefined,
+      // The daily amount IS the repayment — not a monthly instalment.
+      key: "dailyAmount",
+      label: t("dashboard.smeFunding.dailyAmount"),
+      value: formatCurrency(
+        summary.current?.daily_amount ?? funding.daily_amount,
+        locale,
+      ),
+      hint: t("dashboard.smeFunding.perBusinessDay"),
       icon: CalendarClock,
     },
     {
@@ -73,8 +81,9 @@ export function SmeFundingPanel({ industry }: { industry?: string | null }) {
       label: t("dashboard.smeFunding.rate"),
       value: t("dashboard.smeFunding.rateValue", {
         rate: funding.interest_rate_pct.toFixed(1),
-        grade: funding.grade,
+        score: funding.score,
       }),
+      hint: t("dashboard.smeFunding.allInRate"),
       icon: Zap,
     },
   ];
@@ -169,7 +178,42 @@ export function SmeFundingPanel({ industry }: { industry?: string | null }) {
           ))}
         </dl>
 
-        {/* Amortization schedule */}
+        {/* The two facts an SME is entitled to know from the day they sign:
+            what the total is (and that it never moves), and the date at which
+            anything still outstanding falls due in full. */}
+        <dl className="mt-5 grid grid-cols-1 gap-4 border-t border-border pt-5 sm:grid-cols-2">
+          <div className="min-w-0">
+            <dt className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              {t("dashboard.smeFunding.totalRepayable")}
+            </dt>
+            <dd className="mt-1 min-w-0">
+              <TruncatedFigure
+                value={formatCurrency(funding.total_repayable, locale)}
+                className="text-lg font-bold text-foreground"
+              />
+            </dd>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              {t("dashboard.smeFunding.fixedAtSigning")}
+            </p>
+          </div>
+          <div className="min-w-0">
+            <dt className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <ShieldAlert className="h-3.5 w-3.5 shrink-0" />
+              {t("dashboard.smeFunding.backstopDate")}
+            </dt>
+            <dd className="mt-1 truncate text-lg font-bold text-foreground">
+              {summary.backstop_date
+                ? formatDate(summary.backstop_date, locale)
+                : t("common.na")}
+            </dd>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              {t("dashboard.smeFunding.backstopHint")}
+            </p>
+          </div>
+        </dl>
+
+        {/* Repayment periods — each one a run of business days at a fixed
+            daily amount, with the true-up applied at the end of it. */}
         <div className="mt-5 border-t border-border pt-5">
           <div className="flex flex-wrap items-center justify-between gap-2 pb-3">
             <h4 className="text-sm font-semibold text-foreground">
@@ -184,51 +228,66 @@ export function SmeFundingPanel({ industry }: { industry?: string | null }) {
           </div>
 
           <ul className="divide-y divide-border border-t border-border">
-            {installments.map((installment) => (
+            {periods.map((period) => (
               <li
-                key={installment.number}
+                key={period.number}
                 className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="flex min-w-0 items-center gap-3">
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-bold text-muted-foreground">
-                    {installment.number}
+                    {period.number}
                   </span>
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-foreground">
-                      {formatDate(installment.due_date, locale)}
-                    </p>
-                    <p className="truncate text-xs text-muted-foreground">
-                      {t("dashboard.smeFunding.split", {
-                        principal: formatCurrency(
-                          installment.principal,
-                          locale,
-                        ),
-                        interest: formatCurrency(installment.interest, locale),
+                      {t("dashboard.smeFunding.periodRange", {
+                        start: formatDate(period.start_date, locale),
+                        end: formatDate(period.end_date, locale),
                       })}
                     </p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {t("dashboard.smeFunding.perDay", {
+                        amount: formatCurrency(period.daily_amount, locale),
+                        days: period.business_days,
+                      })}
+                    </p>
+                    {/* Says out loud that relief moved DOWN and what it cost:
+                        nothing off the total, only more time. */}
+                    {period.contractual_daily_amount && (
+                      <p className="truncate text-xs text-amber-700 dark:text-amber-400">
+                        {t("dashboard.smeFunding.reliefApplied", {
+                          from: formatCurrency(
+                            period.contractual_daily_amount,
+                            locale,
+                          ),
+                        })}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3 pl-10 sm:pl-0">
                   <span className="min-w-0 truncate text-sm font-bold text-foreground">
-                    {formatCurrency(
-                      installment.principal + installment.interest,
-                      locale,
-                    )}
+                    {formatCurrency(periodTotal(period), locale)}
                   </span>
                   <Badge
                     variant="outline"
                     className={cn(
                       "shrink-0 rounded-full px-2 text-[11px] font-semibold",
-                      STATUS_STYLES[installment.status],
+                      STATUS_STYLES[period.status],
                     )}
                   >
-                    {t(`dashboard.smeFunding.status.${installment.status}`)}
+                    {t(`dashboard.smeFunding.status.${period.status}`)}
                   </Badge>
                 </div>
               </li>
             ))}
           </ul>
+
+          {/* Early settlement is "no penalty", never a discount. Saying so here
+              is cheaper than an SME discovering it at settlement. */}
+          <p className="pt-3 text-xs text-muted-foreground">
+            {t("dashboard.smeFunding.earlyRepaymentNote")}
+          </p>
         </div>
       </Card>
     </motion.div>

@@ -2,9 +2,9 @@
 
 import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
-import { weakestFactor, type GradeFactor } from "./mock-sme-analytics";
+import { weakestFactor, type ScoreFactor } from "./mock-sme-analytics";
 
-// Why the grade is what it is, and what to work on.
+// Why the score is what it is, and what to work on.
 //
 // Deliberately NOT a chart: four values with a known 0-100 scale and a fixed
 // order are a meter list, and each one needs its weight and a verdict beside it.
@@ -13,12 +13,12 @@ import { weakestFactor, type GradeFactor } from "./mock-sme-analytics";
 // The four groups are the grading engine's own roll-up (bcq 0.40, rsg 0.25,
 // sector 0.25, behavioral 0.10) — an SME reading this sees the same structure
 // an underwriter does.
-export function GradeFactorsPanel({
+export function ScoreFactorsPanel({
   factors,
-  grade,
+  score,
 }: {
-  factors: GradeFactor[];
-  grade: number;
+  factors: ScoreFactor[];
+  score: number;
 }) {
   const { t } = useTranslations();
   const weakest = weakestFactor(factors);
@@ -47,10 +47,10 @@ export function GradeFactorsPanel({
     <div className="space-y-5">
       <div className="flex flex-wrap items-end gap-x-3 gap-y-1">
         <span className="text-3xl font-bold tracking-tight text-foreground">
-          {grade.toFixed(1)}
+          {score.toFixed(1)}
         </span>
         <span className="text-sm text-muted-foreground">
-          {t("dashboard.smeAnalytics.grade.outOf")}
+          {t("dashboard.smeAnalytics.score.outOf")}
         </span>
       </div>
 
@@ -61,7 +61,7 @@ export function GradeFactorsPanel({
               <span className="text-sm font-medium text-foreground">
                 {t(`dashboard.smeAnalytics.factors.${factor.key}`)}
                 <span className="ml-2 text-xs font-normal text-muted-foreground">
-                  {t("dashboard.smeAnalytics.grade.weight", {
+                  {t("dashboard.smeAnalytics.score.weight", {
                     percent: Math.round(factor.weight * 100),
                   })}
                 </span>
@@ -74,7 +74,7 @@ export function GradeFactorsPanel({
               >
                 {factor.score.toFixed(1)}
                 <span className="ml-2 text-xs font-normal">
-                  {t(`dashboard.smeAnalytics.grade.band.${band(factor.score)}`)}
+                  {t(`dashboard.smeAnalytics.score.band.${band(factor.score)}`)}
                 </span>
               </span>
             </div>
@@ -101,10 +101,10 @@ export function GradeFactorsPanel({
       {weakest && (
         <div className="rounded-xl border border-border bg-muted/30 px-4 py-3">
           <p className="text-xs font-semibold text-foreground">
-            {t("dashboard.smeAnalytics.grade.focusTitle")}
+            {t("dashboard.smeAnalytics.score.focusTitle")}
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            {t("dashboard.smeAnalytics.grade.focusBody", {
+            {t("dashboard.smeAnalytics.score.focusBody", {
               factor: t(`dashboard.smeAnalytics.factors.${weakest.key}`),
               score: weakest.score.toFixed(1),
             })}

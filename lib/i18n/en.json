@@ -298,7 +298,8 @@
         "status": {
           "active": "Active & performing",
           "completed": "Fully repaid",
-          "repaying": "In repayment"
+          "repaying": "In repayment",
+          "writtenDown": "Written down"
         },
         "totalDeployed": "Total deployed"
       },
@@ -352,24 +353,32 @@
     "investor": {
       "activeInvestments": "Active Investments",
       "browseProjects": "Browse Investment Projects",
-      "holdingExpectedRoi": "Expected ROI",
-      "holdingGrade": "Grade {grade}",
+      "capitalWrittenDown": "Capital written down",
+      "holdingBackstop": "Backstop {date}",
       "holdingInvested": "Invested",
       "holdingNextPayout": "Next Payout",
       "holdingProgress": "Repayment progress",
       "holdingRank": "Rank #{rank}",
       "holdingReturned": "Returned",
-      "holdingRoi": "Yield / Term",
-      "holdingRoiValue": "{rate}% · {months}m",
+      "holdingRoi": "Target yield / Term",
+      "holdingRoiValue": "{min}–{max}% · {months}m",
+      "holdingScore": "Score {score}/100",
       "holdingStatus": {
         "ACTIVE": "Disbursed",
-        "COMPLETED": "Completed",
+        "EXTENDED": "Extended",
         "FUNDING": "Funding",
-        "REPAYING": "Repaying"
+        "RELIEF": "Relief applied",
+        "REPAID": "Repaid",
+        "REPAID_EARLY": "Repaid early",
+        "REPAYING": "Repaying",
+        "SETTLED_AT_BACKSTOP": "Settled at backstop",
+        "WATCHLIST": "Watchlist",
+        "WRITTEN_DOWN": "Written down"
       },
       "holdingTopYield": "Top Yield #{rank}",
       "holdingViewDetails": "View project details",
       "holdingsTitle": "Your Positions ({count})",
+      "investorBearsLoss": "The investor bears this loss.",
       "mockNotice": "Sample data, shown while this screen is built out. It is not connected to the backend yet, so these positions and figures are not your real portfolio.",
       "noInvestmentsDescription": "You currently have no investment for now. Browse the available opportunities to start your investment journey.",
       "noInvestmentsTitle": "No Investments Found",
@@ -377,7 +386,8 @@
       "title": "Investment Portfolio",
       "totalInvested": "Total Invested",
       "totalReturns": "Total Returns",
-      "weightedRoi": "Avg. Expected Yield"
+      "weightedRoi": "Avg. target yield (open)",
+      "weightedRoiValue": "{min}–{max}%"
     },
     "projectCard": {
       "annualizedReturn": "Target annual rate",
@@ -402,7 +412,7 @@
       "noLoanPurpose": "Not specified",
       "notGuaranteed": "Target, not guaranteed",
       "pending": "Pending",
-      "pendingGrading": "Pending grading",
+      "pendingGrading": "Pending score",
       "raisedOfTarget": "{raised} raised of {target}",
       "status": {
         "active": "ACTIVE",
@@ -869,12 +879,12 @@
     },
     "smeAnalytics": {
       "charts": {
-        "gradeDesc": "The four groups behind your {grade} score, and where to focus.",
-        "gradeTitle": "What drives your grade",
         "repaymentDesc": "What you have repaid against the total owed over the term.",
         "repaymentTitle": "Repayment progress",
         "revenueShareDesc": "Each month against the {ceiling}% level we consider comfortable.",
-        "revenueShareTitle": "Share of revenue going to repayment"
+        "revenueShareTitle": "Share of revenue going to repayment",
+        "scoreDesc": "The four groups behind your {score} business score, and where to focus.",
+        "scoreTitle": "What drives your score"
       },
       "factorHints": {
         "bcq": "Your margins, cost flexibility, and how large the loan is against revenue.",
@@ -888,32 +898,34 @@
         "rsg": "Revenue stability & growth",
         "sector": "Sector outlook"
       },
-      "grade": {
+      "kpi": {
+        "backstop": "Backstop date",
+        "backstopHint": "Anything still outstanding falls due in full on this date.",
+        "costOfCapital": "Cost of this loan",
+        "costOfCapitalHint": "Total interest at {rate}% over {months} months",
+        "dailyRepayment": "Daily repayment",
+        "dailyRepaymentHint": "Each business day. This period totals {total} to {date}.",
+        "earlyPayoff": "Pay off early",
+        "earlyPayoffHint": "Amount to clear this facility today. No prepayment penalty — the total repayable does not change.",
+        "outstanding": "Still owed",
+        "outstandingHint": "{percent}% of the loan repaid so far"
+      },
+      "mockNotice": "Sample data, shown while this screen is built out. It is not connected to the backend yet — there is no repayment schedule module, and the scoring engine is not wired into score runs, so none of these figures reflect your real facility.",
+      "overCeiling": "Repayment took {percent}% of your revenue last month, above the {ceiling}% level we consider comfortable. Talk to us about extending the term if that is squeezing your operations.",
+      "progress": {
+        "label": "Repaid to date",
+        "remaining": "{days} working days left"
+      },
+      "score": {
         "band": {
           "fair": "Fair",
           "strong": "Strong",
           "weak": "Needs work"
         },
-        "focusBody": "{factor} is your weakest group at {score}. Improving it moves your grade — and your rate — more than anything else you can act on right now.",
+        "focusBody": "{factor} is your weakest group at {score}. Improving it moves your business score — and the reference rate it sets — more than anything else you can act on right now.",
         "focusTitle": "Where to focus",
         "outOf": "out of 100",
-        "weight": "{percent}% of grade"
-      },
-      "kpi": {
-        "costOfCapital": "Cost of this loan",
-        "costOfCapitalHint": "Total interest at {rate}% over {months} months",
-        "earlyPayoff": "Pay off early",
-        "earlyPayoffHint": "Amount to clear this facility today. No prepayment penalty — the total repayable does not change.",
-        "nextPayment": "Next payment",
-        "nextPaymentHint": "Due {date}",
-        "outstanding": "Still owed",
-        "outstandingHint": "{percent}% of the loan repaid so far"
-      },
-      "mockNotice": "Sample data, shown while this screen is built out. It is not connected to the backend yet — there is no repayment schedule module, and the grading engine is not wired into score runs, so none of these figures reflect your real loan.",
-      "overCeiling": "Repayment took {percent}% of your revenue last month, above the {ceiling}% level we consider comfortable. Talk to us about extending the term if that is squeezing your operations.",
-      "progress": {
-        "label": "Repaid to date",
-        "remaining": "{days} working days left"
+        "weight": "{percent}% of the score"
       },
       "series": {
         "ceiling": "{percent}% comfort ceiling",
@@ -921,30 +933,39 @@
         "revenueShare": "Share of revenue",
         "totalOwed": "Total owed"
       },
-      "subtitle": "Where your loan stands, what it costs, and what moves your grade.",
-      "title": "Loan analytics"
+      "subtitle": "Where your facility stands, what it costs, and what moves your business score.",
+      "title": "Facility analytics"
     },
     "smeFunding": {
-      "investors": "{count} lenders",
+      "allInRate": "All-in annual rate",
+      "backstopDate": "Backstop date",
+      "backstopHint": "Anything still outstanding falls due in full on this date.",
+      "dailyAmount": "Daily repayment",
+      "earlyRepaymentNote": "Settling early carries no prepayment penalty. It clears the remaining total — it does not reduce it.",
+      "fixedAtSigning": "Fixed at signing. It does not change.",
+      "investors": "{count} investors",
       "mockNotice": "Sample data, shown while this screen is built out. Your company profile above is real; the funding and repayment figures below are not yet connected to the backend.",
-      "nextPayment": "Next payment",
       "ofTarget": "of {target}",
       "outstanding": "Outstanding",
+      "perBusinessDay": "Charged each business day",
+      "perDay": "{amount} × {days} business days",
+      "periodRange": "{start} – {end}",
       "raised": "Raised",
-      "rate": "Rate / Grade",
-      "rateValue": "{rate}% · {grade}",
+      "rate": "Rate / Score",
+      "rateValue": "{rate}% · score {score}",
+      "reliefApplied": "Relief applied — reduced from {from}/day. The total owed is unchanged; collection runs longer.",
       "repaid": "Repaid to date",
-      "scheduleProgress": "{done} of {total} installments settled",
-      "scheduleTitle": "Repayment schedule",
-      "split": "Principal {principal} · Interest {interest}",
+      "scheduleProgress": "{done} of {total} periods collected",
+      "scheduleTitle": "Repayment periods",
       "status": {
-        "DUE": "Due next",
-        "EARLY": "Paid early",
-        "PAID": "Paid",
+        "CURRENT": "Collecting now",
+        "RELIEF_APPLIED": "Relief applied",
+        "SETTLED": "Collected",
         "UPCOMING": "Upcoming"
       },
-      "subtitle": "How much of your ask has been raised, and where you are in the repayment schedule.",
-      "title": "Funding & Repayment"
+      "subtitle": "How much of your ask has been raised, what you repay each business day, and the date everything outstanding falls due.",
+      "title": "Funding & Repayment",
+      "totalRepayable": "Total repayable"
     },
     "transactions": {
       "count": "{count} transactions",
@@ -953,6 +974,14 @@
         "title": "No transactions match"
       },
       "filterByType": "Filter by type",
+      "methods": {
+        "bankTransfer": "Bank transfer",
+        "businessAccount": "Business account",
+        "custodialAccount": "Custodial account",
+        "dailyRepayment": "Daily repayment",
+        "deductedFromDisbursement": "Deducted from disbursement",
+        "platformFee": "Platform service fee"
+      },
       "mockNotice": "Sample data, shown while this screen is built out. It is not connected to the backend yet, so these figures are not your real balances.",
       "searchPlaceholder": "Search by project, reference or method",
       "showing": "Showing {shown} of {total} transactions",
@@ -1098,7 +1127,7 @@
       ],
       "download": "Download",
       "downloadingFile": "Downloading file",
-      "reminderText": "Please review all documents carefully before investing. Consider the risk level and grading when making your investment decision.",
+      "reminderText": "Please review all documents carefully before investing. Consider the risk level and the business score when making your investment decision, and remember the investor bears the loss if the business underperforms.",
       "reminderTitle": "Due Diligence Reminder",
       "startingDownload": "Starting download for {filename}...",
       "subtitle": "Review the SME's submitted documents for due diligence",
@@ -1266,41 +1295,41 @@
     "adjustInv": "← Adjust Investment Specs",
     "adjustShort": "← Adjust Specs",
     "adjustSme": "← Adjust Borrowing Specs",
-    "approved": "APPROVED",
-    "assignedApr": "Assigned APR",
     "borrowerSpecs": "Borrower Specs",
-    "calculateInv": "Calculate Yield & ROI",
-    "calculateSme": "Calculate Interest & APY",
-    "creditAssessment": "Credit Assessment",
-    "creditStatus": "Credit Status",
+    "calculateInvNew": "Show target range",
+    "calculateSmeNew": "Show indicative rate",
     "desiredLoanShort": "Desired Loan",
     "desiredLoanSize": "Desired Loan Size",
     "durationMonths": "{months} Months",
     "durationMos": "{months} Mos",
     "durationTerms": "Duration Terms",
-    "estApyShort": "EST. APY",
-    "estProfitReturn": "Est. Profit Return",
-    "estProfitShort": "EST. PROFIT",
+    "illustrationNote": "Illustration only. Indicative figures, not an offer, not a quote, and not a guarantee — your actual rate and score come from verified tax records.",
+    "indicativeCheck": "Indicative check",
+    "indicativeFit": "LOOKS IN RANGE",
+    "indicativeRate": "Indicative all-in rate",
+    "indicativeStatus": "Indicative fit",
     "invShort": "NĐT",
     "investmentShort": "Investment",
     "investmentSize": "Investment Size",
     "investmentSpecs": "Investment Specs",
     "investorPortal": "INVESTOR PORTAL",
-    "leverageRatio": "Leverage Ratio",
     "loanDuration": "Loan Duration",
     "loanDurationShort": "Duration",
     "locked": "LOCKED",
     "monthlyRevShort": "Monthly Rev",
     "monthlyRevenue": "Monthly Revenue",
+    "notEligible": "OUTSIDE RANGE",
+    "notGuaranteedShort": "Target, not guaranteed",
     "pending": "PENDING...",
-    "rejected": "REJECTED",
+    "revenueCoverage": "Request vs term revenue",
     "riskTolerance": "Risk Tolerance",
+    "scenarioRange": "Scenario range",
+    "scenarioShort": "SCENARIO",
     "scoreLabel": "SCORE",
-    "sigmoidIntRate": "Sigmoid Int. Rate",
     "smePortal": "SME PORTAL",
     "smeShort": "SME",
-    "yearlyRoiRate": "Yearly ROI Rate",
-    "yearlyRoiShort": "YEARLY ROI",
+    "targetYieldRange": "Target annual yield",
+    "targetYieldShort": "TARGET YIELD",
     "yieldReturnProjection": "Yield Return Projection"
   },
   "notFound": {
