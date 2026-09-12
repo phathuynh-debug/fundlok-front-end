@@ -12,7 +12,20 @@ import { settle } from "./ui";
  * default: these specs are testing the dashboard, not onboarding. The tour has
  * its own spec (product-tour.spec.ts), which does NOT call this.
  */
-export async function skipProductTour(context: BrowserContext): Promise<void> {
+/**
+ * The host cookies are seeded for.
+ *
+ * The suite runs against 127.0.0.1, but WebAuthn refuses a bare IP as a
+ * Relying Party ID ("SecurityError: This is an invalid domain"), so the
+ * passkey spec drives the same server through `localhost` instead and seeds
+ * its cookies there. A cookie set for the other spelling is simply never sent.
+ */
+export type StubHost = "127.0.0.1" | "localhost";
+
+export async function skipProductTour(
+  context: BrowserContext,
+  domain: StubHost = "127.0.0.1",
+): Promise<void> {
   // Tells the stub API to report this account as already onboarded, which is
   // what the real backend does through users.onboarding_tour_completed_at.
   // A cookie rather than localStorage because the account, not the browser, is
@@ -22,7 +35,7 @@ export async function skipProductTour(context: BrowserContext): Promise<void> {
     {
       name: "stub_onboarded",
       value: "1",
-      domain: "127.0.0.1",
+      domain,
       path: "/",
       sameSite: "Lax",
     },
@@ -42,19 +55,20 @@ export async function skipProductTour(context: BrowserContext): Promise<void> {
 export async function signInAs(
   context: BrowserContext,
   user: StubUserKey,
-  { skipTour = true }: { skipTour?: boolean } = {},
+  {
+    skipTour = true,
+    domain = "127.0.0.1",
+  }: { skipTour?: boolean; domain?: StubHost } = {},
 ): Promise<void> {
   // Suppressed by default: the walkthrough opens over a first-run dashboard
   // and its scrim would swallow the clicks the rest of the suite depends on.
   // product-tour.spec.ts passes `skipTour: false` to exercise it.
-  if (skipTour) await skipProductTour(context);
+  if (skipTour) await skipProductTour(context, domain);
   await context.addCookies([
     {
       name: "access_token",
       value: user,
-      // 127.0.0.1 rather than "localhost": baseURL uses the numeric host, and
-      // a cookie set for the other spelling is simply never sent.
-      domain: "127.0.0.1",
+      domain,
       path: "/",
       httpOnly: true,
       sameSite: "Lax",

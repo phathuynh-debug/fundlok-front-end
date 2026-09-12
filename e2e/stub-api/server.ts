@@ -93,25 +93,47 @@ function readCookie(req: IncomingMessage, name: string): string | null {
  * server it is mutable — a spec that removes a passkey must not change what
  * the next one sees.
  */
-const stubPasskeys = new Map<
-  string,
-  {
-    id: string;
-    name: string;
-    backed_up: boolean;
-    last_used_at: string | null;
-  }[]
->();
+/**
+ * Must be a registrable suffix of the host the page is served from, or the
+ * browser refuses the ceremony before it reaches the authenticator.
+ *
+ * WebAuthn rejects bare IP addresses outright — "SecurityError: This is an
+ * invalid domain" — so although the rest of the suite runs on 127.0.0.1, the
+ * passkey spec drives the same server through localhost. That is a real
+ * constraint, not a test artefact: an app served from an IP cannot use
+ * passkeys at all.
+ */
+const RP_ID = "localhost";
 
-export function seedStubPasskeys(
-  key: string,
-  rows: {
-    id: string;
-    name: string;
-    backed_up: boolean;
-    last_used_at: string | null;
-  }[],
-) {
+function randomChallenge(): string {
+  return toBase64Url(
+    String.fromCharCode(
+      ...Array.from({ length: 32 }, () => Math.floor(Math.random() * 256)),
+    ),
+  );
+}
+
+function toBase64Url(value: string): string {
+  return Buffer.from(value, "binary")
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+}
+
+const stubPasskeys = new Map<string, Record<string, unknown>[]>();
+
+/**
+ * Passkeys are the only mutable state in this server, so they are the only
+ * thing that can leak between specs sharing a worker. Each test sets its own
+ * `stub_scope` cookie and gets its own bucket; without one the account key is
+ * used, so behaviour is unchanged for every other spec.
+ */
+function passkeyScope(req: IncomingMessage, key: string): string {
+  return readCookie(req, "stub_scope") ?? key;
+}
+
+export function seedStubPasskeys(key: string, rows: Record<string, unknown>[]) {
   stubPasskeys.set(key, rows);
 }
 
@@ -344,6 +366,34 @@ const server = createServer(async (req, res) => {
     });
   }
 
+  // Passkey sign-in is deliberately reachable without a session: the caller
+  // has none yet, which is the entire point of the feature.
+  if (path === "/auth/passkeys/login/options" && method === "POST") {
+    return json(res, 200, {
+      rpId: RP_ID,
+      challenge: randomChallenge(),
+      timeout: 60000,
+      // Empty, like the real endpoint: a discoverable credential means the
+      // browser knows which account it is, and sending a list would let an
+      // unauthenticated caller enumerate who has passkeys.
+      allowCredentials: [],
+      userVerification: "preferred",
+    });
+  }
+
+  if (path === "/auth/passkeys/login/verify" && method === "POST") {
+    // Signs in as whichever account the spec seeded. The real backend finds
+    // the account from the credential id; the stub cannot, so the test names
+    // it with a cookie set beforehand.
+    const asUser = readCookie(req, "stub_passkey_user") as StubUserKey | null;
+    if (!asUser || !(asUser in STUB_USERS)) {
+      return detail(res, 401, "That passkey was not recognised.");
+    }
+    return json(res, 200, withOnboarding(req, STUB_USERS[asUser]), {
+      "set-cookie": sessionCookie(asUser, 60 * 60),
+    });
+  }
+
   // --- Everything below needs a session ------------------------------------
 
   if (!session) {
@@ -356,13 +406,63 @@ const server = createServer(async (req, res) => {
   // are driven by a Chrome DevTools virtual authenticator in the spec rather
   // than faked here. What the stub owns is the list the security screen reads.
   if (path === "/auth/passkeys" && method === "GET") {
-    return json(res, 200, stubPasskeys.get(key) ?? []);
+    return json(res, 200, stubPasskeys.get(passkeyScope(req, key)) ?? []);
   }
+
+  // The ceremonies. The stub issues spec-shaped options and ACCEPTS whatever
+  // the authenticator returns without verifying the signature — it has no
+  // crypto and no business having any.
+  //
+  // What this lets the e2e prove is the frontend integration: options reach
+  // navigator.credentials in a shape it accepts, the result is encoded back
+  // into what the API expects, and the screens react. The cryptographic half
+  // is proven separately against the real backend (app/auth/passkeys.py),
+  // where a full register-then-assert round trip runs and a replayed
+  // assertion is refused.
+  if (path === "/auth/passkeys/register/options" && method === "POST") {
+    return json(res, 200, {
+      rp: { id: RP_ID, name: "FundLok" },
+      user: {
+        id: toBase64Url(user.id),
+        name: user.email,
+        displayName: user.full_name,
+      },
+      challenge: randomChallenge(),
+      pubKeyCredParams: [
+        { type: "public-key", alg: -7 },
+        { type: "public-key", alg: -257 },
+      ],
+      timeout: 60000,
+      excludeCredentials: [],
+      authenticatorSelection: {
+        residentKey: "preferred",
+        userVerification: "preferred",
+      },
+      attestation: "none",
+    });
+  }
+
+  if (path === "/auth/passkeys/register/verify" && method === "POST") {
+    const body = await readBody(req);
+    const scope = passkeyScope(req, key);
+    const created = {
+      id: `pk-${(stubPasskeys.get(scope) ?? []).length + 1}`,
+      name: (body.name as string) || "Passkey",
+      device_type: "multi_device",
+      backed_up: true,
+      created_at: new Date().toISOString(),
+      last_used_at: null,
+    };
+    stubPasskeys.set(scope, [...(stubPasskeys.get(scope) ?? []), created]);
+    return json(res, 201, created);
+  }
+
   if (path.startsWith("/auth/passkeys/") && method === "DELETE") {
     const id = path.split("/").pop();
+    const scope = passkeyScope(req, key);
     stubPasskeys.set(
-      key,
-      (stubPasskeys.get(key) ?? []).filter((p) => p.id !== id),
+      scope,
+      (stubPasskeys.get(scope) ?? []).filter((p) => p.id !== id),
     );
     res.writeHead(204);
     return res.end();
