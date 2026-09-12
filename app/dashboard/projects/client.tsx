@@ -7,6 +7,7 @@ import { usePublicProjects } from "@/hooks/use-projects";
 import type { Project } from "@/services/projects.service";
 import { ProjectCard } from "../_components/ProjectCard";
 import { DashboardHeader } from "../_components/DashboardHeader";
+import { SampleDataNotice } from "../_components/SampleDataNotice";
 import {
   Search,
   SlidersHorizontal,
@@ -31,9 +32,13 @@ interface SecondaryMarketListing {
   // Enum-ish keys rather than English prose: the card renders them through
   // i18n, so a locale switch translates them (dashboard.projects.secondary.*).
   status: "PERFORMING";
-  riskLevel: "LOW" | "MEDIUM" | "HIGH";
-  /** Grade letter only — "Grade {x}" is assembled per locale. */
-  grade: string;
+  /**
+   * 0-100 business score. Not a letter and not a risk band: "A+"/"AA" is
+   * rating-agency notation (fundlok-domain §4), and the standalone "Low risk"
+   * badge that used to sit beside it was the same blanket claim the primary
+   * marketplace card already removed — every listing wore it.
+   */
+  score: number;
   listedDate: string;
   /** i18n key suffix under dashboard.projects.secondary.reasons. */
   reasonKey: string;
@@ -56,10 +61,9 @@ const mockSecondaryMarket: SecondaryMarketListing[] = [
   {
     id: "sec-1",
     legalName: "TechStart Solutions",
-    industry: "Technology",
+    industry: "IT Services",
     status: "PERFORMING",
-    riskLevel: "LOW",
-    grade: "A+",
+    score: 81,
     listedDate: "4/28/2026",
     reasonKey: "rebalancing",
     askingPrice: 537500000,
@@ -79,10 +83,9 @@ const mockSecondaryMarket: SecondaryMarketListing[] = [
   {
     id: "sec-2",
     legalName: "GreenEnergy Corp",
-    industry: "Energy",
+    industry: "Manufacturing",
     status: "PERFORMING",
-    riskLevel: "MEDIUM",
-    grade: "B",
+    score: 63,
     listedDate: "5/10/2026",
     reasonKey: "liquidity",
     askingPrice: 230000000,
@@ -102,10 +105,9 @@ const mockSecondaryMarket: SecondaryMarketListing[] = [
   {
     id: "sec-3",
     legalName: "BioMed Labs",
-    industry: "Healthcare",
+    industry: "Healthcare & Pharmacy",
     status: "PERFORMING",
-    riskLevel: "LOW",
-    grade: "AA",
+    score: 86,
     listedDate: "5/20/2026",
     reasonKey: "profitTaking",
     askingPrice: 780000000,
@@ -168,16 +170,15 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
         </div>
 
         <div className="flex items-center gap-2 self-start sm:self-center">
-          <Badge className="bg-primary text-primary-foreground font-mono text-[10px] uppercase font-bold tracking-wider rounded-full px-2.5 py-0.5 border-none">
-            {t(
-              `dashboard.projects.secondary.risk.${listing.riskLevel.toLowerCase()}`,
-            )}
-          </Badge>
+          {/* The "Low risk" badge that sat here is gone for the same reason
+              it went from the primary card: it was on every listing, which
+              makes it a blanket risk claim rather than an assessment. The
+              score carries the assessment; the investor draws the conclusion. */}
           <Badge
             variant="outline"
             className="bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-zinc-300 dark:border-zinc-700 font-mono text-[10px] uppercase font-bold tracking-wider rounded-full px-2.5 py-0.5"
           >
-            {t("dashboard.projects.secondary.grade", { grade: listing.grade })}
+            {t("dashboard.projects.secondary.score", { score: listing.score })}
           </Badge>
         </div>
       </div>
@@ -543,6 +544,14 @@ export default function ProjectsClient() {
             ))}
           </div>
         </div>
+
+        {/* The card mixes real application data with presentation figures
+            derived from the project id — funding progress, investor count,
+            days remaining and the business score. An investor reading
+            "Score 73/100" as a real assessment is exactly the misreading the
+            handbook's disclosure rules exist to prevent (§3), so the page
+            says which half is which. */}
+        <SampleDataNotice message={t("dashboard.projectCard.sampleNotice")} />
 
         {/* Count display label below search/filters */}
         <div className="text-xs font-semibold text-muted-foreground tracking-wide">

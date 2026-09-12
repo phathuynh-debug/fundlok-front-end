@@ -3,7 +3,7 @@ import { CheckCircle2, AlertTriangle } from "lucide-react";
 import { getDictionary, useTranslations } from "@/lib/i18n";
 import { InvestmentTab } from "./InvestmentTab";
 
-export function RiskAssessmentTab() {
+export function RiskAssessmentTab({ score }: { score: number }) {
   const { locale, t } = useTranslations();
   const dictionary = getDictionary(locale);
   const strengths = dictionary.investment.risk.strengthItems;
@@ -23,7 +23,7 @@ export function RiskAssessmentTab() {
             </p>
           </div>
           <div className="flex items-center gap-2 self-start md:self-center px-4 py-2 bg-muted/40 rounded-xl border font-semibold text-lg">
-            {t("dashboard.projectDetails.grade")}
+            {t("dashboard.projectDetails.score", { score })}
           </div>
         </div>
 

@@ -400,7 +400,6 @@
       "edit": "Edit",
       "expectedRoi": "Annualized ROI",
       "fundedPercent": "{percent}% funded",
-      "grade": "Grade {grade}",
       "hotDeal": "Hot Deal",
       "incorporation": "Incorporation",
       "industry": "Industry",
@@ -414,6 +413,8 @@
       "pending": "Pending",
       "pendingGrading": "Pending score",
       "raisedOfTarget": "{raised} raised of {target}",
+      "sampleNotice": "Sample marketplace figures. Funding progress, investor counts, days remaining and the business score are illustrative while the listing API is built out — only the company, industry, asking amount and purpose are real.",
+      "score": "Score {score}/100",
       "status": {
         "active": "ACTIVE",
         "draft": "DRAFT"
@@ -429,10 +430,10 @@
       "dueDiligence": "Due Diligence",
       "fallbackIndustry": "Technology",
       "fallbackName": "TechStart Solutions",
-      "grade": "Grade A+",
       "investment": "Investment",
       "loading": "Loading project details...",
-      "riskAssessment": "Risk Assessment"
+      "riskAssessment": "Risk Assessment",
+      "score": "Score {score}/100"
     },
     "projects": {
       "filterLabel": "Filter:",
@@ -451,7 +452,6 @@
         "days": "{count} days",
         "daysActive": "{count} days active",
         "discount": "-{percent}% discount",
-        "grade": "Grade {grade}",
         "listedOn": "Listed {date}",
         "madeMissed": "{made} made, {missed} missed",
         "ofLoan": "{percent}% of loan",
@@ -466,11 +466,7 @@
         },
         "revenueShare": "Revenue share",
         "revenueShareTerms": "{percent}% daily until principal paid",
-        "risk": {
-          "high": "High risk",
-          "low": "Low risk",
-          "medium": "Medium risk"
-        },
+        "score": "Score {score}/100",
         "status": {
           "performing": "Performing"
         },
@@ -1344,7 +1340,7 @@
     "ariaLabelUnread": "Notifications, {count} unread",
     "empty": "Nothing new right now.",
     "items": {
-      "gradeUpdated": "Your FundLok grade was updated.",
+      "gradeUpdated": "Your FundLok business score was updated.",
       "newDevice": "First sign-in from a new device.",
       "newListing": "A new project is open for funding.",
       "repaymentReceived": "A repayment landed in your account."

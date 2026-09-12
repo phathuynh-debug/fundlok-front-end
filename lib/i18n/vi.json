@@ -358,7 +358,7 @@
       "holdingInvested": "Đã đầu tư",
       "holdingNextPayout": "Kỳ nhận tiếp theo",
       "holdingProgress": "Tiến độ trả nợ",
-      "holdingRank": "Hạng #{rank}",
+      "holdingRank": "Vị trí #{rank}",
       "holdingReturned": "Đã nhận về",
       "holdingRoi": "Lợi suất mục tiêu / Kỳ hạn",
       "holdingRoiValue": "{min}–{max}% · {months} tháng",
@@ -400,7 +400,6 @@
       "edit": "Chỉnh sửa",
       "expectedRoi": "Tỷ suất lợi nhuận năm",
       "fundedPercent": "Đã huy động {percent}%",
-      "grade": "Hạng {grade}",
       "hotDeal": "Dự án HOT",
       "incorporation": "Thành lập",
       "industry": "Ngành",
@@ -414,6 +413,8 @@
       "pending": "Chưa có",
       "pendingGrading": "Chờ điểm doanh nghiệp",
       "raisedOfTarget": "Đã gọi {raised} / {target}",
+      "sampleNotice": "Số liệu sàn mẫu. Tiến độ huy động, số nhà đầu tư, số ngày còn lại và điểm doanh nghiệp chỉ mang tính minh họa trong lúc API danh sách còn được hoàn thiện — chỉ tên doanh nghiệp, ngành, số tiền cần huy động và mục đích là dữ liệu thật.",
+      "score": "Điểm {score}/100",
       "status": {
         "active": "ĐANG HOẠT ĐỘNG",
         "draft": "BẢN NHÁP"
@@ -429,10 +430,10 @@
       "dueDiligence": "Thẩm định",
       "fallbackIndustry": "Công nghệ",
       "fallbackName": "TechStart Solutions",
-      "grade": "Hạng A+",
       "investment": "Đầu tư",
       "loading": "Đang tải chi tiết dự án...",
-      "riskAssessment": "Đánh giá rủi ro"
+      "riskAssessment": "Đánh giá rủi ro",
+      "score": "Điểm {score}/100"
     },
     "projects": {
       "filterLabel": "Lọc:",
@@ -451,7 +452,6 @@
         "days": "{count} ngày",
         "daysActive": "Đã hoạt động {count} ngày",
         "discount": "Thấp hơn {percent}%",
-        "grade": "Hạng {grade}",
         "listedOn": "Đăng ngày {date}",
         "madeMissed": "Đã trả {made}, trễ {missed}",
         "ofLoan": "{percent}% khoản vay",
@@ -466,11 +466,7 @@
         },
         "revenueShare": "Chia sẻ doanh thu",
         "revenueShareTerms": "{percent}% mỗi ngày cho đến khi trả hết gốc",
-        "risk": {
-          "high": "Rủi ro cao",
-          "low": "Rủi ro thấp",
-          "medium": "Rủi ro trung bình"
-        },
+        "score": "Điểm {score}/100",
         "status": {
           "performing": "Đang trả tốt"
         },
@@ -1344,7 +1340,7 @@
     "ariaLabelUnread": "Thông báo, {count} chưa đọc",
     "empty": "Hiện chưa có thông báo mới.",
     "items": {
-      "gradeUpdated": "Hạng FundLok của bạn đã được cập nhật.",
+      "gradeUpdated": "Điểm doanh nghiệp FundLok của bạn đã được cập nhật.",
       "newDevice": "Lần đầu đăng nhập từ thiết bị mới.",
       "newListing": "Có dự án mới đang mở huy động vốn.",
       "repaymentReceived": "Một khoản trả nợ đã vào tài khoản của bạn."

@@ -15,6 +15,7 @@ import { RiskAssessmentTab } from "./_components/RiskAssessmentTab";
 import { DueDiligenceTab } from "./_components/DueDiligenceTab";
 import { useTranslations } from "@/lib/i18n";
 import { industryLabel } from "@/lib/industry-label";
+import { sampleListingScore } from "@/lib/sample-listing-figures";
 import {
   pageTransitionProps,
   fadeInUpProps,
@@ -77,6 +78,9 @@ export default function ProjectDetailsClient() {
     usePublicProjects(!isAuthLoading && user?.role === "INVESTOR");
 
   const project = projects.find((p) => p.id === projectId);
+  // Same source as the marketplace card, so the score a user clicked through
+  // from is the score they land on. See lib/sample-listing-figures.ts.
+  const sampleScore = sampleListingScore(project?.id ?? projectId);
 
   if (isAuthLoading || isProjectsLoading) {
     return <ProjectDetailsSkeleton />;
@@ -133,7 +137,7 @@ export default function ProjectDetailsClient() {
                   variant="outline"
                   className="bg-background text-foreground rounded-full px-3 py-0.5 text-xs font-semibold border-muted"
                 >
-                  {t("dashboard.projectDetails.grade")}
+                  {t("dashboard.projectDetails.score", { score: sampleScore })}
                 </Badge>
               </div>
             </div>
@@ -186,7 +190,7 @@ export default function ProjectDetailsClient() {
         <AnimatePresence mode="wait">
           {activeTab === "risk" ? (
             <motion.div key="risk" {...tabContentAnimation}>
-              <RiskAssessmentTab />
+              <RiskAssessmentTab score={sampleScore} />
             </motion.div>
           ) : (
             <motion.div key="diligence" {...tabContentAnimation}>

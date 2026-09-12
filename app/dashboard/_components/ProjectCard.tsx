@@ -20,6 +20,7 @@ import { useTranslations } from "@/lib/i18n";
 import { formatDate } from "@/lib/format-date";
 import { formatCurrency } from "@/lib/format-currency";
 import { industryLabel } from "@/lib/industry-label";
+import { listingHash, sampleListingScore } from "@/lib/sample-listing-figures";
 import { cn } from "@/lib/utils";
 import { getIndustryChrome } from "./sme-dashboard-config";
 import { CONTROL_IDLE } from "@/lib/ui-tokens";
@@ -71,12 +72,11 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
       ? `${address.city}, ${address.country}`
       : t("common.locationUnavailable");
 
-  // Deterministic presentation metrics for active deals in the marketplace
-  const hash = Math.abs(
-    (project.id || project.legal_name || "deal")
-      .split("")
-      .reduce((acc, c) => ((acc << 5) - acc + c.charCodeAt(0)) | 0, 0),
-  );
+  // Deterministic presentation metrics for active deals in the marketplace.
+  // See lib/sample-listing-figures.ts — the details page behind this card
+  // derives its score from the same place so the two cannot disagree.
+  const listingSeed = project.id || project.legal_name;
+  const hash = listingHash(listingSeed);
   const fundingProgressPct = askingAmount ? (hash % 29) + 65 : 0; // 65% - 93%
   const raisedAmount = askingAmount
     ? Math.round((askingAmount * (fundingProgressPct / 100)) / 1_000_000) *
@@ -90,7 +90,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
         Math.round((askingAmount * 0.01) / 1_000_000) * 1_000_000,
       )
     : 5_000_000;
-  const grade = hash % 3 === 0 ? "AAA" : hash % 3 === 1 ? "AA" : "A+";
+  const sampleScore = sampleListingScore(listingSeed);
   const isHot = fundingProgressPct >= 75;
 
   return (
@@ -141,15 +141,15 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                   </Badge>
                 )}
                 {/* No "Low Risk" badge: it was hardcoded on every listing
-                    regardless of the grade, which is a blanket risk claim we
-                    cannot support (Handbook §3.4, §8). The grade badge below
+                    regardless of the score, which is a blanket risk claim we
+                    cannot support (Handbook §3.4, §8). The score badge below
                     carries the assessment, and the investor draws their own
                     conclusion from it. */}
                 <Badge
                   variant="outline"
                   className="bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-zinc-300 dark:border-zinc-700 font-mono text-[10px] uppercase font-bold tracking-wider rounded-full px-2.5 py-0.5"
                 >
-                  {t("dashboard.projectCard.grade", { grade })}
+                  {t("dashboard.projectCard.score", { score: sampleScore })}
                 </Badge>
               </>
             )}
