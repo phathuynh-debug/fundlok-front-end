@@ -4,6 +4,32 @@ import type { StubUserKey } from "../stub-api/fixtures";
 import { settle } from "./ui";
 
 /**
+ * Mark the first-run walkthrough as already seen.
+ *
+ * Every spec below signs in with a fresh context, so without this the tour
+ * opens over the dashboard and its scrim swallows the clicks and hovers the
+ * rest of the suite depends on. Suppressing it here is also the honest
+ * default: these specs are testing the dashboard, not onboarding. The tour has
+ * its own spec (product-tour.spec.ts), which does NOT call this.
+ */
+export async function skipProductTour(context: BrowserContext): Promise<void> {
+  // Tells the stub API to report this account as already onboarded, which is
+  // what the real backend does through users.onboarding_tour_completed_at.
+  // A cookie rather than localStorage because the account, not the browser, is
+  // where that fact lives now — seeding browser storage would only exercise
+  // the fallback path.
+  await context.addCookies([
+    {
+      name: "stub_onboarded",
+      value: "1",
+      domain: "127.0.0.1",
+      path: "/",
+      sameSite: "Lax",
+    },
+  ]);
+}
+
+/**
  * Sign in as one of the stub accounts by seeding the session cookie.
  *
  * Why not drive the login form every time: the real cookie is httpOnly and set
@@ -16,7 +42,12 @@ import { settle } from "./ui";
 export async function signInAs(
   context: BrowserContext,
   user: StubUserKey,
+  { skipTour = true }: { skipTour?: boolean } = {},
 ): Promise<void> {
+  // Suppressed by default: the walkthrough opens over a first-run dashboard
+  // and its scrim would swallow the clicks the rest of the suite depends on.
+  // product-tour.spec.ts passes `skipTour: false` to exercise it.
+  if (skipTour) await skipProductTour(context);
   await context.addCookies([
     {
       name: "access_token",

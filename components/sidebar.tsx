@@ -29,6 +29,8 @@ interface NavItem {
   labelKey: string;
   href: string;
   icon: LucideIcon;
+  /** Anchor for the first-run walkthrough — see lib/constants/tour-steps.ts. */
+  tourId?: string;
 }
 
 const SETTINGS_HREF = "/dashboard/settings";
@@ -38,26 +40,31 @@ const navItems: NavItem[] = [
     labelKey: "dashboard.sidebar.overview",
     href: "/dashboard",
     icon: LayoutDashboard,
+    tourId: "nav-overview",
   },
   {
     labelKey: "dashboard.sidebar.investmentProjects",
     href: "/dashboard/projects",
     icon: Briefcase,
+    tourId: "nav-projects",
   },
   {
     labelKey: "dashboard.sidebar.transactions",
     href: "/dashboard/transactions",
     icon: History,
+    tourId: "nav-transactions",
   },
   {
     labelKey: "dashboard.sidebar.analytics",
     href: "/dashboard/analytics",
     icon: PieChart,
+    tourId: "nav-analytics",
   },
   {
     labelKey: "dashboard.sidebar.security",
     href: "/dashboard/security",
     icon: ShieldCheck,
+    tourId: "nav-security",
   },
 ];
 
@@ -91,15 +98,18 @@ function NavLink({
   icon: Icon,
   label,
   active,
+  tourId,
 }: {
   href: string;
   icon: LucideIcon;
   label: string;
   active: boolean;
+  tourId?: string;
 }) {
   return (
     <Link
       href={href}
+      data-tour={tourId}
       className={cn(
         "group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200",
         active ? "bg-primary/10 text-primary" : CONTROL_IDLE,
@@ -164,6 +174,7 @@ export function Sidebar() {
                   icon={item.icon}
                   label={t(item.labelKey)}
                   active={pathname === item.href}
+                  tourId={item.tourId}
                 />
               ))}
 
@@ -212,6 +223,7 @@ export function Sidebar() {
                   icon={item.icon}
                   label={t(item.labelKey)}
                   active={pathname === item.href}
+                  tourId={item.tourId}
                 />
               ))}
             </nav>

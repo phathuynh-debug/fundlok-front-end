@@ -33,6 +33,16 @@ export interface User {
   // ask for the current password.
   has_password?: boolean;
   created_at?: string | null;
+  /**
+   * When this ACCOUNT finished or skipped the first-run dashboard
+   * walkthrough; null until then. Server-side rather than in browser storage
+   * so onboarding follows the person across devices.
+   *
+   * Optional because a backend that predates the column simply omits it — the
+   * tour treats "field absent" as "ask the browser instead" rather than
+   * replaying itself on every load.
+   */
+  onboarding_tour_completed_at?: string | null;
 }
 
 /**

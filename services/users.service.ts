@@ -91,6 +91,12 @@ export const usersService = {
     return apiClient.patch<User>(USER_ENDPOINTS.selectRole, { role });
   },
 
+  // POST /users/me/onboarding-tour/complete. Returns the refreshed user, so
+  // the caller can seed the cache without a follow-up GET /users/me.
+  completeOnboardingTour() {
+    return apiClient.post<User>(USER_ENDPOINTS.completeOnboardingTour);
+  },
+
   // POST /users/me/password. Returns an ack, not the user — the caller
   // refreshes currentUser so has_password flips to true.
   changePassword(payload: ChangePasswordRequest) {

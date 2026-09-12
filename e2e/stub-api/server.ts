@@ -86,6 +86,26 @@ function readCookie(req: IncomingMessage, name: string): string | null {
   return null;
 }
 
+/**
+ * Whether this account has already been through the first-run walkthrough.
+ *
+ * Driven by a cookie rather than stub state so it stays per-test: the stub is
+ * shared across every test in a worker, and a `POST .../complete` from one
+ * spec must not silently onboard the next one. support/auth.ts sets the cookie
+ * for every spec that is not testing the tour itself.
+ */
+const ONBOARDED_COOKIE = "stub_onboarded";
+
+function withOnboarding<T extends object>(req: IncomingMessage, user: T) {
+  return {
+    ...user,
+    onboarding_tour_completed_at:
+      readCookie(req, ONBOARDED_COOKIE) === "1"
+        ? "2026-01-01T00:00:00+00:00"
+        : null,
+  };
+}
+
 /** The signed-in stub user for this request, or null when unauthenticated. */
 function currentUser(req: IncomingMessage) {
   const token = readCookie(req, COOKIE_NAME);
@@ -303,7 +323,17 @@ const server = createServer(async (req, res) => {
   const { key, user } = session;
 
   if (path === "/users/me" && method === "GET") {
-    return json(res, 200, user);
+    return json(res, 200, withOnboarding(req, user));
+  }
+
+  // Records that the account has seen the first-run walkthrough. The real
+  // endpoint returns the refreshed /me payload so the frontend can seed its
+  // cache without a follow-up GET; mirrored here.
+  if (path === "/users/me/onboarding-tour/complete" && method === "POST") {
+    return json(res, 200, {
+      ...user,
+      onboarding_tour_completed_at: new Date().toISOString(),
+    });
   }
 
   // Profile edit (/dashboard/settings/profile). Echoes the patch back rather

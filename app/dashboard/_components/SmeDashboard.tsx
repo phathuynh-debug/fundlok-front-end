@@ -54,7 +54,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
               {t("dashboard.sme.emptyDescription")}
             </p>
           </div>
-          <Button asChild size="lg" className="gap-2">
+          <Button asChild size="lg" className="gap-2" data-tour="sme-apply">
             <Link href="/project-application">
               {t("dashboard.sme.emptyCta")}
               <ArrowRight className="h-4 w-4" />

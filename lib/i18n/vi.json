@@ -963,6 +963,43 @@
       "title": "Gọi vốn & Trả nợ",
       "totalRepayable": "Tổng số tiền phải trả"
     },
+    "tour": {
+      "back": "Quay lại",
+      "done": "Đã hiểu",
+      "next": "Tiếp theo",
+      "progress": "Bước {current}/{total}",
+      "skip": "Bỏ qua",
+      "steps": {
+        "analytics": {
+          "body": "Tiến độ hoàn trả, và những yếu tố ảnh hưởng đến điểm doanh nghiệp — yếu tố quyết định lãi suất tham khảo của bạn.",
+          "title": "Chi tiết phía sau con số tổng"
+        },
+        "investorOverview": {
+          "body": "Vốn đã cam kết, số đã nhận về, và phần đã ghi giảm. Bạn là bên cấp vốn và hợp đồng được ký với doanh nghiệp — nếu doanh nghiệp không đạt kỳ vọng, bạn chịu khoản lỗ.",
+          "title": "Tổng quan danh mục của bạn"
+        },
+        "investorProjects": {
+          "body": "Mỗi tin đăng đều hiển thị điểm doanh nghiệp, doanh thu đã xác minh phía sau điểm đó, các khoản phí và hạn chót cuối cùng. Lợi suất là mục tiêu và khoảng ước tính, không phải cam kết.",
+          "title": "Một tin đăng cho bạn biết điều gì"
+        },
+        "security": {
+          "body": "Lịch sử đăng nhập, thiết bị đang hoạt động và xác thực hai lớp. Đáng dành hai phút ngay bây giờ.",
+          "title": "Giữ tài khoản luôn là của bạn"
+        },
+        "smeApply": {
+          "body": "Nộp hồ sơ bằng tờ khai thuế GTGT và hóa đơn điện tử của bạn. Chúng tôi thẩm định và phản hồi bằng điều khoản cụ thể — việc nộp hồ sơ không đồng nghĩa được duyệt, và bạn sẽ thấy lãi suất, khoản trả mỗi ngày và hạn chót cuối cùng trước khi ký bất cứ điều gì.",
+          "title": "Bắt đầu từ hồ sơ bạn vẫn nộp hằng kỳ"
+        },
+        "smeOverview": {
+          "body": "Số đã trả, số còn phải trả, và ngày mà mọi khoản còn lại đến hạn thanh toán đầy đủ. Tổng số tiền đã được ấn định từ ngày ký — không thay đổi.",
+          "title": "Tổng quan khoản vốn của bạn"
+        },
+        "transactions": {
+          "body": "Giải ngân, khoản trả hằng ngày và phí, mỗi khoản đều có mã tham chiếu để bạn đối chiếu với sổ sách của mình.",
+          "title": "Mọi giao dịch, kèm phí"
+        }
+      }
+    },
     "transactions": {
       "count": "{count} giao dịch",
       "empty": {

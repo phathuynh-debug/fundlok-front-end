@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Sidebar } from "@/components/sidebar";
+import { ProductTour } from "@/components/product-tour";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -25,6 +26,10 @@ export default function DashboardLayout({
           </div>
         </div>
       </main>
+
+      {/* First-run walkthrough. Renders nothing once dismissed, and nothing at
+          all on a viewport where the sidebar is hidden. */}
+      <ProductTour />
     </div>
   );
 }

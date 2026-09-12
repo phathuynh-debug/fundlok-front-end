@@ -963,6 +963,43 @@
       "title": "Funding & Repayment",
       "totalRepayable": "Total repayable"
     },
+    "tour": {
+      "back": "Back",
+      "done": "Got it",
+      "next": "Next",
+      "progress": "Step {current} of {total}",
+      "skip": "Skip",
+      "steps": {
+        "analytics": {
+          "body": "How repayment is tracking, and what moves the business score that sets your reference rate.",
+          "title": "The detail behind the headline"
+        },
+        "investorOverview": {
+          "body": "Capital committed, what has come back, and what has been written down. You provide the capital and the agreement is with the business — if it underperforms, you bear the loss.",
+          "title": "Your portfolio at a glance"
+        },
+        "investorProjects": {
+          "body": "Every listing shows the business score, the verified revenue behind it, the fees, and the backstop date. Yields are targets and ranges, never guarantees.",
+          "title": "What a listing tells you"
+        },
+        "security": {
+          "body": "Sign-ins, active devices and two-factor authentication. Worth two minutes now.",
+          "title": "Keep the account yours"
+        },
+        "smeApply": {
+          "body": "Apply using your VAT declarations and e-invoices. We assess them and come back with terms — applying doesn't guarantee an offer, and you'll see the rate, the daily amount and the backstop date before you sign anything.",
+          "title": "Start with the records you already file"
+        },
+        "smeOverview": {
+          "body": "What you've repaid, what's still owed, and the date anything outstanding falls due in full. The total was fixed the day you signed — it doesn't move.",
+          "title": "Your facility at a glance"
+        },
+        "transactions": {
+          "body": "Disbursements, daily repayments and fees, each with a reference you can match against your own records.",
+          "title": "Every movement, with its fees"
+        }
+      }
+    },
     "transactions": {
       "count": "{count} transactions",
       "empty": {

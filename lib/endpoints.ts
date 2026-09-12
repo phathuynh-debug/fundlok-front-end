@@ -35,6 +35,8 @@ export const USER_ENDPOINTS = {
   me: "/users/me",
   // Sets the role for a user who registered/logged in without one.
   selectRole: "/users/me/role",
+  // Marks the first-run dashboard walkthrough as seen for this account.
+  completeOnboardingTour: "/users/me/onboarding-tour/complete",
   avatarPresign: "/users/me/avatar/presign",
   avatarConfirm: "/users/me/avatar/confirm",
   // Sets a FIRST password on an account created without one (OAuth sign-in).
