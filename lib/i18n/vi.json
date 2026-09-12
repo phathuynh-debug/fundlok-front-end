@@ -1018,12 +1018,14 @@
       "a4": "FundLok tự động hóa các khâu quan trọng gồm onboarding, thẩm định, xử lý đề nghị, dòng vốn và theo dõi trả nợ. Điều này giúp cải thiện tốc độ, tính nhất quán và minh bạch.",
       "a5": "FundLok được xây dựng với bảo mật, kiểm soát truy cập và bảo vệ dữ liệu là những ưu tiên cốt lõi. Các quy trình của nền tảng được thiết kế để hỗ trợ onboarding an toàn, xử lý giao dịch và quản lý thông tin.",
       "a6": "Không. Mọi hoạt động cấp vốn và đầu tư đều bao gồm thẩm định điều kiện, cấu trúc khoản vay và rủi ro. FundLok cải thiện khả năng tiếp cận, quy trình và tính minh bạch, nhưng không loại bỏ rủi ro kinh doanh hay rủi ro trả nợ. Việc cấp vốn dựa trên quyết định của nhà đầu tư, nằm ngoài quyền kiểm soát của FundLok.",
+      "a7": "Có. FundLok thu xếp nguồn vốn cho doanh nghiệp vừa và nhỏ tại Việt Nam. Nhà đầu tư là bên cấp vốn và hợp đồng tín dụng được ký giữa nhà đầu tư và doanh nghiệp — FundLok không phải ngân hàng, không phải bên cho vay, và không cho vay bằng tiền của mình. Doanh nghiệp chọn kỳ hạn 6 hoặc 12 tháng, hoàn trả một khoản cố định mỗi ngày làm việc, và tổng số tiền phải trả được ấn định ngay khi ký. Nếu doanh thu được xác minh thấp hơn dự kiến trong một kỳ, nghĩa vụ của kỳ đó giảm xuống và thời gian kéo dài thêm; không bao giờ tăng lên.",
       "q1": "FundLok là gì?",
       "q2": "FundLok khác gì so với khoản vay truyền thống?",
       "q3": "FundLok có phải là ngân hàng không?",
       "q4": "FundLok ứng dụng công nghệ như thế nào trong quy trình?",
       "q5": "FundLok có an toàn không?",
       "q6": "FundLok có đảm bảo cấp vốn hoặc lợi nhuận không?",
+      "q7": "FundLok có cung cấp nguồn vốn cho doanh nghiệp vừa và nhỏ tại Việt Nam không?",
       "title": "Câu hỏi chung"
     },
     "investor": {

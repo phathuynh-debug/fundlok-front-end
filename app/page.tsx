@@ -20,9 +20,9 @@ const LinkedInIcon = (props: React.SVGProps<SVGSVGElement>) => (
 // Multilingual dictionary for static landing page assets
 const dict = {
   en: {
-    heroTitle: "Flexible Capital for MSMEs",
+    heroTitle: "Flexible Capital for MSMEs in Vietnam",
     heroSubtitle:
-      "FundLok helps MSMEs access financing with repayment aligned to actual revenue, supported by data, AI, and transparent on-chain investor infrastructure.",
+      "FundLok arranges funding for SMEs in Vietnam: investors provide the capital, repayment is a fixed amount each business day, and the total repayable is fixed at signing. If verified revenue falls short, the obligation for that period drops and the facility runs longer — it never rises.",
     navProduct: "PRODUCT",
     navProcess: "HOW IT WORKS",
     navContact: "CONTACT",
@@ -60,9 +60,9 @@ const dict = {
     teamCto: "Chief Technological Officer",
   },
   vi: {
-    heroTitle: "Sàn vốn linh hoạt cho doanh nghiệp vừa và nhỏ",
+    heroTitle: "Sàn vốn linh hoạt cho doanh nghiệp vừa và nhỏ tại Việt Nam",
     heroSubtitle:
-      "FundLok giúp các doanh nghiệp vừa và nhỏ tiếp cận vốn vay với việc trả nợ được điều chỉnh theo doanh thu thực tế, được hỗ trợ bởi dữ liệu, AI và hạ tầng nhà đầu tư minh bạch trên chuỗi.",
+      "FundLok thu xếp nguồn vốn cho doanh nghiệp vừa và nhỏ tại Việt Nam: nhà đầu tư là bên cấp vốn, khoản hoàn trả là một số tiền cố định mỗi ngày làm việc, và tổng số tiền phải trả được ấn định ngay khi ký. Nếu doanh thu được xác minh thấp hơn dự kiến, nghĩa vụ của kỳ đó giảm xuống và thời gian kéo dài thêm — không bao giờ tăng lên.",
     navProduct: "SẢN PHẨM",
     navProcess: "QUY TRÌNH",
     navContact: "LIÊN HỆ",
@@ -102,18 +102,21 @@ const dict = {
 };
 
 export const metadata: Metadata = {
-  title: "FundLok | Flexible Capital Platform for SMEs",
+  title: "FundLok | Flexible Capital Platform for SMEs in Vietnam",
   description:
-    "FundLok connects investors with SMEs through a technology-led financing platform, using data and AI to support flexible funding aligned with real business needs.",
+    "Funding for SMEs in Vietnam: investors provide the capital, businesses repay a fixed amount each business day, and the total is fixed at signing. FundLok is not a bank.",
   keywords: [
     "FundLok",
+    "funding for SMEs in Vietnam",
+    "SME funding Vietnam",
+    "MSME funding Vietnam",
+    "business funding Vietnam",
     "SME funding",
     "private credit",
     "flexible capital",
     "on-chain credit",
     "investor portal",
     "flexible funding",
-    "AI credit scoring",
     "Loc Vuong",
     "Huy Pham",
     "Edward Wong",
@@ -124,17 +127,17 @@ export const metadata: Metadata = {
     "FundLok founders",
   ],
   openGraph: {
-    title: "FundLok | Flexible Capital Platform for SMEs",
+    title: "FundLok | Flexible Capital Platform for SMEs in Vietnam",
     description:
-      "FundLok connects investors with SMEs through a technology-led financing platform, using data and AI to support flexible funding aligned with real business needs.",
+      "Funding for SMEs in Vietnam: investors provide the capital, businesses repay a fixed amount each business day, and the total is fixed at signing. FundLok is not a bank.",
     type: "website",
     siteName: "FundLok",
   },
   twitter: {
     card: "summary_large_image",
-    title: "FundLok | Flexible Capital Platform for SMEs",
+    title: "FundLok | Flexible Capital Platform for SMEs in Vietnam",
     description:
-      "FundLok connects investors with SMEs through a technology-led financing platform, using data and AI to support flexible funding aligned with real business needs.",
+      "Funding for SMEs in Vietnam: investors provide the capital, businesses repay a fixed amount each business day, and the total is fixed at signing. FundLok is not a bank.",
   },
 };
 

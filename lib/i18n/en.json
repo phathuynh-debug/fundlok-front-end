@@ -1018,12 +1018,14 @@
       "a4": "FundLok is built to automate key parts of onboarding, assessment, offer handling, funding flows, and repayment tracking. This helps improve speed, consistency, and transparency.",
       "a5": "FundLok is built with security, controlled access, and data protection as core priorities. Platform processes are designed to support secure onboarding, transaction handling, and information management.",
       "a6": "No. All funding and investment activity involves eligibility review, structuring, and risk. FundLok improves access, process, and transparency, but it does not eliminate business or repayment risk. Fundings are based on investors' decisions, over which FundLok has no control.",
+      "a7": "Yes. FundLok arranges funding for SMEs in Vietnam. Investors provide the capital and the credit agreement is between the investor and the business — FundLok is not a bank, is not a lender, and does not lend its own money. A business declares a term of 6 or 12 months, repays a fixed amount each business day, and the total repayable is fixed at signing. If verified revenue falls short over a period, the obligation for that period drops and the facility runs longer; it never rises.",
       "q1": "What is FundLok?",
       "q2": "How is FundLok different from a traditional loan?",
       "q3": "Is FundLok a bank?",
       "q4": "How does FundLok use technology in its process?",
       "q5": "Is FundLok secure?",
       "q6": "Does FundLok guarantee funding or returns?",
+      "q7": "Does FundLok provide funding for SMEs in Vietnam?",
       "title": "General Questions"
     },
     "investor": {

@@ -100,7 +100,14 @@ export default async function RootLayout({
     url: SITE_URL,
     logo: `${SITE_URL}/logo/image.png`,
     description:
-      "FundLok connects investors with SMEs through a technology-led financing platform, using data and AI to support flexible funding.",
+      "FundLok arranges funding for SMEs in Vietnam. Investors provide the capital and the credit agreement is between the investor and the business; FundLok is not a bank and does not lend its own money.",
+    // Geography is the half of "funding for SMEs in Vietnam" the site never
+    // stated. The postal address alone leaves it implied, not asserted.
+    areaServed: {
+      "@type": "Country",
+      name: "Vietnam",
+    },
+    knowsLanguage: ["vi", "en"],
     telephone: "094 371 13 82",
     address: {
       "@type": "PostalAddress",
@@ -109,7 +116,11 @@ export default async function RootLayout({
       addressRegion: "Hồ Chí Minh",
       addressCountry: "VN",
     },
-    sameAs: ["https://www.linkedin.com/company/fundlok"],
+    sameAs: [
+      "https://www.linkedin.com/company/fundlok",
+      "https://www.facebook.com/profile.php?id=61579474545924",
+      "https://www.instagram.com/fundlokvn/",
+    ],
   };
 
   return (

@@ -14,12 +14,15 @@ import {
 } from "@/components/ui/accordion";
 import { BackgroundBlobs } from "@/components/background-blobs";
 import { useTranslations } from "@/lib/i18n";
+import {
+  FAQ_CATEGORIES,
+  faqQuestionNumbers,
+  type FaqCategory,
+} from "@/lib/faq-questions";
 import { cn } from "@/lib/utils";
 
-const QUESTIONS_PER_CATEGORY = 6;
-
-const CATEGORIES = ["general", "msme", "investor"] as const;
-type CategoryKey = (typeof CATEGORIES)[number];
+const CATEGORIES = FAQ_CATEGORIES;
+type CategoryKey = FaqCategory;
 
 const sectionId = (key: CategoryKey) => `faq-${key}`;
 
@@ -121,10 +124,7 @@ export default function FaqClient() {
               </h2>
 
               <Accordion type="single" collapsible className="w-full">
-                {Array.from(
-                  { length: QUESTIONS_PER_CATEGORY },
-                  (_, i) => i + 1,
-                ).map((n) => (
+                {faqQuestionNumbers(key).map((n) => (
                   <AccordionItem
                     key={n}
                     value={`${key}-${n}`}

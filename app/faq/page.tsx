@@ -1,20 +1,19 @@
 import type { Metadata } from "next";
 import en from "@/lib/i18n/en.json";
+import { FAQ_CATEGORIES, faqQuestionNumbers } from "@/lib/faq-questions";
 import FaqClient from "./faq-client";
 
 // Everything below is derived from the same dictionary the page renders,
 // so metadata and structured data never drift from the visible content.
 const faq = en.faqPage;
-const categories = [faq.general, faq.msme, faq.investor];
 
-const questionNumbers = [1, 2, 3, 4, 5, 6] as const;
-
-const qaPairs = categories.flatMap((category) =>
-  questionNumbers.map((n) => ({
+const qaPairs = FAQ_CATEGORIES.flatMap((key) => {
+  const category = faq[key];
+  return faqQuestionNumbers(key).map((n) => ({
     question: category[`q${n}` as keyof typeof category] as string,
     answer: category[`a${n}` as keyof typeof category] as string,
-  })),
-);
+  }));
+});
 
 // Search engines see every question verbatim in the keywords list.
 const questionKeywords = qaPairs.map(({ question }) => question);
