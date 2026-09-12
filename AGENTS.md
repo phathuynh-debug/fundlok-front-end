@@ -51,8 +51,8 @@ The rules that get people in trouble:
 - **Never use rating language** ("chấm điểm", "credit score") — in **either**
   `en.json` **or** `vi.json`. Say "điểm doanh nghiệp và lãi suất tham khảo".
 - **Never name a custodial bank** — "custodial bank partners", plural and
-  unnamed — and never say "FundLok never holds funds"; say we hold *instruction
-  rights within bank-enforced conditions*.
+  unnamed — and never say "FundLok never holds funds"; say we hold _instruction
+  rights within bank-enforced conditions_.
 - **Never imply we are a bank or a licensed lender**, and never discuss our
   regulatory framework externally.
 - **Investor listings must show** the score, the verified revenue behind it, how

@@ -46,9 +46,12 @@ test("signs an investor in and lets them reach the dashboard", async ({
     .getByLabel(t("auth.login.emailLabel"))
     .fill(STUB_USERS.investor.email);
   await page.getByLabel(t("auth.login.passwordLabel")).fill(STUB_PASSWORD);
-  await page
-    .getByRole("button", { name: t("auth.login.submit"), exact: true })
-    .click();
+  const submitBtn = page.getByRole("button", {
+    name: t("auth.login.submit"),
+    exact: true,
+  });
+  await expect(submitBtn).toBeEnabled();
+  await submitBtn.click();
 
   await expect(toast(page, t("auth.login.successTitle"))).toBeVisible();
 

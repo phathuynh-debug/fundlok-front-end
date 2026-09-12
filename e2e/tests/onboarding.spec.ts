@@ -76,6 +76,7 @@ test.describe("/verify-email", () => {
   });
 
   test("can resend the verification email", async ({ page }) => {
+    await expect(page.getByText("unverified@e2e.test")).toBeVisible();
     await page
       .getByRole("button", { name: t("auth.verifyEmail.resendBtn") })
       .click();

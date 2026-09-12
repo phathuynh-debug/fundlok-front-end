@@ -9,6 +9,12 @@ import type { DocumentKey, DocumentUpload } from "./useLoanApplication";
 // ReviewRow reads everything from context, so we mock the context hook and feed
 // it a controlled value. This is how to unit-test the context-driven components
 // in this folder without standing up the whole provider + React Query.
+vi.mock(
+  "@/app/dashboard/_components/loan-application/LoanApplicationContext",
+  () => ({
+    useLoanApplicationContext: vi.fn(),
+  }),
+);
 vi.mock("./LoanApplicationContext", () => ({
   useLoanApplicationContext: vi.fn(),
 }));

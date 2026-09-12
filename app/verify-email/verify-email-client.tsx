@@ -237,7 +237,7 @@ export function VerifyEmailClient() {
         {/* Resend verification button */}
         <Button
           onClick={handleResend}
-          disabled={isResending}
+          disabled={isResending || isRefreshing || !user?.email}
           variant="outline"
           className="w-full h-11"
         >
