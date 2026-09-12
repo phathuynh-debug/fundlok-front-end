@@ -62,12 +62,11 @@ export interface SmeLoan {
   next_payment_date: string;
   /** Consecutive on-time payments — feeds the behavioral premium. */
   on_time_streak: number;
-  /**
-   * Interest saved by closing the loan today instead of running the full term.
-   * Early repayment is a platform value (see CLAUDE.md), so it is surfaced
-   * rather than buried.
-   */
-  early_repayment_saving: number;
+  // No "interest saved by early repayment" field: Handbook §5.9 fixes the
+  // origination total at signing, and early settlement clears the remaining
+  // total with no rebate. Closing early costs nothing extra and saves nothing
+  // — the amount to settle today is simply the outstanding balance, derived in
+  // deriveRepaymentSummary().
   /** Final grade from the last locked score run, 0-100. */
   grade: number;
 }
@@ -82,7 +81,6 @@ export const MOCK_SME_LOAN: SmeLoan = {
   next_payment: 98_436_421,
   next_payment_date: "2026-09-05",
   on_time_streak: 5,
-  early_repayment_saving: 27_400_000,
   grade: 70.98,
 };
 

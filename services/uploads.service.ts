@@ -65,15 +65,22 @@ export const DOCUMENT_TYPE_RULES: Record<
   business_registration: { extensions: ["pdf"], maxSizeMb: 25 },
   vat_tax_zip: { extensions: ["zip"], maxSizeMb: 200 },
   financial_report: { extensions: ["pdf"], maxSizeMb: 25 },
-  e_invoice_data: { extensions: ["zip", "xlsx", "csv", "xml"], maxSizeMb: 100 },
+  // Handbook §5.10: the signed XML original is the only e-invoice evidence we
+  // accept — a spreadsheet can be edited and proves nothing, so .xlsx and .csv
+  // are rejected at upload rather than at verification. A .zip is still allowed
+  // as a container for the signed XMLs. The backend mirror
+  // (app/uploads/schemas.py) still lists xlsx/csv and must be tightened too —
+  // it, not this file, is the actual gate.
+  e_invoice_data: { extensions: ["zip", "xml"], maxSizeMb: 100 },
   cic_report: { extensions: ["pdf"], maxSizeMb: 25 },
 };
 
 const CONTENT_TYPES_BY_EXTENSION: Record<string, string[]> = {
   pdf: ["application/pdf"],
   zip: ["application/zip", "application/x-zip-compressed"],
-  xlsx: ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
-  csv: ["text/csv"],
+  // No xlsx/csv entry: no document type accepts a spreadsheet any more, and
+  // resolveContentType() returning null for one is what makes the rejection
+  // stick rather than falling through to a guessed type.
   xml: ["application/xml", "text/xml"],
 };
 

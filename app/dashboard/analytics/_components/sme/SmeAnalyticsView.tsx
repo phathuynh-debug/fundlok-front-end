@@ -86,12 +86,17 @@ export function SmeAnalyticsView() {
       valueClassName: "text-foreground",
     },
     {
-      key: "earlySaving",
-      label: t("dashboard.smeAnalytics.kpi.earlySaving"),
-      value: formatCurrency(MOCK_SME_LOAN.early_repayment_saving, locale),
-      hint: t("dashboard.smeAnalytics.kpi.earlySavingHint"),
+      // Was "Save by repaying early", showing interest avoided by closing
+      // today. Handbook §5.9: the origination total is fixed at signing and
+      // early settlement clears the remaining total with NO rebate — the
+      // benefit is "no prepayment penalty", never "pay early, pay less". The
+      // tile now shows what it actually costs to close today, and says so.
+      key: "earlyPayoff",
+      label: t("dashboard.smeAnalytics.kpi.earlyPayoff"),
+      value: formatCurrency(summary.outstanding, locale),
+      hint: t("dashboard.smeAnalytics.kpi.earlyPayoffHint"),
       icon: ShieldCheck,
-      valueClassName: "text-emerald-600 dark:text-emerald-400",
+      valueClassName: "text-foreground",
     },
   ];
 

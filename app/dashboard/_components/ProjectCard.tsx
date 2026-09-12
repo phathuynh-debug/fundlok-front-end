@@ -140,9 +140,11 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                     <span>{t("dashboard.projectCard.hotDeal")}</span>
                   </Badge>
                 )}
-                <Badge className="bg-primary text-primary-foreground font-mono text-[10px] uppercase font-bold tracking-wider rounded-full px-2.5 py-0.5 border-none">
-                  {t("dashboard.projectCard.lowRisk")}
-                </Badge>
+                {/* No "Low Risk" badge: it was hardcoded on every listing
+                    regardless of the grade, which is a blanket risk claim we
+                    cannot support (Handbook §3.4, §8). The grade badge below
+                    carries the assessment, and the investor draws their own
+                    conclusion from it. */}
                 <Badge
                   variant="outline"
                   className="bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-zinc-300 dark:border-zinc-700 font-mono text-[10px] uppercase font-bold tracking-wider rounded-full px-2.5 py-0.5"
@@ -230,7 +232,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                 </span>
                 {durationMonths !== undefined && (
                   <span className="text-[11px] font-medium text-muted-foreground font-mono">
-                    {t("dashboard.projectCard.monthlyAmortized")}
+                    {t("dashboard.projectCard.dailyRepayment")}
                   </span>
                 )}
               </div>
@@ -253,10 +255,19 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                     ? t("dashboard.projectCard.pendingGrading")
                     : `${expectedRoiPct.toFixed(1)}%`}
                 </span>
+                {/* Handbook §5.13 / §8: a projected return is never presented
+                    as a promise. The figure is labelled a target and carries
+                    the disclaimer inline — an investor must not be able to read
+                    it as a fixed or guaranteed yield. */}
                 {expectedRoiPct !== undefined && (
-                  <span className="text-[10px] font-medium text-emerald-700/80 dark:text-emerald-300/80 font-mono">
-                    {t("dashboard.projectCard.annualizedReturn")}
-                  </span>
+                  <>
+                    <span className="text-[10px] font-medium text-emerald-700/80 dark:text-emerald-300/80 font-mono">
+                      {t("dashboard.projectCard.annualizedReturn")}
+                    </span>
+                    <span className="text-[10px] font-medium text-muted-foreground">
+                      {t("dashboard.projectCard.notGuaranteed")}
+                    </span>
+                  </>
                 )}
               </div>
             </>
@@ -357,11 +368,17 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800/80 px-2.5 py-1 rounded-md border border-zinc-200/70 dark:border-zinc-700/60">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              {t("dashboard.projectCard.assetBacked")}
+              {/* Was "Asset-Backed" — untrue and unsayable: we finance
+                  without hard collateral, and the tag implied a security
+                  behind the facility (Handbook §2, §8). The real basis is
+                  verified revenue. */}
+              {t("dashboard.projectCard.verifiedRevenue")}
             </span>
             <span className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800/80 px-2.5 py-1 rounded-md border border-zinc-200/70 dark:border-zinc-700/60">
               <TrendingUp className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              {t("dashboard.projectCard.monthlyAmortized")}
+              {/* Repayment is a fixed amount every business day, not a
+                  monthly amortising schedule (Handbook §5.4). */}
+              {t("dashboard.projectCard.dailyRepayment")}
             </span>
             <span className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800/80 px-2.5 py-1 rounded-md border border-zinc-200/70 dark:border-zinc-700/60">
               <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />

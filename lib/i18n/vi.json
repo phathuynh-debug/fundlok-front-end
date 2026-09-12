@@ -103,7 +103,7 @@
       "networkSubtitle": "SME đã xác thực và nhà đầu tư được công nhận",
       "networkTitle": "Mạng lưới đáng tin cậy",
       "securitySubtitle": "Dữ liệu của bạn được mã hóa và bảo vệ",
-      "securityTitle": "Bảo mật chuẩn ngân hàng",
+      "securityTitle": "Mã hóa đầu cuối",
       "speedSubtitle": "Kết nối trong vài ngày, không phải vài tháng",
       "speedTitle": "Quy trình gọi vốn nhanh"
     },
@@ -348,7 +348,6 @@
       "holdingProgress": "Tiến độ trả nợ",
       "holdingRank": "Hạng #{rank}",
       "holdingReturned": "Đã nhận về",
-      "holdingRiskLow": "Rủi ro thấp",
       "holdingRoi": "Lợi suất / Kỳ hạn",
       "holdingRoiValue": "{rate}% · {months} tháng",
       "holdingStatus": {
@@ -370,11 +369,11 @@
       "weightedRoi": "Lợi suất kỳ vọng TB"
     },
     "projectCard": {
-      "annualizedReturn": "Lợi suất cố định/năm",
+      "annualizedReturn": "Lợi suất mục tiêu/năm",
       "askingAmount": "Số tiền cần huy động",
-      "assetBacked": "Đảm bảo tài sản",
       "backers": "{count} Nhà đầu tư",
       "created": "Tạo ngày {date}",
+      "dailyRepayment": "Trả nợ hằng ngày",
       "daysLeft": "Còn {count} ngày",
       "duration": "Thời hạn",
       "edit": "Chỉnh sửa",
@@ -387,11 +386,10 @@
       "invest": "Đầu tư",
       "loanPurpose": "Mục đích vay",
       "location": "Vị trí",
-      "lowRisk": "Rủi ro thấp",
       "minTicket": "Tối thiểu: {amount}",
-      "monthlyAmortized": "Gốc + lãi hàng tháng",
       "months": "{count} tháng",
       "noLoanPurpose": "Chưa cung cấp",
+      "notGuaranteed": "Mục tiêu, không phải cam kết",
       "pending": "Chưa có",
       "pendingGrading": "Chờ xếp hạng",
       "raisedOfTarget": "Đã gọi {raised} / {target}",
@@ -400,6 +398,7 @@
         "draft": "BẢN NHÁP"
       },
       "taxId": "Mã số thuế",
+      "verifiedRevenue": "Doanh thu đã xác minh",
       "verifiedSme": "SME đã xác thực",
       "viewDetails": "Xem chi tiết dự án"
     },
@@ -412,7 +411,6 @@
       "grade": "Hạng A+",
       "investment": "Đầu tư",
       "loading": "Đang tải chi tiết dự án...",
-      "lowRisk": "Rủi ro thấp",
       "riskAssessment": "Đánh giá rủi ro"
     },
     "projects": {
@@ -893,14 +891,14 @@
       "kpi": {
         "costOfCapital": "Chi phí khoản vay",
         "costOfCapitalHint": "Tổng lãi ở mức {rate}% trong {months} tháng",
-        "earlySaving": "Tiết kiệm khi trả sớm",
-        "earlySavingHint": "Số lãi bạn không phải trả nếu tất toán hôm nay",
+        "earlyPayoff": "Tất toán sớm",
+        "earlyPayoffHint": "Số tiền để tất toán khoản này hôm nay. Không có phí trả trước — tổng số tiền phải trả không thay đổi.",
         "nextPayment": "Kỳ trả tiếp theo",
         "nextPaymentHint": "Đến hạn {date}",
         "outstanding": "Còn phải trả",
         "outstandingHint": "Đã trả {percent}% khoản vay"
       },
-      "mockNotice": "Dữ liệu mẫu, hiển thị trong lúc trang này còn được hoàn thiện. Trang chưa kết nối backend — chưa có module lịch trả nợ và engine xếp hạng chưa được nối vào các lần chấm điểm, nên các số liệu này không phản ánh khoản vay thật của bạn.",
+      "mockNotice": "Dữ liệu mẫu, hiển thị trong lúc trang này còn được hoàn thiện. Trang chưa kết nối backend — chưa có module lịch trả nợ và engine xếp hạng chưa được nối vào các lần tính điểm doanh nghiệp, nên các số liệu này không phản ánh khoản vay thật của bạn.",
       "overCeiling": "Tháng trước, khoản trả nợ chiếm {percent}% doanh thu, cao hơn mức {ceiling}% mà chúng tôi cho là an toàn. Hãy trao đổi với chúng tôi về việc gia hạn nếu điều này gây áp lực cho hoạt động của bạn.",
       "progress": {
         "label": "Đã trả đến nay",
@@ -1020,14 +1018,14 @@
     "investor": {
       "a1": "Nhà đầu tư hoàn tất quy trình onboarding và xác minh có thể tiếp cận các cơ hội trên nền tảng, theo cấu trúc và yêu cầu áp dụng. Số vốn đầu tư có thể bắt đầu chỉ từ 10.000.000 VND.",
       "a2": "Nhà đầu tư đã xác minh có thể xem các dự án đang niêm yết, đánh giá các cơ hội được cấu trúc sẵn và tham gia thông qua quy trình cấp vốn của nền tảng.",
-      "a3": "Vốn của nhà đầu tư được xử lý thông qua cấu trúc cấp vốn có kiểm soát và chỉ được sử dụng cho các mục đích tài trợ MSME đã được phê duyệt.",
-      "a4": "FundLok được thiết kế với cơ chế điều phối dòng tiền có kiểm soát, minh bạch giao dịch và các biện pháp an toàn vận hành nhằm hỗ trợ quy trình cấp vốn an toàn và minh bạch.",
+      "a3": "Tiền được giữ tại các đối tác ngân hàng lưu ký. Dòng tiền chỉ đi theo hai hướng: tới tài khoản SME đã xác minh theo một hợp đồng đã ký, hoặc quay về chính nhà đầu tư đã chuyển. Tiền không bao giờ chuyển vào tài khoản của FundLok.",
+      "a4": "FundLok không sở hữu tiền của nhà đầu tư và không có quyền sử dụng số tiền đó — chúng tôi chỉ có quyền ra lệnh trong các điều kiện do ngân hàng lưu ký thực thi. Hợp đồng tín dụng là giữa nhà đầu tư và SME; FundLok không phải là một bên của hợp đồng, và nhà đầu tư chịu rủi ro tín dụng nếu doanh nghiệp không đạt kỳ vọng.",
       "a5": "Khi MSME trả nợ thông qua cấu trúc vận hành của nền tảng, dòng tiền được điều phối và theo dõi theo quy trình phân bổ và trả nợ áp dụng. Nhà đầu tư có thể yêu cầu giải ngân bất kỳ lúc nào, với thời gian xử lý 1 ngày.",
       "a6": "Nhà đầu tư có thể theo dõi hoạt động cấp vốn, tiến độ trả nợ và các giao dịch liên quan thông qua lớp công nghệ của nền tảng.",
       "q1": "Ai có thể đầu tư qua FundLok?",
       "q2": "Nhà đầu tư tham gia như thế nào?",
       "q3": "Tiền của nhà đầu tư đi về đâu?",
-      "q4": "Vốn của nhà đầu tư được bảo vệ như thế nào?",
+      "q4": "Tiền của nhà đầu tư được giữ ở đâu và ai chịu rủi ro?",
       "q5": "Nhà đầu tư nhận lại tiền trả nợ ra sao?",
       "q6": "Nhà đầu tư có thể theo dõi gì trên FundLok?",
       "title": "Dành cho nhà đầu tư"
@@ -1116,14 +1114,6 @@
       "title": "Tiến độ lợi nhuận"
     },
     "risk": {
-      "afterPrincipal": "Sau khi gốc được trả",
-      "everyTwoWeeks": "Mỗi 2 tuần",
-      "howItWorks": "SME chia sẻ 8,5% doanh thu hằng ngày cho đến khi khoản gốc được hoàn trả. Sau đó, tỷ lệ giảm còn 2%. Cần thanh toán tối thiểu 30.000.000 VND mỗi 2 tuần để đảm bảo lợi nhuận ổn định.",
-      "howItWorksTitle": "Cách hoạt động:",
-      "minimumBiweekly": "Tối thiểu hai tuần",
-      "postPrincipalRate": "Tỷ lệ sau khi trả gốc",
-      "primaryRate": "Tỷ lệ chính",
-      "revenueShareTerms": "Điều khoản chia sẻ doanh thu",
       "riskItems": [
         "Sự hiện diện thị trường còn hạn chế ngoài khu vực chính",
         "Phụ thuộc vào các khách hàng chủ chốt cho 40% doanh thu"
@@ -1137,12 +1127,11 @@
         "Chi phí thu hút khách hàng thấp so với giá trị vòng đời"
       ],
       "strengths": "Điểm mạnh",
-      "subtitle": "Phân tích của chúng tôi dẫn đến hạng A+ và ROI kỳ vọng 10,2%",
-      "title": "Đánh giá rủi ro FundLok",
-      "untilPrincipal": "Cho đến khi gốc được trả"
+      "subtitle": "Phân tích của chúng tôi đằng sau điểm doanh nghiệp và lãi suất tham khảo tương ứng. Các con số là mục tiêu, không phải cam kết, và nhà đầu tư chịu rủi ro tín dụng.",
+      "title": "Đánh giá rủi ro FundLok"
     },
     "tab": {
-      "agreement": "Khi đầu tư, bạn đồng ý gửi tiền vào tài khoản nền tảng an toàn của chúng tôi",
+      "agreement": "Khi đầu tư, bạn đồng ý rằng tiền được giữ tại các đối tác ngân hàng lưu ký. FundLok không sở hữu số tiền này và không có quyền sử dụng cho mục đích riêng — chúng tôi chỉ có quyền ra lệnh trong các điều kiện do ngân hàng thực thi.",
       "enterAmount": "Nhập số tiền bạn muốn đầu tư vào cơ hội này",
       "funded": "Đã tài trợ",
       "fundingProgress": "Tiến độ gọi vốn",
@@ -1504,13 +1493,13 @@
       "fittingItem3": "Hệ thống tự động, trực quan & có tính hợp tác cao",
       "fittingTitle": "Phù hợp với từng SME",
       "header": "Tại sao FundLok đặc biệt?",
-      "safetyDesc": "Cơ chế bảo vệ mạnh mẽ và cấu trúc mang lại lợi nhuận tự tin.",
-      "safetyItem1": "Thu nhập ổn định, hàng ngày",
+      "safetyDesc": "Cấp vốn được phân hạng rủi ro với dòng trả nợ được giám sát. Lợi nhuận là mục tiêu, không phải cam kết, và nhà đầu tư chịu rủi ro tín dụng.",
+      "safetyItem1": "Thu nợ vào mỗi ngày làm việc",
       "safetyItem2": "Thông tin minh bạch, rõ ràng và có tính kiểm toán cao",
-      "safetyItem3": "Lãi suất được hoàn trả lũy tiến phụ thuộc vào hiệu suất của SME",
-      "safetyTitle": "An toàn cho Nhà đầu tư",
+      "safetyItem3": "Khi doanh thu sụt giảm, nghĩa vụ kỳ đó giảm và thời hạn kéo dài — tổng số tiền phải trả không tăng",
+      "safetyTitle": "Minh bạch cho Nhà đầu tư",
       "transparencyDesc": "Vận hành không cần trung gian tin cậy, thúc đẩy bởi đầu vào dữ liệu chuẩn và xác thực tự động.",
-      "transparencyItem1": "Đọc tài liệu, đánh giá khoản vay và tính toán lãi suất tự động 100%",
+      "transparencyItem1": "Đọc tài liệu, đánh giá khoản vay và tính lãi được tự động hóa",
       "transparencyItem2": "Dữ liệu gửi lên phải từ các nguồn đã được xác thực để bảo vệ tất cả các bên",
       "transparencyItem3": "Báo cáo tài chính doanh nghiệp & đánh giá sức khỏe khoản vay theo thời gian thực",
       "transparencyTitle": "Minh bạch, Công khai, Tự động"

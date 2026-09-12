@@ -126,9 +126,9 @@ export default function ProjectDetailsClient() {
                 {displayName}
               </h1>
               <div className="flex items-center gap-2">
-                <Badge className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-3 py-0.5 text-xs font-semibold">
-                  {t("dashboard.projectDetails.lowRisk")}
-                </Badge>
+                {/* No "Low Risk" badge — it was hardcoded on every project and
+                    is a blanket risk claim we cannot support (Handbook §3.4,
+                    §8). The grade badge carries the assessment. */}
                 <Badge
                   variant="outline"
                   className="bg-background text-foreground rounded-full px-3 py-0.5 text-xs font-semibold border-muted"

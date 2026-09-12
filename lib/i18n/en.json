@@ -103,7 +103,7 @@
       "networkSubtitle": "Verified SMEs and accredited investors",
       "networkTitle": "Trusted network",
       "securitySubtitle": "Your data is encrypted and protected",
-      "securityTitle": "Bank-grade security",
+      "securityTitle": "Encrypted end to end",
       "speedSubtitle": "Get matched within days, not months",
       "speedTitle": "Fast funding process"
     },
@@ -348,7 +348,6 @@
       "holdingProgress": "Repayment progress",
       "holdingRank": "Rank #{rank}",
       "holdingReturned": "Returned",
-      "holdingRiskLow": "Low Risk",
       "holdingRoi": "Yield / Term",
       "holdingRoiValue": "{rate}% · {months}m",
       "holdingStatus": {
@@ -370,11 +369,11 @@
       "weightedRoi": "Avg. Expected Yield"
     },
     "projectCard": {
-      "annualizedReturn": "Fixed Annual Rate",
+      "annualizedReturn": "Target annual rate",
       "askingAmount": "Asking amount",
-      "assetBacked": "Asset-Backed",
       "backers": "{count} Investors",
       "created": "Created {date}",
+      "dailyRepayment": "Daily repayment",
       "daysLeft": "{count} days left",
       "duration": "Duration",
       "edit": "Edit",
@@ -387,11 +386,10 @@
       "invest": "Invest",
       "loanPurpose": "Loan purpose",
       "location": "Location",
-      "lowRisk": "Low Risk",
       "minTicket": "Min: {amount}",
-      "monthlyAmortized": "Monthly P+I",
       "months": "{count} months",
       "noLoanPurpose": "Not specified",
+      "notGuaranteed": "Target, not guaranteed",
       "pending": "Pending",
       "pendingGrading": "Pending grading",
       "raisedOfTarget": "{raised} raised of {target}",
@@ -400,6 +398,7 @@
         "draft": "DRAFT"
       },
       "taxId": "Tax ID",
+      "verifiedRevenue": "Verified revenue",
       "verifiedSme": "Verified SME",
       "viewDetails": "View Project Details"
     },
@@ -412,7 +411,6 @@
       "grade": "Grade A+",
       "investment": "Investment",
       "loading": "Loading project details...",
-      "lowRisk": "Low Risk",
       "riskAssessment": "Risk Assessment"
     },
     "projects": {
@@ -893,8 +891,8 @@
       "kpi": {
         "costOfCapital": "Cost of this loan",
         "costOfCapitalHint": "Total interest at {rate}% over {months} months",
-        "earlySaving": "Save by repaying early",
-        "earlySavingHint": "Interest you avoid by closing today",
+        "earlyPayoff": "Pay off early",
+        "earlyPayoffHint": "Amount to clear this facility today. No prepayment penalty — the total repayable does not change.",
         "nextPayment": "Next payment",
         "nextPaymentHint": "Due {date}",
         "outstanding": "Still owed",
@@ -1020,14 +1018,14 @@
     "investor": {
       "a1": "Investors who complete the required onboarding and verification process may access opportunities available on the platform, subject to the applicable structure and requirements. Funding can start from as small as VND 10,000,000.",
       "a2": "Verified investors can browse available listings, review structured opportunities, and participate through the platform's funding process.",
-      "a3": "Investor funds are intended to be handled through a controlled funding structure and used only for approved MSME financing purposes.",
-      "a4": "FundLok is designed with controlled fund routing, transaction visibility, and operational safeguards to support a secure and transparent funding process.",
+      "a3": "Funds sit with our custodial bank partners. Money moves in only two directions: to a verified SME account against a signed agreement, or back to the investor who sent it. It never moves into a FundLok account.",
+      "a4": "FundLok does not own investor funds and cannot draw on them — we hold instruction rights within conditions the custodial bank enforces. The credit agreement is between the investor and the SME; FundLok is not a party to it, and the investor bears the credit risk if a business underperforms.",
       "a5": "As MSME repayments are made through the platform's servicing structure, funds are routed and tracked according to the applicable repayment and allocation process. Investors can request a disbursement anytime, with a processing time of 1 day.",
       "a6": "Investors are intended to have visibility into funding activity, repayment progress, and relevant transaction tracking through the platform's technology layer.",
       "q1": "Who can invest through FundLok?",
       "q2": "How do investors participate?",
       "q3": "Where do investor funds go?",
-      "q4": "How are investor funds protected and secured?",
+      "q4": "How are investor funds held, and who bears the risk?",
       "q5": "How do investors receive repayments?",
       "q6": "What can investors track on FundLok?",
       "title": "For Investors"
@@ -1116,14 +1114,6 @@
       "title": "Return Progress"
     },
     "risk": {
-      "afterPrincipal": "After principal paid",
-      "everyTwoWeeks": "Every 2 weeks",
-      "howItWorks": "The SME shares 8.5% of their daily revenue until the principal is repaid. After that, the rate drops to 2%. A minimum payment of 30,000,000 VND is required every 2 weeks to ensure consistent returns.",
-      "howItWorksTitle": "How it works:",
-      "minimumBiweekly": "Minimum Bi-weekly",
-      "postPrincipalRate": "Post-Principal Rate",
-      "primaryRate": "Primary Rate",
-      "revenueShareTerms": "Revenue Share Terms",
       "riskItems": [
         "Limited market presence outside primary region",
         "Dependence on key clients for 40% of revenue"
@@ -1137,12 +1127,11 @@
         "Low customer acquisition cost relative to lifetime value"
       ],
       "strengths": "Strengths",
-      "subtitle": "Our analysis leading to the A+ grade and 10.2% expected ROI",
-      "title": "FundLok Risk Assessment",
-      "untilPrincipal": "Until principal paid"
+      "subtitle": "Our analysis behind this business score and the reference rate it sets. Figures are targets, not guarantees, and the investor bears the credit risk.",
+      "title": "FundLok Risk Assessment"
     },
     "tab": {
-      "agreement": "By investing, you agree to deposit funds into our secure platform account",
+      "agreement": "By investing, you agree that funds are held by our custodial bank partners. FundLok does not own them and cannot draw on them — we hold instruction rights within conditions the bank enforces.",
       "enterAmount": "Enter the amount you wish to invest in this opportunity",
       "funded": "Funded",
       "fundingProgress": "Funding Progress",
@@ -1504,13 +1493,13 @@
       "fittingItem3": "Automatic, intuitive & highly collaborative system",
       "fittingTitle": "Fitting to each SME",
       "header": "Why is FundLok special?",
-      "safetyDesc": "Robust protection mechanisms and structure to deliver confident returns.",
-      "safetyItem1": "Stable, daily income",
+      "safetyDesc": "Risk-graded financing with monitored repayment. Returns are targets, not guarantees, and the investor bears the credit risk.",
+      "safetyItem1": "Repayment collected every business day",
       "safetyItem2": "Transparent, clear, and highly auditable information",
-      "safetyItem3": "Interest repaid progressively depending on SME's performance",
-      "safetyTitle": "Safety for Investors",
+      "safetyItem3": "When revenue falls short the period obligation drops and the term extends — the total owed never rises",
+      "safetyTitle": "Visibility for Investors",
       "transparencyDesc": "Trust-free operation driven by standard data inputs and automated verification.",
-      "transparencyItem1": "Documents reading, loan assessment, and interest calculations are 100% automatic",
+      "transparencyItem1": "Document reading, loan assessment and interest calculation are automated",
       "transparencyItem2": "Data submitted must be from verified sources to protect all parties",
       "transparencyItem3": "Real-time business financial report & loan health assessment",
       "transparencyTitle": "Transparent, Public, Automatic"
