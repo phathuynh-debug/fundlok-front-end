@@ -322,7 +322,7 @@ export function AchievementsCarousel({
                   alt="Enlarged Achievement Photo"
                   fill
                   className={`object-contain transition-transform duration-300 ${
-                    lightboxImage.includes("sustainability-action")
+                    lightboxImage.includes("sustainability-action-2")
                       ? "rotate-270 scale-[0.75]"
                       : ""
                   }`}
