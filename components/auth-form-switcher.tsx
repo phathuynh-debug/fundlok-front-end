@@ -102,24 +102,52 @@ export function AuthFormSwitcher({ initialMode }: AuthFormSwitcherProps) {
                   {isLogin ? (
                     <>
                       {t("auth.switcher.dontHaveAccount")}{" "}
-                      <button
-                        type="button"
-                        onClick={() => switchTo("register")}
+                      {/* A real href, not a bare button. This switch is an
+                          in-place animation that rewrites the URL, so a
+                          crawler previously saw no path at all from /login to
+                          /register — and a reader could not open it in a new
+                          tab. The click is intercepted for the normal case and
+                          left alone when a modifier key means "new tab". */}
+                      <a
+                        href="/register"
+                        onClick={(event) => {
+                          if (
+                            event.metaKey ||
+                            event.ctrlKey ||
+                            event.shiftKey ||
+                            event.altKey
+                          ) {
+                            return;
+                          }
+                          event.preventDefault();
+                          switchTo("register");
+                        }}
                         className="text-foreground font-medium underline underline-offset-2 hover:text-accent transition-colors"
                       >
                         {t("auth.switcher.signUp")}
-                      </button>
+                      </a>
                     </>
                   ) : (
                     <>
                       {t("auth.switcher.alreadyHaveAccount")}{" "}
-                      <button
-                        type="button"
-                        onClick={() => switchTo("login")}
+                      <a
+                        href="/login"
+                        onClick={(event) => {
+                          if (
+                            event.metaKey ||
+                            event.ctrlKey ||
+                            event.shiftKey ||
+                            event.altKey
+                          ) {
+                            return;
+                          }
+                          event.preventDefault();
+                          switchTo("login");
+                        }}
                         className="text-foreground font-medium underline underline-offset-2 hover:text-accent transition-colors"
                       >
                         {t("auth.switcher.signIn")}
-                      </button>
+                      </a>
                     </>
                   )}
                 </p>

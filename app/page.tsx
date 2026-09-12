@@ -156,6 +156,8 @@ export default async function Page() {
       logos: [
         {
           src: "/images/partners/sihub.png",
+          width: 1000,
+          height: 1000,
           alt: "Startup and Innovation Hub of Ho Chi Minh City (SIHUB)",
           href: "https://www.sihub.gov.vn/",
           invertOnDark: false,
@@ -167,12 +169,16 @@ export default async function Page() {
       logos: [
         {
           src: "/images/partners/google-cloud-startups.png",
+          width: 850,
+          height: 214,
           alt: "Google Cloud for Startups",
           href: "https://cloud.google.com/startup",
           invertOnDark: false,
         },
         {
           src: "/images/partners/cloudflare-startups.png",
+          width: 815,
+          height: 236,
           alt: "Cloudflare for Startups",
           href: "https://www.cloudflare.com/forstartups/",
           invertOnDark: true,
@@ -258,6 +264,12 @@ export default async function Page() {
                         <img
                           src={logo.src}
                           alt={logo.alt}
+                          // Intrinsic dimensions so the row reserves its space
+                          // before the logos load, instead of reflowing.
+                          width={logo.width}
+                          height={logo.height}
+                          loading="lazy"
+                          decoding="async"
                           className={`max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105 ${
                             logo.invertOnDark
                               ? "dark:brightness-0 dark:invert"
@@ -295,6 +307,10 @@ export default async function Page() {
                 <div className="relative aspect-square w-full rounded-2xl overflow-hidden mb-5 bg-slate-100 dark:bg-slate-800">
                   <img
                     src="/images/huy.png"
+                    width={1076}
+                    height={1280}
+                    loading="lazy"
+                    decoding="async"
                     alt="Huy Pham"
                     className="w-full h-full object-cover"
                   />
@@ -328,6 +344,10 @@ export default async function Page() {
                 <div className="relative aspect-square w-full rounded-2xl overflow-hidden mb-5 bg-slate-100 dark:bg-slate-800">
                   <img
                     src="/images/loc.png"
+                    width={2016}
+                    height={3024}
+                    loading="lazy"
+                    decoding="async"
                     alt="Loc Vuong"
                     className="w-full h-full object-cover"
                   />
@@ -361,6 +381,10 @@ export default async function Page() {
                 <div className="relative aspect-square w-full rounded-2xl overflow-hidden mb-5 bg-slate-100 dark:bg-slate-800">
                   <img
                     src="/images/edward.png"
+                    width={1024}
+                    height={1024}
+                    loading="lazy"
+                    decoding="async"
                     alt="Edward Wong"
                     className="w-full h-full object-cover"
                   />

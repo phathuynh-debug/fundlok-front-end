@@ -51,6 +51,12 @@ export function RegisterClient() {
               </p>
             </div>
 
+            {/* An H2 under the page's single H1: the page had a heading and
+                then a wall of inputs, with no structure between them. */}
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+              {t("auth.switcher.registerSectionTitle")}
+            </h2>
+
             {/* Main registration logic component */}
             <RegistrationForm
               onSuccess={(email) => setRegisteredEmail(email)}
