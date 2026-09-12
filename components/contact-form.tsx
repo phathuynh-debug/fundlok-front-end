@@ -1,19 +1,36 @@
 "use client";
 
 import React, { useState } from "react";
-import { apiClient } from "@/lib/api-client";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useTurnstile } from "@/hooks/use-turnstile";
+import { useSubmitContact } from "@/hooks/use-contact";
+import { CONTACT_PURPOSE_OPTIONS } from "@/lib/constants/contact-purposes";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
+
+// Matches the plain inputs below: the shadcn trigger ships a compact h-9
+// rounded-md control, so the size/radius/padding are overridden rather than
+// letting the select sit a few pixels shorter than its neighbours.
+const SELECT_TRIGGER_CLASS =
+  "w-full rounded-2xl border-border/40 bg-transparent px-4 py-3 text-sm shadow-none " +
+  "data-[size=default]:h-auto data-[placeholder]:text-muted-foreground/60 " +
+  "dark:bg-transparent dark:hover:bg-transparent " +
+  "focus-visible:border-emerald-500 focus-visible:ring-0";
 
 export function ContactForm() {
   const { t, locale } = useTranslations();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [purpose, setPurpose] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
-  const [isPending, setIsPending] = useState(false);
 
   // Cloudflare Turnstile Hook
   const {
@@ -23,9 +40,21 @@ export function ContactForm() {
   } = useTurnstile();
 
   const { toast } = useToast();
+  const submitContact = useSubmitContact();
+  const isPending = submitContact.isPending;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // The trigger is a button, not a <select>, so `required` can't enforce this.
+    if (!purpose) {
+      toast({
+        variant: "destructive",
+        title: t("contactPage.form.purposeRequired"),
+        description: t("contactPage.form.selectPurpose"),
+      });
+      return;
+    }
 
     if (!turnstileToken) {
       toast({
@@ -36,42 +65,44 @@ export function ContactForm() {
       return;
     }
 
-    setIsPending(true);
-
-    try {
-      await apiClient.post("/contact", {
+    submitContact.mutate(
+      {
         name,
         email,
+        purpose,
         subject,
         message,
         turnstile_token: turnstileToken,
-      });
+      },
+      {
+        onSuccess: () => {
+          toast({
+            title: t("contactPage.form.messageSent"),
+            description: t("contactPage.form.inquirySubmitted"),
+          });
 
-      toast({
-        title: t("contactPage.form.messageSent"),
-        description: t("contactPage.form.inquirySubmitted"),
-      });
-
-      // Reset form states
-      setName("");
-      setEmail("");
-      setSubject("");
-      setMessage("");
-      // Reset Turnstile widget visually
-      resetTurnstile();
-    } catch (error: unknown) {
-      toast({
-        variant: "destructive",
-        title: t("contactPage.form.failedToSendMessage"),
-        description:
-          (error as Error)?.message ||
-          (locale === "vi"
-            ? "Đã có lỗi xảy ra. Vui lòng thử lại."
-            : "Something went wrong. Please try again."),
-      });
-    } finally {
-      setIsPending(false);
-    }
+          // Reset form states
+          setName("");
+          setEmail("");
+          setPurpose("");
+          setSubject("");
+          setMessage("");
+          // Reset Turnstile widget visually
+          resetTurnstile();
+        },
+        onError: (error) => {
+          toast({
+            variant: "destructive",
+            title: t("contactPage.form.failedToSendMessage"),
+            description:
+              error?.message ||
+              (locale === "vi"
+                ? "Đã có lỗi xảy ra. Vui lòng thử lại."
+                : "Something went wrong. Please try again."),
+          });
+        },
+      },
+    );
   };
 
   return (
@@ -96,6 +127,21 @@ export function ContactForm() {
           disabled={isPending}
         />
       </div>
+      <Select value={purpose} onValueChange={setPurpose} disabled={isPending}>
+        <SelectTrigger
+          className={SELECT_TRIGGER_CLASS}
+          aria-label={t("contactPage.form.purposePlaceholder")}
+        >
+          <SelectValue placeholder={t("contactPage.form.purposePlaceholder")} />
+        </SelectTrigger>
+        <SelectContent>
+          {CONTACT_PURPOSE_OPTIONS.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {t(`contactPage.form.purposes.${option.labelKey}`)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       <input
         type="text"
         placeholder={t("contactPage.form.subjectPlaceholder")}

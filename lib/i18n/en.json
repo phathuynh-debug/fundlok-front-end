@@ -261,7 +261,18 @@
       "messagePlaceholder": "Message",
       "messageSent": "Message Sent",
       "namePlaceholder": "Name",
+      "purposePlaceholder": "What is this about?",
+      "purposeRequired": "Purpose Required",
+      "purposes": {
+        "investing": "Investing on FundLok",
+        "media": "Media or press",
+        "other": "Something else",
+        "partnership": "Partnership or integration",
+        "smeFunding": "Funding for my business",
+        "support": "Product support"
+      },
       "securityCheckRequired": "Security Check Required",
+      "selectPurpose": "Please choose what your message is about.",
       "sendMessage": "Send Message",
       "sending": "Sending...",
       "subjectPlaceholder": "Subject"

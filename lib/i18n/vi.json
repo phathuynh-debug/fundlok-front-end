@@ -261,7 +261,18 @@
       "messagePlaceholder": "Tin nhắn",
       "messageSent": "Đã gửi tin nhắn",
       "namePlaceholder": "Họ và tên",
+      "purposePlaceholder": "Bạn muốn trao đổi về việc gì?",
+      "purposeRequired": "Vui lòng chọn nội dung",
+      "purposes": {
+        "investing": "Đầu tư trên FundLok",
+        "media": "Báo chí hoặc truyền thông",
+        "other": "Nội dung khác",
+        "partnership": "Hợp tác hoặc tích hợp",
+        "smeFunding": "Nguồn vốn cho doanh nghiệp của tôi",
+        "support": "Hỗ trợ sản phẩm"
+      },
       "securityCheckRequired": "Yêu cầu kiểm tra bảo mật",
+      "selectPurpose": "Hãy chọn nội dung bạn muốn trao đổi.",
       "sendMessage": "Gửi tin nhắn",
       "sending": "Đang gửi...",
       "subjectPlaceholder": "Tiêu đề"

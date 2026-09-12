@@ -53,6 +53,12 @@ export const PROJECT_ENDPOINTS = {
   public: "/projects/public",
 } as const;
 
+// Public marketing contact form. No session needed — the backend gates it on
+// Cloudflare Turnstile instead.
+export const CONTACT_ENDPOINTS = {
+  submit: "/contact",
+} as const;
+
 export const FILES_ENDPOINTS = {
   presign: "/files/presign",
   commit: (fileId: string) => `/files/${fileId}/commit`,
