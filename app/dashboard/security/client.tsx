@@ -24,9 +24,11 @@ import { ProtectionList } from "./_components/ProtectionList";
 import { SecurityPostureCard } from "./_components/SecurityPostureCard";
 import { SessionList } from "./_components/SessionList";
 import { buildProtections, deriveScore } from "./_components/mock-security";
+import { usePasskeys } from "@/hooks/use-authentication";
 import { ChangePasswordDialog } from "./_components/ChangePasswordDialog";
 import { TwoFactorDisableDialog } from "./_components/TwoFactorDisableDialog";
 import { TwoFactorSetupDialog } from "./_components/TwoFactorSetupDialog";
+import { PasskeyDialog } from "./_components/PasskeyDialog";
 
 function SecuritySkeleton() {
   return (
@@ -69,7 +71,7 @@ export default function SecurityClient() {
     useRevokeOtherSessions();
 
   // Sign-in alerts are a real preference; the password row opens a dialog.
-  // 2FA and passkeys have no backend, so buildProtections marks them
+  // 2FA and passkeys are both real now, so buildProtections marks them
   // unavailable rather than pretending they are on.
   const { data: preferences, isLoading: isPrefsLoading } =
     useSecurityPreferences(!isAuthLoading);
@@ -80,14 +82,18 @@ export default function SecurityClient() {
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
   const [totpSetupOpen, setTotpSetupOpen] = useState(false);
   const [totpDisableOpen, setTotpDisableOpen] = useState(false);
+  const [passkeyDialogOpen, setPasskeyDialogOpen] = useState(false);
+
+  const { data: passkeys } = usePasskeys();
 
   const protections = useMemo(
     () =>
       buildProtections(
         preferences?.signin_alerts_enabled ?? false,
         twoFactor?.enabled ?? false,
+        passkeys?.length ?? 0,
       ),
-    [preferences?.signin_alerts_enabled, twoFactor?.enabled],
+    [preferences?.signin_alerts_enabled, twoFactor?.enabled, passkeys?.length],
   );
 
   const score = useMemo(() => deriveScore(protections), [protections]);
@@ -112,6 +118,13 @@ export default function SecurityClient() {
     if (key === "totp") {
       if (twoFactor?.enabled) setTotpDisableOpen(true);
       else setTotpSetupOpen(true);
+      return;
+    }
+    // Passkeys open the same dialog whether or not any are registered: it is
+    // a device list, and "turn off" would mean revoking every one of them at
+    // once, which is never what a single click should do.
+    if (key === "passkey") {
+      setPasskeyDialogOpen(true);
       return;
     }
     if (key !== "loginAlerts") return;
@@ -238,6 +251,11 @@ export default function SecurityClient() {
       <ChangePasswordDialog
         open={passwordDialogOpen}
         onOpenChange={setPasswordDialogOpen}
+      />
+
+      <PasskeyDialog
+        open={passkeyDialogOpen}
+        onOpenChange={setPasskeyDialogOpen}
       />
 
       <TwoFactorSetupDialog

@@ -55,8 +55,8 @@ describe("deriveScore", () => {
 
   it("scores only the protections that are actually on", () => {
     // With alerts off, `password` (25) and the payout lock (20) are the only
-    // "on" rows: 2FA and passkeys are unavailable, not enabled, so they must
-    // not count toward the score. Claiming otherwise was the bug.
+    // "on" rows: 2FA and passkeys are off, not enabled, so they must not
+    // count toward the score. Claiming otherwise was the bug.
     const withoutAlerts = deriveScore(buildProtections(false));
     expect(withoutAlerts).toBe(45);
     expect(scoreBand(withoutAlerts)).toBe("weak");
@@ -72,11 +72,33 @@ describe("deriveScore", () => {
     expect(deriveScore(buildProtections(false, true))).toBe(75);
     expect(scoreBand(deriveScore(buildProtections(false, true)))).toBe("fair");
 
-    // Everything the user can currently turn on: password 25 + payout lock 20
-    // + alerts 10 + 2FA 30 = 85. Passkeys (15) remain unavailable, so 100 is
-    // still unreachable — deliberately, rather than flattering the score.
+    // password 25 + payout lock 20 + alerts 10 + 2FA 30 = 85, with no passkey
+    // registered.
     expect(deriveScore(buildProtections(true, true))).toBe(85);
     expect(scoreBand(deriveScore(buildProtections(true, true)))).toBe("strong");
+  });
+
+  it("counts passkeys once one is actually registered", () => {
+    // The row was hardcoded "unavailable" while there was no WebAuthn
+    // backend. Now it reflects webauthn_credentials, so the last 15 points
+    // are reachable and a fully protected account can actually score 100 —
+    // which the score claimed was possible all along.
+    expect(deriveScore(buildProtections(false, false, 1))).toBe(60);
+    expect(deriveScore(buildProtections(true, true, 1))).toBe(100);
+    expect(scoreBand(deriveScore(buildProtections(true, true, 1)))).toBe(
+      "strong",
+    );
+  });
+
+  it("treats an account with no passkey as off, never unavailable", () => {
+    // "Unavailable" tells a user the feature does not exist. It does now, so
+    // an empty list has to read as "not set up yet" — an invitation, not a
+    // dead end.
+    const passkey = buildProtections(false, false, 0).find(
+      (item) => item.key === "passkey",
+    );
+    expect(passkey?.state).toBe("off");
+    expect(passkey?.toggleable).toBe(true);
   });
 });
 

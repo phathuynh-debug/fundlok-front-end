@@ -29,6 +29,14 @@ export const AUTH_ENDPOINTS = {
   twoFactorEnable: "/auth/2fa/enable",
   twoFactorDisable: "/auth/2fa/disable",
   twoFactorLogin: "/auth/login/2fa",
+  // Passkeys (WebAuthn). The two `passkeyLogin*` routes are reachable without
+  // a session — that is the point of them; everything else requires one.
+  passkeys: "/auth/passkeys",
+  passkeyRegisterOptions: "/auth/passkeys/register/options",
+  passkeyRegisterVerify: "/auth/passkeys/register/verify",
+  passkeyDelete: (id: string) => `/auth/passkeys/${id}`,
+  passkeyLoginOptions: "/auth/passkeys/login/options",
+  passkeyLoginVerify: "/auth/passkeys/login/verify",
 } as const;
 
 export const USER_ENDPOINTS = {

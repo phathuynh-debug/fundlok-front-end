@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   authenticationService,
+  type Passkey,
   isTotpChallenge,
   type DeviceSession,
   type LoginPayload,
@@ -26,6 +27,7 @@ import {
   type SecurityPreferences,
 } from "@/services/users.service";
 import type { ApiError } from "@/lib/types";
+import { createPasskey, getPasskeyAssertion } from "@/lib/passkeys";
 
 // ---------- Query keys ----------
 export const authKeys = {
@@ -35,6 +37,7 @@ export const authKeys = {
   securityPreferences: () => [...authKeys.all, "security-preferences"] as const,
   securityEvents: () => [...authKeys.all, "security-events"] as const,
   twoFactor: () => [...authKeys.all, "two-factor"] as const,
+  passkeys: () => [...authKeys.all, "passkeys"] as const,
 };
 
 // ---------- Mutations ----------
@@ -283,6 +286,83 @@ export function useDisableTwoFactor() {
       // reconciled from the server.
       queryClient.setQueryData(authKeys.twoFactor(), status);
       queryClient.invalidateQueries({ queryKey: authKeys.twoFactor() });
+    },
+  });
+}
+
+// ---------- Passkeys ----------
+
+export function usePasskeys(enabled = true) {
+  return useQuery<Passkey[], ApiError>({
+    queryKey: authKeys.passkeys(),
+    queryFn: () => authenticationService.listPasskeys(),
+    staleTime: 30 * 1000,
+    retry: false,
+    enabled,
+  });
+}
+
+/**
+ * Register a passkey: fetch options, run the browser ceremony, verify.
+ *
+ * All three steps live in one mutation because they are one user action and
+ * the middle step cannot be retried independently — the challenge is consumed
+ * by the attempt, so a retry has to start again from options.
+ *
+ * The ceremony runs against `navigator.credentials`, so this only works in a
+ * secure context (https, or localhost).
+ */
+export function useRegisterPasskey() {
+  const queryClient = useQueryClient();
+
+  return useMutation<Passkey, ApiError | Error, string | undefined>({
+    mutationFn: async (name) => {
+      const options = await authenticationService.passkeyRegisterOptions();
+      const credential = await createPasskey(options);
+      return authenticationService.passkeyRegisterVerify({
+        credential,
+        name: name ?? null,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: authKeys.passkeys() });
+    },
+  });
+}
+
+export function useDeletePasskey() {
+  const queryClient = useQueryClient();
+
+  return useMutation<void, ApiError, string>({
+    mutationFn: (id) => authenticationService.deletePasskey(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: authKeys.passkeys() });
+    },
+  });
+}
+
+/**
+ * Sign in with a passkey. No email, no password — the browser offers whatever
+ * it holds for this site and the server identifies the account from the
+ * credential.
+ *
+ * Seeds `currentUser` from the response so the redirect after sign-in does not
+ * have to wait on a second /users/me round trip.
+ */
+export function usePasskeyLogin() {
+  const queryClient = useQueryClient();
+
+  return useMutation<User, ApiError | Error, boolean | undefined>({
+    mutationFn: async (rememberMe) => {
+      const options = await authenticationService.passkeyLoginOptions();
+      const credential = await getPasskeyAssertion(options);
+      return authenticationService.passkeyLoginVerify({
+        credential,
+        remember_me: rememberMe ?? false,
+      });
+    },
+    onSuccess: (user) => {
+      queryClient.setQueryData(authKeys.currentUser(), user);
     },
   });
 }

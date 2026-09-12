@@ -201,6 +201,44 @@ export const authenticationService = {
     return apiClient.post<TotpStatus>(AUTH_ENDPOINTS.twoFactorDisable, payload);
   },
 
+  // --- Passkeys ---
+  // The *Options calls return the WebAuthn spec's own JSON, which is handed
+  // straight to the browser. Typed loosely on purpose: the shape belongs to
+  // the spec, and restating it here would be a second definition that can
+  // only drift from `lib/passkeys.ts`, which does the actual conversion.
+  listPasskeys() {
+    return apiClient.get<Passkey[]>(AUTH_ENDPOINTS.passkeys);
+  },
+
+  passkeyRegisterOptions() {
+    return apiClient.post<Record<string, unknown>>(
+      AUTH_ENDPOINTS.passkeyRegisterOptions,
+      {},
+    );
+  },
+
+  passkeyRegisterVerify(payload: PasskeyRegisterPayload) {
+    return apiClient.post<Passkey>(
+      AUTH_ENDPOINTS.passkeyRegisterVerify,
+      payload,
+    );
+  },
+
+  deletePasskey(id: string) {
+    return apiClient.delete<void>(AUTH_ENDPOINTS.passkeyDelete(id));
+  },
+
+  passkeyLoginOptions() {
+    return apiClient.post<Record<string, unknown>>(
+      AUTH_ENDPOINTS.passkeyLoginOptions,
+      {},
+    );
+  },
+
+  passkeyLoginVerify(payload: PasskeyLoginPayload) {
+    return apiClient.post<User>(AUTH_ENDPOINTS.passkeyLoginVerify, payload);
+  },
+
   oauthLogin(payload: OAuthLoginPayload) {
     return apiClient.post<OAuthTokenResponse>(
       AUTH_ENDPOINTS.oauthLogin,
@@ -269,3 +307,30 @@ export const authenticationService = {
     );
   },
 };
+
+/**
+ * A registered passkey, as the security screen lists them.
+ *
+ * `device_type` is WebAuthn's own classification: "multi_device" means the
+ * credential syncs (iCloud Keychain, Google Password Manager) and survives
+ * losing the device; "single_device" means it lives on that hardware only.
+ * Worth surfacing — they have very different recovery stories.
+ */
+export interface Passkey {
+  id: string;
+  name: string;
+  device_type?: string | null;
+  backed_up: boolean;
+  created_at?: string | null;
+  last_used_at?: string | null;
+}
+
+export interface PasskeyRegisterPayload {
+  credential: Record<string, unknown>;
+  name?: string | null;
+}
+
+export interface PasskeyLoginPayload {
+  credential: Record<string, unknown>;
+  remember_me?: boolean;
+}

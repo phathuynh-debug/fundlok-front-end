@@ -47,15 +47,17 @@ export interface ProtectionItem {
  *   loginAlerts real  — users.signin_alerts_enabled, toggled through the API
  *   totp        real  — users.totp_enabled, enrolled through /auth/2fa/*; the
  *                       row opens the setup or disable dialog
- *   passkey     none  — needs WebAuthn on both sides
+ *   passkey     real  — webauthn_credentials via /auth/passkeys; the row opens
+ *                       the manage dialog (add a device, remove one)
  *   payoutLock  mock  — deliberately left as-is for now
  *
- * `signinAlertsEnabled` and `totpEnabled` both come from the API, so the list is
- * built per render rather than being a constant.
+ * `signinAlertsEnabled`, `totpEnabled` and `passkeyCount` all come from the
+ * API, so the list is built per render rather than being a constant.
  */
 export function buildProtections(
   signinAlertsEnabled: boolean,
   totpEnabled = false,
+  passkeyCount = 0,
 ): ProtectionItem[] {
   return [
     { key: "password", state: "on", toggleable: false, weight: 25 },
@@ -75,7 +77,16 @@ export function buildProtections(
       toggleable: false,
       weight: 20,
     },
-    { key: "passkey", state: "unavailable", toggleable: false, weight: 15 },
+    // Real now: webauthn_credentials via GET /auth/passkeys. It was hardcoded
+    // "unavailable" while there was no backend; there is one, so the row
+    // reflects the account rather than the roadmap — the same path the 2FA
+    // row took above.
+    {
+      key: "passkey",
+      state: passkeyCount > 0 ? "on" : "off",
+      toggleable: true,
+      weight: 15,
+    },
     {
       key: "loginAlerts",
       state: signinAlertsEnabled ? "on" : "off",

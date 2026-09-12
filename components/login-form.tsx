@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLogin } from "@/app/login/use-login";
 import { Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
+import { PasskeySignInButton } from "@/components/passkey-sign-in-button";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
@@ -150,6 +151,8 @@ export function LoginForm() {
           </div>
         </>
       )}
+
+      <PasskeySignInButton />
 
       <form onSubmit={handleLogin} className="space-y-4">
         <div className="space-y-2">

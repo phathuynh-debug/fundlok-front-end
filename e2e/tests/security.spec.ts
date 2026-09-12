@@ -39,25 +39,37 @@ test("shows the security posture and protection list", async ({ page }) => {
   }
 });
 
-test("never claims passkeys are enabled", async ({ page }) => {
-  // WebAuthn exists on neither side, so this row must read "unavailable" and
-  // its button must be dead. A switch that pretends to arm a security control
-  // is worse than no switch.
+test("offers passkeys as something to set up, not as unavailable", async ({
+  page,
+}) => {
+  // This row asserted "unavailable" with a dead button while WebAuthn existed
+  // on neither side. It exists on both now — /auth/passkeys and the manage
+  // dialog — so pinning it as unavailable would assert the opposite of the
+  // truth. Exactly what happened to two-factor auth, whose assertions moved
+  // to two-factor.spec.ts for the same reason.
   //
-  // Two-factor auth used to be asserted here too. It is real now — enrolment
-  // and the login step-up live in two-factor.spec.ts — so pinning it as
-  // unavailable would assert the opposite of the truth.
+  // The stub account has no passkey registered, so the row reads "off": an
+  // invitation to set one up, not a dead end.
   const row = page.getByRole("listitem").filter({
     hasText: t("dashboard.security.protections.items.passkey"),
   });
   await expect(row).toContainText(
-    t("dashboard.security.protections.state.unavailable"),
+    t("dashboard.security.protections.state.off"),
   );
+
+  const action = row.getByRole("button", {
+    name: t("dashboard.security.protections.action.turnOn"),
+  });
+  await expect(action).toBeEnabled();
+
+  // And it opens the device list rather than toggling a security control in
+  // place — there is nothing a single click could safely turn "on" here.
+  await action.click();
   await expect(
-    row.getByRole("button", {
-      name: t("dashboard.security.protections.action.unavailable"),
+    page.getByRole("dialog").filter({
+      hasText: t("dashboard.security.passkeys.title"),
     }),
-  ).toBeDisabled();
+  ).toBeVisible();
 });
 
 test("offers two-factor auth as something the user can turn on", async ({

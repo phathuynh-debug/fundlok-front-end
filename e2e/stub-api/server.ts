@@ -87,6 +87,35 @@ function readCookie(req: IncomingMessage, name: string): string | null {
 }
 
 /**
+ * Registered passkeys per stub account.
+ *
+ * Reset between specs by `resetStubState`, because unlike the rest of this
+ * server it is mutable — a spec that removes a passkey must not change what
+ * the next one sees.
+ */
+const stubPasskeys = new Map<
+  string,
+  {
+    id: string;
+    name: string;
+    backed_up: boolean;
+    last_used_at: string | null;
+  }[]
+>();
+
+export function seedStubPasskeys(
+  key: string,
+  rows: {
+    id: string;
+    name: string;
+    backed_up: boolean;
+    last_used_at: string | null;
+  }[],
+) {
+  stubPasskeys.set(key, rows);
+}
+
+/**
  * Whether this account has already been through the first-run walkthrough.
  *
  * Driven by a cookie rather than stub state so it stays per-test: the stub is
@@ -321,6 +350,23 @@ const server = createServer(async (req, res) => {
     return detail(res, 401, "Not authenticated");
   }
   const { key, user } = session;
+
+  // --- Passkeys -----------------------------------------------------------
+  // Registration and sign-in need a real authenticator, so those ceremonies
+  // are driven by a Chrome DevTools virtual authenticator in the spec rather
+  // than faked here. What the stub owns is the list the security screen reads.
+  if (path === "/auth/passkeys" && method === "GET") {
+    return json(res, 200, stubPasskeys.get(key) ?? []);
+  }
+  if (path.startsWith("/auth/passkeys/") && method === "DELETE") {
+    const id = path.split("/").pop();
+    stubPasskeys.set(
+      key,
+      (stubPasskeys.get(key) ?? []).filter((p) => p.id !== id),
+    );
+    res.writeHead(204);
+    return res.end();
+  }
 
   if (path === "/users/me" && method === "GET") {
     return json(res, 200, withOnboarding(req, user));

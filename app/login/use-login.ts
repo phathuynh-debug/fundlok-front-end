@@ -42,7 +42,7 @@ async function hydrateCurrentUser(
 // Admins (and system admins) land in the admin area. Users who don't have a
 // role yet must pick one first. Everyone else goes to the dashboard, where
 // middleware further routes SMEs without projects to the application form.
-function landingRouteFor(user?: User | null) {
+export function landingRouteFor(user?: User | null) {
   if (isAdminRole(user?.role)) {
     return "/admin";
   }
