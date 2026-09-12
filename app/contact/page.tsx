@@ -3,7 +3,7 @@ import ContactClient from "./contact-client";
 import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Contact FundLok | Partnerships, Support, and Inquiries",
+  title: "Contact Us — Partnerships, Product and Support",
   description:
     "Reach out to FundLok for partnerships, support, and general inquiries.",
   keywords: [
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     canonical: "/contact",
   },
   openGraph: {
-    title: "Contact FundLok | Partnerships, Support, and Inquiries",
+    title: "Contact Us — Partnerships, Product and Support",
     description:
       "Reach out to FundLok for partnerships, support, and general inquiries.",
     url: "/contact",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Contact FundLok | Partnerships, Support, and Inquiries",
+    title: "Contact Us — Partnerships, Product and Support",
     description:
       "Reach out to FundLok for partnerships, support, and general inquiries.",
   },

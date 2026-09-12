@@ -102,9 +102,10 @@ const dict = {
 };
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/" },
   title: "FundLok | Flexible Capital Platform for SMEs in Vietnam",
   description:
-    "Funding for SMEs in Vietnam: investors provide the capital, businesses repay a fixed amount each business day, and the total is fixed at signing. FundLok is not a bank.",
+    "Funding for SMEs in Vietnam. Investors provide the capital, businesses repay a fixed amount each business day, and the total is fixed at signing.",
   keywords: [
     "FundLok",
     "funding for SMEs in Vietnam",

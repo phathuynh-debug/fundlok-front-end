@@ -3,7 +3,8 @@ import { AuthLayout } from "@/components/auth-layout";
 import { AuthFormSwitcher } from "@/components/auth-form-switcher";
 
 export const metadata: Metadata = {
-  title: "Login",
+  alternates: { canonical: "/login" },
+  title: "Sign in to your SME or investor dashboard",
   description:
     "Sign in to your FundLok portal to manage SME funding requests or your investment portfolio.",
 };

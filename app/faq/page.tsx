@@ -19,12 +19,9 @@ const qaPairs = FAQ_CATEGORIES.flatMap((key) => {
 const questionKeywords = qaPairs.map(({ question }) => question);
 
 const description =
-  "Answers to the most common questions about FundLok: what FundLok is, " +
-  "how it differs from a traditional loan, who can apply for MSME funding, " +
-  "how businesses are assessed and repay, who can invest, and how investor " +
-  "funds are protected, tracked, and repaid.";
+  "How FundLok funding works: who can apply, what documents you need, how your business score sets the rate, how daily repayment works, and who bears the risk.";
 
-const title = "FundLok FAQ | Frequently Asked Questions";
+const title = "FAQ — How funding, scores and repayment work";
 
 export const metadata: Metadata = {
   title,

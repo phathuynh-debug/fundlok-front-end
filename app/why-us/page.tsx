@@ -3,9 +3,10 @@ import { SITE_URL } from "@/lib/site";
 import WhyUsClient from "./why-us-client";
 
 export const metadata: Metadata = {
-  title: "Why Us | FundLok - Vision, Recognitions & Achievements",
+  alternates: { canonical: "/why-us" },
+  title: "Why Us — Our Vision, Recognition and Track Record",
   description:
-    "Discover FundLok's vision and award-winning track record. Recognized by the Australian Government (Sustainability in Action 2024), incubated by SIHUB, and a Top 10 project at the International Blockchain Olympiad 2023. Learn about investor safety, flexible revenue-share terms for SMEs, and automated document processing.",
+    "FundLok's vision for SME funding in Vietnam and the recognition behind it, including a 2024 Australian Government award and incubation by SIHUB.",
   keywords: [
     "FundLok vision",
     "FundLok achievements",
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
     "LENDMI",
   ],
   openGraph: {
-    title: "Why Us | FundLok - Vision, Recognitions & Achievements",
+    title: "Why Us — Our Vision, Recognition and Track Record",
     description:
       "Discover FundLok's vision and award-winning track record — recognized by the Australian Government, incubated by SIHUB, and a Top 10 project at the International Blockchain Olympiad 2023.",
     type: "website",
@@ -36,7 +37,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Why Us | FundLok - Vision, Recognitions & Achievements",
+    title: "Why Us — Our Vision, Recognition and Track Record",
     description:
       "Discover FundLok's vision and award-winning track record — recognized by the Australian Government, incubated by SIHUB, and a Top 10 project at the International Blockchain Olympiad 2023.",
   },
