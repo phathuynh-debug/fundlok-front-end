@@ -93,11 +93,11 @@ export function AuthFormSwitcher({ initialMode }: AuthFormSwitcherProps) {
           ) : (
             <>
               <div className="flex flex-col gap-2">
-                <h2 className="text-2xl lg:text-3xl font-bold text-foreground">
+                <h1 className="text-2xl lg:text-3xl font-bold text-foreground">
                   {isLogin
                     ? t("auth.switcher.welcomeBack")
                     : t("auth.switcher.createAccount")}
-                </h2>
+                </h1>
                 <p className="text-muted-foreground">
                   {isLogin ? (
                     <>

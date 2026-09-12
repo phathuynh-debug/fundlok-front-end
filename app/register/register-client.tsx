@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+import Link from "next/link";
+
+import Logo from "@/components/logo";
 import { RegistrationForm } from "@/components/registration-form";
 import { VerifyEmailNotice } from "@/components/verify-email-notice";
 import { LocaleSwitcher } from "@/components/locale-switcher";
@@ -16,8 +19,19 @@ export function RegisterClient() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/50 p-6">
-      <div className="w-full max-w-md space-y-6 bg-white p-8 rounded-xl shadow-lg border border-border">
-        <div className="flex justify-end">
+      {/* bg-card, not bg-white: a hardcoded white surface stays white in dark
+          mode and takes its foreground text with it. */}
+      <div className="w-full max-w-md space-y-6 bg-card text-card-foreground p-8 rounded-xl shadow-lg border border-border">
+        {/* The brand mark doubles as the way back to the site. This screen had
+            no internal links at all — a dead end for anyone who changed their
+            mind, and a page with no outbound links for a crawler. */}
+        <div className="flex items-center justify-between gap-4">
+          <Link href="/" aria-label={t("common.backToHome")}>
+            <Logo
+              alt={t("common.brandName")}
+              containerClassName="relative w-32 h-8"
+            />
+          </Link>
           <LocaleSwitcher />
         </div>
 
@@ -41,6 +55,16 @@ export function RegisterClient() {
             <RegistrationForm
               onSuccess={(email) => setRegisteredEmail(email)}
             />
+
+            <p className="text-center text-sm text-muted-foreground">
+              {t("auth.switcher.alreadyHaveAccount")}{" "}
+              <Link
+                href="/login"
+                className="font-semibold text-primary hover:underline"
+              >
+                {t("auth.switcher.signIn")}
+              </Link>
+            </p>
           </>
         )}
       </div>

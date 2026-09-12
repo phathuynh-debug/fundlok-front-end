@@ -88,9 +88,9 @@ export function ForgotPasswordForm() {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h2 className="text-2xl lg:text-3xl font-bold text-foreground">
+        <h1 className="text-2xl lg:text-3xl font-bold text-foreground">
           {t("auth.forgotPassword.title")}
-        </h2>
+        </h1>
         <p className="text-muted-foreground text-sm">
           {t("auth.forgotPassword.description")}
         </p>

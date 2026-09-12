@@ -49,9 +49,14 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           </div>
 
           <div className="flex flex-col gap-8 max-w-lg">
-            <h1 className="text-4xl xl:text-5xl font-bold text-white leading-tight text-balance">
+            {/* Not an <h1>: this line is the same on every auth screen, so as
+                a heading it made /login and /forgot-password share one — which
+                tells a crawler the two pages are about the same thing. The
+                page's own heading carries the H1 instead; this is brand copy
+                and keeps its size through styling, not through its tag. */}
+            <p className="text-4xl xl:text-5xl font-bold text-white leading-tight text-balance">
               {t("auth.hero.headline")}
-            </h1>
+            </p>
             <p className="text-lg text-slate-300 leading-relaxed">
               {t("auth.hero.description")}
             </p>
