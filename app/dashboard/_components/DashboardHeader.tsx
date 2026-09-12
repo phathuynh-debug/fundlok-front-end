@@ -20,6 +20,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { TourReplayButton } from "@/components/tour-replay-button";
 import { useTranslations } from "@/lib/i18n";
 import { cn, getInitials } from "@/lib/utils";
 import { CONTROL_IDLE } from "@/lib/ui-tokens";
@@ -112,6 +113,7 @@ export function DashboardHeader() {
           <div className="flex items-center gap-1.5">
             <LocaleSwitcher />
             <ThemeToggle />
+            <TourReplayButton />
           </div>
 
           <div className="h-5 w-px bg-border/60" />

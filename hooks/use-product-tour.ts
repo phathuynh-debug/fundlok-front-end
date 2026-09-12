@@ -96,6 +96,8 @@ export interface ProductTour {
   isLastStep: boolean;
   next: () => void;
   back: () => void;
+  /** Replay from step one, regardless of whether it has been seen. */
+  restart: () => void;
   /** Finish or skip — both mean "do not show this again". */
   dismiss: () => void;
 }
@@ -116,6 +118,17 @@ export function useProductTour({ enabled }: { enabled: boolean }): ProductTour {
   const [rect, setRect] = useState<SpotlightRect | null>(null);
 
   const candidateSteps = useMemo(() => tourStepsForRole(role), [role]);
+
+  /** Open at step one with whatever targets are on the page right now. */
+  const openNow = useCallback(() => {
+    const live = candidateSteps.filter((step) =>
+      Boolean(document.querySelector(step.target)),
+    );
+    if (live.length === 0) return false;
+    setSteps(live);
+    setStepIndex(0);
+    return true;
+  }, [candidateSteps]);
 
   // Start-up: wait for the role, check whether this person has already been
   // shown it, then keep only the steps whose target is actually on the page.
@@ -158,9 +171,7 @@ export function useProductTour({ enabled }: { enabled: boolean }): ProductTour {
       if (live.length === candidateSteps.length || Date.now() >= deadline) {
         // Nothing to point at at all — say nothing rather than opening an
         // empty tour.
-        if (live.length === 0) return;
-        setSteps(live);
-        setStepIndex(0);
+        openNow();
         return;
       }
 
@@ -169,7 +180,15 @@ export function useProductTour({ enabled }: { enabled: boolean }): ProductTour {
 
     timer = setTimeout(attempt, RESOLVE_POLL_MS);
     return () => clearTimeout(timer);
-  }, [enabled, role, candidateSteps, isUserPending, serverKnows, serverSeen]);
+  }, [
+    enabled,
+    role,
+    candidateSteps,
+    isUserPending,
+    serverKnows,
+    serverSeen,
+    openNow,
+  ]);
 
   const isOpen = steps.length > 0;
   const step = isOpen ? (steps[stepIndex] ?? null) : null;
@@ -217,6 +236,19 @@ export function useProductTour({ enabled }: { enabled: boolean }): ProductTour {
     setStepIndex((current) => Math.max(0, current - 1));
   }, []);
 
+  /**
+   * Replay on demand, from the help button.
+   *
+   * Deliberately ignores `enabled` and the completed-at timestamp: someone who
+   * asks for the walkthrough is asking for it whatever the account says, and
+   * on a page other than the dashboard they simply get the steps whose targets
+   * exist there. Dismissing afterwards re-POSTs the completion, which the
+   * backend treats as a no-op rather than moving the original timestamp.
+   */
+  const restart = useCallback(() => {
+    openNow();
+  }, [openNow]);
+
   return {
     isOpen,
     step,
@@ -226,6 +258,7 @@ export function useProductTour({ enabled }: { enabled: boolean }): ProductTour {
     isLastStep: stepIndex >= steps.length - 1,
     next,
     back,
+    restart,
     dismiss,
   };
 }

@@ -968,6 +968,7 @@
       "done": "Got it",
       "next": "Next",
       "progress": "Step {current} of {total}",
+      "replay": "Replay the walkthrough",
       "skip": "Skip",
       "steps": {
         "analytics": {

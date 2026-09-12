@@ -111,6 +111,53 @@ test.describe("an account that has already been onboarded", () => {
   });
 });
 
+test.describe("the replay button", () => {
+  // signInAs reports the account as already onboarded, which is the state this
+  // button exists for: the walkthrough is gone and there is otherwise no way
+  // back to it.
+  test.beforeEach(async ({ context }) => {
+    await signInAs(context, "investor");
+  });
+
+  test("brings the walkthrough back after it has been dismissed", async ({
+    page,
+  }) => {
+    await page.goto("/dashboard");
+    await expect(
+      page.getByRole("heading", { name: t("dashboard.investor.title") }),
+    ).toBeVisible();
+    await expect(page.getByRole("dialog")).toBeHidden();
+
+    await page
+      .getByRole("button", { name: t("dashboard.tour.replay") })
+      .click();
+
+    const tour = page.getByRole("dialog");
+    await expect(tour).toBeVisible();
+    // Back at the beginning, not wherever it was left.
+    await expect(tour).toContainText(
+      t("dashboard.tour.progress", { current: 1, total: 5 }),
+    );
+  });
+
+  test("replays the walkthrough for this role, not the other one", async ({
+    page,
+  }) => {
+    await page.goto("/dashboard");
+    await page
+      .getByRole("button", { name: t("dashboard.tour.replay") })
+      .click();
+
+    const tour = page.getByRole("dialog");
+    await expect(tour).toContainText(
+      t("dashboard.tour.steps.investorOverview.title"),
+    );
+    await expect(tour).not.toContainText(
+      t("dashboard.tour.steps.smeApply.title"),
+    );
+  });
+});
+
 test.describe("dismissing it", () => {
   test.beforeEach(firstRun("investor"));
 

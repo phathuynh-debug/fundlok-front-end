@@ -968,6 +968,7 @@
       "done": "Đã hiểu",
       "next": "Tiếp theo",
       "progress": "Bước {current}/{total}",
+      "replay": "Xem lại hướng dẫn",
       "skip": "Bỏ qua",
       "steps": {
         "analytics": {

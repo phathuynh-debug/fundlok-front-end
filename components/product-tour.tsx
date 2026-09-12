@@ -1,10 +1,14 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { createContext, useContext, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useAppearance } from "@/components/appearance-provider";
-import { useProductTour, type SpotlightRect } from "@/hooks/use-product-tour";
+import {
+  useProductTour,
+  type ProductTour as ProductTourState,
+  type SpotlightRect,
+} from "@/hooks/use-product-tour";
 import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +22,43 @@ import { cn } from "@/lib/utils";
  * colour matches the app's dialog overlay (`bg-black/50`) so a tour and a modal
  * dim the page the same amount.
  */
+
+/**
+ * The walkthrough now has two consumers — the overlay and the "replay" button
+ * in the header — so its state lives in a context rather than being threaded
+ * through the layout as props. Same shape as the loan-application context: the
+ * hook holds the logic, the provider only distributes it.
+ */
+const ProductTourContext = createContext<ProductTourState | null>(null);
+
+export function useProductTourControls(): ProductTourState {
+  const value = useContext(ProductTourContext);
+  if (!value) {
+    throw new Error(
+      "useProductTourControls must be used within a ProductTourProvider",
+    );
+  }
+  return value;
+}
+
+export function ProductTourProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const pathname = usePathname();
+
+  // `enabled` gates only the AUTOMATIC first-run open: that belongs on the
+  // dashboard landing page, where the targets live and where interrupting
+  // someone costs nothing. Replaying from the help button works anywhere.
+  const tour = useProductTour({ enabled: pathname === "/dashboard" });
+
+  return (
+    <ProductTourContext.Provider value={tour}>
+      {children}
+    </ProductTourContext.Provider>
+  );
+}
 
 const CARD_WIDTH = 320;
 const GAP = 14;
@@ -54,16 +95,11 @@ function cardPosition(rect: SpotlightRect): { top: number; left: number } {
 }
 
 export function ProductTour() {
-  const pathname = usePathname();
   const { t } = useTranslations();
   const { reduceMotion } = useAppearance();
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // Only offers itself on the dashboard landing page: that is where the
-  // targets live, and interrupting someone midway through an application form
-  // would be worse than not explaining the product at all.
-  const tour = useProductTour({ enabled: pathname === "/dashboard" });
-
+  const tour = useProductTourControls();
   const { isOpen, step, stepIndex, stepCount, rect, isLastStep } = tour;
 
   // Escape dismisses, like every other overlay in the app.
