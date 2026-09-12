@@ -340,6 +340,28 @@
       },
       "viewLabel": "View as"
     },
+    "documentGuide": {
+      "open": "What is this form?",
+      "steps": {
+        "actions": {
+          "body": "Review everything on the last stage before you send. We come back within 3-5 business days with your business score, the all-in rate, the fixed amount you would repay each business day, and the backstop date — the day anything still outstanding falls due in full. Sending an application is not an approval, and nothing is owed until you sign.",
+          "title": "Sending, and what follows"
+        },
+        "documents": {
+          "body": "Nothing here is new paperwork. The charter and business registration are PDFs, and the e-invoice data must be the signed electronic original — XML files, or a ZIP of them. A PDF or a screenshot of an invoice is not accepted, because it can be edited and so proves nothing about your revenue.",
+          "title": "Documents you already file"
+        },
+        "stages": {
+          "body": "Your legal papers, then the revenue and cost figures you already report, your e-invoice data, and your CIC report — then a review screen. You can move back and forth freely; nothing is sent until you press send on the last stage.",
+          "title": "Six stages, in this order"
+        },
+        "why": {
+          "body": "This panel changes with the stage you are on. It says what the document is used for and where to get it — the CIC report, for instance, comes from the State Bank's own portal.",
+          "title": "Why each one is asked for"
+        }
+      },
+      "title": "About this form"
+    },
     "header": {
       "home": "Home",
       "loading": "Loading header...",

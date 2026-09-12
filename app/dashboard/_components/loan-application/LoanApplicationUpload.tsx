@@ -1,6 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
+import { DocumentGuide } from "@/components/document-guide";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, Loader2, AlertCircle, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -64,6 +65,12 @@ function LoanApplicationWizard() {
         theme.borderColor,
       )}
     >
+      {/* Top-right rather than beside the title: the heading is centred, and
+          a button in that flow would pull it off-centre. */}
+      <div className="flex justify-end -mb-4">
+        <DocumentGuide />
+      </div>
+
       <div className="mb-6 text-center">
         <h3 className="text-2xl font-bold tracking-tight text-foreground">
           {t("dashboard.sme.submitLoanApplication")}
@@ -85,7 +92,9 @@ function LoanApplicationWizard() {
       {/* The form never submits on its own — sending is only triggered by an
           explicit click on the Send button below. */}
       <form onSubmit={(e) => e.preventDefault()} className="space-y-6 mt-6">
-        <StepIndicator />
+        <div data-tour="loan-steps">
+          <StepIndicator />
+        </div>
 
         {/* Step content */}
         <div className="relative overflow-hidden min-h-[360px] mt-8">
@@ -103,7 +112,10 @@ function LoanApplicationWizard() {
                 /* --- Document collection steps (split layout) --- */
                 <div className="grid gap-0 md:grid-cols-[1fr_auto_1fr] items-stretch">
                   {/* Left Column: Upload File fields */}
-                  <div className="space-y-6 p-4 md:pr-6 flex flex-col justify-center">
+                  <div
+                    className="space-y-6 p-4 md:pr-6 flex flex-col justify-center"
+                    data-tour="loan-fields"
+                  >
                     {currentStep === 1 && (
                       <div className="space-y-4">
                         <h4 className="text-lg font-bold text-foreground">
@@ -212,7 +224,9 @@ function LoanApplicationWizard() {
 
                   {/* Right Column: Why & How panel */}
                   <div className="space-y-4 p-4 md:pl-6 flex flex-col justify-center">
-                    <DocumentInfoPanel />
+                    <div data-tour="loan-info">
+                      <DocumentInfoPanel />
+                    </div>
                   </div>
                 </div>
               )}
@@ -221,7 +235,10 @@ function LoanApplicationWizard() {
         </div>
 
         {/* Step navigation actions */}
-        <div className="flex justify-between items-center pt-6 border-t border-border/40">
+        <div
+          className="flex justify-between items-center pt-6 border-t border-border/40"
+          data-tour="loan-actions"
+        >
           <Button
             type="button"
             variant="outline"

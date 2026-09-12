@@ -340,6 +340,28 @@
       },
       "viewLabel": "Hiển thị dạng"
     },
+    "documentGuide": {
+      "open": "Biểu mẫu này là gì?",
+      "steps": {
+        "actions": {
+          "body": "Hãy xem lại toàn bộ ở bước cuối trước khi gửi. Chúng tôi phản hồi trong vòng 3-5 ngày làm việc kèm điểm doanh nghiệp, lãi suất trọn gói, số tiền cố định bạn sẽ trả mỗi ngày làm việc, và hạn chót cuối cùng — ngày mà mọi khoản còn lại đến hạn thanh toán đầy đủ. Việc gửi hồ sơ không đồng nghĩa được duyệt, và bạn không nợ gì cho đến khi ký.",
+          "title": "Gửi hồ sơ, và điều gì diễn ra sau đó"
+        },
+        "documents": {
+          "body": "Không có giấy tờ nào phải làm mới. Điều lệ công ty và giấy đăng ký kinh doanh nộp dạng PDF, còn dữ liệu hóa đơn điện tử phải là bản gốc điện tử có chữ ký — tệp XML, hoặc một tệp ZIP chứa chúng. Ảnh chụp màn hình hay bản PDF của hóa đơn không được chấp nhận, vì có thể chỉnh sửa nên không chứng minh được doanh thu.",
+          "title": "Những hồ sơ bạn vẫn nộp hằng kỳ"
+        },
+        "stages": {
+          "body": "Hồ sơ pháp lý, sau đó là các số liệu doanh thu và chi phí bạn vẫn khai báo, dữ liệu hóa đơn điện tử, và báo cáo CIC — rồi đến màn hình xem lại. Bạn có thể quay tới quay lui thoải mái; không có gì được gửi đi cho đến khi bạn bấm gửi ở bước cuối.",
+          "title": "Sáu bước, theo thứ tự này"
+        },
+        "why": {
+          "body": "Khung này thay đổi theo bước bạn đang ở. Nó cho biết hồ sơ được dùng để làm gì và lấy ở đâu — ví dụ báo cáo CIC lấy từ cổng thông tin của Ngân hàng Nhà nước.",
+          "title": "Vì sao cần từng hồ sơ"
+        }
+      },
+      "title": "Về biểu mẫu này"
+    },
     "header": {
       "home": "Trang chủ",
       "loading": "Đang tải thanh tiêu đề...",

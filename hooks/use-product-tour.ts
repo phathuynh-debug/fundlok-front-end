@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useCurrentUser } from "@/hooks/use-authentication";
 import { useCompleteOnboardingTour } from "@/hooks/use-users";
 import {
@@ -9,6 +9,9 @@ import {
   type TourStep,
 } from "@/lib/constants/tour-steps";
 import type { SelectableRole } from "@/services/authentication.service";
+import { useTourEngine, type SpotlightRect } from "@/hooks/use-tour-engine";
+
+export type { SpotlightRect };
 
 /**
  * First-run walkthrough state.
@@ -35,16 +38,6 @@ import type { SelectableRole } from "@/services/authentication.service";
  * (wait for the role, resolve targets, measure, reposition) is testable and the
  * overlay stays presentation.
  */
-
-/** A measured target, in viewport coordinates. */
-export interface SpotlightRect {
-  top: number;
-  left: number;
-  width: number;
-  height: number;
-}
-
-const PADDING = 8;
 
 /**
  * How long to keep looking for the tour's targets before starting with
@@ -74,19 +67,6 @@ function writeSeen(key: string): void {
   }
 }
 
-function measure(selector: string): SpotlightRect | null {
-  const element = document.querySelector(selector);
-  if (!element) return null;
-  const rect = element.getBoundingClientRect();
-  if (rect.width === 0 && rect.height === 0) return null;
-  return {
-    top: rect.top - PADDING,
-    left: rect.left - PADDING,
-    width: rect.width + PADDING * 2,
-    height: rect.height + PADDING * 2,
-  };
-}
-
 export interface ProductTour {
   isOpen: boolean;
   step: TourStep | null;
@@ -113,22 +93,15 @@ export function useProductTour({ enabled }: { enabled: boolean }): ProductTour {
   const serverSeen = user?.onboarding_tour_completed_at;
   const serverKnows = serverSeen !== undefined;
 
-  const [steps, setSteps] = useState<readonly TourStep[]>([]);
-  const [stepIndex, setStepIndex] = useState(0);
-  const [rect, setRect] = useState<SpotlightRect | null>(null);
+  const engine = useTourEngine();
+  const { open, close } = engine;
 
   const candidateSteps = useMemo(() => tourStepsForRole(role), [role]);
 
-  /** Open at step one with whatever targets are on the page right now. */
-  const openNow = useCallback(() => {
-    const live = candidateSteps.filter((step) =>
-      Boolean(document.querySelector(step.target)),
-    );
-    if (live.length === 0) return false;
-    setSteps(live);
-    setStepIndex(0);
-    return true;
-  }, [candidateSteps]);
+  const openNow = useCallback(
+    () => open(candidateSteps),
+    [open, candidateSteps],
+  );
 
   // Start-up: wait for the role, check whether this person has already been
   // shown it, then keep only the steps whose target is actually on the page.
@@ -190,51 +163,13 @@ export function useProductTour({ enabled }: { enabled: boolean }): ProductTour {
     openNow,
   ]);
 
-  const isOpen = steps.length > 0;
-  const step = isOpen ? (steps[stepIndex] ?? null) : null;
-
-  // Keep the spotlight on its target through scrolls, resizes and the sidebar's
-  // own transitions. Same rAF reasoning as above.
-  useEffect(() => {
-    if (!step) return;
-
-    let frame = 0;
-    const update = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => setRect(measure(step.target)));
-    };
-
-    update();
-    window.addEventListener("resize", update);
-    window.addEventListener("scroll", update, true);
-
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("resize", update);
-      window.removeEventListener("scroll", update, true);
-    };
-  }, [step]);
-
   const dismiss = useCallback(() => {
     // Mirror locally first so the overlay cannot flicker back while the write
     // is in flight, then record it against the account.
     if (role) writeSeen(tourStorageKey(role));
-    setSteps([]);
-    setStepIndex(0);
-    setRect(null);
+    close();
     completeTour.mutate();
-  }, [role, completeTour]);
-
-  const next = useCallback(() => {
-    setStepIndex((current) => {
-      if (current >= steps.length - 1) return current;
-      return current + 1;
-    });
-  }, [steps.length]);
-
-  const back = useCallback(() => {
-    setStepIndex((current) => Math.max(0, current - 1));
-  }, []);
+  }, [role, close, completeTour]);
 
   /**
    * Replay on demand, from the help button.
@@ -249,16 +184,5 @@ export function useProductTour({ enabled }: { enabled: boolean }): ProductTour {
     openNow();
   }, [openNow]);
 
-  return {
-    isOpen,
-    step,
-    stepIndex,
-    stepCount: steps.length,
-    rect,
-    isLastStep: stepIndex >= steps.length - 1,
-    next,
-    back,
-    restart,
-    dismiss,
-  };
+  return { ...engine, restart, dismiss };
 }

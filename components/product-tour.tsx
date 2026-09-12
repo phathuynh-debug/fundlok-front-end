@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useRef } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useAppearance } from "@/components/appearance-provider";
@@ -61,6 +61,8 @@ export function ProductTourProvider({
 }
 
 const CARD_WIDTH = 320;
+/** Only the first-frame guess; replaced by a real measurement immediately. */
+const DEFAULT_CARD_HEIGHT = 210;
 const GAP = 14;
 
 /**
@@ -68,7 +70,10 @@ const GAP = 14;
  * inside the viewport rather than letting it hang off the edge. Sidebar targets
  * sit at the far left, so "to the right of the hole" is the common case.
  */
-function cardPosition(rect: SpotlightRect): { top: number; left: number } {
+function cardPosition(
+  rect: SpotlightRect,
+  cardHeight: number,
+): { top: number; left: number } {
   const margin = 12;
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
@@ -84,23 +89,59 @@ function cardPosition(rect: SpotlightRect): { top: number; left: number } {
   );
 
   let top = rect.top;
-  // The card is taller than a nav row; keep its bottom on screen.
-  const assumedHeight = 210;
-  if (top + assumedHeight > viewportHeight - margin) {
-    top = viewportHeight - assumedHeight - margin;
+  // Measured, not assumed. A guessed height was fine for the four-line
+  // dashboard steps and pushed the buttons off-screen the moment a step
+  // carried a longer explanation.
+  if (top + cardHeight > viewportHeight - margin) {
+    top = viewportHeight - cardHeight - margin;
   }
   top = Math.max(margin, top);
 
   return { top, left };
 }
 
-export function ProductTour() {
+/**
+ * The spotlight itself, driven by whichever walkthrough passed its state in.
+ *
+ * `i18nBase` is the key prefix its copy lives under, so the dashboard tour and
+ * the document guide can render through the same overlay without either of
+ * them knowing about the other.
+ */
+export function TourOverlay({
+  tour,
+  i18nBase,
+}: {
+  tour: Pick<
+    ProductTourState,
+    | "isOpen"
+    | "step"
+    | "stepIndex"
+    | "stepCount"
+    | "rect"
+    | "isLastStep"
+    | "next"
+    | "back"
+    | "dismiss"
+  >;
+  i18nBase: string;
+}) {
   const { t } = useTranslations();
   const { reduceMotion } = useAppearance();
   const cardRef = useRef<HTMLDivElement>(null);
 
-  const tour = useProductTourControls();
   const { isOpen, step, stepIndex, stepCount, rect, isLastStep } = tour;
+  const [cardHeight, setCardHeight] = useState(DEFAULT_CARD_HEIGHT);
+
+  // Re-measure whenever the step changes: each one carries a different amount
+  // of text. rAF so the browser has laid the card out first.
+  useEffect(() => {
+    if (!isOpen) return;
+    const frame = requestAnimationFrame(() => {
+      const height = cardRef.current?.offsetHeight;
+      if (height) setCardHeight(height);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [isOpen, stepIndex, step]);
 
   // Escape dismisses, like every other overlay in the app.
   useEffect(() => {
@@ -122,7 +163,7 @@ export function ProductTour() {
 
   if (!isOpen || !step || !rect) return null;
 
-  const { top, left } = cardPosition(rect);
+  const { top, left } = cardPosition(rect, cardHeight);
   const titleId = `tour-step-${step.id}-title`;
 
   return (
@@ -171,10 +212,10 @@ export function ProductTour() {
           id={titleId}
           className="mt-1.5 text-base font-bold tracking-tight text-foreground"
         >
-          {t(`dashboard.tour.steps.${step.id}.title`)}
+          {t(`${i18nBase}.steps.${step.id}.title`)}
         </h2>
         <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-          {t(`dashboard.tour.steps.${step.id}.body`)}
+          {t(`${i18nBase}.steps.${step.id}.body`)}
         </p>
 
         <div className="mt-4 flex items-center justify-between gap-2">
@@ -205,4 +246,10 @@ export function ProductTour() {
       </div>
     </div>
   );
+}
+
+/** The dashboard orientation tour, wired to its provider. */
+export function ProductTour() {
+  const tour = useProductTourControls();
+  return <TourOverlay tour={tour} i18nBase="dashboard.tour" />;
 }
