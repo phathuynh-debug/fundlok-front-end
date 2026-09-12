@@ -15,5 +15,11 @@ export interface PageResponse<T> {
 export interface ApiError {
   message: string;
   details?: Record<string, unknown>;
+  /**
+   * Present when the endpoint returned a structured `{ code, message, fields }`
+   * detail. Translate by `code`; `message` is the English fallback for a code
+   * the UI has no string for.
+   */
+  reason?: { code: string; message: string; fields?: string[] };
   status?: number;
 }

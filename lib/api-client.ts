@@ -9,13 +9,41 @@ import { getStatusMessage } from "./status-codes";
 import type { ApiError } from "./types";
 
 // ---------- Error message extraction ----------
-// Handles FastAPI ({ detail: string | PydanticError[] }) and Express-style
-// ({ message: string }) error shapes.
+// Handles FastAPI ({ detail: string | PydanticError[] | ErrorReason }) and
+// Express-style ({ message: string }) error shapes.
+
+/**
+ * A machine-readable error the UI is expected to translate. `code` is the
+ * contract; `message` is the server's English fallback; `fields` names the
+ * inputs at fault, as machine names the UI labels in the reader's language.
+ */
+export interface ErrorReason {
+  code: string;
+  message: string;
+  fields?: string[];
+}
+
+function isReason(value: unknown): value is ErrorReason {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return false;
+  }
+  const candidate = value as { code?: unknown; message?: unknown };
+  return (
+    typeof candidate.code === "string" && typeof candidate.message === "string"
+  );
+}
+
 function extractMessage(data: unknown): string | undefined {
   if (!data) return undefined;
   if (typeof data === "string") return data;
 
   const obj = data as { detail?: unknown; message?: unknown; error?: unknown };
+
+  // A structured detail — `{ code, message, fields? }`. Endpoints whose errors
+  // are rendered to a bilingual user send this so the client can translate by
+  // code; `message` is the English fallback for a code the client has no string
+  // for yet.
+  if (isReason(obj.detail)) return obj.detail.message;
 
   if (Array.isArray(obj.detail)) {
     const first = obj.detail[0] as
@@ -63,8 +91,11 @@ class ApiClient {
         const message =
           extractMessage(data) || getStatusMessage(status) || error.message;
         const details = data?.details;
+        // Carried separately from `message` so a caller can translate by code
+        // rather than render the server's English.
+        const reason = isReason(data?.detail) ? data.detail : undefined;
 
-        return Promise.reject({ message, details, status });
+        return Promise.reject({ message, details, reason, status });
       },
     );
   }

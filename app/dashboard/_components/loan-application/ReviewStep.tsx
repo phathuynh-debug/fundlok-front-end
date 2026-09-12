@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { ReviewRow } from "./ReviewRow";
+import { IndicativeRateCard } from "./IndicativeRateCard";
 import { useLoanApplicationContext } from "./LoanApplicationContext";
 import type { DocumentKey } from "./useLoanApplication";
 import { LITE_FIGURE_FIELDS, parseFigure } from "./lite-grading-fields";
@@ -117,6 +118,11 @@ export function ReviewStep() {
           {t("dashboard.sme.lite.editFigures")}
         </button>
       </div>
+
+      {/* What the engine makes of those figures. It sits after the read-back
+          and before the send hint on purpose: the applicant should see the rate
+          their own numbers imply while the numbers are still editable. */}
+      <IndicativeRateCard />
 
       <p className="text-center text-xs text-muted-foreground">
         {canSend

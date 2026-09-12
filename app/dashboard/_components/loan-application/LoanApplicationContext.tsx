@@ -16,6 +16,8 @@ const STEP_FOR_DOCUMENT: Record<DocumentKey, number> = {
 // the presentation context (locale/theme/t) + the preview dialog state. Child
 // components read what they need from here instead of receiving props.
 type LoanApplicationContextValue = ReturnType<typeof useLoanApplication> & {
+  /** The application every server call in this wizard is scoped to. */
+  loanApplicationId: string;
   locale: string;
   theme: IndustryTheme;
   t: (key: string) => string;
@@ -82,6 +84,7 @@ export function LoanApplicationProvider({
   // progress tick anyway, so there's no extra cost over the previous props.
   const value: LoanApplicationContextValue = {
     ...loanApp,
+    loanApplicationId,
     locale,
     theme,
     t,

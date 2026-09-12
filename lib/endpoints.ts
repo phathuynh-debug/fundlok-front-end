@@ -68,13 +68,19 @@ export const LOANS_ENDPOINTS = {
     `/loans/applications/${applicationId}/submit`,
   /**
    * Self-reported figures for the Lite grading path (replaces the VAT and
-   * annual-financials uploads). NOTE: not implemented on the backend yet —
-   * `loan_applications` has no columns for these (see
-   * app/lending/models.py), so this needs a migration + route before it
-   * returns anything but 404.
+   * annual-financials uploads). Stored on
+   * `loan_applications.self_reported_figures`.
    */
   figures: (applicationId: string) =>
     `/loans/applications/${applicationId}/figures`,
+  /**
+   * The indicative interest band the grading engine derives from those
+   * figures. A range, never a single rate, and never an offer — the
+   * applicant's CIC score is unknown before KYC, so the engine is run at both
+   * ends of the range it was calibrated against.
+   */
+  indicativeRate: (applicationId: string) =>
+    `/loans/applications/${applicationId}/indicative-rate`,
 } as const;
 
 export const ADMIN_ENDPOINTS = {

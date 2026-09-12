@@ -527,6 +527,35 @@ const server = createServer(async (req, res) => {
     });
   }
 
+  // GET /loans/applications/:id/indicative-rate. A fixed band standing in for
+  // the grading engine: the arithmetic is the backend's (tests/loans/
+  // test_indicative_rate.py scores it against the real engine), and what a
+  // browser test can prove is that the card renders a RANGE with its
+  // assumptions and its not-an-offer line — the parts that are a compliance
+  // requirement rather than a calculation.
+  if (
+    /^\/loans\/applications\/[^/]+\/indicative-rate$/.test(path) &&
+    method === "GET"
+  ) {
+    return json(res, 200, {
+      rate_low_pct: 13.8,
+      rate_high_pct: 14.5,
+      grade_low: 69.0,
+      grade_high: 77.1,
+      decision_low: "AI_PENDING",
+      decision_high: "AI_PENDING",
+      engine_version: "1.0.0",
+      params_version: "wb-v0-20260728",
+      sector_reference_version: "sr-v1-20260728",
+      provisional: true,
+      assumptions: [
+        "CIC score is not known; bracketed across 442-750.",
+        "Identity and AML checks are assumed to pass; they are verified for real later.",
+        "Monthly revenue is modelled from the annual totals provided, not from filings.",
+      ],
+    });
+  }
+
   // --- Admin ---------------------------------------------------------------
   // Guarded like the real backend: a non-admin session must get a 403 here, so
   // a test can prove the API is not the only thing keeping them out.
