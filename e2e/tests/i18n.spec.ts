@@ -106,3 +106,64 @@ test("the same screen works in English", async ({ page, context }) => {
     page.getByRole("heading", { name: t("dashboard.investor.title") }),
   ).toBeVisible();
 });
+
+test.describe("switching language on the marketing site", () => {
+  /**
+   * The homepage builds its copy on the SERVER from the NEXT_LOCALE cookie
+   * (app/page.tsx), while the header, the tabs and the step cards are client
+   * components reading the same locale from context.
+   *
+   * That split broke in production: the switcher updated React state, the
+   * client half changed language, and every server-rendered section — hero,
+   * process, partners, team, the team bios — stayed in the previous one. A
+   * visitor reading "English" in the switcher saw a Vietnamese page.
+   *
+   * The fix writes the cookie synchronously and calls router.refresh(); this
+   * pins it, because only the server half can regress without the client half
+   * noticing.
+   */
+  test("server-rendered sections follow the switch, not just the chrome", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const bodyText = () => page.locator("body").innerText();
+
+    const english = await bodyText();
+    expect(english).toContain("Flexible Capital for MSMEs");
+
+    await page.getByRole("button", { name: "Vietnamese" }).click();
+    await expect(
+      page.getByRole("heading", { level: 1, name: /Sàn vốn linh hoạt/ }),
+    ).toBeVisible();
+
+    const vietnamese = await bodyText();
+    // One assertion per server-rendered section: they are separate reads of
+    // the same dictionary and could regress independently.
+    expect(vietnamese, "hero").toContain("Sàn vốn linh hoạt");
+    expect(vietnamese, "process section").toContain("Hành trình gọi vốn");
+    expect(vietnamese, "partners section").toContain("Đối tác & Chương trình");
+    expect(vietnamese, "team section").toContain("Đội ngũ sáng lập");
+    expect(vietnamese, "team bio").toContain("Huy dẫn dắt");
+    expect(vietnamese, "old language must be gone").not.toContain(
+      "Flexible Capital for MSMEs",
+    );
+  });
+
+  test("switches back again", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "Vietnamese" }).click();
+    await expect(
+      page.getByRole("heading", { level: 1, name: /Sàn vốn linh hoạt/ }),
+    ).toBeVisible();
+
+    // The switcher labels are themselves translated, so the way back is
+    // "Tiếng Anh" rather than "English".
+    await page.getByRole("button", { name: "Tiếng Anh" }).click();
+    await expect(
+      page.getByRole("heading", {
+        level: 1,
+        name: /Flexible Capital for MSMEs/,
+      }),
+    ).toBeVisible();
+  });
+});

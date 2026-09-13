@@ -1,12 +1,25 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { useRouter } from "next/navigation";
 import en from "./en.json";
 import vi from "./vi.json";
 
 export const LOCALE_COOKIE_NAME = "NEXT_LOCALE";
 
 export const supportedLocales = ["en", "vi"] as const;
+
+/** One year, so a returning visitor keeps the language they chose. */
+function writeLocaleCookie(locale: string): void {
+  document.cookie = `${LOCALE_COOKIE_NAME}=${locale}; path=/; max-age=31536000; samesite=lax`;
+}
 export type Locale = (typeof supportedLocales)[number];
 
 type MessageTree = typeof en;
@@ -75,15 +88,32 @@ export function LocaleProvider({
   children: React.ReactNode;
 }) {
   const [locale, setLocaleState] = useState<Locale>(initialLocale);
+  const router = useRouter();
 
   useEffect(() => {
     document.documentElement.lang = locale;
-    document.cookie = `${LOCALE_COOKIE_NAME}=${locale}; path=/; max-age=31536000; samesite=lax`;
   }, [locale]);
 
-  const setLocale = (nextLocale: Locale) => {
-    setLocaleState(nextLocale);
-  };
+  const setLocale = useCallback(
+    (nextLocale: Locale) => {
+      // The cookie is written HERE, synchronously, rather than in an effect
+      // keyed on `locale`. Everything below depends on the order.
+      writeLocaleCookie(nextLocale);
+      setLocaleState(nextLocale);
+
+      // Client components re-render from context on the line above. Server
+      // components do not — and the marketing pages build their copy on the
+      // server from this very cookie (see app/page.tsx). Without this refresh
+      // the header and the tabs switched language while the hero, the process
+      // section, the partner headings and the team bios stayed in the old one.
+      //
+      // The refresh re-requests the server tree, carrying the cookie just set;
+      // had that write stayed in an effect it would still be pending here and
+      // the server would answer in the previous language.
+      router.refresh();
+    },
+    [router],
+  );
 
   const value = useMemo<LocaleContextValue>(
     () => ({
@@ -91,7 +121,7 @@ export function LocaleProvider({
       setLocale,
       t: (key, values) => translate(dictionaries[locale], key, values),
     }),
-    [locale],
+    [locale, setLocale],
   );
 
   return (
