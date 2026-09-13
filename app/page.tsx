@@ -155,9 +155,9 @@ export default async function Page() {
       label: strings.partnersStrategic,
       logos: [
         {
-          src: "/images/partners/sihub.png",
-          width: 1000,
-          height: 1000,
+          src: "/images/partners/sihub.webp",
+          width: 500,
+          height: 500,
           alt: "Startup and Innovation Hub of Ho Chi Minh City (SIHUB)",
           href: "https://www.sihub.gov.vn/",
           invertOnDark: false,
@@ -168,17 +168,17 @@ export default async function Page() {
       label: strings.partnersInfra,
       logos: [
         {
-          src: "/images/partners/google-cloud-startups.png",
-          width: 850,
-          height: 214,
+          src: "/images/partners/google-cloud-startups.webp",
+          width: 500,
+          height: 126,
           alt: "Google Cloud for Startups",
           href: "https://cloud.google.com/startup",
           invertOnDark: false,
         },
         {
-          src: "/images/partners/cloudflare-startups.png",
-          width: 815,
-          height: 236,
+          src: "/images/partners/cloudflare-startups.webp",
+          width: 500,
+          height: 145,
           alt: "Cloudflare for Startups",
           href: "https://www.cloudflare.com/forstartups/",
           invertOnDark: true,
@@ -306,9 +306,9 @@ export default async function Page() {
               <div className="flex flex-col bg-white/40 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-3xl p-5 shadow-lg backdrop-blur-md hover:scale-[1.01] transition-transform duration-300">
                 <div className="relative aspect-square w-full rounded-2xl overflow-hidden mb-5 bg-slate-100 dark:bg-slate-800">
                   <img
-                    src="/images/huy.png"
-                    width={1076}
-                    height={1280}
+                    src="/images/huy.webp"
+                    width={672}
+                    height={800}
                     loading="lazy"
                     decoding="async"
                     alt="Huy Pham"
@@ -343,9 +343,9 @@ export default async function Page() {
               <div className="flex flex-col bg-white/40 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-3xl p-5 shadow-lg backdrop-blur-md hover:scale-[1.01] transition-transform duration-300">
                 <div className="relative aspect-square w-full rounded-2xl overflow-hidden mb-5 bg-slate-100 dark:bg-slate-800">
                   <img
-                    src="/images/loc.png"
-                    width={2016}
-                    height={3024}
+                    src="/images/loc.webp"
+                    width={533}
+                    height={800}
                     loading="lazy"
                     decoding="async"
                     alt="Loc Vuong"
@@ -380,9 +380,9 @@ export default async function Page() {
               <div className="flex flex-col bg-white/40 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-3xl p-5 shadow-lg backdrop-blur-md hover:scale-[1.01] transition-transform duration-300">
                 <div className="relative aspect-square w-full rounded-2xl overflow-hidden mb-5 bg-slate-100 dark:bg-slate-800">
                   <img
-                    src="/images/edward.png"
-                    width={1024}
-                    height={1024}
+                    src="/images/edward.webp"
+                    width={800}
+                    height={800}
                     loading="lazy"
                     decoding="async"
                     alt="Edward Wong"

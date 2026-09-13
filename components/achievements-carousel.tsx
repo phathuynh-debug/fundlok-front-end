@@ -326,8 +326,15 @@ export function AchievementsCarousel({
                       ? "rotate-270 scale-[0.75]"
                       : ""
                   }`}
-                  sizes="100vw"
-                  priority
+                  // The lightbox is capped at max-w-5xl (1024px), so `100vw`
+                  // was asking the optimizer for a candidate several times
+                  // wider than anything that gets painted.
+                  sizes="(max-width: 1024px) 100vw, 1024px"
+                  // Not `priority`: that is deprecated in Next 16, and it
+                  // preloads — pointless for an image that only mounts after a
+                  // click. `fetchPriority` just moves it up the queue once it
+                  // is actually in the DOM.
+                  fetchPriority="high"
                 />
               </div>
             </motion.div>

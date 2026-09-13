@@ -30,7 +30,7 @@ const achievementsData = {
       category: "Government Recognition",
       description:
         "FundLok was recognized as a top-3 fintech project by the Australian Government for facilitating sustainable cross-border investments and ESG-aligned SME funding.",
-      images: ["/achivements/sustainability-action-2.png"],
+      images: ["/achivements/sustainability-action-2.webp"],
     },
     {
       title: "Seed Stage Start-up Incubation in FinTech Industry 2025",
@@ -39,10 +39,10 @@ const achievementsData = {
       description:
         "Selected for the premium incubation program by SIHUB, receiving strategic mentorship, regulatory sandbox guidance, and network access to top regional venture capitals.",
       images: [
-        "/achivements/sustainability-action-1.png",
-        "/achivements/sihub-announcement.png",
-        "/achivements/sihub-pitching-1.png",
-        "/achivements/sihub-pitching-2.png",
+        "/achivements/sustainability-action-1.webp",
+        "/achivements/sihub-announcement.webp",
+        "/achivements/sihub-pitching-1.webp",
+        "/achivements/sihub-pitching-2.webp",
       ],
     },
     {
@@ -51,7 +51,7 @@ const achievementsData = {
       category: "Global Innovation",
       description:
         "Representing Vietnam (under the project name LENDMI), FundLok won a top-10 global spot for pioneering blockchain-based credit scoring and secure liquidity pooling for emerging markets.",
-      images: ["/achivements/ibcol-certificate.png"],
+      images: ["/achivements/ibcol-certificate.webp"],
       pdf: "/achivements/ibcol-certificate.pdf",
     },
   ],
@@ -62,7 +62,7 @@ const achievementsData = {
       category: "Ghi nhận từ Chính phủ",
       description:
         "FundLok được ghi nhận là một trong 3 dự án FinTech xuất sắc nhất bởi Chính phủ Úc trong việc thúc đẩy đầu tư bền vững và hỗ trợ vốn SME theo tiêu chuẩn ESG.",
-      images: ["/achivements/sustainability-action-2.png"],
+      images: ["/achivements/sustainability-action-2.webp"],
     },
     {
       title: "Ươm tạo Khởi nghiệp Giai đoạn Hạt giống ngành FinTech 2025",
@@ -71,10 +71,10 @@ const achievementsData = {
       description:
         "Được lựa chọn tham gia chương trình ươm tạo cao cấp của SIHUB, nhận hỗ trợ tư vấn chiến lược, hướng dẫn thử nghiệm pháp lý (sandbox) và tiếp cận mạng lưới quỹ đầu tư mạo hiểm hàng đầu khu vực.",
       images: [
-        "/achivements/sustainability-action-1.png",
-        "/achivements/sihub-announcement.png",
-        "/achivements/sihub-pitching-1.png",
-        "/achivements/sihub-pitching-2.png",
+        "/achivements/sustainability-action-1.webp",
+        "/achivements/sihub-announcement.webp",
+        "/achivements/sihub-pitching-1.webp",
+        "/achivements/sihub-pitching-2.webp",
       ],
     },
     {
@@ -83,7 +83,7 @@ const achievementsData = {
       category: "Sáng tạo Toàn cầu",
       description:
         "Đại diện cho Việt Nam (dưới tên dự án LENDMI), FundLok đã giành vị trí top 10 toàn cầu nhờ tiên phong trong việc chấm điểm tín dụng dựa trên blockchain và tối ưu hóa bể thanh khoản an toàn cho thị trường mới nổi.",
-      images: ["/achivements/ibcol-certificate.png"],
+      images: ["/achivements/ibcol-certificate.webp"],
       pdf: "/achivements/ibcol-certificate.pdf",
     },
   ],

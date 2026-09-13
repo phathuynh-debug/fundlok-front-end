@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, Lock } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
@@ -23,7 +23,6 @@ type MockupProps = {
 
 export default function Mockup(props: MockupProps) {
   const { t, locale } = useTranslations();
-  const [device, setDevice] = useState<"phone" | "laptop">("phone");
   const [view, setView] = useState<"investor" | "sme">("sme");
 
   // SME Calculator states. VND, matching lib/constants/loan-constraints.ts —
@@ -40,17 +39,6 @@ export default function Mockup(props: MockupProps) {
   // Show results calculation states
   const [smeShowResults, setSmeShowResults] = useState(false);
   const [invShowResults, setInvShowResults] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const mq = window.matchMedia("(min-width: 1024px)");
-    const handler = (e: MediaQueryListEvent | MediaQueryList) => {
-      setDevice(e.matches ? "laptop" : "phone");
-    };
-    handler(mq);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
 
   const partner = props.activePartner;
 
@@ -230,310 +218,153 @@ export default function Mockup(props: MockupProps) {
     </>
   );
 
-  if (device === "laptop") {
-    return (
-      <div className="w-full flex justify-center mb-6 z-20 select-none">
-        <div className="relative w-[800px] aspect-[2528/1684] shrink-0">
-          {/* MacBook Pro Model Image */}
-          <img
-            src="/images/macbook.png"
-            alt="MacBook Pro Mockup"
-            className="w-full h-full object-contain pointer-events-none select-none"
-          />
+  const laptopMockup = (
+    <div className="w-full flex justify-center mb-6 z-20 select-none">
+      <div className="relative w-[800px] aspect-[2528/1684] shrink-0">
+        {/* MacBook Pro Model Image. Intrinsic dimensions are declared so the
+              frame reserves its box before the bytes land; `fetchPriority` is
+              high because on a wide viewport this is the largest thing above
+              the fold, i.e. the LCP element. */}
+        <img
+          src="/images/macbook.webp"
+          alt="MacBook Pro Mockup"
+          width={612}
+          height={408}
+          fetchPriority="high"
+          decoding="async"
+          className="w-full h-full object-contain pointer-events-none select-none"
+        />
 
-          {/* Screen Glass Inner Box */}
-          <div
-            className="absolute overflow-hidden bg-slate-950 border border-black/30 shadow-inner flex flex-col justify-between"
-            style={{
-              top: "10.7%",
-              left: "14.5%",
-              width: "71.6%",
-              height: "73.3%",
-              borderRadius: "1rem 1rem 0.1rem 0.1rem",
-            }}
-          >
-            {/* Web Browser Header */}
-            <div className="bg-[#141517] border-b border-zinc-950 px-4 py-2 flex items-center justify-between shrink-0 select-none">
-              {/* macOS Dot Window Controls */}
-              <div className="flex items-center gap-1.5 w-1/4">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f56] border border-[#e0443e] opacity-80" />
-                <span className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e] border border-[#dea123] opacity-80" />
-                <span className="w-2.5 h-2.5 rounded-full bg-[#27c93f] border border-[#1aab29] opacity-80" />
-              </div>
+        {/* Screen Glass Inner Box */}
+        <div
+          className="absolute overflow-hidden bg-slate-950 border border-black/30 shadow-inner flex flex-col justify-between"
+          style={{
+            top: "10.7%",
+            left: "14.5%",
+            width: "71.6%",
+            height: "73.3%",
+            borderRadius: "1rem 1rem 0.1rem 0.1rem",
+          }}
+        >
+          {/* Web Browser Header */}
+          <div className="bg-[#141517] border-b border-zinc-950 px-4 py-2 flex items-center justify-between shrink-0 select-none">
+            {/* macOS Dot Window Controls */}
+            <div className="flex items-center gap-1.5 w-1/4">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f56] border border-[#e0443e] opacity-80" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e] border border-[#dea123] opacity-80" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#27c93f] border border-[#1aab29] opacity-80" />
+            </div>
 
-              {/* URL Search bar */}
-              <div className="w-2/4 max-w-sm flex items-center justify-center gap-1.5 bg-black/40 border border-zinc-800/80 px-4 py-1.5 rounded-lg text-[10px] text-zinc-400 font-mono tracking-wide">
-                <Lock className="w-2.5 h-2.5 text-emerald-500 shrink-0" />
-                <span className="truncate">
-                  app.fundlok.com/portal/{partner.id}
+            {/* URL Search bar */}
+            <div className="w-2/4 max-w-sm flex items-center justify-center gap-1.5 bg-black/40 border border-zinc-800/80 px-4 py-1.5 rounded-lg text-[10px] text-zinc-400 font-mono tracking-wide">
+              <Lock className="w-2.5 h-2.5 text-emerald-500 shrink-0" />
+              <span className="truncate">
+                app.fundlok.com/portal/{partner.id}
+              </span>
+            </div>
+
+            {/* Secure Badge */}
+            <div className="w-1/4 flex justify-end items-center gap-2 text-[9px] text-zinc-500 font-mono font-bold tracking-wider">
+              <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-widest scale-90">
+                Active
+              </span>
+            </div>
+          </div>
+
+          {/* Portal Dashboard App */}
+          <div className="bg-gradient-to-br from-slate-950 via-zinc-900 to-slate-950 flex-1 text-white p-5 overflow-hidden flex flex-col justify-between">
+            {/* Nav & Header */}
+            <div className="flex items-center justify-between border-b border-zinc-900 pb-2">
+              <div className="flex items-center gap-2">
+                <div className="w-5.5 h-5.5 rounded bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
+                  <TrendingUp className="h-3 w-3 text-emerald-400" />
+                </div>
+                <span className="font-sans font-bold text-[10px] uppercase tracking-widest text-zinc-300">
+                  {partner.name}
                 </span>
               </div>
 
-              {/* Secure Badge */}
-              <div className="w-1/4 flex justify-end items-center gap-2 text-[9px] text-zinc-500 font-mono font-bold tracking-wider">
-                <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-widest scale-90">
-                  Active
-                </span>
+              {/* Portal Selectors */}
+              <div className="flex items-center gap-1.5 bg-zinc-950 border border-zinc-900 p-0.5 rounded-lg">
+                <button
+                  onClick={() => setView("sme")}
+                  className={`text-[8.5px] font-mono tracking-wider px-4 py-1.5 rounded-md font-bold transition-all duration-300 cursor-pointer ${view === "sme" ? "bg-emerald-600 text-white shadow-md" : "text-zinc-400 hover:text-zinc-200"}`}
+                >
+                  {t("mockup.smePortal")}
+                </button>
+                <button
+                  onClick={() => setView("investor")}
+                  className={`text-[8.5px] font-mono tracking-wider px-4 py-1.5 rounded-md font-bold transition-all duration-300 cursor-pointer ${view === "investor" ? "bg-emerald-600 text-white shadow-md" : "text-zinc-400 hover:text-zinc-200"}`}
+                >
+                  {t("mockup.investorPortal")}
+                </button>
               </div>
             </div>
 
-            {/* Portal Dashboard App */}
-            <div className="bg-gradient-to-br from-slate-950 via-zinc-900 to-slate-950 flex-1 text-white p-5 overflow-hidden flex flex-col justify-between">
-              {/* Nav & Header */}
-              <div className="flex items-center justify-between border-b border-zinc-900 pb-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-5.5 h-5.5 rounded bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
-                    <TrendingUp className="h-3 w-3 text-emerald-400" />
-                  </div>
-                  <span className="font-sans font-bold text-[10px] uppercase tracking-widest text-zinc-300">
-                    {partner.name}
+            {/* Dashboard grid */}
+            <div className="grid grid-cols-12 gap-5 flex-1 pt-4 items-center">
+              {/* Left Column: table parameters */}
+              <div className="col-span-6 bg-zinc-950/45 border border-zinc-900/60 rounded-xl p-4 flex flex-col justify-between h-full max-h-[235px] shadow-lg backdrop-blur-sm">
+                <div className="flex items-center justify-between border-b border-zinc-900/60 pb-2 mb-2">
+                  <span className="text-[10px] font-mono tracking-wider font-bold text-emerald-400 uppercase">
+                    {view === "sme"
+                      ? t("mockup.borrowerSpecs")
+                      : t("mockup.investmentSpecs")}
+                  </span>
+                  <span className="text-[9px] font-sans font-bold text-zinc-550 uppercase bg-zinc-900/60 px-2 py-0.5 rounded">
+                    {partner.category}
                   </span>
                 </div>
-
-                {/* Portal Selectors */}
-                <div className="flex items-center gap-1.5 bg-zinc-950 border border-zinc-900 p-0.5 rounded-lg">
-                  <button
-                    onClick={() => setView("sme")}
-                    className={`text-[8.5px] font-mono tracking-wider px-4 py-1.5 rounded-md font-bold transition-all duration-300 cursor-pointer ${view === "sme" ? "bg-emerald-600 text-white shadow-md" : "text-zinc-400 hover:text-zinc-200"}`}
-                  >
-                    {t("mockup.smePortal")}
-                  </button>
-                  <button
-                    onClick={() => setView("investor")}
-                    className={`text-[8.5px] font-mono tracking-wider px-4 py-1.5 rounded-md font-bold transition-all duration-300 cursor-pointer ${view === "investor" ? "bg-emerald-600 text-white shadow-md" : "text-zinc-400 hover:text-zinc-200"}`}
-                  >
-                    {t("mockup.investorPortal")}
-                  </button>
-                </div>
+                {view === "sme"
+                  ? matrixSme(smeShowResults)
+                  : matrixInvestor(invShowResults)}
               </div>
 
-              {/* Dashboard grid */}
-              <div className="grid grid-cols-12 gap-5 flex-1 pt-4 items-center">
-                {/* Left Column: table parameters */}
-                <div className="col-span-6 bg-zinc-950/45 border border-zinc-900/60 rounded-xl p-4 flex flex-col justify-between h-full max-h-[235px] shadow-lg backdrop-blur-sm">
-                  <div className="flex items-center justify-between border-b border-zinc-900/60 pb-2 mb-2">
-                    <span className="text-[10px] font-mono tracking-wider font-bold text-emerald-400 uppercase">
-                      {view === "sme"
-                        ? t("mockup.borrowerSpecs")
-                        : t("mockup.investmentSpecs")}
-                    </span>
-                    <span className="text-[9px] font-sans font-bold text-zinc-550 uppercase bg-zinc-900/60 px-2 py-0.5 rounded">
-                      {partner.category}
-                    </span>
-                  </div>
-                  {view === "sme"
-                    ? matrixSme(smeShowResults)
-                    : matrixInvestor(invShowResults)}
-                </div>
-
-                {/* Right Column: Visual Charts & Controls */}
-                <div className="col-span-6 flex flex-col justify-between h-full max-h-[235px] gap-3">
-                  {view === "sme" ? (
-                    !smeShowResults ? (
-                      <>
-                        {/* SME Sliders controls */}
-                        <div className="bg-zinc-950/45 border border-zinc-900/50 rounded-xl p-2.5 flex flex-col gap-2 shadow-lg backdrop-blur-sm flex-1 justify-center">
-                          {/* Slider 1: Loan Size */}
-                          <div className="flex flex-col gap-1">
-                            <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
-                              <span>{t("mockup.desiredLoanSize")}</span>
-                              <span className="text-emerald-400 font-mono font-semibold text-[9px]">
-                                {formatCompactCurrency(smeLoanSize, locale)}
-                              </span>
-                            </div>
-                            <input
-                              type="range"
-                              min="200000000"
-                              max="5000000000"
-                              step="100000000"
-                              value={smeLoanSize}
-                              onChange={(e) =>
-                                setSmeLoanSize(Number(e.target.value))
-                              }
-                              className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none thumb-sm"
-                            />
-                          </div>
-
-                          {/* Slider 2: Monthly Revenue */}
-                          <div className="flex flex-col gap-1">
-                            <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
-                              <span>{t("mockup.monthlyRevenue")}</span>
-                              <span className="text-emerald-400 font-mono font-semibold text-[9px]">
-                                {formatCompactCurrency(smeRevenue, locale)}
-                              </span>
-                            </div>
-                            <input
-                              type="range"
-                              min="100000000"
-                              max="2000000000"
-                              step="50000000"
-                              value={smeRevenue}
-                              onChange={(e) =>
-                                setSmeRevenue(Number(e.target.value))
-                              }
-                              className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none thumb-sm"
-                            />
-                          </div>
-
-                          {/* Slider 3: Duration */}
-                          <div className="flex flex-col gap-1">
-                            <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
-                              <span>{t("mockup.loanDuration")}</span>
-                              <span className="text-emerald-400 font-mono font-semibold text-[9px]">
-                                {t("mockup.durationMonths", {
-                                  months: smeDuration,
-                                })}
-                              </span>
-                            </div>
-                            <input
-                              type="range"
-                              min="6"
-                              max="12"
-                              step="6"
-                              value={smeDuration}
-                              onChange={(e) =>
-                                setSmeDuration(Number(e.target.value))
-                              }
-                              className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none thumb-sm"
-                            />
-                          </div>
-                        </div>
-
-                        <button
-                          onClick={() => setSmeShowResults(true)}
-                          className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 transition-all text-[8.5px] font-sans font-bold uppercase tracking-widest text-white shadow-lg shadow-emerald-900/20 cursor-pointer flex items-center justify-center gap-1.5"
-                        >
-                          {t("mockup.calculateSmeNew")}
-                        </button>
-                      </>
-                    ) : (
-                      <div className="bg-zinc-950/45 border border-zinc-900/50 rounded-xl p-3 flex flex-col justify-between shadow-lg backdrop-blur-sm flex-1 h-full">
-                        <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider border-b border-zinc-900/40 pb-1.5">
-                          <span>{t("mockup.indicativeCheck")}</span>
-                          <span
-                            className={
-                              isSmeIneligible
-                                ? "text-red-400"
-                                : "text-emerald-400"
-                            }
-                          >
-                            {isSmeIneligible
-                              ? t("mockup.notEligible")
-                              : t("mockup.indicativeFit")}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center justify-around flex-1 py-1">
-                          {/* SVG Gauges */}
-                          <div className="relative w-18 h-18">
-                            <svg className="w-full h-full transform -rotate-90">
-                              {/* Track circle */}
-                              <circle
-                                cx="36"
-                                cy="36"
-                                r="30"
-                                className="stroke-zinc-800"
-                                strokeWidth="5"
-                                fill="transparent"
-                              />
-                              {/* Progress circle */}
-                              <circle
-                                cx="36"
-                                cy="36"
-                                r="30"
-                                className={`transition-all duration-500 ${
-                                  isSmeIneligible
-                                    ? "stroke-red-500"
-                                    : businessScore >= 70
-                                      ? "stroke-emerald-500"
-                                      : "stroke-amber-500"
-                                }`}
-                                strokeWidth="5"
-                                fill="transparent"
-                                strokeDasharray={188.4}
-                                strokeDashoffset={
-                                  188.4 - (businessScore / 100) * 188.4
-                                }
-                                strokeLinecap="round"
-                              />
-                            </svg>
-                            <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-0.5">
-                              <span className="text-sm font-mono font-bold text-white leading-none">
-                                {businessScore}
-                              </span>
-                              <span className="text-[5px] text-zinc-500 font-sans font-bold uppercase tracking-wider mt-0.5">
-                                {t("mockup.scoreLabel")}
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Metric readout */}
-                          <div className="flex flex-col gap-1.5 text-[9px]">
-                            <div className="flex flex-col">
-                              <span className="text-zinc-550 text-[6px] font-sans font-bold uppercase tracking-wider">
-                                {t("mockup.revenueCoverage")}
-                              </span>
-                              <span className="font-mono text-white font-bold">
-                                {coverageText}
-                              </span>
-                            </div>
-                            <div className="flex flex-col">
-                              <span className="text-zinc-550 text-[6px] font-sans font-bold uppercase tracking-wider">
-                                {t("mockup.indicativeRate")}
-                              </span>
-                              <span className="font-mono text-emerald-400 font-bold">
-                                {indicativeRateText}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <button
-                          onClick={() => setSmeShowResults(false)}
-                          className="w-full py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-[8px] font-sans font-bold uppercase tracking-wider hover:bg-zinc-850 hover:border-zinc-700 active:scale-98 transition-all text-zinc-300 cursor-pointer"
-                        >
-                          {t("mockup.adjustSme")}
-                        </button>
-                      </div>
-                    )
-                  ) : !invShowResults ? (
+              {/* Right Column: Visual Charts & Controls */}
+              <div className="col-span-6 flex flex-col justify-between h-full max-h-[235px] gap-3">
+                {view === "sme" ? (
+                  !smeShowResults ? (
                     <>
-                      {/* Investor Sliders controls */}
+                      {/* SME Sliders controls */}
                       <div className="bg-zinc-950/45 border border-zinc-900/50 rounded-xl p-2.5 flex flex-col gap-2 shadow-lg backdrop-blur-sm flex-1 justify-center">
-                        {/* Slider 1: Investment Size */}
+                        {/* Slider 1: Loan Size */}
                         <div className="flex flex-col gap-1">
                           <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
-                            <span>{t("mockup.investmentShort")}</span>
+                            <span>{t("mockup.desiredLoanSize")}</span>
                             <span className="text-emerald-400 font-mono font-semibold text-[9px]">
-                              {formatCompactCurrency(invSize, locale)}
+                              {formatCompactCurrency(smeLoanSize, locale)}
                             </span>
                           </div>
                           <input
                             type="range"
-                            min="50000000"
-                            max="2000000000"
-                            step="50000000"
-                            value={invSize}
-                            onChange={(e) => setInvSize(Number(e.target.value))}
+                            min="200000000"
+                            max="5000000000"
+                            step="100000000"
+                            value={smeLoanSize}
+                            onChange={(e) =>
+                              setSmeLoanSize(Number(e.target.value))
+                            }
                             className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none thumb-sm"
                           />
                         </div>
 
-                        {/* Slider 2: Risk Tolerance */}
+                        {/* Slider 2: Monthly Revenue */}
                         <div className="flex flex-col gap-1">
                           <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
-                            <span>{t("mockup.riskTolerance")}</span>
+                            <span>{t("mockup.monthlyRevenue")}</span>
                             <span className="text-emerald-400 font-mono font-semibold text-[9px]">
-                              {invRisk.toFixed(1)} / 10
+                              {formatCompactCurrency(smeRevenue, locale)}
                             </span>
                           </div>
                           <input
                             type="range"
-                            min="0"
-                            max="10"
-                            step="0.5"
-                            value={invRisk}
-                            onChange={(e) => setInvRisk(Number(e.target.value))}
+                            min="100000000"
+                            max="2000000000"
+                            step="50000000"
+                            value={smeRevenue}
+                            onChange={(e) =>
+                              setSmeRevenue(Number(e.target.value))
+                            }
                             className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none thumb-sm"
                           />
                         </div>
@@ -541,10 +372,10 @@ export default function Mockup(props: MockupProps) {
                         {/* Slider 3: Duration */}
                         <div className="flex flex-col gap-1">
                           <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
-                            <span>{t("mockup.durationTerms")}</span>
+                            <span>{t("mockup.loanDuration")}</span>
                             <span className="text-emerald-400 font-mono font-semibold text-[9px]">
                               {t("mockup.durationMonths", {
-                                months: invDuration,
+                                months: smeDuration,
                               })}
                             </span>
                           </div>
@@ -553,9 +384,9 @@ export default function Mockup(props: MockupProps) {
                             min="6"
                             max="12"
                             step="6"
-                            value={invDuration}
+                            value={smeDuration}
                             onChange={(e) =>
-                              setInvDuration(Number(e.target.value))
+                              setSmeDuration(Number(e.target.value))
                             }
                             className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none thumb-sm"
                           />
@@ -563,84 +394,245 @@ export default function Mockup(props: MockupProps) {
                       </div>
 
                       <button
-                        onClick={() => setInvShowResults(true)}
+                        onClick={() => setSmeShowResults(true)}
                         className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 transition-all text-[8.5px] font-sans font-bold uppercase tracking-widest text-white shadow-lg shadow-emerald-900/20 cursor-pointer flex items-center justify-center gap-1.5"
                       >
-                        {t("mockup.calculateInvNew")}
+                        {t("mockup.calculateSmeNew")}
                       </button>
                     </>
                   ) : (
                     <div className="bg-zinc-950/45 border border-zinc-900/50 rounded-xl p-3 flex flex-col justify-between shadow-lg backdrop-blur-sm flex-1 h-full">
                       <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider border-b border-zinc-900/40 pb-1.5">
-                        <span>{t("mockup.yieldReturnProjection")}</span>
-                        <span className="text-emerald-400 font-bold font-mono">
-                          {targetRangeText}
+                        <span>{t("mockup.indicativeCheck")}</span>
+                        <span
+                          className={
+                            isSmeIneligible
+                              ? "text-red-400"
+                              : "text-emerald-400"
+                          }
+                        >
+                          {isSmeIneligible
+                            ? t("mockup.notEligible")
+                            : t("mockup.indicativeFit")}
                         </span>
                       </div>
 
-                      {/* Chart bars */}
-                      <div className="h-20 flex items-end justify-between gap-1.5 px-1 py-1">
-                        {[6, 12].map((dur) => {
-                          // Midpoint of the target range, only to size the
-                          // bar. The figure printed under it is the range.
-                          const profit =
-                            ((invSize * (targetCentre / 100)) / 12) * dur;
-                          const maxProfit =
-                            ((invSize * (17.5 / 100)) / 12) * 12;
-                          const heightPct = Math.min(
-                            100,
-                            Math.max(15, (profit / maxProfit) * 150),
-                          );
+                      <div className="flex items-center justify-around flex-1 py-1">
+                        {/* SVG Gauges */}
+                        <div className="relative w-18 h-18">
+                          <svg className="w-full h-full transform -rotate-90">
+                            {/* Track circle */}
+                            <circle
+                              cx="36"
+                              cy="36"
+                              r="30"
+                              className="stroke-zinc-800"
+                              strokeWidth="5"
+                              fill="transparent"
+                            />
+                            {/* Progress circle */}
+                            <circle
+                              cx="36"
+                              cy="36"
+                              r="30"
+                              className={`transition-all duration-500 ${
+                                isSmeIneligible
+                                  ? "stroke-red-500"
+                                  : businessScore >= 70
+                                    ? "stroke-emerald-500"
+                                    : "stroke-amber-500"
+                              }`}
+                              strokeWidth="5"
+                              fill="transparent"
+                              strokeDasharray={188.4}
+                              strokeDashoffset={
+                                188.4 - (businessScore / 100) * 188.4
+                              }
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                          <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-0.5">
+                            <span className="text-sm font-mono font-bold text-white leading-none">
+                              {businessScore}
+                            </span>
+                            <span className="text-[5px] text-zinc-500 font-sans font-bold uppercase tracking-wider mt-0.5">
+                              {t("mockup.scoreLabel")}
+                            </span>
+                          </div>
+                        </div>
 
-                          const isHighlighted =
-                            dur === 6 ? invDuration <= 6 : invDuration > 6;
-
-                          return (
-                            <div
-                              key={dur}
-                              className="flex-1 h-full flex flex-col items-center justify-end"
-                            >
-                              <span
-                                className={`text-[6px] font-mono mb-0.5 ${isHighlighted ? "text-emerald-400 font-bold" : "text-zinc-500"}`}
-                              >
-                                {formatCompactCurrency(
-                                  Math.round(profit),
-                                  locale,
-                                )}
-                              </span>
-                              <div
-                                className={`w-full rounded-t-sm transition-all duration-300 ${isHighlighted ? "bg-emerald-400 shadow-[0_0_5px_#10b981]" : "bg-emerald-500/25"}`}
-                                style={{ height: `${heightPct}%` }}
-                              />
-                              <span
-                                className={`text-[6px] font-mono mt-1 ${isHighlighted ? "text-emerald-400 font-bold" : "text-zinc-500"}`}
-                              >
-                                {t("mockup.durationMos", { months: dur })}
-                              </span>
-                            </div>
-                          );
-                        })}
+                        {/* Metric readout */}
+                        <div className="flex flex-col gap-1.5 text-[9px]">
+                          <div className="flex flex-col">
+                            <span className="text-zinc-550 text-[6px] font-sans font-bold uppercase tracking-wider">
+                              {t("mockup.revenueCoverage")}
+                            </span>
+                            <span className="font-mono text-white font-bold">
+                              {coverageText}
+                            </span>
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-zinc-550 text-[6px] font-sans font-bold uppercase tracking-wider">
+                              {t("mockup.indicativeRate")}
+                            </span>
+                            <span className="font-mono text-emerald-400 font-bold">
+                              {indicativeRateText}
+                            </span>
+                          </div>
+                        </div>
                       </div>
 
                       <button
-                        onClick={() => setInvShowResults(false)}
+                        onClick={() => setSmeShowResults(false)}
                         className="w-full py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-[8px] font-sans font-bold uppercase tracking-wider hover:bg-zinc-850 hover:border-zinc-700 active:scale-98 transition-all text-zinc-300 cursor-pointer"
                       >
-                        {t("mockup.adjustInv")}
+                        {t("mockup.adjustSme")}
                       </button>
                     </div>
-                  )}
-                </div>
+                  )
+                ) : !invShowResults ? (
+                  <>
+                    {/* Investor Sliders controls */}
+                    <div className="bg-zinc-950/45 border border-zinc-900/50 rounded-xl p-2.5 flex flex-col gap-2 shadow-lg backdrop-blur-sm flex-1 justify-center">
+                      {/* Slider 1: Investment Size */}
+                      <div className="flex flex-col gap-1">
+                        <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
+                          <span>{t("mockup.investmentShort")}</span>
+                          <span className="text-emerald-400 font-mono font-semibold text-[9px]">
+                            {formatCompactCurrency(invSize, locale)}
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min="50000000"
+                          max="2000000000"
+                          step="50000000"
+                          value={invSize}
+                          onChange={(e) => setInvSize(Number(e.target.value))}
+                          className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none thumb-sm"
+                        />
+                      </div>
+
+                      {/* Slider 2: Risk Tolerance */}
+                      <div className="flex flex-col gap-1">
+                        <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
+                          <span>{t("mockup.riskTolerance")}</span>
+                          <span className="text-emerald-400 font-mono font-semibold text-[9px]">
+                            {invRisk.toFixed(1)} / 10
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="10"
+                          step="0.5"
+                          value={invRisk}
+                          onChange={(e) => setInvRisk(Number(e.target.value))}
+                          className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none thumb-sm"
+                        />
+                      </div>
+
+                      {/* Slider 3: Duration */}
+                      <div className="flex flex-col gap-1">
+                        <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider">
+                          <span>{t("mockup.durationTerms")}</span>
+                          <span className="text-emerald-400 font-mono font-semibold text-[9px]">
+                            {t("mockup.durationMonths", {
+                              months: invDuration,
+                            })}
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min="6"
+                          max="12"
+                          step="6"
+                          value={invDuration}
+                          onChange={(e) =>
+                            setInvDuration(Number(e.target.value))
+                          }
+                          className="w-full h-1 bg-zinc-850 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none thumb-sm"
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => setInvShowResults(true)}
+                      className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 transition-all text-[8.5px] font-sans font-bold uppercase tracking-widest text-white shadow-lg shadow-emerald-900/20 cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      {t("mockup.calculateInvNew")}
+                    </button>
+                  </>
+                ) : (
+                  <div className="bg-zinc-950/45 border border-zinc-900/50 rounded-xl p-3 flex flex-col justify-between shadow-lg backdrop-blur-sm flex-1 h-full">
+                    <div className="flex justify-between items-center text-[7.5px] text-zinc-400 font-bold uppercase tracking-wider border-b border-zinc-900/40 pb-1.5">
+                      <span>{t("mockup.yieldReturnProjection")}</span>
+                      <span className="text-emerald-400 font-bold font-mono">
+                        {targetRangeText}
+                      </span>
+                    </div>
+
+                    {/* Chart bars */}
+                    <div className="h-20 flex items-end justify-between gap-1.5 px-1 py-1">
+                      {[6, 12].map((dur) => {
+                        // Midpoint of the target range, only to size the
+                        // bar. The figure printed under it is the range.
+                        const profit =
+                          ((invSize * (targetCentre / 100)) / 12) * dur;
+                        const maxProfit = ((invSize * (17.5 / 100)) / 12) * 12;
+                        const heightPct = Math.min(
+                          100,
+                          Math.max(15, (profit / maxProfit) * 150),
+                        );
+
+                        const isHighlighted =
+                          dur === 6 ? invDuration <= 6 : invDuration > 6;
+
+                        return (
+                          <div
+                            key={dur}
+                            className="flex-1 h-full flex flex-col items-center justify-end"
+                          >
+                            <span
+                              className={`text-[6px] font-mono mb-0.5 ${isHighlighted ? "text-emerald-400 font-bold" : "text-zinc-500"}`}
+                            >
+                              {formatCompactCurrency(
+                                Math.round(profit),
+                                locale,
+                              )}
+                            </span>
+                            <div
+                              className={`w-full rounded-t-sm transition-all duration-300 ${isHighlighted ? "bg-emerald-400 shadow-[0_0_5px_#10b981]" : "bg-emerald-500/25"}`}
+                              style={{ height: `${heightPct}%` }}
+                            />
+                            <span
+                              className={`text-[6px] font-mono mt-1 ${isHighlighted ? "text-emerald-400 font-bold" : "text-zinc-500"}`}
+                            >
+                              {t("mockup.durationMos", { months: dur })}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <button
+                      onClick={() => setInvShowResults(false)}
+                      className="w-full py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-[8px] font-sans font-bold uppercase tracking-wider hover:bg-zinc-850 hover:border-zinc-700 active:scale-98 transition-all text-zinc-300 cursor-pointer"
+                    >
+                      {t("mockup.adjustInv")}
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 
   // Mobile / Tablet: Tactile Phone Mockup
-  return (
+  const phoneMockup = (
     <div
       onMouseMove={props.onMouseMove}
       onMouseLeave={props.onMouseLeave}
@@ -993,5 +985,19 @@ export default function Mockup(props: MockupProps) {
         </div>
       </motion.div>
     </div>
+  );
+
+  // Both chromes are rendered and the breakpoint is decided in CSS, not in an
+  // effect. The previous `matchMedia` + `useState` gate meant NEITHER variant
+  // existed in the server HTML, so on a wide screen the 800px MacBook frame —
+  // the largest element above the fold, and therefore the LCP element — only
+  // appeared once ~350KB of JS had downloaded, parsed and hydrated. Rendering
+  // both costs a few KB of markup the other breakpoint never paints; that is
+  // far cheaper than putting the LCP element behind hydration.
+  return (
+    <>
+      <div className="w-full hidden lg:block">{laptopMockup}</div>
+      <div className="w-full lg:hidden flex justify-center">{phoneMockup}</div>
+    </>
   );
 }

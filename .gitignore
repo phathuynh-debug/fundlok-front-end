@@ -14,7 +14,13 @@
 /coverage
 
 # next.js
+# The glob covers the alternate dist dirs NEXT_DIST_DIR is pointed at (the E2E
+# suite uses .next-e2e). Leaving one untracked is not just clutter: Tailwind v4
+# auto-detects sources by scanning everything git does not ignore, and it will
+# happily extract garbage "utilities" out of compiled binary chunks, which then
+# fail to parse as CSS.
 /.next/
+/.next-*/
 /out/
 
 # production
