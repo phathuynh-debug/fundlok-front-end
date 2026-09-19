@@ -96,7 +96,7 @@
     "shadcn": "^4.19.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.9.3",
-    "vitest": "^3.2.7"
+    "vitest": "^4.1.11"
   },
   "overrides": {
     "js-yaml": "4.3.2",
