@@ -1276,20 +1276,12 @@
     }
   },
   "kyc": {
-    "abandonedHint": "It looks like the verification wasn't completed. Let's try again.",
-    "abandonedTitle": "Verification not finished",
     "approvedHint": "You're all set. Taking you to your dashboard…",
     "approvedTitle": "Identity verified",
-    "awaitingUser": "Waiting for you to finish on Didit.",
-    "cameraNote": "You'll need to allow camera access on the next screen.",
     "checking": "Checking your verification…",
-    "consent": "You'll be securely redirected to our verification partner Didit to scan your ID document and take a quick selfie. It takes about two minutes.",
-    "consentTitle": "Before you start",
     "continueBtn": "Continue",
     "declinedHint": "We couldn't verify your identity. You can try again.",
     "declinedTitle": "Verification failed",
-    "expiredHint": "Your verification link expired. Start a new one to continue.",
-    "expiredTitle": "Verification link expired",
     "gv": {
       "backLabel": "ID card — back",
       "cameraClose": "Close camera",
@@ -1351,18 +1343,9 @@
       "typeCompany": "Company",
       "typeLabel": "Certificate type"
     },
-    "refreshBtn": "Refresh status",
-    "resubmitHint": "Some steps need to be redone. Continue your verification.",
-    "resubmitTitle": "A few steps to redo",
-    "resumeBtn": "Continue verification",
     "retryBtn": "Try again",
     "returnBtn": "Return",
-    "startBtn": "Verify my identity",
     "startErrorDescription": "Something went wrong starting verification. Please try again.",
-    "startErrorTitle": "Couldn't start verification",
-    "starting": "Starting…",
-    "stillPendingHint": "Still pending — it can take a moment to update after you finish.",
-    "subtitle": "One last step before you continue — we need to confirm who you are.",
     "title": "Verify your identity"
   },
   "localeSwitcher": {

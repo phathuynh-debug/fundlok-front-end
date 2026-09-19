@@ -1276,20 +1276,12 @@
     }
   },
   "kyc": {
-    "abandonedHint": "Có vẻ như quá trình xác minh chưa hoàn tất. Hãy thử lại.",
-    "abandonedTitle": "Chưa hoàn tất xác minh",
     "approvedHint": "Mọi thứ đã sẵn sàng. Đang đưa bạn đến bảng điều khiển…",
     "approvedTitle": "Đã xác minh danh tính",
-    "awaitingUser": "Đang chờ bạn hoàn tất trên Didit.",
-    "cameraNote": "Bạn cần cho phép truy cập camera ở màn hình kế tiếp.",
     "checking": "Đang kiểm tra xác minh của bạn…",
-    "consent": "Bạn sẽ được chuyển hướng an toàn đến đối tác xác minh Didit để quét giấy tờ tùy thân và chụp ảnh chân dung. Quá trình mất khoảng hai phút.",
-    "consentTitle": "Trước khi bắt đầu",
     "continueBtn": "Tiếp tục",
     "declinedHint": "Chúng tôi không thể xác minh danh tính của bạn. Bạn có thể thử lại.",
     "declinedTitle": "Xác minh thất bại",
-    "expiredHint": "Liên kết xác minh của bạn đã hết hạn. Bắt đầu lại để tiếp tục.",
-    "expiredTitle": "Liên kết xác minh đã hết hạn",
     "gv": {
       "backLabel": "CCCD/CMND — mặt sau",
       "cameraClose": "Đóng máy ảnh",
@@ -1351,18 +1343,9 @@
       "typeCompany": "Doanh nghiệp",
       "typeLabel": "Loại giấy phép"
     },
-    "refreshBtn": "Làm mới trạng thái",
-    "resubmitHint": "Một số bước cần được thực hiện lại. Hãy tiếp tục xác minh.",
-    "resubmitTitle": "Cần làm lại vài bước",
-    "resumeBtn": "Tiếp tục xác minh",
     "retryBtn": "Thử lại",
     "returnBtn": "Quay lại",
-    "startBtn": "Xác minh danh tính",
     "startErrorDescription": "Đã xảy ra lỗi khi bắt đầu xác minh. Vui lòng thử lại.",
-    "startErrorTitle": "Không thể bắt đầu xác minh",
-    "starting": "Đang bắt đầu…",
-    "stillPendingHint": "Vẫn đang chờ — có thể mất một chút thời gian để cập nhật sau khi bạn hoàn tất.",
-    "subtitle": "Một bước cuối trước khi tiếp tục — chúng tôi cần xác nhận danh tính của bạn.",
     "title": "Xác minh danh tính"
   },
   "localeSwitcher": {

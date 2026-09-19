@@ -11,7 +11,7 @@
  * interception alone.
  *
  * Running the real backend in CI instead would mean Postgres, Alembic, R2,
- * SMTP and the Didit/GVerify partner APIs. So the suite points `API_URL` at
+ * SMTP and the GVerify partner APIs. So the suite points `API_URL` at
  * this process: a dependency-free HTTP server that answers the handful of
  * endpoints the frontend actually reads, keyed off the `access_token` cookie.
  *

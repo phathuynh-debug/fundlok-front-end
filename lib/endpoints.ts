@@ -99,26 +99,11 @@ export const ADMIN_ENDPOINTS = {
   maintenance: "/system/maintenance",
 } as const;
 
-// Identity/business verification via Didit. Two behaviourally-identical
-// prefixes, gated by role server-side: investors do KYC (/kyc/*), SMEs do KYB
-// (/kyb/*). Pick the prefix from the user's role — calling the wrong one 403s.
-// The browser only talks to our API; the backend owns the Didit session and is
-// the source of truth (set from Didit's signed webhook).
-export type VerificationKind = "KYC" | "KYB";
-
-export function verificationEndpoints(kind: VerificationKind) {
-  const base = kind === "KYC" ? "/kyc" : "/kyb";
-  return {
-    start: `${base}/start`,
-    status: `${base}/status`,
-    sync: `${base}/sync`,
-  } as const;
-}
-
-// GVerify (Datatrust) eKYC — the direct-API KYC provider that replaces the
-// Didit hosted flow for INVESTORS. No redirect and no webhook: we submit the
-// ID images + portrait in one call and the response carries the final verdict.
-// SMEs (KYB) stay on the Didit flow above until GVerify eKYB lands.
+// GVerify (Datatrust) — identity/business verification for both roles, gated
+// by role server-side: investors do KYC, SMEs do KYB (calling the wrong one
+// 403s). Direct API, so no redirect and no webhook: we submit the images in
+// one call and the response carries the final verdict. The browser only talks
+// to our API; the backend owns the provider session and is the source of truth.
 export const GVERIFY_ENDPOINTS = {
   verify: "/gverify/kyc/verify",
   status: "/gverify/kyc/status",

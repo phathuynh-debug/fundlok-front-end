@@ -28,10 +28,9 @@ import { CaptureTabs } from "./CaptureTabs";
 import { useGVerifyKyc } from "./useGVerifyKyc";
 import type { ApiError } from "@/lib/types";
 
-// Investor KYC via GVerify (Datatrust) — the in-app replacement for the Didit
-// hosted redirect. The user stages ID front/back + a portrait, we submit them
-// in one call, and the verdict comes back synchronously: no redirect, no
-// webhook, no polling.
+// Investor KYC via GVerify (Datatrust) — an in-app flow: the user stages ID
+// front/back + a portrait, we submit them in one call, and the verdict comes
+// back synchronously: no redirect, no webhook, no polling.
 export function GVerifyKycClient() {
   const router = useRouter();
   const searchParams = useSearchParams();

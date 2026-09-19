@@ -51,10 +51,10 @@ const DOCUMENT_TYPES: Array<{
   },
 ];
 
-// SME business verification via GVerify eKYB — the in-app replacement for the
-// Didit hosted KYB flow. The SME uploads the business registration certificate
-// (photo or PDF), we OCR it and cross-check the tax code against the state
-// registry, and the verdict comes back synchronously.
+// SME business verification via GVerify eKYB — an in-app flow: the SME uploads
+// the business registration certificate (photo or PDF), we OCR it and
+// cross-check the tax code against the state registry, and the verdict comes
+// back synchronously.
 export function GVerifyKybClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
