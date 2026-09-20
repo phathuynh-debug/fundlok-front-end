@@ -13,6 +13,7 @@ import {
   type GVerifyStatusResponse,
   type GVerifyKybVerifyPayload,
   type GVerifyKybVerifyResponse,
+  type GVerifyKybCertificate,
   type GVerifyKybStatusResponse,
 } from "@/services/gverify.service";
 import type { ApiError } from "@/lib/types";
@@ -21,6 +22,7 @@ import type { ApiError } from "@/lib/types";
 export const gverifyKeys = {
   all: ["gverify"] as const,
   status: () => [...gverifyKeys.all, "status"] as const,
+  kybCertificate: () => [...gverifyKeys.all, "kyb-certificate"] as const,
   kybStatus: () => [...gverifyKeys.all, "kyb-status"] as const,
 };
 
@@ -141,5 +143,32 @@ export function useGVerifyVerifyWithToken() {
   return useMutation<GVerifyVerifyResponse, ApiError, TokenVerifyInput>({
     mutationFn: ({ payload, token }) =>
       gverifyService.verifyWithToken(payload, token),
+  });
+}
+
+/**
+ * The certificate the SME already gave us for KYB, as a short-lived URL.
+ *
+ * 404 means "nothing stored" — an ordinary outcome, since retention is
+ * best-effort — so it resolves to null rather than throwing. The caller then
+ * asks for an upload instead of rendering a broken preview.
+ *
+ * Not cached for long: the URL expires in 10 minutes, and serving a dead link
+ * from cache is worse than refetching.
+ */
+export function useKybCertificate(enabled = true) {
+  return useQuery<GVerifyKybCertificate | null, ApiError>({
+    queryKey: gverifyKeys.kybCertificate(),
+    enabled,
+    queryFn: async () => {
+      try {
+        return await gverifyService.kybGetCertificate();
+      } catch (err) {
+        if ((err as ApiError)?.status === 404) return null;
+        throw err;
+      }
+    },
+    staleTime: 5 * 60 * 1000,
+    retry: false,
   });
 }

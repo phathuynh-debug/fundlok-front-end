@@ -125,4 +125,7 @@ export const GVERIFY_ENDPOINTS = {
   // state tax-registry cross-check, synchronous verdict.
   kybVerify: "/gverify/kyb/verify",
   kybStatus: "/gverify/kyb/status",
+  // A 10-minute read URL for the certificate the SME already submitted for
+  // KYB, so the loan application does not ask for the same file twice.
+  kybCertificate: "/gverify/kyb/certificate",
 } as const;

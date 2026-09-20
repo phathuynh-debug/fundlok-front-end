@@ -902,6 +902,8 @@
       "requiredDocsMissingTitle": "Required Documents Missing",
       "resumeSending": "Resume sending",
       "retryUpload": "Retry",
+      "reusedFromKyb": "Already provided",
+      "reusedFromKybHint": "Taken from the certificate you submitted for business verification.",
       "reviewAllReadyHint": "All documents are ready. Click Send to upload them one by one.",
       "reviewMissingHint": "Add the missing documents before sending.",
       "reviewStepLabel": "Review",
@@ -959,6 +961,7 @@
       "vatDeclarationsHelpText": "For each of the 24 months, you must upload two files — (1) the VAT declaration and (2) the successful submission confirmation — for a total of 48 files. Please compress all files into a single .zip archive before uploading.",
       "vatDeclarationsHelpTitle": "48 files required:",
       "vatZipLabel": "Upload .zip containing all 48 VAT files (24 declarations + 24 confirmations)",
+      "viewDocument": "View",
       "whereToFindThese": "Where to find these numbers",
       "whyWeNeedThis": "Why we need this"
     },

@@ -902,6 +902,8 @@
       "requiredDocsMissingTitle": "Thiếu tài liệu bắt buộc",
       "resumeSending": "Tiếp tục gửi",
       "retryUpload": "Thử lại",
+      "reusedFromKyb": "Đã cung cấp",
+      "reusedFromKybHint": "Lấy từ giấy tờ bạn đã nộp khi xác minh doanh nghiệp.",
       "reviewAllReadyHint": "Tất cả tài liệu đã sẵn sàng. Nhấn Gửi để tải lên lần lượt từng tệp.",
       "reviewMissingHint": "Vui lòng bổ sung các tài liệu còn thiếu trước khi gửi.",
       "reviewStepLabel": "Xem lại",
@@ -959,6 +961,7 @@
       "vatDeclarationsHelpText": "Với mỗi tháng trong 24 tháng, bạn phải tải lên hai tệp — (1) tờ khai thuế GTGT và (2) xác nhận nộp thuế thành công — tổng cộng 48 tệp. Vui lòng nén tất cả các tệp thành một kho lưu trữ định dạng .zip duy nhất trước khi tải lên.",
       "vatDeclarationsHelpTitle": "Yêu cầu 48 tệp:",
       "vatZipLabel": "Tải lên tệp .zip chứa tất cả 48 tệp thuế GTGT (24 tờ khai + 24 xác nhận)",
+      "viewDocument": "Xem",
       "whereToFindThese": "Tìm các số liệu này ở đâu",
       "whyWeNeedThis": "Lý do cần hồ sơ"
     },

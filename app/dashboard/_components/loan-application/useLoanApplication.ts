@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useKybCertificate } from "@/hooks/use-gverify";
 import { useUploadLoanDocument, useConfirmUploads } from "@/hooks/use-uploads";
 import {
   useSaveLoanFigures,
@@ -105,6 +106,14 @@ export function useLoanApplication({
   t,
 }: UseLoanApplicationOptions) {
   const { toast } = useToast();
+
+  // The SME already submitted their business registration certificate for KYB.
+  // Asking for the same PDF again is busywork, and a second copy can disagree
+  // with the one that was actually verified. When it is on file, that document
+  // requirement is met and the wizard offers a preview instead of an upload.
+  const { data: kybCertificate } = useKybCertificate();
+  const isSatisfiedByKyb = (key: DocumentKey): boolean =>
+    key === "companyRegistration" && !!kybCertificate;
 
   const uploadDocument = useUploadLoanDocument();
   const confirmUploads = useConfirmUploads();
@@ -353,7 +362,11 @@ export function useLoanApplication({
   const isStepValid = (step: number): boolean => {
     if (step === REVIEW_STEP) return canSend;
     const keys = STEP_DOCUMENTS[step];
-    if (keys) return keys.every((key) => isStaged(documents[key]));
+    if (keys) {
+      return keys.every(
+        (key) => isStaged(documents[key]) || isSatisfiedByKyb(key),
+      );
+    }
     if (figureFieldsForStep(step).length) return isFigureStepValid(step);
     return false;
   };
@@ -412,8 +425,9 @@ export function useLoanApplication({
     (field) => validateFigure(field, figures[field.key]) === null,
   );
   const canSend =
-    ALL_DOCUMENT_KEYS.every((key) => isStaged(documents[key])) &&
-    allFiguresValid;
+    ALL_DOCUMENT_KEYS.every(
+      (key) => isStaged(documents[key]) || isSatisfiedByKyb(key),
+    ) && allFiguresValid;
   const allFilesUploaded = ALL_DOCUMENT_KEYS.every(
     (key) => documents[key].status === "uploaded",
   );
@@ -427,6 +441,10 @@ export function useLoanApplication({
     submitApplication.isPending;
 
   return {
+    // The stored KYB certificate, or null when nothing was retained. Drives
+    // both the "already provided" state and its preview link.
+    kybCertificate: kybCertificate ?? null,
+    isSatisfiedByKyb,
     // State
     documents,
     figures,
