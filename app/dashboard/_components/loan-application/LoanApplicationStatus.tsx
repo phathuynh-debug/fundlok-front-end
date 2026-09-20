@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { Check, FileText } from "lucide-react";
+import { Check, FileText, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ProjectLoanApplication } from "@/services/projects.service";
 import type { LoanDocumentType } from "@/services/uploads.service";
@@ -35,6 +35,52 @@ const REPAYMENT_LABELS: Record<string, { en: string; vi: string }> = {
   MONTHLY: { en: "Monthly", vi: "Hàng tháng" },
   QUARTERLY: { en: "Quarterly", vi: "Hàng quý" },
   END_OF_TERM: { en: "End of term", vi: "Cuối kỳ" },
+};
+
+type StepState = "done" | "active" | "pending" | "rejected";
+
+/**
+ * How a decided application presents itself.
+ *
+ * Keyed by `loan_applications.status`; anything else (SUBMITTED, UNDER_REVIEW)
+ * falls through to the in-progress presentation. The operator's
+ * `decision_note` is deliberately NOT shown — it is an internal review note,
+ * and the handbook keeps internal reasoning off applicant surfaces. The
+ * applicant gets the outcome and a way to ask about it.
+ */
+const DECIDED_PRESENTATION: Record<
+  string,
+  {
+    titleKey: string;
+    subtitleKey: string;
+    badgeKey: string;
+    noteKey: string;
+    finalStep: StepState;
+    badgeClass: string;
+    badgeTextClass: string;
+    dotClass: string;
+  }
+> = {
+  APPROVED: {
+    titleKey: "dashboard.sme.statusApprovedTitle",
+    subtitleKey: "dashboard.sme.statusApprovedSubtitle",
+    badgeKey: "dashboard.sme.statusApprovedBadge",
+    noteKey: "dashboard.sme.statusApprovedNote",
+    finalStep: "done",
+    badgeClass: "border-emerald-500/30 bg-emerald-500/10",
+    badgeTextClass: "text-emerald-700 dark:text-emerald-300",
+    dotClass: "bg-emerald-500",
+  },
+  REJECTED: {
+    titleKey: "dashboard.sme.statusRejectedTitle",
+    subtitleKey: "dashboard.sme.statusRejectedSubtitle",
+    badgeKey: "dashboard.sme.statusRejectedBadge",
+    noteKey: "dashboard.sme.statusRejectedNote",
+    finalStep: "rejected",
+    badgeClass: "border-destructive/30 bg-destructive/10",
+    badgeTextClass: "text-destructive",
+    dotClass: "bg-destructive",
+  },
 };
 
 function formatBytes(bytes: number): string {
@@ -70,11 +116,24 @@ export function LoanApplicationStatus({
     ? new Date(loanApplication.submitted_at)
     : null;
 
-  // Three-stage tracker — submission is done, review is in progress, decision pending.
+  // This panel used to be hardcoded to "awaiting review" for every status
+  // that was not DRAFT, so a decided application kept telling the applicant
+  // their documents were still being read. The three outcomes it can now
+  // show are the three the backend can put on `status` after submission.
+  const decided = DECIDED_PRESENTATION[loanApplication.status] ?? null;
+
+  // Three-stage tracker. Undecided: submission done, review running, decision
+  // still ahead. Decided: the third node carries the verdict.
   const steps = [
     { label: t("dashboard.sme.statusStepSubmitted"), state: "done" as const },
-    { label: t("dashboard.sme.statusStepReview"), state: "active" as const },
-    { label: t("dashboard.sme.statusStepDecision"), state: "pending" as const },
+    {
+      label: t("dashboard.sme.statusStepReview"),
+      state: decided ? ("done" as const) : ("active" as const),
+    },
+    {
+      label: t("dashboard.sme.statusStepDecision"),
+      state: decided ? decided.finalStep : ("pending" as const),
+    },
   ];
 
   return (
@@ -86,20 +145,39 @@ export function LoanApplicationStatus({
             {t("dashboard.sme.statusSubmittedEyebrow")}
           </span>
           <h3 className="text-xl font-bold tracking-tight text-foreground">
-            {t("dashboard.sme.statusSubmittedTitle")}
+            {t(decided?.titleKey ?? "dashboard.sme.statusSubmittedTitle")}
           </h3>
           <p className="max-w-xl text-sm leading-relaxed text-muted-foreground">
-            {t("dashboard.sme.statusSubmittedSubtitle")}
+            {t(decided?.subtitleKey ?? "dashboard.sme.statusSubmittedSubtitle")}
           </p>
         </div>
 
-        <div className="flex shrink-0 items-center gap-2 self-start rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 sm:self-center">
+        <div
+          className={cn(
+            "flex shrink-0 items-center gap-2 self-start rounded-full border px-3 py-1.5 sm:self-center",
+            decided?.badgeClass ?? "border-amber-500/30 bg-amber-500/10",
+          )}
+        >
           <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-500/70" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500" />
+            {/* The pulse means "something is still happening". A decided
+                application is not still happening, so it gets a steady dot. */}
+            {!decided && (
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-500/70" />
+            )}
+            <span
+              className={cn(
+                "relative inline-flex h-2 w-2 rounded-full",
+                decided?.dotClass ?? "bg-amber-500",
+              )}
+            />
           </span>
-          <span className="text-xs font-semibold text-amber-700 dark:text-amber-300">
-            {t("dashboard.sme.statusUnderReviewBadge")}
+          <span
+            className={cn(
+              "text-xs font-semibold",
+              decided?.badgeTextClass ?? "text-amber-700 dark:text-amber-300",
+            )}
+          >
+            {t(decided?.badgeKey ?? "dashboard.sme.statusUnderReviewBadge")}
           </span>
         </div>
       </div>
@@ -122,9 +200,13 @@ export function LoanApplicationStatus({
                       "border-amber-500 bg-background text-amber-600 dark:text-amber-400",
                     step.state === "pending" &&
                       "border-border bg-background text-muted-foreground",
+                    step.state === "rejected" &&
+                      "border-destructive bg-destructive text-white",
                   )}
                 >
-                  {step.state === "done" ? (
+                  {step.state === "rejected" ? (
+                    <X className="h-4 w-4" />
+                  ) : step.state === "done" ? (
                     <Check className="h-4 w-4" />
                   ) : step.state === "active" ? (
                     <motion.span
@@ -139,9 +221,10 @@ export function LoanApplicationStatus({
                 <span
                   className={cn(
                     "text-[11px] font-medium sm:text-xs",
-                    step.state === "pending"
-                      ? "text-muted-foreground"
-                      : "text-foreground",
+                    step.state === "pending" && "text-muted-foreground",
+                    step.state === "rejected" && "text-destructive",
+                    (step.state === "done" || step.state === "active") &&
+                      "text-foreground",
                   )}
                 >
                   {step.label}
@@ -266,8 +349,10 @@ export function LoanApplicationStatus({
         </div>
 
         {/* Footnote */}
+        {/* "No action is needed from you right now" is only true while a
+            review is running. */}
         <p className="border-t border-border/60 pt-4 text-xs leading-relaxed text-muted-foreground">
-          {t("dashboard.sme.statusReviewNote")}
+          {t(decided?.noteKey ?? "dashboard.sme.statusReviewNote")}
         </p>
       </div>
     </Card>
