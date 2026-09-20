@@ -10,6 +10,7 @@ import type { ApiError } from "@/lib/types";
 import {
   adminService,
   type AdminDecisionPayload,
+  type AdminDocumentUrl,
   type AdminKybVerification,
   type AdminLoanApplication,
   type AdminOverview,
@@ -30,6 +31,8 @@ export const adminKeys = {
   auditLogs: (params: AuditLogParams) =>
     [...adminKeys.all, "audit-logs", params] as const,
   maintenance: () => [...adminKeys.all, "maintenance"] as const,
+  documentUrl: (documentId: string) =>
+    [...adminKeys.all, "document-url", documentId] as const,
   projectDetail: (projectId: string) =>
     [...adminKeys.all, "project", projectId] as const,
 };
@@ -147,5 +150,18 @@ export function useSetUserStatus() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: adminKeys.all });
     },
+  });
+}
+
+// A read URL for one document, fetched only while its dialog is open.
+// staleTime 0 because the URL expires in 10 minutes — a cached one is worse
+// than a refetch.
+export function useAdminDocumentUrl(documentId: string | null) {
+  return useQuery<AdminDocumentUrl, ApiError>({
+    queryKey: adminKeys.documentUrl(documentId ?? ""),
+    queryFn: () => adminService.getDocumentUrl(documentId as string),
+    enabled: documentId !== null,
+    staleTime: 0,
+    retry: false,
   });
 }

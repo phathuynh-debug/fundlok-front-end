@@ -202,6 +202,14 @@ export interface AdminUserStatusPayload {
   note?: string | null;
 }
 
+export interface AdminDocumentUrl {
+  url: string;
+  /** Seconds the URL stays valid — 600. */
+  expires_in: number;
+  content_type: string | null;
+  original_filename: string;
+}
+
 export interface AdminDecisionPayload {
   decision: AdminDecision;
   note?: string | null;
@@ -243,6 +251,15 @@ export const adminService = {
     return apiClient.patch<AdminUserDetail>(
       ADMIN_ENDPOINTS.userStatus(userId),
       body,
+    );
+  },
+
+  // Admin only. Fetched on demand when a document is opened, never up front:
+  // the URL expires in 10 minutes, so one minted with the list would often be
+  // dead by the time anyone clicked it.
+  getDocumentUrl(documentId: string) {
+    return apiClient.get<AdminDocumentUrl>(
+      ADMIN_ENDPOINTS.documentUrl(documentId),
     );
   },
 

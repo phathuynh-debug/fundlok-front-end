@@ -107,6 +107,8 @@ export const ADMIN_ENDPOINTS = {
   applicationDecision: (id: string) => `/admin/applications/${id}/decision`,
   // Account status. SUSPENDED is a real deny server-side, not a label.
   userStatus: (id: string) => `/admin/users/${id}/status`,
+  // A 10-minute read URL for one uploaded application document.
+  documentUrl: (id: string) => `/admin/documents/${id}/url`,
 } as const;
 
 // GVerify (Datatrust) — identity/business verification for both roles, gated

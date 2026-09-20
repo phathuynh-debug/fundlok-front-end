@@ -22,6 +22,8 @@ import {
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import { DocumentViewerDialog } from "./DocumentViewerDialog";
 import { useToast } from "@/hooks/use-toast";
 import {
   useAdminProjectDetail,
@@ -67,6 +69,9 @@ export function ProjectPreviewSheet({
 
   // One note box per decision target, keyed by record id — a rejection reason
   // typed against one application must not follow the operator to the next.
+  // Which document the viewer dialog is showing; null = closed.
+  const [viewerDocument, setViewerDocument] =
+    useState<AdminApplicationDocument | null>(null);
   const [notes, setNotes] = useState<Record<string, string>>({});
   const noteFor = (id: string) => notes[id] ?? "";
   const setNote = (id: string, value: string) =>
@@ -217,7 +222,11 @@ export function ProjectPreviewSheet({
                         {formatDate(application.created_at, locale)}
                       </p>
 
-                      <DocumentList documents={application.documents} t={t} />
+                      <DocumentList
+                        documents={application.documents}
+                        t={t}
+                        onOpen={setViewerDocument}
+                      />
 
                       {application.decision_note && (
                         <p className="text-xs leading-relaxed text-muted-foreground">
@@ -253,6 +262,13 @@ export function ProjectPreviewSheet({
           </div>
         )}
       </SheetContent>
+
+      <DocumentViewerDialog
+        document={viewerDocument}
+        onOpenChange={(open) => {
+          if (!open) setViewerDocument(null);
+        }}
+      />
     </Sheet>
   );
 }
@@ -264,9 +280,11 @@ export function ProjectPreviewSheet({
 function DocumentList({
   documents,
   t,
+  onOpen,
 }: {
   documents: AdminApplicationDocument[];
   t: (key: string) => string;
+  onOpen: (document: AdminApplicationDocument) => void;
 }) {
   if (documents.length === 0) {
     return (
@@ -281,27 +299,39 @@ function DocumentList({
         const label = t(
           `admin.preview.documentTypes.${document.document_type}`,
         );
+        // Only a confirmed upload can be opened — there is no object behind a
+        // PENDING row, so it stays inert rather than offering a dead link.
+        const openable = document.status === "UPLOADED";
         return (
-          <li
-            key={document.id}
-            className="flex items-center gap-2 text-xs text-muted-foreground"
-          >
-            <FileText className="h-3.5 w-3.5 shrink-0" aria-hidden />
-            <span className="font-medium text-foreground">
-              {/* An unmapped type falls back to the raw key rather than the
-                  missing-key string. */}
-              {label.startsWith("admin.preview.")
-                ? document.document_type
-                : label}
-            </span>
-            <span className="truncate">{document.original_filename}</span>
-            {/* PENDING means the presign was issued but the object never
-                landed — worth flagging, not hiding. */}
-            {document.status !== "UPLOADED" && (
-              <Badge variant="secondary" className="ml-auto shrink-0">
-                {document.status}
-              </Badge>
-            )}
+          <li key={document.id}>
+            <button
+              type="button"
+              disabled={!openable}
+              onClick={() => onOpen(document)}
+              className={cn(
+                "flex w-full items-center gap-2 rounded-md px-1 py-1 text-left text-xs text-muted-foreground",
+                openable
+                  ? "cursor-pointer hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  : "cursor-default",
+              )}
+            >
+              <FileText className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              <span className="font-medium text-foreground">
+                {/* An unmapped type falls back to the raw key rather than the
+                    missing-key string. */}
+                {label.startsWith("admin.preview.")
+                  ? document.document_type
+                  : label}
+              </span>
+              <span className="truncate">{document.original_filename}</span>
+              {/* PENDING means the presign was issued but the object never
+                  landed — worth flagging, not hiding. */}
+              {!openable && (
+                <Badge variant="secondary" className="ml-auto shrink-0">
+                  {document.status}
+                </Badge>
+              )}
+            </button>
           </li>
         );
       })}
