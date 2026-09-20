@@ -1,11 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
+  clampPercentInput,
   LITE_FIGURE_FIELDS,
   REQUIRED_LITE_FIGURE_KEYS,
   figureFieldsForStep,
   parseFigure,
   validateFigure,
   type LiteFigureField,
+  validateFigureConsistency,
+  type LiteFigureKey,
 } from "./lite-grading-fields";
 
 const field = (key: string): LiteFigureField => {
@@ -127,5 +130,116 @@ describe("required set", () => {
     ]) {
       expect(REQUIRED_LITE_FIGURE_KEYS).toContain(key);
     }
+  });
+});
+
+describe("validateFigureConsistency", () => {
+  const blank = Object.fromEntries(
+    LITE_FIGURE_FIELDS.map((f) => [f.key, ""]),
+  ) as Record<LiteFigureKey, string>;
+  const withValues = (
+    values: Partial<Record<LiteFigureKey, string>>,
+  ): Record<LiteFigureKey, string> => ({
+    ...blank,
+    ...(values as Record<LiteFigureKey, string>),
+  });
+
+  it("blames the largest customer when it exceeds the top three", () => {
+    // The exact case that reached production as a 422 at Send: top1 66,
+    // top3 55.
+    expect(
+      validateFigureConsistency(
+        withValues({ conc_top1_pct: "66", conc_top3_pct: "55" }),
+      ),
+    ).toEqual({ conc_top1_pct: "top1_exceeds_top3" });
+  });
+
+  it("allows the largest customer to BE the top three", () => {
+    // A company with one customer is unusual, not impossible — equality has
+    // to pass or it rejects a real business.
+    expect(
+      validateFigureConsistency(
+        withValues({ conc_top1_pct: "55", conc_top3_pct: "55" }),
+      ),
+    ).toEqual({});
+  });
+
+  it("rejects a weakest month above the best month", () => {
+    expect(
+      validateFigureConsistency(
+        withValues({ revenue_best_month: "100", revenue_worst_month: "200" }),
+      ),
+    ).toEqual({ revenue_worst_month: "worst_exceeds_best" });
+  });
+
+  it("rejects a single month larger than the year containing it", () => {
+    expect(
+      validateFigureConsistency(
+        withValues({
+          revenue_last_12m: "1000",
+          revenue_best_month: "2000",
+        }),
+      ),
+    ).toEqual({ revenue_best_month: "month_exceeds_year" });
+  });
+
+  it("reports nothing while a figure is still blank", () => {
+    // Half-typed input must not light up red — the per-field `required` check
+    // owns that, and only once the step is submitted.
+    expect(
+      validateFigureConsistency(withValues({ conc_top1_pct: "66" })),
+    ).toEqual({});
+  });
+
+  it("passes a self-consistent set", () => {
+    expect(
+      validateFigureConsistency(
+        withValues({
+          revenue_last_12m: "575757575",
+          revenue_best_month: "75656565",
+          revenue_worst_month: "6767676",
+          conc_top1_pct: "40",
+          conc_top3_pct: "55",
+        }),
+      ),
+    ).toEqual({});
+  });
+});
+
+describe("clampPercentInput", () => {
+  it("holds a value above 100 at 100", () => {
+    // The reported case: typing into "Top 3 customers, % of revenue" ran past
+    // 100 and only failed at Send.
+    expect(clampPercentInput("2323")).toBe("100");
+    expect(clampPercentInput("101")).toBe("100");
+  });
+
+  it("holds a negative at 0", () => {
+    // Not typeable on a numeric keypad, but reachable by paste.
+    expect(clampPercentInput("-5")).toBe("0");
+  });
+
+  it("leaves a value inside the range exactly as typed", () => {
+    // Including the raw spelling — reformatting mid-typing moves the caret.
+    expect(clampPercentInput("23")).toBe("23");
+    expect(clampPercentInput("0")).toBe("0");
+    expect(clampPercentInput("100")).toBe("100");
+  });
+
+  it("leaves an empty field empty", () => {
+    // Coercing blank to "0" would make an optional figure look answered, and
+    // 0% concentration is a claim rather than a default.
+    expect(clampPercentInput("")).toBe("");
+    expect(clampPercentInput("   ")).toBe("   ");
+  });
+
+  it("does not rewrite something that is not a number", () => {
+    // The existing not_a_number error should get to explain itself.
+    expect(clampPercentInput("abc")).toBe("abc");
+    expect(clampPercentInput("12abc")).toBe("12abc");
+  });
+
+  it("accepts the separators a Vietnamese keyboard produces", () => {
+    expect(clampPercentInput("1.000")).toBe("100");
   });
 });

@@ -174,7 +174,14 @@ export const REQUIRED_LITE_FIGURE_KEYS: readonly LiteFigureKey[] =
  */
 const VND_MAX = 1_000_000_000_000; // 1 trillion đồng
 
-export type FigureError = "required" | "not_a_number" | "out_of_range" | null;
+export type FigureError =
+  | "required"
+  | "not_a_number"
+  | "out_of_range"
+  | "worst_exceeds_best"
+  | "month_exceeds_year"
+  | "top1_exceeds_top3"
+  | null;
 
 export function validateFigure(
   field: LiteFigureField,
@@ -193,10 +200,89 @@ export function validateFigure(
   return value <= 0 || value > VND_MAX ? "out_of_range" : null;
 }
 
+export const PERCENT_MIN = 0;
+export const PERCENT_MAX = 100;
+
+/**
+ * Hold a percentage inside 0-100 as it is typed.
+ *
+ * A share of revenue above 100% describes nothing, and the backend rejects it
+ * — but only at Send, several steps later. Clamping at the input turns a
+ * late error into an impossible state.
+ *
+ * Deliberately narrow:
+ *   - only `pct` fields; a VND amount has no such ceiling.
+ *   - an empty string stays empty. Coercing a blank field to "0" would make
+ *     an optional figure look answered, and 0% concentration is a claim, not
+ *     a default.
+ *   - anything that is not a clean number is returned untouched, so the
+ *     existing `not_a_number` error still gets to explain itself rather than
+ *     being silently rewritten.
+ */
+export function clampPercentInput(raw: string): string {
+  const trimmed = raw.trim();
+  if (!trimmed) return raw;
+
+  const normalized = trimmed.replace(/[.,\s]/g, "");
+  if (!/^-?\d+$/.test(normalized)) return raw;
+
+  const value = Number(normalized);
+  if (!Number.isFinite(value)) return raw;
+  if (value > PERCENT_MAX) return String(PERCENT_MAX);
+  if (value < PERCENT_MIN) return String(PERCENT_MIN);
+  return raw;
+}
+
 /** Digits only, for submitting and for comparing. `null` when left blank. */
 export function parseFigure(raw: string): number | null {
   const normalized = raw.trim().replace(/[.,\s]/g, "");
   if (!normalized) return null;
   const value = Number(normalized);
   return Number.isFinite(value) ? value : null;
+}
+
+/**
+ * The rules that involve more than one figure.
+ *
+ * Kept as data rather than inline checks so the form, the review step and the
+ * tests all read the same list. Each returns the key it should blame — the
+ * field the applicant has to change — not merely that something is wrong.
+ *
+ * Mirrors app/loans/schemas.py exactly. The backend stays authoritative; this
+ * only moves the conversation earlier.
+ */
+export function validateFigureConsistency(
+  values: Record<LiteFigureKey, string>,
+): Partial<Record<LiteFigureKey, FigureError>> {
+  const errors: Partial<Record<LiteFigureKey, FigureError>> = {};
+  const n = (key: LiteFigureKey) => parseFigure(values[key]);
+
+  const best = n("revenue_best_month");
+  const worst = n("revenue_worst_month");
+  const year = n("revenue_last_12m");
+  const top1 = n("conc_top1_pct");
+  const top3 = n("conc_top3_pct");
+
+  // A worst month that beats the best month describes no real company.
+  if (best !== null && worst !== null && worst > best) {
+    errors.revenue_worst_month = "worst_exceeds_best";
+  }
+
+  // A single month cannot out-earn the year that contains it.
+  if (year !== null) {
+    if (best !== null && best > year)
+      errors.revenue_best_month = "month_exceeds_year";
+    if (worst !== null && worst > year) {
+      errors.revenue_worst_month =
+        errors.revenue_worst_month ?? "month_exceeds_year";
+    }
+  }
+
+  // The largest customer is one OF the top three, so its share cannot be
+  // larger than theirs combined.
+  if (top1 !== null && top3 !== null && top1 > top3) {
+    errors.conc_top1_pct = "top1_exceeds_top3";
+  }
+
+  return errors;
 }
