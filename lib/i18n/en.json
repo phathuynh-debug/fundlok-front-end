@@ -21,6 +21,30 @@
       "projects": "projects",
       "users": "users"
     },
+    "preview": {
+      "applicationDecided": "Decision recorded",
+      "applicationsHeading": "Funding requests",
+      "approve": "Approve",
+      "companyHeading": "Company",
+      "decisionFailed": "Could not record the decision",
+      "documentTypes": {
+        "business_registration": "Business registration",
+        "cic_report": "CIC report",
+        "e_invoice_data": "E-invoice data",
+        "legal_charter": "Company charter"
+      },
+      "documentsHeading": "Documents",
+      "engineHeading": "Verification engine",
+      "kybResolved": "Verification resolved",
+      "noApplications": "No funding requests yet.",
+      "noDocuments": "No documents uploaded yet.",
+      "noKyb": "This company has not started business verification yet.",
+      "notePlaceholder": "Reason (optional, recorded in the audit log)",
+      "openRow": "Preview {name}",
+      "reject": "Reject",
+      "subtitle": "Both approvals are required before a funding request can proceed.",
+      "title": "Project preview"
+    },
     "sidebar": {
       "auditLogs": "Audit logs",
       "badge": "Admin",

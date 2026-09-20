@@ -97,6 +97,14 @@ export const ADMIN_ENDPOINTS = {
   overview: "/admin/overview",
   auditLogs: "/admin/audit-logs",
   maintenance: "/system/maintenance",
+  // The project preview: one company, its funding requests, and the owner's
+  // latest KYB attempt — both halves of the two-approval gate in one payload.
+  projectDetail: (id: string) => `/admin/projects/${id}`,
+  // The operator's two decisions. Both are admin-only server-side and both are
+  // one-way: a decided record answers 409, never a silent overwrite.
+  resolveKybVerification: (id: string) =>
+    `/admin/kyb-verifications/${id}/resolve`,
+  applicationDecision: (id: string) => `/admin/applications/${id}/decision`,
 } as const;
 
 // GVerify (Datatrust) — identity/business verification for both roles, gated

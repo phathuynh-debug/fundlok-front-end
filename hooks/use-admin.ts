@@ -9,8 +9,12 @@ import {
 import type { ApiError } from "@/lib/types";
 import {
   adminService,
+  type AdminDecisionPayload,
+  type AdminKybVerification,
+  type AdminLoanApplication,
   type AdminOverview,
   type AdminOverviewParams,
+  type AdminProjectDetail,
   type AuditLog,
   type AuditLogParams,
   type MaintenanceState,
@@ -24,6 +28,8 @@ export const adminKeys = {
   auditLogs: (params: AuditLogParams) =>
     [...adminKeys.all, "audit-logs", params] as const,
   maintenance: () => [...adminKeys.all, "maintenance"] as const,
+  projectDetail: (projectId: string) =>
+    [...adminKeys.all, "project", projectId] as const,
 };
 
 export function useAdminOverview(
@@ -69,6 +75,58 @@ export function useSetMaintenance() {
     mutationFn: (body) => adminService.setMaintenance(body),
     onSuccess: (state) => {
       queryClient.setQueryData(adminKeys.maintenance(), state);
+    },
+  });
+}
+
+// --- Project preview: the two-approval gate -------------------------------- //
+
+// One company, its funding requests, and the owner's latest KYB. Only fetched
+// while the preview is open, so the list view stays one request.
+export function useAdminProjectDetail(projectId: string | null) {
+  return useQuery<AdminProjectDetail, ApiError>({
+    queryKey: adminKeys.projectDetail(projectId ?? ""),
+    queryFn: () => adminService.getProjectDetail(projectId as string),
+    enabled: projectId !== null,
+    staleTime: 0,
+    retry: false,
+  });
+}
+
+interface DecisionInput {
+  id: string;
+  body: AdminDecisionPayload;
+}
+
+// Settles a parked KYB attempt. Invalidates rather than seeding the cache: the
+// verdict changes whether the project counts as verified, and the preview also
+// shows applications whose gate state is read against it.
+export function useResolveKybVerification(projectId: string | null) {
+  const queryClient = useQueryClient();
+  return useMutation<AdminKybVerification, ApiError, DecisionInput>({
+    mutationFn: ({ id, body }) => adminService.resolveKybVerification(id, body),
+    onSuccess: () => {
+      if (projectId) {
+        void queryClient.invalidateQueries({
+          queryKey: adminKeys.projectDetail(projectId),
+        });
+      }
+    },
+  });
+}
+
+// The operator half. Same invalidation reasoning, plus the overview list shows
+// project status that a decision can move.
+export function useDecideApplication(projectId: string | null) {
+  const queryClient = useQueryClient();
+  return useMutation<AdminLoanApplication, ApiError, DecisionInput>({
+    mutationFn: ({ id, body }) => adminService.decideApplication(id, body),
+    onSuccess: () => {
+      if (projectId) {
+        void queryClient.invalidateQueries({
+          queryKey: adminKeys.projectDetail(projectId),
+        });
+      }
     },
   });
 }

@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DataTable, type Column } from "./_components/DataTable";
+import { ProjectPreviewSheet } from "./_components/ProjectPreviewSheet";
 import { useTranslations } from "@/lib/i18n";
 import { getInitials } from "@/lib/utils";
 
@@ -148,6 +149,8 @@ export default function AdminPage() {
   // "all" = no filter (Radix Select can't use an empty-string value).
   const [status, setStatus] = useState("all");
   const [role, setRole] = useState("all");
+  // Which project the preview panel is showing; null = closed.
+  const [previewProjectId, setPreviewProjectId] = useState<string | null>(null);
   const [industryInput, setIndustryInput] = useState("");
   const [industry, setIndustry] = useState("");
 
@@ -407,6 +410,10 @@ export default function AdminPage() {
             isLoading={isOverviewLoading}
             isFetching={isFetching}
             emptyMessage={t("admin.table.noProjects")}
+            onRowClick={(p) => setPreviewProjectId(p.id)}
+            getRowLabel={(p) =>
+              t("admin.preview.openRow").replace("{name}", p.legal_name)
+            }
           />
         )}
 
@@ -456,6 +463,16 @@ export default function AdminPage() {
           </div>
         </div>
       </div>
+
+      {/* Opened by clicking a project row. Renders nothing until then — the
+          detail query is gated on projectId, so the list view stays one
+          request. */}
+      <ProjectPreviewSheet
+        projectId={previewProjectId}
+        onOpenChange={(open) => {
+          if (!open) setPreviewProjectId(null);
+        }}
+      />
     </div>
   );
 }

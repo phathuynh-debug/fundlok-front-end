@@ -21,6 +21,30 @@
       "projects": "dự án",
       "users": "người dùng"
     },
+    "preview": {
+      "applicationDecided": "Đã ghi nhận quyết định",
+      "applicationsHeading": "Đề nghị vay",
+      "approve": "Phê duyệt",
+      "companyHeading": "Doanh nghiệp",
+      "decisionFailed": "Không thể ghi nhận quyết định",
+      "documentTypes": {
+        "business_registration": "Giấy đăng ký kinh doanh",
+        "cic_report": "Báo cáo CIC",
+        "e_invoice_data": "Dữ liệu hóa đơn điện tử",
+        "legal_charter": "Điều lệ công ty"
+      },
+      "documentsHeading": "Hồ sơ",
+      "engineHeading": "Hệ thống xác minh",
+      "kybResolved": "Đã xử lý xác minh",
+      "noApplications": "Chưa có đề nghị vay nào.",
+      "noDocuments": "Chưa tải lên hồ sơ nào.",
+      "noKyb": "Doanh nghiệp này chưa bắt đầu xác minh.",
+      "notePlaceholder": "Lý do (không bắt buộc, được ghi vào nhật ký)",
+      "openRow": "Xem nhanh {name}",
+      "reject": "Từ chối",
+      "subtitle": "Cần cả hai phê duyệt trước khi đề nghị vay được tiếp tục.",
+      "title": "Xem nhanh hồ sơ"
+    },
     "sidebar": {
       "auditLogs": "Nhật ký kiểm toán",
       "badge": "Quản trị",

@@ -61,6 +61,118 @@ const twoFactor = new Map<
   { enabled: boolean; pendingSecret: string | null; recoveryRemaining: number }
 >();
 
+/**
+ * Admin project preview state: one KYB attempt and one funding request per
+ * stub project, both decidable.
+ *
+ * Mutable for the same reason the 2FA map is — the panel exists to record a
+ * DECISION, and a fixture that is permanently PENDING (or permanently
+ * approved) cannot exercise the transition. Built lazily so each project the
+ * suite opens gets its own records rather than sharing one.
+ */
+interface StubAdminApplication {
+  id: string;
+  requested_amount: number;
+  purpose: string | null;
+  repayment_preference: string | null;
+  status: string;
+  admin_approval: string;
+  submitted_at: string | null;
+  decided_at: string | null;
+  decision_note: string | null;
+  created_at: string | null;
+  documents: Array<{
+    id: string;
+    document_type: string;
+    original_filename: string;
+    content_type: string | null;
+    file_size_bytes: number | null;
+    status: string;
+    uploaded_at: string | null;
+  }>;
+}
+
+interface StubAdminKyb {
+  id: string;
+  status: string;
+  is_approved: boolean;
+  rejection_reason: string | null;
+  business_name: string | null;
+  tax_code: string | null;
+  updated_at: string | null;
+}
+
+const adminApplications = new Map<string, StubAdminApplication>();
+const adminKybAttempts = new Map<string, StubAdminKyb>();
+const adminProjectSeeded = new Set<string>();
+
+function adminProjectDetail(projectId: string) {
+  const project = STUB_PUBLIC_PROJECTS.find((p) => p.id === projectId);
+  if (!project) return null;
+
+  if (!adminProjectSeeded.has(projectId)) {
+    adminProjectSeeded.add(projectId);
+    adminApplications.set(`app-${projectId}`, {
+      id: `app-${projectId}`,
+      requested_amount: 500000000,
+      purpose: "Kitchen expansion",
+      repayment_preference: "MONTHLY",
+      status: "SUBMITTED",
+      admin_approval: "PENDING",
+      submitted_at: "2026-09-01T00:00:00Z",
+      decided_at: null,
+      decision_note: null,
+      created_at: "2026-09-01T00:00:00Z",
+      // What the SME wizard collects: step 1 produces two, steps 4 and 5 one
+      // each. One left PENDING on purpose — a presign that never completed is
+      // a real state the panel has to surface rather than hide.
+      documents: [
+        {
+          id: `doc-charter-${projectId}`,
+          document_type: "legal_charter",
+          original_filename: "dieu-le-cong-ty.pdf",
+          content_type: "application/pdf",
+          file_size_bytes: 240000,
+          status: "UPLOADED",
+          uploaded_at: "2026-09-01T00:00:00Z",
+        },
+        {
+          id: `doc-reg-${projectId}`,
+          document_type: "business_registration",
+          original_filename: "giay-dang-ky-kinh-doanh.pdf",
+          content_type: "application/pdf",
+          file_size_bytes: 182000,
+          status: "PENDING",
+          uploaded_at: null,
+        },
+      ],
+    });
+    // Parked by the engine — the state an operator is there to settle.
+    adminKybAttempts.set(`kyb-${projectId}`, {
+      id: `kyb-${projectId}`,
+      status: "MANUAL_REVIEW",
+      is_approved: false,
+      rejection_reason: "OCR confidence too low on the tax code",
+      business_name: project.legal_name,
+      tax_code: "1501167629",
+      updated_at: "2026-09-01T00:00:00Z",
+    });
+  }
+
+  return {
+    id: project.id,
+    legal_name: project.legal_name,
+    tax_id: "1501167629",
+    industry: project.industry,
+    status: project.status ?? "DRAFT",
+    address: null,
+    incorporation_date: "2019-03-15",
+    created_at: project.created_at ?? "2026-02-01T00:00:00Z",
+    applications: [adminApplications.get(`app-${projectId}`)!],
+    kyb: adminKybAttempts.get(`kyb-${projectId}`)!,
+  };
+}
+
 /** Forced-503 switch for the unconfigured-server case. */
 let setupUnavailable = false;
 
@@ -779,6 +891,57 @@ const server = createServer(async (req, res) => {
           page_size: Number(url.searchParams.get("page_size") ?? 20),
         },
       });
+    }
+
+    // --- Admin project preview: the two-approval gate --------------------- //
+    // Mutable, like the 2FA block above and for the same reason: the whole
+    // point of the panel is what happens when a decision flips, which a
+    // stateless fixture cannot express.
+    const projectDetailMatch = path.match(/^\/admin\/projects\/([^/]+)$/);
+    if (projectDetailMatch && method === "GET") {
+      const detail = adminProjectDetail(projectDetailMatch[1]);
+      if (!detail) return json(res, 404, { detail: "Project not found" });
+      return json(res, 200, detail);
+    }
+
+    const decisionMatch = path.match(
+      /^\/admin\/applications\/([^/]+)\/decision$/,
+    );
+    if (decisionMatch && method === "POST") {
+      const body = await readBody(req);
+      const application = adminApplications.get(decisionMatch[1]);
+      if (!application)
+        return json(res, 404, { detail: "Application not found" });
+      if (application.admin_approval !== "PENDING") {
+        return json(res, 409, {
+          detail: `Application has already been ${application.admin_approval.toLowerCase()}`,
+        });
+      }
+      application.admin_approval = String(body.decision);
+      application.decision_note = (body.note as string) ?? null;
+      application.decided_at = new Date().toISOString();
+      return json(res, 200, application);
+    }
+
+    const resolveMatch = path.match(
+      /^\/admin\/kyb-verifications\/([^/]+)\/resolve$/,
+    );
+    if (resolveMatch && method === "POST") {
+      const body = await readBody(req);
+      const attempt = adminKybAttempts.get(resolveMatch[1]);
+      if (!attempt)
+        return json(res, 404, { detail: "KYB verification not found" });
+      if (attempt.status !== "MANUAL_REVIEW") {
+        return json(res, 409, {
+          detail: "Only a MANUAL_REVIEW attempt can be resolved",
+        });
+      }
+      attempt.status = String(body.decision);
+      attempt.is_approved = attempt.status === "APPROVED";
+      if (attempt.status === "REJECTED") {
+        attempt.rejection_reason = (body.note as string) ?? null;
+      }
+      return json(res, 200, attempt);
     }
 
     if (path === "/admin/audit-logs" && method === "GET") {

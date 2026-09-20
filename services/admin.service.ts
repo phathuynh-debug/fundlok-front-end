@@ -111,9 +111,109 @@ export interface MaintenanceUpdate {
   message?: string | null;
 }
 
+// --- Project preview: the two-approval gate ------------------------------- //
+//
+// A funding request needs BOTH the verification engine's approval (GVerify KYB,
+// plus a locked score run) and an operator's. The preview shows both so it is
+// clear WHY an application has not moved.
+
+/** What an operator can decide. There is no way back to PENDING. */
+export type AdminDecision = "APPROVED" | "REJECTED";
+
+/** PENDING until someone decides; server-side CHECK constraint enforces it. */
+export type AdminApproval = "PENDING" | AdminDecision;
+
+// The engine's half. `status` is the provider's own verdict — MANUAL_REVIEW is
+// the only one an operator may resolve.
+export interface AdminKybVerification {
+  id: string;
+  status: string;
+  is_approved: boolean;
+  rejection_reason: string | null;
+  business_name: string | null;
+  tax_code: string | null;
+  updated_at: string | null;
+}
+
+// One file the SME uploaded on the loan-application wizard. Metadata only —
+// there is no download endpoint yet, so the panel shows WHAT was supplied
+// rather than pretending to offer the file.
+export interface AdminApplicationDocument {
+  id: string;
+  // Backend document_type: legal_charter | business_registration |
+  // e_invoice_data | cic_report. Rendered through an i18n lookup.
+  document_type: string;
+  original_filename: string;
+  content_type: string | null;
+  file_size_bytes: number | null;
+  // PENDING = presigned but never confirmed in storage; UPLOADED = HEAD-checked.
+  status: string;
+  uploaded_at: string | null;
+}
+
+export interface AdminLoanApplication {
+  id: string;
+  // Integer VND. The column is Numeric(20, 0) and the API serialises it as an
+  // int for that reason — do not coerce it through a float.
+  requested_amount: number;
+  purpose: string | null;
+  repayment_preference: string | null;
+  status: string;
+  admin_approval: AdminApproval;
+  submitted_at: string | null;
+  decided_at: string | null;
+  decision_note: string | null;
+  created_at: string | null;
+  documents: AdminApplicationDocument[];
+}
+
+export interface AdminProjectDetail {
+  id: string;
+  legal_name: string;
+  tax_id: string | null;
+  industry: string | null;
+  status: string;
+  // The raw JSONB the SME filled in on the project application — no
+  // server-side schema, so it is read defensively where rendered.
+  address: Record<string, unknown> | null;
+  incorporation_date: string | null;
+  created_at: string | null;
+  applications: AdminLoanApplication[];
+  kyb: AdminKybVerification | null;
+}
+
+export interface AdminDecisionPayload {
+  decision: AdminDecision;
+  note?: string | null;
+}
+
 export const adminService = {
   getOverview(params: AdminOverviewParams = {}) {
     return apiClient.get<AdminOverview>(ADMIN_ENDPOINTS.overview, { params });
+  },
+
+  // Admin only. One company, its funding requests, and the owner's latest KYB.
+  getProjectDetail(projectId: string) {
+    return apiClient.get<AdminProjectDetail>(
+      ADMIN_ENDPOINTS.projectDetail(projectId),
+    );
+  },
+
+  // Admin only. Settles a KYB attempt the engine parked in MANUAL_REVIEW;
+  // 409 if it was already decided by the provider.
+  resolveKybVerification(verificationId: string, body: AdminDecisionPayload) {
+    return apiClient.post<AdminKybVerification>(
+      ADMIN_ENDPOINTS.resolveKybVerification(verificationId),
+      body,
+    );
+  },
+
+  // Admin only. The operator half of the gate; 409 if already decided.
+  decideApplication(applicationId: string, body: AdminDecisionPayload) {
+    return apiClient.post<AdminLoanApplication>(
+      ADMIN_ENDPOINTS.applicationDecision(applicationId),
+      body,
+    );
   },
 
   // Admin only — returns a flat list (not paginated), newest first.
