@@ -64,6 +64,16 @@ const twoFactor = new Map<
 /** Forced-503 switch for the unconfigured-server case. */
 let setupUnavailable = false;
 
+/**
+ * KYB approvals earned during a run, keyed by stub user.
+ *
+ * Mutable for the same reason 2FA is: approval is a transition, and the whole
+ * point of the post-verification redirect is what happens the moment it flips.
+ * A fixture flag alone can only express "already approved" or "never", never
+ * the change itself. Only ever set by POST /gverify/kyb/verify.
+ */
+const kybApproved = new Set<string>();
+
 function totpState(key: string) {
   if (!twoFactor.has(key)) {
     twoFactor.set(key, {
@@ -655,10 +665,46 @@ const server = createServer(async (req, res) => {
 
   // The proxy's on-demand verification gate. Both prefixes answer from the same
   // fixture flag; the proxy picks one by role.
+  // A KYB submission. The real provider returns the verdict synchronously, so
+  // there is no webhook to wait on: the attempt is terminal by the time this
+  // responds, and the caller counts as approved from here on.
+  if (path === "/gverify/kyb/verify" && method === "POST") {
+    kybApproved.add(key);
+    return json(res, 201, {
+      verification_id: `00000000-0000-0000-0000-00000000kyb1`.slice(0, 36),
+      status: "APPROVED",
+      is_approved: true,
+      rejection_reason: null,
+      tax_code: user.kyb?.tax_code ?? null,
+      license_code: null,
+      business_name: user.kyb?.business_name ?? null,
+      business_type: "Công ty Cổ phần",
+      business_status: "Đang hoạt động",
+      representatives: [],
+      created_at: new Date().toISOString(),
+    });
+  }
+
   if (path === "/gverify/kyc/status" || path === "/gverify/kyb/status") {
+    const approved =
+      user.is_approved ||
+      (path === "/gverify/kyb/status" && kybApproved.has(key));
+    // KYB additionally carries what the certificate OCR read, which the SME
+    // project application prefills from. Null (not absent) when the fixture
+    // has no certificate data — that is the real endpoint's shape too.
+    const certificate =
+      path === "/gverify/kyb/status"
+        ? {
+            business_name: user.kyb?.business_name ?? null,
+            tax_code: user.kyb?.tax_code ?? null,
+            company_address: user.kyb?.company_address ?? null,
+            date_of_establishment: user.kyb?.date_of_establishment ?? null,
+          }
+        : {};
     return json(res, 200, {
-      is_approved: user.is_approved,
-      status: user.is_approved ? "APPROVED" : "PENDING",
+      is_approved: approved,
+      status: approved ? "APPROVED" : "PENDING",
+      ...certificate,
     });
   }
 

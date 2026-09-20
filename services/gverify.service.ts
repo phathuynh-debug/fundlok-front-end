@@ -117,6 +117,12 @@ export interface GVerifyKybStatusResponse {
   rejection_reason: string | null;
   tax_code: string | null;
   business_name: string | null;
+  // Read verbatim off the certificate — one free-text line, not structured
+  // parts (the provider's Decode Address API is out of scope backend-side).
+  // Optional: older backends omit both, so treat absent as "not available"
+  // rather than assuming null.
+  company_address?: string | null;
+  date_of_establishment?: string | null;
   updated_at: string | null;
 }
 

@@ -1456,6 +1456,8 @@
       "companySizeDerived": "Được xếp loại {size}",
       "durationMonths": "Đây là các thời hạn nền tảng hỗ trợ. Thời hạn dài hơn giúp giảm mức trả hằng ngày.",
       "employeeCount": "Số nhân viên toàn thời gian, từ 1 đến 200.",
+      "prefilledAddressFromKyb": "Địa chỉ và tỉnh/thành được lấy từ giấy đăng ký kinh doanh đã xác minh của bạn. Vui lòng bổ sung khu vực và mã bưu chính, và chỉnh sửa nếu có sai lệch.",
+      "prefilledFromKyb": "Tên pháp lý và mã số thuế được điền sẵn từ giấy đăng ký kinh doanh đã xác minh của bạn. Vui lòng kiểm tra và chỉnh sửa nếu có sai lệch.",
       "requestedAmountRange": "Từ {min} đến {max} VND."
     },
     "industries": {

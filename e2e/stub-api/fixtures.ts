@@ -29,6 +29,19 @@ export interface StubUser {
   /** Drives /gverify/{kyc,kyb}/status — the proxy's on-demand action gate. */
   is_approved: boolean;
   avatar_url: string | null;
+  /**
+   * What the KYB certificate OCR read off this SME's business registration.
+   * Only set where a test needs the project application's prefill; absent
+   * means the status endpoint reports the fields as null, which is itself a
+   * case worth covering.
+   */
+  kyb?: {
+    business_name: string;
+    tax_code: string;
+    /** Verbatim single line, exactly as the real provider returns it. */
+    company_address: string;
+    date_of_establishment: string;
+  };
 }
 
 const base = {
@@ -71,6 +84,15 @@ export const STUB_USERS: Record<StubUserKey, StubUser> = {
     email: "sme-empty@e2e.test",
     full_name: "SME Without Project",
     role: "SME",
+    // Shaped after a real certificate: the address arrives as one line with
+    // the province last behind a "Tỉnh" prefix, and carries no postal code.
+    kyb: {
+      business_name: "CÔNG TY CỔ PHẦN FUNDLOK",
+      tax_code: "1501167629",
+      company_address:
+        "Thửa đất số 7, Khóm Thuận Tiến B, Phường Bình Minh, Tỉnh Vĩnh Long, Việt Nam",
+      date_of_establishment: "15/03/2019",
+    },
   },
   admin: {
     ...base,

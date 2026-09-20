@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,6 +13,7 @@ import {
   Send,
   ArrowRight,
   ArrowLeft,
+  ShieldCheck,
 } from "lucide-react";
 import { useForm, type Path } from "react-hook-form";
 import { z } from "zod";
@@ -30,6 +31,8 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { useCreateProject, useMyProjects } from "@/hooks/use-projects";
+import { useGVerifyKybStatus } from "@/hooks/use-gverify";
+import { splitKybAddress } from "@/lib/kyb-address";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { useTranslations } from "@/lib/i18n";
 import { digitsOnly, formatAmountInput } from "@/lib/format-currency";
@@ -202,14 +205,73 @@ export default function ProjectApplicationClient() {
     register("address.country");
   }, [register]);
 
+  // KYB already read the legal name and tax code off the business registration
+  // certificate, so retyping them here only invites a mismatch with what was
+  // verified. Only an SME has a KYB record to read.
+  const { data: kyb } = useGVerifyKybStatus(user?.role === "SME");
+  const kybLegalName = kyb?.is_approved ? kyb.business_name : null;
+  const kybTaxId = kyb?.is_approved ? kyb.tax_code : null;
+  // The certificate carries the head-office address as one free-text line, so
+  // only the province is recoverable with confidence — see lib/kyb-address.ts.
+  // Ward/district land in the street line and the postal code is not on the
+  // certificate at all, so both stay the SME's to finish.
+  const kybAddress = splitKybAddress(
+    kyb?.is_approved ? kyb.company_address : null,
+  );
+  // One-shot: once seeded, a later refetch must not overwrite an edit.
+  const prefillAppliedRef = useRef(false);
+
+  useEffect(() => {
+    if (prefillAppliedRef.current) return;
+    if (!kybLegalName && !kybTaxId && !kybAddress.street && !kybAddress.city) {
+      return;
+    }
+
+    prefillAppliedRef.current = true;
+    // Never clobber something already typed — the SME may have started filling
+    // the form before the KYB status query resolved.
+    if (kybLegalName && !getValues("legal_name")) {
+      setValue("legal_name", kybLegalName, { shouldValidate: true });
+    }
+    if (kybTaxId && !getValues("tax_id")) {
+      setValue("tax_id", kybTaxId, { shouldValidate: true });
+    }
+    if (kybAddress.street && !getValues("address.street")) {
+      setValue("address.street", kybAddress.street, { shouldValidate: true });
+    }
+    if (kybAddress.city && !getValues("address.city")) {
+      setValue("address.city", kybAddress.city, { shouldValidate: true });
+    }
+  }, [
+    kybLegalName,
+    kybTaxId,
+    kybAddress.street,
+    kybAddress.city,
+    getValues,
+    setValue,
+  ]);
+
   const selectedIndustry = watch("industry");
+  const legalNameValue = watch("legal_name");
+  const taxIdValue = watch("tax_id");
   const employeeCount = watch("employee_count");
   const derivedCompanySize = companySizeForHeadcount(Number(employeeCount));
   const requestedAmount = watch("loan.requested_amount");
   const selectedDuration = watch("loan.duration_months");
   const selectedRepayment = watch("loan.repayment_preference");
+  const streetValue = watch("address.street");
   const selectedCity = watch("address.city");
   const selectedCountry = watch("address.country");
+
+  // Derived, not stored: each notice describes what is currently in its step's
+  // fields, so it retires itself once the SME has edited those values away from
+  // what KYB read off the certificate.
+  const prefilledFromKyb =
+    (!!kybLegalName && legalNameValue === kybLegalName) ||
+    (!!kybTaxId && taxIdValue === kybTaxId);
+  const prefilledAddressFromKyb =
+    (!!kybAddress.street && streetValue === kybAddress.street) ||
+    (!!kybAddress.city && selectedCity === kybAddress.city);
 
   const repaymentOptions = [
     {
@@ -459,6 +521,18 @@ export default function ProjectApplicationClient() {
             {/* Step 1: Business details */}
             {currentStep === 1 && (
               <div className="space-y-4 animate-in fade-in duration-200">
+                {prefilledFromKyb && (
+                  <p className="flex items-start gap-2 rounded-xl border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
+                    <ShieldCheck
+                      className="mt-px h-4 w-4 shrink-0 text-emerald-600"
+                      aria-hidden
+                    />
+                    <span>
+                      {t("projectApplication.hints.prefilledFromKyb")}
+                    </span>
+                  </p>
+                )}
+
                 <Field
                   label={t("projectApplication.fields.legalName")}
                   htmlFor="legalName"
@@ -552,6 +626,18 @@ export default function ProjectApplicationClient() {
             {/* Step 2: Location */}
             {currentStep === 2 && (
               <div className="space-y-4 animate-in fade-in duration-200">
+                {prefilledAddressFromKyb && (
+                  <p className="flex items-start gap-2 rounded-xl border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
+                    <ShieldCheck
+                      className="mt-px h-4 w-4 shrink-0 text-emerald-600"
+                      aria-hidden
+                    />
+                    <span>
+                      {t("projectApplication.hints.prefilledAddressFromKyb")}
+                    </span>
+                  </p>
+                )}
+
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Field
                     label={t("projectApplication.fields.street")}

@@ -75,6 +75,22 @@ async function fillStepOne(page: import("@playwright/test").Page) {
     .fill("25");
 }
 
+// The two step-1 fields a business registration certificate does NOT carry, so
+// KYB prefill can never satisfy them. Filling just these proves the prefilled
+// pair is what lets the step validate.
+async function fillStepOneGapsOnly(page: import("@playwright/test").Page) {
+  await page.getByRole("combobox").first().click();
+  await page
+    .getByRole("option", {
+      name: t(`projectApplication.industries.${INDUSTRY_OPTIONS[0].labelKey}`),
+      exact: true,
+    })
+    .click();
+  await page
+    .getByLabel(t("projectApplication.fields.employeeCount"))
+    .fill("25");
+}
+
 async function fillAddress(page: import("@playwright/test").Page) {
   // Step 2 validates street, city, state, postal_code AND country before it
   // will advance, so every one of them has to be filled — leaving state or
@@ -110,6 +126,81 @@ test.describe("/project-application", () => {
     // whom this form is reachable.
     await signInAs(context, "smeNoProject");
     await page.goto("/project-application");
+  });
+
+  // --- KYB prefill ---------------------------------------------------------
+  // The SME has already handed us their business registration certificate and
+  // we OCR'd it. Asking them to retype what it said is the only way the
+  // application can disagree with what was verified.
+
+  test("prefills legal name and tax ID from the verified certificate", async ({
+    page,
+  }) => {
+    await expect(
+      page.getByLabel(t("projectApplication.fields.legalName")),
+    ).toHaveValue("CÔNG TY CỔ PHẦN FUNDLOK");
+    await expect(
+      page.getByLabel(t("projectApplication.fields.taxId")),
+    ).toHaveValue("1501167629");
+    await expect(
+      page.getByText(t("projectApplication.hints.prefilledFromKyb")),
+    ).toBeVisible();
+  });
+
+  test("splits the certificate address into street and province", async ({
+    page,
+  }) => {
+    // Legal name and tax ID are already valid from the prefill; only the two
+    // fields the certificate cannot supply still need filling to advance.
+    await fillStepOneGapsOnly(page);
+    await next(page);
+
+    // The province is the only part of the one-line address that can be
+    // recovered reliably, so the rest stays on the street line.
+    await expect(
+      page.getByLabel(t("projectApplication.fields.street")),
+    ).toHaveValue("Thửa đất số 7, Khóm Thuận Tiến B, Phường Bình Minh");
+    await expect(
+      page.getByLabel(t("projectApplication.fields.city")),
+    ).toContainText("Vĩnh Long");
+    await expect(
+      page.getByText(t("projectApplication.hints.prefilledAddressFromKyb")),
+    ).toBeVisible();
+  });
+
+  test("leaves the fields the certificate cannot supply empty", async ({
+    page,
+  }) => {
+    // A certificate carries no postal code and no headcount, so these must
+    // stay blank rather than being guessed into.
+    await expect(
+      page.getByLabel(t("projectApplication.fields.employeeCount")),
+    ).toHaveValue("");
+
+    await fillStepOneGapsOnly(page);
+    await next(page);
+    await expect(
+      page.getByLabel(t("projectApplication.fields.postalCode")),
+    ).toHaveValue("");
+    await expect(
+      page.getByLabel(t("projectApplication.fields.stateRegion")),
+    ).toHaveValue("");
+  });
+
+  test("keeps an SME edit to a prefilled field and drops the notice", async ({
+    page,
+  }) => {
+    const legalName = page.getByLabel(t("projectApplication.fields.legalName"));
+    await legalName.fill("A Different Trading Name");
+    const taxId = page.getByLabel(t("projectApplication.fields.taxId"));
+    await taxId.fill("9999999999");
+
+    // Both edited away from the certificate, so the notice no longer describes
+    // what is on screen and retires itself.
+    await expect(legalName).toHaveValue("A Different Trading Name");
+    await expect(
+      page.getByText(t("projectApplication.hints.prefilledFromKyb")),
+    ).toHaveCount(0);
   });
 
   test("renders the application form", async ({ page }) => {

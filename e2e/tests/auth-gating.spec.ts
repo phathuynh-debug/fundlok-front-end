@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 import { signInAs } from "../support/auth";
+import { t } from "../support/i18n";
 
 /**
  * The proxy.ts route matrix.
@@ -231,5 +232,48 @@ test.describe("on-demand verification gate", () => {
     await signInAs(context, "unapprovedInvestor");
     await page.goto("/dashboard/transactions");
     await expect(page).toHaveURL(/\/dashboard\/transactions$/);
+  });
+});
+
+// --- Post-verification redirect ---------------------------------------------
+// The whole point of the ?next= handoff is that finishing verification returns
+// the SME to the action they were blocked on. Reported broken by hand: the
+// screen reached "Business verified" and then sat there until a manual refresh.
+
+test.describe("finishing KYB returns the SME to their action", () => {
+  test("redirects to ?next= without a manual refresh", async ({
+    page,
+    context,
+  }) => {
+    await signInAs(context, "unapprovedSme");
+
+    // Blocked, exactly as auth-gating asserts above.
+    await page.goto("/project-application");
+    await expect(page).toHaveURL(/\/kyc\?next=%2Fproject-application/);
+
+    // Stage a certificate and submit it. The stub answers APPROVED
+    // synchronously, like the real provider.
+    await page
+      .locator('input[type="file"]')
+      .first()
+      .setInputFiles({
+        name: "certificate.pdf",
+        mimeType: "application/pdf",
+        buffer: Buffer.from("%PDF-1.4 stub certificate"),
+      });
+    await page
+      .getByRole("button", { name: t("kyc.continueBtn"), exact: true })
+      .click();
+    await page
+      .getByRole("button", { name: t("kyc.gv.submitBtn"), exact: true })
+      .click();
+
+    // The confirmation appears...
+    await expect(page.getByText(t("kyc.kyb.approvedTitle"))).toBeVisible();
+
+    // ...and then the app moves them on by itself. No reload here on purpose:
+    // a page.reload() would mask the bug, because the proxy redirects correctly
+    // on a fresh request — it is only the client-side hop that was failing.
+    await expect(page).toHaveURL(/\/project-application$/, { timeout: 10_000 });
   });
 });

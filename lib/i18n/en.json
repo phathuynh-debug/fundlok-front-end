@@ -1456,6 +1456,8 @@
       "companySizeDerived": "Classified as {size}",
       "durationMonths": "The only terms available on the platform. Longer terms lower the daily repayment.",
       "employeeCount": "Full-time headcount, between 1 and 200.",
+      "prefilledAddressFromKyb": "Street and city came from the address on your verified business registration. Add the state/region and postal code, and edit anything that differs.",
+      "prefilledFromKyb": "Legal name and tax ID were filled in from your verified business registration. Check them and edit if anything differs.",
       "requestedAmountRange": "Between {min} and {max} VND."
     },
     "industries": {
