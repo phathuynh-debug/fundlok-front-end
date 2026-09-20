@@ -174,6 +174,42 @@ export const REQUIRED_LITE_FIGURE_KEYS: readonly LiteFigureKey[] =
  */
 const VND_MAX = 1_000_000_000_000; // 1 trillion đồng
 
+export const PERCENT_MIN = 0;
+export const PERCENT_MAX = 100;
+
+/**
+ * The two units read a "." completely differently, so nothing here may parse a
+ * figure without knowing which one it is holding.
+ *
+ * In a VND amount the separators are grouping: `4.800.000.000` is four point
+ * eight billion đồng, and the dots are noise to be stripped. In a percentage
+ * there is nothing to group — the field tops out at 100 — so a "." is a
+ * decimal point, and `19.81` is nineteen point eight one percent.
+ *
+ * Sharing one normaliser between them is what turned a measured concentration
+ * of 19.81% into 1981, which `clampPercentInput` then pinned to 100 — the
+ * worst possible value for that factor, arrived at silently, from a figure the
+ * applicant typed correctly. Concentration comes off an e-invoice export with
+ * two decimals, so this is not a rounding difference; it is a different
+ * number reaching the engine.
+ */
+const VND_DIGITS = /^\d+$/;
+const PERCENT_NUMBER = /^\d+(?:[.,]\d+)?$/;
+
+/** Both separators are accepted: a Vietnamese keyboard writes 19,81. */
+const toDecimal = (cleaned: string) => Number(cleaned.replace(",", "."));
+
+const stripSpaces = (raw: string) => raw.replace(/\s/g, "");
+
+const UNIT_BY_KEY = Object.fromEntries(
+  LITE_FIGURE_FIELDS.map((field) => [field.key, field.unit]),
+) as Record<LiteFigureKey, LiteFigureUnit>;
+
+/** The unit for a key, where only the key is to hand (consistency checks). */
+export function unitForKey(key: LiteFigureKey): LiteFigureUnit {
+  return UNIT_BY_KEY[key];
+}
+
 export type FigureError =
   | "required"
   | "not_a_number"
@@ -189,19 +225,23 @@ export function validateFigure(
 ): FigureError {
   const trimmed = raw.trim();
   if (!trimmed) return field.required ? "required" : null;
+  const cleaned = stripSpaces(trimmed);
+
+  if (field.unit === "pct") {
+    if (!PERCENT_NUMBER.test(cleaned)) return "not_a_number";
+    const value = toDecimal(cleaned);
+    if (!Number.isFinite(value)) return "not_a_number";
+    return value > PERCENT_MAX ? "out_of_range" : null;
+  }
 
   // Accept the thousands separators a Vietnamese keyboard produces.
-  const normalized = trimmed.replace(/[.,\s]/g, "");
-  if (!/^\d+$/.test(normalized)) return "not_a_number";
+  const digits = cleaned.replace(/[.,]/g, "");
+  if (!VND_DIGITS.test(digits)) return "not_a_number";
 
-  const value = Number(normalized);
+  const value = Number(digits);
   if (!Number.isFinite(value)) return "not_a_number";
-  if (field.unit === "pct") return value > 100 ? "out_of_range" : null;
   return value <= 0 || value > VND_MAX ? "out_of_range" : null;
 }
-
-export const PERCENT_MIN = 0;
-export const PERCENT_MAX = 100;
 
 /**
  * Hold a percentage inside 0-100 as it is typed.
@@ -218,26 +258,44 @@ export const PERCENT_MAX = 100;
  *   - anything that is not a clean number is returned untouched, so the
  *     existing `not_a_number` error still gets to explain itself rather than
  *     being silently rewritten.
+ *   - a decimal is a value, not a violation. This runs on every keystroke, so
+ *     it also has to leave a half-typed "19." and a lone "-" alone rather than
+ *     rewriting them mid-word.
  */
 export function clampPercentInput(raw: string): string {
   const trimmed = raw.trim();
   if (!trimmed) return raw;
 
-  const normalized = trimmed.replace(/[.,\s]/g, "");
-  if (!/^-?\d+$/.test(normalized)) return raw;
+  const cleaned = stripSpaces(trimmed).replace(",", ".");
+  if (!/^-?\d+(?:\.\d*)?$/.test(cleaned)) return raw;
 
-  const value = Number(normalized);
+  const value = Number(cleaned.endsWith(".") ? cleaned.slice(0, -1) : cleaned);
   if (!Number.isFinite(value)) return raw;
   if (value > PERCENT_MAX) return String(PERCENT_MAX);
   if (value < PERCENT_MIN) return String(PERCENT_MIN);
   return raw;
 }
 
-/** Digits only, for submitting and for comparing. `null` when left blank. */
-export function parseFigure(raw: string): number | null {
-  const normalized = raw.trim().replace(/[.,\s]/g, "");
-  if (!normalized) return null;
-  const value = Number(normalized);
+/**
+ * The number behind the typed string, for submitting and for comparing.
+ * `null` when blank or unparseable.
+ *
+ * `unit` is required, not defaulted: a default is how a percentage came to be
+ * read with the VND normaliser in the first place, and the failure was silent.
+ */
+export function parseFigure(raw: string, unit: LiteFigureUnit): number | null {
+  const cleaned = stripSpaces(raw.trim());
+  if (!cleaned) return null;
+
+  if (unit === "pct") {
+    if (!PERCENT_NUMBER.test(cleaned)) return null;
+    const value = toDecimal(cleaned);
+    return Number.isFinite(value) ? value : null;
+  }
+
+  const digits = cleaned.replace(/[.,]/g, "");
+  if (!VND_DIGITS.test(digits)) return null;
+  const value = Number(digits);
   return Number.isFinite(value) ? value : null;
 }
 
@@ -255,7 +313,7 @@ export function validateFigureConsistency(
   values: Record<LiteFigureKey, string>,
 ): Partial<Record<LiteFigureKey, FigureError>> {
   const errors: Partial<Record<LiteFigureKey, FigureError>> = {};
-  const n = (key: LiteFigureKey) => parseFigure(values[key]);
+  const n = (key: LiteFigureKey) => parseFigure(values[key], unitForKey(key));
 
   const best = n("revenue_best_month");
   const worst = n("revenue_worst_month");

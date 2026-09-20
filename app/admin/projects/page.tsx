@@ -7,7 +7,7 @@ import { isAdminRole } from "@/services/authentication.service";
 import { useTranslations } from "@/lib/i18n";
 import { AdminDirectory, AdminPageLoader } from "../_components/AdminDirectory";
 
-export default function AdminUsersPage() {
+export default function AdminProjectsPage() {
   const { user, isLoading } = useRequireAuth();
   const router = useRouter();
   const { t } = useTranslations();
@@ -26,14 +26,14 @@ export default function AdminUsersPage() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          {t("admin.usersPage.title")}
+          {t("admin.projectsPage.title")}
         </h1>
         <p className="text-sm text-muted-foreground">
-          {t("admin.usersPage.subtitle")}
+          {t("admin.projectsPage.subtitle")}
         </p>
       </div>
 
-      <AdminDirectory mode="users" />
+      <AdminDirectory mode="projects" />
     </div>
   );
 }

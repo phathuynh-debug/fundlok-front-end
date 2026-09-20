@@ -42,18 +42,35 @@
       "noApplications": "Chưa có đề nghị vay nào.",
       "noDocuments": "Chưa tải lên hồ sơ nào.",
       "noKyb": "Doanh nghiệp này chưa bắt đầu xác minh.",
+      "noScoreRun": "Engine tính điểm chưa chạy cho đề nghị này.",
       "notPreviewable": "Không thể xem loại tệp này trên trình duyệt. Hãy tải xuống để mở.",
       "notePlaceholder": "Lý do (không bắt buộc, được ghi vào nhật ký)",
       "openRow": "Xem nhanh {name}",
       "reject": "Từ chối",
+      "rescore": "Chạy lại",
+      "runScoring": "Chạy tính điểm",
+      "scoreComplete": "Đã tính điểm xong",
+      "scoreFailed": "Không thể chạy tính điểm",
+      "scoreGrade": "Điểm doanh nghiệp",
+      "scoreHeading": "Engine tính điểm",
+      "scoreAiPendingHint": "Chưa có điểm — phần đánh giá ngành cho đề nghị này chưa hoàn tất.",
+      "scoreInconclusive": "Engine chưa đủ dữ liệu để đưa ra điểm",
+      "scoreInsufficientHint": "Chưa có điểm — engine còn thiếu dữ liệu tài chính của đề nghị này. Phê duyệt lúc này là phê duyệt khi chưa có điểm.",
+      "scoreNeedsSubmitted": "Việc tính điểm chỉ chạy sau khi doanh nghiệp đã gửi đề nghị này.",
+      "scoreRate": "Lãi suất tham khảo",
       "subtitle": "Cần cả hai phê duyệt trước khi đề nghị vay được tiếp tục.",
       "title": "Xem nhanh hồ sơ"
+    },
+    "projectsPage": {
+      "subtitle": "Xem hồ sơ doanh nghiệp và tình trạng phê duyệt.",
+      "title": "Dự án"
     },
     "sidebar": {
       "auditLogs": "Nhật ký kiểm toán",
       "badge": "Quản trị",
       "logout": "Đăng xuất",
       "overview": "Tổng quan",
+      "projects": "Dự án",
       "systemSettings": "Cài đặt hệ thống",
       "users": "Người dùng"
     },
@@ -91,12 +108,10 @@
       "name": "Tên",
       "noProjects": "Không tìm thấy dự án.",
       "noUsers": "Không tìm thấy người dùng.",
-      "projects": "Dự án",
       "role": "Vai trò",
       "searchProjects": "Tìm dự án…",
       "searchUsers": "Tìm người dùng…",
-      "status": "Trạng thái",
-      "users": "Người dùng"
+      "status": "Trạng thái"
     },
     "title": "Tổng quan quản trị",
     "userPreview": {
@@ -117,7 +132,6 @@
       "title": "Tài khoản"
     },
     "usersPage": {
-      "comingSoon": "Quản lý người dùng sắp ra mắt.",
       "subtitle": "Quản lý người dùng nền tảng tại đây.",
       "title": "Người dùng"
     },
@@ -1573,6 +1587,9 @@
       "durationMonths": "Chọn thời hạn vay 3, 6, 9 hoặc 12 tháng",
       "employeeCount": "Nhập số nhân viên từ 1 đến 200 — nền tảng chỉ tài trợ doanh nghiệp SME",
       "incorporationDate": "Vui lòng nhập ngày thành lập",
+      "incorporationDateFormat": "Vui lòng nhập ngày hợp lệ theo định dạng YYYY-MM-DD.",
+      "incorporationDateFuture": "Ngày thành lập không thể ở tương lai.",
+      "incorporationDateTooEarly": "Ngày này có vẻ quá xa trong quá khứ — vui lòng kiểm tra lại.",
       "industry": "Vui lòng nhập ngành",
       "legalName": "Vui lòng nhập tên pháp lý",
       "postalCode": "Vui lòng nhập mã bưu chính",

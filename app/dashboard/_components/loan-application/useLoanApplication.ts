@@ -333,7 +333,10 @@ export function useLoanApplication({
       await saveFigures.mutateAsync({
         applicationId: loanApplicationId,
         payload: Object.fromEntries(
-          LITE_FIGURE_KEYS.map((key) => [key, parseFigure(figures[key])]),
+          LITE_FIGURE_FIELDS.map((field) => [
+            field.key,
+            parseFigure(figures[field.key], field.unit),
+          ]),
         ) as unknown as LoanApplicationFiguresPayload,
       });
       await confirmUploads.mutateAsync({

@@ -32,6 +32,7 @@ import {
   STUB_ADMIN_USERS,
   STUB_AUDIT_LOGS,
   STUB_PASSWORD,
+  STUB_ADMIN_ONLY_PROJECT,
   STUB_PUBLIC_PROJECTS,
   STUB_USERS,
   projectsFor,
@@ -109,8 +110,36 @@ const adminProjectSeeded = new Set<string>();
 /** Status changes made during a run, keyed by stub user id. */
 const adminUserStatuses = new Map<string, string>();
 
+/** Score runs produced during a run, keyed by application id. */
+const adminScoreRuns = new Map<string, Record<string, unknown>>();
+
+function scoreRunFor(applicationId: string) {
+  const run = adminScoreRuns.get(applicationId);
+  if (!run) return null;
+  // Both are null on an INSUFFICIENT_DATA run: the real engine reports the
+  // grade as absent rather than zero (R8), and a stub that invented a 0 here
+  // would let the UI ship a bug the API cannot produce.
+  const pricing = run.pricing as { interest_rate_pct: number } | null;
+  const grade = run.grade as { value: number } | null;
+  return {
+    id: run.id,
+    status: run.status,
+    decision: run.decision,
+    final_grade: grade?.value ?? null,
+    interest_rate_pct: pricing?.interest_rate_pct ?? null,
+    engine_version: "1.0.0",
+    params_version: "wb-v1-20260917",
+    created_at: new Date().toISOString(),
+  };
+}
+
+/** Every company the admin console can open — listings plus admin-only ones. */
+function adminProjects() {
+  return [...STUB_PUBLIC_PROJECTS, STUB_ADMIN_ONLY_PROJECT];
+}
+
 function adminProjectDetail(projectId: string) {
-  const project = STUB_PUBLIC_PROJECTS.find((p) => p.id === projectId);
+  const project = adminProjects().find((p) => p.id === projectId);
   if (!project) return null;
 
   if (!adminProjectSeeded.has(projectId)) {
@@ -171,7 +200,12 @@ function adminProjectDetail(projectId: string) {
     address: null,
     incorporation_date: "2019-03-15",
     created_at: project.created_at ?? "2026-02-01T00:00:00Z",
-    applications: [adminApplications.get(`app-${projectId}`)!],
+    applications: [
+      {
+        ...adminApplications.get(`app-${projectId}`)!,
+        score_run: scoreRunFor(`app-${projectId}`),
+      },
+    ],
     kyb: adminKybAttempts.get(`kyb-${projectId}`)!,
   };
 }
@@ -892,6 +926,48 @@ const server = createServer(async (req, res) => {
     });
   }
 
+  // --- Underwriting ---------------------------------------------------------
+  // NOT under /admin/ — the real route is /underwriting/*, and it is gated by
+  // require_roles(Role.ADMIN) specifically: a SYSTEM_ADMIN is refused too.
+  if (path === "/underwriting/score-runs" && method === "POST") {
+    if (user.role !== "ADMIN") {
+      return detail(res, 403, "Not authorized for this action");
+    }
+    const body = await readBody(req);
+    const applicationId = String(body.application_id);
+    // One company has no financials behind it, so the engine declines to
+    // grade it. That is a 201 with a decision, not an error — the operator
+    // gets an answer, just not a score.
+    const ungraded = applicationId.endsWith(STUB_ADMIN_ONLY_PROJECT.id);
+    const run = ungraded
+      ? {
+          id: `run-${applicationId}`,
+          application_id: applicationId,
+          status: "READY",
+          decision: "INSUFFICIENT_DATA",
+          grade: null,
+          pricing: null,
+          fired_gates: [],
+          versions: { engine: "1.0.0", params: "wb-v1-20260917" },
+        }
+      : {
+          id: `run-${applicationId}`,
+          application_id: applicationId,
+          status: "READY",
+          decision: "APPROVED",
+          grade: { value: 75.91 },
+          pricing: {
+            interest_rate_pct: 13.93,
+            target_payment_vnd: 534817122,
+            target_daily_vnd: 4051644,
+          },
+          fired_gates: [],
+          versions: { engine: "1.0.0", params: "wb-v1-20260917" },
+        };
+    adminScoreRuns.set(applicationId, run);
+    return json(res, 201, run);
+  }
+
   // --- Admin ---------------------------------------------------------------
   // Guarded like the real backend: a non-admin session must get a 403 here, so
   // a test can prove the API is not the only thing keeping them out.
@@ -905,7 +981,7 @@ const server = createServer(async (req, res) => {
         url.searchParams.get("mode") === "projects" ? "projects" : "users";
       const items =
         mode === "projects"
-          ? STUB_PUBLIC_PROJECTS
+          ? adminProjects()
           : STUB_ADMIN_USERS.map((u) => ({
               ...u,
               status: adminUserStatuses.get(u.id) ?? u.status,

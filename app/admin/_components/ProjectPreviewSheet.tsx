@@ -7,6 +7,7 @@ import {
   Clock,
   FileText,
   Loader2,
+  Play,
   ShieldCheck,
   XCircle,
 } from "lucide-react";
@@ -30,11 +31,13 @@ import {
   useDecideApplication,
   useResolveKybVerification,
 } from "@/hooks/use-admin";
+import { useStartScoreRun } from "@/hooks/use-underwriting";
 import { useTranslations } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format-currency";
 import { formatDate } from "@/lib/format-date";
 import type {
   AdminApplicationDocument,
+  AdminScoreRun,
   AdminDecision,
   AdminLoanApplication,
 } from "@/services/admin.service";
@@ -67,15 +70,46 @@ export function ProjectPreviewSheet({
   const { mutateAsync: decide, isPending: deciding } =
     useDecideApplication(projectId);
 
-  // One note box per decision target, keyed by record id — a rejection reason
-  // typed against one application must not follow the operator to the next.
   // Which document the viewer dialog is showing; null = closed.
   const [viewerDocument, setViewerDocument] =
     useState<AdminApplicationDocument | null>(null);
+  // One note box per decision target, keyed by record id — a rejection reason
+  // typed against one application must not follow the operator to the next.
   const [notes, setNotes] = useState<Record<string, string>>({});
   const noteFor = (id: string) => notes[id] ?? "";
   const setNote = (id: string, value: string) =>
     setNotes((prev) => ({ ...prev, [id]: value }));
+
+  // Which application is being scored; null = none. Tracked by id rather than
+  // a bare boolean so one request's spinner cannot appear on another's row.
+  const [scoringId, setScoringId] = useState<string | null>(null);
+  const { mutateAsync: startScoreRun } = useStartScoreRun(projectId);
+
+  const handleScore = async (applicationId: string) => {
+    setScoringId(applicationId);
+    try {
+      const run = await startScoreRun({ application_id: applicationId });
+      // INSUFFICIENT_DATA and AI_PENDING are answers, not failures — the
+      // engine declining for want of inputs is information the operator needs,
+      // so it is reported neutrally rather than as an error.
+      const inconclusive =
+        run.decision === "INSUFFICIENT_DATA" || run.decision === "AI_PENDING";
+      toast({
+        title: inconclusive
+          ? t("admin.preview.scoreInconclusive")
+          : t("admin.preview.scoreComplete"),
+        description: inconclusive ? String(run.decision) : undefined,
+      });
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: t("admin.preview.scoreFailed"),
+        description: (err as ApiError)?.message ?? undefined,
+      });
+    } finally {
+      setScoringId(null);
+    }
+  };
 
   const fail = (err: unknown) =>
     toast({
@@ -222,6 +256,19 @@ export function ProjectPreviewSheet({
                         {formatDate(application.created_at, locale)}
                       </p>
 
+                      {/* The engine's answer, before the operator gives
+                          theirs — the whole point of previewing. */}
+                      <ScoreRunSummary
+                        run={application.score_run}
+                        t={t}
+                        // Scoring needs a SUBMITTED application: the engine
+                        // would otherwise grade figures the SME has not
+                        // finished entering, and the API answers 400.
+                        canRun={application.status === "SUBMITTED"}
+                        running={scoringId === application.id}
+                        onRun={() => handleScore(application.id)}
+                      />
+
                       <DocumentList
                         documents={application.documents}
                         t={t}
@@ -277,6 +324,127 @@ export function ProjectPreviewSheet({
 // document_type so a new type shows up as its raw key rather than vanishing —
 // silently dropping a document an operator is meant to review would be worse
 // than an unpolished label.
+// The grading engine's result for one funding request.
+//
+// Shows BOTH the run lifecycle and the decision: a LOCKED run that decided
+// REVIEW is not an approval, and collapsing them would read as one. The grade
+// is a 0-100 internal assessment — a reference input to the operator's
+// decision, never a rating, so it is labelled as a score and never graded to a
+// letter.
+function ScoreRunSummary({
+  run,
+  t,
+  canRun,
+  running,
+  onRun,
+}: {
+  run: AdminScoreRun | null;
+  t: (key: string) => string;
+  canRun: boolean;
+  running: boolean;
+  onRun: () => void;
+}) {
+  const runButton = (
+    <Button
+      type="button"
+      size="sm"
+      variant="outline"
+      className="w-full"
+      disabled={!canRun || running}
+      onClick={onRun}
+    >
+      {running ? (
+        <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+      ) : (
+        <Play className="mr-2 h-3.5 w-3.5" />
+      )}
+      {run ? t("admin.preview.rescore") : t("admin.preview.runScoring")}
+    </Button>
+  );
+
+  if (!run) {
+    // No run means no opinion. Rendering a zero would invent one.
+    return (
+      <div className="space-y-2">
+        <p className="text-xs text-muted-foreground">
+          {canRun
+            ? t("admin.preview.noScoreRun")
+            : t("admin.preview.scoreNeedsSubmitted")}
+        </p>
+        {canRun && runButton}
+      </div>
+    );
+  }
+  // REJECT is a verdict; INSUFFICIENT_DATA and AI_PENDING are the engine
+  // saying it has no verdict. All three are red because all three mean there
+  // is no score behind the Approve button sitting directly below — and a grey
+  // badge next to two em-dashes reads, at a glance, like a score that simply
+  // has not loaded yet.
+  const noVerdict =
+    run.decision === "INSUFFICIENT_DATA" || run.decision === "AI_PENDING";
+  const blocked = noVerdict || run.decision === "REJECT";
+
+  return (
+    <div
+      className={cn(
+        "space-y-2 rounded-lg border bg-background/60 p-3",
+        blocked ? "border-destructive/50" : "border-border",
+      )}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs font-semibold text-foreground">
+          {t("admin.preview.scoreHeading")}
+        </span>
+        <div className="flex items-center gap-1.5">
+          <Badge variant="secondary">{run.status}</Badge>
+          {run.decision && (
+            <Badge variant={blocked ? "destructive" : "secondary"}>
+              {run.decision}
+            </Badge>
+          )}
+        </div>
+      </div>
+      <dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+        <dt className="text-muted-foreground">
+          {t("admin.preview.scoreGrade")}
+        </dt>
+        <dd className="font-mono text-foreground">
+          {run.final_grade === null ? "—" : run.final_grade.toFixed(2)}
+        </dd>
+        <dt className="text-muted-foreground">
+          {t("admin.preview.scoreRate")}
+        </dt>
+        <dd className="font-mono text-foreground">
+          {run.interest_rate_pct === null
+            ? "—"
+            : `${run.interest_rate_pct.toFixed(2)}%`}
+        </dd>
+      </dl>
+      {/* The two em-dashes above are the whole story otherwise. Say what is
+          absent and what approving anyway would mean, because the Approve
+          button is the next thing on the panel. */}
+      {noVerdict && (
+        <p className="text-[11px] leading-relaxed text-destructive">
+          {run.decision === "AI_PENDING"
+            ? t("admin.preview.scoreAiPendingHint")
+            : t("admin.preview.scoreInsufficientHint")}
+        </p>
+      )}
+      {/* Provenance: which engine and parameter set produced this, so a quote
+          stays traceable after either is bumped. */}
+      {(run.engine_version || run.params_version) && (
+        <p className="font-mono text-[11px] text-muted-foreground">
+          {run.engine_version} · {run.params_version}
+        </p>
+      )}
+      {/* A LOCKED run is the basis a contract gets created on, so it is not
+          re-run from here — a new one would leave which run backed the
+          decision ambiguous. */}
+      {run.status !== "LOCKED" && canRun && runButton}
+    </div>
+  );
+}
+
 function DocumentList({
   documents,
   t,

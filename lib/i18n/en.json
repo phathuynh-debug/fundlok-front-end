@@ -42,18 +42,35 @@
       "noApplications": "No funding requests yet.",
       "noDocuments": "No documents uploaded yet.",
       "noKyb": "This company has not started business verification yet.",
+      "noScoreRun": "The grading engine has not run for this request yet.",
       "notPreviewable": "This file type cannot be shown in the browser. Download it to open it.",
       "notePlaceholder": "Reason (optional, recorded in the audit log)",
       "openRow": "Preview {name}",
       "reject": "Reject",
+      "rescore": "Run again",
+      "runScoring": "Run scoring",
+      "scoreComplete": "Scoring complete",
+      "scoreFailed": "Could not run scoring",
+      "scoreGrade": "Business score",
+      "scoreHeading": "Grading engine",
+      "scoreAiPendingHint": "No score yet — the sector assessment for this request has not finished.",
+      "scoreInconclusive": "The engine could not reach a score",
+      "scoreInsufficientHint": "No score was produced — the engine is missing financial inputs for this request. Approving now approves it without one.",
+      "scoreNeedsSubmitted": "Scoring runs once the business has submitted this request.",
+      "scoreRate": "Reference rate",
       "subtitle": "Both approvals are required before a funding request can proceed.",
       "title": "Project preview"
+    },
+    "projectsPage": {
+      "subtitle": "Review company applications and their approvals.",
+      "title": "Projects"
     },
     "sidebar": {
       "auditLogs": "Audit logs",
       "badge": "Admin",
       "logout": "Log out",
       "overview": "Overview",
+      "projects": "Projects",
       "systemSettings": "System settings",
       "users": "Users"
     },
@@ -91,12 +108,10 @@
       "name": "Name",
       "noProjects": "No projects found.",
       "noUsers": "No users found.",
-      "projects": "Projects",
       "role": "Role",
       "searchProjects": "Search projects…",
       "searchUsers": "Search users…",
-      "status": "Status",
-      "users": "Users"
+      "status": "Status"
     },
     "title": "Admin overview",
     "userPreview": {
@@ -117,7 +132,6 @@
       "title": "Account"
     },
     "usersPage": {
-      "comingSoon": "User management coming soon.",
       "subtitle": "Manage platform users from here.",
       "title": "Users"
     },
@@ -1573,6 +1587,9 @@
       "durationMonths": "Choose a loan term of 3, 6, 9 or 12 months",
       "employeeCount": "Enter a headcount between 1 and 200 — this platform funds SMEs only",
       "incorporationDate": "Incorporation date is required",
+      "incorporationDateFormat": "Enter a real date in the format YYYY-MM-DD.",
+      "incorporationDateFuture": "The incorporation date cannot be in the future.",
+      "incorporationDateTooEarly": "That date looks too far in the past — please check it.",
       "industry": "Industry is required",
       "legalName": "Legal name is required",
       "postalCode": "Postal code is required",

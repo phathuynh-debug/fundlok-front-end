@@ -99,7 +99,7 @@ export function ReviewStep() {
         </h5>
         <dl className="divide-y divide-border/60">
           {LITE_FIGURE_FIELDS.map((field) => {
-            const value = parseFigure(figures[field.key]);
+            const value = parseFigure(figures[field.key], field.unit);
             return (
               <div
                 key={field.key}

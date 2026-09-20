@@ -151,6 +151,23 @@ export interface AdminApplicationDocument {
   uploaded_at: string | null;
 }
 
+// What the grading engine produced. `status` is the run's lifecycle
+// (RUNNING | READY | LOCKED | FAILED); `decision` is the grading OUTCOME
+// (APPROVED | REVIEW | REJECT | INSUFFICIENT_DATA | AI_PENDING). They are not
+// the same thing — a LOCKED run that decided REVIEW is not an approval.
+export interface AdminScoreRun {
+  id: string;
+  status: string;
+  decision: string | null;
+  /** 0-100 internal assessment, full precision. */
+  final_grade: number | null;
+  /** All-in annual rate the score implies, capped at the 20% ceiling. */
+  interest_rate_pct: number | null;
+  engine_version: string | null;
+  params_version: string | null;
+  created_at: string | null;
+}
+
 export interface AdminLoanApplication {
   id: string;
   // Integer VND. The column is Numeric(20, 0) and the API serialises it as an
@@ -165,6 +182,8 @@ export interface AdminLoanApplication {
   decision_note: string | null;
   created_at: string | null;
   documents: AdminApplicationDocument[];
+  /** Null until the engine has run — no run means no opinion, not a zero. */
+  score_run: AdminScoreRun | null;
 }
 
 export interface AdminProjectDetail {

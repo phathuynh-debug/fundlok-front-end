@@ -229,6 +229,21 @@ export const STUB_PUBLIC_PROJECTS = [
 ];
 
 /**
+ * A company that exists only in the admin console, never on the marketplace.
+ *
+ * It carries the funding request the engine CANNOT grade, so the panel's
+ * ungraded state has a company of its own — the marketplace specs derive their
+ * expectations from STUB_PUBLIC_PROJECTS, and a third listing there would be a
+ * third card on a screen this has nothing to do with.
+ */
+export const STUB_ADMIN_ONLY_PROJECT = {
+  ...STUB_PROJECT,
+  id: "20000000-0000-0000-0000-000000000004",
+  legal_name: "Ungraded Trading Co",
+  industry: "Retail",
+};
+
+/**
  * The same company, but with the application still in DRAFT.
  *
  * The DRAFT branch of SmeDashboard renders the application wizard. That used

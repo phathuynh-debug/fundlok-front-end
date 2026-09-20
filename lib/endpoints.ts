@@ -111,6 +111,17 @@ export const ADMIN_ENDPOINTS = {
   documentUrl: (id: string) => `/admin/documents/${id}/url`,
 } as const;
 
+// Underwriting. Admin-only server-side (require_roles(Role.ADMIN) — note that
+// is ADMIN specifically, not SYSTEM_ADMIN). A score run is a dated, audited
+// artefact: it writes an append-only score_run_inputs row for exact replay and
+// records the board-set bank rate in force, so it is started deliberately
+// rather than as a side effect of an upload.
+export const UNDERWRITING_ENDPOINTS = {
+  scoreRuns: "/underwriting/score-runs",
+  scoreRun: (id: string) => `/underwriting/score-runs/${id}`,
+  approveScoreRun: (id: string) => `/underwriting/score-runs/${id}/approve`,
+} as const;
+
 // GVerify (Datatrust) — identity/business verification for both roles, gated
 // by role server-side: investors do KYC, SMEs do KYB (calling the wrong one
 // 403s). Direct API, so no redirect and no webhook: we submit the images in

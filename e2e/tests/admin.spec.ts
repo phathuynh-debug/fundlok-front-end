@@ -29,8 +29,8 @@ test.describe("as an admin", () => {
     ).toBeVisible();
   });
 
-  test("the overview lists users from the API", async ({ page }) => {
-    await page.goto("/admin");
+  test("the users page lists users from the API", async ({ page }) => {
+    await page.goto("/admin/users");
 
     for (const row of STUB_ADMIN_USERS) {
       await expect(page.getByText(row.email)).toBeVisible();
@@ -109,8 +109,7 @@ test.describe("the admin project preview", () => {
     page: import("@playwright/test").Page,
     company: string,
   ) => {
-    await page.goto("/admin");
-    await page.getByRole("button", { name: t("admin.table.projects") }).click();
+    await page.goto("/admin/projects");
     await page.getByRole("button", { name: new RegExp(company) }).click();
   };
 
@@ -192,14 +191,63 @@ test.describe("the admin project preview", () => {
     await expect(page.getByText("MANUAL_REVIEW")).toHaveCount(0);
   });
 
+  test("shows no score until the engine is run, then shows one", async ({
+    page,
+  }) => {
+    // Northwind: its own company, because this test mutates score-run state
+    // and the stub shares it across a worker.
+    await openPreview(page, "Northwind IT");
+
+    await expect(page.getByText(t("admin.preview.noScoreRun"))).toBeVisible();
+
+    await page
+      .getByRole("button", { name: t("admin.preview.runScoring") })
+      .click();
+
+    // The engine's answer, before the operator gives theirs.
+    await expect(page.getByText(t("admin.preview.scoreHeading"))).toBeVisible();
+    await expect(page.getByText("75.91")).toBeVisible();
+    await expect(page.getByText("13.93%")).toBeVisible();
+    // Status and decision are separate axes and both are shown.
+    await expect(page.getByText("READY")).toBeVisible();
+    await expect(page.getByText("APPROVED").first()).toBeVisible();
+  });
+
+  test("an ungraded run reads as blocked, not as a pending score", async ({
+    page,
+  }) => {
+    // Its own company: this one mutates score-run state too.
+    await openPreview(page, "Ungraded Trading Co");
+
+    await page
+      .getByRole("button", { name: t("admin.preview.runScoring") })
+      .click();
+
+    // Scoped to the panel: the toast reports the same decision, and matching
+    // page-wide picks up its copy and its aria-live announcement too.
+    const panel = page.getByRole("dialog");
+
+    // The engine answered — it just has no score to give.
+    await expect(
+      panel.getByText(t("admin.preview.scoreInsufficientHint")),
+    ).toBeVisible();
+
+    // The decision badge carries the destructive token, not the neutral one
+    // the status badge uses — that contrast is the whole point of the change.
+    await expect(panel.getByText("INSUFFICIENT_DATA")).toHaveClass(
+      /bg-destructive/,
+    );
+    await expect(panel.getByText("READY")).not.toHaveClass(/bg-destructive/);
+  });
+
   test("both tables offer a preview", async ({ page }) => {
     // Superseded an earlier test that asserted user rows were inert — they
     // were, until the account panel landed. Kept as a positive assertion so
     // the affordance cannot silently disappear from either table.
-    await page.goto("/admin");
+    await page.goto("/admin/users");
     await expect(page.locator('tbody tr[role="button"]').first()).toBeVisible();
 
-    await page.getByRole("button", { name: t("admin.table.projects") }).click();
+    await page.goto("/admin/projects");
     await expect(page.locator('tbody tr[role="button"]').first()).toBeVisible();
   });
 });
@@ -216,7 +264,7 @@ test.describe("the admin user preview", () => {
     page: import("@playwright/test").Page,
     fullName: string,
   ) => {
-    await page.goto("/admin");
+    await page.goto("/admin/users");
     await page
       .getByRole("button", {
         name: t("admin.userPreview.openRow").replace("{name}", fullName),

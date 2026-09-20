@@ -81,6 +81,18 @@ type ProjectApplicationValues = {
 
 const TOTAL_STEPS = 5;
 
+// No Vietnamese enterprise predates this by any margin that matters, and it is
+// far enough back to never reject a real company. Its job is to catch a typo,
+// not to adjudicate history.
+const INCORPORATION_DATE_MIN = "1900-01-01";
+
+/** Today as YYYY-MM-DD in the viewer's own timezone, not UTC. */
+function todayIso(): string {
+  const now = new Date();
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 10);
+}
+
 export default function ProjectApplicationClient() {
   const router = useRouter();
   const { toast } = useToast();
@@ -113,9 +125,36 @@ export default function ProjectApplicationClient() {
           count <= MAX_EMPLOYEES
         );
       }, t("projectApplication.validation.employeeCount")),
+    // A native date input does NOT bound the year: typing extra digits yields
+    // "20003-05-12", which the browser accepts and the backend rejects with a
+    // parser message naming a field the applicant never saw. The `min`/`max`
+    // attributes on the input keep the picker honest; this keeps a typed or
+    // pasted value honest too.
     incorporation_date: z
       .string()
-      .min(1, t("projectApplication.validation.incorporationDate")),
+      .min(1, t("projectApplication.validation.incorporationDate"))
+      .refine(
+        (value) => /^\d{4}-\d{2}-\d{2}$/.test(value),
+        t("projectApplication.validation.incorporationDateFormat"),
+      )
+      .refine((value) => {
+        const parsed = new Date(`${value}T00:00:00Z`);
+        // Date accepts "2025-02-31" and rolls it forward, so round-trip it.
+        return (
+          !Number.isNaN(parsed.getTime()) &&
+          parsed.toISOString().slice(0, 10) === value
+        );
+      }, t("projectApplication.validation.incorporationDateFormat"))
+      .refine(
+        (value) => value >= INCORPORATION_DATE_MIN,
+        t("projectApplication.validation.incorporationDateTooEarly"),
+      )
+      .refine(
+        // A future incorporation date would make operating_months negative,
+        // which the grading engine has no sensible answer for.
+        (value) => value <= todayIso(),
+        t("projectApplication.validation.incorporationDateFuture"),
+      ),
     address: z.object({
       street: z
         .string()
@@ -760,6 +799,10 @@ export default function ProjectApplicationClient() {
                   <Input
                     id="incorporationDate"
                     type="date"
+                    // Bounds the native picker AND the spinner, so a 5-digit
+                    // year cannot be produced in the first place.
+                    min={INCORPORATION_DATE_MIN}
+                    max={todayIso()}
                     {...register("incorporation_date")}
                     disabled={isPending}
                   />
