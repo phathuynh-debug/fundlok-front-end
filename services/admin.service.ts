@@ -182,6 +182,26 @@ export interface AdminProjectDetail {
   kyb: AdminKybVerification | null;
 }
 
+// Account statuses. Only SUSPENDED denies — the backend rejects a suspended
+// account on every request AND at login. PENDING_KYC is a normal onboarding
+// state and stays permissive.
+export type AdminUserStatus = "ACTIVE" | "PENDING_KYC" | "SUSPENDED";
+
+export interface AdminUserDetail {
+  id: string;
+  email: string;
+  full_name: string | null;
+  role: string | null;
+  status: AdminUserStatus;
+  email_verified: boolean;
+  created_at: string | null;
+}
+
+export interface AdminUserStatusPayload {
+  status: AdminUserStatus;
+  note?: string | null;
+}
+
 export interface AdminDecisionPayload {
   decision: AdminDecision;
   note?: string | null;
@@ -212,6 +232,16 @@ export const adminService = {
   decideApplication(applicationId: string, body: AdminDecisionPayload) {
     return apiClient.post<AdminLoanApplication>(
       ADMIN_ENDPOINTS.applicationDecision(applicationId),
+      body,
+    );
+  },
+
+  // Admin only. Two server-side guards beyond the role check: nobody may
+  // change their own status (self-suspension is unrecoverable), and only a
+  // SYSTEM_ADMIN may act on an admin-level account.
+  setUserStatus(userId: string, body: AdminUserStatusPayload) {
+    return apiClient.patch<AdminUserDetail>(
+      ADMIN_ENDPOINTS.userStatus(userId),
       body,
     );
   },

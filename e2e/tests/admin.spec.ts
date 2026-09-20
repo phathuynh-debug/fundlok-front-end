@@ -202,3 +202,65 @@ test.describe("the admin project preview", () => {
     await expect(page.locator('tbody tr[role="button"]')).toHaveCount(0);
   });
 });
+
+// --- Account status ---------------------------------------------------------
+// SUSPENDED is a real deny server-side: the backend rejects the account on
+// every request and refuses a new session. So this panel is a security
+// control, and the guards on it matter as much as the happy path.
+
+test.describe("the admin user preview", () => {
+  const openUser = async (
+    page: import("@playwright/test").Page,
+    email: string,
+  ) => {
+    await page.goto("/admin");
+    await page.getByRole("button", { name: new RegExp(email) }).click();
+  };
+
+  test("a user row opens the account panel", async ({ context, page }) => {
+    await signInAs(context, "admin");
+    await openUser(page, STUB_USERS.investor.email);
+
+    await expect(
+      page.getByText(t("admin.userPreview.statusHeading")),
+    ).toBeVisible();
+    // The copy states what suspending actually does, because it does it.
+    await expect(
+      page.getByText(t("admin.userPreview.suspendWarning")),
+    ).toBeVisible();
+  });
+
+  test("suspending a member account updates the table", async ({
+    context,
+    page,
+  }) => {
+    await signInAs(context, "admin");
+    await openUser(page, STUB_USERS.sme.email);
+
+    await page
+      .getByRole("button", { name: t("admin.userPreview.statuses.SUSPENDED") })
+      .click();
+
+    // The panel closes and the row reflects the new status.
+    await expect(
+      page.getByText(t("admin.userPreview.statusHeading")),
+    ).toHaveCount(0);
+    await expect(page.getByText("SUSPENDED").first()).toBeVisible();
+  });
+
+  test("an admin cannot change their own status", async ({ context, page }) => {
+    // Self-suspension is unrecoverable, so the controls are withheld rather
+    // than offered and then refused by the server.
+    await signInAs(context, "admin");
+    await openUser(page, STUB_USERS.admin.email);
+
+    await expect(
+      page.getByText(t("admin.userPreview.blockedSelf")),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", {
+        name: t("admin.userPreview.statuses.SUSPENDED"),
+      }),
+    ).toHaveCount(0);
+  });
+});

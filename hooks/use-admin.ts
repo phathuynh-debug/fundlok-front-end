@@ -15,6 +15,8 @@ import {
   type AdminOverview,
   type AdminOverviewParams,
   type AdminProjectDetail,
+  type AdminUserDetail,
+  type AdminUserStatusPayload,
   type AuditLog,
   type AuditLogParams,
   type MaintenanceState,
@@ -127,6 +129,23 @@ export function useDecideApplication(projectId: string | null) {
           queryKey: adminKeys.projectDetail(projectId),
         });
       }
+    },
+  });
+}
+
+// Changes an account's status. Invalidates the overview rather than seeding it:
+// the status column is rendered in the table the panel was opened from, and a
+// suspension is consequential enough to be worth re-reading from the server.
+export function useSetUserStatus() {
+  const queryClient = useQueryClient();
+  return useMutation<
+    AdminUserDetail,
+    ApiError,
+    { id: string; body: AdminUserStatusPayload }
+  >({
+    mutationFn: ({ id, body }) => adminService.setUserStatus(id, body),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: adminKeys.all });
     },
   });
 }

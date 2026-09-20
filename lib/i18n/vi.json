@@ -95,6 +95,23 @@
       "users": "Người dùng"
     },
     "title": "Tổng quan quản trị",
+    "userPreview": {
+      "blockedAdmin": "Chỉ quản trị viên hệ thống mới có thể thay đổi tài khoản quản trị.",
+      "blockedSelf": "Bạn không thể thay đổi trạng thái tài khoản của chính mình.",
+      "notePlaceholder": "Lý do (không bắt buộc, được ghi vào nhật ký)",
+      "openRow": "Mở {name}",
+      "statusChanged": "Đã cập nhật trạng thái tài khoản",
+      "statusFailed": "Không thể thay đổi trạng thái tài khoản",
+      "statusHeading": "Trạng thái tài khoản",
+      "statuses": {
+        "ACTIVE": "Hoạt động",
+        "PENDING_KYC": "Chờ xác minh",
+        "SUSPENDED": "Tạm khóa"
+      },
+      "subtitle": "Thay đổi quyền truy cập của tài khoản này.",
+      "suspendWarning": "Tạm khóa sẽ đăng xuất tài khoản trên mọi thiết bị và chặn đăng nhập cho đến khi được khôi phục. Trạng thái chờ xác minh không hạn chế truy cập.",
+      "title": "Tài khoản"
+    },
     "usersPage": {
       "comingSoon": "Quản lý người dùng sắp ra mắt.",
       "subtitle": "Quản lý người dùng nền tảng tại đây.",

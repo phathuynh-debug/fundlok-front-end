@@ -32,6 +32,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DataTable, type Column } from "./_components/DataTable";
 import { ProjectPreviewSheet } from "./_components/ProjectPreviewSheet";
+import { UserPreviewSheet } from "./_components/UserPreviewSheet";
 import { useTranslations } from "@/lib/i18n";
 import { getInitials } from "@/lib/utils";
 
@@ -151,6 +152,9 @@ export default function AdminPage() {
   const [role, setRole] = useState("all");
   // Which project the preview panel is showing; null = closed.
   const [previewProjectId, setPreviewProjectId] = useState<string | null>(null);
+  // The row the user panel is showing; null = closed. The row itself is enough
+  // for this panel — there is no extra detail to fetch.
+  const [previewUser, setPreviewUser] = useState<AdminUserRow | null>(null);
   const [industryInput, setIndustryInput] = useState("");
   const [industry, setIndustry] = useState("");
 
@@ -401,6 +405,13 @@ export default function AdminPage() {
             isLoading={isOverviewLoading}
             isFetching={isFetching}
             emptyMessage={t("admin.table.noUsers")}
+            onRowClick={(u) => setPreviewUser(u)}
+            getRowLabel={(u) =>
+              t("admin.userPreview.openRow").replace(
+                "{name}",
+                u.full_name || u.email,
+              )
+            }
           />
         ) : (
           <DataTable<AdminProjectRow>
@@ -471,6 +482,13 @@ export default function AdminPage() {
         projectId={previewProjectId}
         onOpenChange={(open) => {
           if (!open) setPreviewProjectId(null);
+        }}
+      />
+
+      <UserPreviewSheet
+        user={previewUser}
+        onOpenChange={(open) => {
+          if (!open) setPreviewUser(null);
         }}
       />
     </div>

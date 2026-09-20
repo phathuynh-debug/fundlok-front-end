@@ -95,6 +95,23 @@
       "users": "Users"
     },
     "title": "Admin overview",
+    "userPreview": {
+      "blockedAdmin": "Only a system admin can change an admin account.",
+      "blockedSelf": "You cannot change your own account status.",
+      "notePlaceholder": "Reason (optional, recorded in the audit log)",
+      "openRow": "Open {name}",
+      "statusChanged": "Account status updated",
+      "statusFailed": "Could not change the account status",
+      "statusHeading": "Account status",
+      "statuses": {
+        "ACTIVE": "Active",
+        "PENDING_KYC": "Pending KYC",
+        "SUSPENDED": "Suspend"
+      },
+      "subtitle": "Change what this account is allowed to do.",
+      "suspendWarning": "Suspending signs the account out everywhere and blocks sign-in until it is restored. Pending KYC does not restrict access.",
+      "title": "Account"
+    },
     "usersPage": {
       "comingSoon": "User management coming soon.",
       "subtitle": "Manage platform users from here.",

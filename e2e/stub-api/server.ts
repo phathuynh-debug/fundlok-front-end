@@ -106,6 +106,9 @@ const adminApplications = new Map<string, StubAdminApplication>();
 const adminKybAttempts = new Map<string, StubAdminKyb>();
 const adminProjectSeeded = new Set<string>();
 
+/** Status changes made during a run, keyed by stub user id. */
+const adminUserStatuses = new Map<string, string>();
+
 function adminProjectDetail(projectId: string) {
   const project = STUB_PUBLIC_PROJECTS.find((p) => p.id === projectId);
   if (!project) return null;
@@ -873,7 +876,12 @@ const server = createServer(async (req, res) => {
       const mode =
         url.searchParams.get("mode") === "projects" ? "projects" : "users";
       const items =
-        mode === "projects" ? STUB_PUBLIC_PROJECTS : STUB_ADMIN_USERS;
+        mode === "projects"
+          ? STUB_PUBLIC_PROJECTS
+          : STUB_ADMIN_USERS.map((u) => ({
+              ...u,
+              status: adminUserStatuses.get(u.id) ?? u.status,
+            }));
       const search = url.searchParams.get("search");
       const filtered = search
         ? items.filter((row) =>
@@ -897,6 +905,33 @@ const server = createServer(async (req, res) => {
     // Mutable, like the 2FA block above and for the same reason: the whole
     // point of the panel is what happens when a decision flips, which a
     // stateless fixture cannot express.
+    const userStatusMatch = path.match(/^\/admin\/users\/([^/]+)\/status$/);
+    if (userStatusMatch && method === "PATCH") {
+      const body = await readBody(req);
+      const target = STUB_ADMIN_USERS.find((u) => u.id === userStatusMatch[1]);
+      if (!target) return json(res, 404, { detail: "User not found" });
+      // The server's two guards, mirrored so the suite can assert the UI
+      // respects them rather than only that it renders them.
+      if (target.id === user.id) {
+        return json(res, 409, {
+          detail: "You cannot change your own account status",
+        });
+      }
+      if (
+        ["ADMIN", "SYSTEM_ADMIN"].includes(String(target.role)) &&
+        user.role !== "SYSTEM_ADMIN"
+      ) {
+        return json(res, 403, {
+          detail: "Only a system admin can change an admin account's status",
+        });
+      }
+      adminUserStatuses.set(target.id, String(body.status));
+      return json(res, 200, {
+        ...target,
+        status: String(body.status),
+      });
+    }
+
     const projectDetailMatch = path.match(/^\/admin\/projects\/([^/]+)$/);
     if (projectDetailMatch && method === "GET") {
       const detail = adminProjectDetail(projectDetailMatch[1]);

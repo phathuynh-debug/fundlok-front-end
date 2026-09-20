@@ -237,6 +237,18 @@ export function projectsFor(key: StubUserKey) {
 
 /** Rows for the admin overview table (mode=users). */
 export const STUB_ADMIN_USERS = [
+  // The signed-in admin appears in their own table, which is what makes the
+  // "cannot change your own status" guard reachable from the UI.
+  {
+    id: STUB_USERS.admin.id,
+    email: STUB_USERS.admin.email,
+    full_name: STUB_USERS.admin.full_name,
+    role: "ADMIN",
+    status: "ACTIVE",
+    email_verified: true,
+    avatar_url: null,
+    created_at: "2026-01-05T08:00:00+07:00",
+  },
   {
     id: STUB_USERS.investor.id,
     email: STUB_USERS.investor.email,
@@ -272,7 +284,7 @@ export const STUB_ADMIN_USERS = [
 export const STUB_ADMIN_STATS = {
   total_users: STUB_ADMIN_USERS.length,
   total_projects: 2,
-  users_by_role: { INVESTOR: 2, SME: 1 },
+  users_by_role: { INVESTOR: 2, SME: 1, ADMIN: 1 },
   users_by_status: { ACTIVE: 2, PENDING: 1 },
   projects_by_status: { ACTIVE: 1, DRAFT: 1 },
 };

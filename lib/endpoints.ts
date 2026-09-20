@@ -105,6 +105,8 @@ export const ADMIN_ENDPOINTS = {
   resolveKybVerification: (id: string) =>
     `/admin/kyb-verifications/${id}/resolve`,
   applicationDecision: (id: string) => `/admin/applications/${id}/decision`,
+  // Account status. SUSPENDED is a real deny server-side, not a label.
+  userStatus: (id: string) => `/admin/users/${id}/status`,
 } as const;
 
 // GVerify (Datatrust) — identity/business verification for both roles, gated
