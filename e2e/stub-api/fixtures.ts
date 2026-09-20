@@ -17,6 +17,7 @@ export type StubUserKey =
   | "unapprovedInvestor"
   | "unapprovedSme"
   | "smeDraftApplication"
+  | "smeRejectedApplication"
   | "twoFactor"
   | "suspended"
   | "expiredSession";
@@ -76,6 +77,16 @@ export const STUB_USERS: Record<StubUserKey, StubUser> = {
     id: "00000000-0000-0000-0000-0000000000a9",
     email: "sme-draft@e2e.test",
     full_name: "SME With Draft",
+    role: "SME",
+  },
+  // The refused outcome. Its own account because the status panel is driven
+  // by the application's status, and the SUBMITTED-state tests must keep
+  // seeing "awaiting review".
+  smeRejectedApplication: {
+    ...base,
+    id: "00000000-0000-0000-0000-0000000000aa",
+    email: "sme-rejected@e2e.test",
+    full_name: "SME Refused",
     role: "SME",
   },
   // Same role, but /projects comes back empty — the dashboard's "apply for
@@ -264,9 +275,43 @@ export const STUB_PROJECT_DRAFT_APPLICATION = {
   },
 };
 
+/**
+ * A refused application, carrying the operator's reason and a gap in the file.
+ *
+ * Both are what the applicant is owed on a refusal: an outcome with no
+ * explanation is the thing they phone about. `cic_report` is deliberately
+ * absent so the "still missing" list has something real in it.
+ */
+export const STUB_PROJECT_REJECTED_APPLICATION = {
+  ...STUB_PROJECT,
+  id: "20000000-0000-0000-0000-00000000000a",
+  loan_application: {
+    ...STUB_PROJECT.loan_application,
+    id: "30000000-0000-0000-0000-00000000000a",
+    project_id: "20000000-0000-0000-0000-00000000000a",
+    status: "REJECTED",
+    decision_note:
+      "The revenue in the declarations does not match the figures on the form.",
+    decided_at: "2026-09-12T09:00:00+07:00",
+    documents: [
+      {
+        id: "d1",
+        document_type: "legal_charter",
+        original_filename: "dieu-le-cong-ty.pdf",
+        content_type: "application/pdf",
+        file_size_bytes: 240000,
+        status: "UPLOADED",
+        uploaded_at: "2026-09-01T00:00:00Z",
+      },
+    ],
+  },
+};
+
 export function projectsFor(key: StubUserKey) {
   if (key === "sme" || key === "unapprovedSme") return [STUB_PROJECT];
   if (key === "smeDraftApplication") return [STUB_PROJECT_DRAFT_APPLICATION];
+  if (key === "smeRejectedApplication")
+    return [STUB_PROJECT_REJECTED_APPLICATION];
   return [];
 }
 

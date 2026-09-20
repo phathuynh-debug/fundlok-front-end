@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { Check, FileText, X } from "lucide-react";
+import { AlertCircle, Check, FileText, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ProjectLoanApplication } from "@/services/projects.service";
 import type { LoanDocumentType } from "@/services/uploads.service";
@@ -31,6 +31,23 @@ const DOCUMENT_LABELS: Record<LoanDocumentType, { en: string; vi: string }> = {
 
 const DOCUMENT_ORDER = Object.keys(DOCUMENT_LABELS) as LoanDocumentType[];
 
+/**
+ * What the wizard actually asks for today (`DOCUMENT_TYPES` in
+ * useLoanApplication).
+ *
+ * Steps 2 and 3 became typed figures, so VAT declarations and the annual
+ * financial statement are no longer uploaded by anyone. Counting them as
+ * expected is what made a complete application report "4/6 received" with two
+ * gaps the applicant had no way to close — and it would have put two
+ * impossible items at the top of the missing list below.
+ */
+const EXPECTED_DOCUMENT_TYPES: LoanDocumentType[] = [
+  "legal_charter",
+  "business_registration",
+  "e_invoice_data",
+  "cic_report",
+];
+
 const REPAYMENT_LABELS: Record<string, { en: string; vi: string }> = {
   MONTHLY: { en: "Monthly", vi: "Hàng tháng" },
   QUARTERLY: { en: "Quarterly", vi: "Hàng quý" },
@@ -56,6 +73,7 @@ const DECIDED_PRESENTATION: Record<
     badgeKey: string;
     noteKey: string;
     finalStep: StepState;
+    reasonClass: string;
     badgeClass: string;
     badgeTextClass: string;
     dotClass: string;
@@ -67,6 +85,7 @@ const DECIDED_PRESENTATION: Record<
     badgeKey: "dashboard.sme.statusApprovedBadge",
     noteKey: "dashboard.sme.statusApprovedNote",
     finalStep: "done",
+    reasonClass: "border-emerald-500/30 bg-emerald-500/5",
     badgeClass: "border-emerald-500/30 bg-emerald-500/10",
     badgeTextClass: "text-emerald-700 dark:text-emerald-300",
     dotClass: "bg-emerald-500",
@@ -77,6 +96,7 @@ const DECIDED_PRESENTATION: Record<
     badgeKey: "dashboard.sme.statusRejectedBadge",
     noteKey: "dashboard.sme.statusRejectedNote",
     finalStep: "rejected",
+    reasonClass: "border-destructive/30 bg-destructive/5",
     badgeClass: "border-destructive/30 bg-destructive/10",
     badgeTextClass: "text-destructive",
     dotClass: "bg-destructive",
@@ -116,11 +136,27 @@ export function LoanApplicationStatus({
     ? new Date(loanApplication.submitted_at)
     : null;
 
+  // Anything outside the expected four is still shown when it was actually
+  // uploaded — an application that predates the typed-figure steps has a VAT
+  // zip on file, and hiding it would tell the applicant we lost it.
+  const extraTypes = DOCUMENT_ORDER.filter(
+    (type) =>
+      !EXPECTED_DOCUMENT_TYPES.includes(type) && receivedByType.has(type),
+  );
+  const listedTypes = [...EXPECTED_DOCUMENT_TYPES, ...extraTypes];
+  const missingTypes = EXPECTED_DOCUMENT_TYPES.filter(
+    (type) => !receivedByType.has(type),
+  );
+  const receivedExpected = EXPECTED_DOCUMENT_TYPES.length - missingTypes.length;
+
   // This panel used to be hardcoded to "awaiting review" for every status
   // that was not DRAFT, so a decided application kept telling the applicant
   // their documents were still being read. The three outcomes it can now
   // show are the three the backend can put on `status` after submission.
   const decided = DECIDED_PRESENTATION[loanApplication.status] ?? null;
+  // Trimmed: an operator who tabbed through the field leaves whitespace, and
+  // an empty reason box is worse than no reason box.
+  const decisionNote = loanApplication.decision_note?.trim() || null;
 
   // Three-stage tracker. Undecided: submission done, review running, decision
   // still ahead. Decided: the third node carries the verdict.
@@ -249,6 +285,51 @@ export function LoanApplicationStatus({
           ))}
         </div>
 
+        {/* Why the answer is what it is. An outcome with no explanation is
+            the thing an applicant phones about, so the operator's reason and
+            any gap in the file are stated here rather than left to email. */}
+        {decided && (decisionNote || missingTypes.length > 0) && (
+          <div
+            className={cn(
+              "space-y-3 rounded-xl border p-4",
+              decided.reasonClass,
+            )}
+          >
+            {decisionNote && (
+              <div className="space-y-1">
+                <h4 className="text-xs font-semibold uppercase tracking-wide text-foreground">
+                  {t("dashboard.sme.statusReasonHeading")}
+                </h4>
+                <p className="text-sm leading-relaxed text-foreground/90">
+                  {decisionNote}
+                </p>
+              </div>
+            )}
+
+            {missingTypes.length > 0 && (
+              <div className="space-y-1">
+                <h4 className="text-xs font-semibold uppercase tracking-wide text-foreground">
+                  {t("dashboard.sme.statusMissingHeading")}
+                </h4>
+                <ul className="space-y-1">
+                  {missingTypes.map((type) => (
+                    <li
+                      key={type}
+                      className="flex items-center gap-2 text-sm text-foreground/90"
+                    >
+                      <AlertCircle className="h-3.5 w-3.5 shrink-0 text-destructive" />
+                      {DOCUMENT_LABELS[type][isVi ? "vi" : "en"]}
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  {t("dashboard.sme.statusMissingHint")}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Key facts row */}
         <dl className="grid grid-cols-2 gap-x-4 gap-y-4 rounded-xl border border-border/60 bg-muted/20 p-4 sm:grid-cols-4">
           <div className="space-y-0.5">
@@ -300,13 +381,13 @@ export function LoanApplicationStatus({
             </h4>
             <span className="text-xs font-medium text-muted-foreground">
               {t("dashboard.sme.statusDocumentsReceivedCount")
-                .replace("{count}", String(receivedByType.size))
-                .replace("{total}", String(DOCUMENT_ORDER.length))}
+                .replace("{count}", String(receivedExpected))
+                .replace("{total}", String(EXPECTED_DOCUMENT_TYPES.length))}
             </span>
           </div>
 
           <ul className="divide-y divide-border/60">
-            {DOCUMENT_ORDER.map((type) => {
+            {listedTypes.map((type) => {
               const doc = receivedByType.get(type);
               const label = DOCUMENT_LABELS[type][isVi ? "vi" : "en"];
               return (

@@ -35,6 +35,13 @@ export interface ProjectLoanApplication {
   status: string;
   submitted_at: string | null;
   created_at: string | null;
+  /**
+   * The operator's reason for the decision, shown to the applicant once the
+   * application is decided. Null while it is still under review, and null on
+   * a decision the operator left unexplained.
+   */
+  decision_note: string | null;
+  decided_at: string | null;
   documents: ApplicationDocument[];
 }
 
