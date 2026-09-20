@@ -1654,5 +1654,12 @@
       "transparencyItem3": "Real-time business financial report & loan health assessment",
       "transparencyTitle": "Transparent, Public, Automatic"
     }
+  },
+  "suspended": {
+    "body": "You cannot sign in or use FundLok while your account is suspended.",
+    "contactBtn": "Contact support",
+    "contactHint": "If you think this is a mistake, contact our team and we will look into it. Please include the email address on the account.",
+    "signOutBtn": "Sign out",
+    "title": "Your account is suspended"
   }
 }

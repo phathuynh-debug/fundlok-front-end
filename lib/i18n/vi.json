@@ -1654,5 +1654,12 @@
       "transparencyItem3": "Báo cáo tài chính doanh nghiệp & đánh giá sức khỏe khoản vay theo thời gian thực",
       "transparencyTitle": "Minh bạch, Công khai, Tự động"
     }
+  },
+  "suspended": {
+    "body": "Bạn không thể đăng nhập hoặc sử dụng FundLok khi tài khoản đang bị tạm khóa.",
+    "contactBtn": "Liên hệ hỗ trợ",
+    "contactHint": "Nếu bạn cho rằng đây là nhầm lẫn, vui lòng liên hệ với chúng tôi để được kiểm tra. Hãy cung cấp địa chỉ email của tài khoản.",
+    "signOutBtn": "Đăng xuất",
+    "title": "Tài khoản của bạn đã bị tạm khóa"
   }
 }

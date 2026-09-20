@@ -290,6 +290,23 @@ function currentUser(req: IncomingMessage) {
   return key in STUB_USERS ? { key, user: STUB_USERS[key] } : null;
 }
 
+/**
+ * Accounts the backend refuses outright.
+ *
+ * The real API rejects a suspended account in get_current_user, so EVERY
+ * authenticated route answers 403 — not just login. Mirrored here because the
+ * proxy reads /users/me server-side to decide where to send the request, and
+ * that decision is the thing under test.
+ */
+const SUSPENDED_KEYS = new Set<StubUserKey>(["suspended"]);
+
+/**
+ * Accounts whose access token is treated as expired: the cookie resolves to a
+ * stub identity, but every authenticated route answers 401 exactly as the real
+ * API does once the 30-minute token lapses.
+ */
+const EXPIRED_KEYS = new Set<StubUserKey>(["expiredSession"]);
+
 function json(
   res: ServerResponse,
   status: number,
@@ -591,6 +608,17 @@ const server = createServer(async (req, res) => {
     );
     res.writeHead(204);
     return res.end();
+  }
+
+  // An expired access token: the cookie is still sent, the backend rejects it.
+  if (EXPIRED_KEYS.has(key)) {
+    return json(res, 401, { detail: "Could not validate credentials" });
+  }
+
+  // A suspended account is refused on EVERY authenticated route, matching
+  // get_current_user server-side — not only at login.
+  if (SUSPENDED_KEYS.has(key)) {
+    return json(res, 403, { detail: "This account has been suspended" });
   }
 
   if (path === "/users/me" && method === "GET") {

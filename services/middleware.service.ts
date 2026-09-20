@@ -55,6 +55,9 @@ async function fetchMaintenance(): Promise<MaintenanceFlag> {
   }
 }
 
+/** The backend rejected this session because the account is suspended. */
+export const SUSPENDED = "SUSPENDED" as const;
+
 export const middlewareService = {
   // Reads the platform maintenance flag from the public maintenance endpoint
   // (GET /system/maintenance — readable without auth so the gate can apply to
@@ -92,7 +95,18 @@ export const middlewareService = {
   },
 
   // Returns the currently authenticated user
-  async getCurrentUser(request: NextRequest): Promise<CurrentUser | null> {
+  /**
+   * Resolve the session.
+   *
+   * Returns the sentinel `SUSPENDED` rather than null when the backend rejects
+   * the account as suspended. Collapsing that into null would route a
+   * suspended user to /login, where their password is correct but sign-in is
+   * refused — a loop with no explanation. The proxy needs to tell the two
+   * apart to send them somewhere that says what happened.
+   */
+  async getCurrentUser(
+    request: NextRequest,
+  ): Promise<CurrentUser | typeof SUSPENDED | null> {
     const accessToken = request.cookies.get("access_token")?.value;
 
     if (!accessToken) {
@@ -109,6 +123,19 @@ export const middlewareService = {
       });
 
       if (!response.ok) {
+        // 403 alone is not enough — an unverified email answers 403 too on
+        // some routes. Match the backend's own detail so only a suspension
+        // takes this branch, and fall back to "no session" otherwise.
+        if (response.status === 403) {
+          const detail = await response
+            .clone()
+            .json()
+            .then((body) => String(body?.detail ?? ""))
+            .catch(() => "");
+          if (detail.toLowerCase().includes("suspended")) {
+            return SUSPENDED;
+          }
+        }
         return null;
       }
 

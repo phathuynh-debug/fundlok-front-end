@@ -192,14 +192,15 @@ test.describe("the admin project preview", () => {
     await expect(page.getByText("MANUAL_REVIEW")).toHaveCount(0);
   });
 
-  test("user rows stay inert — there is no preview for them", async ({
-    page,
-  }) => {
-    // onRowClick is passed only to the projects table. A row that looks
-    // clickable and does nothing is worse than no affordance at all.
+  test("both tables offer a preview", async ({ page }) => {
+    // Superseded an earlier test that asserted user rows were inert — they
+    // were, until the account panel landed. Kept as a positive assertion so
+    // the affordance cannot silently disappear from either table.
     await page.goto("/admin");
-    await page.getByRole("button", { name: t("admin.table.users") }).click();
-    await expect(page.locator('tbody tr[role="button"]')).toHaveCount(0);
+    await expect(page.locator('tbody tr[role="button"]').first()).toBeVisible();
+
+    await page.getByRole("button", { name: t("admin.table.projects") }).click();
+    await expect(page.locator('tbody tr[role="button"]').first()).toBeVisible();
   });
 });
 
@@ -209,17 +210,23 @@ test.describe("the admin project preview", () => {
 // control, and the guards on it matter as much as the happy path.
 
 test.describe("the admin user preview", () => {
+  // Rows are labelled "Open {name}" from the full name, so that is what the
+  // accessible name matches on — not the email shown in the cell.
   const openUser = async (
     page: import("@playwright/test").Page,
-    email: string,
+    fullName: string,
   ) => {
     await page.goto("/admin");
-    await page.getByRole("button", { name: new RegExp(email) }).click();
+    await page
+      .getByRole("button", {
+        name: t("admin.userPreview.openRow").replace("{name}", fullName),
+      })
+      .click();
   };
 
   test("a user row opens the account panel", async ({ context, page }) => {
     await signInAs(context, "admin");
-    await openUser(page, STUB_USERS.investor.email);
+    await openUser(page, STUB_USERS.investor.full_name);
 
     await expect(
       page.getByText(t("admin.userPreview.statusHeading")),
@@ -235,24 +242,25 @@ test.describe("the admin user preview", () => {
     page,
   }) => {
     await signInAs(context, "admin");
-    await openUser(page, STUB_USERS.sme.email);
+    await openUser(page, STUB_USERS.sme.full_name);
 
     await page
       .getByRole("button", { name: t("admin.userPreview.statuses.SUSPENDED") })
       .click();
 
-    // The panel closes and the row reflects the new status.
+    // The outcome that matters: the row in the table now reads SUSPENDED.
+    // Scoped to a table cell rather than matching the bare word, which also
+    // appears on the panel's own status badge and button.
     await expect(
-      page.getByText(t("admin.userPreview.statusHeading")),
-    ).toHaveCount(0);
-    await expect(page.getByText("SUSPENDED").first()).toBeVisible();
+      page.getByRole("cell", { name: "SUSPENDED", exact: true }),
+    ).toBeVisible();
   });
 
   test("an admin cannot change their own status", async ({ context, page }) => {
     // Self-suspension is unrecoverable, so the controls are withheld rather
     // than offered and then refused by the server.
     await signInAs(context, "admin");
-    await openUser(page, STUB_USERS.admin.email);
+    await openUser(page, "Admin Test");
 
     await expect(
       page.getByText(t("admin.userPreview.blockedSelf")),

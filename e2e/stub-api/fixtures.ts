@@ -17,7 +17,9 @@ export type StubUserKey =
   | "unapprovedInvestor"
   | "unapprovedSme"
   | "smeDraftApplication"
-  | "twoFactor";
+  | "twoFactor"
+  | "suspended"
+  | "expiredSession";
 
 export interface StubUser {
   id: string;
@@ -138,6 +140,24 @@ export const STUB_USERS: Record<StubUserKey, StubUser> = {
     role: "INVESTOR",
     is_approved: false,
   },
+  // Suspended: the backend refuses this account on every request, so the proxy
+  // must route it to /suspended rather than looping it through /login.
+  suspended: {
+    ...base,
+    id: "00000000-0000-0000-0000-0000000000b2",
+    email: "suspended@e2e.test",
+    full_name: "Suspended Test",
+    role: "INVESTOR",
+  },
+  // Cookie present, session refused — an expired access token. The proxy must
+  // read this as signed out, not as a user who never picked a role.
+  expiredSession: {
+    ...base,
+    id: "00000000-0000-0000-0000-0000000000b3",
+    email: "expired@e2e.test",
+    full_name: "Expired Session",
+    role: "ADMIN",
+  },
   unapprovedSme: {
     ...base,
     id: "00000000-0000-0000-0000-0000000000a9",
@@ -242,7 +262,7 @@ export const STUB_ADMIN_USERS = [
   {
     id: STUB_USERS.admin.id,
     email: STUB_USERS.admin.email,
-    full_name: STUB_USERS.admin.full_name,
+    full_name: "Admin Test",
     role: "ADMIN",
     status: "ACTIVE",
     email_verified: true,
