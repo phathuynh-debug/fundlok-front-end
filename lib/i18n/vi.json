@@ -1483,15 +1483,13 @@
   "notifications": {
     "ariaLabel": "Thông báo",
     "ariaLabelUnread": "Thông báo, {count} chưa đọc",
-    "empty": "Hiện chưa có thông báo mới.",
+    "empty": "Hiện chưa có gì mới.",
     "items": {
-      "gradeUpdated": "Điểm doanh nghiệp FundLok của bạn đã được cập nhật.",
-      "newDevice": "Lần đầu đăng nhập từ thiết bị mới.",
-      "newListing": "Có dự án mới đang mở huy động vốn.",
-      "repaymentReceived": "Một khoản trả nợ đã vào tài khoản của bạn."
+      "applicationApproved": "Đề nghị tài trợ của bạn đã được duyệt.",
+      "applicationRejected": "Đề nghị tài trợ của bạn không được duyệt.",
+      "unknown": "Tài khoản của bạn có cập nhật mới."
     },
-    "markAllRead": "Đánh dấu đã đọc tất cả",
-    "mockNotice": "Thông báo mẫu — chưa kết nối hệ thống gửi thông báo và trạng thái đã đọc không được lưu.",
+    "markAllRead": "Đánh dấu tất cả đã đọc",
     "title": "Thông báo"
   },
   "projectApplication": {

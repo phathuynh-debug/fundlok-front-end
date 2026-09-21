@@ -142,3 +142,11 @@ export const GVERIFY_ENDPOINTS = {
   // KYB, so the loan application does not ask for the same file twice.
   kybCertificate: "/gverify/kyb/certificate",
 } as const;
+
+// In-app notifications — the bell in the sidebar. Every route is scoped to the
+// signed-in user server-side; there is no "all notifications" read.
+export const NOTIFICATION_ENDPOINTS = {
+  list: "/notifications",
+  markRead: (id: string) => `/notifications/${id}/read`,
+  markAllRead: "/notifications/read-all",
+} as const;

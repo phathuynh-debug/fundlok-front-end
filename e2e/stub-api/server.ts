@@ -110,6 +110,51 @@ const adminProjectSeeded = new Set<string>();
 /** Status changes made during a run, keyed by stub user id. */
 const adminUserStatuses = new Map<string, string>();
 
+/** Notifications, keyed by stub user. Mutable: read state is the whole point. */
+const notificationsByUser = new Map<string, StubNotification[]>();
+
+interface StubNotification {
+  id: string;
+  event: string;
+  entity_type: string | null;
+  entity_id: string | null;
+  data: Record<string, unknown>;
+  read_at: string | null;
+  created_at: string;
+}
+
+function notificationsFor(key: StubUserKey): StubNotification[] {
+  if (!notificationsByUser.has(key)) {
+    // Only the SME accounts have anything: a notification is addressed to the
+    // applicant, and an empty bell for everyone else is the correct answer.
+    const seeded: StubNotification[] =
+      key === "sme" || key === "smeRejectedApplication"
+        ? [
+            {
+              id: `ntf-1-${key}`,
+              event: "APPLICATION_REJECTED",
+              entity_type: "LOAN_APPLICATION",
+              entity_id: "30000000-0000-0000-0000-000000000001",
+              data: { amount_vnd: 500000000 },
+              read_at: null,
+              created_at: "2026-09-12T09:00:00+07:00",
+            },
+            {
+              id: `ntf-2-${key}`,
+              event: "APPLICATION_APPROVED",
+              entity_type: "LOAN_APPLICATION",
+              entity_id: "30000000-0000-0000-0000-000000000001",
+              data: { amount_vnd: 500000000 },
+              read_at: "2026-09-10T09:00:00+07:00",
+              created_at: "2026-09-10T08:00:00+07:00",
+            },
+          ]
+        : [];
+    notificationsByUser.set(key, seeded);
+  }
+  return notificationsByUser.get(key)!;
+}
+
 /** Score runs produced during a run, keyed by application id. */
 const adminScoreRuns = new Map<string, Record<string, unknown>>();
 
@@ -883,6 +928,33 @@ const server = createServer(async (req, res) => {
       status: approved ? "APPROVED" : "PENDING",
       ...certificate,
     });
+  }
+
+  // --- Notifications --------------------------------------------------------
+  // Mutable per worker, like the other decision state: the point of the panel
+  // is what happens when something is marked read, which a frozen fixture
+  // cannot express. Keyed by user so the scoping the API enforces is visible
+  // here too.
+  if (path === "/notifications" && method === "GET") {
+    const items = notificationsFor(key);
+    return json(res, 200, {
+      items,
+      unread: items.filter((n) => n.read_at === null).length,
+    });
+  }
+
+  const markReadMatch = path.match(/^\/notifications\/([^/]+)\/read$/);
+  if (markReadMatch && method === "PATCH") {
+    const target = notificationsFor(key).find((n) => n.id === markReadMatch[1]);
+    if (!target) return json(res, 404, { detail: "Notification not found" });
+    target.read_at = target.read_at ?? new Date().toISOString();
+    return json(res, 200, target);
+  }
+
+  if (path === "/notifications/read-all" && method === "POST") {
+    const unread = notificationsFor(key).filter((n) => n.read_at === null);
+    for (const item of unread) item.read_at = new Date().toISOString();
+    return json(res, 200, { updated: unread.length });
   }
 
   if (path === "/projects" && method === "GET") {

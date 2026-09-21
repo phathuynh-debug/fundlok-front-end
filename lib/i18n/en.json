@@ -1485,13 +1485,11 @@
     "ariaLabelUnread": "Notifications, {count} unread",
     "empty": "Nothing new right now.",
     "items": {
-      "gradeUpdated": "Your FundLok business score was updated.",
-      "newDevice": "First sign-in from a new device.",
-      "newListing": "A new project is open for funding.",
-      "repaymentReceived": "A repayment landed in your account."
+      "applicationApproved": "Your funding request has been approved.",
+      "applicationRejected": "Your funding request was not approved.",
+      "unknown": "You have an update on your account."
     },
     "markAllRead": "Mark all as read",
-    "mockNotice": "Sample notifications — no delivery pipeline is connected yet, and read state is not saved.",
     "title": "Notifications"
   },
   "projectApplication": {
