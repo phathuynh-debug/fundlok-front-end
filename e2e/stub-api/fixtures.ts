@@ -17,7 +17,10 @@ export type StubUserKey =
   | "unapprovedInvestor"
   | "unapprovedSme"
   | "smeDraftApplication"
-  | "twoFactor";
+  | "smeRejectedApplication"
+  | "twoFactor"
+  | "suspended"
+  | "expiredSession";
 
 export interface StubUser {
   id: string;
@@ -29,6 +32,19 @@ export interface StubUser {
   /** Drives /gverify/{kyc,kyb}/status — the proxy's on-demand action gate. */
   is_approved: boolean;
   avatar_url: string | null;
+  /**
+   * What the KYB certificate OCR read off this SME's business registration.
+   * Only set where a test needs the project application's prefill; absent
+   * means the status endpoint reports the fields as null, which is itself a
+   * case worth covering.
+   */
+  kyb?: {
+    business_name: string;
+    tax_code: string;
+    /** Verbatim single line, exactly as the real provider returns it. */
+    company_address: string;
+    date_of_establishment: string;
+  };
 }
 
 const base = {
@@ -63,6 +79,16 @@ export const STUB_USERS: Record<StubUserKey, StubUser> = {
     full_name: "SME With Draft",
     role: "SME",
   },
+  // The refused outcome. Its own account because the status panel is driven
+  // by the application's status, and the SUBMITTED-state tests must keep
+  // seeing "awaiting review".
+  smeRejectedApplication: {
+    ...base,
+    id: "00000000-0000-0000-0000-0000000000aa",
+    email: "sme-rejected@e2e.test",
+    full_name: "SME Refused",
+    role: "SME",
+  },
   // Same role, but /projects comes back empty — the dashboard's "apply for
   // funding" empty state.
   smeNoProject: {
@@ -71,6 +97,15 @@ export const STUB_USERS: Record<StubUserKey, StubUser> = {
     email: "sme-empty@e2e.test",
     full_name: "SME Without Project",
     role: "SME",
+    // Shaped after a real certificate: the address arrives as one line with
+    // the province last behind a "Tỉnh" prefix, and carries no postal code.
+    kyb: {
+      business_name: "CÔNG TY CỔ PHẦN FUNDLOK",
+      tax_code: "1501167629",
+      company_address:
+        "Thửa đất số 7, Khóm Thuận Tiến B, Phường Bình Minh, Tỉnh Vĩnh Long, Việt Nam",
+      date_of_establishment: "15/03/2019",
+    },
   },
   admin: {
     ...base,
@@ -115,6 +150,24 @@ export const STUB_USERS: Record<StubUserKey, StubUser> = {
     email: "unapproved-investor@e2e.test",
     role: "INVESTOR",
     is_approved: false,
+  },
+  // Suspended: the backend refuses this account on every request, so the proxy
+  // must route it to /suspended rather than looping it through /login.
+  suspended: {
+    ...base,
+    id: "00000000-0000-0000-0000-0000000000b2",
+    email: "suspended@e2e.test",
+    full_name: "Suspended Test",
+    role: "INVESTOR",
+  },
+  // Cookie present, session refused — an expired access token. The proxy must
+  // read this as signed out, not as a user who never picked a role.
+  expiredSession: {
+    ...base,
+    id: "00000000-0000-0000-0000-0000000000b3",
+    email: "expired@e2e.test",
+    full_name: "Expired Session",
+    role: "ADMIN",
   },
   unapprovedSme: {
     ...base,
@@ -187,6 +240,21 @@ export const STUB_PUBLIC_PROJECTS = [
 ];
 
 /**
+ * A company that exists only in the admin console, never on the marketplace.
+ *
+ * It carries the funding request the engine CANNOT grade, so the panel's
+ * ungraded state has a company of its own — the marketplace specs derive their
+ * expectations from STUB_PUBLIC_PROJECTS, and a third listing there would be a
+ * third card on a screen this has nothing to do with.
+ */
+export const STUB_ADMIN_ONLY_PROJECT = {
+  ...STUB_PROJECT,
+  id: "20000000-0000-0000-0000-000000000004",
+  legal_name: "Ungraded Trading Co",
+  industry: "Retail",
+};
+
+/**
  * The same company, but with the application still in DRAFT.
  *
  * The DRAFT branch of SmeDashboard renders the application wizard. That used
@@ -207,14 +275,60 @@ export const STUB_PROJECT_DRAFT_APPLICATION = {
   },
 };
 
+/**
+ * A refused application, carrying the operator's reason and a gap in the file.
+ *
+ * Both are what the applicant is owed on a refusal: an outcome with no
+ * explanation is the thing they phone about. `cic_report` is deliberately
+ * absent so the "still missing" list has something real in it.
+ */
+export const STUB_PROJECT_REJECTED_APPLICATION = {
+  ...STUB_PROJECT,
+  id: "20000000-0000-0000-0000-00000000000a",
+  loan_application: {
+    ...STUB_PROJECT.loan_application,
+    id: "30000000-0000-0000-0000-00000000000a",
+    project_id: "20000000-0000-0000-0000-00000000000a",
+    status: "REJECTED",
+    decision_note:
+      "The revenue in the declarations does not match the figures on the form.",
+    decided_at: "2026-09-12T09:00:00+07:00",
+    documents: [
+      {
+        id: "d1",
+        document_type: "legal_charter",
+        original_filename: "dieu-le-cong-ty.pdf",
+        content_type: "application/pdf",
+        file_size_bytes: 240000,
+        status: "UPLOADED",
+        uploaded_at: "2026-09-01T00:00:00Z",
+      },
+    ],
+  },
+};
+
 export function projectsFor(key: StubUserKey) {
   if (key === "sme" || key === "unapprovedSme") return [STUB_PROJECT];
   if (key === "smeDraftApplication") return [STUB_PROJECT_DRAFT_APPLICATION];
+  if (key === "smeRejectedApplication")
+    return [STUB_PROJECT_REJECTED_APPLICATION];
   return [];
 }
 
 /** Rows for the admin overview table (mode=users). */
 export const STUB_ADMIN_USERS = [
+  // The signed-in admin appears in their own table, which is what makes the
+  // "cannot change your own status" guard reachable from the UI.
+  {
+    id: STUB_USERS.admin.id,
+    email: STUB_USERS.admin.email,
+    full_name: "Admin Test",
+    role: "ADMIN",
+    status: "ACTIVE",
+    email_verified: true,
+    avatar_url: null,
+    created_at: "2026-01-05T08:00:00+07:00",
+  },
   {
     id: STUB_USERS.investor.id,
     email: STUB_USERS.investor.email,
@@ -250,7 +364,7 @@ export const STUB_ADMIN_USERS = [
 export const STUB_ADMIN_STATS = {
   total_users: STUB_ADMIN_USERS.length,
   total_projects: 2,
-  users_by_role: { INVESTOR: 2, SME: 1 },
+  users_by_role: { INVESTOR: 2, SME: 1, ADMIN: 1 },
   users_by_status: { ACTIVE: 2, PENDING: 1 },
   projects_by_status: { ACTIVE: 1, DRAFT: 1 },
 };

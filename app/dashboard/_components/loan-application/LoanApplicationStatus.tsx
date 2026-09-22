@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { Check, FileText } from "lucide-react";
+import { AlertCircle, Check, FileText, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ProjectLoanApplication } from "@/services/projects.service";
 import type { LoanDocumentType } from "@/services/uploads.service";
@@ -31,10 +31,76 @@ const DOCUMENT_LABELS: Record<LoanDocumentType, { en: string; vi: string }> = {
 
 const DOCUMENT_ORDER = Object.keys(DOCUMENT_LABELS) as LoanDocumentType[];
 
+/**
+ * What the wizard actually asks for today (`DOCUMENT_TYPES` in
+ * useLoanApplication).
+ *
+ * Steps 2 and 3 became typed figures, so VAT declarations and the annual
+ * financial statement are no longer uploaded by anyone. Counting them as
+ * expected is what made a complete application report "4/6 received" with two
+ * gaps the applicant had no way to close — and it would have put two
+ * impossible items at the top of the missing list below.
+ */
+const EXPECTED_DOCUMENT_TYPES: LoanDocumentType[] = [
+  "legal_charter",
+  "business_registration",
+  "e_invoice_data",
+  "cic_report",
+];
+
 const REPAYMENT_LABELS: Record<string, { en: string; vi: string }> = {
   MONTHLY: { en: "Monthly", vi: "Hàng tháng" },
   QUARTERLY: { en: "Quarterly", vi: "Hàng quý" },
   END_OF_TERM: { en: "End of term", vi: "Cuối kỳ" },
+};
+
+type StepState = "done" | "active" | "pending" | "rejected";
+
+/**
+ * How a decided application presents itself.
+ *
+ * Keyed by `loan_applications.status`; anything else (SUBMITTED, UNDER_REVIEW)
+ * falls through to the in-progress presentation. The operator's
+ * `decision_note` is deliberately NOT shown — it is an internal review note,
+ * and the handbook keeps internal reasoning off applicant surfaces. The
+ * applicant gets the outcome and a way to ask about it.
+ */
+const DECIDED_PRESENTATION: Record<
+  string,
+  {
+    titleKey: string;
+    subtitleKey: string;
+    badgeKey: string;
+    noteKey: string;
+    finalStep: StepState;
+    reasonClass: string;
+    badgeClass: string;
+    badgeTextClass: string;
+    dotClass: string;
+  }
+> = {
+  APPROVED: {
+    titleKey: "dashboard.sme.statusApprovedTitle",
+    subtitleKey: "dashboard.sme.statusApprovedSubtitle",
+    badgeKey: "dashboard.sme.statusApprovedBadge",
+    noteKey: "dashboard.sme.statusApprovedNote",
+    finalStep: "done",
+    reasonClass: "border-emerald-500/30 bg-emerald-500/5",
+    badgeClass: "border-emerald-500/30 bg-emerald-500/10",
+    badgeTextClass: "text-emerald-700 dark:text-emerald-300",
+    dotClass: "bg-emerald-500",
+  },
+  REJECTED: {
+    titleKey: "dashboard.sme.statusRejectedTitle",
+    subtitleKey: "dashboard.sme.statusRejectedSubtitle",
+    badgeKey: "dashboard.sme.statusRejectedBadge",
+    noteKey: "dashboard.sme.statusRejectedNote",
+    finalStep: "rejected",
+    reasonClass: "border-destructive/30 bg-destructive/5",
+    badgeClass: "border-destructive/30 bg-destructive/10",
+    badgeTextClass: "text-destructive",
+    dotClass: "bg-destructive",
+  },
 };
 
 function formatBytes(bytes: number): string {
@@ -70,11 +136,40 @@ export function LoanApplicationStatus({
     ? new Date(loanApplication.submitted_at)
     : null;
 
-  // Three-stage tracker — submission is done, review is in progress, decision pending.
+  // Anything outside the expected four is still shown when it was actually
+  // uploaded — an application that predates the typed-figure steps has a VAT
+  // zip on file, and hiding it would tell the applicant we lost it.
+  const extraTypes = DOCUMENT_ORDER.filter(
+    (type) =>
+      !EXPECTED_DOCUMENT_TYPES.includes(type) && receivedByType.has(type),
+  );
+  const listedTypes = [...EXPECTED_DOCUMENT_TYPES, ...extraTypes];
+  const missingTypes = EXPECTED_DOCUMENT_TYPES.filter(
+    (type) => !receivedByType.has(type),
+  );
+  const receivedExpected = EXPECTED_DOCUMENT_TYPES.length - missingTypes.length;
+
+  // This panel used to be hardcoded to "awaiting review" for every status
+  // that was not DRAFT, so a decided application kept telling the applicant
+  // their documents were still being read. The three outcomes it can now
+  // show are the three the backend can put on `status` after submission.
+  const decided = DECIDED_PRESENTATION[loanApplication.status] ?? null;
+  // Trimmed: an operator who tabbed through the field leaves whitespace, and
+  // an empty reason box is worse than no reason box.
+  const decisionNote = loanApplication.decision_note?.trim() || null;
+
+  // Three-stage tracker. Undecided: submission done, review running, decision
+  // still ahead. Decided: the third node carries the verdict.
   const steps = [
     { label: t("dashboard.sme.statusStepSubmitted"), state: "done" as const },
-    { label: t("dashboard.sme.statusStepReview"), state: "active" as const },
-    { label: t("dashboard.sme.statusStepDecision"), state: "pending" as const },
+    {
+      label: t("dashboard.sme.statusStepReview"),
+      state: decided ? ("done" as const) : ("active" as const),
+    },
+    {
+      label: t("dashboard.sme.statusStepDecision"),
+      state: decided ? decided.finalStep : ("pending" as const),
+    },
   ];
 
   return (
@@ -86,20 +181,39 @@ export function LoanApplicationStatus({
             {t("dashboard.sme.statusSubmittedEyebrow")}
           </span>
           <h3 className="text-xl font-bold tracking-tight text-foreground">
-            {t("dashboard.sme.statusSubmittedTitle")}
+            {t(decided?.titleKey ?? "dashboard.sme.statusSubmittedTitle")}
           </h3>
           <p className="max-w-xl text-sm leading-relaxed text-muted-foreground">
-            {t("dashboard.sme.statusSubmittedSubtitle")}
+            {t(decided?.subtitleKey ?? "dashboard.sme.statusSubmittedSubtitle")}
           </p>
         </div>
 
-        <div className="flex shrink-0 items-center gap-2 self-start rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 sm:self-center">
+        <div
+          className={cn(
+            "flex shrink-0 items-center gap-2 self-start rounded-full border px-3 py-1.5 sm:self-center",
+            decided?.badgeClass ?? "border-amber-500/30 bg-amber-500/10",
+          )}
+        >
           <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-500/70" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500" />
+            {/* The pulse means "something is still happening". A decided
+                application is not still happening, so it gets a steady dot. */}
+            {!decided && (
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-500/70" />
+            )}
+            <span
+              className={cn(
+                "relative inline-flex h-2 w-2 rounded-full",
+                decided?.dotClass ?? "bg-amber-500",
+              )}
+            />
           </span>
-          <span className="text-xs font-semibold text-amber-700 dark:text-amber-300">
-            {t("dashboard.sme.statusUnderReviewBadge")}
+          <span
+            className={cn(
+              "text-xs font-semibold",
+              decided?.badgeTextClass ?? "text-amber-700 dark:text-amber-300",
+            )}
+          >
+            {t(decided?.badgeKey ?? "dashboard.sme.statusUnderReviewBadge")}
           </span>
         </div>
       </div>
@@ -122,9 +236,13 @@ export function LoanApplicationStatus({
                       "border-amber-500 bg-background text-amber-600 dark:text-amber-400",
                     step.state === "pending" &&
                       "border-border bg-background text-muted-foreground",
+                    step.state === "rejected" &&
+                      "border-destructive bg-destructive text-white",
                   )}
                 >
-                  {step.state === "done" ? (
+                  {step.state === "rejected" ? (
+                    <X className="h-4 w-4" />
+                  ) : step.state === "done" ? (
                     <Check className="h-4 w-4" />
                   ) : step.state === "active" ? (
                     <motion.span
@@ -139,9 +257,10 @@ export function LoanApplicationStatus({
                 <span
                   className={cn(
                     "text-[11px] font-medium sm:text-xs",
-                    step.state === "pending"
-                      ? "text-muted-foreground"
-                      : "text-foreground",
+                    step.state === "pending" && "text-muted-foreground",
+                    step.state === "rejected" && "text-destructive",
+                    (step.state === "done" || step.state === "active") &&
+                      "text-foreground",
                   )}
                 >
                   {step.label}
@@ -165,6 +284,51 @@ export function LoanApplicationStatus({
             </div>
           ))}
         </div>
+
+        {/* Why the answer is what it is. An outcome with no explanation is
+            the thing an applicant phones about, so the operator's reason and
+            any gap in the file are stated here rather than left to email. */}
+        {decided && (decisionNote || missingTypes.length > 0) && (
+          <div
+            className={cn(
+              "space-y-3 rounded-xl border p-4",
+              decided.reasonClass,
+            )}
+          >
+            {decisionNote && (
+              <div className="space-y-1">
+                <h4 className="text-xs font-semibold uppercase tracking-wide text-foreground">
+                  {t("dashboard.sme.statusReasonHeading")}
+                </h4>
+                <p className="text-sm leading-relaxed text-foreground/90">
+                  {decisionNote}
+                </p>
+              </div>
+            )}
+
+            {missingTypes.length > 0 && (
+              <div className="space-y-1">
+                <h4 className="text-xs font-semibold uppercase tracking-wide text-foreground">
+                  {t("dashboard.sme.statusMissingHeading")}
+                </h4>
+                <ul className="space-y-1">
+                  {missingTypes.map((type) => (
+                    <li
+                      key={type}
+                      className="flex items-center gap-2 text-sm text-foreground/90"
+                    >
+                      <AlertCircle className="h-3.5 w-3.5 shrink-0 text-destructive" />
+                      {DOCUMENT_LABELS[type][isVi ? "vi" : "en"]}
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  {t("dashboard.sme.statusMissingHint")}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Key facts row */}
         <dl className="grid grid-cols-2 gap-x-4 gap-y-4 rounded-xl border border-border/60 bg-muted/20 p-4 sm:grid-cols-4">
@@ -217,13 +381,13 @@ export function LoanApplicationStatus({
             </h4>
             <span className="text-xs font-medium text-muted-foreground">
               {t("dashboard.sme.statusDocumentsReceivedCount")
-                .replace("{count}", String(receivedByType.size))
-                .replace("{total}", String(DOCUMENT_ORDER.length))}
+                .replace("{count}", String(receivedExpected))
+                .replace("{total}", String(EXPECTED_DOCUMENT_TYPES.length))}
             </span>
           </div>
 
           <ul className="divide-y divide-border/60">
-            {DOCUMENT_ORDER.map((type) => {
+            {listedTypes.map((type) => {
               const doc = receivedByType.get(type);
               const label = DOCUMENT_LABELS[type][isVi ? "vi" : "en"];
               return (
@@ -266,8 +430,10 @@ export function LoanApplicationStatus({
         </div>
 
         {/* Footnote */}
+        {/* "No action is needed from you right now" is only true while a
+            review is running. */}
         <p className="border-t border-border/60 pt-4 text-xs leading-relaxed text-muted-foreground">
-          {t("dashboard.sme.statusReviewNote")}
+          {t(decided?.noteKey ?? "dashboard.sme.statusReviewNote")}
         </p>
       </div>
     </Card>

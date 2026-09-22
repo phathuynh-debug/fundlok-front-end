@@ -21,11 +21,56 @@
       "projects": "projects",
       "users": "users"
     },
+    "preview": {
+      "applicationDecided": "Decision recorded",
+      "applicationsHeading": "Funding requests",
+      "approve": "Approve",
+      "companyHeading": "Company",
+      "decisionFailed": "Could not record the decision",
+      "documentLinkExpiry": "This link expires in 10 minutes.",
+      "documentTypes": {
+        "business_registration": "Business registration",
+        "cic_report": "CIC report",
+        "e_invoice_data": "E-invoice data",
+        "legal_charter": "Company charter"
+      },
+      "documentUnavailable": "This document could not be opened.",
+      "documentsHeading": "Documents",
+      "download": "Download",
+      "engineHeading": "Verification engine",
+      "kybResolved": "Verification resolved",
+      "noApplications": "No funding requests yet.",
+      "noDocuments": "No documents uploaded yet.",
+      "noKyb": "This company has not started business verification yet.",
+      "noScoreRun": "The grading engine has not run for this request yet.",
+      "notPreviewable": "This file type cannot be shown in the browser. Download it to open it.",
+      "notePlaceholder": "Reason (optional) — the applicant sees this, and it is recorded in the audit log",
+      "openRow": "Preview {name}",
+      "reject": "Reject",
+      "rescore": "Run again",
+      "runScoring": "Run scoring",
+      "scoreComplete": "Scoring complete",
+      "scoreFailed": "Could not run scoring",
+      "scoreGrade": "Business score",
+      "scoreHeading": "Grading engine",
+      "scoreAiPendingHint": "No score yet — the sector assessment for this request has not finished.",
+      "scoreInconclusive": "The engine could not reach a score",
+      "scoreInsufficientHint": "No score was produced — the engine is missing financial inputs for this request. Approving now approves it without one.",
+      "scoreNeedsSubmitted": "Scoring runs once the business has submitted this request.",
+      "scoreRate": "Reference rate",
+      "subtitle": "Both approvals are required before a funding request can proceed.",
+      "title": "Project preview"
+    },
+    "projectsPage": {
+      "subtitle": "Review company applications and their approvals.",
+      "title": "Projects"
+    },
     "sidebar": {
       "auditLogs": "Audit logs",
       "badge": "Admin",
       "logout": "Log out",
       "overview": "Overview",
+      "projects": "Projects",
       "systemSettings": "System settings",
       "users": "Users"
     },
@@ -63,16 +108,30 @@
       "name": "Name",
       "noProjects": "No projects found.",
       "noUsers": "No users found.",
-      "projects": "Projects",
       "role": "Role",
       "searchProjects": "Search projects…",
       "searchUsers": "Search users…",
-      "status": "Status",
-      "users": "Users"
+      "status": "Status"
     },
     "title": "Admin overview",
+    "userPreview": {
+      "blockedAdmin": "Only a system admin can change an admin account.",
+      "blockedSelf": "You cannot change your own account status.",
+      "notePlaceholder": "Reason (optional, recorded in the audit log)",
+      "openRow": "Open {name}",
+      "statusChanged": "Account status updated",
+      "statusFailed": "Could not change the account status",
+      "statusHeading": "Account status",
+      "statuses": {
+        "ACTIVE": "Active",
+        "PENDING_KYC": "Pending KYC",
+        "SUSPENDED": "Suspend"
+      },
+      "subtitle": "Change what this account is allowed to do.",
+      "suspendWarning": "Suspending signs the account out everywhere and blocks sign-in until it is restored. Pending KYC does not restrict access.",
+      "title": "Account"
+    },
     "usersPage": {
-      "comingSoon": "User management coming soon.",
       "subtitle": "Manage platform users from here.",
       "title": "Users"
     },
@@ -810,16 +869,19 @@
         "cogsY1": "Cost of goods sold",
         "cogsY1Hint": "What the goods or services you sold cost you (B02-DN: \\u201cGi\\u00e1 v\\u1ed1n h\\u00e0ng b\\u00e1n\\u201d).",
         "concTop1": "Largest customer, % of revenue",
-        "concTop1Hint": "How much of your revenue comes from your single biggest customer.",
+        "concTop1Hint": "Share of revenue from your single biggest customer. Cannot be higher than the top-3 share. Enter 0-100.",
         "concTop3": "Top 3 customers, % of revenue",
-        "concTop3Hint": "Combined share from your three biggest customers.",
+        "concTop3Hint": "Combined share from your three biggest customers. Enter 0-100.",
         "costsSubtitle": "Four numbers from your most recent annual accounts. Approximate is fine; we confirm them during review.",
         "costsTitle": "Costs — last full financial year",
         "editFigures": "Edit these figures",
         "error": {
+          "month_exceeds_year": "A single month cannot be higher than the 12-month total.",
           "not_a_number": "Enter digits only.",
           "out_of_range": "That value looks out of range — please check it.",
-          "required": "This figure is required."
+          "required": "This figure is required.",
+          "top1_exceeds_top3": "Your largest customer is one of the top three, so this cannot exceed the top-3 share.",
+          "worst_exceeds_best": "The weakest month cannot be higher than the best month."
         },
         "fixedCostY1": "Fixed costs",
         "fixedCostY1Hint": "Rent, salaries, insurance — costs you pay whether you sell or not.",
@@ -828,7 +890,7 @@
         "notProvided": "Not provided",
         "optional": "optional",
         "ownerWithdrawal": "Owner withdrawals, as % of profit",
-        "ownerWithdrawalHint": "Roughly how much of the profit the owners took out last year.",
+        "ownerWithdrawalHint": "Roughly how much of the profit the owners took out last year. Enter 0-100.",
         "revenueBestMonth": "Best month's revenue",
         "revenueBestMonthHint": "Your strongest single month in the last year.",
         "revenueLast12m": "Total revenue, last 12 months",
@@ -861,6 +923,8 @@
       "requiredDocsMissingTitle": "Required Documents Missing",
       "resumeSending": "Resume sending",
       "retryUpload": "Retry",
+      "reusedFromKyb": "Already provided",
+      "reusedFromKybHint": "Taken from the certificate you submitted for business verification.",
       "reviewAllReadyHint": "All documents are ready. Click Send to upload them one by one.",
       "reviewMissingHint": "Add the missing documents before sending.",
       "reviewStepLabel": "Review",
@@ -871,10 +935,21 @@
       "sending": "Sending...",
       "sentStatus": "Sent",
       "stateProvince": "State/Province",
+      "statusApprovedBadge": "Approved",
+      "statusApprovedNote": "We will email you the offer, including the total repayable, the daily amount and the backstop date, before anything is signed.",
+      "statusApprovedSubtitle": "Your request has cleared review. We will be in touch by email with the next step — nothing is committed until you have seen and signed the offer.",
+      "statusApprovedTitle": "Approved — offer to follow",
       "statusDocuments": "Documents",
       "statusDocumentsReceivedCount": "{count}/{total} received",
+      "statusMissingHeading": "Still missing",
+      "statusMissingHint": "Send these to your contact at FundLok and we can look at the request again.",
+      "statusReasonHeading": "What the reviewer said",
       "statusReceived": "Received",
       "statusReference": "Reference",
+      "statusRejectedBadge": "Not approved",
+      "statusRejectedNote": "A decision on one request does not close the door on a later one. If your figures or documents have changed, tell us and we will look again.",
+      "statusRejectedSubtitle": "We are not able to take this request forward. Your documents stay on file, and our team can talk you through what would change the answer.",
+      "statusRejectedTitle": "Not approved",
       "statusRepaymentPreference": "Repayment",
       "statusRequestedAmount": "Requested Amount",
       "statusReviewNote": "Reviews typically take a few business days. No action is needed from you right now.",
@@ -918,6 +993,7 @@
       "vatDeclarationsHelpText": "For each of the 24 months, you must upload two files — (1) the VAT declaration and (2) the successful submission confirmation — for a total of 48 files. Please compress all files into a single .zip archive before uploading.",
       "vatDeclarationsHelpTitle": "48 files required:",
       "vatZipLabel": "Upload .zip containing all 48 VAT files (24 declarations + 24 confirmations)",
+      "viewDocument": "View",
       "whereToFindThese": "Where to find these numbers",
       "whyWeNeedThis": "Why we need this"
     },
@@ -1409,13 +1485,11 @@
     "ariaLabelUnread": "Notifications, {count} unread",
     "empty": "Nothing new right now.",
     "items": {
-      "gradeUpdated": "Your FundLok business score was updated.",
-      "newDevice": "First sign-in from a new device.",
-      "newListing": "A new project is open for funding.",
-      "repaymentReceived": "A repayment landed in your account."
+      "applicationApproved": "Your funding request has been approved.",
+      "applicationRejected": "Your funding request was not approved.",
+      "unknown": "You have an update on your account."
     },
     "markAllRead": "Mark all as read",
-    "mockNotice": "Sample notifications — no delivery pipeline is connected yet, and read state is not saved.",
     "title": "Notifications"
   },
   "projectApplication": {
@@ -1456,6 +1530,8 @@
       "companySizeDerived": "Classified as {size}",
       "durationMonths": "The only terms available on the platform. Longer terms lower the daily repayment.",
       "employeeCount": "Full-time headcount, between 1 and 200.",
+      "prefilledAddressFromKyb": "Street and city came from the address on your verified business registration. Add the state/region and postal code, and edit anything that differs.",
+      "prefilledFromKyb": "Legal name and tax ID were filled in from your verified business registration. Check them and edit if anything differs.",
       "requestedAmountRange": "Between {min} and {max} VND."
     },
     "industries": {
@@ -1520,6 +1596,9 @@
       "durationMonths": "Choose a loan term of 3, 6, 9 or 12 months",
       "employeeCount": "Enter a headcount between 1 and 200 — this platform funds SMEs only",
       "incorporationDate": "Incorporation date is required",
+      "incorporationDateFormat": "Enter a real date in the format YYYY-MM-DD.",
+      "incorporationDateFuture": "The incorporation date cannot be in the future.",
+      "incorporationDateTooEarly": "That date looks too far in the past — please check it.",
       "industry": "Industry is required",
       "legalName": "Legal name is required",
       "postalCode": "Postal code is required",
@@ -1611,5 +1690,12 @@
       "transparencyItem3": "Real-time business financial report & loan health assessment",
       "transparencyTitle": "Transparent, Public, Automatic"
     }
+  },
+  "suspended": {
+    "body": "You cannot sign in or use FundLok while your account is suspended.",
+    "contactBtn": "Contact support",
+    "contactHint": "If you think this is a mistake, contact our team and we will look into it. Please include the email address on the account.",
+    "signOutBtn": "Sign out",
+    "title": "Your account is suspended"
   }
 }

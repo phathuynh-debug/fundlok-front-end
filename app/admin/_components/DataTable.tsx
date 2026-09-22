@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 
 // A single column definition: how to label the header and render each cell.
 export interface Column<T> {
@@ -32,6 +33,13 @@ interface DataTableProps<T> {
   // Background refetch (paging/filtering) — shows a subtle corner spinner.
   isFetching?: boolean;
   emptyMessage?: string;
+  // Makes rows activatable. Rows become real <button>-like targets: focusable,
+  // Enter/Space activated, with a pointer and hover fill. Left unset, rows stay
+  // inert and pick up none of that affordance, so a table with nothing to open
+  // never looks clickable.
+  onRowClick?: (row: T) => void;
+  // Accessible label for an activatable row, e.g. "Preview Acme Holdings".
+  getRowLabel?: (row: T) => string;
 }
 
 // Generic, presentational table. Pass the data plus a column config describing
@@ -43,6 +51,8 @@ export function DataTable<T>({
   isLoading,
   isFetching,
   emptyMessage = "No results found.",
+  onRowClick,
+  getRowLabel,
 }: DataTableProps<T>) {
   const colCount = columns.length;
 
@@ -85,7 +95,30 @@ export function DataTable<T>({
             rows.map((row) => (
               // Fixed height keeps every row uniform regardless of cell
               // content — sized to comfortably fit the 32px (h-8) avatar.
-              <TableRow key={getRowKey(row)} className="h-16">
+              <TableRow
+                key={getRowKey(row)}
+                className={cn(
+                  "h-16",
+                  onRowClick &&
+                    "cursor-pointer transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
+                )}
+                // A <tr> has no native activation, so keyboard support is
+                // wired by hand rather than left to the mouse only.
+                role={onRowClick ? "button" : undefined}
+                tabIndex={onRowClick ? 0 : undefined}
+                aria-label={onRowClick ? getRowLabel?.(row) : undefined}
+                onClick={onRowClick ? () => onRowClick(row) : undefined}
+                onKeyDown={
+                  onRowClick
+                    ? (event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          onRowClick(row);
+                        }
+                      }
+                    : undefined
+                }
+              >
                 {columns.map((col) => (
                   <TableCell key={col.key} className={col.cellClassName}>
                     {col.render(row)}

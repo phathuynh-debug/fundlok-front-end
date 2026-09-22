@@ -97,6 +97,29 @@ export const ADMIN_ENDPOINTS = {
   overview: "/admin/overview",
   auditLogs: "/admin/audit-logs",
   maintenance: "/system/maintenance",
+  // The project preview: one company, its funding requests, and the owner's
+  // latest KYB attempt — both halves of the two-approval gate in one payload.
+  projectDetail: (id: string) => `/admin/projects/${id}`,
+  // The operator's two decisions. Both are admin-only server-side and both are
+  // one-way: a decided record answers 409, never a silent overwrite.
+  resolveKybVerification: (id: string) =>
+    `/admin/kyb-verifications/${id}/resolve`,
+  applicationDecision: (id: string) => `/admin/applications/${id}/decision`,
+  // Account status. SUSPENDED is a real deny server-side, not a label.
+  userStatus: (id: string) => `/admin/users/${id}/status`,
+  // A 10-minute read URL for one uploaded application document.
+  documentUrl: (id: string) => `/admin/documents/${id}/url`,
+} as const;
+
+// Underwriting. Admin-only server-side (require_roles(Role.ADMIN) — note that
+// is ADMIN specifically, not SYSTEM_ADMIN). A score run is a dated, audited
+// artefact: it writes an append-only score_run_inputs row for exact replay and
+// records the board-set bank rate in force, so it is started deliberately
+// rather than as a side effect of an upload.
+export const UNDERWRITING_ENDPOINTS = {
+  scoreRuns: "/underwriting/score-runs",
+  scoreRun: (id: string) => `/underwriting/score-runs/${id}`,
+  approveScoreRun: (id: string) => `/underwriting/score-runs/${id}/approve`,
 } as const;
 
 // GVerify (Datatrust) — identity/business verification for both roles, gated
@@ -115,4 +138,15 @@ export const GVERIFY_ENDPOINTS = {
   // state tax-registry cross-check, synchronous verdict.
   kybVerify: "/gverify/kyb/verify",
   kybStatus: "/gverify/kyb/status",
+  // A 10-minute read URL for the certificate the SME already submitted for
+  // KYB, so the loan application does not ask for the same file twice.
+  kybCertificate: "/gverify/kyb/certificate",
+} as const;
+
+// In-app notifications — the bell in the sidebar. Every route is scoped to the
+// signed-in user server-side; there is no "all notifications" read.
+export const NOTIFICATION_ENDPOINTS = {
+  list: "/notifications",
+  markRead: (id: string) => `/notifications/${id}/read`,
+  markAllRead: "/notifications/read-all",
 } as const;

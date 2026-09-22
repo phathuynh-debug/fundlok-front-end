@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import QRCode from "react-qr-code";
 import {
@@ -32,7 +32,6 @@ import type { ApiError } from "@/lib/types";
 // front/back + a portrait, we submit them in one call, and the verdict comes
 // back synchronously: no redirect, no webhook, no polling.
 export function GVerifyKycClient() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const { t } = useTranslations();
@@ -85,13 +84,17 @@ export function GVerifyKycClient() {
   const landing = postVerificationTarget(searchParams.get("next"), user?.role);
   const isApproved = status?.is_approved === true;
 
-  // Once approved, head into the app after a brief confirmation.
+  // Once approved, head into the app after a brief confirmation. Full document
+  // load rather than a client navigation, for the same reason as the KYB screen
+  // (see GVerifyKybClient): the proxy gates this route on the verification
+  // status it read BEFORE the verdict existed, so the hop has to re-enter the
+  // server rather than reuse router state.
   useEffect(() => {
     if (isApproved) {
-      const id = setTimeout(() => router.replace(landing), 1200);
+      const id = setTimeout(() => window.location.replace(landing), 1200);
       return () => clearTimeout(id);
     }
-  }, [isApproved, router, landing]);
+  }, [isApproved, landing]);
 
   const handleSubmit = async () => {
     try {

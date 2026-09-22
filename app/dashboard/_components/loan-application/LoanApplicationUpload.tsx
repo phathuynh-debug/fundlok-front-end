@@ -39,6 +39,7 @@ export function LoanApplicationUpload(props: LoanApplicationUploadProps) {
 
 function LoanApplicationWizard() {
   const {
+    kybCertificate,
     currentStep,
     reviewStep,
     totalSteps,
@@ -126,10 +127,20 @@ function LoanApplicationWizard() {
                           label={t("dashboard.sme.companyCharter")}
                         />
                         <div className="border-t border-border/60 my-5" />
-                        <UploadField
-                          docKey="companyRegistration"
-                          label={t("dashboard.sme.companyRegistration")}
-                        />
+                        {/* Already on file from KYB — reused rather than
+                            re-collected, so the application cannot end up with
+                            a different certificate from the verified one. */}
+                        {kybCertificate ? (
+                          <ReusedDocumentField
+                            label={t("dashboard.sme.companyRegistration")}
+                            url={kybCertificate.url}
+                          />
+                        ) : (
+                          <UploadField
+                            docKey="companyRegistration"
+                            label={t("dashboard.sme.companyRegistration")}
+                          />
+                        )}
                       </div>
                     )}
 
@@ -315,5 +326,44 @@ function LoanApplicationWizard() {
         t={t}
       />
     </Card>
+  );
+}
+
+/**
+ * A document requirement already met by an earlier step.
+ *
+ * Deliberately offers no Remove: the SME cannot detach the certificate their
+ * KYB verdict was based on from inside the loan wizard. The preview link is a
+ * presigned URL that expires in ten minutes, which is why it is read from the
+ * query each time the panel renders rather than being held in state.
+ */
+function ReusedDocumentField({ label, url }: { label: string; url: string }) {
+  const { t } = useLoanApplicationContext();
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-semibold text-foreground">{label}</span>
+        <span className="text-xs text-muted-foreground">
+          {t("dashboard.sme.reusedFromKyb")}
+        </span>
+      </div>
+      <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-3">
+        <CheckCircle2
+          className="h-4 w-4 shrink-0 text-emerald-600"
+          aria-hidden
+        />
+        <span className="flex-1 truncate text-sm text-muted-foreground">
+          {t("dashboard.sme.reusedFromKybHint")}
+        </span>
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="shrink-0 text-sm font-medium text-primary underline underline-offset-4"
+        >
+          {t("dashboard.sme.viewDocument")}
+        </a>
+      </div>
+    </div>
   );
 }

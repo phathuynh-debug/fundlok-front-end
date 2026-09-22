@@ -29,8 +29,8 @@ test.describe("as an admin", () => {
     ).toBeVisible();
   });
 
-  test("the overview lists users from the API", async ({ page }) => {
-    await page.goto("/admin");
+  test("the users page lists users from the API", async ({ page }) => {
+    await page.goto("/admin/users");
 
     for (const row of STUB_ADMIN_USERS) {
       await expect(page.getByText(row.email)).toBeVisible();
@@ -92,4 +92,231 @@ test("a non-admin session is refused by the API as well as the router", async ({
   const response = await page.request.get("/api/admin/overview");
   expect(response.status()).toBe(403);
   expect(request).toBeTruthy();
+});
+
+// --- Project preview: the two-approval gate ---------------------------------
+// A funding request needs BOTH the verification engine's approval and an
+// operator's. The preview is where an operator sees which half is missing and
+// supplies theirs.
+//
+// The stub records DECISIONS, and that state is mutable and shared by every
+// test in a worker (same caveat as the 2FA fixture). So each test that decides
+// something owns a different project — otherwise one test's approval is the
+// next test's starting state.
+
+test.describe("the admin project preview", () => {
+  const openPreview = async (
+    page: import("@playwright/test").Page,
+    company: string,
+  ) => {
+    await page.goto("/admin/projects");
+    await page.getByRole("button", { name: new RegExp(company) }).click();
+  };
+
+  test.beforeEach(async ({ context }) => {
+    await signInAs(context, "admin");
+  });
+
+  test("a project row opens the preview", async ({ page }) => {
+    // Read-only: asserts nothing that a decision elsewhere could change.
+    await openPreview(page, "Delta Foods JSC");
+
+    await expect(page.getByText(t("admin.preview.subtitle"))).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Delta Foods JSC" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(t("admin.preview.engineHeading")),
+    ).toBeVisible();
+    await expect(
+      page.getByText(t("admin.preview.applicationsHeading")),
+    ).toBeVisible();
+  });
+
+  test("lists the documents the SME uploaded", async ({ page }) => {
+    // Read-only, so it can share a company with the other read-only test.
+    await openPreview(page, "Delta Foods JSC");
+
+    // Labelled by type, not by raw backend key.
+    await expect(
+      page.getByText(t("admin.preview.documentTypes.legal_charter")),
+    ).toBeVisible();
+    await expect(page.getByText("dieu-le-cong-ty.pdf")).toBeVisible();
+    await expect(
+      page.getByText(t("admin.preview.documentTypes.business_registration")),
+    ).toBeVisible();
+
+    // A presign that never completed is surfaced, not hidden — that document
+    // is missing as far as a reviewer is concerned.
+    await expect(page.getByText("PENDING").last()).toBeVisible();
+  });
+
+  test("approving the funding request records the operator's half", async ({
+    page,
+  }) => {
+    await openPreview(page, "Delta Foods JSC");
+
+    const approve = page.getByRole("button", {
+      name: t("admin.preview.approve"),
+    });
+
+    // Both halves are outstanding to begin with, so both offer a decision.
+    // Asserted on the CONTROLS rather than on badge text: "PENDING" also
+    // labels a document whose upload never completed, and matching on the
+    // word alone would conflate the two.
+    await expect(page.getByText("MANUAL_REVIEW")).toBeVisible();
+    await expect(approve).toHaveCount(2);
+
+    // The last belongs to the funding request; the first is the engine's.
+    await approve.last().click();
+
+    await expect(page.getByText("APPROVED")).toBeVisible();
+    // One-way: the funding request's controls retire, leaving only the
+    // engine's, so it cannot be re-decided from the panel.
+    await expect(approve).toHaveCount(1);
+  });
+
+  test("resolving the parked verification flips the engine half", async ({
+    page,
+  }) => {
+    // Its own company, so the approval above cannot pre-empt this.
+    await openPreview(page, "Northwind IT");
+    await expect(page.getByText("MANUAL_REVIEW")).toBeVisible();
+
+    await page
+      .getByRole("button", { name: t("admin.preview.approve") })
+      .first()
+      .click();
+
+    await expect(page.getByText("MANUAL_REVIEW")).toHaveCount(0);
+  });
+
+  test("shows no score until the engine is run, then shows one", async ({
+    page,
+  }) => {
+    // Northwind: its own company, because this test mutates score-run state
+    // and the stub shares it across a worker.
+    await openPreview(page, "Northwind IT");
+
+    await expect(page.getByText(t("admin.preview.noScoreRun"))).toBeVisible();
+
+    await page
+      .getByRole("button", { name: t("admin.preview.runScoring") })
+      .click();
+
+    // The engine's answer, before the operator gives theirs.
+    await expect(page.getByText(t("admin.preview.scoreHeading"))).toBeVisible();
+    await expect(page.getByText("75.91")).toBeVisible();
+    await expect(page.getByText("13.93%")).toBeVisible();
+    // Status and decision are separate axes and both are shown.
+    await expect(page.getByText("READY")).toBeVisible();
+    await expect(page.getByText("APPROVED").first()).toBeVisible();
+  });
+
+  test("an ungraded run reads as blocked, not as a pending score", async ({
+    page,
+  }) => {
+    // Its own company: this one mutates score-run state too.
+    await openPreview(page, "Ungraded Trading Co");
+
+    await page
+      .getByRole("button", { name: t("admin.preview.runScoring") })
+      .click();
+
+    // Scoped to the panel: the toast reports the same decision, and matching
+    // page-wide picks up its copy and its aria-live announcement too.
+    const panel = page.getByRole("dialog");
+
+    // The engine answered — it just has no score to give.
+    await expect(
+      panel.getByText(t("admin.preview.scoreInsufficientHint")),
+    ).toBeVisible();
+
+    // The decision badge carries the destructive token, not the neutral one
+    // the status badge uses — that contrast is the whole point of the change.
+    await expect(panel.getByText("INSUFFICIENT_DATA")).toHaveClass(
+      /bg-destructive/,
+    );
+    await expect(panel.getByText("READY")).not.toHaveClass(/bg-destructive/);
+  });
+
+  test("both tables offer a preview", async ({ page }) => {
+    // Superseded an earlier test that asserted user rows were inert — they
+    // were, until the account panel landed. Kept as a positive assertion so
+    // the affordance cannot silently disappear from either table.
+    await page.goto("/admin/users");
+    await expect(page.locator('tbody tr[role="button"]').first()).toBeVisible();
+
+    await page.goto("/admin/projects");
+    await expect(page.locator('tbody tr[role="button"]').first()).toBeVisible();
+  });
+});
+
+// --- Account status ---------------------------------------------------------
+// SUSPENDED is a real deny server-side: the backend rejects the account on
+// every request and refuses a new session. So this panel is a security
+// control, and the guards on it matter as much as the happy path.
+
+test.describe("the admin user preview", () => {
+  // Rows are labelled "Open {name}" from the full name, so that is what the
+  // accessible name matches on — not the email shown in the cell.
+  const openUser = async (
+    page: import("@playwright/test").Page,
+    fullName: string,
+  ) => {
+    await page.goto("/admin/users");
+    await page
+      .getByRole("button", {
+        name: t("admin.userPreview.openRow").replace("{name}", fullName),
+      })
+      .click();
+  };
+
+  test("a user row opens the account panel", async ({ context, page }) => {
+    await signInAs(context, "admin");
+    await openUser(page, STUB_USERS.investor.full_name);
+
+    await expect(
+      page.getByText(t("admin.userPreview.statusHeading")),
+    ).toBeVisible();
+    // The copy states what suspending actually does, because it does it.
+    await expect(
+      page.getByText(t("admin.userPreview.suspendWarning")),
+    ).toBeVisible();
+  });
+
+  test("suspending a member account updates the table", async ({
+    context,
+    page,
+  }) => {
+    await signInAs(context, "admin");
+    await openUser(page, STUB_USERS.sme.full_name);
+
+    await page
+      .getByRole("button", { name: t("admin.userPreview.statuses.SUSPENDED") })
+      .click();
+
+    // The outcome that matters: the row in the table now reads SUSPENDED.
+    // Scoped to a table cell rather than matching the bare word, which also
+    // appears on the panel's own status badge and button.
+    await expect(
+      page.getByRole("cell", { name: "SUSPENDED", exact: true }),
+    ).toBeVisible();
+  });
+
+  test("an admin cannot change their own status", async ({ context, page }) => {
+    // Self-suspension is unrecoverable, so the controls are withheld rather
+    // than offered and then refused by the server.
+    await signInAs(context, "admin");
+    await openUser(page, "Admin Test");
+
+    await expect(
+      page.getByText(t("admin.userPreview.blockedSelf")),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", {
+        name: t("admin.userPreview.statuses.SUSPENDED"),
+      }),
+    ).toHaveCount(0);
+  });
 });

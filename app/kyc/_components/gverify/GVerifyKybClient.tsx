@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Building2,
@@ -56,7 +56,6 @@ const DOCUMENT_TYPES: Array<{
 // cross-check the tax code against the state registry, and the verdict comes
 // back synchronously.
 export function GVerifyKybClient() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const { t } = useTranslations();
@@ -85,12 +84,19 @@ export function GVerifyKybClient() {
   const landing = postVerificationTarget(searchParams.get("next"), user?.role);
   const isApproved = status?.is_approved === true;
 
+  // Approval changes what the SERVER will do with this session: proxy.ts routes
+  // on /gverify/kyb/status, and it has already answered "not approved" for this
+  // page load. A soft client navigation can be served from router state that
+  // predates the verdict and quietly land the user back on /kyc — reported from
+  // the field as "it says verified and then just sits there until I refresh".
+  // A full document load is the only hop that guarantees the proxy re-evaluates
+  // from scratch. `replace` so Back does not return to the verification screen.
   useEffect(() => {
     if (isApproved) {
-      const id = setTimeout(() => router.replace(landing), 1200);
+      const id = setTimeout(() => window.location.replace(landing), 1200);
       return () => clearTimeout(id);
     }
-  }, [isApproved, router, landing]);
+  }, [isApproved, landing]);
 
   const handleSubmit = async () => {
     try {

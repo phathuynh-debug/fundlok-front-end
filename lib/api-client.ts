@@ -35,6 +35,21 @@ function extractMessage(data: unknown): string | undefined {
   return undefined;
 }
 
+const REFRESH_PATH = "/auth/refresh";
+
+/**
+ * Endpoints where a 401 is the ANSWER, not an expired session.
+ *
+ * Retrying a wrong password behind the user's back would double every failed
+ * login attempt against the rate limiter and hide the real error.
+ */
+const NO_REFRESH_PATHS = [
+  "/auth/login",
+  "/auth/register",
+  "/auth/logout",
+  "/auth/passkeys/login",
+];
+
 class ApiClient {
   private axiosInstance: AxiosInstance;
 
@@ -52,11 +67,65 @@ class ApiClient {
     this.setupInterceptors();
   }
 
+  /**
+   * A refresh already in flight, so concurrent 401s wait for one rotation.
+   *
+   * Refresh tokens are single-use and rotated server-side: the presented token
+   * is revoked and a new pair issued. A dashboard that fires six queries at
+   * once would otherwise send six refreshes, five of which present a token the
+   * first call already revoked — and reuse detection would reject them, so
+   * five of the six requests would fail anyway.
+   */
+  private refreshInFlight: Promise<void> | null = null;
+
+  private refreshSession(): Promise<void> {
+    if (!this.refreshInFlight) {
+      // The bare axios instance, not this one: going through the interceptor
+      // would make a failing refresh try to refresh itself.
+      this.refreshInFlight = axios
+        .post(`${API_URL}${REFRESH_PATH}`, undefined, {
+          withCredentials: true,
+        })
+        .then(() => undefined)
+        .finally(() => {
+          this.refreshInFlight = null;
+        });
+    }
+    return this.refreshInFlight;
+  }
+
   private setupInterceptors() {
     this.axiosInstance.interceptors.response.use(
       (response: AxiosResponse) => response,
       async (error: AxiosError<ApiError>) => {
         const status = error.response?.status;
+        const config = error.config as
+          (AxiosRequestConfig & { _retried?: boolean }) | undefined;
+
+        // The access token is short-lived (30 minutes) while the refresh token
+        // lasts 14 days. Without this the session simply died at the 30-minute
+        // mark: every call 401'd and nothing ever called /auth/refresh, which
+        // existed but had no caller. Rotate once and replay the request.
+        //
+        // `_retried` bounds it to a single attempt, so a genuinely
+        // unauthenticated caller fails immediately instead of looping.
+        if (
+          status === 401 &&
+          config &&
+          !config._retried &&
+          !config.url?.includes(REFRESH_PATH) &&
+          !NO_REFRESH_PATHS.some((path) => config.url?.includes(path))
+        ) {
+          config._retried = true;
+          try {
+            await this.refreshSession();
+            return await this.axiosInstance.request(config);
+          } catch {
+            // Fall through: the refresh token is gone or revoked too, so this
+            // really is an expired session rather than a stale access token.
+          }
+        }
+
         const data = error.response?.data as
           (ApiError & { detail?: unknown }) | undefined;
 

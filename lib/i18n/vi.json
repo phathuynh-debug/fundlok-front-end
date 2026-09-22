@@ -21,11 +21,56 @@
       "projects": "dự án",
       "users": "người dùng"
     },
+    "preview": {
+      "applicationDecided": "Đã ghi nhận quyết định",
+      "applicationsHeading": "Đề nghị vay",
+      "approve": "Phê duyệt",
+      "companyHeading": "Doanh nghiệp",
+      "decisionFailed": "Không thể ghi nhận quyết định",
+      "documentLinkExpiry": "Liên kết này hết hạn sau 10 phút.",
+      "documentTypes": {
+        "business_registration": "Giấy đăng ký kinh doanh",
+        "cic_report": "Báo cáo CIC",
+        "e_invoice_data": "Dữ liệu hóa đơn điện tử",
+        "legal_charter": "Điều lệ công ty"
+      },
+      "documentUnavailable": "Không thể mở hồ sơ này.",
+      "documentsHeading": "Hồ sơ",
+      "download": "Tải xuống",
+      "engineHeading": "Hệ thống xác minh",
+      "kybResolved": "Đã xử lý xác minh",
+      "noApplications": "Chưa có đề nghị vay nào.",
+      "noDocuments": "Chưa tải lên hồ sơ nào.",
+      "noKyb": "Doanh nghiệp này chưa bắt đầu xác minh.",
+      "noScoreRun": "Engine tính điểm chưa chạy cho đề nghị này.",
+      "notPreviewable": "Không thể xem loại tệp này trên trình duyệt. Hãy tải xuống để mở.",
+      "notePlaceholder": "Lý do (không bắt buộc) — doanh nghiệp sẽ đọc được nội dung này, và nó cũng được ghi vào nhật ký",
+      "openRow": "Xem nhanh {name}",
+      "reject": "Từ chối",
+      "rescore": "Chạy lại",
+      "runScoring": "Chạy tính điểm",
+      "scoreComplete": "Đã tính điểm xong",
+      "scoreFailed": "Không thể chạy tính điểm",
+      "scoreGrade": "Điểm doanh nghiệp",
+      "scoreHeading": "Engine tính điểm",
+      "scoreAiPendingHint": "Chưa có điểm — phần đánh giá ngành cho đề nghị này chưa hoàn tất.",
+      "scoreInconclusive": "Engine chưa đủ dữ liệu để đưa ra điểm",
+      "scoreInsufficientHint": "Chưa có điểm — engine còn thiếu dữ liệu tài chính của đề nghị này. Phê duyệt lúc này là phê duyệt khi chưa có điểm.",
+      "scoreNeedsSubmitted": "Việc tính điểm chỉ chạy sau khi doanh nghiệp đã gửi đề nghị này.",
+      "scoreRate": "Lãi suất tham khảo",
+      "subtitle": "Cần cả hai phê duyệt trước khi đề nghị vay được tiếp tục.",
+      "title": "Xem nhanh hồ sơ"
+    },
+    "projectsPage": {
+      "subtitle": "Xem hồ sơ doanh nghiệp và tình trạng phê duyệt.",
+      "title": "Dự án"
+    },
     "sidebar": {
       "auditLogs": "Nhật ký kiểm toán",
       "badge": "Quản trị",
       "logout": "Đăng xuất",
       "overview": "Tổng quan",
+      "projects": "Dự án",
       "systemSettings": "Cài đặt hệ thống",
       "users": "Người dùng"
     },
@@ -63,16 +108,30 @@
       "name": "Tên",
       "noProjects": "Không tìm thấy dự án.",
       "noUsers": "Không tìm thấy người dùng.",
-      "projects": "Dự án",
       "role": "Vai trò",
       "searchProjects": "Tìm dự án…",
       "searchUsers": "Tìm người dùng…",
-      "status": "Trạng thái",
-      "users": "Người dùng"
+      "status": "Trạng thái"
     },
     "title": "Tổng quan quản trị",
+    "userPreview": {
+      "blockedAdmin": "Chỉ quản trị viên hệ thống mới có thể thay đổi tài khoản quản trị.",
+      "blockedSelf": "Bạn không thể thay đổi trạng thái tài khoản của chính mình.",
+      "notePlaceholder": "Lý do (không bắt buộc, được ghi vào nhật ký)",
+      "openRow": "Mở {name}",
+      "statusChanged": "Đã cập nhật trạng thái tài khoản",
+      "statusFailed": "Không thể thay đổi trạng thái tài khoản",
+      "statusHeading": "Trạng thái tài khoản",
+      "statuses": {
+        "ACTIVE": "Hoạt động",
+        "PENDING_KYC": "Chờ xác minh",
+        "SUSPENDED": "Tạm khóa"
+      },
+      "subtitle": "Thay đổi quyền truy cập của tài khoản này.",
+      "suspendWarning": "Tạm khóa sẽ đăng xuất tài khoản trên mọi thiết bị và chặn đăng nhập cho đến khi được khôi phục. Trạng thái chờ xác minh không hạn chế truy cập.",
+      "title": "Tài khoản"
+    },
     "usersPage": {
-      "comingSoon": "Quản lý người dùng sắp ra mắt.",
       "subtitle": "Quản lý người dùng nền tảng tại đây.",
       "title": "Người dùng"
     },
@@ -810,16 +869,19 @@
         "cogsY1": "Giá vốn hàng bán",
         "cogsY1Hint": "Chi phí của hàng hoá hoặc dịch vụ bạn đã bán (Mẫu B02-DN: “Giá vốn hàng bán”).",
         "concTop1": "Khách hàng lớn nhất, % doanh thu",
-        "concTop1Hint": "Bao nhiêu phần trăm doanh thu đến từ khách hàng lớn nhất.",
+        "concTop1Hint": "Tỷ lệ doanh thu từ khách hàng lớn nhất. Không thể cao hơn tỷ lệ của nhóm 3 khách hàng lớn nhất. Nhập 0-100.",
         "concTop3": "3 khách hàng lớn nhất, % doanh thu",
-        "concTop3Hint": "Tổng tỷ trọng của ba khách hàng lớn nhất.",
+        "concTop3Hint": "Tổng tỷ trọng của ba khách hàng lớn nhất. Nhập 0-100.",
         "costsSubtitle": "Bốn con số từ báo cáo tài chính năm gần nhất. Số gần đúng là được; chúng tôi sẽ xác nhận khi xét hồ sơ.",
         "costsTitle": "Chi phí — năm tài chính gần nhất",
         "editFigures": "Sửa số liệu",
         "error": {
+          "month_exceeds_year": "Doanh thu một tháng không thể cao hơn tổng 12 tháng.",
           "not_a_number": "Chỉ nhập chữ số.",
           "out_of_range": "Giá trị có vẻ ngoài phạm vi — vui lòng kiểm tra lại.",
-          "required": "Chỉ tiêu này là bắt buộc."
+          "required": "Chỉ tiêu này là bắt buộc.",
+          "top1_exceeds_top3": "Khách hàng lớn nhất nằm trong nhóm 3 khách hàng lớn nhất, nên tỷ lệ này không thể vượt quá tỷ lệ của nhóm 3.",
+          "worst_exceeds_best": "Tháng thấp nhất không thể cao hơn tháng cao nhất."
         },
         "fixedCostY1": "Chi phí cố định",
         "fixedCostY1Hint": "Tiền thuê, lương, bảo hiểm — các chi phí phải trả dù có bán được hay không.",
@@ -828,7 +890,7 @@
         "notProvided": "Chưa cung cấp",
         "optional": "không bắt buộc",
         "ownerWithdrawal": "Chủ sở hữu rút vốn, % lợi nhuận",
-        "ownerWithdrawalHint": "Khoảng bao nhiêu phần trăm lợi nhuận chủ sở hữu đã rút ra năm ngoái.",
+        "ownerWithdrawalHint": "Khoảng bao nhiêu phần trăm lợi nhuận chủ sở hữu đã rút ra năm ngoái. Nhập 0-100.",
         "revenueBestMonth": "Doanh thu tháng cao nhất",
         "revenueBestMonthHint": "Tháng có doanh thu cao nhất trong năm qua.",
         "revenueLast12m": "Tổng doanh thu 12 tháng gần nhất",
@@ -861,6 +923,8 @@
       "requiredDocsMissingTitle": "Thiếu tài liệu bắt buộc",
       "resumeSending": "Tiếp tục gửi",
       "retryUpload": "Thử lại",
+      "reusedFromKyb": "Đã cung cấp",
+      "reusedFromKybHint": "Lấy từ giấy tờ bạn đã nộp khi xác minh doanh nghiệp.",
       "reviewAllReadyHint": "Tất cả tài liệu đã sẵn sàng. Nhấn Gửi để tải lên lần lượt từng tệp.",
       "reviewMissingHint": "Vui lòng bổ sung các tài liệu còn thiếu trước khi gửi.",
       "reviewStepLabel": "Xem lại",
@@ -871,10 +935,21 @@
       "sending": "Đang gửi...",
       "sentStatus": "Đã gửi",
       "stateProvince": "Bang/Tỉnh",
+      "statusApprovedBadge": "Đã duyệt",
+      "statusApprovedNote": "Chúng tôi sẽ gửi email đề nghị tài trợ, gồm tổng số tiền phải trả, số tiền trả mỗi ngày và ngày đáo hạn cuối, trước khi ký bất kỳ giấy tờ nào.",
+      "statusApprovedSubtitle": "Hồ sơ của bạn đã qua bước xét duyệt. Chúng tôi sẽ liên hệ qua email về bước tiếp theo — chưa có cam kết nào cho đến khi bạn xem và ký đề nghị tài trợ.",
+      "statusApprovedTitle": "Đã duyệt — sẽ có đề nghị tài trợ",
       "statusDocuments": "Tài liệu",
       "statusDocumentsReceivedCount": "Đã nhận {count}/{total}",
+      "statusMissingHeading": "Còn thiếu",
+      "statusMissingHint": "Gửi những tài liệu này cho người phụ trách của bạn tại FundLok để chúng tôi xem xét lại hồ sơ.",
+      "statusReasonHeading": "Nhận xét của người xét duyệt",
       "statusReceived": "Đã nhận",
       "statusReference": "Mã hồ sơ",
+      "statusRejectedBadge": "Không được duyệt",
+      "statusRejectedNote": "Kết quả của hồ sơ này không ảnh hưởng đến các hồ sơ sau. Nếu số liệu hoặc tài liệu của bạn thay đổi, hãy cho chúng tôi biết để xem xét lại.",
+      "statusRejectedSubtitle": "Chúng tôi chưa thể tiếp tục với hồ sơ này. Tài liệu của bạn vẫn được lưu, và đội ngũ của chúng tôi có thể trao đổi với bạn về những điều có thể thay đổi kết quả.",
+      "statusRejectedTitle": "Không được duyệt",
       "statusRepaymentPreference": "Trả nợ",
       "statusRequestedAmount": "Số tiền yêu cầu",
       "statusReviewNote": "Quá trình xét duyệt thường mất vài ngày làm việc. Hiện tại bạn không cần thực hiện thêm thao tác nào.",
@@ -918,6 +993,7 @@
       "vatDeclarationsHelpText": "Với mỗi tháng trong 24 tháng, bạn phải tải lên hai tệp — (1) tờ khai thuế GTGT và (2) xác nhận nộp thuế thành công — tổng cộng 48 tệp. Vui lòng nén tất cả các tệp thành một kho lưu trữ định dạng .zip duy nhất trước khi tải lên.",
       "vatDeclarationsHelpTitle": "Yêu cầu 48 tệp:",
       "vatZipLabel": "Tải lên tệp .zip chứa tất cả 48 tệp thuế GTGT (24 tờ khai + 24 xác nhận)",
+      "viewDocument": "Xem",
       "whereToFindThese": "Tìm các số liệu này ở đâu",
       "whyWeNeedThis": "Lý do cần hồ sơ"
     },
@@ -1407,15 +1483,13 @@
   "notifications": {
     "ariaLabel": "Thông báo",
     "ariaLabelUnread": "Thông báo, {count} chưa đọc",
-    "empty": "Hiện chưa có thông báo mới.",
+    "empty": "Hiện chưa có gì mới.",
     "items": {
-      "gradeUpdated": "Điểm doanh nghiệp FundLok của bạn đã được cập nhật.",
-      "newDevice": "Lần đầu đăng nhập từ thiết bị mới.",
-      "newListing": "Có dự án mới đang mở huy động vốn.",
-      "repaymentReceived": "Một khoản trả nợ đã vào tài khoản của bạn."
+      "applicationApproved": "Đề nghị tài trợ của bạn đã được duyệt.",
+      "applicationRejected": "Đề nghị tài trợ của bạn không được duyệt.",
+      "unknown": "Tài khoản của bạn có cập nhật mới."
     },
-    "markAllRead": "Đánh dấu đã đọc tất cả",
-    "mockNotice": "Thông báo mẫu — chưa kết nối hệ thống gửi thông báo và trạng thái đã đọc không được lưu.",
+    "markAllRead": "Đánh dấu tất cả đã đọc",
     "title": "Thông báo"
   },
   "projectApplication": {
@@ -1456,6 +1530,8 @@
       "companySizeDerived": "Được xếp loại {size}",
       "durationMonths": "Đây là các thời hạn nền tảng hỗ trợ. Thời hạn dài hơn giúp giảm mức trả hằng ngày.",
       "employeeCount": "Số nhân viên toàn thời gian, từ 1 đến 200.",
+      "prefilledAddressFromKyb": "Địa chỉ và tỉnh/thành được lấy từ giấy đăng ký kinh doanh đã xác minh của bạn. Vui lòng bổ sung khu vực và mã bưu chính, và chỉnh sửa nếu có sai lệch.",
+      "prefilledFromKyb": "Tên pháp lý và mã số thuế được điền sẵn từ giấy đăng ký kinh doanh đã xác minh của bạn. Vui lòng kiểm tra và chỉnh sửa nếu có sai lệch.",
       "requestedAmountRange": "Từ {min} đến {max} VND."
     },
     "industries": {
@@ -1520,6 +1596,9 @@
       "durationMonths": "Chọn thời hạn vay 3, 6, 9 hoặc 12 tháng",
       "employeeCount": "Nhập số nhân viên từ 1 đến 200 — nền tảng chỉ tài trợ doanh nghiệp SME",
       "incorporationDate": "Vui lòng nhập ngày thành lập",
+      "incorporationDateFormat": "Vui lòng nhập ngày hợp lệ theo định dạng YYYY-MM-DD.",
+      "incorporationDateFuture": "Ngày thành lập không thể ở tương lai.",
+      "incorporationDateTooEarly": "Ngày này có vẻ quá xa trong quá khứ — vui lòng kiểm tra lại.",
       "industry": "Vui lòng nhập ngành",
       "legalName": "Vui lòng nhập tên pháp lý",
       "postalCode": "Vui lòng nhập mã bưu chính",
@@ -1611,5 +1690,12 @@
       "transparencyItem3": "Báo cáo tài chính doanh nghiệp & đánh giá sức khỏe khoản vay theo thời gian thực",
       "transparencyTitle": "Minh bạch, Công khai, Tự động"
     }
+  },
+  "suspended": {
+    "body": "Bạn không thể đăng nhập hoặc sử dụng FundLok khi tài khoản đang bị tạm khóa.",
+    "contactBtn": "Liên hệ hỗ trợ",
+    "contactHint": "Nếu bạn cho rằng đây là nhầm lẫn, vui lòng liên hệ với chúng tôi để được kiểm tra. Hãy cung cấp địa chỉ email của tài khoản.",
+    "signOutBtn": "Đăng xuất",
+    "title": "Tài khoản của bạn đã bị tạm khóa"
   }
 }

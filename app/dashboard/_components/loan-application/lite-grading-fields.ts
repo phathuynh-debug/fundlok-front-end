@@ -174,7 +174,50 @@ export const REQUIRED_LITE_FIGURE_KEYS: readonly LiteFigureKey[] =
  */
 const VND_MAX = 1_000_000_000_000; // 1 trillion đồng
 
-export type FigureError = "required" | "not_a_number" | "out_of_range" | null;
+export const PERCENT_MIN = 0;
+export const PERCENT_MAX = 100;
+
+/**
+ * The two units read a "." completely differently, so nothing here may parse a
+ * figure without knowing which one it is holding.
+ *
+ * In a VND amount the separators are grouping: `4.800.000.000` is four point
+ * eight billion đồng, and the dots are noise to be stripped. In a percentage
+ * there is nothing to group — the field tops out at 100 — so a "." is a
+ * decimal point, and `19.81` is nineteen point eight one percent.
+ *
+ * Sharing one normaliser between them is what turned a measured concentration
+ * of 19.81% into 1981, which `clampPercentInput` then pinned to 100 — the
+ * worst possible value for that factor, arrived at silently, from a figure the
+ * applicant typed correctly. Concentration comes off an e-invoice export with
+ * two decimals, so this is not a rounding difference; it is a different
+ * number reaching the engine.
+ */
+const VND_DIGITS = /^\d+$/;
+const PERCENT_NUMBER = /^\d+(?:[.,]\d+)?$/;
+
+/** Both separators are accepted: a Vietnamese keyboard writes 19,81. */
+const toDecimal = (cleaned: string) => Number(cleaned.replace(",", "."));
+
+const stripSpaces = (raw: string) => raw.replace(/\s/g, "");
+
+const UNIT_BY_KEY = Object.fromEntries(
+  LITE_FIGURE_FIELDS.map((field) => [field.key, field.unit]),
+) as Record<LiteFigureKey, LiteFigureUnit>;
+
+/** The unit for a key, where only the key is to hand (consistency checks). */
+export function unitForKey(key: LiteFigureKey): LiteFigureUnit {
+  return UNIT_BY_KEY[key];
+}
+
+export type FigureError =
+  | "required"
+  | "not_a_number"
+  | "out_of_range"
+  | "worst_exceeds_best"
+  | "month_exceeds_year"
+  | "top1_exceeds_top3"
+  | null;
 
 export function validateFigure(
   field: LiteFigureField,
@@ -182,21 +225,122 @@ export function validateFigure(
 ): FigureError {
   const trimmed = raw.trim();
   if (!trimmed) return field.required ? "required" : null;
+  const cleaned = stripSpaces(trimmed);
+
+  if (field.unit === "pct") {
+    if (!PERCENT_NUMBER.test(cleaned)) return "not_a_number";
+    const value = toDecimal(cleaned);
+    if (!Number.isFinite(value)) return "not_a_number";
+    return value > PERCENT_MAX ? "out_of_range" : null;
+  }
 
   // Accept the thousands separators a Vietnamese keyboard produces.
-  const normalized = trimmed.replace(/[.,\s]/g, "");
-  if (!/^\d+$/.test(normalized)) return "not_a_number";
+  const digits = cleaned.replace(/[.,]/g, "");
+  if (!VND_DIGITS.test(digits)) return "not_a_number";
 
-  const value = Number(normalized);
+  const value = Number(digits);
   if (!Number.isFinite(value)) return "not_a_number";
-  if (field.unit === "pct") return value > 100 ? "out_of_range" : null;
   return value <= 0 || value > VND_MAX ? "out_of_range" : null;
 }
 
-/** Digits only, for submitting and for comparing. `null` when left blank. */
-export function parseFigure(raw: string): number | null {
-  const normalized = raw.trim().replace(/[.,\s]/g, "");
-  if (!normalized) return null;
-  const value = Number(normalized);
+/**
+ * Hold a percentage inside 0-100 as it is typed.
+ *
+ * A share of revenue above 100% describes nothing, and the backend rejects it
+ * — but only at Send, several steps later. Clamping at the input turns a
+ * late error into an impossible state.
+ *
+ * Deliberately narrow:
+ *   - only `pct` fields; a VND amount has no such ceiling.
+ *   - an empty string stays empty. Coercing a blank field to "0" would make
+ *     an optional figure look answered, and 0% concentration is a claim, not
+ *     a default.
+ *   - anything that is not a clean number is returned untouched, so the
+ *     existing `not_a_number` error still gets to explain itself rather than
+ *     being silently rewritten.
+ *   - a decimal is a value, not a violation. This runs on every keystroke, so
+ *     it also has to leave a half-typed "19." and a lone "-" alone rather than
+ *     rewriting them mid-word.
+ */
+export function clampPercentInput(raw: string): string {
+  const trimmed = raw.trim();
+  if (!trimmed) return raw;
+
+  const cleaned = stripSpaces(trimmed).replace(",", ".");
+  if (!/^-?\d+(?:\.\d*)?$/.test(cleaned)) return raw;
+
+  const value = Number(cleaned.endsWith(".") ? cleaned.slice(0, -1) : cleaned);
+  if (!Number.isFinite(value)) return raw;
+  if (value > PERCENT_MAX) return String(PERCENT_MAX);
+  if (value < PERCENT_MIN) return String(PERCENT_MIN);
+  return raw;
+}
+
+/**
+ * The number behind the typed string, for submitting and for comparing.
+ * `null` when blank or unparseable.
+ *
+ * `unit` is required, not defaulted: a default is how a percentage came to be
+ * read with the VND normaliser in the first place, and the failure was silent.
+ */
+export function parseFigure(raw: string, unit: LiteFigureUnit): number | null {
+  const cleaned = stripSpaces(raw.trim());
+  if (!cleaned) return null;
+
+  if (unit === "pct") {
+    if (!PERCENT_NUMBER.test(cleaned)) return null;
+    const value = toDecimal(cleaned);
+    return Number.isFinite(value) ? value : null;
+  }
+
+  const digits = cleaned.replace(/[.,]/g, "");
+  if (!VND_DIGITS.test(digits)) return null;
+  const value = Number(digits);
   return Number.isFinite(value) ? value : null;
+}
+
+/**
+ * The rules that involve more than one figure.
+ *
+ * Kept as data rather than inline checks so the form, the review step and the
+ * tests all read the same list. Each returns the key it should blame — the
+ * field the applicant has to change — not merely that something is wrong.
+ *
+ * Mirrors app/loans/schemas.py exactly. The backend stays authoritative; this
+ * only moves the conversation earlier.
+ */
+export function validateFigureConsistency(
+  values: Record<LiteFigureKey, string>,
+): Partial<Record<LiteFigureKey, FigureError>> {
+  const errors: Partial<Record<LiteFigureKey, FigureError>> = {};
+  const n = (key: LiteFigureKey) => parseFigure(values[key], unitForKey(key));
+
+  const best = n("revenue_best_month");
+  const worst = n("revenue_worst_month");
+  const year = n("revenue_last_12m");
+  const top1 = n("conc_top1_pct");
+  const top3 = n("conc_top3_pct");
+
+  // A worst month that beats the best month describes no real company.
+  if (best !== null && worst !== null && worst > best) {
+    errors.revenue_worst_month = "worst_exceeds_best";
+  }
+
+  // A single month cannot out-earn the year that contains it.
+  if (year !== null) {
+    if (best !== null && best > year)
+      errors.revenue_best_month = "month_exceeds_year";
+    if (worst !== null && worst > year) {
+      errors.revenue_worst_month =
+        errors.revenue_worst_month ?? "month_exceeds_year";
+    }
+  }
+
+  // The largest customer is one OF the top three, so its share cannot be
+  // larger than theirs combined.
+  if (top1 !== null && top3 !== null && top1 > top3) {
+    errors.conc_top1_pct = "top1_exceeds_top3";
+  }
+
+  return errors;
 }

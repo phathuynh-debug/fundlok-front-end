@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useKybCertificate } from "@/hooks/use-gverify";
 import { useUploadLoanDocument, useConfirmUploads } from "@/hooks/use-uploads";
 import {
   useSaveLoanFigures,
@@ -13,6 +14,9 @@ import {
 } from "@/services/uploads.service";
 import {
   LITE_FIGURE_FIELDS,
+  clampPercentInput,
+  validateFigureConsistency,
+  type LiteFigureField,
   LITE_FIGURE_KEYS,
   figureFieldsForStep,
   parseFigure,
@@ -106,6 +110,14 @@ export function useLoanApplication({
 }: UseLoanApplicationOptions) {
   const { toast } = useToast();
 
+  // The SME already submitted their business registration certificate for KYB.
+  // Asking for the same PDF again is busywork, and a second copy can disagree
+  // with the one that was actually verified. When it is on file, that document
+  // requirement is met and the wizard offers a preview instead of an upload.
+  const { data: kybCertificate } = useKybCertificate();
+  const isSatisfiedByKyb = (key: DocumentKey): boolean =>
+    key === "companyRegistration" && !!kybCertificate;
+
   const uploadDocument = useUploadLoanDocument();
   const confirmUploads = useConfirmUploads();
   const submitApplication = useSubmitLoanApplication();
@@ -191,7 +203,12 @@ export function useLoanApplication({
   // --- Typed figures ---
 
   const setFigure = (key: LiteFigureKey, raw: string) => {
-    setFigures((prev) => ({ ...prev, [key]: raw }));
+    // Percentages are held inside 0-100 as they are typed, so an impossible
+    // share never survives to become a 422 at Send. Applied here rather than
+    // in the input so every caller of setFigure gets it.
+    const field = LITE_FIGURE_FIELDS.find((f) => f.key === key);
+    const next = field?.unit === "pct" ? clampPercentInput(raw) : raw;
+    setFigures((prev) => ({ ...prev, [key]: next }));
     // Clear a stale error as soon as the value becomes valid; don't introduce
     // a new one mid-typing (that fires "not a number" on an empty string).
     setFigureErrors((prev) => (prev[key] ? { ...prev, [key]: null } : prev));
@@ -207,10 +224,16 @@ export function useLoanApplication({
     }));
   };
 
+  // Per-field errors plus the cross-field rules. The consistency errors are
+  // blamed on a specific input so they can render under it, rather than in a
+  // toast naming a snake_case field the applicant never saw.
+  const figureErrorFor = (field: LiteFigureField): FigureError =>
+    validateFigure(field, figures[field.key]) ??
+    validateFigureConsistency(figures)[field.key] ??
+    null;
+
   const isFigureStepValid = (step: number): boolean =>
-    figureFieldsForStep(step).every(
-      (field) => validateFigure(field, figures[field.key]) === null,
-    );
+    figureFieldsForStep(step).every((field) => figureErrorFor(field) === null);
 
   /** Marks every invalid field on a step so the user can see what is missing. */
   const revealFigureErrors = (step: number) => {
@@ -219,7 +242,7 @@ export function useLoanApplication({
     setFigureErrors((prev) => {
       const next = { ...prev };
       for (const field of fields) {
-        next[field.key] = validateFigure(field, figures[field.key]);
+        next[field.key] = figureErrorFor(field);
       }
       return next;
     });
@@ -283,6 +306,10 @@ export function useLoanApplication({
 
     const fileKeys: string[] = [];
     for (const key of ALL_DOCUMENT_KEYS) {
+      // Nothing to send for a requirement already met by KYB — there is no
+      // staged file, and uploadOne would fail on the null. The certificate is
+      // already in storage against the verification attempt.
+      if (isSatisfiedByKyb(key)) continue;
       const doc = documents[key];
       if (doc.status === "uploaded" && doc.fileKey) {
         fileKeys.push(doc.fileKey);
@@ -306,7 +333,10 @@ export function useLoanApplication({
       await saveFigures.mutateAsync({
         applicationId: loanApplicationId,
         payload: Object.fromEntries(
-          LITE_FIGURE_KEYS.map((key) => [key, parseFigure(figures[key])]),
+          LITE_FIGURE_FIELDS.map((field) => [
+            field.key,
+            parseFigure(figures[field.key], field.unit),
+          ]),
         ) as unknown as LoanApplicationFiguresPayload,
       });
       await confirmUploads.mutateAsync({
@@ -353,7 +383,11 @@ export function useLoanApplication({
   const isStepValid = (step: number): boolean => {
     if (step === REVIEW_STEP) return canSend;
     const keys = STEP_DOCUMENTS[step];
-    if (keys) return keys.every((key) => isStaged(documents[key]));
+    if (keys) {
+      return keys.every(
+        (key) => isStaged(documents[key]) || isSatisfiedByKyb(key),
+      );
+    }
     if (figureFieldsForStep(step).length) return isFigureStepValid(step);
     return false;
   };
@@ -409,15 +443,22 @@ export function useLoanApplication({
   // Every document holds a sendable file (no missing files, no bad files) and
   // every required figure parses.
   const allFiguresValid = LITE_FIGURE_FIELDS.every(
-    (field) => validateFigure(field, figures[field.key]) === null,
+    (field) => figureErrorFor(field) === null,
   );
   const canSend =
-    ALL_DOCUMENT_KEYS.every((key) => isStaged(documents[key])) &&
-    allFiguresValid;
+    ALL_DOCUMENT_KEYS.every(
+      (key) => isStaged(documents[key]) || isSatisfiedByKyb(key),
+    ) && allFiguresValid;
   const allFilesUploaded = ALL_DOCUMENT_KEYS.every(
     (key) => documents[key].status === "uploaded",
   );
-  const uploadedCount = ALL_DOCUMENT_KEYS.filter(
+  // Documents this application still has to send. A requirement met by KYB is
+  // not one of them, so it must not count toward the progress bar either —
+  // otherwise "3 of 4" can never reach 4 and the wizard looks stuck.
+  const sendableKeys = ALL_DOCUMENT_KEYS.filter(
+    (key) => !isSatisfiedByKyb(key),
+  );
+  const uploadedCount = sendableKeys.filter(
     (key) => documents[key].status === "uploaded",
   ).length;
   // Confirm + submit running after every file is up.
@@ -427,6 +468,10 @@ export function useLoanApplication({
     submitApplication.isPending;
 
   return {
+    // The stored KYB certificate, or null when nothing was retained. Drives
+    // both the "already provided" state and its preview link.
+    kybCertificate: kybCertificate ?? null,
+    isSatisfiedByKyb,
     // State
     documents,
     figures,
@@ -440,8 +485,8 @@ export function useLoanApplication({
     canSend,
     allFilesUploaded,
     uploadedCount,
-    totalDocuments: ALL_DOCUMENT_KEYS.length,
-    documentKeys: ALL_DOCUMENT_KEYS,
+    totalDocuments: sendableKeys.length,
+    documentKeys: sendableKeys,
 
     // File actions
     handleFileChange,

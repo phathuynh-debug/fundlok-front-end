@@ -19,7 +19,7 @@ export function FigureField({ field }: { field: LiteFigureField }) {
 
   const raw = figures[field.key];
   const error = figureErrors[field.key];
-  const parsed = parseFigure(raw);
+  const parsed = parseFigure(raw, field.unit);
 
   const errorText = error ? t(`dashboard.sme.lite.error.${error}`) : null;
 
@@ -50,7 +50,9 @@ export function FigureField({ field }: { field: LiteFigureField }) {
         // swallows the thousands separators a Vietnamese keyboard produces and
         // silently changes the value on scroll.
         type="text"
-        inputMode="numeric"
+        // "decimal" on a percentage so the phone keypad actually offers the
+        // separator the field now accepts.
+        inputMode={field.unit === "pct" ? "decimal" : "numeric"}
         autoComplete="off"
         disabled={busy}
         value={raw}

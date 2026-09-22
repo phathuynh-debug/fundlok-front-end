@@ -43,6 +43,8 @@ const withLoan = (extra: Record<string, unknown> = {}) =>
       repayment_preference: "MONTHLY",
       status: "DRAFT",
       submitted_at: null,
+      decision_note: null,
+      decided_at: null,
       created_at: null,
       documents: [],
       ...extra,

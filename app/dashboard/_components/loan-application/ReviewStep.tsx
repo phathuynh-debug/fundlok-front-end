@@ -1,5 +1,7 @@
 "use client";
 
+import { CheckCircle2 } from "lucide-react";
+
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { ReviewRow } from "./ReviewRow";
@@ -20,6 +22,7 @@ const DOCUMENT_LABEL_KEYS: Record<DocumentKey, string> = {
 export function ReviewStep() {
   const {
     documentKeys,
+    kybCertificate,
     figures,
     canSend,
     isSending,
@@ -62,6 +65,22 @@ export function ReviewStep() {
       )}
 
       <div className="space-y-2.5">
+        {/* Already on file from KYB — shown so the review reads as complete,
+            rather than listing it as missing when it was never asked for. */}
+        {kybCertificate && (
+          <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/20 px-3 py-2.5 text-sm">
+            <CheckCircle2
+              className="h-4 w-4 shrink-0 text-emerald-600"
+              aria-hidden
+            />
+            <span className="flex-1 text-foreground">
+              {t("dashboard.sme.companyRegistration")}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {t("dashboard.sme.reusedFromKyb")}
+            </span>
+          </div>
+        )}
         {documentKeys.map((key) => (
           <ReviewRow
             key={key}
@@ -80,7 +99,7 @@ export function ReviewStep() {
         </h5>
         <dl className="divide-y divide-border/60">
           {LITE_FIGURE_FIELDS.map((field) => {
-            const value = parseFigure(figures[field.key]);
+            const value = parseFigure(figures[field.key], field.unit);
             return (
               <div
                 key={field.key}

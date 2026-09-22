@@ -134,3 +134,58 @@ test.describe("an SME with no project yet", () => {
     ).toHaveCount(0);
   });
 });
+
+// --- A refused application ---------------------------------------------------
+// The panel used to render "Submitted — awaiting review" for every status that
+// was not DRAFT, so a decided application kept telling the applicant their
+// documents were still being read.
+
+test.describe("an SME whose application was refused", () => {
+  test.beforeEach(async ({ context }) => {
+    await signInAs(context, "smeRejectedApplication");
+  });
+
+  test("is told the outcome, not that a review is running", async ({
+    page,
+  }) => {
+    await page.goto("/dashboard");
+
+    await expect(
+      page.getByRole("heading", {
+        name: t("dashboard.sme.statusRejectedTitle"),
+      }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(t("dashboard.sme.statusSubmittedTitle")),
+    ).toHaveCount(0);
+    // And the "no action is needed from you right now" footnote is gone,
+    // because it is only true while something is still being decided.
+    await expect(
+      page.getByText(t("dashboard.sme.statusReviewNote")),
+    ).toHaveCount(0);
+  });
+
+  test("shows the reviewer's reason and what is still missing", async ({
+    page,
+  }) => {
+    await page.goto("/dashboard");
+
+    await expect(
+      page.getByText(t("dashboard.sme.statusReasonHeading")),
+    ).toBeVisible();
+    await expect(
+      page.getByText(
+        "The revenue in the declarations does not match the figures on the form.",
+      ),
+    ).toBeVisible();
+
+    // The gap in the file, named. Only the CIC report was withheld in the
+    // fixture, so the two steps that became typed figures must not appear —
+    // listing documents nobody can upload any more is noise, not a gap.
+    const missing = page.getByText(t("dashboard.sme.statusMissingHeading"));
+    await expect(missing).toBeVisible();
+    await expect(page.getByText("CIC Credit Report").last()).toBeVisible();
+    await expect(page.getByText("VAT Declarations")).toHaveCount(0);
+    await expect(page.getByText("Financial Statement")).toHaveCount(0);
+  });
+});

@@ -32,6 +32,7 @@ import {
   STUB_ADMIN_USERS,
   STUB_AUDIT_LOGS,
   STUB_PASSWORD,
+  STUB_ADMIN_ONLY_PROJECT,
   STUB_PUBLIC_PROJECTS,
   STUB_USERS,
   projectsFor,
@@ -61,8 +62,211 @@ const twoFactor = new Map<
   { enabled: boolean; pendingSecret: string | null; recoveryRemaining: number }
 >();
 
+/**
+ * Admin project preview state: one KYB attempt and one funding request per
+ * stub project, both decidable.
+ *
+ * Mutable for the same reason the 2FA map is — the panel exists to record a
+ * DECISION, and a fixture that is permanently PENDING (or permanently
+ * approved) cannot exercise the transition. Built lazily so each project the
+ * suite opens gets its own records rather than sharing one.
+ */
+interface StubAdminApplication {
+  id: string;
+  requested_amount: number;
+  purpose: string | null;
+  repayment_preference: string | null;
+  status: string;
+  admin_approval: string;
+  submitted_at: string | null;
+  decided_at: string | null;
+  decision_note: string | null;
+  created_at: string | null;
+  documents: Array<{
+    id: string;
+    document_type: string;
+    original_filename: string;
+    content_type: string | null;
+    file_size_bytes: number | null;
+    status: string;
+    uploaded_at: string | null;
+  }>;
+}
+
+interface StubAdminKyb {
+  id: string;
+  status: string;
+  is_approved: boolean;
+  rejection_reason: string | null;
+  business_name: string | null;
+  tax_code: string | null;
+  updated_at: string | null;
+}
+
+const adminApplications = new Map<string, StubAdminApplication>();
+const adminKybAttempts = new Map<string, StubAdminKyb>();
+const adminProjectSeeded = new Set<string>();
+
+/** Status changes made during a run, keyed by stub user id. */
+const adminUserStatuses = new Map<string, string>();
+
+/** Notifications, keyed by stub user. Mutable: read state is the whole point. */
+const notificationsByUser = new Map<string, StubNotification[]>();
+
+interface StubNotification {
+  id: string;
+  event: string;
+  entity_type: string | null;
+  entity_id: string | null;
+  data: Record<string, unknown>;
+  read_at: string | null;
+  created_at: string;
+}
+
+function notificationsFor(key: StubUserKey): StubNotification[] {
+  if (!notificationsByUser.has(key)) {
+    // Only the SME accounts have anything: a notification is addressed to the
+    // applicant, and an empty bell for everyone else is the correct answer.
+    const seeded: StubNotification[] =
+      key === "sme" || key === "smeRejectedApplication"
+        ? [
+            {
+              id: `ntf-1-${key}`,
+              event: "APPLICATION_REJECTED",
+              entity_type: "LOAN_APPLICATION",
+              entity_id: "30000000-0000-0000-0000-000000000001",
+              data: { amount_vnd: 500000000 },
+              read_at: null,
+              created_at: "2026-09-12T09:00:00+07:00",
+            },
+            {
+              id: `ntf-2-${key}`,
+              event: "APPLICATION_APPROVED",
+              entity_type: "LOAN_APPLICATION",
+              entity_id: "30000000-0000-0000-0000-000000000001",
+              data: { amount_vnd: 500000000 },
+              read_at: "2026-09-10T09:00:00+07:00",
+              created_at: "2026-09-10T08:00:00+07:00",
+            },
+          ]
+        : [];
+    notificationsByUser.set(key, seeded);
+  }
+  return notificationsByUser.get(key)!;
+}
+
+/** Score runs produced during a run, keyed by application id. */
+const adminScoreRuns = new Map<string, Record<string, unknown>>();
+
+function scoreRunFor(applicationId: string) {
+  const run = adminScoreRuns.get(applicationId);
+  if (!run) return null;
+  // Both are null on an INSUFFICIENT_DATA run: the real engine reports the
+  // grade as absent rather than zero (R8), and a stub that invented a 0 here
+  // would let the UI ship a bug the API cannot produce.
+  const pricing = run.pricing as { interest_rate_pct: number } | null;
+  const grade = run.grade as { value: number } | null;
+  return {
+    id: run.id,
+    status: run.status,
+    decision: run.decision,
+    final_grade: grade?.value ?? null,
+    interest_rate_pct: pricing?.interest_rate_pct ?? null,
+    engine_version: "1.0.0",
+    params_version: "wb-v1-20260917",
+    created_at: new Date().toISOString(),
+  };
+}
+
+/** Every company the admin console can open — listings plus admin-only ones. */
+function adminProjects() {
+  return [...STUB_PUBLIC_PROJECTS, STUB_ADMIN_ONLY_PROJECT];
+}
+
+function adminProjectDetail(projectId: string) {
+  const project = adminProjects().find((p) => p.id === projectId);
+  if (!project) return null;
+
+  if (!adminProjectSeeded.has(projectId)) {
+    adminProjectSeeded.add(projectId);
+    adminApplications.set(`app-${projectId}`, {
+      id: `app-${projectId}`,
+      requested_amount: 500000000,
+      purpose: "Kitchen expansion",
+      repayment_preference: "MONTHLY",
+      status: "SUBMITTED",
+      admin_approval: "PENDING",
+      submitted_at: "2026-09-01T00:00:00Z",
+      decided_at: null,
+      decision_note: null,
+      created_at: "2026-09-01T00:00:00Z",
+      // What the SME wizard collects: step 1 produces two, steps 4 and 5 one
+      // each. One left PENDING on purpose — a presign that never completed is
+      // a real state the panel has to surface rather than hide.
+      documents: [
+        {
+          id: `doc-charter-${projectId}`,
+          document_type: "legal_charter",
+          original_filename: "dieu-le-cong-ty.pdf",
+          content_type: "application/pdf",
+          file_size_bytes: 240000,
+          status: "UPLOADED",
+          uploaded_at: "2026-09-01T00:00:00Z",
+        },
+        {
+          id: `doc-reg-${projectId}`,
+          document_type: "business_registration",
+          original_filename: "giay-dang-ky-kinh-doanh.pdf",
+          content_type: "application/pdf",
+          file_size_bytes: 182000,
+          status: "PENDING",
+          uploaded_at: null,
+        },
+      ],
+    });
+    // Parked by the engine — the state an operator is there to settle.
+    adminKybAttempts.set(`kyb-${projectId}`, {
+      id: `kyb-${projectId}`,
+      status: "MANUAL_REVIEW",
+      is_approved: false,
+      rejection_reason: "OCR confidence too low on the tax code",
+      business_name: project.legal_name,
+      tax_code: "1501167629",
+      updated_at: "2026-09-01T00:00:00Z",
+    });
+  }
+
+  return {
+    id: project.id,
+    legal_name: project.legal_name,
+    tax_id: "1501167629",
+    industry: project.industry,
+    status: project.status ?? "DRAFT",
+    address: null,
+    incorporation_date: "2019-03-15",
+    created_at: project.created_at ?? "2026-02-01T00:00:00Z",
+    applications: [
+      {
+        ...adminApplications.get(`app-${projectId}`)!,
+        score_run: scoreRunFor(`app-${projectId}`),
+      },
+    ],
+    kyb: adminKybAttempts.get(`kyb-${projectId}`)!,
+  };
+}
+
 /** Forced-503 switch for the unconfigured-server case. */
 let setupUnavailable = false;
+
+/**
+ * KYB approvals earned during a run, keyed by stub user.
+ *
+ * Mutable for the same reason 2FA is: approval is a transition, and the whole
+ * point of the post-verification redirect is what happens the moment it flips.
+ * A fixture flag alone can only express "already approved" or "never", never
+ * the change itself. Only ever set by POST /gverify/kyb/verify.
+ */
+const kybApproved = new Set<string>();
 
 function totpState(key: string) {
   if (!twoFactor.has(key)) {
@@ -164,6 +368,23 @@ function currentUser(req: IncomingMessage) {
   const key = token as StubUserKey;
   return key in STUB_USERS ? { key, user: STUB_USERS[key] } : null;
 }
+
+/**
+ * Accounts the backend refuses outright.
+ *
+ * The real API rejects a suspended account in get_current_user, so EVERY
+ * authenticated route answers 403 — not just login. Mirrored here because the
+ * proxy reads /users/me server-side to decide where to send the request, and
+ * that decision is the thing under test.
+ */
+const SUSPENDED_KEYS = new Set<StubUserKey>(["suspended"]);
+
+/**
+ * Accounts whose access token is treated as expired: the cookie resolves to a
+ * stub identity, but every authenticated route answers 401 exactly as the real
+ * API does once the 30-minute token lapses.
+ */
+const EXPIRED_KEYS = new Set<StubUserKey>(["expiredSession"]);
 
 function json(
   res: ServerResponse,
@@ -468,6 +689,17 @@ const server = createServer(async (req, res) => {
     return res.end();
   }
 
+  // An expired access token: the cookie is still sent, the backend rejects it.
+  if (EXPIRED_KEYS.has(key)) {
+    return json(res, 401, { detail: "Could not validate credentials" });
+  }
+
+  // A suspended account is refused on EVERY authenticated route, matching
+  // get_current_user server-side — not only at login.
+  if (SUSPENDED_KEYS.has(key)) {
+    return json(res, 403, { detail: "This account has been suspended" });
+  }
+
   if (path === "/users/me" && method === "GET") {
     return json(res, 200, withOnboarding(req, user));
   }
@@ -655,11 +887,74 @@ const server = createServer(async (req, res) => {
 
   // The proxy's on-demand verification gate. Both prefixes answer from the same
   // fixture flag; the proxy picks one by role.
-  if (path === "/gverify/kyc/status" || path === "/gverify/kyb/status") {
-    return json(res, 200, {
-      is_approved: user.is_approved,
-      status: user.is_approved ? "APPROVED" : "PENDING",
+  // A KYB submission. The real provider returns the verdict synchronously, so
+  // there is no webhook to wait on: the attempt is terminal by the time this
+  // responds, and the caller counts as approved from here on.
+  if (path === "/gverify/kyb/verify" && method === "POST") {
+    kybApproved.add(key);
+    return json(res, 201, {
+      verification_id: `00000000-0000-0000-0000-00000000kyb1`.slice(0, 36),
+      status: "APPROVED",
+      is_approved: true,
+      rejection_reason: null,
+      tax_code: user.kyb?.tax_code ?? null,
+      license_code: null,
+      business_name: user.kyb?.business_name ?? null,
+      business_type: "Công ty Cổ phần",
+      business_status: "Đang hoạt động",
+      representatives: [],
+      created_at: new Date().toISOString(),
     });
+  }
+
+  if (path === "/gverify/kyc/status" || path === "/gverify/kyb/status") {
+    const approved =
+      user.is_approved ||
+      (path === "/gverify/kyb/status" && kybApproved.has(key));
+    // KYB additionally carries what the certificate OCR read, which the SME
+    // project application prefills from. Null (not absent) when the fixture
+    // has no certificate data — that is the real endpoint's shape too.
+    const certificate =
+      path === "/gverify/kyb/status"
+        ? {
+            business_name: user.kyb?.business_name ?? null,
+            tax_code: user.kyb?.tax_code ?? null,
+            company_address: user.kyb?.company_address ?? null,
+            date_of_establishment: user.kyb?.date_of_establishment ?? null,
+          }
+        : {};
+    return json(res, 200, {
+      is_approved: approved,
+      status: approved ? "APPROVED" : "PENDING",
+      ...certificate,
+    });
+  }
+
+  // --- Notifications --------------------------------------------------------
+  // Mutable per worker, like the other decision state: the point of the panel
+  // is what happens when something is marked read, which a frozen fixture
+  // cannot express. Keyed by user so the scoping the API enforces is visible
+  // here too.
+  if (path === "/notifications" && method === "GET") {
+    const items = notificationsFor(key);
+    return json(res, 200, {
+      items,
+      unread: items.filter((n) => n.read_at === null).length,
+    });
+  }
+
+  const markReadMatch = path.match(/^\/notifications\/([^/]+)\/read$/);
+  if (markReadMatch && method === "PATCH") {
+    const target = notificationsFor(key).find((n) => n.id === markReadMatch[1]);
+    if (!target) return json(res, 404, { detail: "Notification not found" });
+    target.read_at = target.read_at ?? new Date().toISOString();
+    return json(res, 200, target);
+  }
+
+  if (path === "/notifications/read-all" && method === "POST") {
+    const unread = notificationsFor(key).filter((n) => n.read_at === null);
+    for (const item of unread) item.read_at = new Date().toISOString();
+    return json(res, 200, { updated: unread.length });
   }
 
   if (path === "/projects" && method === "GET") {
@@ -703,6 +998,48 @@ const server = createServer(async (req, res) => {
     });
   }
 
+  // --- Underwriting ---------------------------------------------------------
+  // NOT under /admin/ — the real route is /underwriting/*, and it is gated by
+  // require_roles(Role.ADMIN) specifically: a SYSTEM_ADMIN is refused too.
+  if (path === "/underwriting/score-runs" && method === "POST") {
+    if (user.role !== "ADMIN") {
+      return detail(res, 403, "Not authorized for this action");
+    }
+    const body = await readBody(req);
+    const applicationId = String(body.application_id);
+    // One company has no financials behind it, so the engine declines to
+    // grade it. That is a 201 with a decision, not an error — the operator
+    // gets an answer, just not a score.
+    const ungraded = applicationId.endsWith(STUB_ADMIN_ONLY_PROJECT.id);
+    const run = ungraded
+      ? {
+          id: `run-${applicationId}`,
+          application_id: applicationId,
+          status: "READY",
+          decision: "INSUFFICIENT_DATA",
+          grade: null,
+          pricing: null,
+          fired_gates: [],
+          versions: { engine: "1.0.0", params: "wb-v1-20260917" },
+        }
+      : {
+          id: `run-${applicationId}`,
+          application_id: applicationId,
+          status: "READY",
+          decision: "APPROVED",
+          grade: { value: 75.91 },
+          pricing: {
+            interest_rate_pct: 13.93,
+            target_payment_vnd: 534817122,
+            target_daily_vnd: 4051644,
+          },
+          fired_gates: [],
+          versions: { engine: "1.0.0", params: "wb-v1-20260917" },
+        };
+    adminScoreRuns.set(applicationId, run);
+    return json(res, 201, run);
+  }
+
   // --- Admin ---------------------------------------------------------------
   // Guarded like the real backend: a non-admin session must get a 403 here, so
   // a test can prove the API is not the only thing keeping them out.
@@ -715,7 +1052,12 @@ const server = createServer(async (req, res) => {
       const mode =
         url.searchParams.get("mode") === "projects" ? "projects" : "users";
       const items =
-        mode === "projects" ? STUB_PUBLIC_PROJECTS : STUB_ADMIN_USERS;
+        mode === "projects"
+          ? adminProjects()
+          : STUB_ADMIN_USERS.map((u) => ({
+              ...u,
+              status: adminUserStatuses.get(u.id) ?? u.status,
+            }));
       const search = url.searchParams.get("search");
       const filtered = search
         ? items.filter((row) =>
@@ -733,6 +1075,84 @@ const server = createServer(async (req, res) => {
           page_size: Number(url.searchParams.get("page_size") ?? 20),
         },
       });
+    }
+
+    // --- Admin project preview: the two-approval gate --------------------- //
+    // Mutable, like the 2FA block above and for the same reason: the whole
+    // point of the panel is what happens when a decision flips, which a
+    // stateless fixture cannot express.
+    const userStatusMatch = path.match(/^\/admin\/users\/([^/]+)\/status$/);
+    if (userStatusMatch && method === "PATCH") {
+      const body = await readBody(req);
+      const target = STUB_ADMIN_USERS.find((u) => u.id === userStatusMatch[1]);
+      if (!target) return json(res, 404, { detail: "User not found" });
+      // The server's two guards, mirrored so the suite can assert the UI
+      // respects them rather than only that it renders them.
+      if (target.id === user.id) {
+        return json(res, 409, {
+          detail: "You cannot change your own account status",
+        });
+      }
+      if (
+        ["ADMIN", "SYSTEM_ADMIN"].includes(String(target.role)) &&
+        user.role !== "SYSTEM_ADMIN"
+      ) {
+        return json(res, 403, {
+          detail: "Only a system admin can change an admin account's status",
+        });
+      }
+      adminUserStatuses.set(target.id, String(body.status));
+      return json(res, 200, {
+        ...target,
+        status: String(body.status),
+      });
+    }
+
+    const projectDetailMatch = path.match(/^\/admin\/projects\/([^/]+)$/);
+    if (projectDetailMatch && method === "GET") {
+      const detail = adminProjectDetail(projectDetailMatch[1]);
+      if (!detail) return json(res, 404, { detail: "Project not found" });
+      return json(res, 200, detail);
+    }
+
+    const decisionMatch = path.match(
+      /^\/admin\/applications\/([^/]+)\/decision$/,
+    );
+    if (decisionMatch && method === "POST") {
+      const body = await readBody(req);
+      const application = adminApplications.get(decisionMatch[1]);
+      if (!application)
+        return json(res, 404, { detail: "Application not found" });
+      if (application.admin_approval !== "PENDING") {
+        return json(res, 409, {
+          detail: `Application has already been ${application.admin_approval.toLowerCase()}`,
+        });
+      }
+      application.admin_approval = String(body.decision);
+      application.decision_note = (body.note as string) ?? null;
+      application.decided_at = new Date().toISOString();
+      return json(res, 200, application);
+    }
+
+    const resolveMatch = path.match(
+      /^\/admin\/kyb-verifications\/([^/]+)\/resolve$/,
+    );
+    if (resolveMatch && method === "POST") {
+      const body = await readBody(req);
+      const attempt = adminKybAttempts.get(resolveMatch[1]);
+      if (!attempt)
+        return json(res, 404, { detail: "KYB verification not found" });
+      if (attempt.status !== "MANUAL_REVIEW") {
+        return json(res, 409, {
+          detail: "Only a MANUAL_REVIEW attempt can be resolved",
+        });
+      }
+      attempt.status = String(body.decision);
+      attempt.is_approved = attempt.status === "APPROVED";
+      if (attempt.status === "REJECTED") {
+        attempt.rejection_reason = (body.note as string) ?? null;
+      }
+      return json(res, 200, attempt);
     }
 
     if (path === "/admin/audit-logs" && method === "GET") {

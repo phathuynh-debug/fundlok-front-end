@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { middlewareService } from "@/services/middleware.service";
+import { SUSPENDED, middlewareService } from "@/services/middleware.service";
 import { applyBackendSecret } from "@/lib/backend-secret";
 
 // Same default as next.config.ts and middleware.service.ts. Kept in step with
@@ -28,6 +28,9 @@ const KYC_ROUTE = "/kyc";
 // Frontend system-settings page (distinct from the backend /system API prefix).
 const SYSTEM_SETTINGS_ROUTE = "/admin/system";
 const MAINTENANCE_ROUTE = "/maintenance";
+// Where a suspended account lands. Reachable ONLY while suspended — see the
+// gate below.
+const SUSPENDED_ROUTE = "/suspended";
 // During maintenance only the auth entry points are blocked — public pages and
 // the rest of the site stay accessible.
 const MAINTENANCE_BLOCKED_ROUTES = ["/login", "/register"];
@@ -121,6 +124,7 @@ function isHandledRoute(pathname: string) {
     pathname === "/register" ||
     pathname === "/verify-email" ||
     pathname === SELECT_ROLE_ROUTE ||
+    pathname === SUSPENDED_ROUTE ||
     pathname.startsWith(KYC_ROUTE) ||
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/project-application") ||
@@ -167,9 +171,63 @@ export async function proxy(request: NextRequest) {
   }
   const accessToken = request.cookies.get("access_token")?.value;
   const isAuthenticated = !!accessToken;
-  const currentUser = isAuthenticated
+  const session = isAuthenticated
     ? await middlewareService.getCurrentUser(request)
     : null;
+
+  // A suspended account holds a valid cookie but the backend refuses it. Sent
+  // to /login it would loop: the password is right, sign-in is refused, and
+  // nothing says why. /suspended is the one page that explains it, so this
+  // gate runs before every other redirect below.
+  const isSuspendedSession = session === SUSPENDED;
+  if (isSuspendedSession && pathname !== SUSPENDED_ROUTE) {
+    return NextResponse.redirect(new URL(SUSPENDED_ROUTE, request.url));
+  }
+  // Nobody else has any business on that page.
+  if (!isSuspendedSession && pathname === SUSPENDED_ROUTE) {
+    return NextResponse.redirect(
+      new URL(isAuthenticated ? "/dashboard" : "/login", request.url),
+    );
+  }
+
+  const currentUser = session === SUSPENDED ? null : session;
+
+  // A cookie the backend will not honour is NOT a session.
+  //
+  // `isAuthenticated` only means "an access_token cookie exists". Once that
+  // token expires the cookie is still there, but /users/me 401s and
+  // currentUser is null — and every role gate below then reads the user as
+  // having no role. An admin refreshing /admin was bounced to /select-role by
+  // the admin gate, because authRedirectTarget computes to SELECT_ROLE_ROUTE
+  // when there is no role to redirect on. That is the "it asks me to choose a
+  // role again" report: not a lost role, a lost session being mistaken for
+  // one.
+  //
+  // Treat it as signed out and say so, keeping ?from= so the user returns to
+  // where they were once they sign in again.
+  // `!isSuspendedSession` matters: a suspended session also has a null
+  // currentUser, and without this it would be bounced to /login — the exact
+  // unexplained loop /suspended exists to prevent.
+  if (
+    isAuthenticated &&
+    !currentUser &&
+    !isSuspendedSession &&
+    isHandledRoute(pathname)
+  ) {
+    const isPublicEntry =
+      AUTH_ROUTES.some((route) => pathname === route) ||
+      pathname === "/verify-email";
+    if (!isPublicEntry) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("from", pathname);
+      const response = NextResponse.redirect(loginUrl);
+      // Clear the stale pair so the next request is cleanly anonymous rather
+      // than repeating this round trip to the backend.
+      response.cookies.delete("access_token");
+      response.cookies.delete("refresh_token");
+      return response;
+    }
+  }
   const isSystemAdmin = currentUser?.role === "SYSTEM_ADMIN";
   const isAdmin = currentUser?.role === "ADMIN";
   // Both ADMIN and SYSTEM_ADMIN may enter the /admin area (mirrors require_admin).
@@ -386,6 +444,7 @@ export const config = {
     "/select-role",
     "/kyc",
     "/kyc/:path*",
+    "/suspended",
     "/verify-email",
     "/maintenance",
   ],

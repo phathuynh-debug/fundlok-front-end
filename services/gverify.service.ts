@@ -117,6 +117,12 @@ export interface GVerifyKybStatusResponse {
   rejection_reason: string | null;
   tax_code: string | null;
   business_name: string | null;
+  // Read verbatim off the certificate — one free-text line, not structured
+  // parts (the provider's Decode Address API is out of scope backend-side).
+  // Optional: older backends omit both, so treat absent as "not available"
+  // rather than assuming null.
+  company_address?: string | null;
+  date_of_establishment?: string | null;
   updated_at: string | null;
 }
 
@@ -154,7 +160,24 @@ export function kybVerifyResponseToStatus(
 // room than the client's default 20s.
 const VERIFY_TIMEOUT_MS = 60_000;
 
+// A short-lived read URL for the stored KYB certificate. Absent (404) is a
+// normal answer: document retention is best-effort server-side, so an approved
+// SME may still have no stored file and must be asked to upload one.
+export interface GVerifyKybCertificate {
+  url: string;
+  /** Seconds the URL stays valid — 600. */
+  expires_in: number;
+  content_type: string;
+  verification_id: string;
+}
+
 export const gverifyService = {
+  kybGetCertificate() {
+    return apiClient.get<GVerifyKybCertificate>(
+      GVERIFY_ENDPOINTS.kybCertificate,
+    );
+  },
+
   // One-shot KYC: OCR both card faces + face-match the portrait. A REJECTED
   // outcome is still a 2xx — the business verdict is in the body. Only
   // provider failures surface as 502.
