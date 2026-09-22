@@ -243,6 +243,17 @@ export function LoginForm() {
             t("auth.login.submit")
           )}
         </Button>
+
+        <p className="text-xs text-center text-muted-foreground pt-1">
+          {t("auth.login.termsNotice").split("{termsLink}")[0]}
+          <Link
+            href="/terms"
+            className="underline underline-offset-2 hover:text-foreground transition-colors font-medium"
+          >
+            {t("auth.footer.termsLink")}
+          </Link>
+          {t("auth.login.termsNotice").split("{termsLink}")[1]}
+        </p>
       </form>
     </div>
   );

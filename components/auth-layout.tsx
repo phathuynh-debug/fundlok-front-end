@@ -81,7 +81,18 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           </div>
 
           <div className="flex items-center justify-between gap-4 text-sm text-slate-500">
-            <span>{t("auth.footer.copyright")}</span>
+            <div className="flex items-center gap-3">
+              <span>{t("auth.footer.copyright")}</span>
+              <span className="text-slate-600" aria-hidden>
+                •
+              </span>
+              <Link
+                href="/terms"
+                className="hover:text-slate-300 underline underline-offset-2 transition-colors"
+              >
+                {t("auth.footer.termsLink")}
+              </Link>
+            </div>
             <div className="flex items-center gap-3">
               <LocaleSwitcher tone="inverted" />
               <ThemeToggle />
@@ -111,18 +122,29 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           <div className="w-full max-w-md">{children}</div>
         </div>
 
-        {/* Desktop Footer */}
-        <div className="hidden lg:flex items-center justify-center p-6 border-t border-border">
-          <p className="text-sm text-muted-foreground">
-            {t("auth.footer.helpPrefix")}{" "}
+        {/* Form Footer */}
+        <footer className="flex items-center justify-center p-6 border-t border-border">
+          <p className="text-sm text-muted-foreground flex items-center justify-center gap-3 flex-wrap">
+            <span>
+              {t("auth.footer.helpPrefix")}{" "}
+              <Link
+                href="/contact"
+                className="text-foreground font-medium underline underline-offset-2 hover:text-accent transition-colors"
+              >
+                {t("auth.footer.supportLink")}
+              </Link>
+            </span>
+            <span className="text-muted-foreground/60" aria-hidden>
+              •
+            </span>
             <Link
-              href="#"
+              href="/terms"
               className="text-foreground font-medium underline underline-offset-2 hover:text-accent transition-colors"
             >
-              {t("auth.footer.supportLink")}
+              {t("auth.footer.termsLink")}
             </Link>
           </p>
-        </div>
+        </footer>
       </div>
     </motion.div>
   );

@@ -33,6 +33,7 @@ const aboutLinks = [
 const supportLinks = [
   { label: "Contact Us", href: "/contact" },
   { label: "Project Application", href: "/project-application" },
+  { label: "Terms of Service", href: "/terms" },
   { label: "Log In", href: "/login" },
   { label: "Register", href: "/register" },
 ];
@@ -55,7 +56,7 @@ const socialLinks = [
   },
   {
     label: "Email",
-    href: "mailto:hello@fundlok.com",
+    href: "mailto:support@fundlok.com",
     icon: Mail,
   },
 ];

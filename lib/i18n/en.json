@@ -49,11 +49,11 @@
       "reject": "Reject",
       "rescore": "Run again",
       "runScoring": "Run scoring",
+      "scoreAiPendingHint": "No score yet — the sector assessment for this request has not finished.",
       "scoreComplete": "Scoring complete",
       "scoreFailed": "Could not run scoring",
       "scoreGrade": "Business score",
       "scoreHeading": "Grading engine",
-      "scoreAiPendingHint": "No score yet — the sector assessment for this request has not finished.",
       "scoreInconclusive": "The engine could not reach a score",
       "scoreInsufficientHint": "No score was produced — the engine is missing financial inputs for this request. Approving now approves it without one.",
       "scoreNeedsSubmitted": "Scoring runs once the business has submitted this request.",
@@ -141,7 +141,8 @@
     "footer": {
       "copyright": "© 2026 FundLok. All rights reserved.",
       "helpPrefix": "Need help?",
-      "supportLink": "Contact support"
+      "supportLink": "Contact support",
+      "termsLink": "Terms of Service"
     },
     "forgotPassword": {
       "backToLogin": "Back to sign in",
@@ -188,6 +189,7 @@
       "submitting": "Signing In...",
       "successDescription": "Login successful. Redirecting...",
       "successTitle": "Welcome back!",
+      "termsNotice": "By signing in, you agree to FundLok's {termsLink}.",
       "twoFactorBack": "Back to sign in",
       "twoFactorCodeLabel": "Authentication code",
       "twoFactorDescription": "Your password was accepted. Enter the code from your authenticator app to finish signing in.",
@@ -215,6 +217,7 @@
       "submitting": "Creating account...",
       "successDescription": "Your account is ready. Please sign in to continue.",
       "successTitle": "Registration Successful",
+      "termsNotice": "By creating an account, you agree to FundLok's {termsLink}.",
       "validationErrorTitle": "Validation Error"
     },
     "resetPassword": {
@@ -1695,7 +1698,33 @@
     "body": "You cannot sign in or use FundLok while your account is suspended.",
     "contactBtn": "Contact support",
     "contactHint": "If you think this is a mistake, contact our team and we will look into it. Please include the email address on the account.",
-    "signOutBtn": "Sign out",
-    "title": "Your account is suspended"
+    "signOutBtn": "Sign Out",
+    "title": "Your account has been suspended"
+  },
+  "termsPage": {
+    "backToHome": "Back to Home",
+    "badge": "Legal & Regulatory Disclosures",
+    "complianceDesc": "Personal data governance strictly aligned with Decree No. 13/2023/ND-CP on Personal Data Protection.",
+    "complianceTitle": "Decree 13 Compliant",
+    "effectiveDate": "Last updated: 22 September 2026",
+    "lastUpdated": "Last updated: 22 September 2026",
+    "noResults": "No clauses found matching your search term.",
+    "noticeBanner": "FundLok operates strictly as a financial technology and arranger platform. Investor capital sits with licensed custodial bank partners: FundLok is not the owner of those funds, has no right to draw on them for its own purposes, and holds only instruction rights within conditions the bank enforces. FundLok is not a bank and does not lend its own balance sheet. Credit agreements exist directly between Investors and SMEs; Investors bear credit risk.",
+    "noticeTitle": "Operating Model & Custodial Bank Architecture Notice",
+    "searchPlaceholder": "Search terms and conditions...",
+    "sections": {
+      "contact": "Contact Information",
+      "overview": "Overview & Operating Model",
+      "partA": "Part A: General Terms",
+      "partB": "Part B: Terms of Use",
+      "partC": "Part C: Privacy Policy & Personal Data Protection"
+    },
+    "share": "Share",
+    "shareCopied": "Link copied",
+    "supportDesc": "Our legal and support teams are available to address any inquiries.",
+    "supportTitle": "Questions regarding these terms?",
+    "tableOfContents": "Table of Contents",
+    "title": "FundLok Terms and Conditions of Service",
+    "version": "Version: September 2026"
   }
 }

@@ -12,6 +12,7 @@ const PUBLIC_ROUTES = [
   { path: "/faq", name: "FAQ", titleKey: "faqPage.title" },
   { path: "/why-us", name: "why us", titleKey: "specialPage.title" },
   { path: "/contact", name: "contact", titleKey: "contactPage.title" },
+  { path: "/terms", name: "terms", titleKey: "termsPage.title" },
   { path: "/login", name: "login" },
   { path: "/register", name: "register" },
   {

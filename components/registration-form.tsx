@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTurnstile } from "@/hooks/use-turnstile";
 
@@ -253,6 +254,17 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         {isPending ? t("auth.register.submitting") : t("auth.register.submit")}
       </Button>
+
+      <p className="text-xs text-center text-muted-foreground pt-1">
+        {t("auth.register.termsNotice").split("{termsLink}")[0]}
+        <Link
+          href="/terms"
+          className="underline underline-offset-2 hover:text-foreground transition-colors font-medium"
+        >
+          {t("auth.footer.termsLink")}
+        </Link>
+        {t("auth.register.termsNotice").split("{termsLink}")[1]}
+      </p>
     </form>
   );
 }

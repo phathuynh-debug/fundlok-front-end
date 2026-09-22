@@ -49,11 +49,11 @@
       "reject": "Từ chối",
       "rescore": "Chạy lại",
       "runScoring": "Chạy tính điểm",
+      "scoreAiPendingHint": "Chưa có điểm — phần đánh giá ngành cho đề nghị này chưa hoàn tất.",
       "scoreComplete": "Đã tính điểm xong",
       "scoreFailed": "Không thể chạy tính điểm",
       "scoreGrade": "Điểm doanh nghiệp",
       "scoreHeading": "Engine tính điểm",
-      "scoreAiPendingHint": "Chưa có điểm — phần đánh giá ngành cho đề nghị này chưa hoàn tất.",
       "scoreInconclusive": "Engine chưa đủ dữ liệu để đưa ra điểm",
       "scoreInsufficientHint": "Chưa có điểm — engine còn thiếu dữ liệu tài chính của đề nghị này. Phê duyệt lúc này là phê duyệt khi chưa có điểm.",
       "scoreNeedsSubmitted": "Việc tính điểm chỉ chạy sau khi doanh nghiệp đã gửi đề nghị này.",
@@ -141,7 +141,8 @@
     "footer": {
       "copyright": "© 2026 FundLok. Bảo lưu mọi quyền.",
       "helpPrefix": "Cần hỗ trợ?",
-      "supportLink": "Liên hệ hỗ trợ"
+      "supportLink": "Liên hệ hỗ trợ",
+      "termsLink": "Điều khoản dịch vụ"
     },
     "forgotPassword": {
       "backToLogin": "Quay lại đăng nhập",
@@ -188,6 +189,7 @@
       "submitting": "Đang đăng nhập...",
       "successDescription": "Đăng nhập thành công. Đang chuyển hướng...",
       "successTitle": "Chào mừng trở lại!",
+      "termsNotice": "Bằng việc đăng nhập, bạn đồng ý với {termsLink} của FundLok.",
       "twoFactorBack": "Quay lại đăng nhập",
       "twoFactorCodeLabel": "Mã xác thực",
       "twoFactorDescription": "Mật khẩu đã đúng. Nhập mã từ ứng dụng xác thực của bạn để hoàn tất đăng nhập.",
@@ -215,6 +217,7 @@
       "submitting": "Đang tạo tài khoản...",
       "successDescription": "Tài khoản của bạn đã sẵn sàng. Vui lòng đăng nhập để tiếp tục.",
       "successTitle": "Đăng ký thành công",
+      "termsNotice": "Bằng việc tạo tài khoản, bạn đồng ý với {termsLink} của FundLok.",
       "validationErrorTitle": "Lỗi xác thực"
     },
     "resetPassword": {
@@ -1697,5 +1700,31 @@
     "contactHint": "Nếu bạn cho rằng đây là nhầm lẫn, vui lòng liên hệ với chúng tôi để được kiểm tra. Hãy cung cấp địa chỉ email của tài khoản.",
     "signOutBtn": "Đăng xuất",
     "title": "Tài khoản của bạn đã bị tạm khóa"
+  },
+  "termsPage": {
+    "backToHome": "Quay lại trang chủ",
+    "badge": "Văn bản pháp lý & Quy định nền tảng",
+    "complianceDesc": "Bảo vệ dữ liệu cá nhân theo Nghị định 13/2023/NĐ-CP được tích hợp vào toàn bộ hệ sinh thái FundLok.",
+    "complianceTitle": "Bảo mật Nghị định 13",
+    "effectiveDate": "Ngày cập nhật: 22 tháng 9 năm 2026",
+    "lastUpdated": "Ngày cập nhật: 22 tháng 9 năm 2026",
+    "noResults": "Không tìm thấy điều khoản phù hợp với từ khóa tìm kiếm.",
+    "noticeBanner": "FundLok là nền tảng công nghệ kết nối tài chính. Tiền của Nhà đầu tư được lưu giữ tại các đối tác ngân hàng lưu ký (custodial bank partners) độc lập. FundLok không phải là ngân hàng hay tổ chức tín dụng, không sở hữu tiền của người dùng và chỉ nắm giữ quyền chỉ thị thanh toán theo các điều kiện nghiêm ngặt do ngân hàng thực thi. Hợp đồng tài trợ vốn được xác lập trực tiếp giữa Doanh nghiệp và Nhà đầu tư; Nhà đầu tư là bên cấp vốn và tự chịu rủi ro tín dụng nếu doanh nghiệp không đạt kỳ vọng.",
+    "noticeTitle": "Thông báo về mô hình vận hành và lưu ký độc lập",
+    "searchPlaceholder": "Tìm kiếm điều khoản và quy định...",
+    "sections": {
+      "contact": "Thông tin liên hệ",
+      "overview": "Tổng quan & Cơ chế hoạt động",
+      "partA": "Phần A: Điều khoản chung",
+      "partB": "Phần B: Điều khoản sử dụng",
+      "partC": "Phần C: Chính sách bảo mật & Bảo vệ dữ liệu cá nhân"
+    },
+    "share": "Chia sẻ",
+    "shareCopied": "Đã sao chép liên kết",
+    "supportDesc": "Bộ phận pháp chế và hỗ trợ FundLok sẵn sàng giải đáp mọi câu hỏi của bạn.",
+    "supportTitle": "Bạn có thắc mắc về điều khoản dịch vụ?",
+    "tableOfContents": "Mục lục điều khoản",
+    "title": "Điều khoản và Điều kiện sử dụng dịch vụ FundLok",
+    "version": "Phiên bản: Tháng 9 năm 2026"
   }
 }
