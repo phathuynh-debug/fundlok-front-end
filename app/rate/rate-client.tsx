@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { AlertCircle, Info, Loader2 } from "lucide-react";
@@ -35,6 +35,81 @@ function parseAmount(raw: string): number | null {
   if (!normalized) return null;
   const value = Number(normalized);
   return Number.isFinite(value) ? value : null;
+}
+
+/**
+ * Thousand separators, in the reader's convention: "400.000.000" in Vietnamese,
+ * "400,000,000" in English.
+ *
+ * Grouped with a regex rather than `toLocaleString`, which would route through
+ * a double. VND amounts run to 13 digits here and a pasted value could be
+ * longer; regex grouping is exact at any length and never rounds a figure the
+ * applicant typed.
+ */
+function groupDigits(digits: string, locale: string): string {
+  const separator = locale === "vi" ? "." : ",";
+  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, separator);
+}
+
+const digitsOnly = (raw: string) => raw.replace(/\D/g, "");
+
+/**
+ * A money field that formats as you type.
+ *
+ * State holds digits only; the separators exist just for reading. Formatting
+ * on every keystroke would otherwise drop the caret to the end mid-edit — fine
+ * while appending, maddening when correcting a digit in the middle — so the
+ * caret is re-placed after the same NUMBER OF DIGITS it preceded, which is
+ * stable across the separators shifting around it.
+ */
+function AmountInput({
+  value,
+  onChange,
+  locale,
+  placeholder,
+}: {
+  value: string;
+  onChange: (digits: string) => void;
+  locale: string;
+  placeholder?: string;
+}) {
+  const ref = useRef<HTMLInputElement>(null);
+  const caretDigits = useRef<number | null>(null);
+
+  useEffect(() => {
+    const input = ref.current;
+    const target = caretDigits.current;
+    if (!input || target === null) return;
+    caretDigits.current = null;
+
+    const formatted = input.value;
+    let seen = 0;
+    let position = formatted.length;
+    for (let i = 0; i < formatted.length; i++) {
+      if (seen === target) {
+        position = i;
+        break;
+      }
+      if (/\d/.test(formatted[i])) seen += 1;
+    }
+    input.setSelectionRange(position, position);
+  }, [value]);
+
+  return (
+    <Input
+      ref={ref}
+      inputMode="numeric"
+      value={groupDigits(value, locale)}
+      placeholder={placeholder}
+      onChange={(event) => {
+        const caret = event.target.selectionStart ?? event.target.value.length;
+        caretDigits.current = digitsOnly(
+          event.target.value.slice(0, caret),
+        ).length;
+        onChange(digitsOnly(event.target.value));
+      }}
+    />
+  );
 }
 
 const DURATIONS = [6, 12] as const;
@@ -110,19 +185,34 @@ export default function RateClient() {
     label: string,
     value: string,
     onChange: (v: string) => void,
-    opts: { hint?: string; placeholder?: string; optional?: boolean } = {},
+    opts: {
+      hint?: string;
+      placeholder?: string;
+      optional?: boolean;
+      /** Money: group thousands as the visitor types. */
+      amount?: boolean;
+    } = {},
   ) => (
     <div className="space-y-1.5">
       <label className="flex items-baseline gap-2 text-sm font-medium text-foreground">
         {label}
         {!opts.optional && <span className="text-xs text-destructive">*</span>}
       </label>
-      <Input
-        inputMode="numeric"
-        value={value}
-        placeholder={opts.placeholder}
-        onChange={(e) => onChange(e.target.value)}
-      />
+      {opts.amount ? (
+        <AmountInput
+          value={value}
+          onChange={onChange}
+          locale={locale}
+          placeholder={opts.placeholder}
+        />
+      ) : (
+        <Input
+          inputMode="numeric"
+          value={value}
+          placeholder={opts.placeholder}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      )}
       {opts.hint && (
         <p className="text-xs leading-relaxed text-muted-foreground">
           {opts.hint}
@@ -197,28 +287,34 @@ export default function RateClient() {
             </div>
 
             {field(t("ratePage.revenueLast"), revenueLast, setRevenueLast, {
+              amount: true,
               placeholder: "4000000000",
             })}
             {field(t("ratePage.revenuePrior"), revenuePrior, setRevenuePrior, {
+              amount: true,
               hint: t("ratePage.revenuePriorHint"),
               placeholder: "3200000000",
             })}
 
             <div className="grid gap-4 sm:grid-cols-2">
               {field(t("ratePage.cogs"), cogs, setCogs, {
+                amount: true,
                 placeholder: "2400000000",
               })}
               {field(t("ratePage.fixedCost"), fixedCost, setFixedCost, {
+                amount: true,
                 hint: t("ratePage.fixedCostHint"),
                 placeholder: "600000000",
               })}
             </div>
             {field(t("ratePage.variableCost"), variableCost, setVariableCost, {
+              amount: true,
               optional: true,
               placeholder: "300000000",
             })}
 
             {field(t("ratePage.loanAmount"), loanAmount, setLoanAmount, {
+              amount: true,
               hint: t("ratePage.loanAmountHint"),
               placeholder: "800000000",
             })}
@@ -262,10 +358,12 @@ export default function RateClient() {
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 {field(t("ratePage.bestMonth"), bestMonth, setBestMonth, {
+                  amount: true,
                   optional: true,
                   placeholder: "480000000",
                 })}
                 {field(t("ratePage.worstMonth"), worstMonth, setWorstMonth, {
+                  amount: true,
                   optional: true,
                   placeholder: "210000000",
                 })}
