@@ -19,6 +19,7 @@ import {
 const NAV_LINKS = [
   { href: "/", labelKey: "header.home" },
   { href: "/why-us", labelKey: "header.whyUs" },
+  { href: "/rate", labelKey: "header.rate" },
   { href: "/faq", labelKey: "header.faq" },
   { href: "/contact", labelKey: "header.contactUs" },
 ] as const;
