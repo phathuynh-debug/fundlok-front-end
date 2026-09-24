@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { NumericInput } from "@/components/ui/numeric-input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Banknote } from "lucide-react";
@@ -138,13 +138,12 @@ export function InvestmentTab() {
               <span className="absolute right-3.5 top-3 text-muted-foreground font-medium">
                 ₫
               </span>
-              <Input
+              <NumericInput
                 id="investmentAmount"
-                type="number"
                 placeholder={t("investment.tab.placeholder")}
                 className="pr-8 bg-muted/20 border-muted focus-visible:ring-1 focus-visible:ring-foreground py-5 rounded-xl text-base"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onValueChange={setAmount}
                 disabled={isPending}
                 required
               />

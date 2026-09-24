@@ -2,13 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { AlertCircle, Info, Loader2 } from "lucide-react";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
+import { AlertCircle, Info, Loader2, Sparkles } from "lucide-react";
 import SiteHeader from "@/components/site-header";
 import SiteFooter from "@/components/site-footer";
 import { BackgroundBlobs } from "@/components/background-blobs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { NumericInput } from "@/components/ui/numeric-input";
+import { digitsOnly } from "@/lib/format-currency";
 import { useTranslations } from "@/lib/i18n";
 import { useRateEstimate } from "@/hooks/use-loans";
 import { INDUSTRY_OPTIONS } from "@/lib/constants/industries";
@@ -50,8 +52,6 @@ function groupDigits(digits: string, locale: string): string {
   const separator = locale === "vi" ? "." : ",";
   return digits.replace(/\B(?=(\d{3})+(?!\d))/g, separator);
 }
-
-const digitsOnly = (raw: string) => raw.replace(/\D/g, "");
 
 /**
  * A money field that formats as you type.
@@ -228,9 +228,106 @@ function validate(v: Values, t: (key: string) => string): Errors {
   return errors;
 }
 
+/* --------------------------------------------------------------------------
+ * Result reveal
+ *
+ * Pressing Calculate is the one moment on this page worth marking: the visitor
+ * has typed nine figures and is owed a payoff. The reveal is deliberately
+ * DECORATIVE ONLY — nothing here adds or emphasises copy. A band is indicative
+ * and provisional, so a flourish that read as "approved" would be a compliance
+ * defect (see this file's header), which is why the celebration lives in motion
+ * and never in words, and why the not-an-offer line keeps its place in the
+ * stagger rather than being pushed below the fold.
+ * ------------------------------------------------------------------------ */
+
+const resultVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08, delayChildren: 0.04 },
+  },
+};
+
+const resultItemVariants: Variants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 260, damping: 22 },
+  },
+};
+
+/** The two headline figures overshoot slightly on the way in — the rest of the
+ *  panel only rises. */
+const figureVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.82 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { type: "spring", stiffness: 340, damping: 15 },
+  },
+};
+
+/** Precomputed so the burst is identical on every run and costs nothing to
+ *  render — a random spray would also re-randomise on every React re-render. */
+const BURST_PIECES = Array.from({ length: 16 }, (_, index) => {
+  const angle = (index / 16) * Math.PI * 2;
+  const distance = 52 + (index % 4) * 18;
+  return {
+    id: index,
+    x: Math.cos(angle) * distance,
+    y: Math.sin(angle) * distance * 0.7,
+    delay: (index % 5) * 0.025,
+  };
+});
+
+const BURST_COLORS = [
+  "bg-emerald-400",
+  "bg-emerald-500/70",
+  "bg-amber-400/80",
+] as const;
+
+/** One-shot confetti behind the result heading. Purely decorative: aria-hidden
+ *  so a screen reader never meets it, and not rendered at all for a visitor who
+ *  has asked for reduced motion. */
+function ResultBurst() {
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute left-1/2 top-6 z-0 h-0 w-0"
+    >
+      {BURST_PIECES.map((piece) => (
+        <motion.span
+          key={piece.id}
+          className={cn(
+            "absolute h-1.5 w-1.5 rounded-full",
+            BURST_COLORS[piece.id % BURST_COLORS.length],
+          )}
+          // Single-value targets, not keyframe arrays: the piece starts visible
+          // at the origin and flies outward as it fades. Same shape of animation
+          // the rest of this page already uses.
+          initial={{ opacity: 1, scale: 1, x: 0, y: 0 }}
+          animate={{ opacity: 0, scale: 0.4, x: piece.x, y: piece.y }}
+          transition={{
+            duration: 1,
+            delay: piece.delay,
+            ease: "easeOut",
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/** Clearance for the sticky site header, so a scrolled-to panel does not tuck
+ *  its own heading underneath it. */
+const HEADER_CLEARANCE_PX = 88;
+
 export default function RateClient() {
   const { locale, t } = useTranslations();
   const estimate = useRateEstimate();
+  const reduceMotion = useReducedMotion();
+  const resultRef = useRef<HTMLDivElement>(null);
 
   const [industry, setIndustry] = useState("");
   const [operatingMonths, setOperatingMonths] = useState("");
@@ -278,6 +375,43 @@ export default function RateClient() {
       : undefined;
 
   const canSubmit = Object.keys(errors).length === 0 && !!industry.trim();
+
+  // Brings the result panel into view once a band (or an error) has rendered —
+  // the mobile case, where the panel sits a full screen below the button that
+  // produced it.
+  //
+  // An effect, not the mutation's `onSuccess`. onSuccess runs BEFORE React
+  // re-renders, so measuring there sizes the panel in its short empty state,
+  // which fits on screen and makes the scroll look unnecessary; on mobile that
+  // silently did nothing at all. An effect runs after the DOM is committed, so
+  // the measurement is of the panel the visitor is about to see. Deferring to
+  // requestAnimationFrame would fix the measurement too, but rAF is throttled
+  // whenever the tab is not painting and the scroll would then never happen.
+  //
+  // `settledAt` changes once per calculation, so this fires once per press and
+  // not on every keystroke.
+  const settledAt = estimate.isPending ? null : estimate.submittedAt || null;
+
+  useEffect(() => {
+    if (!settledAt) return;
+    const el = resultRef.current;
+    if (!el) return;
+
+    // The test is on the panel's TOP, not on whether the whole panel fits: the
+    // top is where the heading and the two figures are, and a filled panel is
+    // routinely taller than a laptop viewport. Requiring it to fit entirely
+    // would scroll on desktop too, where the two columns already sit side by
+    // side and any movement is a jolt for no gain.
+    const top = el.getBoundingClientRect().top;
+    const comfortablyInView =
+      top >= HEADER_CLEARANCE_PX && top <= window.innerHeight * 0.5;
+    if (comfortablyInView) return;
+
+    window.scrollTo({
+      top: top + window.scrollY - HEADER_CLEARANCE_PX,
+      behavior: reduceMotion ? "auto" : "smooth",
+    });
+  }, [settledAt, reduceMotion]);
 
   const onSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -350,13 +484,12 @@ export default function RateClient() {
             onBlur={() => markTouched(name)}
           />
         ) : (
-          <Input
-            inputMode="numeric"
+          <NumericInput
             value={value}
             placeholder={opts.placeholder}
             aria-invalid={Boolean(error)}
             onBlur={() => markTouched(name)}
-            onChange={(e) => onChange(e.target.value)}
+            onValueChange={onChange}
           />
         )}
         {/* The message sits under the field that caused it, not in a summary
@@ -616,10 +749,11 @@ export default function RateClient() {
 
           {/* ---------------- Result ---------------- */}
           <motion.div
+            ref={resultRef}
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.28, ease: "easeOut" }}
-            className="rounded-2xl border border-border bg-card p-6 shadow-xs lg:sticky lg:top-24"
+            className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-xs lg:sticky lg:top-24"
           >
             {!data && !estimate.isError && (
               <p className="py-12 text-center text-sm text-muted-foreground">
@@ -636,15 +770,38 @@ export default function RateClient() {
               </div>
             )}
 
+            {/* A SIBLING of the staggered panel below, not a child of it: the
+                burst is chrome, and inside that container it would be dealt a
+                turn in the content stagger. Keyed separately so it replays per
+                calculation. */}
+            {data && !reduceMotion && (
+              <ResultBurst key={`burst-${estimate.submittedAt}`} />
+            )}
+
             {data && (
               <motion.div
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
-                className="space-y-5"
+                // Keyed on the mutation's own timestamp so a recalculation
+                // replays the reveal. Without it React reuses the subtree and
+                // a visitor who tweaks a figure watches a new band appear with
+                // no acknowledgement that anything happened.
+                key={estimate.submittedAt}
+                variants={resultVariants}
+                initial="hidden"
+                animate="visible"
+                className="relative z-10 space-y-5"
               >
-                <div className="flex items-start justify-between gap-3">
-                  <h2 className="text-lg font-bold">
+                <motion.div
+                  variants={resultItemVariants}
+                  className="flex items-start justify-between gap-3"
+                >
+                  <h2 className="flex items-center gap-2 text-lg font-bold">
+                    <motion.span
+                      variants={figureVariants}
+                      className="inline-flex"
+                      aria-hidden
+                    >
+                      <Sparkles className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
+                    </motion.span>
                     {t("ratePage.resultTitle")}
                   </h2>
                   {data.provisional && (
@@ -652,19 +809,25 @@ export default function RateClient() {
                       {t("ratePage.provisional")}
                     </span>
                   )}
-                </div>
+                </motion.div>
 
                 {/* Both as ranges. The visitor's CIC score is unknown, so a
                     single figure would claim a precision this does not have. */}
-                <div className="grid gap-4 sm:grid-cols-2">
+                <motion.div
+                  variants={resultItemVariants}
+                  className="grid gap-4 sm:grid-cols-2"
+                >
                   <div className="space-y-1">
                     <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                       {t("ratePage.scoreLabel")}
                     </p>
                     <div className="flex items-baseline gap-1.5">
-                      <span className="font-mono text-2xl font-bold tracking-tight">
+                      <motion.span
+                        variants={figureVariants}
+                        className="origin-left font-mono text-2xl font-bold tracking-tight"
+                      >
                         {score(data.score_low)} – {score(data.score_high)}
-                      </span>
+                      </motion.span>
                       <span className="text-xs text-muted-foreground">
                         {t("ratePage.scoreOutOf")}
                       </span>
@@ -675,22 +838,31 @@ export default function RateClient() {
                       {t("ratePage.rateLabel")}
                     </p>
                     <div className="flex items-baseline gap-1.5">
-                      <span className="font-mono text-2xl font-bold tracking-tight">
+                      <motion.span
+                        variants={figureVariants}
+                        className="origin-left font-mono text-2xl font-bold tracking-tight"
+                      >
                         {pct(data.rate_low_pct)} – {pct(data.rate_high_pct)}
-                      </span>
+                      </motion.span>
                       <span className="text-xs text-muted-foreground">
                         {t("ratePage.perYear")}
                       </span>
                     </div>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Read with the number, not below it. */}
-                <p className="text-xs font-medium leading-relaxed text-foreground">
+                <motion.p
+                  variants={resultItemVariants}
+                  className="text-xs font-medium leading-relaxed text-foreground"
+                >
                   {t("ratePage.notAnOffer")}
-                </p>
+                </motion.p>
 
-                <div className="space-y-1.5 border-t border-border/60 pt-3">
+                <motion.div
+                  variants={resultItemVariants}
+                  className="space-y-1.5 border-t border-border/60 pt-3"
+                >
                   <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                     <Info className="h-3 w-3" />
                     {t("ratePage.assumptionsTitle")}
@@ -716,9 +888,12 @@ export default function RateClient() {
                       );
                     })}
                   </ul>
-                </div>
+                </motion.div>
 
-                <div className="rounded-xl border border-border/70 bg-muted/20 p-4">
+                <motion.div
+                  variants={resultItemVariants}
+                  className="rounded-xl border border-border/70 bg-muted/20 p-4"
+                >
                   <p className="text-sm font-bold">{t("ratePage.ctaTitle")}</p>
                   <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
                     {t("ratePage.ctaBody")}
@@ -728,7 +903,7 @@ export default function RateClient() {
                       {t("ratePage.ctaButton")}
                     </Link>
                   </Button>
-                </div>
+                </motion.div>
               </motion.div>
             )}
           </motion.div>
