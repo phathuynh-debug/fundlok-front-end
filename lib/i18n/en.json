@@ -256,7 +256,6 @@
       "alreadyHaveAccount": "Already have an account?",
       "createAccount": "Create your account",
       "dontHaveAccount": "Don't have an account?",
-      "registerSectionTitle": "Your details",
       "signIn": "Sign in",
       "signUp": "Sign up",
       "welcomeBack": "Welcome back"
@@ -283,7 +282,6 @@
     "contactSupport": "Contact support",
     "copyright": "© 2026 FundLok. All rights reserved.",
     "createAccount": "Create account",
-    "createAnAccount": "Create an Account",
     "dashboard": "Dashboard",
     "edit": "Edit",
     "filter": "Filter:",

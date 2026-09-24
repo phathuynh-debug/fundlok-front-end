@@ -35,7 +35,7 @@ const supportLinks = [
   { label: "Project Application", href: "/project-application" },
   { label: "Terms of Service", href: "/terms" },
   { label: "Log In", href: "/login" },
-  { label: "Register", href: "/register" },
+  { label: "Register", href: "/login?mode=register" },
 ];
 
 const socialLinks = [

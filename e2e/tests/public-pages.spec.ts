@@ -14,7 +14,9 @@ const PUBLIC_ROUTES = [
   { path: "/contact", name: "contact", titleKey: "contactPage.title" },
   { path: "/terms", name: "terms", titleKey: "termsPage.title" },
   { path: "/login", name: "login" },
-  { path: "/register", name: "register" },
+  // Sign-up is a mode of the login page, not its own route — /register was
+  // removed and 308s here.
+  { path: "/login?mode=register", name: "register" },
   {
     path: "/forgot-password",
     name: "forgot password",
@@ -30,8 +32,11 @@ for (const route of PUBLIC_ROUTES) {
     expect(response?.status(), `${route.path} should not error`).toBeLessThan(
       400,
     );
+    // Escape every regex metacharacter, not just the leading slash: one route
+    // carries a query string, and a bare `?` would silently turn the preceding
+    // character optional instead of matching.
     await expect(page).toHaveURL(
-      new RegExp(`${route.path.replace("/", "\\/")}$`),
+      new RegExp(`${route.path.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`),
     );
 
     if (route.titleKey) {
@@ -64,7 +69,7 @@ test("the landing page links to sign in", async ({ page }) => {
 test("registration asks for the fields the backend requires", async ({
   page,
 }) => {
-  await page.goto("/register");
+  await page.goto("/login?mode=register");
 
   for (const key of [
     "auth.register.fullNameLabel",
@@ -79,7 +84,7 @@ test("registration asks for the fields the backend requires", async ({
 test("registration rejects mismatched passwords client-side", async ({
   page,
 }) => {
-  await page.goto("/register");
+  await page.goto("/login?mode=register");
 
   await page.getByLabel(t("auth.register.fullNameLabel")).fill("E2E Person");
   await page.getByLabel(t("auth.register.emailLabel")).fill("new@e2e.test");

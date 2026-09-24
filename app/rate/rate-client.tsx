@@ -705,7 +705,9 @@ export default function RateClient() {
                     {t("ratePage.ctaBody")}
                   </p>
                   <Button asChild size="sm" className="mt-3">
-                    <Link href="/register">{t("ratePage.ctaButton")}</Link>
+                    <Link href="/login?mode=register">
+                      {t("ratePage.ctaButton")}
+                    </Link>
                   </Button>
                 </div>
               </motion.div>

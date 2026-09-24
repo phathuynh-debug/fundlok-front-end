@@ -51,10 +51,17 @@ export function AuthFormSwitcher({ initialMode }: AuthFormSwitcherProps) {
     setMode(next);
 
     // Keep the URL in sync for login/register (no dedicated route for the
-    // post-register verify step — it stays on the current URL).
+    // post-register verify step — it stays on the current URL). Register is
+    // `/login?mode=register`, which the page reads back on a reload; the old
+    // value here was "/", so refreshing mid-signup dropped the visitor on the
+    // marketing landing page.
     if (next === "login" || next === "register") {
       // Update URL without triggering full Next.js navigation to prevent double animation
-      window.history.pushState(null, "", next === "login" ? "/login" : "/");
+      window.history.pushState(
+        null,
+        "",
+        next === "login" ? "/login" : "/login?mode=register",
+      );
     }
 
     // Duration matches transition + a little buffer
@@ -104,12 +111,12 @@ export function AuthFormSwitcher({ initialMode }: AuthFormSwitcherProps) {
                       {t("auth.switcher.dontHaveAccount")}{" "}
                       {/* A real href, not a bare button. This switch is an
                           in-place animation that rewrites the URL, so a
-                          crawler previously saw no path at all from /login to
-                          /register — and a reader could not open it in a new
-                          tab. The click is intercepted for the normal case and
-                          left alone when a modifier key means "new tab". */}
+                          crawler would otherwise see no path at all to the
+                          sign-up form — and a reader could not open it in a
+                          new tab. The click is intercepted for the normal case
+                          and left alone when a modifier key means "new tab". */}
                       <a
-                        href="/register"
+                        href="/login?mode=register"
                         onClick={(event) => {
                           if (
                             event.metaKey ||

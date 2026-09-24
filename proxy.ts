@@ -16,7 +16,9 @@ const PROTECTED_ROUTES = [
 ];
 
 // Routes that should redirect based on whether the user already has projects.
-const AUTH_ROUTES = ["/login", "/register", "/"];
+// `/login` covers sign-up too (?mode=register); /register was removed and now
+// 308s here from next.config.
+const AUTH_ROUTES = ["/login", "/"];
 const APPLICATION_ROUTE = "/project-application";
 const DASHBOARD_ROUTE = "/dashboard";
 const ADMIN_ROUTE = "/admin";
@@ -33,7 +35,7 @@ const MAINTENANCE_ROUTE = "/maintenance";
 const SUSPENDED_ROUTE = "/suspended";
 // During maintenance only the auth entry points are blocked — public pages and
 // the rest of the site stay accessible.
-const MAINTENANCE_BLOCKED_ROUTES = ["/login", "/register"];
+const MAINTENANCE_BLOCKED_ROUTES = ["/login"];
 
 // --- On-demand verification gates ---
 // KYC/KYB is NOT a blanket gate after login anymore. Users register, pick a
@@ -121,7 +123,6 @@ function isHandledRoute(pathname: string) {
   return (
     pathname === "/" ||
     pathname === "/login" ||
-    pathname === "/register" ||
     pathname === "/verify-email" ||
     pathname === SELECT_ROLE_ROUTE ||
     pathname === SUSPENDED_ROUTE ||
@@ -237,11 +238,12 @@ export async function proxy(request: NextRequest) {
   const hasRole = !!currentUser?.role;
 
   // --- Maintenance gate ---
-  // During maintenance only the auth entry points (login/register) are blocked;
-  // public pages stay fully accessible. System admins are never blocked.
+  // During maintenance only the auth entry point (/login, which also serves
+  // sign-up at ?mode=register) is blocked; public pages stay fully accessible.
+  // System admins are never blocked.
   //
-  // Scope is deliberate and load-bearing: the flag is only READ on those two
-  // routes and /maintenance itself. The public marketing pages (/why-us, /faq,
+  // Scope is deliberate and load-bearing: the flag is only READ on that route
+  // and /maintenance itself. The public marketing pages (/why-us, /faq,
   // /contact, …) aren't in the matcher at all, and `/` is matched but never
   // reaches this branch — so browsing the site costs zero maintenance lookups.
   // The lookup itself is cached in middleware.service.ts; see the note there
@@ -435,7 +437,6 @@ export const config = {
     "/api/:path*",
     "/",
     "/login",
-    "/register",
     "/dashboard/:path*",
     "/project-application",
     "/project-application/:path*",

@@ -38,13 +38,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
     },
     {
+      // Sign-up lives on this page too, at ?mode=register. The query variant is
+      // deliberately not listed separately — it is the same document.
       url: `${SITE_URL}/login`,
-      lastModified,
-      changeFrequency: "monthly",
-      priority: 0.5,
-    },
-    {
-      url: `${SITE_URL}/register`,
       lastModified,
       changeFrequency: "monthly",
       priority: 0.5,
