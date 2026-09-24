@@ -67,11 +67,15 @@ function AmountInput({
   onChange,
   locale,
   placeholder,
+  invalid,
+  onBlur,
 }: {
   value: string;
   onChange: (digits: string) => void;
   locale: string;
   placeholder?: string;
+  invalid?: boolean;
+  onBlur?: () => void;
 }) {
   const ref = useRef<HTMLInputElement>(null);
   const caretDigits = useRef<number | null>(null);
@@ -101,6 +105,8 @@ function AmountInput({
       inputMode="numeric"
       value={groupDigits(value, locale)}
       placeholder={placeholder}
+      aria-invalid={invalid}
+      onBlur={onBlur}
       onChange={(event) => {
         const caret = event.target.selectionStart ?? event.target.value.length;
         caretDigits.current = digitsOnly(
@@ -113,6 +119,114 @@ function AmountInput({
 }
 
 const DURATIONS = [6, 12] as const;
+
+// The engine's own bounds, restated so the visitor is told before a round
+// trip. The server re-checks all of them -- this is convenience, not a
+// security boundary.
+const VND_MAX = 1_000_000_000_000;
+const LOAN_MIN = 200_000_000;
+const LOAN_MAX = 5_000_000_000;
+
+type Values = Record<string, string>;
+type Errors = Record<string, string>;
+
+/**
+ * Per-field validation, keyed by field name so each message renders under the
+ * input that caused it.
+ *
+ * The costs-vs-revenue check is the reason this exists rather than leaving it
+ * to the server: it is the most common way a figure set is unscoreable, and
+ * the server can only answer "your costs exceed your revenue" about the whole
+ * form. Caught here it lands under the cost fields, in the reader's language,
+ * before anything is sent.
+ */
+function validate(v: Values, t: (key: string) => string): Errors {
+  const errors: Errors = {};
+  const num = (key: string) => parseAmount(v[key] ?? "");
+  const e = (key: string) => `ratePage.error.${key}`;
+
+  for (const key of [
+    "operatingMonths",
+    "employeeCount",
+    "revenueLast",
+    "revenuePrior",
+    "cogs",
+    "fixedCost",
+    "loanAmount",
+  ]) {
+    if (!(v[key] ?? "").trim()) errors[key] = t(e("required"));
+  }
+
+  const months = num("operatingMonths");
+  if (!errors.operatingMonths && (months === null || months < 1)) {
+    errors.operatingMonths = t(e("operatingRange"));
+  }
+
+  const staff = num("employeeCount");
+  if (!errors.employeeCount && (staff === null || staff < 1 || staff > 200)) {
+    errors.employeeCount = t(e("employeeRange"));
+  }
+
+  for (const key of ["revenueLast", "revenuePrior", "cogs", "fixedCost"]) {
+    if (errors[key]) continue;
+    const value = num(key);
+    if (value === null || value <= 0) errors[key] = t(e("mustBePositive"));
+    else if (value > VND_MAX) errors[key] = t(e("tooLarge"));
+  }
+
+  const loan = num("loanAmount");
+  if (
+    !errors.loanAmount &&
+    (loan === null || loan < LOAN_MIN || loan > LOAN_MAX)
+  ) {
+    errors.loanAmount = t(e("loanRange"));
+  }
+
+  // Costs against the revenue they were incurred against. Flagged on every
+  // cost field, because any one of the three could be the mistyped one and
+  // marking only the last would point at the wrong number.
+  const revenue = num("revenueLast");
+  const costs =
+    (num("cogs") ?? 0) + (num("fixedCost") ?? 0) + (num("variableCost") ?? 0);
+  if (
+    revenue !== null &&
+    revenue > 0 &&
+    costs >= revenue &&
+    !errors.cogs &&
+    !errors.fixedCost
+  ) {
+    const message = t(e("costsExceedRevenue"));
+    errors.cogs = message;
+    errors.fixedCost = message;
+    if ((v.variableCost ?? "").trim()) errors.variableCost = message;
+  }
+
+  const best = num("bestMonth");
+  const worst = num("worstMonth");
+  if (best !== null && revenue !== null && best > revenue) {
+    errors.bestMonth = t(e("monthExceedsYear"));
+  }
+  if (worst !== null && revenue !== null && worst > revenue) {
+    errors.worstMonth = t(e("monthExceedsYear"));
+  }
+  if (best !== null && worst !== null && worst > best && !errors.worstMonth) {
+    errors.worstMonth = t(e("worstExceedsBest"));
+  }
+
+  for (const key of ["top1", "top3"]) {
+    const value = num(key);
+    if (value !== null && (value < 0 || value > 100)) {
+      errors[key] = t(e("percentRange"));
+    }
+  }
+  const one = num("top1");
+  const three = num("top3");
+  if (one !== null && three !== null && one > three && !errors.top1) {
+    errors.top1 = t(e("top1ExceedsTop3"));
+  }
+
+  return errors;
+}
 
 export default function RateClient() {
   const { locale, t } = useTranslations();
@@ -133,7 +247,13 @@ export default function RateClient() {
   const [top1, setTop1] = useState("");
   const [top3, setTop3] = useState("");
 
-  const required = [
+  // Which fields the visitor has left, plus whether they have tried to submit.
+  // Errors stay hidden until one of those is true: flagging "required" on a
+  // field nobody has reached yet is nagging, not help.
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+
+  const values: Values = {
     industry,
     operatingMonths,
     employeeCount,
@@ -141,14 +261,28 @@ export default function RateClient() {
     revenuePrior,
     cogs,
     fixedCost,
+    variableCost,
     loanAmount,
-  ];
-  const canSubmit =
-    required.every((v) => v.trim() !== "") && !estimate.isPending;
+    bestMonth,
+    worstMonth,
+    top1,
+    top3,
+  };
+
+  const errors = validate(values, t);
+  const showError = (key: string) =>
+    (submitAttempted || touched[key]) && errors[key] ? errors[key] : undefined;
+  const industryError =
+    (submitAttempted || touched.industry) && !industry.trim()
+      ? t("ratePage.error.required")
+      : undefined;
+
+  const canSubmit = Object.keys(errors).length === 0 && !!industry.trim();
 
   const onSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (!canSubmit) return;
+    setSubmitAttempted(true);
+    if (!canSubmit || estimate.isPending) return;
     estimate.mutate({
       industry,
       operating_months: Number(parseAmount(operatingMonths) ?? 0),
@@ -181,7 +315,11 @@ export default function RateClient() {
 
   const data = estimate.data;
 
+  const markTouched = (name: string) =>
+    setTouched((prev) => (prev[name] ? prev : { ...prev, [name]: true }));
+
   const field = (
+    name: string,
     label: string,
     value: string,
     onChange: (v: string) => void,
@@ -192,34 +330,53 @@ export default function RateClient() {
       /** Money: group thousands as the visitor types. */
       amount?: boolean;
     } = {},
-  ) => (
-    <div className="space-y-1.5">
-      <label className="flex items-baseline gap-2 text-sm font-medium text-foreground">
-        {label}
-        {!opts.optional && <span className="text-xs text-destructive">*</span>}
-      </label>
-      {opts.amount ? (
-        <AmountInput
-          value={value}
-          onChange={onChange}
-          locale={locale}
-          placeholder={opts.placeholder}
-        />
-      ) : (
-        <Input
-          inputMode="numeric"
-          value={value}
-          placeholder={opts.placeholder}
-          onChange={(e) => onChange(e.target.value)}
-        />
-      )}
-      {opts.hint && (
-        <p className="text-xs leading-relaxed text-muted-foreground">
-          {opts.hint}
-        </p>
-      )}
-    </div>
-  );
+  ) => {
+    const error = showError(name);
+    return (
+      <div className="space-y-1.5">
+        <label className="flex items-baseline gap-2 text-sm font-medium text-foreground">
+          {label}
+          {!opts.optional && (
+            <span className="text-xs text-destructive">*</span>
+          )}
+        </label>
+        {opts.amount ? (
+          <AmountInput
+            value={value}
+            onChange={onChange}
+            locale={locale}
+            placeholder={opts.placeholder}
+            invalid={Boolean(error)}
+            onBlur={() => markTouched(name)}
+          />
+        ) : (
+          <Input
+            inputMode="numeric"
+            value={value}
+            placeholder={opts.placeholder}
+            aria-invalid={Boolean(error)}
+            onBlur={() => markTouched(name)}
+            onChange={(e) => onChange(e.target.value)}
+          />
+        )}
+        {/* The message sits under the field that caused it, not in a summary
+          elsewhere on the page — at 3,000,000,000 vs 300,000,000 the whole
+          question is WHICH number is wrong. */}
+        {error ? (
+          <p className="flex items-start gap-1.5 text-xs leading-relaxed text-destructive">
+            <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" />
+            <span>{error}</span>
+          </p>
+        ) : (
+          opts.hint && (
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              {opts.hint}
+            </p>
+          )
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="relative min-h-screen w-full bg-background text-foreground overflow-x-hidden">
@@ -260,7 +417,12 @@ export default function RateClient() {
               <select
                 value={industry}
                 onChange={(e) => setIndustry(e.target.value)}
-                className="h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                onBlur={() => markTouched("industry")}
+                aria-invalid={Boolean(industryError)}
+                className={cn(
+                  "h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                  industryError ? "border-destructive" : "border-input",
+                )}
               >
                 <option value="">{t("ratePage.industryPlaceholder")}</option>
                 {INDUSTRY_OPTIONS.map((option) => (
@@ -269,16 +431,24 @@ export default function RateClient() {
                   </option>
                 ))}
               </select>
+              {industryError && (
+                <p className="flex items-start gap-1.5 text-xs leading-relaxed text-destructive">
+                  <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" />
+                  <span>{industryError}</span>
+                </p>
+              )}
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               {field(
+                "operatingMonths",
                 t("ratePage.operatingMonths"),
                 operatingMonths,
                 setOperatingMonths,
                 { hint: t("ratePage.operatingMonthsHint"), placeholder: "36" },
               )}
               {field(
+                "employeeCount",
                 t("ratePage.employeeCount"),
                 employeeCount,
                 setEmployeeCount,
@@ -286,38 +456,68 @@ export default function RateClient() {
               )}
             </div>
 
-            {field(t("ratePage.revenueLast"), revenueLast, setRevenueLast, {
-              amount: true,
-              placeholder: "4000000000",
-            })}
-            {field(t("ratePage.revenuePrior"), revenuePrior, setRevenuePrior, {
-              amount: true,
-              hint: t("ratePage.revenuePriorHint"),
-              placeholder: "3200000000",
-            })}
+            {field(
+              "revenueLast",
+              t("ratePage.revenueLast"),
+              revenueLast,
+              setRevenueLast,
+              {
+                amount: true,
+                placeholder: "4000000000",
+              },
+            )}
+            {field(
+              "revenuePrior",
+              t("ratePage.revenuePrior"),
+              revenuePrior,
+              setRevenuePrior,
+              {
+                amount: true,
+                hint: t("ratePage.revenuePriorHint"),
+                placeholder: "3200000000",
+              },
+            )}
 
             <div className="grid gap-4 sm:grid-cols-2">
-              {field(t("ratePage.cogs"), cogs, setCogs, {
+              {field("cogs", t("ratePage.cogs"), cogs, setCogs, {
                 amount: true,
                 placeholder: "2400000000",
               })}
-              {field(t("ratePage.fixedCost"), fixedCost, setFixedCost, {
-                amount: true,
-                hint: t("ratePage.fixedCostHint"),
-                placeholder: "600000000",
-              })}
+              {field(
+                "fixedCost",
+                t("ratePage.fixedCost"),
+                fixedCost,
+                setFixedCost,
+                {
+                  amount: true,
+                  hint: t("ratePage.fixedCostHint"),
+                  placeholder: "600000000",
+                },
+              )}
             </div>
-            {field(t("ratePage.variableCost"), variableCost, setVariableCost, {
-              amount: true,
-              optional: true,
-              placeholder: "300000000",
-            })}
+            {field(
+              "variableCost",
+              t("ratePage.variableCost"),
+              variableCost,
+              setVariableCost,
+              {
+                amount: true,
+                optional: true,
+                placeholder: "300000000",
+              },
+            )}
 
-            {field(t("ratePage.loanAmount"), loanAmount, setLoanAmount, {
-              amount: true,
-              hint: t("ratePage.loanAmountHint"),
-              placeholder: "800000000",
-            })}
+            {field(
+              "loanAmount",
+              t("ratePage.loanAmount"),
+              loanAmount,
+              setLoanAmount,
+              {
+                amount: true,
+                hint: t("ratePage.loanAmountHint"),
+                placeholder: "800000000",
+              },
+            )}
 
             <div className="space-y-1.5">
               <label className="text-sm font-medium">
@@ -357,21 +557,33 @@ export default function RateClient() {
                 </p>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
-                {field(t("ratePage.bestMonth"), bestMonth, setBestMonth, {
-                  amount: true,
-                  optional: true,
-                  placeholder: "480000000",
-                })}
-                {field(t("ratePage.worstMonth"), worstMonth, setWorstMonth, {
-                  amount: true,
-                  optional: true,
-                  placeholder: "210000000",
-                })}
-                {field(t("ratePage.top1"), top1, setTop1, {
+                {field(
+                  "bestMonth",
+                  t("ratePage.bestMonth"),
+                  bestMonth,
+                  setBestMonth,
+                  {
+                    amount: true,
+                    optional: true,
+                    placeholder: "480000000",
+                  },
+                )}
+                {field(
+                  "worstMonth",
+                  t("ratePage.worstMonth"),
+                  worstMonth,
+                  setWorstMonth,
+                  {
+                    amount: true,
+                    optional: true,
+                    placeholder: "210000000",
+                  },
+                )}
+                {field("top1", t("ratePage.top1"), top1, setTop1, {
                   optional: true,
                   placeholder: "18",
                 })}
-                {field(t("ratePage.top3"), top3, setTop3, {
+                {field("top3", t("ratePage.top3"), top3, setTop3, {
                   optional: true,
                   placeholder: "41",
                 })}
