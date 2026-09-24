@@ -384,19 +384,33 @@ export default function RateClient() {
       <BackgroundBlobs variant="compact" />
 
       <main className="relative z-10 mx-auto w-full max-w-6xl px-6 py-16 md:py-20">
-        <div className="mb-10 space-y-3 text-center">
+        {/* Entrance motion matches the other public pages (see faq-client):
+            the hero drops in, then the two panels rise with a short cascade so
+            the eye lands on the form first. The panels animate individually
+            rather than under a shared parent — a transformed ancestor would
+            become the containing block for the result card's `lg:sticky` and
+            silently kill it. */}
+        <motion.div
+          initial={{ opacity: 0, y: -16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="mb-10 space-y-3 text-center"
+        >
           <h1 className="text-4xl font-extrabold tracking-tight md:text-5xl">
             {t("ratePage.title")}
           </h1>
           <p className="mx-auto max-w-2xl text-sm leading-7 text-muted-foreground md:text-base">
             {t("ratePage.subtitle")}
           </p>
-        </div>
+        </motion.div>
 
         <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
           {/* ---------------- Form ---------------- */}
-          <form
+          <motion.form
             onSubmit={onSubmit}
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
             className="space-y-5 rounded-2xl border border-border bg-card p-6 shadow-xs"
           >
             <div className="space-y-1">
@@ -598,10 +612,15 @@ export default function RateClient() {
                 ? t("ratePage.calculating")
                 : t("ratePage.submit")}
             </Button>
-          </form>
+          </motion.form>
 
           {/* ---------------- Result ---------------- */}
-          <div className="rounded-2xl border border-border bg-card p-6 shadow-xs lg:sticky lg:top-24">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.28, ease: "easeOut" }}
+            className="rounded-2xl border border-border bg-card p-6 shadow-xs lg:sticky lg:top-24"
+          >
             {!data && !estimate.isError && (
               <p className="py-12 text-center text-sm text-muted-foreground">
                 {t("ratePage.resultEmpty")}
@@ -712,7 +731,7 @@ export default function RateClient() {
                 </div>
               </motion.div>
             )}
-          </div>
+          </motion.div>
         </div>
       </main>
 
