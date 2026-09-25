@@ -26,9 +26,7 @@ test.describe("Terms of Service page and links", () => {
     await page.goto("/terms");
     await settle(page);
 
-    const searchInput = page.getByPlaceholder(
-      t("termsPage.searchPlaceholder"),
-    );
+    const searchInput = page.getByPlaceholder(t("termsPage.searchPlaceholder"));
     await expect(searchInput).toBeVisible();
 
     // Type a query that matches specific terms
