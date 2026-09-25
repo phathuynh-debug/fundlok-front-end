@@ -80,6 +80,13 @@ export const UPLOADS_ENDPOINTS = {
 } as const;
 
 export const LOANS_ENDPOINTS = {
+  /**
+   * Indicative rate for a visitor with no account (the public /rate page).
+   * Unauthenticated and stateless: it stores nothing and returns a band, never
+   * a single rate. The engine runs server-side because the reference rate and
+   * the rating formula are internal pricing inputs.
+   */
+  rateEstimate: "/loans/rate-estimate",
   submit: (applicationId: string) =>
     `/loans/applications/${applicationId}/submit`,
   /**

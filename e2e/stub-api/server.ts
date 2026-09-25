@@ -464,7 +464,7 @@ const server = createServer(async (req, res) => {
 
   // --- Public ---------------------------------------------------------------
 
-  // Read by proxy.ts on /login, /register and /maintenance only. GET only: the
+  // Read by proxy.ts on /login and /maintenance only. GET only: the
   // authenticated PUT (admin toggle) is handled further down.
   if (path === "/system/maintenance" && method === "GET") {
     return json(res, 200, { enabled: false });

@@ -19,6 +19,7 @@ import {
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { NumericInput } from "@/components/ui/numeric-input";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -294,14 +295,13 @@ export function GVerifyKybClient() {
                   >
                     {t("kyc.kyb.taxCodeLabel")}
                   </label>
-                  <Input
+                  <NumericInput
                     id="kyb-tax-code"
-                    inputMode="numeric"
                     maxLength={14}
                     placeholder="1501167629"
                     value={details.taxCode}
                     disabled={submitting}
-                    onChange={(e) => setDetail("taxCode", e.target.value)}
+                    onValueChange={(digits) => setDetail("taxCode", digits)}
                   />
                   <p className="text-xs text-muted-foreground">
                     {t("kyc.kyb.taxCodeHint")}

@@ -58,7 +58,7 @@ test.describe("Terms of Service page and links", () => {
   });
 
   test("registration form links to terms of service", async ({ page }) => {
-    await page.goto("/register");
+    await page.goto("/login?mode=register");
     await settle(page);
 
     // The form notice link

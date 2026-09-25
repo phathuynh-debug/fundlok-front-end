@@ -17,8 +17,8 @@ type MaintenanceFlag = { enabled?: boolean } | null;
 // cached in module scope rather than re-fetched per request.
 //
 // Without this the proxy hit GET /system/maintenance on every request to
-// /login or /register, including the RSC prefetches Next fires when those
-// links merely scroll into view on a public page. That produced a continuous
+// /login, including the RSC prefetches Next fires when those links merely
+// scroll into view on a public page. That produced a continuous
 // stream of requests against the API for a value that changes maybe twice a
 // year. Prefetches can't be filtered out instead: Next strips `rsc`,
 // `next-router-state-tree` and `next-router-prefetch` from `request.headers`
@@ -64,8 +64,9 @@ export const middlewareService = {
   // anonymous visitors). Fails open (returns null) on any error so a backend
   // hiccup never locks the whole site out.
   //
-  // Only the auth entry points (/login, /register) and /maintenance itself
-  // call this — public pages are never gated, so they never trigger a lookup.
+  // Only the auth entry point (/login, which also serves sign-up at
+  // ?mode=register) and /maintenance itself call this — public pages are never
+  // gated, so they never trigger a lookup.
   async getMaintenance(): Promise<MaintenanceFlag> {
     const now = Date.now();
 

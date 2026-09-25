@@ -17,15 +17,22 @@ export function LocaleSwitcher({
   const { locale, setLocale, t } = useTranslations();
   const inverted = tone === "inverted";
 
+  // Two-letter codes rather than the language names. "EN"/"VI" read the same
+  // in either locale, so the control stops changing width when the language
+  // does — the names were the widest thing in the header, and in Vietnamese
+  // ("Tiếng Anh"/"Tiếng Việt") they were nearly twice the English width.
+  //
+  // The full name stays as the accessible name: a screen reader announcing
+  // "V I" is not a language.
   const options = [
-    { value: "en", label: t("localeSwitcher.english") },
-    { value: "vi", label: t("localeSwitcher.vietnamese") },
+    { value: "en", code: "EN", label: t("localeSwitcher.english") },
+    { value: "vi", code: "VI", label: t("localeSwitcher.vietnamese") },
   ] as const;
 
   return (
     <div
       className={cn(
-        "inline-flex rounded-full border p-1 shadow-sm",
+        "inline-flex items-center gap-0.5 rounded-full border p-0.5 shadow-sm",
         inverted
           ? "border-white/20 bg-white/10 backdrop-blur-sm"
           : "border-border bg-background",
@@ -40,8 +47,10 @@ export function LocaleSwitcher({
             type="button"
             onClick={() => setLocale(opt.value)}
             aria-pressed={active}
+            aria-label={opt.label}
+            title={opt.label}
             className={cn(
-              "h-8 rounded-full px-3 text-xs font-medium transition-colors",
+              "h-7 min-w-9 rounded-full px-2.5 text-xs font-semibold tracking-wide transition-colors",
               active
                 ? inverted
                   ? "bg-white text-slate-900"
@@ -51,7 +60,7 @@ export function LocaleSwitcher({
                   : CONTROL_IDLE,
             )}
           >
-            {opt.label}
+            {opt.code}
           </button>
         );
       })}

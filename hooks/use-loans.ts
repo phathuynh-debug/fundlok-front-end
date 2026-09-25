@@ -6,6 +6,9 @@ import {
   loansService,
   type LoanApplicationFiguresPayload,
   type LoanApplicationSubmitResponse,
+  publicRateService,
+  type RateEstimate,
+  type RateEstimatePayload,
 } from "@/services/loans.service";
 import { projectKeys } from "@/hooks/use-projects";
 
@@ -37,5 +40,23 @@ export function useSaveLoanFigures() {
       // The figures are part of the application record the dashboard reads.
       queryClient.invalidateQueries({ queryKey: projectKeys.mine() });
     },
+  });
+}
+
+/**
+ * The public rate calculator (/rate).
+ *
+ * A mutation rather than a query: nothing exists to read until the visitor
+ * presses Calculate, and the result is a function of what they typed rather
+ * than of server state. That also keeps the engine off the keystroke path —
+ * no debounced requests firing as someone types their revenue.
+ *
+ * `retry: false` for the same reason as the wizard's band: every error this
+ * endpoint returns is a 422 describing something the visitor must change.
+ */
+export function useRateEstimate() {
+  return useMutation<RateEstimate, ApiError, RateEstimatePayload>({
+    mutationFn: (payload) => publicRateService.estimate(payload),
+    retry: false,
   });
 }

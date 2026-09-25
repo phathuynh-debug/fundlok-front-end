@@ -52,6 +52,20 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        // /register was a second, plainer copy of the same RegistrationForm
+        // the login page already renders through AuthFormSwitcher. It was
+        // removed rather than kept in sync. The URL was indexed and linked, so
+        // it redirects instead of 404ing — permanent, because it is not coming
+        // back.
+        source: "/register",
+        destination: "/login?mode=register",
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     return [
       {

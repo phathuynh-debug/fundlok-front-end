@@ -36,6 +36,7 @@ import { splitKybAddress } from "@/lib/kyb-address";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { useTranslations } from "@/lib/i18n";
 import { digitsOnly, formatAmountInput } from "@/lib/format-currency";
+import { NumericInput } from "@/components/ui/numeric-input";
 import { cn } from "@/lib/utils";
 import {
   VN_PROVINCES,
@@ -173,7 +174,7 @@ export default function ProjectApplicationClient() {
     }),
     loan: z.object({
       // Engine bounds, not house style: loan_constraints in
-      // grading_params_v1.yaml refuses anything outside 200M-5bn before it
+      // grading_params_v1.yaml refuses anything outside 20M-5bn before it
       // scores, so catch it here rather than as a 500 at scoring time.
       requested_amount: z
         .string()
@@ -632,17 +633,24 @@ export default function ProjectApplicationClient() {
                   htmlFor="employeeCount"
                   error={errors.employee_count?.message}
                 >
-                  <Input
+                  {/* Not `type="number"`: that still accepts e/E/+/- and
+                      reports an empty value while the contents are invalid, so
+                      the form state disagrees with the screen. Headcount is a
+                      plain count — the bounds are the schema's job, the keyboard
+                      is this field's. Written through setValue for the same
+                      reason the amount field below is: `register`'s own onChange
+                      would receive the raw keystroke. */}
+                  <NumericInput
                     id="employeeCount"
-                    type="number"
-                    inputMode="numeric"
-                    min={MIN_EMPLOYEES}
-                    max={MAX_EMPLOYEES}
-                    step="1"
                     placeholder={t(
                       "projectApplication.placeholders.employeeCount",
                     )}
-                    {...register("employee_count")}
+                    value={employeeCount ?? ""}
+                    onValueChange={(digits) =>
+                      setValue("employee_count", digits, {
+                        shouldValidate: true,
+                      })
+                    }
                     disabled={isPending}
                   />
                   {derivedCompanySize ? (
