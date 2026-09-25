@@ -116,7 +116,7 @@ export interface Holding {
 // Eight positions spanning the whole lifecycle — the healthy path AND the four
 // endings, so every status badge is reachable and the screen never implies
 // that nothing goes wrong. Ticket sizes sit between 150M and 700M VND —
-// plausible against the 200M-5B range in lib/constants/loan-constraints.ts.
+// plausible against the 20M-5B range in lib/constants/loan-constraints.ts.
 export const MOCK_HOLDINGS: Holding[] = [
   {
     id: "10000000-0000-0000-0000-000000000001",

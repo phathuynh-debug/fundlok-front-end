@@ -1606,7 +1606,7 @@
       "postalCode": "Postal code is required",
       "repaymentPreference": "Repayment preference is required",
       "requestedAmount": "Enter a requested amount greater than 0",
-      "requestedAmountRange": "Enter an amount between 200,000,000 and 5,000,000,000 VND",
+      "requestedAmountRange": "Enter an amount between 20,000,000 and 5,000,000,000 VND",
       "street": "Street is required",
       "taxId": "Tax ID is required"
     }
@@ -1632,7 +1632,7 @@
     "error": {
       "costsExceedRevenue": "Your costs add up to more than your revenue for the same period, so there is nothing to lend against. Check these figures.",
       "employeeRange": "Between 1 and 200 employees.",
-      "loanRange": "Must be between 200,000,000 ₫ and 5,000,000,000 ₫.",
+      "loanRange": "Must be between 20,000,000 ₫ and 5,000,000,000 ₫.",
       "monthExceedsYear": "A single month cannot be more than the whole year's revenue.",
       "mustBePositive": "Must be greater than zero.",
       "operatingRange": "Enter the number of months, at least 1.",
@@ -1650,7 +1650,7 @@
     "industry": "Industry",
     "industryPlaceholder": "Select your industry",
     "loanAmount": "How much you want",
-    "loanAmountHint": "Between 200,000,000 ₫ and 5,000,000,000 ₫.",
+    "loanAmountHint": "Between 20,000,000 ₫ and 5,000,000,000 ₫.",
     "months12": "12 months",
     "months6": "6 months",
     "notAnOffer": "This is an estimate, not an offer. Your final rate is set after we verify your figures and can differ. FundLok is not a credit rating company.",

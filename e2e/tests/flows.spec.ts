@@ -261,7 +261,7 @@ test.describe("/project-application", () => {
   });
 
   test("rejects a loan below the engine's minimum", async ({ page }) => {
-    // LOAN_MIN_VND is 200,000,000 and the engine's `loan_constraints` reject
+    // LOAN_MIN_VND is 20,000,000 and the engine's `loan_constraints` reject
     // anything under it, so the form must catch this before the API does.
     await fillStepOne(page);
     await next(page);

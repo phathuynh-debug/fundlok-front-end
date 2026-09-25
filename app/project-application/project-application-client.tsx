@@ -174,7 +174,7 @@ export default function ProjectApplicationClient() {
     }),
     loan: z.object({
       // Engine bounds, not house style: loan_constraints in
-      // grading_params_v1.yaml refuses anything outside 200M-5bn before it
+      // grading_params_v1.yaml refuses anything outside 20M-5bn before it
       // scores, so catch it here rather than as a 500 at scoring time.
       requested_amount: z
         .string()

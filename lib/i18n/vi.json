@@ -1606,7 +1606,7 @@
       "postalCode": "Vui lòng nhập mã bưu chính",
       "repaymentPreference": "Vui lòng chọn hình thức trả nợ",
       "requestedAmount": "Vui lòng nhập số tiền vay lớn hơn 0",
-      "requestedAmountRange": "Nhập số tiền từ 200.000.000 đến 5.000.000.000 VND",
+      "requestedAmountRange": "Nhập số tiền từ 20.000.000 đến 5.000.000.000 VND",
       "street": "Vui lòng nhập đường",
       "taxId": "Vui lòng nhập mã số thuế"
     }
@@ -1632,7 +1632,7 @@
     "error": {
       "costsExceedRevenue": "Tổng chi phí của bạn lớn hơn doanh thu cùng kỳ, nên không còn nguồn để tài trợ. Hãy kiểm tra lại các số liệu này.",
       "employeeRange": "Từ 1 đến 200 nhân sự.",
-      "loanRange": "Phải từ 200.000.000 ₫ đến 5.000.000.000 ₫.",
+      "loanRange": "Phải từ 20.000.000 ₫ đến 5.000.000.000 ₫.",
       "monthExceedsYear": "Doanh thu một tháng không thể lớn hơn doanh thu cả năm.",
       "mustBePositive": "Phải lớn hơn 0.",
       "operatingRange": "Nhập số tháng, tối thiểu 1.",
@@ -1650,7 +1650,7 @@
     "industry": "Ngành nghề",
     "industryPlaceholder": "Chọn ngành của bạn",
     "loanAmount": "Số tiền bạn cần",
-    "loanAmountHint": "Từ 200.000.000 ₫ đến 5.000.000.000 ₫.",
+    "loanAmountHint": "Từ 20.000.000 ₫ đến 5.000.000.000 ₫.",
     "months12": "12 tháng",
     "months6": "6 tháng",
     "notAnOffer": "Đây là ước tính, không phải đề nghị cấp vốn. Lãi suất cuối cùng được xác định sau khi chúng tôi xác minh số liệu và có thể khác. FundLok không phải công ty xếp hạng tín nhiệm.",

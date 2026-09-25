@@ -337,9 +337,9 @@ export default function Mockup(props: MockupProps) {
                           </div>
                           <input
                             type="range"
-                            min="200000000"
+                            min="20000000"
                             max="5000000000"
-                            step="100000000"
+                            step="20000000"
                             value={smeLoanSize}
                             onChange={(e) =>
                               setSmeLoanSize(Number(e.target.value))
@@ -732,9 +732,9 @@ export default function Mockup(props: MockupProps) {
                         </div>
                         <input
                           type="range"
-                          min="200000000"
+                          min="20000000"
                           max="5000000000"
-                          step="100000000"
+                          step="20000000"
                           value={smeLoanSize}
                           onChange={(e) =>
                             setSmeLoanSize(Number(e.target.value))

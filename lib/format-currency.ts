@@ -1,6 +1,6 @@
 // VND formatting for every money surface in the app.
 //
-// The platform lends in Vietnamese dong: loan sizes are bounded 200,000,000 to
+// The platform lends in Vietnamese dong: loan sizes are bounded 20,000,000 to
 // 5,000,000,000 VND by the grading engine's `loan_constraints`, repayments are
 // posted in VND, and the marketplace is domestic. There is no USD anywhere in
 // the product.

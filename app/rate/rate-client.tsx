@@ -14,6 +14,7 @@ import { digitsOnly } from "@/lib/format-currency";
 import { useTranslations } from "@/lib/i18n";
 import { useRateEstimate } from "@/hooks/use-loans";
 import { INDUSTRY_OPTIONS } from "@/lib/constants/industries";
+import { LOAN_MAX_VND, LOAN_MIN_VND } from "@/lib/constants/loan-constraints";
 import { cn } from "@/lib/utils";
 
 /**
@@ -120,12 +121,16 @@ function AmountInput({
 
 const DURATIONS = [6, 12] as const;
 
-// The engine's own bounds, restated so the visitor is told before a round
+// The engine's own bounds, checked here so the visitor is told before a round
 // trip. The server re-checks all of them -- this is convenience, not a
 // security boundary.
+//
+// The loan bounds come from the shared constants rather than being retyped: a
+// second copy here is exactly how the form and the application wizard end up
+// disagreeing about what the engine accepts.
 const VND_MAX = 1_000_000_000_000;
-const LOAN_MIN = 200_000_000;
-const LOAN_MAX = 5_000_000_000;
+const LOAN_MIN = LOAN_MIN_VND;
+const LOAN_MAX = LOAN_MAX_VND;
 
 type Values = Record<string, string>;
 type Errors = Record<string, string>;

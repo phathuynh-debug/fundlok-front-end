@@ -19,7 +19,7 @@ interface InvestmentKpisProps {
 
 export function InvestmentKpis({
   // Mock fallback while the page has no real loan attached: 1.25bn VND sits
-  // inside the engine's 200M-5bn range, so it reads as a plausible loan.
+  // inside the engine's 20M-5bn range, so it reads as a plausible loan.
   loanAmountVnd = 1_250_000_000,
   expectedRoi = "10.2%",
   // 12, not an arbitrary number: the grading engine only accepts 3/6/9/12
