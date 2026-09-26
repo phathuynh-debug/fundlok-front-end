@@ -67,11 +67,11 @@ export default function Mockup(props: MockupProps) {
 
   const targetMinPct = targetCentre - 1.5;
   const targetMaxPct = targetCentre + 1.5;
-  const targetRangeText = `${targetMinPct.toFixed(1)}–${targetMaxPct.toFixed(1)}%`;
+  const targetRangeText = `${targetMinPct.toFixed(1)}-${targetMaxPct.toFixed(1)}%`;
 
   const scenarioLow = ((invSize * (targetMinPct / 100)) / 12) * invDuration;
   const scenarioHigh = ((invSize * (targetMaxPct / 100)) / 12) * invDuration;
-  const scenarioText = `${formatCompactCurrency(scenarioLow, locale)} – ${formatCompactCurrency(scenarioHigh, locale)}`;
+  const scenarioText = `${formatCompactCurrency(scenarioLow, locale)} - ${formatCompactCurrency(scenarioHigh, locale)}`;
 
   const scoreText = String(businessScore);
   const coverageText = coverage.toFixed(2) + "x";

@@ -30,7 +30,7 @@ export function ChartTooltipRow({
       />
       <div className="flex flex-1 items-center justify-between gap-3 leading-none">
         <span className="text-muted-foreground">{label}</span>
-        <span className="text-foreground font-mono font-medium tabular-nums">
+        <span className="text-foreground font-semibold tabular-nums">
           {formatCurrency(value, locale)}
         </span>
       </div>

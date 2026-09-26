@@ -24,7 +24,7 @@ const dict = {
   en: {
     heroTitle: "Flexible Capital for MSMEs in Vietnam",
     heroSubtitle:
-      "FundLok arranges funding for SMEs in Vietnam: investors provide the capital, repayment is a fixed amount each business day, and the total repayable is fixed at signing. If verified revenue falls short, the obligation for that period drops and the facility runs longer — it never rises.",
+      "FundLok arranges funding for SMEs in Vietnam: investors provide the capital, repayment is a fixed amount each business day, and the total repayable is fixed at signing. If verified revenue falls short, the obligation for that period drops and the facility runs longer; it never rises.",
     navProduct: "PRODUCT",
     navProcess: "HOW IT WORKS",
     navContact: "CONTACT",
@@ -43,7 +43,7 @@ const dict = {
     variableRate: "Variable rate",
     processTitle: "A clearer, technology-enabled funding journey",
     processSubtitle:
-      "FundLok is designed to make funding more flexible for SMEs and more transparent for investors — combining a customer-friendly experience with automation, data-driven assessment, secure fund handling, and clear repayment tracking.",
+      "FundLok is designed to make funding more flexible for SMEs and more transparent for investors, combining a customer-friendly experience with automation, data-driven assessment, secure fund handling, and clear repayment tracking.",
     ourSolution: "Our Solution",
     partnersEyebrow: "BACKED BY",
     partnersTitle: "Our Partners & Programs",
@@ -64,7 +64,7 @@ const dict = {
   vi: {
     heroTitle: "Sàn vốn linh hoạt cho doanh nghiệp vừa và nhỏ tại Việt Nam",
     heroSubtitle:
-      "FundLok thu xếp nguồn vốn cho doanh nghiệp vừa và nhỏ tại Việt Nam: nhà đầu tư là bên cấp vốn, khoản hoàn trả là một số tiền cố định mỗi ngày làm việc, và tổng số tiền phải trả được ấn định ngay khi ký. Nếu doanh thu được xác minh thấp hơn dự kiến, nghĩa vụ của kỳ đó giảm xuống và thời gian kéo dài thêm — không bao giờ tăng lên.",
+      "FundLok thu xếp nguồn vốn cho doanh nghiệp vừa và nhỏ tại Việt Nam: nhà đầu tư là bên cấp vốn, khoản hoàn trả là một số tiền cố định mỗi ngày làm việc, và tổng số tiền phải trả được ấn định ngay khi ký. Nếu doanh thu được xác minh thấp hơn dự kiến, nghĩa vụ của kỳ đó giảm xuống và thời gian kéo dài thêm; không bao giờ tăng lên.",
     navProduct: "SẢN PHẨM",
     navProcess: "QUY TRÌNH",
     navContact: "LIÊN HỆ",
@@ -83,7 +83,7 @@ const dict = {
     variableRate: "Lãi suất thả nổi",
     processTitle: "Hành trình gọi vốn rõ ràng hơn, hỗ trợ bởi công nghệ",
     processSubtitle:
-      "FundLok được thiết kế để giúp việc gọi vốn linh hoạt hơn cho doanh nghiệp SME và minh bạch hơn cho nhà đầu tư — kết hợp trải nghiệm thân thiện với khách hàng cùng quy trình tự động hóa, thẩm định bằng dữ liệu, quản lý quỹ an toàn và theo dõi hoàn trả rõ ràng.",
+      "FundLok được thiết kế để giúp việc gọi vốn linh hoạt hơn cho doanh nghiệp SME và minh bạch hơn cho nhà đầu tư, kết hợp trải nghiệm thân thiện với khách hàng cùng quy trình tự động hóa, thẩm định bằng dữ liệu, quản lý quỹ an toàn và theo dõi hoàn trả rõ ràng.",
     ourSolution: "Giải pháp của chúng tôi",
     partnersEyebrow: "ĐỒNG HÀNH CÙNG",
     partnersTitle: "Đối tác & Chương trình",
