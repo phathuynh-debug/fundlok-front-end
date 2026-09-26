@@ -1,6 +1,7 @@
 import {
   ArrowRight,
   Pencil,
+  HelpCircle,
   Clock,
   Users,
   ShieldCheck,
@@ -13,6 +14,11 @@ import {
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { Project } from "@/services/projects.service";
 import Link from "next/link";
 import { useTranslations } from "@/lib/i18n";
@@ -240,6 +246,20 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
               <div className="flex flex-col gap-1 rounded-xl bg-gradient-to-br from-emerald-500/15 via-emerald-500/10 to-teal-500/5 dark:from-emerald-500/20 dark:via-emerald-500/10 dark:to-teal-500/15 border border-emerald-500/30 p-3 shadow-2xs">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 font-mono flex items-center gap-1">
                   {t("dashboard.projectCard.expectedRoi")}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        aria-label={t("dashboard.projectCard.expectedRoiHint")}
+                        className="text-emerald-600/70 hover:text-emerald-700 dark:text-emerald-400/70 dark:hover:text-emerald-300"
+                      >
+                        <HelpCircle className="h-3 w-3" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      {t("dashboard.projectCard.expectedRoiHint")}
+                    </TooltipContent>
+                  </Tooltip>
                 </span>
                 <span
                   className={cn(
@@ -254,18 +274,14 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                     : `${expectedRoiPct.toFixed(1)}%`}
                 </span>
                 {/* Handbook §5.13 / §8: a projected return is never presented
-                    as a promise. The figure is labelled a target and carries
-                    the disclaimer inline — an investor must not be able to read
-                    it as a fixed or guaranteed yield. */}
+                    as a promise. The figure carries the "target, not
+                    guaranteed" disclaimer inline (the tooltip above expands
+                    on it) — an investor must not be able to read it as a
+                    fixed or guaranteed yield. */}
                 {expectedRoiPct !== undefined && (
-                  <>
-                    <span className="text-[10px] font-medium text-emerald-700/80 dark:text-emerald-300/80 font-mono">
-                      {t("dashboard.projectCard.annualizedReturn")}
-                    </span>
-                    <span className="text-[10px] font-medium text-muted-foreground">
-                      {t("dashboard.projectCard.notGuaranteed")}
-                    </span>
-                  </>
+                  <span className="text-[10px] font-medium text-muted-foreground">
+                    {t("dashboard.projectCard.notGuaranteed")}
+                  </span>
                 )}
               </div>
             </>

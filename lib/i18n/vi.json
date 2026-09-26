@@ -477,7 +477,6 @@
       "weightedRoiValue": "{min}–{max}%"
     },
     "projectCard": {
-      "annualizedReturn": "Lợi suất mục tiêu/năm",
       "askingAmount": "Số tiền cần huy động",
       "backers": "{count} Nhà đầu tư",
       "created": "Tạo ngày {date}",
@@ -486,6 +485,7 @@
       "duration": "Thời hạn",
       "edit": "Chỉnh sửa",
       "expectedRoi": "Tỷ suất lợi nhuận năm",
+      "expectedRoiHint": "Lãi suất năm dự kiến mà doanh nghiệp trả cho khoản vay này. Đây là mục tiêu, không phải lợi nhuận được cam kết. Nếu doanh nghiệp không đạt kỳ vọng, bạn là người chịu khoản lỗ.",
       "fundedPercent": "Đã huy động {percent}%",
       "hotDeal": "Dự án HOT",
       "incorporation": "Thành lập",

@@ -477,7 +477,6 @@
       "weightedRoiValue": "{min}–{max}%"
     },
     "projectCard": {
-      "annualizedReturn": "Target annual rate",
       "askingAmount": "Asking amount",
       "backers": "{count} Investors",
       "created": "Created {date}",
@@ -486,6 +485,7 @@
       "duration": "Duration",
       "edit": "Edit",
       "expectedRoi": "Annualized ROI",
+      "expectedRoiHint": "The expected annual interest the business pays on this loan. It's a target, not a guaranteed return. If the business underperforms, you bear the loss.",
       "fundedPercent": "{percent}% funded",
       "hotDeal": "Hot Deal",
       "incorporation": "Incorporation",
