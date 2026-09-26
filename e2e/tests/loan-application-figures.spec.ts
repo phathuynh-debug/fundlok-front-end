@@ -148,7 +148,7 @@ test.describe("the revenue step", () => {
 
     await page.locator("#revenue_last_12m").fill("4000000000");
 
-    await expect(page.getByText("4,000,000,000 ₫")).toBeVisible();
+    await expect(page.getByText("4.000.000.000 ₫")).toBeVisible();
   });
 
   test("advances once both required revenue figures are given", async ({
@@ -193,16 +193,18 @@ test.describe("the costs step", () => {
     await expect(page.locator("#variable_cost_excl_cogs_y1")).toBeVisible();
   });
 
-  test("rejects a percentage above 100", async ({ page }) => {
+  // The field CLAMPS rather than rejects: clampPercentInput pins anything over
+  // 100 to "100", so the out-of-range message can never fire here. That landed
+  // in 6e18bd6, after this test was written, which left the old assertion
+  // testing a state the UI no longer reaches. Assert the clamp instead.
+  test("clamps a percentage above 100", async ({ page }) => {
     await advanceToCostsStep(page);
 
     const field = page.locator("#conc_top1_pct");
     await field.fill("140");
     await field.blur();
 
-    await expect(
-      page.getByText(t("dashboard.sme.lite.error.out_of_range")),
-    ).toBeVisible();
+    await expect(field).toHaveValue("100");
   });
 
   test("lets the optional percentages stay blank", async ({ page }) => {

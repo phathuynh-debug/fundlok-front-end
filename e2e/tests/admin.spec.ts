@@ -126,10 +126,12 @@ test.describe("the admin project preview", () => {
       page.getByRole("heading", { name: "Delta Foods JSC" }),
     ).toBeVisible();
     await expect(
-      page.getByText(t("admin.preview.engineHeading")),
+      page.getByRole("heading", { name: t("admin.preview.engineHeading") }),
     ).toBeVisible();
     await expect(
-      page.getByText(t("admin.preview.applicationsHeading")),
+      page.getByRole("heading", {
+        name: t("admin.preview.applicationsHeading"),
+      }),
     ).toBeVisible();
   });
 

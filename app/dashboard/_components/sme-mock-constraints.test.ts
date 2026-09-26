@@ -71,7 +71,7 @@ describe("SME mock loans obey the grading engine's constraints", () => {
     // Proves the assertion above can actually fail: 10 months is the value
     // that shipped on the investment KPI card before SCRUM-150.
     expect(isAllowedLoanDuration(10)).toBe(false);
-    expect(LOAN_DURATIONS_MONTHS).toEqual([3, 6, 9, 12]);
+    expect(LOAN_DURATIONS_MONTHS).toEqual([1, 2, 3, 4, 5, 6]);
   });
 });
 

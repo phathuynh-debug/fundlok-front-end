@@ -29,10 +29,18 @@ const dictionaries: Record<Locale, MessageTree> = {
   vi,
 };
 
-const DEFAULT_LOCALE: Locale = "en";
+/**
+ * Vietnamese, because Vietnam is the market. A visitor with no cookie gets
+ * Vietnamese; English is opt-in through the switcher, which writes the cookie.
+ *
+ * Note this is a cookie-only decision: `Accept-Language` is deliberately NOT
+ * consulted, so the default is predictable and the same HTML can be cached for
+ * every first-time visitor.
+ */
+const DEFAULT_LOCALE: Locale = "vi";
 
 function normalizeLocale(locale: string | null | undefined): Locale {
-  return locale === "vi" ? "vi" : DEFAULT_LOCALE;
+  return locale === "en" ? "en" : DEFAULT_LOCALE;
 }
 
 function getPathValue(source: unknown, path: string): unknown {

@@ -24,7 +24,7 @@ describe("indicativeFigures", () => {
       ) {
         for (
           let amount = 200_000_000;
-          amount <= 5_000_000_000;
+          amount <= 1_000_000_000;
           amount += 100_000_000
         ) {
           const { indicativeRate } = indicativeFigures({
@@ -48,7 +48,7 @@ describe("indicativeFigures", () => {
       ) {
         for (
           let amount = 200_000_000;
-          amount <= 5_000_000_000;
+          amount <= 1_000_000_000;
           amount += 200_000_000
         ) {
           const { businessScore } = indicativeFigures({
@@ -82,7 +82,7 @@ describe("indicativeFigures", () => {
   it("flags a request that outruns the revenue behind it", () => {
     const { isIneligible, coverage } = indicativeFigures({
       monthlyRevenue: 100_000_000,
-      amount: 5_000_000_000,
+      amount: 1_000_000_000,
       termMonths: 6,
     });
     expect(coverage).toBeGreaterThan(MAX_COVERAGE);

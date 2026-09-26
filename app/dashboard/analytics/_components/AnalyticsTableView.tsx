@@ -42,16 +42,16 @@ export function AnalyticsTableView({
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
-              <TableHead className="font-mono text-[10px] uppercase tracking-wider">
+              <TableHead className="text-xs font-semibold uppercase tracking-wider">
                 {t("dashboard.analytics.table.month")}
               </TableHead>
-              <TableHead className="font-mono text-[10px] uppercase tracking-wider text-right">
+              <TableHead className="text-xs font-semibold uppercase tracking-wider text-right">
                 {t("dashboard.analytics.series.deployed")}
               </TableHead>
-              <TableHead className="font-mono text-[10px] uppercase tracking-wider text-right">
+              <TableHead className="text-xs font-semibold uppercase tracking-wider text-right">
                 {t("dashboard.analytics.series.returns")}
               </TableHead>
-              <TableHead className="font-mono text-[10px] uppercase tracking-wider text-right">
+              <TableHead className="text-xs font-semibold uppercase tracking-wider text-right">
                 {t("dashboard.analytics.series.monthlyReturns")}
               </TableHead>
             </TableRow>
@@ -64,13 +64,13 @@ export function AnalyticsTableView({
                   <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
                     {monthTickLabel(point.month, locale)} {year}
                   </TableCell>
-                  <TableCell className="text-right font-mono text-sm tabular-nums whitespace-nowrap">
+                  <TableCell className="text-right text-sm font-medium tabular-nums whitespace-nowrap">
                     {formatCurrency(point.deployed_cumulative, locale)}
                   </TableCell>
-                  <TableCell className="text-right font-mono text-sm tabular-nums whitespace-nowrap">
+                  <TableCell className="text-right text-sm font-medium tabular-nums whitespace-nowrap">
                     {formatCurrency(point.returns_cumulative, locale)}
                   </TableCell>
-                  <TableCell className="text-right font-mono text-sm tabular-nums whitespace-nowrap">
+                  <TableCell className="text-right text-sm font-medium tabular-nums whitespace-nowrap">
                     {formatCurrency(point.returns_monthly, locale)}
                   </TableCell>
                 </TableRow>
@@ -87,13 +87,13 @@ export function AnalyticsTableView({
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
-              <TableHead className="font-mono text-[10px] uppercase tracking-wider">
+              <TableHead className="text-xs font-semibold uppercase tracking-wider">
                 {t("dashboard.analytics.table.industry")}
               </TableHead>
-              <TableHead className="font-mono text-[10px] uppercase tracking-wider text-right">
+              <TableHead className="text-xs font-semibold uppercase tracking-wider text-right">
                 {t("dashboard.analytics.series.deployed")}
               </TableHead>
-              <TableHead className="font-mono text-[10px] uppercase tracking-wider text-right">
+              <TableHead className="text-xs font-semibold uppercase tracking-wider text-right">
                 {t("dashboard.analytics.table.share")}
               </TableHead>
             </TableRow>
@@ -104,10 +104,10 @@ export function AnalyticsTableView({
                 <TableCell className="text-sm font-medium whitespace-nowrap">
                   {row.industry}
                 </TableCell>
-                <TableCell className="text-right font-mono text-sm tabular-nums whitespace-nowrap">
+                <TableCell className="text-right text-sm font-medium tabular-nums whitespace-nowrap">
                   {formatCurrency(row.deployed, locale)}
                 </TableCell>
-                <TableCell className="text-right font-mono text-sm tabular-nums whitespace-nowrap">
+                <TableCell className="text-right text-sm font-medium tabular-nums whitespace-nowrap">
                   {((row.deployed / total) * 100).toFixed(1)}%
                 </TableCell>
               </TableRow>
@@ -123,13 +123,13 @@ export function AnalyticsTableView({
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
-              <TableHead className="font-mono text-[10px] uppercase tracking-wider">
+              <TableHead className="text-xs font-semibold uppercase tracking-wider">
                 {t("dashboard.analytics.table.status")}
               </TableHead>
-              <TableHead className="font-mono text-[10px] uppercase tracking-wider text-right">
+              <TableHead className="text-xs font-semibold uppercase tracking-wider text-right">
                 {t("dashboard.analytics.series.deployed")}
               </TableHead>
-              <TableHead className="font-mono text-[10px] uppercase tracking-wider text-right">
+              <TableHead className="text-xs font-semibold uppercase tracking-wider text-right">
                 {t("dashboard.analytics.table.share")}
               </TableHead>
             </TableRow>
@@ -140,10 +140,10 @@ export function AnalyticsTableView({
                 <TableCell className="text-sm font-medium whitespace-nowrap">
                   {t(`dashboard.analytics.charts.status.${row.statusKey}`)}
                 </TableCell>
-                <TableCell className="text-right font-mono text-sm tabular-nums whitespace-nowrap">
+                <TableCell className="text-right text-sm font-medium tabular-nums whitespace-nowrap">
                   {formatCurrency(row.amount, locale)}
                 </TableCell>
-                <TableCell className="text-right font-mono text-sm tabular-nums whitespace-nowrap">
+                <TableCell className="text-right text-sm font-medium tabular-nums whitespace-nowrap">
                   {((row.amount / total) * 100).toFixed(1)}%
                 </TableCell>
               </TableRow>

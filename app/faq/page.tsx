@@ -1,79 +1,89 @@
 import type { Metadata } from "next";
+
 import en from "@/lib/i18n/en.json";
+import vi from "@/lib/i18n/vi.json";
 import { FAQ_CATEGORIES, faqQuestionNumbers } from "@/lib/faq-questions";
+import {
+  getSeoStrings,
+  OG_LOCALE,
+  resolveSeoLocale,
+  type SeoLocale,
+} from "@/lib/seo";
 import FaqClient from "./faq-client";
 
-// Everything below is derived from the same dictionary the page renders,
-// so metadata and structured data never drift from the visible content.
-const faq = en.faqPage;
+/**
+ * Metadata and rich-result data are built from the SAME dictionary the page
+ * renders, so the snippet can never describe content in another language.
+ *
+ * This used to read `en` at module scope. That was correct while English was
+ * the default; now that a crawler with no cookie gets Vietnamese, the questions
+ * Google was offered as rich results were in a language the page did not show.
+ */
+const dictionaries = { en, vi } as const;
 
-const qaPairs = FAQ_CATEGORIES.flatMap((key) => {
-  const category = faq[key];
-  return faqQuestionNumbers(key).map((n) => ({
-    question: category[`q${n}` as keyof typeof category] as string,
-    answer: category[`a${n}` as keyof typeof category] as string,
-  }));
-});
+function qaPairsFor(locale: SeoLocale) {
+  const faq = dictionaries[locale].faqPage;
+  return FAQ_CATEGORIES.flatMap((key) => {
+    const category = faq[key];
+    return faqQuestionNumbers(key).map((n) => ({
+      question: category[`q${n}` as keyof typeof category] as string,
+      answer: category[`a${n}` as keyof typeof category] as string,
+    }));
+  });
+}
 
-// Search engines see every question verbatim in the keywords list.
-const questionKeywords = qaPairs.map(({ question }) => question);
+export async function generateMetadata(): Promise<Metadata> {
+  const { locale, seo } = await getSeoStrings();
+  const title = seo.faqTitle;
+  const description = seo.faqDescription;
 
-const description =
-  "How FundLok funding works: who can apply, what documents you need, how your business score sets the rate, how daily repayment works, and who bears the risk.";
-
-const title = "FAQ — How funding, scores and repayment work";
-
-export const metadata: Metadata = {
-  title,
-  description,
-  keywords: [
-    "FundLok FAQ",
-    "FundLok questions",
-    "FundLok support",
-    "MSME financing FAQ",
-    "SME financing FAQ",
-    "private credit FAQ",
-    "invest in SMEs",
-    "contact FundLok",
-    ...questionKeywords,
-  ],
-  alternates: {
-    canonical: "/faq",
-  },
-  openGraph: {
+  return {
     title,
     description,
-    url: "/faq",
-    siteName: "FundLok",
-    type: "website",
-  },
-  twitter: {
-    card: "summary",
-    title,
-    description,
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
-
-// FAQPage rich-result structured data: every question with its full answer.
-// This is what makes Q&As eligible to appear directly in search results.
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: qaPairs.map(({ question, answer }) => ({
-    "@type": "Question",
-    name: question,
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: answer,
+    keywords: [
+      "FundLok FAQ",
+      "FundLok questions",
+      "FundLok support",
+      "MSME financing FAQ",
+      "SME financing FAQ",
+      "private credit FAQ",
+      "invest in SMEs",
+      "contact FundLok",
+      // Search engines see every question verbatim, in the page's language.
+      ...qaPairsFor(locale).map(({ question }) => question),
+    ],
+    alternates: { canonical: "/faq" },
+    openGraph: {
+      title,
+      description,
+      url: "/faq",
+      siteName: "FundLok",
+      type: "website",
+      locale: OG_LOCALE[locale],
     },
-  })),
-};
+    twitter: { card: "summary", title, description },
+    robots: { index: true, follow: true },
+  };
+}
 
-export default function FaqPage() {
+export default async function FaqPage() {
+  const locale = await resolveSeoLocale();
+
+  // FAQPage rich-result structured data: every question with its full answer.
+  // This is what makes Q&As eligible to appear directly in search results.
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: qaPairsFor(locale).map(({ question, answer }) => ({
+      "@type": "Question",
+      name: question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: answer,
+      },
+    })),
+  };
+
   return (
     <>
       <script

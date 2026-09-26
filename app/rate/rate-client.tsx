@@ -9,12 +9,20 @@ import SiteFooter from "@/components/site-footer";
 import { BackgroundBlobs } from "@/components/background-blobs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
+import { Skeleton } from "@/components/ui/skeleton";
 import { NumericInput } from "@/components/ui/numeric-input";
 import { digitsOnly } from "@/lib/format-currency";
 import { useTranslations } from "@/lib/i18n";
 import { useRateEstimate } from "@/hooks/use-loans";
 import { INDUSTRY_OPTIONS } from "@/lib/constants/industries";
-import { LOAN_MAX_VND, LOAN_MIN_VND } from "@/lib/constants/loan-constraints";
+import {
+  LOAN_DURATIONS_MONTHS,
+  LOAN_MAX_DURATION_MONTHS,
+  LOAN_MIN_DURATION_MONTHS,
+  LOAN_MAX_VND,
+  LOAN_MIN_VND,
+} from "@/lib/constants/loan-constraints";
 import { cn } from "@/lib/utils";
 
 /**
@@ -119,7 +127,7 @@ function AmountInput({
   );
 }
 
-const DURATIONS = [6, 12] as const;
+const DURATIONS = LOAN_DURATIONS_MONTHS;
 
 // The engine's own bounds, checked here so the visitor is told before a round
 // trip. The server re-checks all of them -- this is convenience, not a
@@ -324,6 +332,50 @@ function ResultBurst() {
   );
 }
 
+/**
+ * What the result panel shows while the engine is thinking.
+ *
+ * Shaped like the answer it is waiting for: heading, two figure blocks, the
+ * not-an-offer line, the assumptions list. A spinner would tell the visitor
+ * that something is happening; this tells them what is about to arrive, and
+ * the panel does not change height when it does.
+ *
+ * `bg-muted`, not the Skeleton default: `--accent` is the emerald brand colour
+ * in light mode, so the stock component pulses bright green.
+ */
+function ResultSkeleton() {
+  const bar = "bg-muted";
+  return (
+    <div aria-hidden className="space-y-5">
+      <div className="flex items-start justify-between gap-3">
+        <Skeleton className={cn("h-6 w-40", bar)} />
+        <Skeleton className={cn("h-5 w-24", bar)} />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        {[0, 1].map((i) => (
+          <div key={i} className="space-y-2">
+            <Skeleton className={cn("h-3 w-24", bar)} />
+            <Skeleton className={cn("h-8 w-32", bar)} />
+          </div>
+        ))}
+      </div>
+
+      <div className="space-y-2">
+        <Skeleton className={cn("h-3 w-full", bar)} />
+        <Skeleton className={cn("h-3 w-4/5", bar)} />
+      </div>
+
+      <div className="space-y-2 border-t border-border/60 pt-3">
+        <Skeleton className={cn("h-3 w-36", bar)} />
+        {[0, 1, 2].map((i) => (
+          <Skeleton key={i} className={cn("h-3 w-full", bar)} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /** Clearance for the sticky site header, so a scrolled-to panel does not tuck
  *  its own heading underneath it. */
 const HEADER_CLEARANCE_PX = 88;
@@ -517,7 +569,7 @@ export default function RateClient() {
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-background text-foreground overflow-x-hidden">
+    <div className="relative min-h-[100dvh] w-full bg-background text-foreground overflow-x-clip">
       <SiteHeader />
       <BackgroundBlobs variant="compact" />
 
@@ -663,7 +715,14 @@ export default function RateClient() {
               "loanAmount",
               t("ratePage.loanAmount"),
               loanAmount,
-              setLoanAmount,
+              (val) => {
+                const num = Number(val);
+                if (num > LOAN_MAX) {
+                  setLoanAmount(String(LOAN_MAX));
+                } else {
+                  setLoanAmount(val);
+                }
+              },
               {
                 amount: true,
                 hint: t("ratePage.loanAmountHint"),
@@ -671,29 +730,42 @@ export default function RateClient() {
               },
             )}
 
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">
-                {t("ratePage.duration")}
-                <span className="ml-2 text-xs text-destructive">*</span>
-              </label>
-              {/* 6 or 12 only. Twelve months is the maximum term; the platform
-                  does not write longer. */}
-              <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">
+                  {t("ratePage.duration")}
+                  <span className="ml-2 text-xs text-destructive">*</span>
+                </label>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                  {duration} {locale === "vi" ? "tháng" : "months"}
+                </span>
+              </div>
+              <Slider
+                id="rateDurationSlider"
+                aria-label={t("ratePage.duration")}
+                min={LOAN_MIN_DURATION_MONTHS}
+                max={LOAN_MAX_DURATION_MONTHS}
+                step={1}
+                value={[duration]}
+                onValueChange={(val) => setDuration(val[0])}
+                className="py-2 cursor-pointer"
+              />
+              {/* 1 to 6 months: matches LOAN_DURATIONS_MONTHS. */}
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
                 {DURATIONS.map((months) => (
                   <button
                     key={months}
                     type="button"
                     onClick={() => setDuration(months)}
                     className={cn(
-                      "rounded-lg border px-3 py-2 text-sm font-semibold transition-colors",
+                      "rounded-md border px-2 py-2 text-sm font-semibold transition-colors cursor-pointer",
                       duration === months
                         ? "border-primary bg-primary text-primary-foreground"
                         : "border-border bg-transparent text-muted-foreground hover:text-foreground",
                     )}
                   >
-                    {months === 6
-                      ? t("ratePage.months6")
-                      : t("ratePage.months12")}
+                    {months} {locale === "vi" ? "tháng" : "mo"}
                   </button>
                 ))}
               </div>
@@ -760,14 +832,16 @@ export default function RateClient() {
             transition={{ duration: 0.6, delay: 0.28, ease: "easeOut" }}
             className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-xs lg:sticky lg:top-24"
           >
-            {!data && !estimate.isError && (
+            {estimate.isPending && <ResultSkeleton />}
+
+            {!estimate.isPending && !data && !estimate.isError && (
               <p className="py-12 text-center text-sm text-muted-foreground">
                 {t("ratePage.resultEmpty")}
               </p>
             )}
 
-            {estimate.isError && (
-              <div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
+            {!estimate.isPending && estimate.isError && (
+              <div className="flex items-start gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 p-3">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
                 <p className="text-xs leading-relaxed text-foreground">
                   {estimate.error?.message ?? t("ratePage.errorGeneric")}

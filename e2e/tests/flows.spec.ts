@@ -27,7 +27,7 @@ test.describe("/dashboard/invest", () => {
       page.getByText(t("investConfirm.amountLabel"), { exact: true }),
     ).toBeVisible();
     await expect(
-      page.getByText(normalizeSpaces(formatCurrency(amount, "en")), {
+      page.getByText(normalizeSpaces(formatCurrency(amount, "vi")), {
         exact: false,
       }),
     ).toBeVisible();
@@ -241,17 +241,16 @@ test.describe("/project-application", () => {
     await fillIncorporation(page);
     await next(page);
 
-    const group = page.getByRole("radiogroup", {
+    const slider = page.getByRole("slider", {
       name: t("projectApplication.fields.durationMonths"),
     });
-    await expect(group).toBeVisible();
-    await expect(group.getByRole("radio")).toHaveCount(
-      LOAN_DURATIONS_MONTHS.length,
-    );
+    await expect(slider).toBeVisible();
+    await expect(slider).toHaveAttribute("aria-valuemin", "1");
+    await expect(slider).toHaveAttribute("aria-valuemax", "6");
 
     for (const months of LOAN_DURATIONS_MONTHS) {
       await expect(
-        group.getByRole("radio", {
+        page.getByRole("button", {
           name: t("projectApplication.durationOptions.months", {
             count: months,
           }),
@@ -260,9 +259,7 @@ test.describe("/project-application", () => {
     }
   });
 
-  test("rejects a loan below the engine's minimum", async ({ page }) => {
-    // LOAN_MIN_VND is 20,000,000 and the engine's `loan_constraints` reject
-    // anything under it, so the form must catch this before the API does.
+  test("auto-scopes requested amount within valid bounds", async ({ page }) => {
     await fillStepOne(page);
     await next(page);
     await fillAddress(page);
@@ -270,21 +267,21 @@ test.describe("/project-application", () => {
     await fillIncorporation(page);
     await next(page);
 
-    await page
-      .getByLabel(t("projectApplication.fields.requestedAmount"))
-      .fill("1000000");
+    const amountInput = page.getByLabel(
+      t("projectApplication.fields.requestedAmount"),
+    );
 
-    // The loan step is validated by the wizard's Next (step 5 is the review),
-    // so that is where the constraint is enforced.
-    await next(page);
+    // Typing too high auto-clamps to 1,000,000,000
+    await amountInput.fill("200000000000000");
+    await expect(amountInput).toHaveValue(/1[.,]000[.,]000[.,]000/);
 
-    await expect(
-      page.getByText(t("projectApplication.validation.requestedAmountRange")),
-    ).toBeVisible();
-    await expect(page).toHaveURL(/\/project-application$/);
+    // Typing below minimum and blurring auto-scopes to 20,000,000
+    await amountInput.fill("1000000");
+    await amountInput.blur();
+    await expect(amountInput).toHaveValue(/20[.,]000[.,]000/);
   });
 
-  test("requires a loan term to be chosen", async ({ page }) => {
+  test("allows selecting a loan term from 1 to 6 months", async ({ page }) => {
     await fillStepOne(page);
     await next(page);
     await fillAddress(page);
@@ -295,12 +292,16 @@ test.describe("/project-application", () => {
     await page
       .getByLabel(t("projectApplication.fields.requestedAmount"))
       .fill("500000000");
-    await next(page);
 
-    // No duration selected — the engine cannot score an application without
-    // one, so the wizard must not advance.
-    await expect(
-      page.getByText(t("projectApplication.validation.durationMonths")),
-    ).toBeVisible();
+    await page
+      .getByRole("button", {
+        name: t("projectApplication.durationOptions.months", { count: 6 }),
+      })
+      .click();
+
+    const slider = page.getByRole("slider", {
+      name: t("projectApplication.fields.durationMonths"),
+    });
+    await expect(slider).toHaveAttribute("aria-valuenow", "6");
   });
 });

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+
+import { getSeoStrings, OG_LOCALE } from "@/lib/seo";
 import { cookies } from "next/headers";
 import SiteHeader from "@/components/site-header";
 import { SectionLocator } from "@/components/section-locator";
@@ -22,7 +24,7 @@ const dict = {
   en: {
     heroTitle: "Flexible Capital for MSMEs in Vietnam",
     heroSubtitle:
-      "FundLok arranges funding for SMEs in Vietnam: investors provide the capital, repayment is a fixed amount each business day, and the total repayable is fixed at signing. If verified revenue falls short, the obligation for that period drops and the facility runs longer — it never rises.",
+      "FundLok arranges funding for SMEs in Vietnam: investors provide the capital, repayment is a fixed amount each business day, and the total repayable is fixed at signing. If verified revenue falls short, the obligation for that period drops and the facility runs longer; it never rises.",
     navProduct: "PRODUCT",
     navProcess: "HOW IT WORKS",
     navContact: "CONTACT",
@@ -41,7 +43,7 @@ const dict = {
     variableRate: "Variable rate",
     processTitle: "A clearer, technology-enabled funding journey",
     processSubtitle:
-      "FundLok is designed to make funding more flexible for SMEs and more transparent for investors — combining a customer-friendly experience with automation, data-driven assessment, secure fund handling, and clear repayment tracking.",
+      "FundLok is designed to make funding more flexible for SMEs and more transparent for investors, combining a customer-friendly experience with automation, data-driven assessment, secure fund handling, and clear repayment tracking.",
     ourSolution: "Our Solution",
     partnersEyebrow: "BACKED BY",
     partnersTitle: "Our Partners & Programs",
@@ -62,7 +64,7 @@ const dict = {
   vi: {
     heroTitle: "Sàn vốn linh hoạt cho doanh nghiệp vừa và nhỏ tại Việt Nam",
     heroSubtitle:
-      "FundLok thu xếp nguồn vốn cho doanh nghiệp vừa và nhỏ tại Việt Nam: nhà đầu tư là bên cấp vốn, khoản hoàn trả là một số tiền cố định mỗi ngày làm việc, và tổng số tiền phải trả được ấn định ngay khi ký. Nếu doanh thu được xác minh thấp hơn dự kiến, nghĩa vụ của kỳ đó giảm xuống và thời gian kéo dài thêm — không bao giờ tăng lên.",
+      "FundLok thu xếp nguồn vốn cho doanh nghiệp vừa và nhỏ tại Việt Nam: nhà đầu tư là bên cấp vốn, khoản hoàn trả là một số tiền cố định mỗi ngày làm việc, và tổng số tiền phải trả được ấn định ngay khi ký. Nếu doanh thu được xác minh thấp hơn dự kiến, nghĩa vụ của kỳ đó giảm xuống và thời gian kéo dài thêm; không bao giờ tăng lên.",
     navProduct: "SẢN PHẨM",
     navProcess: "QUY TRÌNH",
     navContact: "LIÊN HỆ",
@@ -81,7 +83,7 @@ const dict = {
     variableRate: "Lãi suất thả nổi",
     processTitle: "Hành trình gọi vốn rõ ràng hơn, hỗ trợ bởi công nghệ",
     processSubtitle:
-      "FundLok được thiết kế để giúp việc gọi vốn linh hoạt hơn cho doanh nghiệp SME và minh bạch hơn cho nhà đầu tư — kết hợp trải nghiệm thân thiện với khách hàng cùng quy trình tự động hóa, thẩm định bằng dữ liệu, quản lý quỹ an toàn và theo dõi hoàn trả rõ ràng.",
+      "FundLok được thiết kế để giúp việc gọi vốn linh hoạt hơn cho doanh nghiệp SME và minh bạch hơn cho nhà đầu tư, kết hợp trải nghiệm thân thiện với khách hàng cùng quy trình tự động hóa, thẩm định bằng dữ liệu, quản lý quỹ an toàn và theo dõi hoàn trả rõ ràng.",
     ourSolution: "Giải pháp của chúng tôi",
     partnersEyebrow: "ĐỒNG HÀNH CÙNG",
     partnersTitle: "Đối tác & Chương trình",
@@ -101,51 +103,56 @@ const dict = {
   },
 };
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/" },
-  title: "FundLok | Flexible Capital Platform for SMEs in Vietnam",
-  description:
-    "Funding for SMEs in Vietnam. Investors provide the capital, businesses repay a fixed amount each business day, and the total is fixed at signing.",
-  keywords: [
-    "FundLok",
-    "funding for SMEs in Vietnam",
-    "SME funding Vietnam",
-    "MSME funding Vietnam",
-    "business funding Vietnam",
-    "SME funding",
-    "private credit",
-    "flexible capital",
-    "on-chain credit",
-    "investor portal",
-    "flexible funding",
-    "Loc Vuong",
-    "Huy Pham",
-    "Edward Wong",
-    "FundLok CEO",
-    "FundLok CFO",
-    "FundLok CTO",
-    "FundLok founding team",
-    "FundLok founders",
-  ],
-  openGraph: {
-    title: "FundLok | Flexible Capital Platform for SMEs in Vietnam",
-    description:
-      "Funding for SMEs in Vietnam: investors provide the capital, businesses repay a fixed amount each business day, and the total is fixed at signing. FundLok is not a bank.",
-    type: "website",
-    siteName: "FundLok",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "FundLok | Flexible Capital Platform for SMEs in Vietnam",
-    description:
-      "Funding for SMEs in Vietnam: investors provide the capital, businesses repay a fixed amount each business day, and the total is fixed at signing. FundLok is not a bank.",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { locale, seo } = await getSeoStrings();
+
+  return {
+    alternates: { canonical: "/" },
+    title: seo.homeTitle,
+    description: seo.homeDescription,
+    keywords: [
+      "FundLok",
+      "funding for SMEs in Vietnam",
+      "SME funding Vietnam",
+      "MSME funding Vietnam",
+      "business funding Vietnam",
+      "SME funding",
+      "private credit",
+      "flexible capital",
+      "on-chain credit",
+      "investor portal",
+      "flexible funding",
+      "Loc Vuong",
+      "Huy Pham",
+      "Edward Wong",
+      "FundLok CEO",
+      "FundLok CFO",
+      "FundLok CTO",
+      "FundLok founding team",
+      "FundLok founders",
+    ],
+    openGraph: {
+      title: seo.homeTitle,
+      description: seo.homeOgDescription,
+      type: "website",
+      siteName: "FundLok",
+      locale: OG_LOCALE[locale],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: seo.homeTitle,
+      description: seo.homeOgDescription,
+    },
+  };
+}
 
 export default async function Page() {
   const cookieStore = await cookies();
   const cookieValue = cookieStore.get("NEXT_LOCALE")?.value;
-  const locale = cookieValue === "vi" ? "vi" : "en";
+  // Same default as app/layout.tsx and lib/i18n: Vietnamese unless English was
+  // explicitly chosen. This page builds its copy on the server, so it resolves
+  // the cookie itself rather than reading the client context.
+  const locale = cookieValue === "en" ? "en" : "vi";
   const currentLocale = locale;
   const strings = dict[currentLocale];
 
@@ -189,7 +196,7 @@ export default async function Page() {
 
   return (
     <>
-      <div className="relative min-h-screen w-full bg-background text-foreground overflow-x-hidden flex flex-col justify-between selection:bg-accent/20">
+      <div className="relative min-h-[100dvh] w-full bg-background text-foreground overflow-x-clip flex flex-col justify-between selection:bg-accent/20">
         <SiteHeader />
 
         {/* Right-edge scroll-spy rail showing the section currently in view */}
@@ -200,7 +207,7 @@ export default async function Page() {
           {/* Hero Section Container */}
           <section
             id="hero"
-            className="relative w-full min-h-[calc(100vh-76px)] flex flex-col items-center overflow-hidden scroll-mt-20"
+            className="relative w-full min-h-[calc(100dvh-76px)] flex flex-col items-center overflow-hidden scroll-mt-20"
           >
             {/* Client interactive GUI logic (waves + mockup + animated headers) */}
             <HeroInteractive strings={strings} />
@@ -303,7 +310,7 @@ export default async function Page() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Team Member 1: Huy Pham */}
-              <div className="flex flex-col bg-white/40 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-3xl p-5 shadow-lg backdrop-blur-md hover:scale-[1.01] transition-transform duration-300">
+              <div className="flex flex-col bg-card border border-border rounded-2xl p-5 transition-colors duration-200">
                 <div className="relative aspect-square w-full rounded-2xl overflow-hidden mb-5 bg-slate-100 dark:bg-slate-800">
                   <img
                     src="/images/huy.webp"
@@ -340,7 +347,7 @@ export default async function Page() {
               </div>
 
               {/* Team Member 2: Loc Vuong */}
-              <div className="flex flex-col bg-white/40 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-3xl p-5 shadow-lg backdrop-blur-md hover:scale-[1.01] transition-transform duration-300">
+              <div className="flex flex-col bg-card border border-border rounded-2xl p-5 transition-colors duration-200">
                 <div className="relative aspect-square w-full rounded-2xl overflow-hidden mb-5 bg-slate-100 dark:bg-slate-800">
                   <img
                     src="/images/loc.webp"
@@ -377,7 +384,7 @@ export default async function Page() {
               </div>
 
               {/* Team Member 3: Edward Wong */}
-              <div className="flex flex-col bg-white/40 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-3xl p-5 shadow-lg backdrop-blur-md hover:scale-[1.01] transition-transform duration-300">
+              <div className="flex flex-col bg-card border border-border rounded-2xl p-5 transition-colors duration-200">
                 <div className="relative aspect-square w-full rounded-2xl overflow-hidden mb-5 bg-slate-100 dark:bg-slate-800">
                   <img
                     src="/images/edward.webp"

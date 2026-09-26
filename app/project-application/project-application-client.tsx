@@ -18,6 +18,7 @@ import {
 import { useForm, type Path } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -46,7 +47,9 @@ import {
 import { INDUSTRY_OPTIONS } from "@/lib/constants/industries";
 import {
   LOAN_DURATIONS_MONTHS,
+  LOAN_MAX_DURATION_MONTHS,
   LOAN_MAX_VND,
+  LOAN_MIN_DURATION_MONTHS,
   LOAN_MIN_VND,
 } from "@/lib/constants/loan-constraints";
 import {
@@ -229,7 +232,7 @@ export default function ProjectApplicationClient() {
       },
       loan: {
         requested_amount: "",
-        duration_months: "",
+        duration_months: "3",
         purpose: "",
         repayment_preference: "",
       },
@@ -372,6 +375,20 @@ export default function ProjectApplicationClient() {
     } else if (currentStep === 3) {
       fieldsToValidate = ["incorporation_date"];
     } else if (currentStep === 4) {
+      const rawAmount = getValues("loan.requested_amount");
+      if (rawAmount) {
+        const numeric = Number(rawAmount);
+        if (numeric > 0 && numeric < LOAN_MIN_VND) {
+          setValue("loan.requested_amount", String(LOAN_MIN_VND), {
+            shouldValidate: true,
+          });
+        } else if (numeric > LOAN_MAX_VND) {
+          setValue("loan.requested_amount", String(LOAN_MAX_VND), {
+            shouldValidate: true,
+          });
+        }
+      }
+
       fieldsToValidate = [
         "loan.requested_amount",
         "loan.duration_months",
@@ -839,13 +856,51 @@ export default function ProjectApplicationClient() {
                       "projectApplication.placeholders.requestedAmount",
                     )}
                     value={formatAmountInput(requestedAmount ?? "", locale)}
-                    onChange={(event) =>
-                      setValue(
-                        "loan.requested_amount",
-                        digitsOnly(event.target.value),
-                        { shouldValidate: true },
-                      )
-                    }
+                    onChange={(event) => {
+                      const digits = digitsOnly(event.target.value);
+                      if (!digits) {
+                        setValue("loan.requested_amount", "", {
+                          shouldValidate: true,
+                        });
+                        return;
+                      }
+                      const numeric = Number(digits);
+                      if (numeric > LOAN_MAX_VND) {
+                        setValue(
+                          "loan.requested_amount",
+                          String(LOAN_MAX_VND),
+                          {
+                            shouldValidate: true,
+                          },
+                        );
+                      } else {
+                        setValue("loan.requested_amount", digits, {
+                          shouldValidate: true,
+                        });
+                      }
+                    }}
+                    onBlur={() => {
+                      const current = getValues("loan.requested_amount");
+                      if (!current) return;
+                      const numeric = Number(current);
+                      if (numeric > 0 && numeric < LOAN_MIN_VND) {
+                        setValue(
+                          "loan.requested_amount",
+                          String(LOAN_MIN_VND),
+                          {
+                            shouldValidate: true,
+                          },
+                        );
+                      } else if (numeric > LOAN_MAX_VND) {
+                        setValue(
+                          "loan.requested_amount",
+                          String(LOAN_MAX_VND),
+                          {
+                            shouldValidate: true,
+                          },
+                        );
+                      }
+                    }}
                     disabled={isPending}
                   />
                   <p className="mt-2 text-xs text-muted-foreground">
@@ -861,40 +916,66 @@ export default function ProjectApplicationClient() {
                   htmlFor="durationMonths"
                   error={errors.loan?.duration_months?.message}
                 >
-                  <div
-                    id="durationMonths"
-                    role="radiogroup"
-                    aria-label={t("projectApplication.fields.durationMonths")}
-                    className="grid grid-cols-2 sm:grid-cols-4 gap-2"
-                  >
-                    {LOAN_DURATIONS_MONTHS.map((months) => {
-                      const value = String(months);
-                      const isSelected = selectedDuration === value;
-                      return (
-                        <button
-                          key={months}
-                          type="button"
-                          role="radio"
-                          aria-checked={isSelected}
-                          disabled={isPending}
-                          onClick={() =>
-                            setValue("loan.duration_months", value, {
-                              shouldValidate: true,
-                            })
-                          }
-                          className={cn(
-                            "rounded-xl border px-3 py-2.5 text-sm font-semibold transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-60",
-                            isSelected
-                              ? "border-primary bg-primary text-primary-foreground"
-                              : "border-border text-muted-foreground hover:bg-muted hover:text-foreground",
-                          )}
-                        >
-                          {t("projectApplication.durationOptions.months", {
-                            count: months,
-                          })}
-                        </button>
-                      );
-                    })}
+                  <div className="space-y-4 pt-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground font-medium">
+                        {t("projectApplication.hints.durationMonthsRange", {
+                          min: LOAN_MIN_DURATION_MONTHS,
+                          max: LOAN_MAX_DURATION_MONTHS,
+                        })}
+                      </span>
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20 shadow-2xs">
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                        {t("projectApplication.durationOptions.months", {
+                          count: Number(selectedDuration || 3),
+                        })}
+                      </span>
+                    </div>
+
+                    <Slider
+                      id="durationMonths"
+                      aria-label={t("projectApplication.fields.durationMonths")}
+                      min={LOAN_MIN_DURATION_MONTHS}
+                      max={LOAN_MAX_DURATION_MONTHS}
+                      step={1}
+                      value={[Number(selectedDuration || 3)]}
+                      onValueChange={(val) => {
+                        setValue("loan.duration_months", String(val[0]), {
+                          shouldValidate: true,
+                        });
+                      }}
+                      disabled={isPending}
+                      className="py-2 cursor-pointer"
+                    />
+
+                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
+                      {LOAN_DURATIONS_MONTHS.map((months) => {
+                        const isSelected =
+                          Number(selectedDuration || 3) === months;
+                        return (
+                          <button
+                            key={months}
+                            type="button"
+                            disabled={isPending}
+                            onClick={() =>
+                              setValue("loan.duration_months", String(months), {
+                                shouldValidate: true,
+                              })
+                            }
+                            className={cn(
+                              "py-1.5 text-xs rounded-lg transition-all font-semibold cursor-pointer border text-center",
+                              isSelected
+                                ? "bg-primary text-primary-foreground border-primary shadow-xs"
+                                : "border-border/60 bg-muted/30 text-muted-foreground hover:bg-muted hover:text-foreground",
+                            )}
+                          >
+                            {t("projectApplication.durationOptions.months", {
+                              count: months,
+                            })}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                   <p className="mt-2 text-xs text-muted-foreground">
                     {t("projectApplication.hints.durationMonths")}

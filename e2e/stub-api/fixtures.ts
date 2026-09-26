@@ -209,8 +209,8 @@ export const STUB_PROJECT = {
   loan_application: {
     id: "30000000-0000-0000-0000-000000000001",
     project_id: "20000000-0000-0000-0000-000000000001",
-    requested_amount: "1250000000.00",
-    duration_months: 12,
+    requested_amount: "800000000.00",
+    duration_months: 6,
     interest_rate_pct: null,
     purpose: "Working capital for a new production line",
     repayment_preference: "MONTHLY",

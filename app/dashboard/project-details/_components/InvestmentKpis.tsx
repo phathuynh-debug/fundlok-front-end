@@ -20,14 +20,13 @@ interface InvestmentKpisProps {
 }
 
 export function InvestmentKpis({
-  // Mock fallback while the page has no real loan attached: 1.25bn VND sits
-  // inside the engine's 20M-5bn range, so it reads as a plausible loan.
-  loanAmountVnd = 1_250_000_000,
+  // Mock fallback while the page has no real loan attached: 800M VND sits
+  // inside the engine's 20M-1bn range, so it reads as a plausible loan.
+  loanAmountVnd = 800_000_000,
   interestRatePct = 10.2,
-  // 12, not an arbitrary number: the grading engine only accepts 3/6/9/12
-  // (LOAN_DURATIONS_MONTHS), so a 10-month fallback showed investors a term the
-  // platform cannot actually originate.
-  paybackMonths = 12,
+  // 6, not an arbitrary number: the grading engine accepts 1-6 months
+  // (LOAN_DURATIONS_MONTHS), so an unoriginatable term is avoided.
+  paybackMonths = 6,
   revenueShareRate = "8.5%",
 }: InvestmentKpisProps) {
   const { locale, t } = useTranslations();

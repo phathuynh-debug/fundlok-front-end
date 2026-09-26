@@ -1,9 +1,16 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValueEvent,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "framer-motion";
+import { ShieldCheck, Layers, Coins, Banknote } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
-import { ChevronRight, ChevronLeft, RotateCcw } from "lucide-react";
 
 // Content structures for both roles in both English and Vietnamese
 const contentData = {
@@ -34,7 +41,7 @@ const contentData = {
             ["Your case moves forward", "Ready for assessment"],
           ],
           emphasis:
-            "What we want to emphasize here is that getting started should feel simple for you — but still supported by secure digital workflows that keep the process efficient and reliable.",
+            "Getting started is simple for you, and secure digital workflows keep the process efficient behind the scenes.",
         },
         {
           num: 2,
@@ -256,7 +263,7 @@ const contentData = {
             ["Hồ sơ được chuyển tiếp", "Sẵn sàng để thẩm định"],
           ],
           emphasis:
-            "Chúng tôi muốn nhấn mạnh rằng việc bắt đầu sẽ cực kỳ đơn giản cho bạn — nhưng vẫn được bảo đảm bởi các luồng công việc kỹ thuật số an toàn để giữ cho quy trình luôn hiệu quả và đáng tin cậy.",
+            "Việc bắt đầu rất đơn giản với bạn, còn các luồng công việc kỹ thuật số an toàn giữ cho quy trình hiệu quả ở phía sau.",
         },
         {
           num: 2,
@@ -458,13 +465,13 @@ export function InteractiveFlow() {
   const text = contentData[currentLocale];
 
   const [role, setRole] = useState<"sme" | "investor">("sme");
+  const reduceMotion = useReducedMotion();
+  const celebrated = useRef(false);
   const [activeStep, setActiveStep] = useState(0);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const confettiCleanupRef = useRef<(() => void) | null>(null);
 
   const activeRoleData = role === "sme" ? text.sme : text.investor;
-  const stepCount = activeRoleData.steps.length;
-  const currentStepData = activeRoleData.steps[activeStep];
 
   const triggerConfetti = () => {
     const canvas = canvasRef.current;
@@ -930,321 +937,272 @@ export function InteractiveFlow() {
     return cleanup;
   };
 
-  // Confetti trigger on reaching the last step (index 3)
-  useEffect(() => {
-    if (activeStep === 3) {
-      const timer = setTimeout(() => triggerConfetti(), 80);
-      return () => {
-        clearTimeout(timer);
-        if (confettiCleanupRef.current) {
-          confettiCleanupRef.current();
-        }
-      };
-    }
-  }, [activeStep]);
-
-  // Cleanup confetti animation on unmount
+  // Cleanup on unmount. The burst fires when the reader reaches the final
+  // node, not on a timer, so it can be mid-flight when the section unmounts.
   useEffect(() => {
     return () => {
-      if (confettiCleanupRef.current) {
-        confettiCleanupRef.current();
-      }
+      confettiCleanupRef.current?.();
     };
   }, []);
 
-  const handleStepClick = (idx: number) => {
-    setActiveStep(idx);
-    if (idx === 3) {
-      setTimeout(() => triggerConfetti(), 80);
-    }
-  };
+  const stageIcons = [ShieldCheck, Layers, Coins, Banknote];
+  const steps = activeRoleData.steps;
+  const step = steps[Math.min(activeStep, steps.length - 1)];
 
-  const handleNext = () => {
-    if (activeStep < stepCount - 1) {
-      const nextStep = activeStep + 1;
-      setActiveStep(nextStep);
-      if (nextStep === 3) {
-        setTimeout(() => triggerConfetti(), 80);
-      }
-    }
-  };
+  /**
+   * Scroll-pinned sequence, after worldquant.com.
+   *
+   * The section is several viewports tall. Inside it a single panel is pinned,
+   * and scrolling advances the stage rather than moving the panel. That answers
+   * the thing tabs got wrong: the reader does not have to discover a control or
+   * decide what to click, they just keep scrolling and all four stages arrive
+   * in the order they actually happen.
+   *
+   * `useScroll` + `useTransform`, never a scroll listener (5.D). The progress
+   * bar is a motion value, so it repaints without re-rendering React; only the
+   * stage INDEX goes through state, and only when it actually changes, which is
+   * three times across the whole section rather than once per frame (3.B).
+   */
+  const sequenceRef = useRef<HTMLDivElement>(null);
+  // "end start", not "end end": the panel is pinned from the moment the
+  // wrapper's top reaches the viewport top until its BOTTOM does, so that is
+  // the span progress has to map onto. Measuring to "end end" instead leaves
+  // the last stage holding for a whole extra viewport while the first three
+  // get one each.
+  const { scrollYProgress } = useScroll({
+    target: sequenceRef,
+    offset: ["start start", "end start"],
+  });
+  const progressWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
-  const handlePrev = () => {
-    if (activeStep > 0) {
-      setActiveStep((prev) => prev - 1);
-    }
-  };
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    const idx = Math.min(steps.length - 1, Math.floor(v * steps.length));
+    setActiveStep((prev) => (prev === idx ? prev : idx));
+  });
 
-  const handleReset = () => {
-    setActiveStep(0);
-  };
+  useEffect(() => {
+    if (
+      activeStep === steps.length - 1 &&
+      !celebrated.current &&
+      !reduceMotion
+    ) {
+      celebrated.current = true;
+      triggerConfetti();
+    }
+  }, [activeStep, steps.length, reduceMotion]);
 
   const handleRoleChange = (newRole: "sme" | "investor") => {
     setRole(newRole);
-    setActiveStep(0); // Reset to step 1
+    celebrated.current = false;
   };
 
+  const audiences = [
+    {
+      key: "sme" as const,
+      label: currentLocale === "vi" ? "Cho doanh nghiệp" : "For SMEs",
+    },
+    {
+      key: "investor" as const,
+      label: currentLocale === "vi" ? "Cho nhà đầu tư" : "For Investors",
+    },
+  ];
+
+  const stageDetail = (s: (typeof steps)[number]) => (
+    <div className="grid gap-6 lg:grid-cols-[1.35fr_1fr] lg:gap-8">
+      <div className="rounded-2xl border border-border bg-card p-6 md:p-8">
+        <p className="mb-3 font-sans text-xs text-muted-foreground">
+          {s.badge}
+        </p>
+        <h3 className="mb-4 font-sans text-2xl font-extrabold tracking-tight text-foreground md:text-3xl">
+          {(s as { detailTitle?: string }).detailTitle || s.title}
+        </h3>
+        <p className="mb-6 max-w-[65ch] font-sans text-sm leading-relaxed text-muted-foreground">
+          {s.desc}
+        </p>
+        <div className="mb-6 flex flex-wrap gap-2">
+          {s.tags.map((tag, tIdx) => (
+            <span
+              key={tIdx}
+              className="rounded-full bg-emerald-500/10 px-3 py-1 font-sans text-[11px] font-semibold text-emerald-700 dark:text-emerald-400"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+        <div className="grid grid-cols-1 gap-6 border-t border-border/40 pt-6 md:grid-cols-3">
+          {[
+            [
+              currentLocale === "vi" ? "Cách hoạt động" : "How this works",
+              s.how,
+            ],
+            [
+              currentLocale === "vi"
+                ? "Tại sao quan trọng"
+                : "Why this matters",
+              s.why,
+            ],
+            [
+              currentLocale === "vi"
+                ? "Công nghệ hỗ trợ"
+                : "Technology behind it",
+              s.tech,
+            ],
+          ].map(([label, body]) => (
+            <div key={label}>
+              <h4 className="mb-2 font-sans text-xs font-semibold text-foreground">
+                {label}
+              </h4>
+              <p className="font-sans text-[11px] leading-relaxed text-muted-foreground">
+                {body}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4 rounded-2xl border border-border bg-muted/20 p-6">
+        <h4 className="font-sans text-sm font-bold tracking-wide text-foreground">
+          {s.journeyTitle}
+        </h4>
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <span className="mb-4 block font-sans text-xs font-semibold text-foreground">
+            {currentLocale === "vi"
+              ? "Các bước thực hiện"
+              : "What happens here"}
+          </span>
+          <div className="flex flex-col gap-3.5">
+            {s.rows.map((row, rIdx) => (
+              <div
+                key={rIdx}
+                className="flex items-start justify-between gap-4 border-b border-border/10 pb-3.5 last:border-none last:pb-0"
+              >
+                <span className="font-sans text-xs text-muted-foreground">
+                  {row[0]}
+                </span>
+                <span className="shrink-0 text-right font-sans text-xs font-bold text-foreground">
+                  {row[1]}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="mt-auto rounded-2xl border border-emerald-100 bg-emerald-50/50 p-5 dark:border-emerald-900/30 dark:bg-emerald-950/20">
+          <p className="font-sans text-xs font-medium leading-relaxed text-emerald-800 dark:text-emerald-300">
+            {s.emphasis}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
+  const audienceRail = (
+    <div className="flex gap-1 rounded-2xl border border-border bg-card p-1.5">
+      {audiences.map((a) => (
+        <button
+          key={a.key}
+          onClick={() => handleRoleChange(a.key)}
+          aria-pressed={role === a.key}
+          className={`rounded-xl px-4 py-2 text-xs font-sans font-bold transition-colors ${
+            role === a.key
+              ? "bg-emerald-600 text-white"
+              : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+          }`}
+        >
+          {a.label}
+        </button>
+      ))}
+    </div>
+  );
+
+  // Reduced motion gets the whole story stacked, with no pin and no scrub.
+  // Same content, same order, nothing that moves under the reader (6.B).
+  if (reduceMotion) {
+    return (
+      <div className="w-full">
+        <div className="mb-8 flex justify-center">{audienceRail}</div>
+        <div className="space-y-14">
+          {steps.map((s, idx) => (
+            <div key={`${role}-${idx}`}>{stageDetail(s)}</div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full flex flex-col items-center relative">
-      {/* Money Confetti Overlay Canvas */}
+    <div className="relative w-full">
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 pointer-events-none z-50 w-full h-full"
+        className="pointer-events-none absolute inset-0 z-50 h-full w-full"
       />
 
-      {/* Role Toggle Button Switch */}
-      <div className="flex bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1.5 rounded-full mb-12 relative z-20">
-        <button
-          onClick={() => handleRoleChange("sme")}
-          className={`px-6 py-2.5 rounded-full text-xs font-sans font-bold transition-all duration-300 ${
-            role === "sme"
-              ? "bg-emerald-600 text-white shadow-md"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          {currentLocale === "vi" ? "Cho doanh nghiệp" : "For SMEs"}
-        </button>
-        <button
-          onClick={() => handleRoleChange("investor")}
-          className={`px-6 py-2.5 rounded-full text-xs font-sans font-bold transition-all duration-300 ${
-            role === "investor"
-              ? "bg-emerald-600 text-white shadow-md"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          {currentLocale === "vi" ? "Cho nhà đầu tư" : "For Investors"}
-        </button>
-      </div>
+      {/* Exactly one viewport of scroll per stage. */}
+      <div
+        ref={sequenceRef}
+        style={{ height: `${steps.length * 100}vh` }}
+        className="relative"
+      >
+        <div className="sticky top-0 flex min-h-[100dvh] flex-col justify-center py-16">
+          {/* Pinned rail: progress, stage names, audience. Always on screen, so
+              the reader can see where they are and what is still coming. */}
+          <div className="mb-8">
+            <div className="mb-5 h-1 w-full overflow-hidden rounded-full bg-border">
+              <motion.div
+                style={{ width: progressWidth }}
+                className="h-full rounded-full bg-emerald-500"
+              />
+            </div>
 
-      {/* Top Rows: Step Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full mb-10 relative z-20">
-        {activeRoleData.steps.map((step, idx) => {
-          const isActive = idx === activeStep;
-          return (
-            <button
-              key={idx}
-              onClick={() => handleStepClick(idx)}
-              className={`flex flex-col text-left p-5 rounded-2xl border transition-all duration-300 outline-none w-full ${
-                isActive
-                  ? "bg-white dark:bg-slate-900 border-emerald-500 dark:border-emerald-400 shadow-md scale-[1.02]"
-                  : "bg-white/40 dark:bg-slate-900/30 border-slate-200/60 dark:border-slate-800/80 text-muted-foreground/80 hover:border-slate-300 dark:hover:border-slate-700"
-              }`}
-            >
-              {/* Step indicator circle */}
-              <div
-                className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-sans font-bold mb-3 transition-colors duration-300 ${
-                  isActive
-                    ? "bg-emerald-600 text-white"
-                    : "bg-slate-100 dark:bg-slate-800 text-muted-foreground"
-                }`}
-              >
-                {step.num}
-              </div>
-              <h4
-                className={`font-sans font-bold text-sm mb-1 transition-colors duration-300 ${
-                  isActive ? "text-foreground" : "text-muted-foreground"
-                }`}
-              >
-                {step.title}
-              </h4>
-              <p className="text-[10px] font-sans text-muted-foreground leading-normal line-clamp-2">
-                {step.caption}
-              </p>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Two Column details section */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full relative z-20">
-        {/* Left Column: Full Content Card */}
-        <div className="lg:col-span-7 bg-white/70 dark:bg-slate-900/70 border border-slate-200/60 dark:border-slate-800/80 rounded-3xl p-8 shadow-xl backdrop-blur-md flex flex-col justify-between min-h-[500px]">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeStep}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 10 }}
-              transition={{ duration: 0.25 }}
-              className="flex-1 flex flex-col justify-between"
-            >
-              <div>
-                {/* Badge tags header */}
-                <div className="flex items-center gap-3 mb-5">
-                  <span className="text-[10px] font-mono tracking-widest bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-3 py-1 rounded-full font-bold uppercase">
-                    {currentStepData.badge}
-                  </span>
-                  <span className="text-[10px] font-mono tracking-wider text-muted-foreground uppercase">
-                    {currentStepData.stage}
-                  </span>
-                </div>
-
-                {/* Main H3 Title */}
-                <h3 className="font-sans text-3xl font-extrabold text-foreground mb-4 leading-tight tracking-tight">
-                  {(currentStepData as { detailTitle?: string }).detailTitle ||
-                    currentStepData.title}
-                </h3>
-
-                {/* Description Paragraph */}
-                <p className="text-sm text-muted-foreground leading-relaxed font-sans mb-6">
-                  {currentStepData.desc}
-                </p>
-
-                {/* Sub tags list */}
-                <div className="flex flex-wrap gap-2 mb-8">
-                  {currentStepData.tags.map((tag, tIdx) => (
-                    <span
-                      key={tIdx}
-                      className="text-[10px] font-sans font-semibold bg-emerald-50 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-900/30 px-3 py-1.5 rounded-full"
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <ol className="flex flex-wrap items-center gap-x-2 gap-y-2">
+                {steps.map((s, idx) => {
+                  const Icon = stageIcons[idx] ?? ShieldCheck;
+                  const isActive = idx === activeStep;
+                  const isPast = idx < activeStep;
+                  return (
+                    <li
+                      key={`${role}-rail-${idx}`}
+                      className="flex items-center"
                     >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+                      <span
+                        aria-current={isActive ? "step" : undefined}
+                        className={`flex items-center gap-2 rounded-full px-3 py-1.5 transition-colors ${
+                          isActive
+                            ? "bg-emerald-600 text-white"
+                            : isPast
+                              ? "text-foreground"
+                              : "text-muted-foreground"
+                        }`}
+                      >
+                        <Icon className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+                        <span className="font-sans text-xs font-bold">
+                          {s.title}
+                        </span>
+                      </span>
+                      {idx < steps.length - 1 && (
+                        <span
+                          aria-hidden
+                          className="mx-1 hidden h-px w-6 bg-[repeating-linear-gradient(90deg,currentColor_0_4px,transparent_4px_8px)] text-border md:block"
+                        />
+                      )}
+                    </li>
+                  );
+                })}
+              </ol>
+              {audienceRail}
+            </div>
+          </div>
 
-                {/* Three small columns of info */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 border-t border-border/40 pt-6 mb-8">
-                  <div>
-                    <h5 className="text-[10px] font-sans font-bold tracking-wider text-emerald-700 dark:text-emerald-400 uppercase mb-2">
-                      {currentLocale === "vi"
-                        ? "Cách hoạt động"
-                        : "How this works"}
-                    </h5>
-                    <p className="text-[11px] text-muted-foreground font-sans leading-relaxed">
-                      {currentStepData.how}
-                    </p>
-                  </div>
-                  <div>
-                    <h5 className="text-[10px] font-sans font-bold tracking-wider text-emerald-700 dark:text-emerald-400 uppercase mb-2">
-                      {currentLocale === "vi"
-                        ? "Tại sao quan trọng"
-                        : "Why this matters"}
-                    </h5>
-                    <p className="text-[11px] text-muted-foreground font-sans leading-relaxed">
-                      {currentStepData.why}
-                    </p>
-                  </div>
-                  <div>
-                    <h5 className="text-[10px] font-sans font-bold tracking-wider text-emerald-700 dark:text-emerald-400 uppercase mb-2">
-                      {currentLocale === "vi"
-                        ? "Công nghệ hỗ trợ"
-                        : "Technology behind it"}
-                    </h5>
-                    <p className="text-[11px] text-muted-foreground font-sans leading-relaxed">
-                      {currentStepData.tech}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Navigation buttons */}
-              <div className="flex items-center gap-3 border-t border-border/30 pt-6">
-                <button
-                  disabled={activeStep === 0}
-                  onClick={handlePrev}
-                  className={`flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-sans font-bold tracking-wide uppercase transition-all duration-300 border ${
-                    activeStep === 0
-                      ? "bg-slate-100/50 dark:bg-slate-800/30 border-slate-200/40 dark:border-slate-800/50 text-muted-foreground/30 cursor-not-allowed"
-                      : "bg-[#eef1f4] dark:bg-slate-800/85 border-transparent text-zinc-700 dark:text-zinc-200 hover:bg-[#e4e8ec] dark:hover:bg-slate-800 active:scale-95"
-                  }`}
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  {currentLocale === "vi" ? "Quay lại" : "Previous"}
-                </button>
-
-                {activeStep < stepCount - 1 ? (
-                  <button
-                    onClick={handleNext}
-                    className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-xs font-sans font-bold tracking-wide uppercase bg-emerald-600 hover:bg-emerald-700 text-white shadow-md hover:shadow-emerald-600/10 transition-all duration-300 active:scale-95 ml-auto"
-                  >
-                    {currentLocale === "vi" ? "Tiếp theo" : "Next"}
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleReset}
-                    className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-xs font-sans font-bold tracking-wide uppercase bg-emerald-600 hover:bg-emerald-700 text-white shadow-md hover:shadow-emerald-600/10 transition-all duration-300 active:scale-95 ml-auto"
-                  >
-                    <RotateCcw className="w-4 h-4" />
-                    {currentLocale === "vi" ? "Bắt đầu lại" : "Start again"}
-                  </button>
-                )}
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
-        {/* Right Column: Visual Journey Card */}
-        <div className="lg:col-span-5 bg-gradient-to-br from-emerald-50/40 to-teal-50/20 dark:from-slate-900/60 dark:to-slate-950/20 border border-slate-200/50 dark:border-slate-800/60 rounded-3xl p-6 md:p-8 shadow-xl backdrop-blur-md flex flex-col justify-between min-h-[500px]">
+          {/* The stage itself. Cross-fades as the scroll crosses each boundary. */}
           <AnimatePresence mode="wait">
             <motion.div
-              key={activeStep}
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.25 }}
-              className="flex-1 flex flex-col justify-between"
+              key={`${role}-${activeStep}`}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
             >
-              <div>
-                {/* Header title & step dot markers */}
-                <div className="flex items-center justify-between mb-8">
-                  <h4 className="font-sans font-bold text-foreground text-sm tracking-wide">
-                    {currentStepData.journeyTitle}
-                  </h4>
-                  {/* Stepper dots indicator */}
-                  <div className="flex items-center gap-1.5">
-                    {Array.from({ length: stepCount }).map((_, dIdx) => (
-                      <span
-                        key={dIdx}
-                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                          dIdx === activeStep
-                            ? "bg-emerald-500 scale-125"
-                            : "bg-slate-200 dark:bg-slate-700"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Inner White table card */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 rounded-2xl p-5 shadow-md mb-6">
-                  {/* Category label */}
-                  <div className="flex justify-between items-center pb-4 border-b border-border/30 mb-4">
-                    <span className="text-[10px] font-sans font-bold tracking-widest text-emerald-700 dark:text-emerald-400 uppercase">
-                      {currentLocale === "vi"
-                        ? "BƯỚC THỰC HIỆN"
-                        : "WHAT HAPPENS HERE"}
-                    </span>
-                    <span className="text-[10px] font-mono bg-emerald-500/10 text-emerald-700 px-2 py-0.5 rounded uppercase font-bold text-[9px]">
-                      Tech + Trust
-                    </span>
-                  </div>
-
-                  {/* Flow list table rows */}
-                  <div className="flex flex-col gap-3.5">
-                    {currentStepData.rows.map((row, rIdx) => (
-                      <div
-                        key={rIdx}
-                        className="flex justify-between items-start gap-4 pb-3.5 border-b border-border/10 last:border-none last:pb-0"
-                      >
-                        <span className="text-xs text-muted-foreground font-sans">
-                          {row[0]}
-                        </span>
-                        <span className="text-xs font-sans font-bold text-foreground text-right shrink-0">
-                          {row[1]}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Bottom emphasis callout */}
-              <div className="bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl p-5">
-                <p className="text-xs text-emerald-800 dark:text-emerald-300 leading-relaxed font-sans font-medium">
-                  {currentStepData.emphasis}
-                </p>
-              </div>
+              {stageDetail(step)}
             </motion.div>
           </AnimatePresence>
         </div>

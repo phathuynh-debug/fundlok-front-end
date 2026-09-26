@@ -96,16 +96,16 @@ export interface SmeFacility {
 
 export const MOCK_SME_FACILITY: SmeFacility = {
   principal: 800_000_000,
-  // 800,000,000 at 14.32%/yr over twelve months, spread across the 252
-  // business days in the term: 3,629,206 x 252 = 914,559,912.
-  total_obligation: 914_559_912,
+  // 800,000,000 at 14.32%/yr over six months, spread across the 126
+  // business days in the term: 6,803,810 x 126 = 857,280,060.
+  total_obligation: 857_280_060,
   interest_rate_pct: 14.32,
-  term_months: 12,
+  term_months: 6,
   disbursed_at: "2026-04-01",
-  // Five months in, seven to go: 7 x 21 business days.
-  days_remaining: 147,
-  target_daily: 3_629_206,
-  current_period_total: 76_213_326,
+  // Five months in, one to go: 1 x 21 business days.
+  days_remaining: 21,
+  target_daily: 6_803_810,
+  current_period_total: 142_880_010,
   current_period_end_date: "2026-09-30",
   on_time_streak: 5,
   score: 70.98,

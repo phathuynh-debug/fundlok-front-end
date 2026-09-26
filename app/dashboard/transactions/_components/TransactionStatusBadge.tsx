@@ -42,7 +42,7 @@ export function TransactionStatusBadge({
   return (
     <Badge
       variant="outline"
-      className={`${className} font-mono text-[10px] uppercase font-bold tracking-wider rounded-full px-2.5 py-0.5 flex items-center gap-1 w-fit`}
+      className={`${className} text-[11px] uppercase font-semibold tracking-wider rounded-full px-2.5 py-0.5 flex items-center gap-1 w-fit`}
     >
       <Icon className="w-3 h-3 shrink-0" aria-hidden="true" />
       {t(labelKey)}

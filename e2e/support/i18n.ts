@@ -16,7 +16,10 @@ export type TestLocale = keyof typeof dictionaries;
 export function t(
   key: string,
   values?: Record<string, string | number>,
-  locale: TestLocale = "en",
+  // Tracks the app's own default (lib/i18n → DEFAULT_LOCALE). A spec that
+  // wants English must set the cookie with useLocale(context, "en") AND pass
+  // "en" here, the way i18n.spec.ts does for Vietnamese.
+  locale: TestLocale = "vi",
 ): string {
   const resolved = key
     .split(".")
