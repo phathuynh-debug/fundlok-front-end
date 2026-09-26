@@ -15,14 +15,16 @@
  * TODO: serve these from the backend so they cannot drift from the YAML.
  */
 
-/** The only loan terms the engine accepts, in months. */
-export const LOAN_DURATIONS_MONTHS = [3, 6, 9, 12] as const;
+/** The only loan terms the engine accepts, in months (1 to 6 months). */
+export const LOAN_MIN_DURATION_MONTHS = 1;
+export const LOAN_MAX_DURATION_MONTHS = 6;
+export const LOAN_DURATIONS_MONTHS = [1, 2, 3, 4, 5, 6] as const;
 
 export type LoanDurationMonths = (typeof LOAN_DURATIONS_MONTHS)[number];
 
-/** Principal bounds, VND. 20 million to 5 billion. */
+/** Principal bounds, VND. 20 million to 1 billion. */
 export const LOAN_MIN_VND = 20_000_000;
-export const LOAN_MAX_VND = 5_000_000_000;
+export const LOAN_MAX_VND = 1_000_000_000;
 
 export function isAllowedLoanDuration(
   value: number,

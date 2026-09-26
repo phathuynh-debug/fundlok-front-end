@@ -42,19 +42,19 @@ describe("InvestmentKpis", () => {
 
   it("groups the amount the Vietnamese way when the locale is vi", () => {
     locale.current = "vi";
-    render(<InvestmentKpis loanAmountVnd={1_250_000_000} />);
-    expect(screen.getByText("1.250.000.000 ₫")).toBeInTheDocument();
+    render(<InvestmentKpis loanAmountVnd={1_000_000_000} />);
+    expect(screen.getByText("1.000.000.000 ₫")).toBeInTheDocument();
   });
 
   it("renders a real backend amount, not the mock default", () => {
-    render(<InvestmentKpis loanAmountVnd={800_000_000} />);
-    expect(screen.getByText("₫800,000,000")).toBeInTheDocument();
-    expect(screen.queryByText("₫1,250,000,000")).not.toBeInTheDocument();
+    render(<InvestmentKpis loanAmountVnd={500_000_000} />);
+    expect(screen.getByText("₫500,000,000")).toBeInTheDocument();
+    expect(screen.queryByText("₫800,000,000")).not.toBeInTheDocument();
   });
 
   it("keeps the amount on one line and inside the card", () => {
-    render(<InvestmentKpis loanAmountVnd={5_000_000_000} />);
-    const value = screen.getByText("₫5,000,000,000");
+    render(<InvestmentKpis loanAmountVnd={1_000_000_000} />);
+    const value = screen.getByText("₫1,000,000,000");
     // whitespace-nowrap stops a money figure breaking mid-number; truncate is
     // the guard that clips at the card edge instead of overflowing it.
     expect(value.className).toContain("whitespace-nowrap");

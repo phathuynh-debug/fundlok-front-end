@@ -1237,7 +1237,7 @@
       "title": "For Investors"
     },
     "msme": {
-      "a1": "FundLok is designed for MSMEs that meet the platform's eligibility and verification requirements. Suitability depends on the business profile, financial condition, and fit with the funding model. Typical funding ranges from VND 500,000,000 to VND 5,000,000,000.",
+      "a1": "FundLok is designed for MSMEs that meet the platform's eligibility and verification requirements. Suitability depends on the business profile, financial condition, and fit with the funding model. Typical funding ranges from VND 20,000,000 to VND 1,000,000,000.",
       "a2": "MSMEs may need to provide business information, verification documents, and financial data for assessment and repayment. The exact requirements may vary depending on the business and funding request.",
       "a3": "FundLok uses a technology-driven assessment process that may include automated financial evaluation, structured data analysis, AI context-specific investigation, and business-specific review to better understand each MSME's operating situation.",
       "a4": "Yes. MSMEs can review the proposed terms before confirming and proceeding to the listing stage.",
@@ -1535,7 +1535,8 @@
     },
     "hints": {
       "companySizeDerived": "Classified as {size}",
-      "durationMonths": "The only terms available on the platform. Longer terms lower the daily repayment.",
+      "durationMonths": "The only terms available on the platform (1-6 months). Longer terms lower the daily repayment.",
+      "durationMonthsRange": "From {min} to {max} months",
       "employeeCount": "Full-time headcount, between 1 and 200.",
       "prefilledAddressFromKyb": "Street and city came from the address on your verified business registration. Add the state/region and postal code, and edit anything that differs.",
       "prefilledFromKyb": "Legal name and tax ID were filled in from your verified business registration. Check them and edit if anything differs.",
@@ -1600,7 +1601,7 @@
     "validation": {
       "city": "City is required",
       "country": "Country is required",
-      "durationMonths": "Choose a loan term of 3, 6, 9 or 12 months",
+      "durationMonths": "Choose a loan term between 1 and 6 months",
       "employeeCount": "Enter a headcount between 1 and 200 — this platform funds SMEs only",
       "incorporationDate": "Incorporation date is required",
       "incorporationDateFormat": "Enter a real date in the format YYYY-MM-DD.",
@@ -1611,7 +1612,7 @@
       "postalCode": "Postal code is required",
       "repaymentPreference": "Repayment preference is required",
       "requestedAmount": "Enter a requested amount greater than 0",
-      "requestedAmountRange": "Enter an amount between 20,000,000 and 5,000,000,000 VND",
+      "requestedAmountRange": "Enter an amount between 20,000,000 and 1,000,000,000 VND",
       "street": "Street is required",
       "taxId": "Tax ID is required"
     }
@@ -1637,7 +1638,7 @@
     "error": {
       "costsExceedRevenue": "Your costs add up to more than your revenue for the same period, so there is nothing to lend against. Check these figures.",
       "employeeRange": "Between 1 and 200 employees.",
-      "loanRange": "Must be between 20,000,000 ₫ and 5,000,000,000 ₫.",
+      "loanRange": "Must be between 20,000,000 ₫ and 1,000,000,000 ₫.",
       "monthExceedsYear": "A single month cannot be more than the whole year's revenue.",
       "mustBePositive": "Must be greater than zero.",
       "operatingRange": "Enter the number of months, at least 1.",
@@ -1655,7 +1656,7 @@
     "industry": "Industry",
     "industryPlaceholder": "Select your industry",
     "loanAmount": "How much you want",
-    "loanAmountHint": "Between 20,000,000 ₫ and 5,000,000,000 ₫.",
+    "loanAmountHint": "Between 20,000,000 ₫ and 1,000,000,000 ₫.",
     "months12": "12 months",
     "months6": "6 months",
     "notAnOffer": "This is an estimate, not an offer. Your final rate is set after we verify your figures and can differ. FundLok is not a credit rating company.",

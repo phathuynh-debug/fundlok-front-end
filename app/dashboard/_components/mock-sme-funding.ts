@@ -98,7 +98,7 @@ export interface SmeFunding {
 }
 
 export const MOCK_SME_FUNDING: SmeFunding = {
-  requested: 1250000000,
+  requested: 1_000_000_000,
   funded: 875000000,
   investor_count: 14,
   score: 74,

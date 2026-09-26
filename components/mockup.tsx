@@ -28,8 +28,8 @@ export default function Mockup(props: MockupProps) {
   // SME Calculator states. VND, matching lib/constants/loan-constraints.ts —
   // there is no USD anywhere in the product (see lib/format-currency.ts).
   const [smeRevenue, setSmeRevenue] = useState<number>(500_000_000);
-  const [smeLoanSize, setSmeLoanSize] = useState<number>(1_000_000_000);
-  const [smeDuration, setSmeDuration] = useState<number>(12);
+  const [smeLoanSize, setSmeLoanSize] = useState<number>(500_000_000);
+  const [smeDuration, setSmeDuration] = useState<number>(6);
 
   // Investor Calculator states
   const [invSize, setInvSize] = useState<number>(300_000_000);
@@ -338,7 +338,7 @@ export default function Mockup(props: MockupProps) {
                           <input
                             type="range"
                             min="20000000"
-                            max="5000000000"
+                            max="1000000000"
                             step="20000000"
                             value={smeLoanSize}
                             onChange={(e) =>
@@ -381,9 +381,9 @@ export default function Mockup(props: MockupProps) {
                           </div>
                           <input
                             type="range"
-                            min="6"
-                            max="12"
-                            step="6"
+                            min="1"
+                            max="6"
+                            step="1"
                             value={smeDuration}
                             onChange={(e) =>
                               setSmeDuration(Number(e.target.value))
@@ -733,7 +733,7 @@ export default function Mockup(props: MockupProps) {
                         <input
                           type="range"
                           min="20000000"
-                          max="5000000000"
+                          max="1000000000"
                           step="20000000"
                           value={smeLoanSize}
                           onChange={(e) =>
@@ -774,9 +774,9 @@ export default function Mockup(props: MockupProps) {
                         </div>
                         <input
                           type="range"
-                          min="6"
-                          max="12"
-                          step="6"
+                          min="1"
+                          max="6"
+                          step="1"
                           value={smeDuration}
                           onChange={(e) =>
                             setSmeDuration(Number(e.target.value))

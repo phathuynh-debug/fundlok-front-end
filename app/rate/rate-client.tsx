@@ -9,13 +9,20 @@ import SiteFooter from "@/components/site-footer";
 import { BackgroundBlobs } from "@/components/background-blobs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NumericInput } from "@/components/ui/numeric-input";
 import { digitsOnly } from "@/lib/format-currency";
 import { useTranslations } from "@/lib/i18n";
 import { useRateEstimate } from "@/hooks/use-loans";
 import { INDUSTRY_OPTIONS } from "@/lib/constants/industries";
-import { LOAN_MAX_VND, LOAN_MIN_VND } from "@/lib/constants/loan-constraints";
+import {
+  LOAN_DURATIONS_MONTHS,
+  LOAN_MAX_DURATION_MONTHS,
+  LOAN_MIN_DURATION_MONTHS,
+  LOAN_MAX_VND,
+  LOAN_MIN_VND,
+} from "@/lib/constants/loan-constraints";
 import { cn } from "@/lib/utils";
 
 /**
@@ -120,7 +127,7 @@ function AmountInput({
   );
 }
 
-const DURATIONS = [6, 12] as const;
+const DURATIONS = LOAN_DURATIONS_MONTHS;
 
 // The engine's own bounds, checked here so the visitor is told before a round
 // trip. The server re-checks all of them -- this is convenience, not a
@@ -708,7 +715,14 @@ export default function RateClient() {
               "loanAmount",
               t("ratePage.loanAmount"),
               loanAmount,
-              setLoanAmount,
+              (val) => {
+                const num = Number(val);
+                if (num > LOAN_MAX) {
+                  setLoanAmount(String(LOAN_MAX));
+                } else {
+                  setLoanAmount(val);
+                }
+              },
               {
                 amount: true,
                 hint: t("ratePage.loanAmountHint"),
@@ -716,29 +730,42 @@ export default function RateClient() {
               },
             )}
 
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">
-                {t("ratePage.duration")}
-                <span className="ml-2 text-xs text-destructive">*</span>
-              </label>
-              {/* 6 or 12 only. Twelve months is the maximum term; the platform
-                  does not write longer. */}
-              <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">
+                  {t("ratePage.duration")}
+                  <span className="ml-2 text-xs text-destructive">*</span>
+                </label>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                  {duration} {locale === "vi" ? "tháng" : "months"}
+                </span>
+              </div>
+              <Slider
+                id="rateDurationSlider"
+                aria-label={t("ratePage.duration")}
+                min={LOAN_MIN_DURATION_MONTHS}
+                max={LOAN_MAX_DURATION_MONTHS}
+                step={1}
+                value={[duration]}
+                onValueChange={(val) => setDuration(val[0])}
+                className="py-2 cursor-pointer"
+              />
+              {/* 1 to 6 months: matches LOAN_DURATIONS_MONTHS. */}
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
                 {DURATIONS.map((months) => (
                   <button
                     key={months}
                     type="button"
                     onClick={() => setDuration(months)}
                     className={cn(
-                      "rounded-md border px-3 py-2 text-sm font-semibold transition-colors",
+                      "rounded-md border px-2 py-2 text-sm font-semibold transition-colors cursor-pointer",
                       duration === months
                         ? "border-primary bg-primary text-primary-foreground"
                         : "border-border bg-transparent text-muted-foreground hover:text-foreground",
                     )}
                   >
-                    {months === 6
-                      ? t("ratePage.months6")
-                      : t("ratePage.months12")}
+                    {months} {locale === "vi" ? "tháng" : "mo"}
                   </button>
                 ))}
               </div>

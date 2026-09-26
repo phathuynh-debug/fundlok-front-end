@@ -1237,7 +1237,7 @@
       "title": "Dành cho nhà đầu tư"
     },
     "msme": {
-      "a1": "FundLok dành cho các MSME đáp ứng yêu cầu về điều kiện và xác minh của nền tảng. Mức độ phù hợp phụ thuộc vào hồ sơ doanh nghiệp, tình hình tài chính và sự tương thích với mô hình cấp vốn. Hạn mức cấp vốn phổ biến từ 500.000.000 đến 5.000.000.000 VND.",
+      "a1": "FundLok dành cho các MSME đáp ứng yêu cầu về điều kiện và xác minh của nền tảng. Mức độ phù hợp phụ thuộc vào hồ sơ doanh nghiệp, tình hình tài chính và sự tương thích với mô hình cấp vốn. Hạn mức cấp vốn phổ biến từ 20.000.000 đến 1.000.000.000 VND.",
       "a2": "MSME có thể cần cung cấp thông tin doanh nghiệp, tài liệu xác minh và dữ liệu tài chính phục vụ thẩm định và trả nợ. Yêu cầu cụ thể có thể khác nhau tùy theo doanh nghiệp và nhu cầu vốn.",
       "a3": "FundLok sử dụng quy trình thẩm định dựa trên công nghệ, có thể bao gồm đánh giá tài chính tự động, phân tích dữ liệu có cấu trúc, phân tích AI theo ngữ cảnh và đánh giá đặc thù ngành để hiểu rõ tình hình vận hành của từng MSME.",
       "a4": "Có. MSME có thể xem các điều khoản đề xuất trước khi xác nhận và tiến tới giai đoạn niêm yết.",
@@ -1535,7 +1535,8 @@
     },
     "hints": {
       "companySizeDerived": "Được xếp loại {size}",
-      "durationMonths": "Đây là các thời hạn nền tảng hỗ trợ. Thời hạn dài hơn giúp giảm mức trả hằng ngày.",
+      "durationMonths": "Đây là các thời hạn nền tảng hỗ trợ (1-6 tháng). Thời hạn dài hơn giúp giảm mức trả hằng ngày.",
+      "durationMonthsRange": "Từ {min} đến {max} tháng",
       "employeeCount": "Số nhân viên toàn thời gian, từ 1 đến 200.",
       "prefilledAddressFromKyb": "Địa chỉ và tỉnh/thành được lấy từ giấy đăng ký kinh doanh đã xác minh của bạn. Vui lòng bổ sung khu vực và mã bưu chính, và chỉnh sửa nếu có sai lệch.",
       "prefilledFromKyb": "Tên pháp lý và mã số thuế được điền sẵn từ giấy đăng ký kinh doanh đã xác minh của bạn. Vui lòng kiểm tra và chỉnh sửa nếu có sai lệch.",
@@ -1600,7 +1601,7 @@
     "validation": {
       "city": "Vui lòng nhập thành phố",
       "country": "Vui lòng nhập quốc gia",
-      "durationMonths": "Chọn thời hạn vay 3, 6, 9 hoặc 12 tháng",
+      "durationMonths": "Chọn thời hạn vay từ 1 đến 6 tháng",
       "employeeCount": "Nhập số nhân viên từ 1 đến 200 — nền tảng chỉ tài trợ doanh nghiệp SME",
       "incorporationDate": "Vui lòng nhập ngày thành lập",
       "incorporationDateFormat": "Vui lòng nhập ngày hợp lệ theo định dạng YYYY-MM-DD.",
@@ -1611,7 +1612,7 @@
       "postalCode": "Vui lòng nhập mã bưu chính",
       "repaymentPreference": "Vui lòng chọn hình thức trả nợ",
       "requestedAmount": "Vui lòng nhập số tiền vay lớn hơn 0",
-      "requestedAmountRange": "Nhập số tiền từ 20.000.000 đến 5.000.000.000 VND",
+      "requestedAmountRange": "Nhập số tiền từ 20.000.000 đến 1.000.000.000 VND",
       "street": "Vui lòng nhập đường",
       "taxId": "Vui lòng nhập mã số thuế"
     }
@@ -1637,7 +1638,7 @@
     "error": {
       "costsExceedRevenue": "Tổng chi phí của bạn lớn hơn doanh thu cùng kỳ, nên không còn nguồn để tài trợ. Hãy kiểm tra lại các số liệu này.",
       "employeeRange": "Từ 1 đến 200 nhân sự.",
-      "loanRange": "Phải từ 20.000.000 ₫ đến 5.000.000.000 ₫.",
+      "loanRange": "Phải từ 20.000.000 ₫ đến 1.000.000.000 ₫.",
       "monthExceedsYear": "Doanh thu một tháng không thể lớn hơn doanh thu cả năm.",
       "mustBePositive": "Phải lớn hơn 0.",
       "operatingRange": "Nhập số tháng, tối thiểu 1.",
@@ -1655,7 +1656,7 @@
     "industry": "Ngành nghề",
     "industryPlaceholder": "Chọn ngành của bạn",
     "loanAmount": "Số tiền bạn cần",
-    "loanAmountHint": "Từ 20.000.000 ₫ đến 5.000.000.000 ₫.",
+    "loanAmountHint": "Từ 20.000.000 ₫ đến 1.000.000.000 ₫.",
     "months12": "12 tháng",
     "months6": "6 tháng",
     "notAnOffer": "Đây là ước tính, không phải đề nghị cấp vốn. Lãi suất cuối cùng được xác định sau khi chúng tôi xác minh số liệu và có thể khác. FundLok không phải công ty xếp hạng tín nhiệm.",
