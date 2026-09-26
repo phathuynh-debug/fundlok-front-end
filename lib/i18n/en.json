@@ -442,6 +442,7 @@
       "browseProjects": "Browse Investment Projects",
       "capitalWrittenDown": "Capital written down",
       "holdingBackstop": "Backstop {date}",
+      "holdingDailyPayout": "Target {amount}/business day",
       "holdingInvested": "Invested",
       "holdingNextPayout": "Next Payout",
       "holdingProgress": "Repayment progress",
@@ -1065,6 +1066,7 @@
       "fixedAtSigning": "Fixed at signing. It does not change.",
       "investors": "{count} investors",
       "mockNotice": "Sample data, shown while this screen is built out. Your company profile above is real; the funding and repayment figures below are not yet connected to the backend.",
+      "ofDailyRevenue": "About {percent}% of your daily revenue",
       "ofTarget": "of {target}",
       "outstanding": "Outstanding",
       "perBusinessDay": "Charged each business day",
@@ -1293,11 +1295,13 @@
       "title": "Documents & Financial Information"
     },
     "kpis": {
+      "dailyObligation": "Daily obligation amount",
       "estPaybackPeriod": "Loan Duration",
       "expectedRoi": "Annualized ROI",
       "loanAmount": "Loan Amount",
       "months": "{count} mo",
       "ofDailyRevenue": "of daily revenue",
+      "perBusinessDay": "Fixed, each business day",
       "revenueShareRate": "Revenue Share Rate"
     },
     "paymentHistory": {

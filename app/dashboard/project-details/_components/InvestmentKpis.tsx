@@ -5,13 +5,15 @@ import { Banknote, Percent, Calendar, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTranslations } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format-currency";
+import { dailyRepaymentAmount } from "@/lib/facility-terms";
 import { staggerContainerVariants, springItemVariants } from "@/lib/animations";
 
 interface InvestmentKpisProps {
   /** VND, unformatted. Formatted here so the figure follows the UI locale
       instead of arriving as a pre-baked string. */
   loanAmountVnd?: number;
-  expectedRoi?: string;
+  /** All-in annual rate, e.g. 10.2 for 10.2%. */
+  interestRatePct?: number;
   /** Loan term in months; rendered per locale. */
   paybackMonths?: number;
   revenueShareRate?: string;
@@ -21,7 +23,7 @@ export function InvestmentKpis({
   // Mock fallback while the page has no real loan attached: 1.25bn VND sits
   // inside the engine's 20M-5bn range, so it reads as a plausible loan.
   loanAmountVnd = 1_250_000_000,
-  expectedRoi = "10.2%",
+  interestRatePct = 10.2,
   // 12, not an arbitrary number: the grading engine only accepts 3/6/9/12
   // (LOAN_DURATIONS_MONTHS), so a 10-month fallback showed investors a term the
   // platform cannot actually originate.
@@ -29,6 +31,13 @@ export function InvestmentKpis({
   revenueShareRate = "8.5%",
 }: InvestmentKpisProps) {
   const { locale, t } = useTranslations();
+  // What the SME pays across the whole loan each business day — derived from
+  // the same amount, rate and term shown in the other tiles so they reconcile.
+  const dailyObligationVnd = dailyRepaymentAmount(
+    loanAmountVnd,
+    interestRatePct,
+    paybackMonths,
+  );
 
   return (
     <motion.div
@@ -72,7 +81,7 @@ export function InvestmentKpis({
             </span>
           </div>
           <div className="text-3xl font-bold tracking-tight text-emerald-600 mt-2">
-            {expectedRoi}
+            {`${interestRatePct.toFixed(1)}%`}
           </div>
         </Card>
       </motion.div>
@@ -107,6 +116,19 @@ export function InvestmentKpis({
             </div>
             <span className="text-xs text-muted-foreground block mt-1">
               {t("investment.kpis.ofDailyRevenue")}
+            </span>
+          </div>
+          {/* The % is the share of revenue; this is the fixed amount it comes
+              to each business day. */}
+          <div className="mt-3 min-w-0 border-t border-border pt-3">
+            <span className="text-xs font-medium text-muted-foreground block">
+              {t("investment.kpis.dailyObligation")}
+            </span>
+            <div className="truncate whitespace-nowrap text-base font-bold text-foreground">
+              {formatCurrency(dailyObligationVnd, locale)}
+            </div>
+            <span className="text-xs text-muted-foreground block">
+              {t("investment.kpis.perBusinessDay")}
             </span>
           </div>
         </Card>

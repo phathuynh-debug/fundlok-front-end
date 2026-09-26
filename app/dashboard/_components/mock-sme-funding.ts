@@ -93,6 +93,11 @@ export interface SmeFunding {
   total_repayable: number;
   /** The contractual fixed amount charged each business day, VND. */
   daily_amount: number;
+  /**
+   * The daily amount as a share of average daily verified revenue, as a
+   * decimal. The engine's affordability gate sits at 0.30.
+   */
+  revenue_share: number;
   /** When the omnibus account paid out, or null while still funding. */
   disbursed_at: string | null;
 }
@@ -108,6 +113,8 @@ export const MOCK_SME_FUNDING: SmeFunding = {
   // business days in the term: 7,447,917 x 126 = 938,437,542.
   total_repayable: 938437542,
   daily_amount: 7447917,
+  // ~28.6M VND average daily revenue: comfortably under the 0.30 gate.
+  revenue_share: 0.26,
   disbursed_at: "2026-05-18",
 };
 

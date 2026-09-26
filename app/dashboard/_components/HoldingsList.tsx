@@ -19,6 +19,7 @@ import { industryLabel } from "@/lib/industry-label";
 import { staggerContainerVariants, springItemVariants } from "@/lib/animations";
 import { cn } from "@/lib/utils";
 import { CONTROL_HOVER } from "@/lib/ui-tokens";
+import { dailyRepaymentAmount } from "@/lib/facility-terms";
 import { getIndustryChrome } from "./sme-dashboard-config";
 import {
   backstopDate,
@@ -49,6 +50,16 @@ const STATUS_STYLES: Record<HoldingStatus, string> = {
   WRITTEN_DOWN:
     "border-destructive/30 bg-destructive/10 text-destructive dark:text-destructive",
 };
+
+// Positions where the fixed daily repayment is (or is about to start) flowing.
+// RELIEF is left out: the daily amount is reduced for that period, so the
+// contractual figure would overstate what the investor receives.
+const RECEIVING_STATUSES: readonly HoldingStatus[] = [
+  "ACTIVE",
+  "REPAYING",
+  "WATCHLIST",
+  "EXTENDED",
+];
 
 export function HoldingsList({ holdings }: { holdings: Holding[] }) {
   const { locale, t } = useTranslations();
@@ -218,6 +229,24 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
                       </span>
                     )}
                   </dd>
+                  {/* The investor's own share of the SME's fixed daily
+                      repayment — only while repayments are (or are about to
+                      be) flowing. Uses the low end of the target range, and is
+                      labelled a target like the yield it comes from. */}
+                  {RECEIVING_STATUSES.includes(holding.status) && (
+                    <p className="truncate text-[10px] font-semibold text-foreground">
+                      {t("dashboard.investor.holdingDailyPayout", {
+                        amount: formatCurrency(
+                          dailyRepaymentAmount(
+                            holding.invested,
+                            holding.target_return_pct_min,
+                            holding.term_months,
+                          ),
+                          locale,
+                        ),
+                      })}
+                    </p>
+                  )}
                   {/* Disclosed on every position: the date at which everything
                       still outstanding falls due in full. */}
                   {holding.disbursed_at && (

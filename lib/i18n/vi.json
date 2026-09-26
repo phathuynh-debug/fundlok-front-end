@@ -442,6 +442,7 @@
       "browseProjects": "Khám phá dự án đầu tư",
       "capitalWrittenDown": "Vốn đã ghi giảm",
       "holdingBackstop": "Hạn chót {date}",
+      "holdingDailyPayout": "Mục tiêu {amount}/ngày làm việc",
       "holdingInvested": "Đã đầu tư",
       "holdingNextPayout": "Kỳ nhận tiếp theo",
       "holdingProgress": "Tiến độ trả nợ",
@@ -1065,6 +1066,7 @@
       "fixedAtSigning": "Ấn định khi ký. Không thay đổi.",
       "investors": "{count} nhà đầu tư",
       "mockNotice": "Dữ liệu mẫu, hiển thị trong lúc màn hình này đang được hoàn thiện. Thông tin doanh nghiệp phía trên là thật; các số liệu gọi vốn và trả nợ bên dưới chưa kết nối với hệ thống backend.",
+      "ofDailyRevenue": "Khoảng {percent}% doanh thu hằng ngày của bạn",
       "ofTarget": "trên {target}",
       "outstanding": "Còn phải trả",
       "perBusinessDay": "Thu vào mỗi ngày làm việc",
@@ -1293,11 +1295,13 @@
       "title": "Tài liệu & thông tin tài chính"
     },
     "kpis": {
+      "dailyObligation": "Nghĩa vụ trả hằng ngày",
       "estPaybackPeriod": "Thời hạn vay",
       "expectedRoi": "Tỷ suất lợi nhuận năm",
       "loanAmount": "Số tiền vay",
       "months": "{count} tháng",
       "ofDailyRevenue": "trên doanh thu hằng ngày",
+      "perBusinessDay": "Cố định, mỗi ngày làm việc",
       "revenueShareRate": "Tỷ lệ chia sẻ doanh thu"
     },
     "paymentHistory": {

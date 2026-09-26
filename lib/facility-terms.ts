@@ -26,6 +26,23 @@ export const RATE_CEILING_PCT = 20;
 export const BUSINESS_DAYS_PER_PERIOD = 21;
 
 /**
+ * The fixed amount collected each business day, in whole VND: the total
+ * repayable (principal plus simple annual interest over the term, fixed at
+ * signing) spread evenly across every business day in the term.
+ *
+ * 875,000,000 at 14.5%/yr over 6 months -> 938,437,500 / 126 = 7,447,917.
+ */
+export function dailyRepaymentAmount(
+  principal: number,
+  annualRatePct: number,
+  termMonths: number,
+): number {
+  const totalRepayable =
+    principal * (1 + (annualRatePct / 100) * (termMonths / 12));
+  return Math.round(totalRepayable / (termMonths * BUSINESS_DAYS_PER_PERIOD));
+}
+
+/**
  * The hard deadline sits at 1.33x the declared term, and everything still
  * outstanding falls due in full on that date. The SME knows it from the day
  * they sign and it is disclosed on every listing — so it is derived from the

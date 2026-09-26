@@ -74,6 +74,9 @@ export function SmeFundingPanel({ industry }: { industry?: string | null }) {
         locale,
       ),
       hint: t("dashboard.smeFunding.perBusinessDay"),
+      note: t("dashboard.smeFunding.ofDailyRevenue", {
+        percent: Math.round(funding.revenue_share * 100),
+      }),
       icon: CalendarClock,
     },
     {
@@ -172,6 +175,11 @@ export function SmeFundingPanel({ industry }: { industry?: string | null }) {
               {stat.hint && (
                 <p className="truncate text-xs text-muted-foreground">
                   {stat.hint}
+                </p>
+              )}
+              {stat.note && (
+                <p className="truncate text-xs font-semibold text-foreground">
+                  {stat.note}
                 </p>
               )}
             </div>

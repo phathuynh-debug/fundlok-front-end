@@ -100,6 +100,11 @@ export default function ProjectDetailsClient() {
     requestedAmount === undefined || requestedAmount === null
       ? undefined
       : Number(requestedAmount);
+  // Rate and term ride along too, so the daily obligation is computed from the
+  // same figures as the marketplace card rather than the KPI's mock defaults.
+  const interestRatePct =
+    project?.loan_application?.interest_rate_pct ?? undefined;
+  const paybackMonths = project?.loan_application?.duration_months ?? undefined;
 
   return (
     <motion.div
@@ -153,7 +158,11 @@ export default function ProjectDetailsClient() {
 
       {/* KPI Cards Row */}
       <motion.div {...fadeInUpProps}>
-        <InvestmentKpis loanAmountVnd={loanAmountVnd} />
+        <InvestmentKpis
+          loanAmountVnd={loanAmountVnd}
+          interestRatePct={interestRatePct}
+          paybackMonths={paybackMonths}
+        />
       </motion.div>
 
       {/* Tab pill selectors */}

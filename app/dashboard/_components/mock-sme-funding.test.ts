@@ -25,6 +25,7 @@ const funding = (overrides: Partial<SmeFunding> = {}): SmeFunding => ({
   term_months: 6,
   total_repayable: 536_250_000,
   daily_amount: 4_255_952,
+  revenue_share: 0.25,
   disbursed_at: null,
   ...overrides,
 });
