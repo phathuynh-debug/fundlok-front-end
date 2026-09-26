@@ -59,7 +59,7 @@ export default function FaqClient() {
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-background text-foreground flex flex-col overflow-x-hidden selection:bg-accent/20">
+    <div className="relative min-h-[100dvh] w-full bg-background text-foreground flex flex-col overflow-x-clip selection:bg-accent/20">
       <SiteHeader />
 
       <BackgroundBlobs />

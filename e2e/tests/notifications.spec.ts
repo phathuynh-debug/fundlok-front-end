@@ -15,7 +15,9 @@ import { t } from "../support/i18n";
 const openBell = async (page: import("@playwright/test").Page) => {
   // The accessible name carries the count, so match on the prefix rather than
   // on the exact string — the count changes as the test marks things read.
-  const bell = page.getByRole("button", { name: /Notifications/ }).first();
+  const bell = page
+    .getByRole("button", { name: new RegExp(t("notifications.title")) })
+    .first();
   await bell.hover();
   await expect(page.getByText(t("notifications.title"))).toBeVisible();
   return bell;

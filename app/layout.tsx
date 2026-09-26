@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+
+import { getSeoStrings, OG_LOCALE } from "@/lib/seo";
 import { cookies } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -28,52 +30,61 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
 });
 
-export const metadata: Metadata = {
-  // Resolves relative canonical/OG URLs (e.g. "/faq") to absolute ones.
-  metadataBase: new URL(SITE_URL),
-  title: {
-    default: "FundLok | Flexible Capital Platform for SMEs",
-    template: "%s | FundLok",
-  },
-  description:
-    "FundLok connects investors with SMEs through a technology-led financing platform, using data and AI to support flexible funding aligned with real business needs.",
-  keywords: [
-    "FundLok",
-    "SME funding",
-    "private credit",
-    "flexible capital",
-    "on-chain credit",
-    "investor portal",
-    "flexible funding",
-    "AI credit scoring",
-    "DeFi lending",
-    "Sustainability in Action",
-    "Australian Government",
-    "SIHUB FinTech",
-    "IBCOL 2023",
-  ],
-  openGraph: {
-    title: "FundLok | Flexible Capital Platform for SMEs",
-    description:
-      "FundLok connects investors with SMEs through a technology-led financing platform, using data and AI to support flexible funding aligned with real business needs.",
-    type: "website",
-    siteName: "FundLok",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "FundLok | Flexible Capital Platform for SMEs",
-    description:
-      "FundLok connects investors with SMEs through a technology-led financing platform, using data and AI to support flexible funding aligned with real business needs.",
-  },
-  icons: {
-    icon: "/logo/image.png",
-    shortcut: "/logo/image.png",
-    apple: "/logo/image.png",
-  },
-};
+// Per request, not per build: see lib/seo.ts for why a const cannot work here.
+export async function generateMetadata(): Promise<Metadata> {
+  const { locale, seo } = await getSeoStrings();
+  const { siteTitle, siteDescription } = seo;
 
+  return {
+    // Resolves relative canonical/OG URLs (e.g. "/faq") to absolute ones.
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: siteTitle,
+      template: "%s | FundLok",
+    },
+    description: siteDescription,
+    keywords: SITE_KEYWORDS,
+    openGraph: {
+      title: siteTitle,
+      description: siteDescription,
+      type: "website",
+      siteName: "FundLok",
+      locale: OG_LOCALE[locale],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: siteTitle,
+      description: siteDescription,
+    },
+    icons: {
+      icon: "/logo/image.png",
+      shortcut: "/logo/image.png",
+      apple: "/logo/image.png",
+    },
+  };
+}
+
+const SITE_KEYWORDS = [
+  "FundLok",
+  "SME funding",
+  "private credit",
+  "flexible capital",
+  "on-chain credit",
+  "investor portal",
+  "flexible funding",
+  "AI credit scoring",
+  "DeFi lending",
+  "Sustainability in Action",
+  "Australian Government",
+  "SIHUB FinTech",
+  "IBCOL 2023",
+];
+
+// Vietnamese unless the visitor has explicitly chosen English. Mirrors
+// DEFAULT_LOCALE in lib/i18n/index.tsx; the two must agree or the first paint
+// disagrees with the client tree that hydrates over it.
 function getLocaleFromCookie(cookieValue?: string | null) {
-  return cookieValue === "vi" ? "vi" : "en";
+  return cookieValue === "en" ? "en" : "vi";
 }
 
 export default async function RootLayout({

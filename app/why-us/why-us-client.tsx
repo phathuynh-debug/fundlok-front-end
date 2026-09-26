@@ -118,7 +118,7 @@ export default function WhyUsClient() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-background text-foreground overflow-hidden relative selection:bg-emerald-500/30 selection:text-emerald-900 dark:selection:text-emerald-100">
+    <div className="min-h-[100dvh] w-full bg-background text-foreground overflow-clip relative selection:bg-emerald-500/30 selection:text-emerald-900 dark:selection:text-emerald-100">
       {/* Ambient background decoration */}
       <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-emerald-500/10 dark:bg-emerald-500/5 blur-[120px] pointer-events-none -z-10" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-accent/15 dark:bg-accent/5 blur-[100px] pointer-events-none -z-10" />
@@ -173,7 +173,7 @@ export default function WhyUsClient() {
 
           <motion.div
             variants={itemVariants}
-            className="lg:col-span-5 bg-gradient-to-br from-emerald-500/10 via-zinc-500/5 to-transparent dark:from-emerald-500/5 dark:via-zinc-900/40 dark:to-transparent border border-border/10 p-8 rounded-2xl relative overflow-hidden backdrop-blur-sm group hover:border-emerald-500/20 transition-all duration-300 shadow-xl"
+            className="lg:col-span-5 bg-gradient-to-br from-emerald-500/10 via-zinc-500/5 to-transparent dark:from-emerald-500/5 dark:via-zinc-900/40 dark:to-transparent border border-border/10 p-8 rounded-2xl relative overflow-hidden backdrop-blur-sm group hover:border-emerald-500/20 transition-all duration-300"
           >
             <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl -z-10 group-hover:bg-emerald-500/20 transition-all duration-300" />
             <div className="w-10 h-10 rounded-lg bg-emerald-500/15 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-6 font-mono font-bold text-lg">
@@ -214,9 +214,9 @@ export default function WhyUsClient() {
             {/* Card 1: Safety for Investors */}
             <motion.div
               variants={itemVariants}
-              className="bg-white/40 dark:bg-slate-900/40 border border-border/20 dark:border-border/10 rounded-2xl p-8 backdrop-blur-md shadow-xl flex flex-col justify-between hover:translate-y-[-6px] hover:shadow-2xl hover:border-emerald-500/20 dark:hover:bg-slate-900/60 transition-all duration-300 relative overflow-hidden group"
+              className="bg-card border border-border rounded-2xl p-8 flex flex-col justify-between hover:border-emerald-500/40 transition-colors duration-200 relative overflow-clip group"
             >
-              <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-emerald-500 to-teal-500 opacity-70" />
+              <div className="absolute top-0 left-0 w-full h-[2px] bg-emerald-500/80" />
               <div>
                 <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-6 ring-1 ring-emerald-500/25 group-hover:scale-110 transition-transform duration-300">
                   <ShieldCheck className="w-6 h-6" />
@@ -247,9 +247,9 @@ export default function WhyUsClient() {
             {/* Card 2: Fitting to each SME */}
             <motion.div
               variants={itemVariants}
-              className="bg-white/40 dark:bg-slate-900/40 border border-border/20 dark:border-border/10 rounded-2xl p-8 backdrop-blur-md shadow-xl flex flex-col justify-between hover:translate-y-[-6px] hover:shadow-2xl hover:border-emerald-500/20 dark:hover:bg-slate-900/60 transition-all duration-300 relative overflow-hidden group"
+              className="bg-card border border-border rounded-2xl p-8 flex flex-col justify-between hover:border-emerald-500/40 transition-colors duration-200 relative overflow-clip group"
             >
-              <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-emerald-500 to-indigo-500 opacity-70" />
+              <div className="absolute top-0 left-0 w-full h-[2px] bg-emerald-500/80" />
               <div>
                 <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-6 ring-1 ring-emerald-500/25 group-hover:scale-110 transition-transform duration-300">
                   <Sliders className="w-6 h-6" />
@@ -280,9 +280,9 @@ export default function WhyUsClient() {
             {/* Card 3: Transparent, Public, Automatic */}
             <motion.div
               variants={itemVariants}
-              className="bg-white/40 dark:bg-slate-900/40 border border-border/20 dark:border-border/10 rounded-2xl p-8 backdrop-blur-md shadow-xl flex flex-col justify-between hover:translate-y-[-6px] hover:shadow-2xl hover:border-emerald-500/20 dark:hover:bg-slate-900/60 transition-all duration-300 relative overflow-hidden group"
+              className="bg-card border border-border rounded-2xl p-8 flex flex-col justify-between hover:border-emerald-500/40 transition-colors duration-200 relative overflow-clip group"
             >
-              <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-emerald-500 to-cyan-500 opacity-70" />
+              <div className="absolute top-0 left-0 w-full h-[2px] bg-emerald-500/80" />
               <div>
                 <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-6 ring-1 ring-emerald-500/25 group-hover:scale-110 transition-transform duration-300">
                   <Cpu className="w-6 h-6" />
@@ -351,7 +351,7 @@ export default function WhyUsClient() {
           viewport={{ once: true }}
           className="mt-24 md:mt-32 text-center"
         >
-          <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/25 p-8 md:p-12 rounded-3xl backdrop-blur-md max-w-4xl mx-auto shadow-lg relative overflow-hidden group">
+          <div className="bg-emerald-500/5 border border-emerald-500/25 p-8 md:p-12 rounded-2xl max-w-4xl mx-auto relative overflow-clip group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -z-10" />
             <h2 className="font-sans text-2xl md:text-3xl font-extrabold text-foreground tracking-tight mb-4">
               {t("auth.hero.headline")}

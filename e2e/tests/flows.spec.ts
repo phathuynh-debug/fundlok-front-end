@@ -27,7 +27,7 @@ test.describe("/dashboard/invest", () => {
       page.getByText(t("investConfirm.amountLabel"), { exact: true }),
     ).toBeVisible();
     await expect(
-      page.getByText(normalizeSpaces(formatCurrency(amount, "en")), {
+      page.getByText(normalizeSpaces(formatCurrency(amount, "vi")), {
         exact: false,
       }),
     ).toBeVisible();

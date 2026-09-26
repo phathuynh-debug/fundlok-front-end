@@ -1,47 +1,51 @@
 import type { Metadata } from "next";
+
+import { getSeoStrings, OG_LOCALE } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import WhyUsClient from "./why-us-client";
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/why-us" },
-  title: "Why Us — Our Vision, Recognition and Track Record",
-  description:
-    "FundLok's vision for SME funding in Vietnam and the recognition behind it, including a 2024 Australian Government award and incubation by SIHUB.",
-  keywords: [
-    "FundLok vision",
-    "FundLok achievements",
-    "FundLok awards",
-    "FundLok recognitions",
-    "SME story",
-    "flexible capital solutions",
-    "investor safety",
-    "stable daily income",
-    "progressive repayment",
-    "revenue share lending",
-    "automated credit risk scoring",
-    "verified data financing",
-    "Sustainability in Action 2024",
-    "Australian Government",
-    "SIHUB 2025",
-    "Startup and Innovation Hub Ho Chi Minh City",
-    "International Blockchain Olympiad 2023",
-    "IBCOL 2023",
-    "LENDMI",
-  ],
-  openGraph: {
-    title: "Why Us — Our Vision, Recognition and Track Record",
-    description:
-      "Discover FundLok's vision and award-winning track record — recognized by the Australian Government, incubated by SIHUB, and a Top 10 project at the International Blockchain Olympiad 2023.",
-    type: "website",
-    siteName: "FundLok",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Why Us — Our Vision, Recognition and Track Record",
-    description:
-      "Discover FundLok's vision and award-winning track record — recognized by the Australian Government, incubated by SIHUB, and a Top 10 project at the International Blockchain Olympiad 2023.",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { locale, seo } = await getSeoStrings();
+  const title = seo.whyUsTitle;
+  const description = seo.whyUsDescription;
+
+  return {
+    title,
+    description,
+    keywords: [
+      "FundLok vision",
+      "FundLok achievements",
+      "FundLok awards",
+      "FundLok recognitions",
+      "SME story",
+      "flexible capital solutions",
+      "investor safety",
+      "stable daily income",
+      "progressive repayment",
+      "revenue share lending",
+      "automated credit risk scoring",
+      "verified data financing",
+      "Sustainability in Action 2024",
+      "Australian Government",
+      "SIHUB 2025",
+      "Startup and Innovation Hub Ho Chi Minh City",
+      "International Blockchain Olympiad 2023",
+      "IBCOL 2023",
+      "LENDMI",
+    ],
+    alternates: { canonical: "/why-us" },
+    openGraph: {
+      title,
+      description,
+      url: "/why-us",
+      siteName: "FundLok",
+      type: "website",
+      locale: OG_LOCALE[locale],
+    },
+    twitter: { card: "summary", title, description },
+    robots: { index: true, follow: true },
+  };
+}
 
 // Structured data for FundLok's recognitions. Uses ItemList (each award as a
 // CreativeWork) plus an Organization node whose `award` list links back to the
