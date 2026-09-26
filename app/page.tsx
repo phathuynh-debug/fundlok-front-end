@@ -24,7 +24,7 @@ const dict = {
   en: {
     heroTitle: "Flexible capital for MSMEs in Vietnam",
     heroSubtitle:
-      "FundLok arranges funding for SMEs in Vietnam: investors provide the capital, repayment is a fixed amount each business day, and the total repayable is fixed at signing. If verified revenue falls short, the obligation for that period drops and the facility runs longer; it never rises.",
+      "FundLok is a flexible funding platform connecting SMEs in Vietnam with investors. Businesses repay a fixed amount each working day. If verified revenue dips, the term can be extended to lower the daily payment, with interest on the extra time at the rate agreed at signing.",
     navProduct: "PRODUCT",
     navProcess: "HOW IT WORKS",
     navContact: "CONTACT",
@@ -64,7 +64,7 @@ const dict = {
   vi: {
     heroTitle: "Sàn vốn linh hoạt cho doanh nghiệp vừa và nhỏ tại Việt Nam",
     heroSubtitle:
-      "FundLok thu xếp nguồn vốn cho doanh nghiệp vừa và nhỏ tại Việt Nam: nhà đầu tư là bên cấp vốn, khoản hoàn trả là một số tiền cố định mỗi ngày làm việc, và tổng số tiền phải trả được ấn định ngay khi ký. Nếu doanh thu được xác minh thấp hơn dự kiến, nghĩa vụ của kỳ đó giảm xuống và thời gian kéo dài thêm; không bao giờ tăng lên.",
+      "FundLok là nền tảng vốn linh hoạt kết nối doanh nghiệp vừa và nhỏ tại Việt Nam với nhà đầu tư. Doanh nghiệp trả một khoản cố định mỗi ngày làm việc. Nếu doanh thu đã xác minh giảm, thời hạn có thể được kéo dài để giảm khoản trả hằng ngày, và lãi được tính cho phần thời gian kéo dài theo lãi suất đã thỏa thuận khi ký.",
     navProduct: "SẢN PHẨM",
     navProcess: "QUY TRÌNH",
     navContact: "LIÊN HỆ",
