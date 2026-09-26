@@ -1332,6 +1332,7 @@
     },
     "tab": {
       "agreement": "Khi đầu tư, bạn đồng ý rằng tiền được giữ tại các đối tác ngân hàng lưu ký. FundLok không sở hữu số tiền này và không có quyền sử dụng cho mục đích riêng — chúng tôi chỉ có quyền ra lệnh trong các điều kiện do ngân hàng thực thi.",
+      "amountTooHighTitle": "Vượt quá số tiền còn lại",
       "enterAmount": "Nhập số tiền bạn muốn đầu tư vào cơ hội này",
       "funded": "Đã tài trợ",
       "fundingProgress": "Tiến độ gọi vốn",
@@ -1347,8 +1348,8 @@
       "progress": "Tiến độ",
       "remaining": "Còn lại",
       "trackFunding": "Theo dõi số tiền đã được tài trợ cho khoản vay này",
-      "validAmount": "Vui lòng nhập số tiền đầu tư hợp lệ.",
-      "validationErrorTitle": "Lỗi xác thực"
+      "invalidAmountTitle": "Số tiền không hợp lệ",
+      "validAmount": "Vui lòng nhập số tiền đầu tư hợp lệ."
     }
   },
   "kyc": {

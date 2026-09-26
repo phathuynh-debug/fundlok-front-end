@@ -1332,6 +1332,7 @@
     },
     "tab": {
       "agreement": "By investing, you agree that funds are held by our custodial bank partners. FundLok does not own them and cannot draw on them — we hold instruction rights within conditions the bank enforces.",
+      "amountTooHighTitle": "Amount exceeds what's left",
       "enterAmount": "Enter the amount you wish to invest in this opportunity",
       "funded": "Funded",
       "fundingProgress": "Funding Progress",
@@ -1347,8 +1348,8 @@
       "progress": "Progress",
       "remaining": "Remaining",
       "trackFunding": "Track how much of this loan has been funded",
-      "validAmount": "Please enter a valid investment amount.",
-      "validationErrorTitle": "Validation Error"
+      "invalidAmountTitle": "Invalid amount",
+      "validAmount": "Please enter a valid investment amount."
     }
   },
   "kyc": {

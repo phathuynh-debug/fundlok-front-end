@@ -40,7 +40,7 @@ export function InvestmentTab() {
     if (isNaN(numericAmount) || numericAmount <= 0) {
       toast({
         variant: "destructive",
-        title: t("investment.tab.validationErrorTitle"),
+        title: t("investment.tab.invalidAmountTitle"),
         description: t("investment.tab.validAmount"),
       });
       return;
@@ -49,7 +49,7 @@ export function InvestmentTab() {
     if (numericAmount > maxAmount) {
       toast({
         variant: "destructive",
-        title: t("investment.tab.validationErrorTitle"),
+        title: t("investment.tab.amountTooHighTitle"),
         description: t("investment.tab.maxRemainingAmount", {
           amount: formatCurrency(maxAmount, locale),
         }),
