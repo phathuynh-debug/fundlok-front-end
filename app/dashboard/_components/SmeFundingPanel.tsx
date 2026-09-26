@@ -178,7 +178,8 @@ export function SmeFundingPanel({ industry }: { industry?: string | null }) {
                 </p>
               )}
               {stat.note && (
-                <p className="truncate text-xs font-semibold text-foreground">
+                // Wraps rather than truncating: clipping would hide the %.
+                <p className="text-xs font-semibold text-foreground">
                   {stat.note}
                 </p>
               )}
