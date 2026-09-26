@@ -3,14 +3,7 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import {
-  ArrowRight,
-  CalendarClock,
-  Medal,
-  Sparkles,
-  TrendingUp,
-  Trophy,
-} from "lucide-react";
+import { ArrowRight, Medal, TrendingUp, Trophy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/format-currency";
@@ -122,7 +115,7 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
                 <div className="flex flex-wrap items-center gap-2">
                   {/* Ranking Badge */}
                   {isTopYield ? (
-                    <Badge className="bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-mono text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
+                    <Badge className="bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 text-[11px] font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
                       <Trophy className="h-3 w-3 text-amber-500 shrink-0" />
                       <span>
                         {t("dashboard.investor.holdingTopYield", { rank })}
@@ -131,7 +124,7 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
                   ) : isTopThree ? (
                     <Badge
                       variant="outline"
-                      className="bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 font-mono text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1"
+                      className="bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 text-[11px] font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1"
                     >
                       <Medal className="h-3 w-3 text-zinc-500 shrink-0" />
                       <span>
@@ -141,7 +134,7 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
                   ) : (
                     <Badge
                       variant="outline"
-                      className="bg-muted/60 text-muted-foreground font-mono text-[11px] font-medium px-2 py-0.5 rounded-full"
+                      className="bg-muted/60 text-muted-foreground text-[11px] font-medium px-2 py-0.5 rounded-full"
                     >
                       <span>
                         {t("dashboard.investor.holdingRank", { rank })}
@@ -152,7 +145,7 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
                   {/* Business score — a 0-100 reference input, not a rating */}
                   <Badge
                     variant="outline"
-                    className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30 font-mono text-[11px] font-bold px-2.5 py-0.5 rounded-full"
+                    className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30 text-[11px] font-semibold px-2.5 py-0.5 rounded-full"
                   >
                     {t("dashboard.investor.holdingScore", {
                       score: holding.score,
@@ -175,30 +168,29 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
               {/* Figures with attractive styling & standout Expected ROI */}
               <dl className="grid grid-cols-2 gap-3 border-t border-border/60 pt-3 sm:grid-cols-4 items-center">
                 <div className="min-w-0 space-y-1">
-                  <dt className="text-[11px] font-mono font-bold uppercase tracking-wider text-muted-foreground">
+                  <dt className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                     {t("dashboard.investor.holdingInvested")}
                   </dt>
-                  <dd className="min-w-0 truncate text-base font-extrabold text-foreground font-mono">
+                  <dd className="min-w-0 truncate text-base font-bold text-foreground">
                     {formatCurrency(holding.invested, locale)}
                   </dd>
                 </div>
 
                 <div className="min-w-0 space-y-1">
-                  <dt className="text-[11px] font-mono font-bold uppercase tracking-wider text-muted-foreground">
+                  <dt className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                     {t("dashboard.investor.holdingReturned")}
                   </dt>
-                  <dd className="min-w-0 truncate text-base font-extrabold text-emerald-600 dark:text-emerald-400 font-mono flex items-center gap-1">
+                  <dd className="min-w-0 truncate text-base font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                     <TrendingUp className="h-3.5 w-3.5 shrink-0" />
                     {formatCurrency(holding.returned, locale)}
                   </dd>
                 </div>
 
                 <div className="min-w-0 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/30 p-2.5 space-y-0.5">
-                  <dt className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
-                    <Sparkles className="h-3 w-3 text-emerald-500 shrink-0" />
+                  <dt className="text-[11px] font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
                     {t("dashboard.investor.holdingRoi")}
                   </dt>
-                  <dd className="truncate text-base font-black text-emerald-600 dark:text-emerald-400 font-mono">
+                  <dd className="truncate text-base font-bold text-emerald-600 dark:text-emerald-400">
                     {t("dashboard.investor.holdingRoiValue", {
                       min: holding.target_return_pct_min.toFixed(1),
                       max: holding.target_return_pct_max.toFixed(1),
@@ -206,21 +198,18 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
                     })}
                   </dd>
                   {/* A range on its own still reads as a promise without this */}
-                  <p className="truncate text-[9px] font-medium text-emerald-700/80 dark:text-emerald-300/80">
+                  <p className="truncate text-[10px] font-medium text-emerald-700/80 dark:text-emerald-300/80">
                     {t("dashboard.projectCard.notGuaranteed")}
                   </p>
                 </div>
 
                 <div className="min-w-0 space-y-1">
-                  <dt className="text-[11px] font-mono font-bold uppercase tracking-wider text-muted-foreground">
+                  <dt className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                     {t("dashboard.investor.holdingNextPayout")}
                   </dt>
-                  <dd className="flex items-center gap-1.5 truncate text-sm font-bold text-foreground">
+                  <dd className="truncate text-sm font-bold text-foreground">
                     {holding.next_payout_date ? (
-                      <>
-                        <CalendarClock className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                        {formatDate(holding.next_payout_date, locale)}
-                      </>
+                      formatDate(holding.next_payout_date, locale)
                     ) : (
                       <span className="text-muted-foreground">
                         {t("common.na")}
@@ -251,7 +240,7 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
                   <span className="font-medium text-muted-foreground">
                     {t("dashboard.investor.holdingProgress")}
                   </span>
-                  <span className="font-mono font-bold text-foreground">
+                  <span className="font-semibold text-foreground">
                     {holding.progress_pct}%
                   </span>
                 </div>

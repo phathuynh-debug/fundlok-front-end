@@ -816,8 +816,13 @@
     },
     "sidebar": {
       "analytics": "Phân tích",
+      "emailSupport": "Email hỗ trợ",
+      "help": "Trợ giúp & Hỗ trợ",
+      "helpDescription": "Liên hệ ngay nếu bạn cần trợ giúp",
+      "hotline": "Hotline hỗ trợ",
       "investmentProjects": "Dự án đầu tư",
       "memberSuffix": "Thành viên",
+      "needHelp": "Cần hỗ trợ?",
       "notifications": "Thông báo",
       "overview": "Tổng quan",
       "security": "Bảo mật",

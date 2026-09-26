@@ -119,7 +119,7 @@ export function HeroInteractive({ strings }: HeroInteractiveProps) {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.95 }}
           onClick={scrollToProcess}
-          className="relative z-20 mt-2 mb-2 text-muted-foreground/60 hover:text-accent cursor-pointer flex flex-col items-center gap-0.5 text-[9px] font-mono tracking-widest font-bold uppercase transition-colors select-none outline-none border-none bg-transparent"
+          className="relative z-20 mt-2 mb-2 text-muted-foreground/70 hover:text-accent cursor-pointer flex flex-col items-center gap-1 text-xs md:text-sm font-mono tracking-widest font-bold uppercase transition-colors select-none outline-none border-none bg-transparent"
         >
           <motion.div
             animate={{ y: [0, 6, 0] }}
@@ -128,10 +128,10 @@ export function HeroInteractive({ strings }: HeroInteractiveProps) {
               duration: 1.8,
               ease: "easeInOut",
             }}
-            className="flex flex-col items-center gap-0.5"
+            className="flex flex-col items-center gap-1"
           >
             <span>{strings.ourSolution}</span>
-            <ChevronDown className="w-4 h-4" />
+            <ChevronDown className="w-5 h-5 md:w-6 md:h-6" />
           </motion.div>
         </motion.button>
       </div>

@@ -1,7 +1,6 @@
 import {
   ArrowRight,
   Pencil,
-  Sparkles,
   Clock,
   Users,
   ShieldCheck,
@@ -120,7 +119,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
               {role === "INVESTOR" && (
                 <Badge
                   variant="outline"
-                  className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30 text-[10px] font-mono font-bold uppercase tracking-wider rounded-md px-2 py-0.5 flex items-center gap-1"
+                  className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30 text-[10px] font-semibold uppercase tracking-wider rounded-md px-2 py-0.5 flex items-center gap-1"
                 >
                   <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" />
                   <span>{t("dashboard.projectCard.verifiedSme")}</span>
@@ -135,7 +134,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
             {role === "INVESTOR" && (
               <>
                 {isHot && (
-                  <Badge className="bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30 font-mono text-[10px] uppercase font-bold tracking-wider rounded-full px-2.5 py-0.5 flex items-center gap-1">
+                  <Badge className="bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30 text-[10px] uppercase font-semibold tracking-wider rounded-full px-2.5 py-0.5 flex items-center gap-1">
                     <Flame className="w-3 h-3 text-amber-500 shrink-0" />
                     <span>{t("dashboard.projectCard.hotDeal")}</span>
                   </Badge>
@@ -147,7 +146,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                     conclusion from it. */}
                 <Badge
                   variant="outline"
-                  className="bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-zinc-300 dark:border-zinc-700 font-mono text-[10px] uppercase font-bold tracking-wider rounded-full px-2.5 py-0.5"
+                  className="bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-zinc-300 dark:border-zinc-700 text-[10px] uppercase font-semibold tracking-wider rounded-full px-2.5 py-0.5"
                 >
                   {t("dashboard.projectCard.score", { score: sampleScore })}
                 </Badge>
@@ -177,7 +176,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
             record it just filed. */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <div className="flex flex-col gap-1">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground font-mono">
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               {t("dashboard.projectCard.industry")}
             </span>
             <Badge
@@ -198,16 +197,16 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
             <>
               {/* Asking Amount */}
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground font-mono">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   {t("dashboard.projectCard.askingAmount")}
                 </span>
-                <span className="text-lg font-black font-mono text-foreground">
+                <span className="text-lg font-bold text-foreground">
                   {askingAmount === undefined
                     ? t("dashboard.projectCard.pending")
                     : formatCurrency(askingAmount, locale)}
                 </span>
                 {askingAmount !== undefined && (
-                  <span className="text-[11px] font-medium text-muted-foreground font-mono">
+                  <span className="text-[11px] font-medium text-muted-foreground">
                     {t("dashboard.projectCard.minTicket", {
                       amount: formatCurrency(minInvestment, locale),
                     })}
@@ -217,7 +216,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
 
               {/* Duration */}
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground font-mono">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   {t("dashboard.projectCard.duration")}
                 </span>
                 <span className="text-base font-bold text-foreground flex items-center gap-1.5">
@@ -231,7 +230,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                   </span>
                 </span>
                 {durationMonths !== undefined && (
-                  <span className="text-[11px] font-medium text-muted-foreground font-mono">
+                  <span className="text-[11px] font-medium text-muted-foreground">
                     {t("dashboard.projectCard.dailyRepayment")}
                   </span>
                 )}
@@ -239,13 +238,12 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
 
               {/* Hero Expected ROI Callout */}
               <div className="flex flex-col gap-1 rounded-xl bg-gradient-to-br from-emerald-500/15 via-emerald-500/10 to-teal-500/5 dark:from-emerald-500/20 dark:via-emerald-500/10 dark:to-teal-500/15 border border-emerald-500/30 p-3 shadow-2xs">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 font-mono flex items-center gap-1">
-                  <Sparkles className="h-3 w-3 text-emerald-500 shrink-0" />
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
                   {t("dashboard.projectCard.expectedRoi")}
                 </span>
                 <span
                   className={cn(
-                    "text-xl font-black font-mono",
+                    "text-xl font-bold",
                     expectedRoiPct === undefined
                       ? "text-muted-foreground"
                       : "text-emerald-600 dark:text-emerald-400",
@@ -261,7 +259,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                     it as a fixed or guaranteed yield. */}
                 {expectedRoiPct !== undefined && (
                   <>
-                    <span className="text-[10px] font-medium text-emerald-700/80 dark:text-emerald-300/80 font-mono">
+                    <span className="text-[10px] font-medium text-emerald-700/80 dark:text-emerald-300/80">
                       {t("dashboard.projectCard.annualizedReturn")}
                     </span>
                     <span className="text-[10px] font-medium text-muted-foreground">
@@ -304,7 +302,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
             already full at four columns for an investor. Clamped to two lines
             so a long purpose cannot push the cards in a list out of rhythm. */}
         <div className="flex flex-col gap-1 pt-1">
-          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground font-mono flex items-center gap-1.5">
+          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
             <Target className="h-3.5 w-3.5 shrink-0" />
             {t("dashboard.projectCard.loanPurpose")}
           </span>
@@ -326,7 +324,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
           <div className="space-y-2 p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/50">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
               <div className="flex items-center gap-1.5">
-                <span className="font-bold text-foreground font-mono">
+                <span className="font-bold text-foreground">
                   {t("dashboard.projectCard.fundedPercent", {
                     percent: fundingProgressPct,
                   })}
@@ -339,7 +337,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                   })}
                 </span>
               </div>
-              <div className="flex items-center gap-3 text-muted-foreground font-mono text-[11px]">
+              <div className="flex items-center gap-3 text-muted-foreground text-[11px]">
                 <span className="flex items-center gap-1">
                   <Users className="w-3.5 h-3.5" />
                   {t("dashboard.projectCard.backers", {

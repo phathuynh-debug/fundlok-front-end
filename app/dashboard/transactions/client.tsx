@@ -199,7 +199,7 @@ export default function TransactionsClient() {
                     key={status}
                     type="button"
                     onClick={() => setSelectedStatus(status)}
-                    className={`px-3 py-2 rounded-lg text-[10px] font-mono tracking-wider font-bold uppercase transition-all duration-200 cursor-pointer ${
+                    className={`px-3 py-2 rounded-lg text-xs font-semibold uppercase transition-all duration-200 cursor-pointer ${
                       selectedStatus === status
                         ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
                         : `${CONTROL_IDLE} bg-transparent border border-transparent`

@@ -26,22 +26,22 @@ export function TransactionsTable({
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-            <TableHead className="font-mono text-[10px] uppercase tracking-wider whitespace-nowrap">
+            <TableHead className="text-xs font-semibold uppercase tracking-wider whitespace-nowrap">
               {t("dashboard.transactions.table.date")}
             </TableHead>
-            <TableHead className="font-mono text-[10px] uppercase tracking-wider">
+            <TableHead className="text-xs font-semibold uppercase tracking-wider">
               {t("dashboard.transactions.table.transaction")}
             </TableHead>
-            <TableHead className="font-mono text-[10px] uppercase tracking-wider hidden md:table-cell">
+            <TableHead className="text-xs font-semibold uppercase tracking-wider hidden md:table-cell">
               {t("dashboard.transactions.table.method")}
             </TableHead>
-            <TableHead className="font-mono text-[10px] uppercase tracking-wider text-right whitespace-nowrap">
+            <TableHead className="text-xs font-semibold uppercase tracking-wider text-right whitespace-nowrap">
               {t("dashboard.transactions.table.amount")}
             </TableHead>
-            <TableHead className="font-mono text-[10px] uppercase tracking-wider">
+            <TableHead className="text-xs font-semibold uppercase tracking-wider">
               {t("dashboard.transactions.table.status")}
             </TableHead>
-            <TableHead className="font-mono text-[10px] uppercase tracking-wider hidden lg:table-cell">
+            <TableHead className="text-xs font-semibold uppercase tracking-wider hidden lg:table-cell">
               {t("dashboard.transactions.table.reference")}
             </TableHead>
           </TableRow>
@@ -75,14 +75,14 @@ export function TransactionsTable({
                   {txn.method_ref ? ` ${txn.method_ref}` : ""}
                 </TableCell>
                 <TableCell
-                  className={`text-right font-mono text-sm font-bold whitespace-nowrap align-middle ${amountClassName}`}
+                  className={`text-right text-sm font-bold tabular-nums whitespace-nowrap align-middle ${amountClassName}`}
                 >
                   {formatAmount(txn.amount, locale)}
                 </TableCell>
                 <TableCell className="align-middle">
                   <TransactionStatusBadge status={txn.status} />
                 </TableCell>
-                <TableCell className="font-mono text-xs text-muted-foreground hidden lg:table-cell whitespace-nowrap align-middle">
+                <TableCell className="text-xs text-muted-foreground hidden lg:table-cell whitespace-nowrap align-middle">
                   {txn.reference}
                 </TableCell>
               </TableRow>

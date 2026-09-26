@@ -816,8 +816,13 @@
     },
     "sidebar": {
       "analytics": "Analytics",
+      "emailSupport": "Email Support",
+      "help": "Help & Support",
+      "helpDescription": "Contact us if you need any assistance",
+      "hotline": "Hotline",
       "investmentProjects": "Investment Projects",
       "memberSuffix": "Member",
+      "needHelp": "Need help?",
       "notifications": "Notifications",
       "overview": "Overview",
       "security": "Security",

@@ -153,7 +153,7 @@ export default function AnalyticsClient() {
                     type="button"
                     onClick={() => setRange(option)}
                     aria-pressed={range === option}
-                    className={`px-3 py-2 rounded-lg text-[10px] font-mono tracking-wider font-bold uppercase transition-all duration-200 cursor-pointer ${
+                    className={`px-3 py-2 rounded-lg text-xs font-semibold uppercase transition-all duration-200 cursor-pointer ${
                       range === option
                         ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
                         : `${CONTROL_IDLE} bg-transparent border border-transparent`
@@ -180,7 +180,7 @@ export default function AnalyticsClient() {
                     type="button"
                     onClick={() => setView(key)}
                     aria-pressed={view === key}
-                    className={`px-3 py-2 rounded-lg text-[10px] font-mono tracking-wider font-bold uppercase transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
+                    className={`px-3 py-2 rounded-lg text-xs font-semibold uppercase transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
                       view === key
                         ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
                         : `${CONTROL_IDLE} bg-transparent border border-transparent`

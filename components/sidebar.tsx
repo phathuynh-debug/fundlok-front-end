@@ -15,6 +15,10 @@ import {
   ChevronRight,
   UserRound,
   Palette,
+  Headphones,
+  Phone,
+  Mail,
+  ArrowRight,
   type LucideIcon,
 } from "lucide-react";
 import { cn, getInitials } from "@/lib/utils";
@@ -200,6 +204,57 @@ export function Sidebar() {
                 {t("dashboard.sidebar.settings")}
                 <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
               </button>
+
+              {/* Help & Support — contact section for customer assistance */}
+              <div className="pt-4 mt-3 border-t border-border/60">
+                <div className="rounded-xl border border-border/80 bg-muted/30 p-3 space-y-2.5">
+                  <div className="flex items-center gap-2">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0">
+                      <Headphones className="h-4 w-4" />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-foreground truncate">
+                        {t("dashboard.sidebar.needHelp")}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground truncate">
+                        {t("dashboard.sidebar.helpDescription")}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1 pt-0.5 text-xs">
+                    <a
+                      href="tel:0943711382"
+                      className="flex items-center gap-2 rounded-lg px-2 py-1.5 font-medium text-foreground hover:bg-card hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors group/phone"
+                      title={t("dashboard.sidebar.hotline")}
+                    >
+                      <Phone className="h-3.5 w-3.5 text-muted-foreground group-hover/phone:text-emerald-600 dark:group-hover/phone:text-emerald-400 shrink-0 transition-colors" />
+                      <span className="tabular-nums font-semibold">
+                        094 371 13 82
+                      </span>
+                    </a>
+
+                    <a
+                      href="mailto:support@fundlok.com"
+                      className="flex items-center gap-2 rounded-lg px-2 py-1.5 font-medium text-foreground hover:bg-card hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors group/mail"
+                      title={t("dashboard.sidebar.emailSupport")}
+                    >
+                      <Mail className="h-3.5 w-3.5 text-muted-foreground group-hover/mail:text-emerald-600 dark:group-hover/mail:text-emerald-400 shrink-0 transition-colors" />
+                      <span className="truncate">support@fundlok.com</span>
+                    </a>
+                  </div>
+
+                  <div className="pt-1 border-t border-border/40">
+                    <Link
+                      href="/contact"
+                      className="flex items-center justify-between text-[11px] font-medium text-muted-foreground hover:text-foreground px-2 py-0.5 transition-colors"
+                    >
+                      <span>{t("dashboard.sidebar.help")}</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </nav>
 
             {/* Pane 2: settings sub-navigation */}
