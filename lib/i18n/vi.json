@@ -1255,12 +1255,29 @@
     "subtitle": "Mọi điều bạn cần biết về cách FundLok vận hành, cho doanh nghiệp cần vốn và nhà đầu tư cấp vốn.",
     "title": "Câu hỏi thường gặp"
   },
+  "footer": {
+    "aboutUs": "Về chúng tôi",
+    "achievements": "Thành tựu",
+    "connect": "Kết nối với chúng tôi",
+    "connectBody": "Muốn trao đổi trực tiếp với đội ngũ hoặc nhận tin mới từ FundLok? Trang liên hệ là cách nhanh nhất.",
+    "contactUs": "Liên hệ",
+    "customerSupport": "Hỗ trợ khách hàng",
+    "getInTouch": "Liên hệ với chúng tôi",
+    "logIn": "Đăng nhập",
+    "ourSolution": "Giải pháp",
+    "ourStory": "Câu chuyện",
+    "projectApplication": "Đăng ký dự án",
+    "register": "Đăng ký",
+    "tagline": "FundLok xây dựng công cụ vốn linh hoạt cho doanh nghiệp vừa và nhỏ và nhà đầu tư.",
+    "team": "Đội ngũ",
+    "terms": "Điều khoản dịch vụ"
+  },
   "header": {
     "achievements": "THÀNH TỰU",
     "contact": "LIÊN HỆ",
-    "contactUs": "Liên hệ",
+    "contactUs": "LIÊN HỆ",
     "enterApp": "VÀO ỨNG DỤNG",
-    "faq": "FAQ",
+    "faq": "HỎI ĐÁP",
     "home": "TRANG CHỦ",
     "howItWorks": "QUY TRÌNH",
     "navigationMenu": "Danh mục",
@@ -1269,7 +1286,7 @@
     "product": "SẢN PHẨM",
     "rate": "LÃI SUẤT",
     "team": "ĐỘI NGŨ",
-    "whyUs": "WHY US"
+    "whyUs": "VÌ SAO CHỌN CHÚNG TÔI"
   },
   "investConfirm": {
     "amountLabel": "Số tiền đầu tư",
@@ -1449,6 +1466,7 @@
     "borrowerSpecs": "Thông số Người vay",
     "calculateInvNew": "Xem khoảng mục tiêu",
     "calculateSmeNew": "Xem lãi suất tham khảo",
+    "categorySme": "Gọi vốn SME",
     "desiredLoanShort": "Khoản vay",
     "desiredLoanSize": "Khoản vay mong muốn",
     "durationMonths": "{months} Tháng",
@@ -1464,6 +1482,7 @@
     "investmentSize": "Khoản đầu tư",
     "investmentSpecs": "Thông số Đầu tư",
     "investorPortal": "CỔNG NHÀ ĐẦU TƯ",
+    "live": "Live",
     "loanDuration": "Thời hạn vay",
     "loanDurationShort": "Thời hạn",
     "locked": "ĐÃ KHÓA",

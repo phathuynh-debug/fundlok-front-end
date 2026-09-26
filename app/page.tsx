@@ -22,7 +22,7 @@ const LinkedInIcon = (props: React.SVGProps<SVGSVGElement>) => (
 // Multilingual dictionary for static landing page assets
 const dict = {
   en: {
-    heroTitle: "Flexible Capital for MSMEs in Vietnam",
+    heroTitle: "Flexible capital for MSMEs in Vietnam",
     heroSubtitle:
       "FundLok arranges funding for SMEs in Vietnam: investors provide the capital, repayment is a fixed amount each business day, and the total repayable is fixed at signing. If verified revenue falls short, the obligation for that period drops and the facility runs longer; it never rises.",
     navProduct: "PRODUCT",
@@ -46,15 +46,15 @@ const dict = {
       "FundLok is designed to make funding more flexible for SMEs and more transparent for investors, combining a customer-friendly experience with automation, data-driven assessment, secure fund handling, and clear repayment tracking.",
     ourSolution: "Our Solution",
     partnersEyebrow: "BACKED BY",
-    partnersTitle: "Our Partners & Programs",
+    partnersTitle: "Partners & programs",
     partnersSubtitle:
       "FundLok is supported by leading startup programs providing cloud infrastructure, mentorship, and ecosystem access.",
-    partnersStrategic: "Strategic Partner",
-    partnersInfra: "Cloud Infrastructure Partners",
+    partnersStrategic: "Strategic partner",
+    partnersInfra: "Cloud infrastructure partners",
     achievementsTitle: "FundLok's Achievements",
     achievementsSubtitle:
       "Recognized locally and globally for innovation, impact, and technology in FinTech and investment facilitation.",
-    teamTitle: "Meet Our Team",
+    teamTitle: "Meet the team",
     teamSubtitle:
       "The builders and visionaries behind FundLok's technology, financial structuring, and growth.",
     teamCfo: "Chief Financial Officer",
@@ -86,11 +86,11 @@ const dict = {
       "FundLok được thiết kế để giúp việc gọi vốn linh hoạt hơn cho doanh nghiệp SME và minh bạch hơn cho nhà đầu tư, kết hợp trải nghiệm thân thiện với khách hàng cùng quy trình tự động hóa, thẩm định bằng dữ liệu, quản lý quỹ an toàn và theo dõi hoàn trả rõ ràng.",
     ourSolution: "Giải pháp của chúng tôi",
     partnersEyebrow: "ĐỒNG HÀNH CÙNG",
-    partnersTitle: "Đối tác & Chương trình",
+    partnersTitle: "Đối tác & chương trình",
     partnersSubtitle:
       "FundLok được đồng hành bởi các chương trình khởi nghiệp hàng đầu, cung cấp hạ tầng đám mây, cố vấn và kết nối hệ sinh thái.",
-    partnersStrategic: "Đối tác Chiến lược",
-    partnersInfra: "Đối tác Hạ tầng Đám mây",
+    partnersStrategic: "Đối tác chiến lược",
+    partnersInfra: "Đối tác hạ tầng đám mây",
     achievementsTitle: "Thành tựu của FundLok",
     achievementsSubtitle:
       "Được ghi nhận trong nước và quốc tế vì sự đổi mới sáng tạo, tầm ảnh hưởng và công nghệ trong lĩnh vực FinTech và thúc đẩy đầu tư.",
@@ -297,12 +297,9 @@ export default async function Page() {
             className="w-full py-16 px-6 max-w-6xl mx-auto border-t border-border/10 relative z-20 scroll-mt-20"
           >
             <div className="text-center mb-12">
-              <h2 className="font-mono text-xs tracking-widest text-emerald-600 dark:text-emerald-400 font-bold uppercase mb-2">
-                {currentLocale === "vi" ? "ĐỘI NGŨ SÁNG LẬP" : "LEADERSHIP"}
-              </h2>
-              <h3 className="font-sans text-3xl md:text-4xl font-extrabold text-foreground tracking-tight mb-4">
+              <h2 className="font-sans text-4xl md:text-5xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight mb-4">
                 {strings.teamTitle}
-              </h3>
+              </h2>
               <p className="font-sans text-sm md:text-base text-muted-foreground/80 max-w-3xl mx-auto leading-relaxed">
                 {strings.teamSubtitle}
               </p>

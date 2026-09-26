@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { GuillocheWaves } from "@/components/guilloche-waves";
 import Mockup from "@/components/mockup";
+import { useTranslations } from "@/lib/i18n";
 
 type HeroInteractiveProps = {
   strings: {
@@ -14,14 +15,16 @@ type HeroInteractiveProps = {
   };
 };
 
-// The mockup showcases a single demo portal (FundLok's own terminal).
-const partner = {
-  id: "terminal",
-  name: "FundLok Terminal",
-  category: "SME Lending",
-};
-
 export function HeroInteractive({ strings }: HeroInteractiveProps) {
+  const { t } = useTranslations();
+  // The mockup showcases a single demo portal (FundLok's own terminal).
+  // "Funding", not "Lending": FundLok arranges capital; it is not the lender.
+  const partner = {
+    id: "terminal",
+    name: "FundLok Terminal",
+    category: t("mockup.categorySme"),
+  };
+
   // 3D Perspective Tilt States
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);

@@ -266,7 +266,7 @@ export default function Mockup(props: MockupProps) {
             {/* Secure Badge */}
             <div className="w-1/4 flex justify-end items-center gap-2 text-[9px] text-zinc-500 font-mono font-bold tracking-wider">
               <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-widest scale-90">
-                Active
+                {t("mockup.live")}
               </span>
             </div>
           </div>
