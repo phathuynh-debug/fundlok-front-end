@@ -1,8 +1,9 @@
 import { Card } from "@/components/ui/card";
 import { useTranslations } from "@/lib/i18n";
+import { formatCurrency } from "@/lib/format-currency";
 
 export function ReturnProgress() {
-  const { t } = useTranslations();
+  const { locale, t } = useTranslations();
 
   return (
     <Card className="p-6">
@@ -37,7 +38,9 @@ export function ReturnProgress() {
             <p className="text-sm text-muted-foreground mb-1">
               {t("investment.returnProgress.dailyReturn")}
             </p>
-            <p className="text-xl font-bold">$42</p>
+            <p className="text-xl font-bold">
+              {formatCurrency(1_050_000, locale)}
+            </p>
           </div>
           <div>
             <p className="text-sm text-muted-foreground mb-1">
@@ -49,7 +52,9 @@ export function ReturnProgress() {
             <p className="text-sm text-muted-foreground mb-1">
               {t("investment.returnProgress.minBiweekly")}
             </p>
-            <p className="text-xl font-bold">$1,200</p>
+            <p className="text-xl font-bold">
+              {formatCurrency(30_000_000, locale)}
+            </p>
           </div>
         </div>
       </div>
