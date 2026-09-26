@@ -2,14 +2,13 @@
 
 import { useState, useRef, useEffect } from "react";
 import {
-  AnimatePresence,
   motion,
   useMotionValueEvent,
   useReducedMotion,
   useScroll,
   useTransform,
 } from "framer-motion";
-import { ShieldCheck, Layers, Coins, Banknote } from "lucide-react";
+import { Building2, Banknote } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
 
 // Content structures for both roles in both English and Vietnamese
@@ -945,7 +944,6 @@ export function InteractiveFlow() {
     };
   }, []);
 
-  const stageIcons = [ShieldCheck, Layers, Coins, Banknote];
   const steps = activeRoleData.steps;
   const step = steps[Math.min(activeStep, steps.length - 1)];
 
@@ -999,37 +997,133 @@ export function InteractiveFlow() {
   const audiences = [
     {
       key: "sme" as const,
-      label: currentLocale === "vi" ? "Cho doanh nghiệp" : "For SMEs",
+      icon: Building2,
+      label: currentLocale === "vi" ? "Doanh nghiệp" : "SME",
+      short: currentLocale === "vi" ? "Cho doanh nghiệp" : "For SMEs",
+      blurb:
+        currentLocale === "vi"
+          ? "Tôi đang tìm nguồn vốn cho doanh nghiệp của mình."
+          : "I am looking for funding for my business.",
     },
     {
       key: "investor" as const,
-      label: currentLocale === "vi" ? "Cho nhà đầu tư" : "For Investors",
+      icon: Banknote,
+      label: currentLocale === "vi" ? "Nhà đầu tư" : "Investor",
+      short: currentLocale === "vi" ? "Cho nhà đầu tư" : "For Investors",
+      blurb:
+        currentLocale === "vi"
+          ? "Tôi muốn cấp vốn cho các doanh nghiệp đã được thẩm định."
+          : "I want to fund businesses that have been assessed.",
     },
   ];
 
-  const stageDetail = (s: (typeof steps)[number]) => (
-    <div className="grid gap-6 lg:grid-cols-[1.35fr_1fr] lg:gap-8">
-      <div className="rounded-2xl border border-border bg-card p-6 md:p-8">
-        <p className="mb-3 font-sans text-xs text-muted-foreground">
-          {s.badge}
+  /**
+   * Picking an audience takes you to the sequence.
+   *
+   * The old control was a pair of small pills above the fold: easy to miss, and
+   * nothing happened when you used it, so the reader had no idea it had chosen
+   * their path through the rest of the section. Now it is the question the
+   * section opens with, and answering it moves you to the first stage so the
+   * next thing you do is simply scroll.
+   */
+  const chooseAudience = (key: "sme" | "investor") => {
+    handleRoleChange(key);
+    sequenceRef.current?.scrollIntoView({
+      behavior: reduceMotion ? "auto" : "smooth",
+      block: "start",
+    });
+  };
+
+  const audienceGate = (
+    <div className="mx-auto mb-14 max-w-3xl text-center lg:mb-20">
+      <h3 className="mb-3 font-sans text-3xl font-extrabold leading-[1.15] tracking-tighter text-foreground md:text-5xl">
+        {currentLocale === "vi"
+          ? "Bạn là doanh nghiệp hay nhà đầu tư?"
+          : "Are you an SME or an investor?"}
+      </h3>
+      <p className="mx-auto mb-8 max-w-[48ch] font-sans text-sm text-muted-foreground md:text-base">
+        {currentLocale === "vi"
+          ? "Chọn một bên để xem đúng quy trình dành cho bạn."
+          : "Pick one to see the process that applies to you."}
+      </p>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        {audiences.map((a) => {
+          const Icon = a.icon;
+          const isChosen = role === a.key;
+          return (
+            <button
+              key={a.key}
+              onClick={() => chooseAudience(a.key)}
+              aria-pressed={isChosen}
+              className={`group flex flex-col items-start gap-3 rounded-2xl border p-6 text-left transition-colors md:p-8 ${
+                isChosen
+                  ? "border-emerald-500 bg-emerald-500/5"
+                  : "border-border bg-card hover:border-emerald-500/50"
+              }`}
+            >
+              <span
+                className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors ${
+                  isChosen
+                    ? "bg-emerald-600 text-white"
+                    : "bg-muted text-muted-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400"
+                }`}
+              >
+                <Icon className="h-6 w-6" strokeWidth={1.75} />
+              </span>
+              <span className="font-sans text-xl font-extrabold tracking-tight text-foreground md:text-2xl">
+                {a.label}
+              </span>
+              <span className="font-sans text-sm leading-relaxed text-muted-foreground">
+                {a.blurb}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  /**
+   * One stage, presented the way worldquant.com presents a belief: the title
+   * IS the slide. Display type first, one lead paragraph, and the supporting
+   * detail demoted to a quiet grid underneath rather than competing with it.
+   *
+   * leading-[1.1], not leading-none. Vietnamese stacks diacritics above the
+   * cap height (ế, ữ, ộ) and a zero-leading display line clips them. The English
+   * copy would have looked fine and the production language would not.
+   */
+  const stageDetail = (s: (typeof steps)[number], idx: number) => (
+    <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+      <div>
+        <p className="mb-5 font-mono text-xs text-muted-foreground">
+          {String(idx + 1).padStart(2, "0")}
         </p>
-        <h3 className="mb-4 font-sans text-2xl font-extrabold tracking-tight text-foreground md:text-3xl">
+
+        <h3 className="mb-6 max-w-[14ch] font-sans text-4xl font-extrabold leading-[1.1] tracking-tighter text-foreground md:text-6xl lg:text-7xl">
           {(s as { detailTitle?: string }).detailTitle || s.title}
         </h3>
-        <p className="mb-6 max-w-[65ch] font-sans text-sm leading-relaxed text-muted-foreground">
+
+        <p className="mb-8 max-w-[52ch] font-sans text-base leading-relaxed text-muted-foreground md:text-lg">
           {s.desc}
         </p>
-        <div className="mb-6 flex flex-wrap gap-2">
+
+        <div className="flex flex-wrap gap-2">
           {s.tags.map((tag, tIdx) => (
             <span
               key={tIdx}
-              className="rounded-full bg-emerald-500/10 px-3 py-1 font-sans text-[11px] font-semibold text-emerald-700 dark:text-emerald-400"
+              className="rounded-full border border-border px-3 py-1 font-sans text-xs text-muted-foreground"
             >
               {tag}
             </span>
           ))}
         </div>
-        <div className="grid grid-cols-1 gap-6 border-t border-border/40 pt-6 md:grid-cols-3">
+      </div>
+
+      {/* Supporting detail. Hairlines instead of cards: at this scale a boxed
+          panel next to 72px type reads as a second, competing headline. */}
+      <div className="flex flex-col gap-8 lg:pt-16">
+        <div className="grid gap-6 sm:grid-cols-2">
           {[
             [
               currentLocale === "vi" ? "Cách hoạt động" : "How this works",
@@ -1047,50 +1141,39 @@ export function InteractiveFlow() {
                 : "Technology behind it",
               s.tech,
             ],
+            [s.journeyTitle, s.emphasis],
           ].map(([label, body]) => (
-            <div key={label}>
+            <div key={label} className="border-t border-border pt-4">
               <h4 className="mb-2 font-sans text-xs font-semibold text-foreground">
                 {label}
               </h4>
-              <p className="font-sans text-[11px] leading-relaxed text-muted-foreground">
+              <p className="font-sans text-xs leading-relaxed text-muted-foreground">
                 {body}
               </p>
             </div>
           ))}
         </div>
-      </div>
 
-      <div className="flex flex-col gap-4 rounded-2xl border border-border bg-muted/20 p-6">
-        <h4 className="font-sans text-sm font-bold tracking-wide text-foreground">
-          {s.journeyTitle}
-        </h4>
-        <div className="rounded-2xl border border-border bg-card p-5">
-          <span className="mb-4 block font-sans text-xs font-semibold text-foreground">
+        <dl className="border-t border-border pt-4">
+          <dt className="mb-3 font-sans text-xs font-semibold text-foreground">
             {currentLocale === "vi"
               ? "Các bước thực hiện"
               : "What happens here"}
-          </span>
-          <div className="flex flex-col gap-3.5">
-            {s.rows.map((row, rIdx) => (
-              <div
-                key={rIdx}
-                className="flex items-start justify-between gap-4 border-b border-border/10 pb-3.5 last:border-none last:pb-0"
-              >
-                <span className="font-sans text-xs text-muted-foreground">
-                  {row[0]}
-                </span>
-                <span className="shrink-0 text-right font-sans text-xs font-bold text-foreground">
-                  {row[1]}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="mt-auto rounded-2xl border border-emerald-100 bg-emerald-50/50 p-5 dark:border-emerald-900/30 dark:bg-emerald-950/20">
-          <p className="font-sans text-xs font-medium leading-relaxed text-emerald-800 dark:text-emerald-300">
-            {s.emphasis}
-          </p>
-        </div>
+          </dt>
+          {s.rows.map((row, rIdx) => (
+            <div
+              key={rIdx}
+              className="flex items-start justify-between gap-6 py-2"
+            >
+              <dd className="font-sans text-xs text-muted-foreground">
+                {row[0]}
+              </dd>
+              <dd className="shrink-0 text-right font-sans text-xs font-bold text-foreground">
+                {row[1]}
+              </dd>
+            </div>
+          ))}
+        </dl>
       </div>
     </div>
   );
@@ -1108,7 +1191,7 @@ export function InteractiveFlow() {
               : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
           }`}
         >
-          {a.label}
+          {a.short}
         </button>
       ))}
     </div>
@@ -1119,10 +1202,10 @@ export function InteractiveFlow() {
   if (reduceMotion) {
     return (
       <div className="w-full">
-        <div className="mb-8 flex justify-center">{audienceRail}</div>
+        {audienceGate}
         <div className="space-y-14">
           {steps.map((s, idx) => (
-            <div key={`${role}-${idx}`}>{stageDetail(s)}</div>
+            <div key={`${role}-${idx}`}>{stageDetail(s, idx)}</div>
           ))}
         </div>
       </div>
@@ -1136,75 +1219,85 @@ export function InteractiveFlow() {
         className="pointer-events-none absolute inset-0 z-50 h-full w-full"
       />
 
+      {audienceGate}
+
       {/* Exactly one viewport of scroll per stage. */}
       <div
         ref={sequenceRef}
         style={{ height: `${steps.length * 100}vh` }}
         className="relative"
       >
-        <div className="sticky top-0 flex min-h-[100dvh] flex-col justify-center py-16">
-          {/* Pinned rail: progress, stage names, audience. Always on screen, so
-              the reader can see where they are and what is still coming. */}
-          <div className="mb-8">
-            <div className="mb-5 h-1 w-full overflow-hidden rounded-full bg-border">
-              <motion.div
-                style={{ width: progressWidth }}
-                className="h-full rounded-full bg-emerald-500"
-              />
+        <div className="sticky top-0 flex min-h-[100dvh] flex-col">
+          {/* Segmented indicator, after worldquant.com: one segment per stage,
+              filled as the reader passes it, with the progress line running
+              underneath. It is the wayfinding for the whole section, so it sits
+              at the very top of the pinned area and never moves. */}
+          <div className="border-b border-border pt-6">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+              <span className="font-sans text-xs font-semibold text-muted-foreground">
+                {currentLocale === "vi" ? "Quy trình" : "How it works"}
+              </span>
+              {audienceRail}
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <ol className="flex flex-wrap items-center gap-x-2 gap-y-2">
-                {steps.map((s, idx) => {
-                  const Icon = stageIcons[idx] ?? ShieldCheck;
-                  const isActive = idx === activeStep;
-                  const isPast = idx < activeStep;
-                  return (
-                    <li
-                      key={`${role}-rail-${idx}`}
-                      className="flex items-center"
+            <ol className="grid grid-cols-2 md:grid-cols-4">
+              {steps.map((s, idx) => {
+                const isActive = idx === activeStep;
+                const isDone = idx < activeStep;
+                return (
+                  <li
+                    key={`${role}-seg-${idx}`}
+                    aria-current={isActive ? "step" : undefined}
+                    className={`border-l px-3 py-3 transition-colors first:border-l-0 ${
+                      isActive || isDone
+                        ? "border-emerald-500/40"
+                        : "border-border"
+                    }`}
+                  >
+                    <span
+                      className={`block font-sans text-[11px] font-bold leading-snug transition-colors md:text-xs ${
+                        isActive
+                          ? "text-emerald-600 dark:text-emerald-400"
+                          : isDone
+                            ? "text-foreground"
+                            : "text-muted-foreground"
+                      }`}
                     >
-                      <span
-                        aria-current={isActive ? "step" : undefined}
-                        className={`flex items-center gap-2 rounded-full px-3 py-1.5 transition-colors ${
-                          isActive
-                            ? "bg-emerald-600 text-white"
-                            : isPast
-                              ? "text-foreground"
-                              : "text-muted-foreground"
-                        }`}
-                      >
-                        <Icon className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-                        <span className="font-sans text-xs font-bold">
-                          {s.title}
-                        </span>
-                      </span>
-                      {idx < steps.length - 1 && (
-                        <span
-                          aria-hidden
-                          className="mx-1 hidden h-px w-6 bg-[repeating-linear-gradient(90deg,currentColor_0_4px,transparent_4px_8px)] text-border md:block"
-                        />
-                      )}
-                    </li>
-                  );
-                })}
-              </ol>
-              {audienceRail}
+                      {s.title}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+
+            {/* The scrubbed line. Sits on the section's own bottom rule so the
+                bar reads as one object rather than a bar plus a stray track. */}
+            <div className="-mb-px h-0.5 w-full bg-transparent">
+              <motion.div
+                style={{ width: progressWidth }}
+                className="h-full bg-emerald-500"
+              />
             </div>
           </div>
 
-          {/* The stage itself. Cross-fades as the scroll crosses each boundary. */}
-          <AnimatePresence mode="wait">
+          <div className="flex flex-1 flex-col justify-center py-12">
+            {/* The stage itself. Cross-fades as the scroll crosses each boundary. */}
+            {/* No AnimatePresence here, deliberately. With mode="wait" the
+                incoming stage cannot mount until the outgoing one has finished
+                exiting, so scrolling faster than that exit (which is how people
+                actually scroll) backs the queue up and the panel settles on the
+                wrong stage while the indicator shows the right one. A keyed
+                remount has no exit to wait for: React swaps the subtree at once
+                and the new stage fades in, so the two cannot disagree. */}
             <motion.div
               key={`${role}-${activeStep}`}
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
             >
-              {stageDetail(step)}
+              {stageDetail(step, activeStep)}
             </motion.div>
-          </AnimatePresence>
+          </div>
         </div>
       </div>
     </div>

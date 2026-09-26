@@ -132,8 +132,12 @@ class ApiClient {
         const message =
           extractMessage(data) || getStatusMessage(status) || error.message;
         const details = data?.details;
+        // Header rather than body so `detail` stays the plain string every
+        // existing caller already reads. See ApiError.code.
+        const rawCode = error.response?.headers?.["x-error-code"];
+        const code = typeof rawCode === "string" ? rawCode : undefined;
 
-        return Promise.reject({ message, details, status });
+        return Promise.reject({ message, details, status, code });
       },
     );
   }
