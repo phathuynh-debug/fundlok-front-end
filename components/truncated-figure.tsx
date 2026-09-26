@@ -87,7 +87,9 @@ export function TruncatedFigure({
       </TooltipTrigger>
       {/* No content element → Radix renders no tooltip at all. */}
       {isClipped && (
-        <TooltipContent className="font-mono text-xs">{value}</TooltipContent>
+        <TooltipContent className="text-xs tabular-nums">
+          {value}
+        </TooltipContent>
       )}
     </Tooltip>
   );

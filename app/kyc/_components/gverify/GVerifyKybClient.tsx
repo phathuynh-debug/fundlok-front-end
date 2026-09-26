@@ -32,6 +32,7 @@ import { StatusBlock } from "../status-block";
 import { DocumentCaptureField } from "./DocumentCaptureField";
 import { useGVerifyKyb } from "./useGVerifyKyb";
 import type { ApiError } from "@/lib/types";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 // HOUSEHOLD was dropped 2026-07-15 per the provider integration guide — OCR X
 // business verification covers company and branch certificates.
@@ -59,7 +60,7 @@ const DOCUMENT_TYPES: Array<{
 export function GVerifyKybClient() {
   const searchParams = useSearchParams();
   const { toast } = useToast();
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const { data: user } = useCurrentUser();
   const { data: status } = useGVerifyKybStatus();
   const {
@@ -114,7 +115,11 @@ export function GVerifyKybClient() {
       toast({
         variant: "destructive",
         title: t("kyc.gv.errorTitle"),
-        description: apiError?.message || t("kyc.startErrorDescription"),
+        description: apiErrorMessage(
+          apiError,
+          locale,
+          t("kyc.startErrorDescription"),
+        ),
       });
     }
   };

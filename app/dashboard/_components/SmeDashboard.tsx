@@ -8,9 +8,11 @@ import { MapPin, CheckCircle2, Rocket, ArrowRight, Target } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Project } from "@/services/projects.service";
 import { useTranslations } from "@/lib/i18n";
+import { industryLabel } from "@/lib/industry-label";
 import { cn } from "@/lib/utils";
 import { getIndustryTheme } from "./sme-dashboard-config";
 import { formatDate, formatDateTime } from "@/lib/format-date";
+import { enumLabel } from "@/lib/enum-labels";
 import { LoanApplicationUpload } from "./loan-application/LoanApplicationUpload";
 import { LoanApplicationStatus } from "./loan-application/LoanApplicationStatus";
 import { SmeFundingPanel } from "./SmeFundingPanel";
@@ -112,10 +114,10 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
 
         <div className="grid gap-6 p-6 md:p-8 lg:grid-cols-[1.4fr_0.6fr] items-stretch relative z-10">
           {/* Left Column: Project Profile Details */}
-          <div className="space-y-6 flex flex-col justify-between">
+          <div className="min-w-0 space-y-6 flex flex-col justify-between">
             {/* Header / Eyebrow */}
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs font-bold tracking-widest text-muted-foreground uppercase">
+              <div className="flex items-center gap-2 text-xs font-bold tracking-wider text-muted-foreground uppercase">
                 <span className="relative flex h-2.5 w-2.5">
                   <span
                     className={cn(
@@ -152,7 +154,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
                       : "bg-muted text-muted-foreground",
                   )}
                 >
-                  {project.status || t("dashboard.projectCard.status.draft")}
+                  {enumLabel(t, "projectStatus", project.status || "DRAFT")}
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed italic">
@@ -163,9 +165,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
             {/* Responsive Key Values Metrics Grid */}
             <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 pt-4 border-t border-border/40">
               <div className="space-y-1">
-                <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
-                  {t("dashboard.sme.industry")}
-                </p>
+                <p className="stat-label">{t("dashboard.sme.industry")}</p>
                 <p
                   className={cn(
                     "text-base font-bold flex items-center gap-1.5",
@@ -173,21 +173,19 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
                   )}
                 >
                   <theme.icon className="h-4 w-4 shrink-0" />
-                  {project.industry}
+                  {industryLabel(project.industry, t)}
                 </p>
               </div>
 
               <div className="space-y-1">
-                <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
-                  {t("dashboard.sme.taxId")}
-                </p>
+                <p className="stat-label">{t("dashboard.sme.taxId")}</p>
                 <p className="text-base font-bold text-foreground">
                   {project.tax_id}
                 </p>
               </div>
 
               <div className="space-y-1">
-                <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
+                <p className="stat-label">
                   {t("dashboard.sme.incorporationDate")}
                 </p>
                 <p className="text-base font-bold text-foreground">
@@ -198,11 +196,11 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
               </div>
 
               <div className="space-y-1">
-                <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
-                  {t("dashboard.sme.daysActive")}
-                </p>
+                <p className="stat-label">{t("dashboard.sme.daysActive")}</p>
                 <p className="text-base font-bold text-foreground">
-                  {Math.max(0, daysActive)} days
+                  {t("dashboard.sme.dayCount", {
+                    count: Math.max(0, daysActive),
+                  })}
                 </p>
               </div>
             </div>
@@ -249,9 +247,9 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
                   {t("dashboard.sme.systemRecordDetails")}
                 </h4>
                 <div className="space-y-1 text-xs text-muted-foreground">
-                  <p className="font-mono truncate">ID: {project.id}</p>
+                  <p className="font-mono break-all">ID: {project.id}</p>
                   <p>
-                    Created:{" "}
+                    {t("dashboard.sme.createdAt")}:{" "}
                     {project.created_at
                       ? formatDateTime(project.created_at, locale)
                       : t("common.na")}
@@ -311,7 +309,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
               </div>
               <div className="space-y-1">
                 <p className="font-bold text-foreground text-base">
-                  {project.industry}
+                  {industryLabel(project.industry, t)}
                 </p>
                 <p className="text-xs text-muted-foreground max-w-[180px] leading-relaxed">
                   {locale === "vi"

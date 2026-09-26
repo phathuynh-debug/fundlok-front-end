@@ -15,6 +15,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { useUpdateAvatar } from "@/hooks/use-users";
 import { AVATAR_RULES } from "@/services/users.service";
+import { apiErrorMessage } from "@/lib/api-error-message";
+import { useTranslations } from "@/lib/i18n";
 
 interface AvatarUploadDialogProps {
   open: boolean;
@@ -36,6 +38,7 @@ export function AvatarUploadDialog({
   t,
 }: AvatarUploadDialogProps) {
   const { toast } = useToast();
+  const { locale } = useTranslations();
   const updateAvatar = useUpdateAvatar();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -109,9 +112,11 @@ export function AvatarUploadDialog({
           toast({
             variant: "destructive",
             title: t("dashboard.settings.profile.avatar.failedTitle"),
-            description:
-              error?.message ||
+            description: apiErrorMessage(
+              error,
+              locale,
               t("dashboard.settings.profile.avatar.failedDescription"),
+            ),
           });
         },
       },

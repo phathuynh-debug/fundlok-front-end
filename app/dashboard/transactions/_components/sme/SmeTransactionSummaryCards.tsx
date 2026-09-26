@@ -68,9 +68,7 @@ export function SmeTransactionSummaryCards({
           className="bg-card text-card-foreground border border-border rounded-xl shadow-xs p-5 space-y-1"
         >
           <div className="flex items-center justify-between gap-2">
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              {card.label}
-            </span>
+            <span className="stat-label">{card.label}</span>
             <card.icon
               className="h-4 w-4 text-muted-foreground/70 shrink-0"
               aria-hidden="true"

@@ -11,7 +11,7 @@ import { useTranslations } from "@/lib/i18n";
  * rate-client): the heading drops in, then the two panels rise with a short
  * cascade so the eye lands on the copy before the form.
  *
- * Restrained on purpose. This is a regulated lender's contact page, so motion
+ * Restrained on purpose. This is a financing platform's contact page, so motion
  * is here to order the reading, not to perform. The two info cards stagger
  * against each other; nothing loops, nothing parallaxes. */
 const cardsContainer: Variants = {
@@ -43,10 +43,8 @@ export default function ContactClient() {
               transition={{ duration: 0.7, ease: "easeOut" }}
               className="space-y-3"
             >
-              <p className="text-xs font-mono font-bold uppercase tracking-[0.24em] text-emerald-600 dark:text-emerald-400">
-                {t("contactPage.eyebrow")}
-              </p>
-              <h1 className="text-4xl font-extrabold tracking-tight md:text-5xl">
+              <p className="eyebrow">{t("contactPage.eyebrow")}</p>
+              <h1 className="text-4xl font-extrabold leading-tight tracking-tight md:text-5xl">
                 {t("contactPage.title")}
               </h1>
               <p className="max-w-2xl text-sm leading-7 text-muted-foreground md:text-base">
@@ -65,7 +63,7 @@ export default function ContactClient() {
                 variants={cardItem}
                 className="rounded-2xl border border-border bg-card p-5"
               >
-                <h2 className="text-sm font-bold uppercase tracking-[0.18em] text-foreground">
+                <h2 className="text-sm font-bold uppercase tracking-wider text-foreground">
                   {t("contactPage.emailLabel")}
                 </h2>
                 <p className="mt-3 text-sm text-muted-foreground">
@@ -76,7 +74,7 @@ export default function ContactClient() {
                 variants={cardItem}
                 className="rounded-2xl border border-border bg-card p-5"
               >
-                <h2 className="text-sm font-bold uppercase tracking-[0.18em] text-foreground">
+                <h2 className="text-sm font-bold uppercase tracking-wider text-foreground">
                   {t("contactPage.locationLabel")}
                 </h2>
                 <p className="mt-3 text-sm text-muted-foreground">

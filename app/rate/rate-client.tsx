@@ -24,6 +24,7 @@ import {
   LOAN_MIN_VND,
 } from "@/lib/constants/loan-constraints";
 import { cn } from "@/lib/utils";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 /**
  * The public rate calculator.
@@ -844,7 +845,11 @@ export default function RateClient() {
               <div className="flex items-start gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 p-3">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
                 <p className="text-xs leading-relaxed text-foreground">
-                  {estimate.error?.message ?? t("ratePage.errorGeneric")}
+                  {apiErrorMessage(
+                    estimate.error,
+                    locale,
+                    t("ratePage.errorGeneric"),
+                  )}
                 </p>
               </div>
             )}
@@ -897,13 +902,11 @@ export default function RateClient() {
                   className="grid gap-4 sm:grid-cols-2"
                 >
                   <div className="space-y-1">
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                      {t("ratePage.scoreLabel")}
-                    </p>
-                    <div className="flex items-baseline gap-1.5">
+                    <p className="stat-label">{t("ratePage.scoreLabel")}</p>
+                    <div className="flex flex-wrap items-baseline gap-x-1.5">
                       <motion.span
                         variants={figureVariants}
-                        className="origin-left font-mono text-2xl font-bold tracking-tight"
+                        className="origin-left text-2xl font-bold tabular-nums tracking-tight"
                       >
                         {score(data.score_low)} – {score(data.score_high)}
                       </motion.span>
@@ -913,13 +916,11 @@ export default function RateClient() {
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                      {t("ratePage.rateLabel")}
-                    </p>
-                    <div className="flex items-baseline gap-1.5">
+                    <p className="stat-label">{t("ratePage.rateLabel")}</p>
+                    <div className="flex flex-wrap items-baseline gap-x-1.5">
                       <motion.span
                         variants={figureVariants}
-                        className="origin-left font-mono text-2xl font-bold tracking-tight"
+                        className="origin-left text-2xl font-bold tabular-nums tracking-tight"
                       >
                         {pct(data.rate_low_pct)} – {pct(data.rate_high_pct)}
                       </motion.span>

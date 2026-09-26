@@ -23,6 +23,7 @@ import {
 } from "@/hooks/use-authentication";
 import { useTranslations } from "@/lib/i18n";
 import type { SelectableRole } from "@/services/authentication.service";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 // Stagger children so the heading and cards cascade in instead of popping.
 const containerVariants = {
@@ -45,7 +46,7 @@ const itemVariants = {
 export function SelectRoleClient() {
   const router = useRouter();
   const { toast } = useToast();
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const queryClient = useQueryClient();
   const { data: user } = useCurrentUser();
   const { mutate: selectRole } = useSelectRole();
@@ -90,7 +91,11 @@ export function SelectRoleClient() {
         toast({
           variant: "destructive",
           title: t("auth.selectRole.failedTitle"),
-          description: error?.message || t("auth.selectRole.failedDescription"),
+          description: apiErrorMessage(
+            error,
+            locale,
+            t("auth.selectRole.failedDescription"),
+          ),
         });
       },
     });

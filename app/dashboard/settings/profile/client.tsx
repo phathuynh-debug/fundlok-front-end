@@ -28,6 +28,7 @@ import { useCurrentUser } from "@/hooks/use-authentication";
 import { useUpdateProfile } from "@/hooks/use-users";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
+import { roleLabel } from "@/lib/enum-labels";
 import { getInitials } from "@/lib/utils";
 import {
   pageTransitionProps,
@@ -38,6 +39,7 @@ import {
 import { AvatarUploadDialog } from "../_components/AvatarUploadDialog";
 import { SetPasswordDialog } from "../_components/SetPasswordDialog";
 import { profileFormSchema, type ProfileFormValues } from "./form-schema";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 // Best-effort browser name from the UA string — purely cosmetic for the UI mock.
 function detectBrowser(): string {
@@ -120,9 +122,11 @@ export function ProfileClient() {
           toast({
             variant: "destructive",
             title: t("dashboard.settings.profile.updateFailedTitle"),
-            description:
-              error?.message ||
+            description: apiErrorMessage(
+              error,
+              locale,
               t("dashboard.settings.profile.updateFailedDescription"),
+            ),
           });
         },
       },
@@ -380,12 +384,12 @@ export function ProfileClient() {
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <div className="rounded-xl border border-border/60 bg-muted/20 p-5 space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <p className="stat-label">
                   {t("dashboard.settings.profile.role")}
                 </p>
                 {user?.role ? (
                   <Badge className="rounded-full bg-primary/10 text-primary hover:bg-primary/10 border border-primary/20">
-                    {user.role}
+                    {roleLabel(t, user.role)}
                   </Badge>
                 ) : (
                   <span className="text-sm text-muted-foreground">—</span>
@@ -393,7 +397,7 @@ export function ProfileClient() {
               </div>
 
               <div className="rounded-xl border border-border/60 bg-muted/20 p-5 space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <p className="stat-label">
                   {t("dashboard.settings.profile.memberSince")}
                 </p>
                 <p
@@ -405,7 +409,7 @@ export function ProfileClient() {
               </div>
 
               <div className="rounded-xl border border-border/60 bg-muted/20 p-5 space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <p className="stat-label">
                   {t("dashboard.settings.profile.emailAddress")}
                 </p>
                 <p
@@ -434,14 +438,14 @@ export function ProfileClient() {
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <div className="rounded-xl border border-border/60 bg-muted/20 p-5 space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <p className="stat-label">
                   {t("dashboard.settings.profile.loginMethod")}
                 </p>
                 <p className="text-sm font-semibold text-foreground">—</p>
               </div>
 
               <div className="rounded-xl border border-border/60 bg-muted/20 p-5 space-y-3">
-                <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <p className="stat-label flex items-center gap-1.5">
                   {t("dashboard.settings.profile.password")}
                   <span className="inline-flex items-center gap-1 text-primary">
                     <KeyRound className="h-3 w-3" />
@@ -472,7 +476,7 @@ export function ProfileClient() {
               </div>
 
               <div className="rounded-xl border border-border/60 bg-muted/20 p-5 space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <p className="stat-label">
                   {t("dashboard.settings.profile.currentBrowser")}
                 </p>
                 <p

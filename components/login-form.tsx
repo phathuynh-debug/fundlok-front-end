@@ -14,6 +14,7 @@ import { useLogin } from "@/app/login/use-login";
 import { Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
 import { PasskeySignInButton } from "@/components/passkey-sign-in-button";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
@@ -41,7 +42,7 @@ export function LoginForm() {
     totpError,
     cancelTotp,
   } = useLogin();
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +51,7 @@ export function LoginForm() {
       toast({
         variant: "destructive",
         title: t("auth.login.failedTitle"),
-        description: "Please complete the security check.",
+        description: t("auth.securityCheckRequired"),
       });
       return;
     }
@@ -78,7 +79,11 @@ export function LoginForm() {
           toast({
             variant: "destructive",
             title: t("auth.login.failedTitle"),
-            description: error?.message || t("auth.login.failedDescription"),
+            description: apiErrorMessage(
+              error,
+              locale,
+              t("auth.login.failedDescription"),
+            ),
           });
         },
       },

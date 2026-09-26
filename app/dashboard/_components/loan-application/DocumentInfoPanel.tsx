@@ -49,7 +49,7 @@ export function DocumentInfoPanel() {
           <ul className="space-y-2 text-xs text-muted-foreground">
             {[1, 2, 3, 4].map((n) => (
               <li key={n} className="flex items-start gap-1.5">
-                <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-black/5 dark:bg-white/10 text-[9px] font-bold text-foreground">
+                <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-black/5 dark:bg-white/10 text-[10px] font-bold text-foreground">
                   {n}
                 </span>
                 <span>{t(`dashboard.sme.cicStep${n}`)}</span>

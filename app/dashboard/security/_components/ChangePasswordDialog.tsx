@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { useChangePassword } from "@/hooks/use-authentication";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 const MIN_LENGTH = 8;
 
@@ -26,7 +27,7 @@ export function ChangePasswordDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const { toast } = useToast();
   const { mutate: changePassword, isPending } = useChangePassword();
 
@@ -80,7 +81,11 @@ export function ChangePasswordDialog({
         },
         onError: (apiError) =>
           setError(
-            apiError?.message ?? t("security.changePassword.errorGeneric"),
+            apiErrorMessage(
+              apiError,
+              locale,
+              t("security.changePassword.errorGeneric"),
+            ),
           ),
       },
     );

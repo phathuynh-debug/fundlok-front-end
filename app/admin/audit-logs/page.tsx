@@ -18,20 +18,15 @@ import {
 } from "@/components/ui/select";
 import { DataTable, type Column } from "../_components/DataTable";
 import { useTranslations } from "@/lib/i18n";
+import { enumLabel } from "@/lib/enum-labels";
+import { formatDateTime as formatLocaleDateTime } from "@/lib/format-date";
 
 const LIMIT_OPTIONS = [50, 100, 200, 500];
 
-function formatDateTime(value?: string | null) {
-  if (!value) return "—";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "—";
-  return date.toLocaleString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+// The app's locale, not the browser's, so the Vietnamese site never prints an
+// English month name.
+function formatDateTime(value: string | null | undefined, locale: string) {
+  return formatLocaleDateTime(value, locale) || "—";
 }
 
 // UUIDs are long — show a short, copy-friendly prefix with the full value on hover.
@@ -74,25 +69,34 @@ type TranslateFn = (
   values?: Record<string, string | number>,
 ) => string;
 
-const buildColumns = (t: TranslateFn): Column<AuditLog>[] => [
+const buildColumns = (t: TranslateFn, locale: string): Column<AuditLog>[] => [
   {
     key: "time",
     header: t("admin.auditLogs.time"),
     cellClassName: "text-muted-foreground whitespace-nowrap",
-    render: (log) => formatDateTime(log.created_at),
+    render: (log) => formatDateTime(log.created_at, locale),
   },
   {
     key: "action",
     header: t("admin.auditLogs.action"),
     render: (log) =>
-      log.action ? <Badge variant="secondary">{log.action}</Badge> : "—",
+      log.action ? (
+        // The raw code stays on hover: it is what an operator searches for.
+        <Badge variant="secondary" title={log.action}>
+          {enumLabel(t, "auditAction", log.action)}
+        </Badge>
+      ) : (
+        "—"
+      ),
   },
   {
     key: "entity",
     header: t("admin.auditLogs.entity"),
     render: (log) => (
       <div className="flex flex-col">
-        <span className="font-medium text-foreground">{log.entity_type}</span>
+        <span className="font-medium text-foreground" title={log.entity_type}>
+          {enumLabel(t, "auditEntity", log.entity_type)}
+        </span>
         {/* For USER entities the backend resolves the subject; show it. */}
         {log.entity_user ? (
           <span className="text-xs text-muted-foreground">
@@ -127,7 +131,7 @@ const buildColumns = (t: TranslateFn): Column<AuditLog>[] => [
 export default function AdminAuditLogsPage() {
   const { user, isLoading } = useRequireAuth();
   const router = useRouter();
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const isAdmin = !isLoading && isAdminRole(user?.role);
 
   const [entityInput, setEntityInput] = useState("");
@@ -166,7 +170,7 @@ export default function AdminAuditLogsPage() {
     );
   }
 
-  const columns = buildColumns(t);
+  const columns = buildColumns(t, locale);
 
   return (
     <div className="flex flex-col gap-6">

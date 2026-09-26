@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
 import { useResetPassword } from "@/app/reset-password/use-reset-password";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 export function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -29,7 +30,7 @@ export function ResetPasswordForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { toast } = useToast();
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const { resetPassword, isPending, isSuccess } = useResetPassword();
 
   const handleResetPassword = (e: React.FormEvent) => {
@@ -48,7 +49,7 @@ export function ResetPasswordForm() {
       toast({
         variant: "destructive",
         title: t("auth.resetPassword.failedTitle"),
-        description: "Password must be at least 8 characters long.",
+        description: t("auth.resetPassword.passwordTooShort"),
       });
       return;
     }
@@ -83,8 +84,11 @@ export function ResetPasswordForm() {
           toast({
             variant: "destructive",
             title: t("auth.resetPassword.failedTitle"),
-            description:
-              error?.message || t("auth.resetPassword.failedDescription"),
+            description: apiErrorMessage(
+              error,
+              locale,
+              t("auth.resetPassword.failedDescription"),
+            ),
           });
         },
       },

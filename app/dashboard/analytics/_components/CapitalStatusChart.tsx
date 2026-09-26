@@ -102,17 +102,17 @@ export function CapitalStatusChart({
           {slices.map((slice, index) => (
             <li
               key={slice.statusKey}
-              className="flex items-center justify-between gap-3 text-xs"
+              className="flex items-start justify-between gap-3 text-xs"
             >
               <span className="flex min-w-0 items-center gap-2">
                 <span
                   aria-hidden="true"
-                  className="size-2.5 shrink-0 rounded-[2px]"
+                  className="mt-0.5 size-2.5 shrink-0 rounded-[2px]"
                   style={{
                     backgroundColor: `var(--color-${sliceKey(index)})`,
                   }}
                 />
-                <span className="truncate text-muted-foreground">
+                <span className="break-words text-muted-foreground">
                   {slice.label}
                 </span>
               </span>

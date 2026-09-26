@@ -58,6 +58,7 @@ const dict = {
     teamSubtitle:
       "The builders and visionaries behind FundLok's technology, financial structuring, and growth.",
     teamCfo: "Chief Financial Officer",
+    linkedInOf: "{name} on LinkedIn",
     teamCeo: "Founder & Chief Executive Officer",
     teamCto: "Chief Technological Officer",
   },
@@ -98,6 +99,7 @@ const dict = {
     teamSubtitle:
       "Những người xây dựng và kiến tạo đằng sau công nghệ, cấu trúc tài chính và sự tăng trưởng của FundLok.",
     teamCfo: "Giám đốc Tài chính (CFO)",
+    linkedInOf: "LinkedIn của {name}",
     teamCeo: "Nhà sáng lập & Giám đốc Điều hành (CEO)",
     teamCto: "Giám đốc Công nghệ (CTO)",
   },
@@ -222,7 +224,7 @@ export default async function Page() {
               <h2 className="font-sans text-3xl md:text-4xl font-extrabold text-foreground tracking-tight mb-4">
                 {strings.processTitle}
               </h2>
-              <p className="font-sans text-sm md:text-base text-muted-foreground/80 max-w-3xl mx-auto leading-relaxed">
+              <p className="font-sans text-sm md:text-base text-muted-foreground max-w-3xl mx-auto leading-relaxed">
                 {strings.processSubtitle}
               </p>
             </div>
@@ -236,13 +238,11 @@ export default async function Page() {
             className="w-full py-16 px-6 max-w-6xl mx-auto border-t border-border/10 relative z-20 scroll-mt-20"
           >
             <div className="text-center mb-10">
-              <h2 className="font-mono text-xs tracking-widest text-emerald-600 dark:text-emerald-400 font-bold uppercase mb-2">
-                {strings.partnersEyebrow}
-              </h2>
-              <h3 className="font-sans text-3xl font-extrabold text-foreground tracking-tight">
+              <p className="eyebrow mb-2">{strings.partnersEyebrow}</p>
+              <h2 className="font-sans text-3xl font-extrabold text-foreground tracking-tight">
                 {strings.partnersTitle}
-              </h3>
-              <p className="font-sans text-sm text-muted-foreground/80 max-w-2xl mx-auto mt-2">
+              </h2>
+              <p className="font-sans text-sm text-muted-foreground max-w-2xl mx-auto mt-2">
                 {strings.partnersSubtitle}
               </p>
             </div>
@@ -255,9 +255,7 @@ export default async function Page() {
                   key={tier.label}
                   className="w-full flex flex-col items-center gap-6"
                 >
-                  <h4 className="font-mono text-[11px] tracking-widest text-emerald-600 dark:text-emerald-400 font-bold uppercase">
-                    {tier.label}
-                  </h4>
+                  <p className="eyebrow">{tier.label}</p>
                   <div className="flex flex-wrap items-center justify-center gap-5 md:gap-6">
                     {tier.logos.map((logo) => (
                       <a
@@ -297,10 +295,10 @@ export default async function Page() {
             className="w-full py-16 px-6 max-w-6xl mx-auto border-t border-border/10 relative z-20 scroll-mt-20"
           >
             <div className="text-center mb-12">
-              <h2 className="font-sans text-4xl md:text-5xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight mb-4">
+              <h2 className="font-sans text-4xl md:text-5xl font-extrabold leading-tight text-emerald-600 dark:text-emerald-400 tracking-tight mb-4">
                 {strings.teamTitle}
               </h2>
-              <p className="font-sans text-sm md:text-base text-muted-foreground/80 max-w-3xl mx-auto leading-relaxed">
+              <p className="font-sans text-sm md:text-base text-muted-foreground max-w-3xl mx-auto leading-relaxed">
                 {strings.teamSubtitle}
               </p>
             </div>
@@ -320,20 +318,23 @@ export default async function Page() {
                   />
                 </div>
                 <div className="flex items-center justify-between mb-1">
-                  <h4 className="font-sans font-bold text-lg text-foreground">
+                  <h3 className="font-sans font-bold text-lg text-foreground">
                     Huy Pham
-                  </h4>
+                  </h3>
                   <a
                     href="https://www.linkedin.com/in/huy-pham-5646bb49/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-muted-foreground hover:text-emerald-600 transition-colors"
-                    aria-label="Huy Pham's LinkedIn"
+                    aria-label={strings.linkedInOf.replace(
+                      "{name}",
+                      "Huy Pham",
+                    )}
                   >
                     <LinkedInIcon className="w-4 h-4" />
                   </a>
                 </div>
-                <p className="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400 mb-3 uppercase tracking-wider">
+                <p className="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-3 uppercase tracking-wider">
                   {strings.teamCfo}
                 </p>
                 <p className="text-xs text-muted-foreground leading-relaxed font-sans font-medium">
@@ -357,20 +358,23 @@ export default async function Page() {
                   />
                 </div>
                 <div className="flex items-center justify-between mb-1">
-                  <h4 className="font-sans font-bold text-lg text-foreground">
+                  <h3 className="font-sans font-bold text-lg text-foreground">
                     Loc Vuong
-                  </h4>
+                  </h3>
                   <a
                     href="https://www.linkedin.com/in/lok-vuong/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-muted-foreground hover:text-emerald-600 transition-colors"
-                    aria-label="Loc Vuong's LinkedIn"
+                    aria-label={strings.linkedInOf.replace(
+                      "{name}",
+                      "Loc Vuong",
+                    )}
                   >
                     <LinkedInIcon className="w-4 h-4" />
                   </a>
                 </div>
-                <p className="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400 mb-3 uppercase tracking-wider">
+                <p className="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-3 uppercase tracking-wider">
                   {strings.teamCeo}
                 </p>
                 <p className="text-xs text-muted-foreground leading-relaxed font-sans font-medium">
@@ -394,20 +398,23 @@ export default async function Page() {
                   />
                 </div>
                 <div className="flex items-center justify-between mb-1">
-                  <h4 className="font-sans font-bold text-lg text-foreground">
+                  <h3 className="font-sans font-bold text-lg text-foreground">
                     Edward Wong
-                  </h4>
+                  </h3>
                   <a
                     href="https://www.linkedin.com/in/eywong8/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-muted-foreground hover:text-emerald-600 transition-colors"
-                    aria-label="Edward Wong's LinkedIn"
+                    aria-label={strings.linkedInOf.replace(
+                      "{name}",
+                      "Edward Wong",
+                    )}
                   >
                     <LinkedInIcon className="w-4 h-4" />
                   </a>
                 </div>
-                <p className="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400 mb-3 uppercase tracking-wider">
+                <p className="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-3 uppercase tracking-wider">
                   {strings.teamCto}
                 </p>
                 <p className="text-xs text-muted-foreground leading-relaxed font-sans font-medium">

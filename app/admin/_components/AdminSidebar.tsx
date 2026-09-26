@@ -69,7 +69,7 @@ export function AdminSidebar() {
             className="flex min-w-0 items-center font-bold tracking-tight text-primary"
           >
             <Logo
-              alt="Fundlok"
+              alt="FundLok"
               containerClassName="relative w-28 h-8 overflow-hidden shrink-0"
             />
           </Link>

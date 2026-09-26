@@ -31,6 +31,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 /**
  * Three-step enrolment: scan -> confirm a code -> save recovery codes.
@@ -50,7 +51,7 @@ export function TwoFactorSetupDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const { toast } = useToast();
 
   const [step, setStep] = useState<Step>("scan");
@@ -96,7 +97,13 @@ export function TwoFactorSetupDialog({
         setStep("recovery");
       },
       onError: (apiError) =>
-        setError(apiError?.message ?? t("security.twoFactor.codeInvalid")),
+        setError(
+          apiErrorMessage(
+            apiError,
+            locale,
+            t("security.twoFactor.codeInvalid"),
+          ),
+        ),
     });
   };
 

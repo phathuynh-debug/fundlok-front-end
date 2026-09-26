@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { useDisableTwoFactor } from "@/hooks/use-authentication";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 /**
  * Turning 2FA off asks for the password AND a second factor.
@@ -33,7 +34,7 @@ export function TwoFactorDisableDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const { toast } = useToast();
   const { mutate: disable, isPending } = useDisableTwoFactor();
 
@@ -63,7 +64,13 @@ export function TwoFactorDisableDialog({
           close(false);
         },
         onError: (apiError) =>
-          setError(apiError?.message ?? t("security.twoFactor.disableFailed")),
+          setError(
+            apiErrorMessage(
+              apiError,
+              locale,
+              t("security.twoFactor.disableFailed"),
+            ),
+          ),
       },
     );
   };

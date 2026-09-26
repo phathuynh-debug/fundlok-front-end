@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/chart";
 import { formatCurrency, formatCompactCurrency } from "@/lib/format-currency";
 import { useTranslations } from "@/lib/i18n";
+import { industryLabel } from "@/lib/industry-label";
 import { INDUSTRY_COLORS, INDUSTRY_SLICE_LIMIT } from "./industry-colors";
 import { CurrencyChartTooltip } from "./CurrencyChartTooltip";
 import type { IndustryAllocation } from "./mock-analytics";
@@ -33,7 +34,10 @@ export function IndustrySplitChart({
   // Largest first, and anything past the palette folds into one "Other" slice —
   // a sixth industry never gets a generated hue.
   const slices = useMemo(() => {
-    const sorted = [...allocation].sort((a, b) => b.deployed - a.deployed);
+    // Industry values are the engine's English strings; label them per locale.
+    const sorted = [...allocation]
+      .sort((a, b) => b.deployed - a.deployed)
+      .map((item) => ({ ...item, industry: industryLabel(item.industry, t) }));
     if (sorted.length <= INDUSTRY_SLICE_LIMIT) return sorted;
     const head = sorted.slice(0, INDUSTRY_SLICE_LIMIT - 1);
     const tail = sorted.slice(INDUSTRY_SLICE_LIMIT - 1);
@@ -127,17 +131,17 @@ export function IndustrySplitChart({
           {slices.map((slice, index) => (
             <li
               key={slice.industry}
-              className="flex items-center justify-between gap-3 text-xs"
+              className="flex items-start justify-between gap-3 text-xs"
             >
               <span className="flex min-w-0 items-center gap-2">
                 <span
                   aria-hidden="true"
-                  className="size-2.5 shrink-0 rounded-[2px]"
+                  className="mt-0.5 size-2.5 shrink-0 rounded-[2px]"
                   style={{
                     backgroundColor: `var(--color-${sliceKey(index)})`,
                   }}
                 />
-                <span className="truncate text-muted-foreground">
+                <span className="break-words text-muted-foreground">
                   {slice.industry}
                 </span>
               </span>

@@ -2,17 +2,29 @@ import { Card } from "@/components/ui/card";
 import { FileText, Download, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
+import { formatDate } from "@/lib/format-date";
 import { CONTROL_IDLE } from "@/lib/ui-tokens";
 import { cn } from "@/lib/utils";
 
 export function DueDiligenceTab() {
   const { toast } = useToast();
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
 
+  // Sample documents. Names are translated and dates formatted for the
+  // active locale, so the list reads naturally in either language.
   const documents = [
-    { name: "Tax Filing 2025.pdf", date: "1/15/2026" },
-    { name: "VAT Filing Q4 2025.pdf", date: "1/20/2026" },
-    { name: "Financial Statement 2025.pdf", date: "1/25/2026" },
+    {
+      name: t("investment.dueDiligence.sampleFiles.taxFiling"),
+      date: formatDate(new Date(2026, 0, 15), locale),
+    },
+    {
+      name: t("investment.dueDiligence.sampleFiles.vatFiling"),
+      date: formatDate(new Date(2026, 0, 20), locale),
+    },
+    {
+      name: t("investment.dueDiligence.sampleFiles.financialStatement"),
+      date: formatDate(new Date(2026, 0, 25), locale),
+    },
   ];
 
   const handleDownload = (filename: string) => {

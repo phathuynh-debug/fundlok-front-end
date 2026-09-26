@@ -110,7 +110,7 @@ export function ReviewStep() {
                 </dt>
                 <dd
                   className={cn(
-                    "shrink-0 font-mono text-sm",
+                    "shrink-0 text-sm tabular-nums",
                     value === null
                       ? "text-muted-foreground italic"
                       : "font-semibold text-foreground",

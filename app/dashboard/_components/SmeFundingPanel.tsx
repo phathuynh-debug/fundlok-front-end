@@ -88,6 +88,8 @@ export function SmeFundingPanel({ industry }: { industry?: string | null }) {
       }),
       hint: t("dashboard.smeFunding.allInRate"),
       icon: Zap,
+      // Rate and score are two facts in one string: wrap, never clip.
+      wraps: true,
     },
   ];
 
@@ -114,9 +116,7 @@ export function SmeFundingPanel({ industry }: { industry?: string | null }) {
         <div className="space-y-2 border-t border-border pt-5">
           <div className="flex flex-wrap items-end justify-between gap-2">
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                {t("dashboard.smeFunding.raised")}
-              </p>
+              <p className="stat-label">{t("dashboard.smeFunding.raised")}</p>
               {/* Deliberately wraps instead of truncating: this line carries
                   two separate facts (raised and target), and clipping it would
                   hide one of them behind an ellipsis with no way to see it.
@@ -162,18 +162,24 @@ export function SmeFundingPanel({ industry }: { industry?: string | null }) {
         <dl className="mt-5 grid grid-cols-2 gap-4 border-t border-border pt-5 xl:grid-cols-4">
           {stats.map((stat) => (
             <div key={stat.key} className="min-w-0">
-              <dt className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                <stat.icon className="h-3.5 w-3.5 shrink-0" />
-                <span className="truncate">{stat.label}</span>
+              <dt className="stat-label flex items-start gap-1.5">
+                <stat.icon className="mt-px h-3.5 w-3.5 shrink-0" />
+                <span className="min-w-0 break-words">{stat.label}</span>
               </dt>
               <dd className="mt-1 min-w-0">
-                <TruncatedFigure
-                  value={stat.value}
-                  className="text-lg font-bold text-foreground"
-                />
+                {stat.wraps ? (
+                  <span className="block break-words text-lg font-bold tabular-nums text-foreground">
+                    {stat.value}
+                  </span>
+                ) : (
+                  <TruncatedFigure
+                    value={stat.value}
+                    className="text-lg font-bold tabular-nums text-foreground"
+                  />
+                )}
               </dd>
               {stat.hint && (
-                <p className="truncate text-xs text-muted-foreground">
+                <p className="break-words text-xs text-muted-foreground">
                   {stat.hint}
                 </p>
               )}
@@ -192,13 +198,13 @@ export function SmeFundingPanel({ industry }: { industry?: string | null }) {
             and the date at which anything still outstanding falls due in full. */}
         <dl className="mt-5 grid grid-cols-1 gap-4 border-t border-border pt-5 sm:grid-cols-2">
           <div className="min-w-0">
-            <dt className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+            <dt className="stat-label">
               {t("dashboard.smeFunding.totalRepayable")}
             </dt>
             <dd className="mt-1 min-w-0">
               <TruncatedFigure
                 value={formatCurrency(summary.total_repayable, locale)}
-                className="text-lg font-bold text-foreground"
+                className="text-lg font-bold tabular-nums text-foreground"
               />
             </dd>
             <p className="mt-0.5 text-xs text-muted-foreground">
@@ -214,11 +220,11 @@ export function SmeFundingPanel({ industry }: { industry?: string | null }) {
             )}
           </div>
           <div className="min-w-0">
-            <dt className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              <ShieldAlert className="h-3.5 w-3.5 shrink-0" />
+            <dt className="stat-label flex items-start gap-1.5">
+              <ShieldAlert className="mt-px h-3.5 w-3.5 shrink-0" />
               {t("dashboard.smeFunding.backstopDate")}
             </dt>
-            <dd className="mt-1 truncate text-lg font-bold text-foreground">
+            <dd className="mt-1 text-lg font-bold tabular-nums text-foreground">
               {summary.backstop_date
                 ? formatDate(summary.backstop_date, locale)
                 : t("common.na")}
@@ -255,13 +261,13 @@ export function SmeFundingPanel({ industry }: { industry?: string | null }) {
                     {period.number}
                   </span>
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-foreground">
+                    <p className="break-words text-sm font-medium tabular-nums text-foreground">
                       {t("dashboard.smeFunding.periodRange", {
                         start: formatDate(period.start_date, locale),
                         end: formatDate(period.end_date, locale),
                       })}
                     </p>
-                    <p className="truncate text-xs text-muted-foreground">
+                    <p className="break-words text-xs text-muted-foreground">
                       {t("dashboard.smeFunding.perDay", {
                         amount: formatCurrency(period.daily_amount, locale),
                         days: period.business_days,
@@ -270,7 +276,7 @@ export function SmeFundingPanel({ industry }: { industry?: string | null }) {
                     {/* Says out loud that relief moved DOWN and what it cost:
                         nothing off the total, only more time. */}
                     {period.contractual_daily_amount && (
-                      <p className="truncate text-xs text-amber-700 dark:text-amber-400">
+                      <p className="break-words text-xs text-amber-700 dark:text-amber-400">
                         {t("dashboard.smeFunding.reliefApplied", {
                           from: formatCurrency(
                             period.contractual_daily_amount,
@@ -282,14 +288,16 @@ export function SmeFundingPanel({ industry }: { industry?: string | null }) {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 pl-10 sm:pl-0">
-                  <span className="min-w-0 truncate text-sm font-bold text-foreground">
+                {/* Wraps: the Vietnamese status labels are long enough to
+                    push the badge past the card edge on a phone. */}
+                <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1.5 pl-10 sm:pl-0">
+                  <span className="whitespace-nowrap text-sm font-bold tabular-nums text-foreground">
                     {formatCurrency(periodTotal(period), locale)}
                   </span>
                   <Badge
                     variant="outline"
                     className={cn(
-                      "shrink-0 rounded-full px-2 text-[11px] font-semibold",
+                      "max-w-full whitespace-normal rounded-full px-2 text-left text-[11px] font-semibold",
                       STATUS_STYLES[period.status],
                     )}
                   >

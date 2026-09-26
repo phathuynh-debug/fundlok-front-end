@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AuthLayout } from "@/components/auth-layout";
 import { AuthFormSwitcher } from "@/components/auth-form-switcher";
+import { getServerTranslations } from "@/lib/i18n/server";
 
 // `?mode=register` opens straight on the sign-up form. This is the only entry
 // point to registration now that /register is gone: the footer link, the rate
@@ -16,6 +17,7 @@ export async function generateMetadata({
   searchParams: LoginSearchParams;
 }): Promise<Metadata> {
   const { mode } = await searchParams;
+  const { t } = await getServerTranslations();
 
   // The register view keeps the copy the old /register page was indexed under,
   // and canonicalises to itself so the 308 does not land on a URL that then
@@ -23,15 +25,13 @@ export async function generateMetadata({
   return isRegister(mode)
     ? {
         alternates: { canonical: "/login?mode=register" },
-        title: "Create an account — apply for funding or invest",
-        description:
-          "Create an account on FundLok to apply for SME funding or to invest in private credit opportunities.",
+        title: t("seo.registerTitle"),
+        description: t("seo.registerDescription"),
       }
     : {
         alternates: { canonical: "/login" },
-        title: "Sign in to your SME or investor dashboard",
-        description:
-          "Sign in to your FundLok portal to manage SME funding requests or your investment portfolio.",
+        title: t("seo.loginTitle"),
+        description: t("seo.loginDescription"),
       };
 }
 

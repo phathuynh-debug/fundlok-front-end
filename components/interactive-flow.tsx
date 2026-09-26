@@ -312,7 +312,7 @@ const contentData = {
             "Điểm doanh nghiệp 0–100",
             "Doanh thu đã xác minh",
           ],
-          desc: "Mỗi dự án đều hiển thị điểm doanh nghiệp, doanh thu đã xác minh đằng sau điểm số, độ mới của dữ liệu, các khoản phí và hạn chót.",
+          desc: "Mỗi dự án đều hiển thị điểm doanh nghiệp, doanh thu đã xác minh đằng sau điểm số, độ mới của dữ liệu, các khoản phí và hạn tất toán cuối cùng.",
           how: "Lọc theo điểm doanh nghiệp, ngành và kỳ hạn để tìm dự án phù hợp.",
           why: "Đủ thông tin để bạn tự thẩm định, tất cả ở một nơi.",
           tech: "Danh sách dự án cập nhật theo thời gian thực khi vốn được huy động.",
@@ -925,9 +925,7 @@ export function InteractiveFlow() {
   const stageDetail = (s: (typeof steps)[number]) => (
     <div className="grid gap-6 lg:grid-cols-[1.35fr_1fr] lg:gap-8">
       <div className="rounded-2xl border border-border bg-card p-6 md:p-8">
-        <p className="mb-3 font-sans text-xs text-muted-foreground">
-          {s.badge}
-        </p>
+        <p className="eyebrow mb-3">{s.badge}</p>
         <h3 className="mb-4 font-sans text-2xl font-extrabold tracking-tight text-foreground md:text-3xl">
           {(s as { detailTitle?: string }).detailTitle || s.title}
         </h3>
@@ -994,7 +992,7 @@ export function InteractiveFlow() {
                 <span className="font-sans text-xs text-muted-foreground">
                   {row[0]}
                 </span>
-                <span className="shrink-0 text-right font-sans text-xs font-bold text-foreground">
+                <span className="text-right font-sans text-xs font-bold text-foreground">
                   {row[1]}
                 </span>
               </div>

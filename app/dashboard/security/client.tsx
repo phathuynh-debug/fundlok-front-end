@@ -29,6 +29,7 @@ import { ChangePasswordDialog } from "./_components/ChangePasswordDialog";
 import { TwoFactorDisableDialog } from "./_components/TwoFactorDisableDialog";
 import { TwoFactorSetupDialog } from "./_components/TwoFactorSetupDialog";
 import { PasskeyDialog } from "./_components/PasskeyDialog";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 function SecuritySkeleton() {
   return (
@@ -135,7 +136,7 @@ export default function SecurityClient() {
           toast({
             variant: "destructive",
             title: t("dashboard.security.protections.saveFailedTitle"),
-            description: error?.message,
+            description: apiErrorMessage(error, locale, t("common.tryAgain")),
           }),
       },
     );
@@ -152,7 +153,7 @@ export default function SecurityClient() {
         toast({
           variant: "destructive",
           title: t("dashboard.security.sessions.revokeFailedTitle"),
-          description: error?.message,
+          description: apiErrorMessage(error, locale, t("common.tryAgain")),
         }),
     });
 
@@ -169,7 +170,7 @@ export default function SecurityClient() {
         toast({
           variant: "destructive",
           title: t("dashboard.security.sessions.revokeFailedTitle"),
-          description: error?.message,
+          description: apiErrorMessage(error, locale, t("common.tryAgain")),
         }),
     });
 

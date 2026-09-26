@@ -69,9 +69,7 @@ export default function SiteFooter() {
       <div className="mx-auto max-w-6xl px-6 py-14 md:py-16">
         <div className="grid gap-12 md:grid-cols-[1.05fr_1.05fr_1.3fr]">
           <div>
-            <h4 className="text-[13px] font-black uppercase tracking-[0.22em] text-white/95">
-              {t("footer.aboutUs")}
-            </h4>
+            <h2 className="eyebrow text-white/95">{t("footer.aboutUs")}</h2>
             <ul className="mt-6 space-y-3 text-sm text-zinc-300">
               {aboutLinks.map((link) => (
                 <li key={link.labelKey}>
@@ -86,9 +84,9 @@ export default function SiteFooter() {
             </ul>
           </div>
           <div>
-            <h4 className="text-[13px] font-black uppercase tracking-[0.22em] text-white/95">
+            <h2 className="eyebrow text-white/95">
               {t("footer.customerSupport")}
-            </h4>
+            </h2>
             <ul className="mt-6 space-y-3 text-sm text-zinc-300">
               {supportLinks.map((link) => (
                 <li key={link.labelKey}>
@@ -104,9 +102,7 @@ export default function SiteFooter() {
           </div>
 
           <div>
-            <h4 className="text-[13px] font-black uppercase tracking-[0.22em] text-white/95">
-              {t("footer.connect")}
-            </h4>
+            <h2 className="eyebrow text-white/95">{t("footer.connect")}</h2>
             <div className="mt-5 flex items-center gap-3">
               {socialLinks.map(({ label, href, icon: Icon }) => (
                 <a
@@ -128,7 +124,7 @@ export default function SiteFooter() {
             </p>
             <Link
               href="/contact"
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-emerald-500 px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white transition-colors duration-300 hover:bg-emerald-600"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-white transition-colors duration-300 hover:bg-emerald-600"
             >
               {t("footer.getInTouch")}
               <ArrowRight className="h-4 w-4" />
@@ -136,7 +132,7 @@ export default function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-12 border-t border-white/10 pt-6 text-[10px] leading-5 text-zinc-500 md:flex md:items-center md:justify-between">
+        <div className="mt-12 border-t border-white/10 pt-6 text-xs leading-5 text-zinc-400 md:flex md:items-center md:justify-between">
           <p>{t("common.copyright")}</p>
           <p className="mt-2 md:mt-0">{t("footer.tagline")}</p>
         </div>

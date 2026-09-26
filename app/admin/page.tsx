@@ -9,6 +9,7 @@ import { isAdminRole } from "@/services/authentication.service";
 import { Loader2, Users, Briefcase, ShieldCheck } from "lucide-react";
 import { AdminPageLoader } from "./_components/AdminDirectory";
 import { useTranslations } from "@/lib/i18n";
+import { roleLabel } from "@/lib/enum-labels";
 import { CONTROL_HOVER } from "@/lib/ui-tokens";
 import { cn } from "@/lib/utils";
 
@@ -102,7 +103,9 @@ export default function AdminPage() {
             <ShieldCheck className="h-4 w-4" />
             <span className="text-sm font-medium">{t("admin.stats.role")}</span>
           </div>
-          <p className="mt-2 text-2xl font-bold text-foreground">{user.role}</p>
+          <p className="mt-2 text-2xl font-bold text-foreground">
+            {roleLabel(t, user.role)}
+          </p>
         </div>
       </div>
     </div>

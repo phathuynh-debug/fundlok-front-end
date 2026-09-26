@@ -19,9 +19,10 @@ import { useSetUserStatus } from "@/hooks/use-admin";
 import { useCurrentUser } from "@/hooks/use-authentication";
 import { useTranslations } from "@/lib/i18n";
 import { formatDate } from "@/lib/format-date";
+import { enumLabel, roleLabel } from "@/lib/enum-labels";
 import { cn } from "@/lib/utils";
 import type { AdminUserRow, AdminUserStatus } from "@/services/admin.service";
-import type { ApiError } from "@/lib/types";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 // Account status, changed from the users table.
 //
@@ -72,7 +73,7 @@ export function UserPreviewSheet({
       toast({
         variant: "destructive",
         title: t("admin.userPreview.statusFailed"),
-        description: (err as ApiError)?.message ?? undefined,
+        description: apiErrorMessage(err, locale, t("common.tryAgain")),
       });
     }
   };
@@ -96,7 +97,7 @@ export function UserPreviewSheet({
               <dd className="break-all text-foreground">{user.email}</dd>
               <dt className="text-muted-foreground">{t("admin.table.role")}</dt>
               <dd>
-                <Badge variant="secondary">{user.role}</Badge>
+                <Badge variant="secondary">{roleLabel(t, user.role)}</Badge>
               </dd>
               <dt className="text-muted-foreground">
                 {t("admin.table.status")}
@@ -107,7 +108,7 @@ export function UserPreviewSheet({
                     user.status === "SUSPENDED" ? "destructive" : "secondary"
                   }
                 >
-                  {user.status}
+                  {enumLabel(t, "userStatus", user.status)}
                 </Badge>
               </dd>
               <dt className="text-muted-foreground">

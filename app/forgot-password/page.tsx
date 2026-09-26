@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import { AuthLayout } from "@/components/auth-layout";
 import { ForgotPasswordForm } from "@/components/forgot-password-form";
+import { getServerTranslations } from "@/lib/i18n/server";
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/forgot-password" },
-  title: "Reset your password — account recovery",
-  description:
-    "Reset the password for your FundLok account. We email a secure link so you can sign back in to your SME or investor dashboard.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerTranslations();
+  return {
+    alternates: { canonical: "/forgot-password" },
+    title: t("seo.forgotPasswordTitle"),
+    description: t("seo.forgotPasswordDescription"),
+  };
+}
 
 export default function ForgotPasswordPage() {
   return (

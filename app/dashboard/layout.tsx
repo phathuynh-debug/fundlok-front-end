@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
 import { Sidebar } from "@/components/sidebar";
+import { getServerTranslations } from "@/lib/i18n/server";
 import { ProductTour, ProductTourProvider } from "@/components/product-tour";
 
-export const metadata: Metadata = {
-  title: "Dashboard",
-  description:
-    "Manage your capital requirements, review matching projects, and track on-chain investments.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerTranslations();
+  return {
+    // A plain string here would stop the root "%s | FundLok" template from
+    // reaching the pages below, so re-declare it for this section.
+    title: { default: t("seo.dashboardTitle"), template: "%s | FundLok" },
+    description: t("seo.dashboardDescription"),
+  };
+}
 
 export default function DashboardLayout({
   children,

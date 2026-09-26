@@ -1,4 +1,10 @@
 {
+  "achievements": {
+    "closePhoto": "Đóng ảnh phóng to",
+    "next": "Thành tựu tiếp theo",
+    "photoAlt": "{title}, ảnh {number}",
+    "previous": "Thành tựu trước"
+  },
   "admin": {
     "auditLogs": {
       "action": "Hành động",
@@ -42,7 +48,7 @@
       "noApplications": "Chưa có đề nghị vay nào.",
       "noDocuments": "Chưa tải lên hồ sơ nào.",
       "noKyb": "Doanh nghiệp này chưa bắt đầu xác minh.",
-      "noScoreRun": "Engine tính điểm chưa chạy cho đề nghị này.",
+      "noScoreRun": "Hệ thống tính điểm chưa chạy cho đề nghị này.",
       "notPreviewable": "Không thể xem loại tệp này trên trình duyệt. Hãy tải xuống để mở.",
       "notePlaceholder": "Lý do (không bắt buộc) — doanh nghiệp sẽ đọc được nội dung này, và nó cũng được ghi vào nhật ký",
       "openRow": "Xem nhanh {name}",
@@ -53,8 +59,8 @@
       "scoreComplete": "Đã tính điểm xong",
       "scoreFailed": "Không thể chạy tính điểm",
       "scoreGrade": "Điểm doanh nghiệp",
-      "scoreHeading": "Engine tính điểm",
-      "scoreInconclusive": "Engine chưa đủ dữ liệu để đưa ra điểm",
+      "scoreHeading": "Hệ thống tính điểm",
+      "scoreInconclusive": "Hệ thống chưa đủ dữ liệu để đưa ra điểm",
       "scoreInsufficientHint": "Chưa có điểm — engine còn thiếu dữ liệu tài chính của đề nghị này. Phê duyệt lúc này là phê duyệt khi chưa có điểm.",
       "scoreNeedsSubmitted": "Việc tính điểm chỉ chạy sau khi doanh nghiệp đã gửi đề nghị này.",
       "scoreRate": "Lãi suất tham khảo",
@@ -107,6 +113,7 @@
       "legalName": "Tên pháp lý",
       "name": "Tên",
       "noProjects": "Không tìm thấy dự án.",
+      "noResults": "Không tìm thấy kết quả.",
       "noUsers": "Không tìm thấy người dùng.",
       "role": "Vai trò",
       "searchProjects": "Tìm dự án…",
@@ -150,7 +157,7 @@
       "emailLabel": "Địa chỉ email",
       "emailPlaceholder": "name@company.com",
       "failedDescription": "Gửi email đặt lại mật khẩu thất bại. Vui lòng thử lại.",
-      "failedTitle": "Yêu cầu thất bại",
+      "failedTitle": "Chưa gửi được liên kết",
       "submit": "Gửi liên kết đặt lại",
       "submitting": "Đang gửi...",
       "successDescription": "Nếu email được đăng ký, liên kết đặt lại mật khẩu đã được gửi.",
@@ -158,14 +165,14 @@
       "title": "Đặt lại mật khẩu của bạn"
     },
     "hero": {
-      "description": "Tham gia cùng hàng nghìn SME và nhà đầu tư trên nền tảng bảo mật được thiết kế cho những quyết định huy động vốn thông minh hơn.",
+      "description": "Doanh nghiệp nộp hồ sơ bằng chứng từ thuế sẵn có. Nhà đầu tư xem điểm doanh nghiệp, doanh thu đã xác minh và các rủi ro trước khi quyết định.",
       "headline": "Kết nối doanh nghiệp với nhà đầu tư phù hợp",
-      "networkSubtitle": "SME đã xác thực và nhà đầu tư được công nhận",
-      "networkTitle": "Mạng lưới đáng tin cậy",
-      "securitySubtitle": "Dữ liệu của bạn được mã hóa và bảo vệ",
-      "securityTitle": "Mã hóa đầu cuối",
-      "speedSubtitle": "Kết nối trong vài ngày, không phải vài tháng",
-      "speedTitle": "Quy trình gọi vốn nhanh"
+      "networkSubtitle": "Mọi doanh nghiệp và nhà đầu tư đều qua bước xác minh danh tính",
+      "networkTitle": "Thành viên đã xác minh",
+      "securitySubtitle": "Hỗ trợ xác thực hai lớp và passkey",
+      "securityTitle": "Đăng nhập an toàn",
+      "speedSubtitle": "Thấy lãi suất, khoản trả mỗi ngày và mọi khoản phí trước khi ký",
+      "speedTitle": "Điều khoản rõ ràng"
     },
     "layout": {
       "helpPrefix": "Cần hỗ trợ?",
@@ -175,7 +182,7 @@
       "emailLabel": "Địa chỉ email",
       "emailPlaceholder": "name@company.com",
       "failedDescription": "Email hoặc mật khẩu không hợp lệ.",
-      "failedTitle": "Đăng nhập thất bại",
+      "failedTitle": "Đăng nhập không thành công",
       "forgotPassword": "Quên mật khẩu?",
       "or": "hoặc",
       "passkeyFailedBody": "Hãy thử lại, hoặc đăng nhập bằng email và mật khẩu.",
@@ -187,8 +194,8 @@
       "signInWithPasskey": "Đăng nhập bằng passkey",
       "submit": "Đăng nhập",
       "submitting": "Đang đăng nhập...",
-      "successDescription": "Đăng nhập thành công. Đang chuyển hướng...",
-      "successTitle": "Chào mừng trở lại!",
+      "successDescription": "Đã đăng nhập. Đang chuyển đến trang tổng quan...",
+      "successTitle": "Chào mừng trở lại",
       "termsNotice": "Bằng việc đăng nhập, bạn đồng ý với {termsLink} của FundLok.",
       "twoFactorBack": "Quay lại đăng nhập",
       "twoFactorCodeLabel": "Mã xác thực",
@@ -204,7 +211,7 @@
       "emailLabel": "Địa chỉ email",
       "emailPlaceholder": "founder@company.com",
       "failedDescription": "Vui lòng kiểm tra thông tin của bạn và thử lại.",
-      "failedTitle": "Đăng ký thất bại",
+      "failedTitle": "Chưa tạo được tài khoản",
       "fullNameLabel": "Họ và tên",
       "fullNamePlaceholder": "Nguyen Van A",
       "passwordLabel": "Mật khẩu",
@@ -216,26 +223,29 @@
       "submit": "Tạo tài khoản",
       "submitting": "Đang tạo tài khoản...",
       "successDescription": "Tài khoản của bạn đã sẵn sàng. Vui lòng đăng nhập để tiếp tục.",
-      "successTitle": "Đăng ký thành công",
+      "successTitle": "Đã tạo tài khoản",
       "termsNotice": "Bằng việc tạo tài khoản, bạn đồng ý với {termsLink} của FundLok.",
-      "validationErrorTitle": "Lỗi xác thực"
+      "validationErrorTitle": "Vui lòng kiểm tra các ô được đánh dấu"
     },
     "resetPassword": {
       "confirmPasswordLabel": "Xác nhận mật khẩu mới",
       "confirmPasswordPlaceholder": "••••••••",
-      "description": "Vui lòng nhập mật khẩu mới bên dưới để đặt lại quyền truy cập tài khoản.",
+      "description": "Nhập mật khẩu mới cho tài khoản của bạn.",
       "failedDescription": "Đặt lại mật khẩu thất bại. Liên kết có thể đã hết hạn hoặc không hợp lệ.",
-      "failedTitle": "Đặt lại thất bại",
-      "invalidToken": "Mã xác thực đặt lại mật khẩu không hợp lệ hoặc bị thiếu.",
+      "failedTitle": "Chưa đặt lại được mật khẩu",
+      "invalidToken": "Liên kết đặt lại mật khẩu không hợp lệ hoặc thiếu. Hãy yêu cầu liên kết mới.",
+      "loadingForm": "Đang tải biểu mẫu đặt lại mật khẩu...",
       "passwordLabel": "Mật khẩu mới",
       "passwordMismatch": "Mật khẩu không khớp.",
       "passwordPlaceholder": "••••••••",
+      "passwordTooShort": "Mật khẩu phải có ít nhất 8 ký tự.",
       "submit": "Đặt lại mật khẩu",
       "submitting": "Đang đặt lại...",
-      "successDescription": "Mật khẩu của bạn đã được đặt lại thành công. Bây giờ bạn có thể đăng nhập bằng mật khẩu mới.",
+      "successDescription": "Mật khẩu của bạn đã được đặt lại. Bây giờ bạn có thể đăng nhập bằng mật khẩu mới.",
       "successTitle": "Đặt lại mật khẩu thành công",
       "title": "Chọn mật khẩu mới"
     },
+    "securityCheckRequired": "Vui lòng hoàn thành kiểm tra bảo mật.",
     "selectRole": {
       "failedDescription": "Đã xảy ra lỗi. Vui lòng thử lại.",
       "failedTitle": "Không thể lưu lựa chọn",
@@ -247,7 +257,7 @@
       "smeDescription": "Đăng ký vay vốn, gửi hồ sơ doanh nghiệp để xét duyệt và theo dõi các khoản vay của bạn.",
       "smeTitle": "Doanh nghiệp (SME)",
       "submitting": "Đang thiết lập...",
-      "subtitle": "Chọn hướng đi để tiếp tục. Nền tảng sẽ điều chỉnh bảng điều khiển và công cụ theo vai trò của bạn.",
+      "subtitle": "Chọn cách bạn dùng FundLok. Trang tổng quan sẽ được thiết lập theo vai trò đó.",
       "successDescription": "Loại tài khoản của bạn đã được lưu.",
       "successTitle": "Đã hoàn tất",
       "title": "Chào mừng đến với FundLok"
@@ -261,14 +271,29 @@
       "welcomeBack": "Chào mừng trở lại"
     },
     "verifyEmail": {
+      "backToOptions": "Quay lại các tùy chọn xác minh",
       "checkStatus": "Tôi đã xác thực email",
+      "checkStatusFailed": "Đã xảy ra lỗi khi kiểm tra trạng thái. Vui lòng thử lại.",
       "description": "Chúng tôi đã gửi một liên kết xác thực đến địa chỉ email của bạn. Vui lòng nhấp vào liên kết trong email đó để xác thực tài khoản.",
+      "emailNotFound": "Không tìm thấy địa chỉ email của bạn. Vui lòng đăng nhập lại.",
+      "failedTitle": "Xác minh không thành công",
+      "invalidLink": "Liên kết xác minh không hợp lệ hoặc đã hết hạn.",
+      "loadingScreen": "Đang tải màn hình xác minh...",
       "logoutBtn": "Đăng xuất",
+      "pendingDescription": "Chúng tôi chưa xác nhận được email của bạn. Vui lòng kiểm tra hộp thư và bấm vào liên kết xác minh trước.",
+      "pendingTitle": "Chưa hoàn tất xác minh",
       "resendBtn": "Gửi lại email xác thực",
       "resendFailed": "Gửi lại email xác thực thất bại. Vui lòng thử lại.",
-      "resendSuccess": "Email xác thực đã được gửi lại thành công!",
+      "resendSuccess": "Đã gửi lại email xác thực.",
+      "resendSuccessDescription": "Vui lòng kiểm tra hộp thư để nhận liên kết mới.",
       "statusLabel": "Đã gửi đến",
-      "title": "Xác thực địa chỉ email của bạn"
+      "title": "Xác thực địa chỉ email của bạn",
+      "verifiedRedirect": "Email của bạn đã được xác minh. Đang chuyển hướng...",
+      "verifiedTitle": "Đã xác minh email",
+      "verifiedToast": "Đã xác minh email thành công.",
+      "verifyFailedGeneric": "Hiện chưa thể xác minh email của bạn. Vui lòng thử lại.",
+      "verifyingDescription": "Vui lòng chờ trong giây lát, chúng tôi đang xác nhận liên kết xác minh của bạn.",
+      "verifyingTitle": "Đang xác minh email..."
     }
   },
   "common": {
@@ -276,6 +301,10 @@
     "backToHome": "Về trang chủ",
     "brandName": "FundLok",
     "cancel": "Hủy",
+    "carousel": {
+      "next": "Mục tiếp theo",
+      "previous": "Mục trước"
+    },
     "checkingProjectAccess": "Đang kiểm tra quyền truy cập dự án của bạn...",
     "chooseFile": "Chọn tệp",
     "close": "Đóng",
@@ -284,6 +313,7 @@
     "createAccount": "Tạo tài khoản",
     "dashboard": "Bảng điều khiển",
     "edit": "Chỉnh sửa",
+    "error": "Lỗi",
     "filter": "Lọc:",
     "fundlokUser": "Người dùng FundLok",
     "guest": "Khách",
@@ -303,26 +333,36 @@
     "needHelp": "Cần hỗ trợ?",
     "noFileChosen": "Chưa chọn tệp",
     "pageNotFound": "Không tìm thấy trang",
+    "pageSections": "Các phần của trang",
     "processing": "Đang xử lý...",
     "projectApplication": "Đơn đăng ký dự án",
     "searchPlaceholder": "Tìm dự án theo tên hoặc ngành...",
+    "sidebar": {
+      "description": "Hiển thị thanh bên trên thiết bị di động.",
+      "title": "Thanh bên",
+      "toggle": "Mở/đóng thanh bên"
+    },
     "signIn": "Đăng nhập",
     "signUp": "Đăng ký",
     "submit": "Gửi",
     "submitApplication": "Gửi đơn đăng ký",
+    "success": "Thành công",
+    "toggleMenu": "Mở/đóng menu",
+    "toggleTheme": "Chuyển giao diện sáng/tối",
+    "tryAgain": "Vui lòng thử lại.",
     "unknown": "Không xác định",
     "verifiedMember": "Thành viên đã xác thực",
     "viewProjectDetails": "Xem chi tiết dự án"
   },
   "contactPage": {
-    "description": "Sử dụng trang này cho các yêu cầu hợp tác, câu hỏi về sản phẩm hoặc hỗ trợ chung. Chúng tôi phản hồi qua email và có thể chuyển tiếp yêu cầu của bạn đến đúng bộ phận nhanh hơn so với biểu mẫu chân trang cũ.",
+    "description": "Dùng trang này để gửi yêu cầu hợp tác, câu hỏi về sản phẩm hoặc cần hỗ trợ. Chúng tôi phản hồi qua email và chuyển đến đúng bộ phận.",
     "emailLabel": "Email",
     "eyebrow": "Liên hệ",
     "form": {
       "completeSecurityCheck": "Vui lòng hoàn thành kiểm tra bảo mật.",
       "emailPlaceholder": "Email",
       "failedToSendMessage": "Gửi tin nhắn thất bại",
-      "inquirySubmitted": "Cảm ơn bạn! Yêu cầu của bạn đã được gửi thành công.",
+      "inquirySubmitted": "Cảm ơn bạn. Tin nhắn của bạn đã được gửi.",
       "messagePlaceholder": "Tin nhắn",
       "messageSent": "Đã gửi tin nhắn",
       "namePlaceholder": "Họ và tên",
@@ -409,7 +449,7 @@
       "open": "Biểu mẫu này là gì?",
       "steps": {
         "actions": {
-          "body": "Hãy xem lại toàn bộ ở bước cuối trước khi gửi. Chúng tôi phản hồi trong vòng 3-5 ngày làm việc kèm điểm doanh nghiệp, lãi suất trọn gói, số tiền cố định bạn sẽ trả mỗi ngày làm việc, và hạn chót cuối cùng — ngày mà mọi khoản còn lại đến hạn thanh toán đầy đủ. Việc gửi hồ sơ không đồng nghĩa được duyệt, và bạn không nợ gì cho đến khi ký.",
+          "body": "Hãy xem lại toàn bộ ở bước cuối trước khi gửi. Chúng tôi phản hồi trong vòng 3-5 ngày làm việc kèm điểm doanh nghiệp, lãi suất trọn gói, số tiền cố định bạn sẽ trả mỗi ngày làm việc, và hạn tất toán cuối cùng — ngày mà mọi khoản còn lại đến hạn thanh toán đầy đủ. Việc gửi hồ sơ không đồng nghĩa được duyệt, và bạn không nợ gì cho đến khi ký.",
           "title": "Gửi hồ sơ, và điều gì diễn ra sau đó"
         },
         "documents": {
@@ -441,7 +481,7 @@
       "activeInvestments": "Khoản đầu tư đang hoạt động",
       "browseProjects": "Khám phá dự án đầu tư",
       "capitalWrittenDown": "Vốn đã ghi giảm",
-      "holdingBackstop": "Hạn chót {date}",
+      "holdingBackstop": "Hạn tất toán {date}",
       "holdingDailyPayout": "Mục tiêu {amount}/ngày làm việc",
       "holdingInvested": "Đã đầu tư",
       "holdingNextPayout": "Kỳ nhận tiếp theo",
@@ -455,11 +495,11 @@
         "ACTIVE": "Đã giải ngân",
         "EXTENDED": "Đã gia hạn",
         "FUNDING": "Đang gọi vốn",
-        "RELIEF": "Đã giảm nghĩa vụ",
+        "RELIEF": "Đã giảm khoản trả mỗi ngày",
         "REPAID": "Đã tất toán",
         "REPAID_EARLY": "Tất toán sớm",
         "REPAYING": "Đang hoàn trả",
-        "SETTLED_AT_BACKSTOP": "Tất toán tại hạn chót",
+        "SETTLED_AT_BACKSTOP": "Tất toán tại hạn cuối",
         "WATCHLIST": "Đang theo dõi",
         "WRITTEN_DOWN": "Đã ghi giảm"
       },
@@ -535,7 +575,9 @@
         "askingPrice": "Giá chào bán",
         "compare": "So sánh",
         "consecutivePayments": "{count} kỳ trả đúng hạn liên tiếp",
-        "dailyRate": "{percent}% mỗi ngày",
+        "dailyRepayment": "Khoản trả mỗi ngày",
+        "dailyRepaymentPerDay": "{amount}/ngày làm việc",
+        "dailyRepaymentTerms": "{amount} mỗi ngày làm việc cho đến khi trả hết tổng số tiền",
         "days": "{count} ngày",
         "daysActive": "Đã hoạt động {count} ngày",
         "discount": "Thấp hơn {percent}%",
@@ -551,8 +593,6 @@
           "profitTaking": "Chốt lời và phân bổ lại vốn",
           "rebalancing": "Tái cân bằng danh mục để đa dạng hóa"
         },
-        "revenueShare": "Chia sẻ doanh thu",
-        "revenueShareTerms": "{percent}% mỗi ngày cho đến khi trả hết gốc",
         "score": "Điểm {score}/100",
         "status": {
           "performing": "Đang trả tốt"
@@ -572,16 +612,21 @@
     },
     "security": {
       "activity": {
+        "bankAccountFallback": "một tài khoản ngân hàng",
         "events": {
           "failedAttempt": "Một lần đăng nhập thất bại.",
           "failedAttempts": "{count} lần đăng nhập thất bại từ {location}.",
           "newDevice": "Lần đầu đăng nhập từ {device} tại {location}.",
+          "passkeyAdded": "Đã thêm khóa đăng nhập (passkey).",
+          "passkeyRemoved": "Đã xóa khóa đăng nhập (passkey).",
           "passwordChanged": "Đã đổi mật khẩu.",
+          "passwordSet": "Đã đặt mật khẩu.",
           "payoutAccountAdded": "Tài khoản nhận tiền được đổi sang {bank}.",
           "sessionRevoked": "Một thiết bị đã bị đăng xuất.",
           "sessionsRevokedOthers": "Đã đăng xuất khỏi tất cả thiết bị khác.",
           "signIn": "Đăng nhập từ {device} tại {location}.",
           "signInAlertsChanged": "Cập nhật cài đặt thông báo đăng nhập.",
+          "twoFactorDisabled": "Đã tắt xác thực hai lớp.",
           "twoFactorEnabled": "Đã bật xác thực hai lớp."
         },
         "severity": {
@@ -594,7 +639,7 @@
         "unknownDevice": "Thiết bị không xác định",
         "unknownLocation": "Vị trí không xác định"
       },
-      "mockNotice": "Dữ liệu mẫu, hiển thị trong lúc trang này còn được hoàn thiện. Trang chưa kết nối với backend — các công tắc và nút đăng xuất chỉ thay đổi trên trang này và không phản ánh tài khoản thật của bạn.",
+      "mockNotice": "Dữ liệu mẫu. Màn hình này chưa kết nối với tài khoản của bạn, nên các số liệu dưới đây không phải số liệu thật. Các công tắc ở đây chỉ thay đổi trên trang này.",
       "passkeys": {
         "add": "Thêm passkey",
         "addFailedTitle": "Không thể thêm passkey",
@@ -619,7 +664,7 @@
       "posture": {
         "band": {
           "fair": "Trung bình",
-          "strong": "Vững",
+          "strong": "Tốt",
           "weak": "Rủi ro"
         },
         "bandHint": {
@@ -627,7 +672,7 @@
           "strong": "Tài khoản của bạn đã có các lớp bảo vệ chúng tôi khuyến nghị cho nhà đầu tư.",
           "weak": "Các lớp bảo vệ quan trọng đang tắt. Ai có mật khẩu của bạn đều có thể đăng nhập và chuyển tiền."
         },
-        "password": "Đổi mật khẩu",
+        "password": "Lần đổi mật khẩu",
         "passwordHint": "Lần cập nhật gần nhất",
         "protections": "Lớp bảo vệ đã bật",
         "protectionsHint": "Trên tổng số được khuyến nghị",
@@ -663,7 +708,7 @@
           "recommended": "Nên bật",
           "unavailable": "Chưa khả dụng"
         },
-        "subtitle": "Những gì ngăn cách tài khoản của bạn với người khác.",
+        "subtitle": "Các lớp bảo vệ giúp người khác không thể vào tài khoản của bạn.",
         "title": "Bảo vệ tài khoản",
         "updated": "Cập nhật {date}"
       },
@@ -704,7 +749,7 @@
         },
         "language": {
           "description": "Thay đổi toàn bộ nhãn, định dạng ngày và tiền tệ trong ứng dụng.",
-          "enHint": "Amounts appear as ₫1,250,000,000.",
+          "enHint": "Số tiền hiển thị dạng ₫1,250,000,000.",
           "heading": "Ngôn ngữ",
           "viHint": "Số tiền hiển thị dạng 1.250.000.000 ₫."
         },
@@ -819,12 +864,13 @@
       "emailSupport": "Email hỗ trợ",
       "help": "Trợ giúp & Hỗ trợ",
       "helpDescription": "Liên hệ ngay nếu bạn cần trợ giúp",
-      "hotline": "Hotline hỗ trợ",
+      "hotline": "Đường dây hỗ trợ",
       "investmentProjects": "Dự án đầu tư",
       "memberSuffix": "Thành viên",
       "needHelp": "Cần hỗ trợ?",
       "notifications": "Thông báo",
       "overview": "Tổng quan",
+      "roleMember": "Thành viên {role}",
       "security": "Bảo mật",
       "settings": "Cài đặt",
       "settingsAppearance": "Giao diện",
@@ -853,6 +899,7 @@
       "companyRegistration": "Giấy đăng ký kinh doanh",
       "country": "Quốc gia",
       "createdAt": "Ngày tạo",
+      "dayCount": "{count} ngày",
       "daysActive": "Số ngày hoạt động",
       "documentsStillUploadingDescription": "Vui lòng đợi tất cả tài liệu tải lên xong trước khi gửi hồ sơ.",
       "documentsStillUploadingTitle": "Tài liệu đang được tải lên",
@@ -942,7 +989,7 @@
       "sentStatus": "Đã gửi",
       "stateProvince": "Bang/Tỉnh",
       "statusApprovedBadge": "Đã duyệt",
-      "statusApprovedNote": "Chúng tôi sẽ gửi email đề nghị tài trợ, gồm tổng số tiền phải trả, số tiền trả mỗi ngày và ngày đáo hạn cuối, trước khi ký bất kỳ giấy tờ nào.",
+      "statusApprovedNote": "Chúng tôi sẽ gửi email đề nghị tài trợ, gồm tổng số tiền phải trả, số tiền trả mỗi ngày và hạn tất toán cuối cùng, trước khi ký bất kỳ giấy tờ nào.",
       "statusApprovedSubtitle": "Hồ sơ của bạn đã qua bước xét duyệt. Chúng tôi sẽ liên hệ qua email về bước tiếp theo — chưa có cam kết nào cho đến khi bạn xem và ký đề nghị tài trợ.",
       "statusApprovedTitle": "Đã duyệt — sẽ có đề nghị tài trợ",
       "statusDocuments": "Tài liệu",
@@ -975,13 +1022,13 @@
       "step2Why": "Để biết doanh nghiệp bạn bán được bao nhiêu và ổn định đến đâu trong hai năm. Xu hướng và độ ổn định ảnh hưởng đến lãi suất nhiều hơn tổng doanh thu của một năm.",
       "step3How": "Lấy từ báo cáo tài chính năm gần nhất (Mẫu B02-DN). Số liệu gần đúng là được — chúng tôi sẽ xác nhận con số chính xác khi thẩm định.",
       "step3Title": "Bước 3: Báo cáo tài chính năm",
-      "step3Why": "Để tính chi phí tạo ra doanh thu đó, từ đó biết doanh nghiệp bạn có thể trả góp ở mức nào mà vẫn thoải mái.",
+      "step3Why": "Để tính chi phí tạo ra doanh thu đó, từ đó biết doanh nghiệp có thể trả mỗi ngày bao nhiêu mà vẫn thoải mái.",
       "step4How": "Xuất dữ liệu hóa đơn điện tử (đã phát hành và nhận) của 12 tháng gần nhất từ cổng thông tin cơ quan thuế.",
       "step4Title": "Bước 4: Dữ liệu hoá đơn điện tử",
-      "step4Why": "Để xem xét lịch sử giao dịch hoạt động hàng tháng và hồ sơ doanh số hàng ngày nhằm lập hồ sơ dòng tiền tự động.",
+      "step4Why": "Để thấy doanh thu thực tế hằng ngày, từ hóa đơn không thể chỉnh sửa sau khi phát hành.",
       "step5How": "Truy cập cổng thông tin CIC của Ngân hàng Nhà nước, đăng nhập bằng tài khoản doanh nghiệp của bạn, yêu cầu báo cáo tín dụng doanh nghiệp và tải về dạng PDF.",
       "step5Title": "Bước 5: Báo cáo tín dụng CIC",
-      "step5Why": "Để kiểm tra mức độ uy tín tín dụng và lịch sử hoàn trả nợ trong quá khứ thông qua dữ liệu chính thức của trung tâm tín dụng ngân hàng nhà nước.",
+      "step5Why": "Để biết doanh nghiệp đã trả các khoản vay trước đây ra sao, theo dữ liệu CIC của Ngân hàng Nhà nước.",
       "stepIndicator": "Bước {current} / {total}",
       "street": "Đường",
       "submitApplication": "Gửi hồ sơ",
@@ -1007,14 +1054,14 @@
       "charts": {
         "repaymentDesc": "Số đã trả so với tổng phải trả trong suốt thời hạn.",
         "repaymentTitle": "Tiến độ trả nợ",
-        "revenueShareDesc": "Từng tháng so với ngưỡng an toàn {ceiling}%.",
+        "revenueShareDesc": "Từng tháng so với mức dễ chịu {ceiling}%.",
         "revenueShareTitle": "Tỷ lệ doanh thu dùng để trả nợ",
         "scoreDesc": "Bốn nhóm yếu tố tạo nên điểm {score} của bạn, và nơi cần cải thiện.",
         "scoreTitle": "Điều gì quyết định điểm doanh nghiệp của bạn"
       },
       "factorHints": {
         "bcq": "Tỷ suất lợi nhuận, khả năng linh hoạt chi phí và quy mô khoản vay so với doanh thu.",
-        "behavioral": "Điểm tín dụng CIC, các khoản rút của chủ sở hữu và lịch sử trả nợ.",
+        "behavioral": "Điểm tín dụng CIC, các khoản chủ sở hữu rút ra và lịch sử trả nợ.",
         "rsg": "Mức ổn định của doanh thu hằng tháng, xu hướng và mức tập trung khách hàng.",
         "sector": "Điều kiện ngành của bạn — dựa trên dữ liệu ngành, không phải số liệu riêng của bạn."
       },
@@ -1025,19 +1072,19 @@
         "sector": "Triển vọng ngành"
       },
       "kpi": {
-        "backstop": "Hạn chót cuối cùng",
+        "backstop": "Hạn tất toán cuối cùng",
         "backstopHint": "Mọi khoản còn lại sẽ đến hạn thanh toán đầy đủ vào ngày này.",
         "costOfCapital": "Chi phí khoản vay",
         "costOfCapitalHint": "Tổng lãi ở mức {rate}% trong {months} tháng",
         "dailyRepayment": "Khoản trả mỗi ngày",
         "dailyRepaymentHint": "Mỗi ngày làm việc. Kỳ này tổng cộng {total} đến ngày {date}.",
         "earlyPayoff": "Tất toán sớm",
-        "earlyPayoffHint": "Số tiền để tất toán khoản này hôm nay. Không có phí trả trước — tổng số tiền phải trả không thay đổi.",
+        "earlyPayoffHint": "Số tiền để tất toán khoản này hôm nay. Không có phí trả trước hạn, và trả sớm không làm giảm tổng số tiền.",
         "outstanding": "Còn phải trả",
         "outstandingHint": "Đã trả {percent}% khoản vay"
       },
-      "mockNotice": "Dữ liệu mẫu, hiển thị trong lúc trang này còn được hoàn thiện. Trang chưa kết nối backend — chưa có module lịch trả nợ và engine tính điểm chưa được nối vào các lần tính điểm doanh nghiệp, nên các số liệu này không phản ánh khoản vốn thật của bạn.",
-      "overCeiling": "Tháng trước, khoản trả nợ chiếm {percent}% doanh thu, cao hơn mức {ceiling}% mà chúng tôi cho là an toàn. Hãy trao đổi với chúng tôi về việc gia hạn nếu điều này gây áp lực cho hoạt động của bạn.",
+      "mockNotice": "Dữ liệu mẫu. Màn hình này chưa kết nối với tài khoản của bạn, nên các số liệu dưới đây không phải số liệu thật.",
+      "overCeiling": "Tháng trước, khoản trả nợ chiếm {percent}% doanh thu, cao hơn mức {ceiling}% mà chúng tôi cho là dễ chịu. Hãy trao đổi với chúng tôi về việc gia hạn nếu điều này gây áp lực cho hoạt động của bạn.",
       "progress": {
         "label": "Đã trả đến nay",
         "remaining": "Còn {days} ngày làm việc"
@@ -1054,7 +1101,7 @@
         "weight": "{percent}% của điểm"
       },
       "series": {
-        "ceiling": "Ngưỡng an toàn {percent}%",
+        "ceiling": "Ngưỡng dễ chịu {percent}%",
         "repaid": "Đã trả đến nay",
         "revenueShare": "Tỷ lệ trên doanh thu",
         "totalOwed": "Tổng phải trả"
@@ -1064,20 +1111,20 @@
     },
     "smeFunding": {
       "allInRate": "Lãi suất năm trọn gói",
-      "backstopDate": "Hạn chót cuối cùng",
+      "backstopDate": "Hạn tất toán cuối cùng",
       "backstopHint": "Mọi khoản còn lại sẽ đến hạn thanh toán đầy đủ vào ngày này.",
       "dailyAmount": "Khoản trả mỗi ngày",
       "earlyRepaymentNote": "Tất toán sớm không bị phạt trả trước. Việc này thanh toán phần còn lại của tổng số tiền — không làm giảm tổng đó.",
-      "fixedAtSigning": "Ấn định khi ký. Chỉ tăng nếu thời hạn được kéo dài.",
+      "fixedAtSigning": "Ấn định khi ký. Chỉ tăng khi thời hạn được kéo dài, thêm phần lãi của thời gian kéo dài.",
       "investors": "{count} nhà đầu tư",
-      "mockNotice": "Dữ liệu mẫu, hiển thị trong lúc màn hình này đang được hoàn thiện. Thông tin doanh nghiệp phía trên là thật; các số liệu gọi vốn và trả nợ bên dưới chưa kết nối với hệ thống backend.",
+      "mockNotice": "Dữ liệu mẫu. Hồ sơ doanh nghiệp phía trên là thật; số liệu huy động vốn và trả nợ bên dưới là số liệu mẫu cho đến khi màn hình này được kết nối với tài khoản của bạn.",
       "ofDailyRevenue": "Khoảng {percent}% doanh thu hằng ngày của bạn",
       "ofTarget": "trên {target}",
       "outstanding": "Còn phải trả",
       "perBusinessDay": "Thu vào mỗi ngày làm việc",
       "perDay": "{amount} × {days} ngày làm việc",
       "periodRange": "{start} – {end}",
-      "raised": "Đã gọi được",
+      "raised": "Đã huy động",
       "rate": "Lãi suất / Điểm doanh nghiệp",
       "rateValue": "{rate}% · điểm {score}",
       "reliefApplied": "Khoản trả hằng ngày đã giảm từ {from}/ngày. Thời hạn được kéo dài để bù phần chênh lệch, và lãi của phần thời gian thêm sẽ cộng vào tổng số tiền phải trả.",
@@ -1086,13 +1133,13 @@
       "scheduleTitle": "Các kỳ hoàn trả",
       "status": {
         "CURRENT": "Đang thu",
-        "RELIEF_APPLIED": "Đã giảm nghĩa vụ",
+        "RELIEF_APPLIED": "Đã giảm khoản trả mỗi ngày",
         "SETTLED": "Đã thu",
         "UPCOMING": "Sắp tới"
       },
       "stretchNote": "Đã gồm {amount} tiền lãi cho {days} ngày làm việc thời hạn được kéo dài thêm.",
       "subtitle": "Bạn đã huy động được bao nhiêu, mỗi ngày làm việc phải trả bao nhiêu, và ngày mà mọi khoản còn lại đến hạn.",
-      "title": "Gọi vốn & Trả nợ",
+      "title": "Huy động vốn & trả nợ",
       "totalRepayable": "Tổng số tiền phải trả"
     },
     "tour": {
@@ -1112,19 +1159,19 @@
           "title": "Tổng quan danh mục của bạn"
         },
         "investorProjects": {
-          "body": "Mỗi tin đăng đều hiển thị điểm doanh nghiệp, doanh thu đã xác minh phía sau điểm đó, các khoản phí và hạn chót cuối cùng. Lợi suất là mục tiêu và khoảng ước tính, không phải cam kết.",
+          "body": "Mỗi tin đăng đều hiển thị điểm doanh nghiệp, doanh thu đã xác minh phía sau điểm đó, các khoản phí và hạn tất toán cuối cùng. Lợi suất là mục tiêu và khoảng ước tính, không phải cam kết.",
           "title": "Một tin đăng cho bạn biết điều gì"
         },
         "security": {
           "body": "Lịch sử đăng nhập, thiết bị đang hoạt động và xác thực hai lớp. Đáng dành hai phút ngay bây giờ.",
-          "title": "Giữ tài khoản luôn là của bạn"
+          "title": "Bảo vệ tài khoản của bạn"
         },
         "smeApply": {
-          "body": "Nộp hồ sơ bằng tờ khai thuế GTGT và hóa đơn điện tử của bạn. Chúng tôi thẩm định và phản hồi bằng điều khoản cụ thể — việc nộp hồ sơ không đồng nghĩa được duyệt, và bạn sẽ thấy lãi suất, khoản trả mỗi ngày và hạn chót cuối cùng trước khi ký bất cứ điều gì.",
+          "body": "Nộp hồ sơ bằng tờ khai thuế GTGT và hóa đơn điện tử của bạn. Chúng tôi thẩm định và phản hồi bằng điều khoản cụ thể — việc nộp hồ sơ không đồng nghĩa được duyệt, và bạn sẽ thấy lãi suất, khoản trả mỗi ngày và hạn tất toán cuối cùng trước khi ký bất cứ điều gì.",
           "title": "Bắt đầu từ hồ sơ bạn vẫn nộp hằng kỳ"
         },
         "smeOverview": {
-          "body": "Số đã trả, số còn phải trả, và ngày mọi khoản còn lại đến hạn thanh toán đầy đủ. Tổng số tiền được ấn định ngày ký và chỉ tăng nếu thời hạn được kéo dài.",
+          "body": "Số đã trả, số còn phải trả, và ngày mọi khoản còn lại đến hạn thanh toán đầy đủ. Tổng số tiền được ấn định ngày ký và chỉ tăng khi thời hạn được kéo dài, thêm phần lãi của thời gian kéo dài.",
           "title": "Tổng quan khoản vốn của bạn"
         },
         "transactions": {
@@ -1148,11 +1195,11 @@
         "deductedFromDisbursement": "Khấu trừ khi giải ngân",
         "platformFee": "Phí dịch vụ nền tảng"
       },
-      "mockNotice": "Dữ liệu mẫu, hiển thị trong lúc màn hình này đang được hoàn thiện. Trang chưa kết nối với hệ thống backend, nên các số liệu bên dưới không phải số dư thực tế của bạn.",
+      "mockNotice": "Dữ liệu mẫu. Màn hình này chưa kết nối với tài khoản của bạn, nên các số liệu dưới đây không phải số liệu thật.",
       "searchPlaceholder": "Tìm theo dự án, mã tham chiếu hoặc phương thức",
       "showing": "Hiển thị {shown} trong tổng số {total} giao dịch",
-      "smeMockNotice": "Dữ liệu mẫu, hiển thị trong lúc trang này còn được hoàn thiện. Trang chưa kết nối backend — chưa có API sổ cái hay module lịch trả nợ, nên các giao dịch này không phải giao dịch thật.",
-      "smeSubtitle": "Toàn bộ dòng tiền của khoản vay — số bạn đã nhận, số đã trả và phí FundLok đã thu.",
+      "smeMockNotice": "Dữ liệu mẫu. Màn hình này chưa kết nối với tài khoản của bạn, nên các số liệu dưới đây không phải số liệu thật.",
+      "smeSubtitle": "Toàn bộ dòng tiền của khoản vay: số bạn đã nhận, số đã trả và phí FundLok đã thu.",
       "smeSummary": {
         "disbursed": "Đã giải ngân cho bạn",
         "disbursedHint": "Tiền gốc đã chuyển vào tài khoản của bạn",
@@ -1161,7 +1208,7 @@
         "pending": "Đang xử lý",
         "pendingHint": "Các khoản chưa hoàn tất",
         "repaid": "Đã trả đến nay",
-        "repaidHint": "Các kỳ trả cùng các lần trả sớm"
+        "repaidHint": "Các khoản trả hằng ngày và khoản trả sớm (nếu có)"
       },
       "smeTitle": "Giao dịch khoản vay",
       "status": {
@@ -1178,7 +1225,7 @@
         "net": "Chênh lệch ròng",
         "netHint": "Tiền vào trừ tiền ra",
         "pending": "Đang xử lý",
-        "pendingHint": "Chờ tất toán"
+        "pendingHint": "Chờ hoàn tất"
       },
       "table": {
         "amount": "Số tiền",
@@ -1201,18 +1248,127 @@
       }
     }
   },
+  "enums": {
+    "approval": {
+      "APPROVED": "Đã duyệt",
+      "PENDING": "Chờ quyết định",
+      "REJECTED": "Đã từ chối"
+    },
+    "auditAction": {
+      "APPLICATION_ADMIN_DECIDED": "Đã quyết định hồ sơ",
+      "APPROVE": "Đã duyệt",
+      "APPROVE_LOCK": "Đã duyệt và khóa",
+      "AVATAR_UPDATED": "Đã cập nhật ảnh đại diện",
+      "COMMIT": "Đã xác nhận tải lên",
+      "CONFIRM_UPLOADS": "Đã xác nhận các tệp tải lên",
+      "CREATE": "Đã tạo",
+      "CREATE_BUSINESS": "Đã tạo doanh nghiệp",
+      "DISBURSEMENT": "Giải ngân",
+      "KYB_MANUAL_REVIEW_RESOLVED": "Đã xử lý xem xét xác minh doanh nghiệp",
+      "LINK": "Đã liên kết tài khoản",
+      "PASSKEY_ADDED": "Đã thêm passkey",
+      "PASSKEY_REMOVED": "Đã xóa passkey",
+      "PASSWORD_CHANGED": "Đã đổi mật khẩu",
+      "PASSWORD_SET": "Đã đặt mật khẩu",
+      "PLACE": "Đã đặt lệnh",
+      "PRESIGN": "Đã cấp liên kết tải lên",
+      "PROFILE_UPDATED": "Đã cập nhật hồ sơ",
+      "REPAYMENT": "Hoàn trả",
+      "ROLE_SELECTED": "Đã chọn vai trò",
+      "SAVE_FIGURES": "Đã lưu số liệu",
+      "SESSION_REVOKED": "Đã đăng xuất một thiết bị",
+      "SESSIONS_REVOKED_OTHERS": "Đã đăng xuất các thiết bị khác",
+      "SIGN_IN": "Đăng nhập",
+      "SIGNIN_ALERTS_CHANGED": "Đã đổi cài đặt thông báo đăng nhập",
+      "START": "Đã bắt đầu",
+      "SUBMIT": "Đã gửi",
+      "TOTP_DISABLED": "Đã tắt xác thực hai lớp",
+      "TOTP_ENABLED": "Đã bật xác thực hai lớp",
+      "UNLINK": "Đã hủy liên kết tài khoản",
+      "UPLOAD_INITIATED": "Đã bắt đầu tải lên",
+      "USER_STATUS_CHANGED": "Đã đổi trạng thái tài khoản",
+      "VERIFY": "Xác minh",
+      "WEBHOOK": "Đã nhận webhook"
+    },
+    "auditEntity": {
+      "AUTH": "Xác thực",
+      "BANK_RATE_CONFIG": "Cấu hình lãi suất tham khảo",
+      "CONTRACT": "Hợp đồng",
+      "DOCUMENT": "Tài liệu",
+      "GVERIFY_KYB_VERIFICATION": "Xác minh doanh nghiệp",
+      "GVERIFY_KYC_VERIFICATION": "Xác minh danh tính",
+      "LEDGER": "Sổ cái",
+      "LINKED_ACCOUNT": "Tài khoản liên kết",
+      "LISTING": "Tin đăng gọi vốn",
+      "LOAN_APPLICATION": "Hồ sơ đăng ký vốn",
+      "LOAN_APPLICATION_DOCUMENT": "Tài liệu hồ sơ",
+      "ORDER": "Lệnh đầu tư",
+      "PROJECT": "Dự án",
+      "SCORE_RUN": "Lượt tính điểm",
+      "SESSION": "Phiên đăng nhập",
+      "USER": "Người dùng"
+    },
+    "documentStatus": {
+      "APPROVED": "Đã duyệt",
+      "PENDING": "Chưa tải lên",
+      "REJECTED": "Bị từ chối",
+      "SCANNING": "Đang quét",
+      "UPLOADED": "Đã tải lên"
+    },
+    "projectStatus": {
+      "ACTIVE": "Đang hoạt động",
+      "DRAFT": "Bản nháp"
+    },
+    "role": {
+      "ADMIN": "Quản trị viên",
+      "INVESTOR": "Nhà đầu tư",
+      "SME": "Doanh nghiệp",
+      "SYSTEM_ADMIN": "Quản trị hệ thống"
+    },
+    "scoreDecision": {
+      "AI_PENDING": "Chờ AI xử lý",
+      "APPROVED": "Đề xuất duyệt",
+      "INSUFFICIENT_DATA": "Thiếu dữ liệu",
+      "REJECT": "Đề xuất từ chối",
+      "REVIEW": "Cần xem xét"
+    },
+    "scoreRunStatus": {
+      "FAILED": "Thất bại",
+      "LOCKED": "Đã khóa",
+      "READY": "Sẵn sàng",
+      "RUNNING": "Đang chạy"
+    },
+    "userStatus": {
+      "ACTIVE": "Hoạt động",
+      "INACTIVE": "Không hoạt động",
+      "PENDING_KYC": "Chờ xác minh danh tính",
+      "SUSPENDED": "Đã tạm khóa"
+    },
+    "verificationStatus": {
+      "APPROVED": "Đã duyệt",
+      "FAILED": "Thất bại",
+      "MANUAL_REVIEW": "Cần xem xét thủ công",
+      "PENDING": "Đang chờ",
+      "REJECTED": "Bị từ chối"
+    }
+  },
+  "errorPage": {
+    "description": "Không thể tải trang này. Vui lòng thử lại hoặc quay về trang chủ.",
+    "retry": "Thử lại",
+    "title": "Đã xảy ra lỗi"
+  },
   "faqPage": {
     "ctaButton": "Liên hệ với chúng tôi",
     "ctaText": "Đội ngũ FundLok sẵn sàng giải đáp và đồng hành cùng doanh nghiệp hoặc danh mục đầu tư của bạn.",
     "ctaTitle": "Vẫn còn thắc mắc?",
     "eyebrow": "HỖ TRỢ",
     "general": {
-      "a1": "FundLok là nền tảng vốn kết nối các doanh nghiệp siêu nhỏ, nhỏ và vừa (MSME) với nhà đầu tư thông qua mô hình tài chính linh hoạt hơn, được hỗ trợ bởi công nghệ.",
-      "a2": "Các khoản vay truyền thống thường dựa trên lịch trả nợ cứng nhắc, không phải lúc nào cũng phản ánh đúng cách MSME thực sự vận hành. FundLok được thiết kế xoay quanh cấu trúc tài chính thích ứng hơn, bám sát hiệu quả kinh doanh thực tế.",
-      "a3": "Không. FundLok không phải là ngân hàng. Đây là nền tảng ứng dụng công nghệ được thiết kế để hỗ trợ việc cấp vốn, điều phối dòng trả nợ và minh bạch giao dịch trực tiếp giữa MSME và nhà đầu tư cá nhân.",
-      "a4": "FundLok tự động hóa các khâu quan trọng gồm onboarding, thẩm định, xử lý đề nghị, dòng vốn và theo dõi trả nợ. Điều này giúp cải thiện tốc độ, tính nhất quán và minh bạch.",
-      "a5": "FundLok được xây dựng với bảo mật, kiểm soát truy cập và bảo vệ dữ liệu là những ưu tiên cốt lõi. Các quy trình của nền tảng được thiết kế để hỗ trợ onboarding an toàn, xử lý giao dịch và quản lý thông tin.",
-      "a6": "Không. Mọi hoạt động cấp vốn và đầu tư đều bao gồm thẩm định điều kiện, cấu trúc khoản vay và rủi ro. FundLok cải thiện khả năng tiếp cận, quy trình và tính minh bạch, nhưng không loại bỏ rủi ro kinh doanh hay rủi ro trả nợ. Việc cấp vốn dựa trên quyết định của nhà đầu tư, nằm ngoài quyền kiểm soát của FundLok.",
+      "a1": "FundLok kết nối doanh nghiệp vừa và nhỏ tại Việt Nam với nhà đầu tư. Doanh nghiệp huy động vốn và trả một khoản cố định mỗi ngày làm việc; nhà đầu tư cấp vốn và xem được dữ liệu đằng sau từng doanh nghiệp.",
+      "a2": "Khoản vay ngân hàng thường trả góp cố định hằng tháng. FundLok dùng một khoản nhỏ cố định mỗi ngày làm việc, hợp với doanh nghiệp có tiền vào hằng ngày, và thời hạn có thể kéo dài khi doanh thu đã xác minh giảm (có tính lãi cho phần thời gian thêm).",
+      "a3": "Không. FundLok không phải ngân hàng hay bên cho vay. Đây là nền tảng công nghệ thu xếp vốn giữa doanh nghiệp và nhà đầu tư, điều phối khoản trả nợ và hiển thị mọi giao dịch.",
+      "a4": "Công nghệ đảm nhận phần việc lặp lại: đọc tài liệu, đối chiếu với chứng từ thuế, chuẩn bị đề nghị tài trợ, điều phối dòng tiền và theo dõi từng khoản trả hằng ngày. Con người rà soát các quyết định.",
+      "a5": "Tài khoản hỗ trợ xác thực hai lớp và passkey, kết nối được mã hóa, và tiền của nhà đầu tư được giữ tại các đối tác ngân hàng lưu ký, không phải tại FundLok.",
+      "a6": "Không. Mọi hồ sơ đều được thẩm định, và cả huy động vốn lẫn đầu tư đều có rủi ro. FundLok giúp quy trình rõ ràng hơn, nhưng không loại bỏ rủi ro kinh doanh hay rủi ro trả nợ. Doanh nghiệp có được cấp vốn hay không là do nhà đầu tư quyết định, FundLok không kiểm soát việc đó.",
       "a7": "Có. FundLok thu xếp nguồn vốn cho doanh nghiệp vừa và nhỏ tại Việt Nam. Nhà đầu tư là bên cấp vốn và hợp đồng tín dụng được ký giữa nhà đầu tư và doanh nghiệp. FundLok không phải ngân hàng, không phải bên cho vay, và không cho vay bằng tiền của mình. Doanh nghiệp chọn kỳ hạn từ 1 đến 6 tháng, hoàn trả một khoản cố định mỗi ngày làm việc, và tổng số tiền phải trả được ấn định khi ký. Nếu doanh thu đã xác minh giảm, thời hạn có thể kéo dài và khoản trả hằng ngày sẽ nhỏ hơn. Lãi được tính cho phần thời gian thêm, nên tổng số tiền sẽ tăng.",
       "q1": "FundLok là gì?",
       "q2": "FundLok khác gì so với khoản vay truyền thống?",
@@ -1224,12 +1380,12 @@
       "title": "Câu hỏi chung"
     },
     "investor": {
-      "a1": "Nhà đầu tư hoàn tất quy trình onboarding và xác minh có thể tiếp cận các cơ hội trên nền tảng, theo cấu trúc và yêu cầu áp dụng. Số vốn đầu tư có thể bắt đầu chỉ từ 10.000.000 VND.",
-      "a2": "Nhà đầu tư đã xác minh có thể xem các dự án đang niêm yết, đánh giá các cơ hội được cấu trúc sẵn và tham gia thông qua quy trình cấp vốn của nền tảng.",
-      "a3": "Tiền được giữ tại các đối tác ngân hàng lưu ký. Dòng tiền chỉ đi theo hai hướng: tới tài khoản SME đã xác minh theo một hợp đồng đã ký, hoặc quay về chính nhà đầu tư đã chuyển. Tiền không bao giờ chuyển vào tài khoản của FundLok.",
+      "a1": "Bất kỳ ai hoàn tất đăng ký và xác minh danh tính đều có thể xem và cấp vốn cho các dự án. Bạn có thể bắt đầu từ 10.000.000 VND.",
+      "a2": "Xem các dự án, đánh giá điểm doanh nghiệp, doanh thu đã xác minh, các khoản phí và hạn tất toán cuối cùng của từng doanh nghiệp, rồi chọn số tiền muốn góp.",
+      "a3": "Tiền được giữ tại các đối tác ngân hàng lưu ký. Dòng tiền chỉ đi theo hai hướng: tới tài khoản doanh nghiệp đã xác minh theo hợp đồng đã ký, hoặc quay về chính nhà đầu tư đã chuyển. FundLok không sở hữu và không có quyền sử dụng số tiền này cho mục đích riêng.",
       "a4": "FundLok không sở hữu tiền của nhà đầu tư và không có quyền sử dụng số tiền đó: chúng tôi chỉ có quyền ra lệnh trong các điều kiện do ngân hàng lưu ký thực thi. Hợp đồng tín dụng là giữa nhà đầu tư và SME; FundLok không phải là một bên của hợp đồng, và nhà đầu tư chịu rủi ro tín dụng nếu doanh nghiệp không đạt kỳ vọng.",
-      "a5": "Khi MSME trả nợ thông qua cấu trúc vận hành của nền tảng, dòng tiền được điều phối và theo dõi theo quy trình phân bổ và trả nợ áp dụng. Nhà đầu tư có thể yêu cầu giải ngân bất kỳ lúc nào, với thời gian xử lý 1 ngày.",
-      "a6": "Nhà đầu tư có thể theo dõi hoạt động cấp vốn, tiến độ trả nợ và các giao dịch liên quan thông qua lớp công nghệ của nền tảng.",
+      "a5": "Khoản trả mỗi ngày làm việc được chia cho các nhà đầu tư của khoản vốn đó, theo tỷ lệ số tiền mỗi người góp, và hiển thị trong tài khoản của bạn. Bạn có thể rút số tiền đã được hoàn trả về tài khoản ngân hàng đã xác minh.",
+      "a6": "Tiến độ cấp vốn, khoản trả từng ngày làm việc, các loại phí, và mọi cảnh báo hay trạng thái theo dõi của doanh nghiệp bạn cấp vốn.",
       "q1": "Ai có thể đầu tư qua FundLok?",
       "q2": "Nhà đầu tư tham gia như thế nào?",
       "q3": "Tiền của nhà đầu tư đi về đâu?",
@@ -1239,19 +1395,19 @@
       "title": "Dành cho nhà đầu tư"
     },
     "msme": {
-      "a1": "FundLok dành cho các MSME đáp ứng yêu cầu về điều kiện và xác minh của nền tảng. Mức độ phù hợp phụ thuộc vào hồ sơ doanh nghiệp, tình hình tài chính và sự tương thích với mô hình cấp vốn. Hạn mức cấp vốn phổ biến từ 20.000.000 đến 1.000.000.000 VND.",
-      "a2": "MSME có thể cần cung cấp thông tin doanh nghiệp, tài liệu xác minh và dữ liệu tài chính phục vụ thẩm định và trả nợ. Yêu cầu cụ thể có thể khác nhau tùy theo doanh nghiệp và nhu cầu vốn.",
-      "a3": "FundLok sử dụng quy trình thẩm định dựa trên công nghệ, có thể bao gồm đánh giá tài chính tự động, phân tích dữ liệu có cấu trúc, phân tích AI theo ngữ cảnh và đánh giá đặc thù ngành để hiểu rõ tình hình vận hành của từng MSME.",
-      "a4": "Có. MSME có thể xem các điều khoản đề xuất trước khi xác nhận và tiến tới giai đoạn niêm yết.",
-      "a5": "FundLok được thiết kế xoay quanh cơ chế trả nợ phản ánh đúng hoạt động kinh doanh thực tế, giúp tạo ra cấu trúc trả nợ linh hoạt và minh bạch hơn.",
-      "a6": "Vì dòng tiền, tốc độ tăng trưởng và áp lực trả nợ khác nhau giữa các doanh nghiệp. FundLok được xây dựng trên quan điểm tài chính phải phù hợp với thực tế của doanh nghiệp, thay vì ép mọi MSME vào cùng một khuôn mẫu.",
+      "a1": "Doanh nghiệp vừa và nhỏ tại Việt Nam đã qua xác minh và có doanh thu đủ để trả một khoản mỗi ngày. Mức vốn phổ biến từ 20.000.000 đến 1.000.000.000 VND.",
+      "a2": "Giấy chứng nhận đăng ký kinh doanh, tờ khai thuế GTGT và hóa đơn điện tử (bản gốc điện tử có chữ ký), số liệu chi phí, và báo cáo CIC.",
+      "a3": "Chúng tôi đọc chứng từ thuế và số liệu tài chính, đối chiếu với dữ liệu ngành, sau đó có người trực tiếp rà soát kết quả.",
+      "a4": "Có. Bạn xem toàn bộ đề nghị tài trợ, gồm lãi suất, khoản trả mỗi ngày, các khoản phí và hạn tất toán cuối cùng, trước khi xác nhận. Bạn không nợ gì cho đến khi ký.",
+      "a5": "Bạn trả một khoản cố định mỗi ngày làm việc cho đến khi hết tổng số tiền phải trả, được ấn định khi ký. Nếu doanh thu đã xác minh giảm, thời hạn có thể kéo dài và khoản trả hằng ngày nhỏ hơn; lãi của phần thời gian thêm làm tổng số tiền tăng lên. Không có phí trả trước hạn, và bạn biết hạn tất toán cuối cùng ngay từ ngày ký.",
+      "a6": "Vì mỗi doanh nghiệp tạo ra tiền theo cách khác nhau. Khoản trả hằng ngày hợp với doanh nghiệp có tiền vào mỗi ngày, và nếu doanh thu đã xác minh giảm, thời hạn có thể kéo dài để khoản trả hằng ngày nhỏ hơn.",
       "q1": "Ai có thể đăng ký nhận vốn trên FundLok?",
-      "q2": "MSME cần cung cấp những thông tin gì?",
-      "q3": "MSME được thẩm định như thế nào?",
-      "q4": "MSME có được xem đề nghị trước khi quyết định không?",
-      "q5": "Cơ chế trả nợ cho MSME hoạt động ra sao?",
-      "q6": "Vì sao mô hình của FundLok linh hoạt hơn cho MSME?",
-      "title": "Dành cho MSME"
+      "q2": "Doanh nghiệp cần cung cấp những thông tin gì?",
+      "q3": "Doanh nghiệp được thẩm định như thế nào?",
+      "q4": "Doanh nghiệp có được xem đề nghị tài trợ trước khi quyết định không?",
+      "q5": "Việc trả nợ diễn ra như thế nào?",
+      "q6": "Vì sao mô hình của FundLok linh hoạt hơn cho doanh nghiệp?",
+      "title": "Dành cho doanh nghiệp"
     },
     "subtitle": "Mọi điều bạn cần biết về cách FundLok vận hành, cho doanh nghiệp cần vốn và nhà đầu tư cấp vốn.",
     "title": "Câu hỏi thường gặp"
@@ -1313,6 +1469,11 @@
       "downloadingFile": "Đang tải tệp",
       "reminderText": "Hãy đọc kỹ mọi tài liệu trước khi đầu tư. Cân nhắc mức độ rủi ro và điểm doanh nghiệp. Nếu doanh nghiệp không đạt kỳ vọng, bạn là người chịu khoản lỗ.",
       "reminderTitle": "Nhắc nhở thẩm định",
+      "sampleFiles": {
+        "financialStatement": "Báo cáo tài chính 2025.pdf",
+        "taxFiling": "Tờ khai thuế 2025.pdf",
+        "vatFiling": "Tờ khai GTGT Q4 2025.pdf"
+      },
       "startingDownload": "Bắt đầu tải {filename}...",
       "subtitle": "Xem lại các tài liệu SME đã nộp để thẩm định",
       "title": "Tài liệu & thông tin tài chính"
@@ -1400,7 +1561,7 @@
       "failedTitle": "Đã xảy ra sự cố",
       "frontLabel": "CCCD/CMND — mặt trước",
       "invalidType": "Ảnh phải ở định dạng JPEG hoặc PNG",
-      "mobileApprovedHint": "Bạn đã được xác minh! Hãy đóng trang này và quay lại máy tính.",
+      "mobileApprovedHint": "Bạn đã được xác minh. Hãy đóng trang này và quay lại máy tính.",
       "mobileExpired": "Liên kết đã hết hạn. Hãy quay lại máy tính và tạo mã QR mới.",
       "mobileNoTokenHint": "Trang này chỉ hoạt động khi được mở bằng cách quét mã QR hiển thị trên máy tính của bạn.",
       "mobileNoTokenTitle": "Liên kết không đầy đủ",
@@ -1430,22 +1591,22 @@
       "approvedTitle": "Doanh nghiệp đã được xác minh",
       "backBtn": "Quay lại",
       "clickToAdd": "Nhấn để thêm ảnh hoặc PDF",
-      "consent": "Giấy phép của bạn được gửi an toàn tới đối tác xác minh để đọc thông tin và đối chiếu với cơ quan thuế, và được lưu trữ an toàn theo yêu cầu tuân thủ về xác minh doanh nghiệp.",
+      "consent": "Giấy chứng nhận của bạn được gửi an toàn tới đối tác xác minh để đọc thông tin và đối chiếu với cơ quan thuế, và được lưu trữ an toàn theo yêu cầu tuân thủ về xác minh doanh nghiệp.",
       "declinedTitle": "Xác minh doanh nghiệp thất bại",
       "docLabelBranch": "Giấy chứng nhận đăng ký hoạt động chi nhánh",
       "docLabelCompany": "Giấy chứng nhận đăng ký doanh nghiệp",
       "invalidTypeDoc": "Tệp phải ở định dạng JPEG, PNG hoặc PDF",
-      "licenseCodeHint": "Số đăng ký/giấy phép trên giấy chứng nhận, nếu khác mã số thuế. Mặc định dùng mã số thuế nếu để trống.",
-      "licenseCodeLabel": "Số giấy phép kinh doanh — không bắt buộc",
-      "stepDocument": "1. Giấy phép",
+      "licenseCodeHint": "Số đăng ký trên giấy chứng nhận, nếu khác mã số thuế. Để trống thì dùng mã số thuế.",
+      "licenseCodeLabel": "Số đăng ký kinh doanh (không bắt buộc)",
+      "stepDocument": "1. Giấy chứng nhận",
       "stepReview": "2. Kiểm tra & gửi",
-      "subtitle": "Tải lên Giấy đăng ký kinh doanh — chúng tôi sẽ đọc thông tin và đối chiếu với Tổng Cục Thuế.",
-      "taxCodeHint": "Điền nếu có in trên giấy phép — hữu ích khi hệ thống đọc tự động bỏ sót.",
+      "subtitle": "Tải lên Giấy đăng ký kinh doanh — chúng tôi sẽ đọc thông tin và đối chiếu với cơ quan thuế.",
+      "taxCodeHint": "Điền nếu có in trên giấy chứng nhận — hữu ích khi hệ thống đọc tự động bỏ sót.",
       "taxCodeLabel": "Mã số doanh nghiệp (MST) — không bắt buộc",
       "title": "Xác minh doanh nghiệp",
       "typeBranch": "Chi nhánh doanh nghiệp",
       "typeCompany": "Doanh nghiệp",
-      "typeLabel": "Loại giấy phép"
+      "typeLabel": "Loại giấy chứng nhận"
     },
     "retryBtn": "Thử lại",
     "returnBtn": "Quay lại",
@@ -1486,17 +1647,17 @@
     "live": "Live",
     "loanDuration": "Thời hạn vay",
     "loanDurationShort": "Thời hạn",
-    "locked": "ĐÃ KHÓA",
+    "locked": "Đã khóa",
     "monthlyRevShort": "Doanh thu tháng",
     "monthlyRevenue": "Doanh thu hàng tháng",
     "notEligible": "NGOÀI NGƯỠNG",
     "notGuaranteedShort": "Mục tiêu, không phải cam kết",
-    "pending": "ĐANG XỬ LÝ...",
+    "pending": "Đang xử lý...",
     "revenueCoverage": "Khoản vốn so với doanh thu kỳ hạn",
     "riskTolerance": "Mức độ rủi ro",
     "scenarioRange": "Khoảng kịch bản",
     "scenarioShort": "KỊCH BẢN",
-    "scoreLabel": "ĐIỂM SỐ",
+    "scoreLabel": "Điểm số",
     "smePortal": "CỔNG DOANH NGHIỆP",
     "smeShort": "SME",
     "targetYieldRange": "Lợi suất mục tiêu hằng năm",
@@ -1505,7 +1666,7 @@
   },
   "notFound": {
     "body": "Chúng tôi không thể tìm thấy nội dung bạn đang tìm kiếm. URL có thể bị sai hoặc trang đã bị xóa.",
-    "description": "Trang bạn đang tìm không tồn tại hoặc đã được di chuyển. Hãy để chúng tôi đưa bạn trở lại đúng hướng.",
+    "description": "Trang bạn đang tìm không tồn tại hoặc đã được chuyển đi.",
     "goHome": "Về trang chủ",
     "headline": "Có vẻ bạn đã đi nhầm hướng",
     "pageTitle": "Không tìm thấy trang"
@@ -1515,8 +1676,8 @@
     "ariaLabelUnread": "Thông báo, {count} chưa đọc",
     "empty": "Hiện chưa có gì mới.",
     "items": {
-      "applicationApproved": "Đề nghị tài trợ của bạn đã được duyệt.",
-      "applicationRejected": "Đề nghị tài trợ của bạn không được duyệt.",
+      "applicationApproved": "Hồ sơ đề nghị vay của bạn đã được duyệt.",
+      "applicationRejected": "Hồ sơ đề nghị vay của bạn chưa được duyệt.",
       "unknown": "Tài khoản của bạn có cập nhật mới."
     },
     "markAllRead": "Đánh dấu tất cả đã đọc",
@@ -1541,6 +1702,7 @@
     },
     "eyebrow": "Đơn đăng ký dự án",
     "fields": {
+      "address": "Địa chỉ",
       "city": "Thành phố",
       "country": "Quốc gia",
       "durationMonths": "Thời hạn vay",
@@ -1550,7 +1712,7 @@
       "legalName": "Tên pháp lý",
       "loanPurpose": "Mục đích vay",
       "postalCode": "Mã bưu chính",
-      "repaymentPreference": "Hình thức trả nợ",
+      "repaymentPreference": "Cách hoàn trả",
       "requestedAmount": "Số tiền vay (VND)",
       "stateRegion": "Bang / khu vực",
       "street": "Đường",
@@ -1558,11 +1720,12 @@
     },
     "hints": {
       "companySizeDerived": "Được xếp loại {size}",
-      "durationMonths": "Đây là các thời hạn nền tảng hỗ trợ (1-6 tháng). Thời hạn dài hơn giúp giảm mức trả hằng ngày.",
+      "durationMonths": "Kỳ hạn từ 1 đến 6 tháng. Kỳ hạn dài hơn giúp giảm khoản trả hằng ngày nhưng tổng tiền lãi sẽ cao hơn.",
       "durationMonthsRange": "Từ {min} đến {max} tháng",
       "employeeCount": "Số nhân viên toàn thời gian, từ 1 đến 200.",
       "prefilledAddressFromKyb": "Địa chỉ và tỉnh/thành được lấy từ giấy đăng ký kinh doanh đã xác minh của bạn. Vui lòng bổ sung khu vực và mã bưu chính, và chỉnh sửa nếu có sai lệch.",
       "prefilledFromKyb": "Tên pháp lý và mã số thuế được điền sẵn từ giấy đăng ký kinh doanh đã xác minh của bạn. Vui lòng kiểm tra và chỉnh sửa nếu có sai lệch.",
+      "repaymentPreference": "Mọi khoản vốn trên FundLok đều được trả theo cách này. Nếu doanh thu đã xác minh giảm, thời hạn có thể kéo dài và khoản trả hằng ngày sẽ nhỏ hơn.",
       "requestedAmountRange": "Từ {min} đến {max} VND."
     },
     "industries": {
@@ -1598,23 +1761,20 @@
       "city": "Chọn tỉnh / thành phố",
       "country": "Việt Nam",
       "employeeCount": "ví dụ 25",
-      "industry": "Fintech",
-      "legalName": "Acme Holdings Limited",
+      "industry": "Thực phẩm & đồ uống",
+      "legalName": "Công ty TNHH ABC",
       "loanPurpose": "Vốn lưu động cho các đơn hàng mới",
       "postalCode": "100000",
-      "repaymentPreference": "Chọn hình thức trả nợ",
       "requestedAmount": "500000000",
       "state": "Ba Đình",
       "street": "123 Nguyễn Huệ",
       "taxId": "123456789"
     },
     "repaymentOptions": {
-      "endOfTerm": "Trả một lần cuối kỳ",
-      "monthly": "Trả góp hàng tháng",
-      "quarterly": "Trả góp hàng quý"
+      "daily": "Khoản cố định mỗi ngày làm việc"
     },
-    "subtitle": "Gửi các thông tin cơ bản của công ty và chúng tôi sẽ chuyển tài khoản của bạn vào bảng điều khiển sau khi dự án được tạo.",
-    "title": "Đăng ký dự án mà các nhà đầu tư của bạn sẽ thấy.",
+    "subtitle": "Vài thông tin cơ bản để tạo hồ sơ. Bạn có thể xem lại toàn bộ trước khi gửi cho đội ngũ của chúng tôi.",
+    "title": "Giới thiệu về doanh nghiệp của bạn",
     "toasts": {
       "failedDescription": "Vui lòng kiểm tra biểu mẫu và thử lại.",
       "failedTitle": "Gửi thất bại",
@@ -1642,7 +1802,7 @@
   },
   "ratePage": {
     "assumption": {
-      "CIC_BRACKETED": "Chúng tôi chưa biết điểm tín dụng từ trung tâm thông tin, nên ước tính được chạy trên toàn khoảng đã hiệu chỉnh.",
+      "CIC_BRACKETED": "Chúng tôi chưa có điểm tín dụng CIC của bạn, nên ước tính được tính trên toàn bộ khoảng đã hiệu chỉnh.",
       "KYC_ASSUMED_PASS": "Giả định các bước xác minh danh tính và phòng chống rửa tiền đều đạt; điều này được kiểm tra thực tế ở bước sau.",
       "REVENUE_FLAT": "Bạn chưa nhập tháng cao nhất và thấp nhất, nên doanh thu được mô hình hóa đều. Doanh nghiệp có tính mùa vụ có thể ra mức khác.",
       "REVENUE_MODELLED": "Doanh thu theo tháng được mô hình hóa từ tổng doanh thu năm bạn cung cấp, không lấy từ hồ sơ khai thuế.",
@@ -1654,7 +1814,7 @@
     "cogs": "Giá vốn hàng bán, 12 tháng gần nhất",
     "ctaBody": "Tạo tài khoản và chúng tôi sẽ hướng dẫn bạn qua hồ sơ đầy đủ.",
     "ctaButton": "Bắt đầu",
-    "ctaTitle": "Muốn con số chính thức?",
+    "ctaTitle": "Sẵn sàng xem lãi suất thực tế?",
     "duration": "Trong bao lâu",
     "employeeCount": "Số nhân sự",
     "employeeCountHint": "Số nhân sự hiện tại, tính cả chủ doanh nghiệp.",
@@ -1680,8 +1840,6 @@
     "industryPlaceholder": "Chọn ngành của bạn",
     "loanAmount": "Số tiền bạn cần",
     "loanAmountHint": "Từ 20.000.000 ₫ đến 1.000.000.000 ₫.",
-    "months12": "12 tháng",
-    "months6": "6 tháng",
     "notAnOffer": "Đây là ước tính, không phải đề nghị cấp vốn. Lãi suất cuối cùng được xác định sau khi chúng tôi xác minh số liệu và có thể khác. FundLok không phải công ty xếp hạng tín nhiệm.",
     "operatingMonths": "Số tháng đã hoạt động",
     "operatingMonthsHint": "Doanh nghiệp đã hoạt động bao lâu, tính bằng tháng.",
@@ -1699,7 +1857,7 @@
     "scoreLabel": "Điểm doanh nghiệp",
     "scoreOutOf": "trên 100",
     "submit": "Tính lãi suất tham khảo",
-    "subtitle": "Trả lời vài câu hỏi và xem khoảng lãi suất mà engine đưa ra. Không cần giấy tờ, không cần tài khoản, khoảng hai phút.",
+    "subtitle": "Trả lời vài câu hỏi và xem khoảng lãi suất hệ thống đưa ra. Không cần giấy tờ, không cần tài khoản, khoảng hai phút.",
     "title": "Xem lãi suất của bạn",
     "top1": "Khách hàng lớn nhất, % doanh thu",
     "top3": "Top 3 khách hàng, % doanh thu",
@@ -1759,48 +1917,89 @@
     }
   },
   "seo": {
+    "adminDescription": "Khu vực quản trị FundLok.",
+    "adminTitle": "Quản trị",
+    "analyticsDescription": "Theo dõi số vốn đã giải ngân, khoản hoàn trả đã nhận và cách danh mục được phân bổ theo ngành.",
+    "analyticsTitle": "Phân tích",
+    "appearanceDescription": "Chọn chủ đề và tùy chọn hiển thị.",
+    "appearanceTitle": "Giao diện",
     "contactDescription": "Liên hệ FundLok cho các yêu cầu hợp tác, hỗ trợ và câu hỏi chung.",
     "contactTitle": "Liên hệ: Hợp tác, sản phẩm và hỗ trợ",
+    "dashboardDescription": "Quản lý nguồn vốn, xem các dự án và theo dõi khoản đầu tư của bạn trên FundLok.",
+    "dashboardTitle": "Tổng quan",
     "faqDescription": "Cách FundLok cấp vốn: ai có thể đăng ký, cần những giấy tờ gì, điểm doanh nghiệp quyết định lãi suất tham khảo ra sao, hoàn trả hằng ngày hoạt động thế nào, và ai chịu rủi ro.",
     "faqTitle": "FAQ: Cấp vốn, điểm doanh nghiệp và hoàn trả",
+    "forgotPasswordDescription": "Đặt lại mật khẩu tài khoản FundLok. Chúng tôi gửi một liên kết bảo mật qua email để bạn đăng nhập lại trang quản lý doanh nghiệp hoặc nhà đầu tư.",
+    "forgotPasswordTitle": "Đặt lại mật khẩu: khôi phục tài khoản",
     "homeDescription": "Vốn linh hoạt cho doanh nghiệp vừa và nhỏ tại Việt Nam. Nhà đầu tư cấp vốn, doanh nghiệp trả khoản cố định mỗi ngày làm việc, thời hạn có thể giãn khi doanh thu giảm.",
     "homeOgDescription": "Vốn linh hoạt cho doanh nghiệp vừa và nhỏ tại Việt Nam. Nhà đầu tư cấp vốn, doanh nghiệp trả khoản cố định mỗi ngày làm việc, thời hạn có thể giãn khi doanh thu giảm. FundLok không phải ngân hàng.",
     "homeTitle": "FundLok | Nền tảng vốn linh hoạt cho doanh nghiệp SME tại Việt Nam",
+    "investDescription": "Xác nhận số tiền bạn muốn đầu tư vào dự án.",
+    "investTitle": "Đầu tư",
+    "kycDescription": "Xác minh danh tính qua đối tác xác minh của FundLok trước khi tiếp tục.",
+    "kycMobileDescription": "Chụp ảnh căn cước và một ảnh chân dung để xác minh danh tính của bạn.",
+    "kycMobileTitle": "Xác minh danh tính",
+    "kycTitle": "Xác minh danh tính",
+    "loginDescription": "Đăng nhập FundLok để quản lý hồ sơ huy động vốn của doanh nghiệp hoặc danh mục đầu tư của bạn.",
+    "loginTitle": "Đăng nhập vào trang quản lý doanh nghiệp hoặc nhà đầu tư",
+    "profileDescription": "Quản lý thông tin cá nhân và thông tin tài khoản của bạn.",
+    "profileTitle": "Hồ sơ",
+    "projectApplicationDescription": "Gửi hồ sơ đăng ký nhận vốn cho doanh nghiệp của bạn. Trên FundLok, nhà đầu tư cấp vốn và doanh nghiệp trả một khoản cố định mỗi ngày làm việc.",
+    "projectApplicationTitle": "Đăng ký nhận vốn",
+    "projectDetailsDescription": "Xem điểm doanh nghiệp, doanh thu đã xác minh, phí, rủi ro và hạn chót hoàn trả trước khi bạn quyết định.",
+    "projectDetailsTitle": "Chi tiết dự án",
+    "projectsDescription": "Xem các doanh nghiệp đang cần vốn trên FundLok, kèm điểm doanh nghiệp, doanh thu đã xác minh và điều khoản hoàn trả.",
+    "projectsTitle": "Dự án đầu tư",
     "rateDescription": "Trả lời vài câu hỏi và xem khoảng lãi suất tham khảo mà hệ thống của FundLok đưa ra. Không cần giấy tờ, không cần tài khoản.",
     "rateTitle": "Xem lãi suất tham khảo cho doanh nghiệp của bạn",
-    "siteDescription": "FundLok kết nối nhà đầu tư với doanh nghiệp vừa và nhỏ tại Việt Nam qua nền tảng cấp vốn ứng dụng công nghệ, dùng dữ liệu và AI để phù hợp với nhu cầu vốn thực tế của doanh nghiệp.",
+    "registerDescription": "Tạo tài khoản FundLok để đăng ký nhận vốn cho doanh nghiệp hoặc đầu tư vào các cơ hội tín dụng tư nhân.",
+    "registerTitle": "Tạo tài khoản: đăng ký nhận vốn hoặc đầu tư",
+    "resetPasswordDescription": "Đặt mật khẩu mới cho tài khoản FundLok của bạn.",
+    "resetPasswordTitle": "Đặt lại mật khẩu",
+    "securityDescription": "Xem các lớp bảo vệ tài khoản, các thiết bị đang đăng nhập và hoạt động bảo mật gần đây.",
+    "securityTitle": "Bảo mật",
+    "selectRoleDescription": "Cho chúng tôi biết bạn sẽ dùng FundLok để làm gì: đăng ký nhận vốn cho doanh nghiệp hay đầu tư vào các cơ hội tín dụng tư nhân.",
+    "selectRoleTitle": "Chọn loại tài khoản",
+    "siteDescription": "FundLok kết nối nhà đầu tư với doanh nghiệp vừa và nhỏ tại Việt Nam. Doanh nghiệp trả khoản cố định mỗi ngày làm việc, nhà đầu tư xem điểm doanh nghiệp và doanh thu đã xác minh của từng dự án.",
     "siteTitle": "FundLok | Nền tảng vốn linh hoạt cho doanh nghiệp SME",
+    "suspendedTitle": "Tài khoản bị tạm khóa",
+    "termsDescription": "Xem Điều khoản và Điều kiện Dịch vụ cùng Chính sách Bảo vệ Dữ liệu Cá nhân áp dụng cho nền tảng công nghệ tài chính FundLok.",
+    "termsTitle": "Điều khoản và Điều kiện Dịch vụ",
+    "transactionsDescription": "Xem mọi giao dịch trên tài khoản FundLok của bạn: khoản đầu tư, khoản hoàn trả, nạp tiền, rút tiền và phí.",
+    "transactionsTitle": "Giao dịch",
+    "verifyEmailDescription": "Xác minh địa chỉ email để truy cập trang quản lý FundLok của bạn.",
+    "verifyEmailTitle": "Xác minh email",
     "whyUsDescription": "Tầm nhìn của FundLok về cấp vốn cho doanh nghiệp vừa và nhỏ tại Việt Nam và những ghi nhận phía sau, gồm giải thưởng của Chính phủ Úc năm 2024 và chương trình ươm tạo tại SIHUB.",
-    "whyUsTitle": "Vì sao chọn FundLok: Tầm nhìn, ghi nhận và hành trình"
+    "whyUsTitle": "Vì sao chọn FundLok: Tầm nhìn, ghi nhận và chặng đường"
   },
   "specialPage": {
-    "subtitle": "Khám phá tầm nhìn của chúng tôi và điều làm cho các giải pháp vốn linh hoạt trở nên độc đáo.",
+    "subtitle": "Tầm nhìn của chúng tôi, và cách mô hình vận hành cho doanh nghiệp lẫn nhà đầu tư.",
     "title": "Vì sao chọn FundLok",
     "vision": {
       "description": "Khi tài chính phù hợp với doanh nghiệp, các SME sẽ phát triển bền vững hơn, các nhà đầu tư có được niềm tin lớn hơn và nền kinh tế hoạt động hiệu quả hơn.",
       "header": "Tầm nhìn của FundLok",
-      "highlight": "Từ đó, các khoản đầu tư vào SME trở thành tài sản thậm chí còn tốt hơn",
+      "highlight": "Và tín dụng doanh nghiệp trở thành thứ nhà đầu tư có thể đánh giá dựa trên dữ liệu",
       "paragraph1": "Dòng tiền, tốc độ tăng trưởng và áp lực trả nợ không giống nhau đối với mọi doanh nghiệp.",
       "paragraph2": "Đó là lý do tại sao chúng tôi xây dựng các giải pháp vốn linh hoạt thích ứng với từng tình huống thực tế.",
       "smeStory": "FundLok tin rằng mỗi doanh nghiệp SME đều có một câu chuyện khác nhau"
     },
     "whySpecial": {
       "fittingDesc": "Giải pháp tài chính phù hợp, liên kết chặt chẽ với chu kỳ tăng trưởng tự nhiên của doanh nghiệp.",
-      "fittingItem1": "Trả nợ bằng cách sử dụng doanh thu hàng ngày",
-      "fittingItem2": "Kích thước khoản vay & điều khoản thanh toán linh hoạt",
-      "fittingItem3": "Hệ thống tự động, trực quan & có tính hợp tác cao",
+      "fittingItem1": "Trả nợ từ doanh thu hằng ngày",
+      "fittingItem2": "Quy mô vốn phù hợp, kỳ hạn 1–6 tháng",
+      "fittingItem3": "Nộp hồ sơ bằng chứng từ sẵn có",
       "fittingTitle": "Phù hợp với từng SME",
       "header": "Tại sao FundLok đặc biệt?",
-      "safetyDesc": "Cấp vốn được phân hạng rủi ro với dòng trả nợ được giám sát. Lợi nhuận là mục tiêu, không phải cam kết, và nhà đầu tư chịu rủi ro tín dụng.",
+      "safetyDesc": "Cấp vốn cho doanh nghiệp, định giá theo điểm doanh nghiệp. Đây là điểm tham khảo do FundLok tự đánh giá, không phải cam kết. Lợi nhuận là mục tiêu, và nhà đầu tư chịu rủi ro tín dụng.",
       "safetyItem1": "Thu nợ vào mỗi ngày làm việc",
-      "safetyItem2": "Thông tin minh bạch, rõ ràng và có tính kiểm toán cao",
+      "safetyItem2": "Mọi giao dịch đều có mã tham chiếu",
       "safetyItem3": "Khi doanh thu giảm, thời hạn có thể kéo dài để khoản trả hằng ngày nhẹ hơn",
-      "safetyTitle": "Minh bạch cho Nhà đầu tư",
-      "transparencyDesc": "Vận hành không cần trung gian tin cậy, thúc đẩy bởi đầu vào dữ liệu chuẩn và xác thực tự động.",
+      "safetyTitle": "Minh bạch cho nhà đầu tư",
+      "transparencyDesc": "Quyết định dựa trên dữ liệu thuế đã xác minh, mọi bước đều được ghi lại.",
       "transparencyItem1": "Đọc tài liệu, đánh giá khoản vay và tính lãi được tự động hóa",
       "transparencyItem2": "Dữ liệu gửi lên phải từ các nguồn đã được xác thực để bảo vệ tất cả các bên",
-      "transparencyItem3": "Báo cáo tài chính doanh nghiệp & đánh giá sức khỏe khoản vay theo thời gian thực",
-      "transparencyTitle": "Minh bạch, Công khai, Tự động"
+      "transparencyItem3": "Trạng thái trả nợ cập nhật mỗi ngày làm việc",
+      "transparencyTitle": "Minh bạch và tự động"
     }
   },
   "suspended": {
@@ -1812,14 +2011,14 @@
   },
   "termsPage": {
     "backToHome": "Quay lại trang chủ",
-    "badge": "Văn bản pháp lý & Quy định nền tảng",
-    "complianceDesc": "Bảo vệ dữ liệu cá nhân theo Nghị định 13/2023/NĐ-CP được tích hợp vào toàn bộ hệ sinh thái FundLok.",
-    "complianceTitle": "Bảo mật Nghị định 13",
+    "badge": "Văn bản pháp lý",
+    "complianceDesc": "Dữ liệu cá nhân được bảo vệ bằng kiểm soát truy cập và xử lý theo quy định của Việt Nam về bảo vệ dữ liệu cá nhân.",
+    "complianceTitle": "Bảo vệ dữ liệu cá nhân",
     "effectiveDate": "Ngày cập nhật: 22 tháng 9 năm 2026",
     "lastUpdated": "Ngày cập nhật: 22 tháng 9 năm 2026",
     "noResults": "Không tìm thấy điều khoản phù hợp với từ khóa tìm kiếm.",
-    "noticeBanner": "FundLok là nền tảng công nghệ kết nối tài chính. Tiền của Nhà đầu tư được lưu giữ tại các đối tác ngân hàng lưu ký (custodial bank partners) độc lập. FundLok không phải là ngân hàng hay tổ chức tín dụng, không sở hữu tiền của người dùng và chỉ nắm giữ quyền chỉ thị thanh toán theo các điều kiện nghiêm ngặt do ngân hàng thực thi. Hợp đồng tài trợ vốn được xác lập trực tiếp giữa Doanh nghiệp và Nhà đầu tư; Nhà đầu tư là bên cấp vốn và tự chịu rủi ro tín dụng nếu doanh nghiệp không đạt kỳ vọng.",
-    "noticeTitle": "Thông báo về mô hình vận hành và lưu ký độc lập",
+    "noticeBanner": "FundLok là nền tảng công nghệ và thu xếp vốn, hoạt động trong khuôn khổ pháp lý đã được rà soát. Tiền của nhà đầu tư được giữ tại các đối tác ngân hàng lưu ký: FundLok không sở hữu, không có quyền sử dụng số tiền này cho mục đích riêng và chỉ có quyền chỉ thị trong các điều kiện do ngân hàng thực thi. FundLok không phải ngân hàng và không cho vay bằng tiền của mình. Hợp đồng tín dụng được ký giữa nhà đầu tư và doanh nghiệp; nhà đầu tư chịu rủi ro tín dụng.",
+    "noticeTitle": "Cách FundLok vận hành và nơi giữ tiền",
     "searchPlaceholder": "Tìm kiếm điều khoản và quy định...",
     "sections": {
       "contact": "Thông tin liên hệ",

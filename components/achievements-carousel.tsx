@@ -11,6 +11,7 @@ import {
   ExternalLink,
   X,
 } from "lucide-react";
+import { useTranslations } from "@/lib/i18n";
 
 type Achievement = {
   title: string;
@@ -34,6 +35,7 @@ export function AchievementsCarousel({
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [direction, setDirection] = useState<"left" | "right">("right");
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const { t } = useTranslations();
 
   // Auto-reset activeImageIndex when activeAchievement changes
   useEffect(() => {
@@ -75,7 +77,7 @@ export function AchievementsCarousel({
         <button
           onClick={handlePrevAchievement}
           className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-emerald-600/95 hover:bg-emerald-700 text-white flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 z-30 invisible md:visible"
-          aria-label="Previous Achievement"
+          aria-label={t("achievements.previous")}
         >
           <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
         </button>
@@ -155,7 +157,10 @@ export function AchievementsCarousel({
                           >
                             <Image
                               src={img}
-                              alt="Thumbnail"
+                              alt={t("achievements.photoAlt", {
+                                title: currentAchievement.title,
+                                number: idx + 1,
+                              })}
                               fill
                               className="object-cover"
                               sizes="64px"
@@ -171,11 +176,11 @@ export function AchievementsCarousel({
                     <div className="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center mb-3 transition-transform duration-300 group-hover:scale-110">
                       <FileText className="w-8 h-8" />
                     </div>
-                    <h5 className="font-sans font-extrabold text-sm text-foreground mb-1">
+                    <p className="font-sans font-extrabold text-sm text-foreground mb-1">
                       {currentLocale === "vi"
                         ? "Chương trình Toàn cầu"
                         : "Global Program"}
-                    </h5>
+                    </p>
                     <p className="font-sans text-xs text-muted-foreground max-w-50 leading-relaxed mb-2">
                       {currentLocale === "vi"
                         ? "Xem tài liệu chứng nhận chính thức của thế vận hội"
@@ -186,7 +191,7 @@ export function AchievementsCarousel({
                         href={currentAchievement.pdf}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500 text-amber-600 dark:text-amber-500 hover:text-white transition-all duration-300 font-mono text-[10px] font-bold uppercase tracking-wider"
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500 text-amber-600 dark:text-amber-500 hover:text-white transition-all duration-300 text-xs font-semibold"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                         {currentLocale === "vi" ? "Mở PDF" : "Open PDF"}
@@ -199,14 +204,14 @@ export function AchievementsCarousel({
               {/* Right Column: Text & Metadata Content (lg:col-span-7) */}
               <div className="lg:col-span-7 flex flex-col justify-center text-left lg:pl-4">
                 {/* Category tag */}
-                <div className="inline-block px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-mono font-bold tracking-wider uppercase w-fit mb-3">
+                <div className="inline-block px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold tracking-wider uppercase w-fit mb-3">
                   {currentAchievement.category}
                 </div>
 
                 {/* Title */}
-                <h4 className="font-sans text-xl md:text-2xl font-extrabold text-foreground leading-snug tracking-tight mb-1.5">
+                <h3 className="font-sans text-xl md:text-2xl font-extrabold text-foreground leading-snug tracking-tight mb-1.5">
                   {currentAchievement.title}
-                </h4>
+                </h3>
 
                 {/* Subtitle / Organisation */}
                 <p className="font-sans text-xs md:text-sm text-amber-600 dark:text-amber-500 font-bold tracking-wide mb-3">
@@ -214,7 +219,7 @@ export function AchievementsCarousel({
                 </p>
 
                 {/* Paragraph Description */}
-                <p className="font-sans text-sm text-muted-foreground/90 leading-relaxed mb-4">
+                <p className="font-sans text-sm text-muted-foreground leading-relaxed mb-4">
                   {currentAchievement.description}
                 </p>
 
@@ -226,12 +231,12 @@ export function AchievementsCarousel({
                       href={currentAchievement.pdf}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 text-xs font-mono tracking-widest font-bold uppercase transition-all duration-300 shadow-md hover:shadow-emerald-500/15"
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-emerald-500/15"
                     >
                       <FileText className="w-4 h-4" />
                       {currentLocale === "vi"
-                        ? "XEM CHỨNG NHẬN"
-                        : "VIEW CERTIFICATE"}
+                        ? "Xem chứng nhận"
+                        : "View certificate"}
                     </a>
                   )}
 
@@ -243,12 +248,12 @@ export function AchievementsCarousel({
                           currentAchievement.images[activeImageIndex],
                         )
                       }
-                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-slate-900/50 hover:bg-zinc-100 dark:hover:bg-slate-800 text-zinc-700 dark:text-zinc-300 text-xs font-mono tracking-widest font-bold uppercase transition-all duration-300"
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-slate-900/50 hover:bg-zinc-100 dark:hover:bg-slate-800 text-zinc-700 dark:text-zinc-300 text-sm font-semibold transition-all duration-300"
                     >
                       <Maximize2 className="w-4 h-4" />
                       {currentLocale === "vi"
-                        ? "PHÓNG TO ẢNH"
-                        : "ENLARGE PHOTO"}
+                        ? "Phóng to ảnh"
+                        : "Enlarge photo"}
                     </button>
                   )}
                 </div>
@@ -261,7 +266,7 @@ export function AchievementsCarousel({
         <button
           onClick={handleNextAchievement}
           className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-emerald-600/95 hover:bg-emerald-700 text-white flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 z-30 invisible md:visible"
-          aria-label="Next Achievement"
+          aria-label={t("achievements.next")}
         >
           <ChevronRight className="w-5 h-5" strokeWidth={2.5} />
         </button>
@@ -272,17 +277,17 @@ export function AchievementsCarousel({
         <button
           onClick={handlePrevAchievement}
           className="w-10 h-10 rounded-full bg-emerald-600/95 hover:bg-emerald-700 text-white flex items-center justify-center shadow-md transition-all duration-300"
-          aria-label="Previous Achievement"
+          aria-label={t("achievements.previous")}
         >
           <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
         </button>
-        <span className="font-mono text-xs font-bold text-zinc-500">
+        <span className="text-xs font-bold tabular-nums text-muted-foreground">
           {activeAchievement + 1} / {achievements.length}
         </span>
         <button
           onClick={handleNextAchievement}
           className="w-10 h-10 rounded-full bg-emerald-600/95 hover:bg-emerald-700 text-white flex items-center justify-center shadow-md transition-all duration-300"
-          aria-label="Next Achievement"
+          aria-label={t("achievements.next")}
         >
           <ChevronRight className="w-5 h-5" strokeWidth={2.5} />
         </button>
@@ -302,7 +307,7 @@ export function AchievementsCarousel({
             <button
               onClick={() => setLightboxImage(null)}
               className="absolute top-4 right-4 z-50 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all outline-none border border-white/15"
-              aria-label="Close Lightbox"
+              aria-label={t("achievements.closePhoto")}
             >
               <X className="w-6 h-6" />
             </button>
@@ -319,7 +324,7 @@ export function AchievementsCarousel({
               <div className="relative w-full h-full max-w-full max-h-full aspect-4/3 lg:aspect-auto">
                 <Image
                   src={lightboxImage}
-                  alt="Enlarged Achievement Photo"
+                  alt={currentAchievement.title}
                   fill
                   className={`object-contain transition-transform duration-300 ${
                     lightboxImage.includes("sustainability-action-2")

@@ -35,13 +35,15 @@ import { useStartScoreRun } from "@/hooks/use-underwriting";
 import { useTranslations } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format-currency";
 import { formatDate } from "@/lib/format-date";
+import { enumLabel } from "@/lib/enum-labels";
+import { industryLabel } from "@/lib/industry-label";
 import type {
   AdminApplicationDocument,
   AdminScoreRun,
   AdminDecision,
   AdminLoanApplication,
 } from "@/services/admin.service";
-import type { ApiError } from "@/lib/types";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 // The admin project preview.
 //
@@ -104,7 +106,7 @@ export function ProjectPreviewSheet({
       toast({
         variant: "destructive",
         title: t("admin.preview.scoreFailed"),
-        description: (err as ApiError)?.message ?? undefined,
+        description: apiErrorMessage(err, locale, t("common.tryAgain")),
       });
     } finally {
       setScoringId(null);
@@ -115,7 +117,7 @@ export function ProjectPreviewSheet({
     toast({
       variant: "destructive",
       title: t("admin.preview.decisionFailed"),
-      description: (err as ApiError)?.message ?? undefined,
+      description: apiErrorMessage(err, locale, t("common.tryAgain")),
     });
 
   const handleKyb = async (id: string, decision: AdminDecision) => {
@@ -159,10 +161,12 @@ export function ProjectPreviewSheet({
               </h3>
               <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                 <Row label={t("admin.table.status")}>
-                  <Badge variant="secondary">{data.status}</Badge>
+                  <Badge variant="secondary">
+                    {enumLabel(t, "projectStatus", data.status)}
+                  </Badge>
                 </Row>
                 <Row label={t("admin.table.industry")}>
-                  {data.industry || "—"}
+                  {industryLabel(data.industry, t) || "—"}
                 </Row>
                 <Row label={t("projectApplication.fields.taxId")}>
                   {data.tax_id || "—"}
@@ -191,7 +195,7 @@ export function ProjectPreviewSheet({
                   <div className="flex items-center gap-2">
                     <StatusIcon status={data.kyb.status} />
                     <span className="text-sm font-medium">
-                      {data.kyb.status}
+                      {enumLabel(t, "verificationStatus", data.kyb.status)}
                     </span>
                   </div>
                   {data.kyb.rejection_reason && (
@@ -248,7 +252,10 @@ export function ProjectPreviewSheet({
                             {application.purpose || "—"}
                           </p>
                         </div>
-                        <ApprovalBadge value={application.admin_approval} />
+                        <ApprovalBadge
+                          value={application.admin_approval}
+                          t={t}
+                        />
                       </div>
 
                       <p className="text-xs text-muted-foreground">
@@ -396,10 +403,12 @@ function ScoreRunSummary({
           {t("admin.preview.scoreHeading")}
         </span>
         <div className="flex items-center gap-1.5">
-          <Badge variant="secondary">{run.status}</Badge>
+          <Badge variant="secondary">
+            {enumLabel(t, "scoreRunStatus", run.status)}
+          </Badge>
           {run.decision && (
             <Badge variant={blocked ? "destructive" : "secondary"}>
-              {run.decision}
+              {enumLabel(t, "scoreDecision", run.decision)}
             </Badge>
           )}
         </div>
@@ -408,13 +417,13 @@ function ScoreRunSummary({
         <dt className="text-muted-foreground">
           {t("admin.preview.scoreGrade")}
         </dt>
-        <dd className="font-mono text-foreground">
+        <dd className="tabular-nums text-foreground">
           {run.final_grade === null ? "—" : run.final_grade.toFixed(2)}
         </dd>
         <dt className="text-muted-foreground">
           {t("admin.preview.scoreRate")}
         </dt>
-        <dd className="font-mono text-foreground">
+        <dd className="tabular-nums text-foreground">
           {run.interest_rate_pct === null
             ? "—"
             : `${run.interest_rate_pct.toFixed(2)}%`}
@@ -496,7 +505,7 @@ function DocumentList({
                   landed — worth flagging, not hiding. */}
               {!openable && (
                 <Badge variant="secondary" className="ml-auto shrink-0">
-                  {document.status}
+                  {enumLabel(t, "documentStatus", document.status)}
                 </Badge>
               )}
             </button>
@@ -537,20 +546,23 @@ function StatusIcon({ status }: { status: string }) {
 
 function ApprovalBadge({
   value,
+  t,
 }: {
   value: AdminLoanApplication["admin_approval"];
+  t: (key: string) => string;
 }) {
+  const label = enumLabel(t, "approval", value);
   if (value === "APPROVED") {
     return (
       <Badge className="gap-1">
         <ShieldCheck className="h-3 w-3" />
-        {value}
+        {label}
       </Badge>
     );
   }
   return (
     <Badge variant={value === "REJECTED" ? "destructive" : "secondary"}>
-      {value}
+      {label}
     </Badge>
   );
 }

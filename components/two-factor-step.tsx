@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTranslations } from "@/lib/i18n";
 import type { ApiError } from "@/lib/types";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 /**
  * The code prompt shown after a correct password on a 2FA account.
@@ -32,7 +33,7 @@ export function TwoFactorStep({
   isVerifying: boolean;
   error?: ApiError | null;
 }) {
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const [code, setCode] = useState("");
 
   const submit = () => {
@@ -81,7 +82,7 @@ export function TwoFactorStep({
 
       {error && (
         <p className="text-sm text-destructive">
-          {error.message || t("auth.login.twoFactorFailed")}
+          {apiErrorMessage(error, locale, t("auth.login.twoFactorFailed"))}
         </p>
       )}
 

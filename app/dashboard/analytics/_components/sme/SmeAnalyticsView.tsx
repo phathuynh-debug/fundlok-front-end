@@ -165,7 +165,7 @@ export function SmeAnalyticsView() {
         variants={staggerContainerVariants}
         initial="hidden"
         animate="show"
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5 gap-4"
       >
         {tiles.map((tile) => (
           <motion.div key={tile.key} variants={springItemVariants}>
