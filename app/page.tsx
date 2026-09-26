@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+
+import { getSeoStrings, OG_LOCALE } from "@/lib/seo";
 import { cookies } from "next/headers";
 import SiteHeader from "@/components/site-header";
 import { SectionLocator } from "@/components/section-locator";
@@ -101,51 +103,56 @@ const dict = {
   },
 };
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/" },
-  title: "FundLok | Flexible Capital Platform for SMEs in Vietnam",
-  description:
-    "Funding for SMEs in Vietnam. Investors provide the capital, businesses repay a fixed amount each business day, and the total is fixed at signing.",
-  keywords: [
-    "FundLok",
-    "funding for SMEs in Vietnam",
-    "SME funding Vietnam",
-    "MSME funding Vietnam",
-    "business funding Vietnam",
-    "SME funding",
-    "private credit",
-    "flexible capital",
-    "on-chain credit",
-    "investor portal",
-    "flexible funding",
-    "Loc Vuong",
-    "Huy Pham",
-    "Edward Wong",
-    "FundLok CEO",
-    "FundLok CFO",
-    "FundLok CTO",
-    "FundLok founding team",
-    "FundLok founders",
-  ],
-  openGraph: {
-    title: "FundLok | Flexible Capital Platform for SMEs in Vietnam",
-    description:
-      "Funding for SMEs in Vietnam: investors provide the capital, businesses repay a fixed amount each business day, and the total is fixed at signing. FundLok is not a bank.",
-    type: "website",
-    siteName: "FundLok",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "FundLok | Flexible Capital Platform for SMEs in Vietnam",
-    description:
-      "Funding for SMEs in Vietnam: investors provide the capital, businesses repay a fixed amount each business day, and the total is fixed at signing. FundLok is not a bank.",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { locale, seo } = await getSeoStrings();
+
+  return {
+    alternates: { canonical: "/" },
+    title: seo.homeTitle,
+    description: seo.homeDescription,
+    keywords: [
+      "FundLok",
+      "funding for SMEs in Vietnam",
+      "SME funding Vietnam",
+      "MSME funding Vietnam",
+      "business funding Vietnam",
+      "SME funding",
+      "private credit",
+      "flexible capital",
+      "on-chain credit",
+      "investor portal",
+      "flexible funding",
+      "Loc Vuong",
+      "Huy Pham",
+      "Edward Wong",
+      "FundLok CEO",
+      "FundLok CFO",
+      "FundLok CTO",
+      "FundLok founding team",
+      "FundLok founders",
+    ],
+    openGraph: {
+      title: seo.homeTitle,
+      description: seo.homeOgDescription,
+      type: "website",
+      siteName: "FundLok",
+      locale: OG_LOCALE[locale],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: seo.homeTitle,
+      description: seo.homeOgDescription,
+    },
+  };
+}
 
 export default async function Page() {
   const cookieStore = await cookies();
   const cookieValue = cookieStore.get("NEXT_LOCALE")?.value;
-  const locale = cookieValue === "vi" ? "vi" : "en";
+  // Same default as app/layout.tsx and lib/i18n: Vietnamese unless English was
+  // explicitly chosen. This page builds its copy on the server, so it resolves
+  // the cookie itself rather than reading the client context.
+  const locale = cookieValue === "en" ? "en" : "vi";
   const currentLocale = locale;
   const strings = dict[currentLocale];
 

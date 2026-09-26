@@ -1729,6 +1729,21 @@
       "verifyAndEnable": "Xác thực và bật"
     }
   },
+  "seo": {
+    "contactDescription": "Liên hệ FundLok cho các yêu cầu hợp tác, hỗ trợ và câu hỏi chung.",
+    "contactTitle": "Liên hệ: Hợp tác, sản phẩm và hỗ trợ",
+    "faqDescription": "Cách FundLok cấp vốn: ai có thể đăng ký, cần những giấy tờ gì, điểm doanh nghiệp quyết định lãi suất tham khảo ra sao, hoàn trả hằng ngày hoạt động thế nào, và ai chịu rủi ro.",
+    "faqTitle": "FAQ: Cấp vốn, điểm doanh nghiệp và hoàn trả",
+    "homeDescription": "Cấp vốn cho doanh nghiệp vừa và nhỏ tại Việt Nam. Nhà đầu tư là bên cấp vốn, doanh nghiệp hoàn trả một khoản cố định mỗi ngày làm việc, và tổng số tiền được ấn định ngay khi ký.",
+    "homeOgDescription": "Cấp vốn cho doanh nghiệp vừa và nhỏ tại Việt Nam: nhà đầu tư là bên cấp vốn, doanh nghiệp hoàn trả một khoản cố định mỗi ngày làm việc, và tổng số tiền được ấn định ngay khi ký. FundLok không phải ngân hàng.",
+    "homeTitle": "FundLok | Nền tảng vốn linh hoạt cho doanh nghiệp SME tại Việt Nam",
+    "rateDescription": "Trả lời vài câu hỏi và xem khoảng lãi suất tham khảo mà hệ thống của FundLok đưa ra. Không cần giấy tờ, không cần tài khoản.",
+    "rateTitle": "Xem lãi suất tham khảo cho doanh nghiệp của bạn",
+    "siteDescription": "FundLok kết nối nhà đầu tư với doanh nghiệp vừa và nhỏ tại Việt Nam qua nền tảng cấp vốn ứng dụng công nghệ, dùng dữ liệu và AI để phù hợp với nhu cầu vốn thực tế của doanh nghiệp.",
+    "siteTitle": "FundLok | Nền tảng vốn linh hoạt cho doanh nghiệp SME",
+    "whyUsDescription": "Tầm nhìn của FundLok về cấp vốn cho doanh nghiệp vừa và nhỏ tại Việt Nam và những ghi nhận phía sau, gồm giải thưởng của Chính phủ Úc năm 2024 và chương trình ươm tạo tại SIHUB.",
+    "whyUsTitle": "Vì sao chọn FundLok: Tầm nhìn, ghi nhận và hành trình"
+  },
   "specialPage": {
     "subtitle": "Khám phá tầm nhìn của chúng tôi và điều làm cho các giải pháp vốn linh hoạt trở nên độc đáo.",
     "title": "Vì sao chọn FundLok",

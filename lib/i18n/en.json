@@ -1729,6 +1729,21 @@
       "verifyAndEnable": "Verify and turn on"
     }
   },
+  "seo": {
+    "contactDescription": "Reach out to FundLok for partnerships, support, and general inquiries.",
+    "contactTitle": "Contact Us: Partnerships, Product and Support",
+    "faqDescription": "How FundLok funding works: who can apply, what documents you need, how your business score sets the rate, how daily repayment works, and who bears the risk.",
+    "faqTitle": "FAQ: How funding, scores and repayment work",
+    "homeDescription": "Funding for SMEs in Vietnam. Investors provide the capital, businesses repay a fixed amount each business day, and the total is fixed at signing.",
+    "homeOgDescription": "Funding for SMEs in Vietnam: investors provide the capital, businesses repay a fixed amount each business day, and the total is fixed at signing. FundLok is not a bank.",
+    "homeTitle": "FundLok | Flexible Capital Platform for SMEs in Vietnam",
+    "rateDescription": "Answer a few questions about your business and see the indicative rate range FundLok's grading engine returns. No documents, no account.",
+    "rateTitle": "Check Your Rate: Indicative SME Financing Rate",
+    "siteDescription": "FundLok connects investors with SMEs through a technology-led financing platform, using data and AI to support flexible funding aligned with real business needs.",
+    "siteTitle": "FundLok | Flexible Capital Platform for SMEs",
+    "whyUsDescription": "FundLok's vision for SME funding in Vietnam and the recognition behind it, including a 2024 Australian Government award and incubation by SIHUB.",
+    "whyUsTitle": "Why Us: Our Vision, Recognition and Track Record"
+  },
   "specialPage": {
     "subtitle": "Discover our vision and what makes our flexible capital solutions unique.",
     "title": "Why FundLok",
