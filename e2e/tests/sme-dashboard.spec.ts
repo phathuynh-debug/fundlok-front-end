@@ -39,7 +39,7 @@ test.describe("an SME with a project", () => {
     // Raised, and the percentage derived from it.
     await expect(
       page.getByText(
-        normalizeSpaces(formatCurrency(MOCK_SME_FUNDING.funded, "en")),
+        normalizeSpaces(formatCurrency(MOCK_SME_FUNDING.funded, "vi")),
         { exact: false },
       ),
     ).toBeVisible();
@@ -184,7 +184,7 @@ test.describe("an SME whose application was refused", () => {
     // listing documents nobody can upload any more is noise, not a gap.
     const missing = page.getByText(t("dashboard.sme.statusMissingHeading"));
     await expect(missing).toBeVisible();
-    await expect(page.getByText("CIC Credit Report").last()).toBeVisible();
+    await expect(page.getByText(/CIC/).last()).toBeVisible();
     await expect(page.getByText("VAT Declarations")).toHaveCount(0);
     await expect(page.getByText("Financial Statement")).toHaveCount(0);
   });

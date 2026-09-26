@@ -37,12 +37,12 @@ test.describe("investor ledger", () => {
       }),
     ).toBeVisible();
     await expect(
-      page.getByText(normalizeSpaces(formatCurrency(summary.totalIn, "en")), {
+      page.getByText(normalizeSpaces(formatCurrency(summary.totalIn, "vi")), {
         exact: false,
       }),
     ).toBeVisible();
     await expect(
-      page.getByText(normalizeSpaces(formatCurrency(summary.totalOut, "en")), {
+      page.getByText(normalizeSpaces(formatCurrency(summary.totalOut, "vi")), {
         exact: false,
       }),
     ).toBeVisible();
@@ -157,7 +157,7 @@ test.describe("SME ledger", () => {
     // card and once as the ledger row it came from. The card's copy is enough.
     await expect(
       page
-        .getByText(normalizeSpaces(formatCurrency(summary.disbursed, "en")), {
+        .getByText(normalizeSpaces(formatCurrency(summary.disbursed, "vi")), {
           exact: false,
         })
         .first(),

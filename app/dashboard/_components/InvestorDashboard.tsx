@@ -116,10 +116,12 @@ export function InvestorDashboard() {
         variants={staggerContainerVariants}
         initial="hidden"
         animate="show"
-        // Stays at four across even though there are now five KPIs: a VND
-        // figure cannot wrap, and a fifth column narrows every card enough to
-        // clip it. The fifth tile wraps to a second row instead.
-        className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+        // Three across, not four or five: a VND figure cannot wrap, and each
+        // extra column narrows every card enough to clip it. Vietnamese is the
+        // default locale and formats wider than English
+        // ("2.706.268.750 ₫" vs "₫2,706,268,750"), which is what pushed this
+        // from four to three. Remaining tiles wrap to a second row.
+        className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
       >
         {kpis.map((kpi) => (
           <motion.div key={kpi.key} variants={springItemVariants}>

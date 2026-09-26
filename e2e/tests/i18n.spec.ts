@@ -103,7 +103,9 @@ test("the same screen works in English", async ({ page, context }) => {
   await page.goto("/dashboard");
 
   await expect(
-    page.getByRole("heading", { name: t("dashboard.investor.title") }),
+    page.getByRole("heading", {
+      name: t("dashboard.investor.title", undefined, "en"),
+    }),
   ).toBeVisible();
 });
 
@@ -124,7 +126,11 @@ test.describe("switching language on the marketing site", () => {
    */
   test("server-rendered sections follow the switch, not just the chrome", async ({
     page,
+    context,
   }) => {
+    // Vietnamese is the app default, so English is pinned to have something
+    // to switch FROM. The switch itself is what this test is about.
+    await useLocale(context, "en");
     await page.goto("/");
     const bodyText = () => page.locator("body").innerText();
 
@@ -149,7 +155,8 @@ test.describe("switching language on the marketing site", () => {
     );
   });
 
-  test("switches back again", async ({ page }) => {
+  test("switches back again", async ({ page, context }) => {
+    await useLocale(context, "en");
     await page.goto("/");
     await page.getByRole("button", { name: "Vietnamese" }).click();
     await expect(

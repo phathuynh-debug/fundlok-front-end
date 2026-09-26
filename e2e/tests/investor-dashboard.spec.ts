@@ -25,8 +25,8 @@ test("renders the portfolio KPIs from the mock data", async ({ page }) => {
     page.getByRole("heading", { name: t("dashboard.investor.title") }),
   ).toBeVisible();
 
-  const totalInvested = formatCurrency(summary.total_invested, "en");
-  const totalReturns = formatCurrency(summary.total_returns, "en");
+  const totalInvested = formatCurrency(summary.total_invested, "vi");
+  const totalReturns = formatCurrency(summary.total_returns, "vi");
 
   await expect(
     page.getByText(t("dashboard.investor.totalInvested")),
@@ -142,7 +142,7 @@ test.describe("clipped-figure tooltip", () => {
     await page.setViewportSize({ width: 900, height: 900 });
     await page.goto("/dashboard");
 
-    const full = normalizeSpaces(formatCurrency(summary.total_invested, "en"));
+    const full = normalizeSpaces(formatCurrency(summary.total_invested, "vi"));
     const figure = page.getByText(full, { exact: false }).first();
     await expect(figure).toBeVisible();
 
@@ -164,7 +164,7 @@ test.describe("clipped-figure tooltip", () => {
     await page.setViewportSize({ width: 1920, height: 1000 });
     await page.goto("/dashboard");
 
-    const full = normalizeSpaces(formatCurrency(summary.total_invested, "en"));
+    const full = normalizeSpaces(formatCurrency(summary.total_invested, "vi"));
     const figure = page.getByText(full, { exact: false }).first();
 
     const isClipped = await figure.evaluate(
@@ -180,7 +180,7 @@ test.describe("clipped-figure tooltip", () => {
     await page.setViewportSize({ width: 900, height: 900 });
     await page.goto("/dashboard");
 
-    const full = normalizeSpaces(formatCurrency(summary.total_invested, "en"));
+    const full = normalizeSpaces(formatCurrency(summary.total_invested, "vi"));
     const figure = page.getByText(full, { exact: false }).first();
 
     await figure.focus();
