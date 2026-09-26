@@ -58,8 +58,12 @@ The rules that get people in trouble:
 - **Investor listings must show** the score, the verified revenue behind it, how
   fresh that data is, the fees, concentration risks, the data gaps, the
   **backstop date**, and that the investor bears the loss.
-- **Early repayment is "no prepayment penalty", never a discount** — the total
-  repayable is fixed at signing.
+- **Early repayment is "no prepayment penalty", never a discount** — settling
+  early clears the total, it does not reduce it.
+- **When the term stretches, the total goes up.** If revenue drops, the term
+  can stretch out and the daily repayment gets smaller; interest on the extra
+  time raises the total. Never say the total "never rises" or "is unchanged".
+- **Terms are 1 to 6 months.** Six is the maximum.
 
 `fundlok-frontend` governs **how** the code is written; `fundlok-domain` governs
 **what it may say**. Both apply.

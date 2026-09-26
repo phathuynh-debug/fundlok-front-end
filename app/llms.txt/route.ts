@@ -25,7 +25,7 @@ export function GET() {
 
 ## How the funding works
 
-- A business declares a term of 6 or 12 months. Twelve months is the maximum.
+- A business declares a term of 1 to 6 months. Six months is the maximum.
 - Repayment is a fixed amount on each business day, not a monthly instalment.
 - The total repayable is set on the day the contract is signed. A strong
   period never shrinks it or raises the daily amount.

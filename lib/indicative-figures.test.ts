@@ -68,12 +68,12 @@ describe("indicativeFigures", () => {
     const strong = indicativeFigures({
       monthlyRevenue: 2_000_000_000,
       amount: 200_000_000,
-      termMonths: 12,
+      termMonths: 6,
     });
     const weak = indicativeFigures({
       monthlyRevenue: 200_000_000,
       amount: 1_000_000_000,
-      termMonths: 12,
+      termMonths: 6,
     });
     expect(strong.businessScore).toBeGreaterThan(weak.businessScore);
     expect(strong.indicativeRate).toBeLessThan(weak.indicativeRate);

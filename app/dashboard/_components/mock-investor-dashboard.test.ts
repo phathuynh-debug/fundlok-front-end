@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
 
+import { ALLOWED_TERM_MONTHS } from "@/lib/facility-terms";
+
 import {
   backstopDate,
   BACKSTOP_MULTIPLIER,
@@ -26,7 +28,7 @@ const holding = (overrides: Partial<Holding> = {}): Holding => ({
   returned: 0,
   target_return_pct_min: 11,
   target_return_pct_max: 13,
-  term_months: 12,
+  term_months: 6,
   progress_pct: 0,
   next_payout_date: null,
   status: "ACTIVE",
@@ -136,9 +138,9 @@ describe("summarizePortfolio", () => {
 describe("backstopDate", () => {
   it("lands at 1.33x the declared term", () => {
     expect(BACKSTOP_MULTIPLIER).toBe(1.33);
-    // 6 -> round(7.98) = 8 months; 12 -> round(15.96) = 16 months.
+    // 3 -> round(3.99) = 4 months; 6 -> round(7.98) = 8 months.
+    expect(backstopDate("2026-01-15", 3)).toBe("2026-05-15");
     expect(backstopDate("2026-01-15", 6)).toBe("2026-09-15");
-    expect(backstopDate("2026-01-15", 12)).toBe("2027-05-15");
   });
 });
 
@@ -153,10 +155,12 @@ describe("MOCK_HOLDINGS", () => {
     }
   });
 
-  it("only ever declares a 6 or 12 month term", () => {
-    // Handbook §2: twelve is the maximum and we never write longer.
+  it("only ever declares a term of 1 to 6 months", () => {
+    // Six is the maximum and we never write longer.
     for (const held of MOCK_HOLDINGS) {
-      expect([6, 12]).toContain(held.term_months);
+      expect(ALLOWED_TERM_MONTHS as readonly number[]).toContain(
+        held.term_months,
+      );
     }
   });
 

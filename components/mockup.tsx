@@ -574,19 +574,19 @@ export default function Mockup(props: MockupProps) {
 
                     {/* Chart bars */}
                     <div className="h-20 flex items-end justify-between gap-1.5 px-1 py-1">
-                      {[6, 12].map((dur) => {
+                      {[3, 6].map((dur) => {
                         // Midpoint of the target range, only to size the
                         // bar. The figure printed under it is the range.
                         const profit =
                           ((invSize * (targetCentre / 100)) / 12) * dur;
-                        const maxProfit = ((invSize * (17.5 / 100)) / 12) * 12;
+                        const maxProfit = ((invSize * (17.5 / 100)) / 12) * 6;
                         const heightPct = Math.min(
                           100,
                           Math.max(15, (profit / maxProfit) * 150),
                         );
 
                         const isHighlighted =
-                          dur === 6 ? invDuration <= 6 : invDuration > 6;
+                          dur === 3 ? invDuration <= 3 : invDuration > 3;
 
                         return (
                           <div
@@ -932,17 +932,17 @@ export default function Mockup(props: MockupProps) {
                   <div className="bg-zinc-900/20 border border-zinc-900/60 rounded-xl p-2 flex flex-col justify-between flex-1 overflow-hidden">
                     {/* Chart bars */}
                     <div className="h-14 flex items-end justify-between gap-1 px-0.5 pt-2">
-                      {[6, 12].map((dur) => {
+                      {[3, 6].map((dur) => {
                         const profit =
                           ((invSize * (targetCentre / 100)) / 12) * dur;
-                        const maxProfit = ((invSize * (17.5 / 100)) / 12) * 12;
+                        const maxProfit = ((invSize * (17.5 / 100)) / 12) * 6;
                         const heightPct = Math.min(
                           100,
                           Math.max(15, (profit / maxProfit) * 150),
                         );
 
                         const isHighlighted =
-                          dur === 6 ? invDuration <= 6 : invDuration > 6;
+                          dur === 3 ? invDuration <= 3 : invDuration > 3;
 
                         return (
                           <div

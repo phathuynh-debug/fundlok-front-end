@@ -22,7 +22,7 @@
 //     is rating-agency notation and we are not a rating agency (§4).
 //   * Returns are a RANGE, never a bare point figure, and are labelled as
 //     targets rather than outcomes (§3).
-//   * Terms are 6 or 12 months. Twelve is the maximum (§2).
+//   * Terms are 1 to 6 months. Six is the maximum (§2).
 //   * Every position carries its backstop date — 1.33x the declared term (§2).
 //   * The lifecycle includes the ways a facility goes wrong. A dataset where
 //     every position is healthy reads as an implied guarantee (§5), so the
@@ -52,8 +52,9 @@ export type HoldingStatus =
   /** A missed business day raised a warning. Not a default — it moves the
    *  facility to a watchlist so the conversation happens on day one. */
   | "WATCHLIST"
-  /** Verified revenue fell short, so the obligation for that period dropped
-   *  and the facility runs longer. The total owed is unchanged. */
+  /** Verified revenue fell short, so the daily amount for that period dropped
+   *  and the term stretches to make it up. Interest on the extra time raises
+   *  the total repayable. */
   | "RELIEF"
   /** Past the declared term with a balance outstanding: extended with a fee
    *  set so the annualised cost stays what it was at signing. */
@@ -61,7 +62,7 @@ export type HoldingStatus =
   /** Total repayable cleared. */
   | "REPAID"
   /** Cleared ahead of the declared term. No prepayment penalty — and no
-   *  discount either: the total was fixed at signing. */
+   *  discount either: settling early clears the total, it does not reduce it. */
   | "REPAID_EARLY"
   /** Reached the 1.33x backstop; everything outstanding fell due in full and
    *  was settled. */
@@ -97,7 +98,7 @@ export interface Holding {
    */
   target_return_pct_min: number;
   target_return_pct_max: number;
-  /** Declared term: 6 or 12 months only. */
+  /** Declared term: 1 to 6 months. */
   term_months: TermMonths;
   /** Share of the total repayable already received, 0-100. */
   progress_pct: number;
@@ -126,11 +127,11 @@ export const MOCK_HOLDINGS: Holding[] = [
     returned: 218750000,
     target_return_pct_min: 13.0,
     target_return_pct_max: 15.5,
-    term_months: 12,
+    term_months: 6,
     progress_pct: 35,
     next_payout_date: "2026-09-05",
     status: "REPAYING",
-    disbursed_at: "2026-03-05",
+    disbursed_at: "2026-07-02",
     score: 82,
   },
   {
@@ -141,12 +142,12 @@ export const MOCK_HOLDINGS: Holding[] = [
     returned: 46250000,
     target_return_pct_min: 10.5,
     target_return_pct_max: 12.5,
-    term_months: 12,
+    term_months: 6,
     progress_pct: 10,
     next_payout_date: "2026-09-12",
     // Missed a business day. A warning, not a default (§2).
     status: "WATCHLIST",
-    disbursed_at: "2026-07-12",
+    disbursed_at: "2026-08-12",
     score: 74,
   },
   {
@@ -175,7 +176,7 @@ export const MOCK_HOLDINGS: Holding[] = [
     returned: 0,
     target_return_pct_min: 12.0,
     target_return_pct_max: 14.0,
-    term_months: 12,
+    term_months: 6,
     progress_pct: 0,
     next_payout_date: "2026-09-28",
     status: "ACTIVE",
@@ -190,13 +191,14 @@ export const MOCK_HOLDINGS: Holding[] = [
     returned: 152000000,
     target_return_pct_min: 14.5,
     target_return_pct_max: 16.5,
-    term_months: 12,
+    term_months: 6,
     progress_pct: 45,
     next_payout_date: "2026-09-08",
-    // Revenue fell short over the last true-up, so the daily obligation for
-    // that period dropped and the facility runs longer. Total owed unchanged.
+    // Revenue fell short over the last true-up, so the daily amount for that
+    // period dropped and the term stretches to make it up. Interest on the
+    // extra time raises the total repayable.
     status: "RELIEF",
-    disbursed_at: "2026-04-08",
+    disbursed_at: "2026-05-20",
     score: 68,
   },
   {
@@ -241,7 +243,7 @@ export const MOCK_HOLDINGS: Holding[] = [
     returned: 148200000,
     target_return_pct_min: 15.0,
     target_return_pct_max: 17.0,
-    term_months: 12,
+    term_months: 6,
     progress_pct: 57,
     next_payout_date: null,
     status: "WRITTEN_DOWN",

@@ -22,7 +22,7 @@
 // identically on every load.
 //
 // HANDBOOK CONSTRAINTS (fundlok-domain §2, §4):
-//   * Term is 6 or 12 months. Twelve is the maximum.
+//   * Term is 1 to 6 months. Six is the maximum.
 //   * The score is 0-100 and is a reference input, never a rating or a
 //     "grade" — that word is avoided in the data and in the copy, in both
 //     locales.
@@ -66,13 +66,15 @@ export interface SmeFacility {
   /** Principal disbursed, VND. */
   principal: number;
   /**
-   * Everything owed across the term, fixed on the day the contract was signed.
-   * A bad month does not grow it and a good month does not shrink it.
+   * Everything owed across the term, as set on the day the contract was
+   * signed. A good month never shrinks it; if revenue drops and the term
+   * stretches, interest on the extra time is added (stretchedTerm in
+   * lib/facility-terms.ts). This sample facility has not stretched.
    */
   total_obligation: number;
   /** The all-in annual rate, capped at the statutory ceiling. */
   interest_rate_pct: number;
-  /** Declared term: 6 or 12 months only. */
+  /** Declared term: 1 to 6 months. */
   term_months: TermMonths;
   /** When the facility was disbursed — the backstop counts from here. */
   disbursed_at: string;
@@ -111,37 +113,38 @@ export const MOCK_SME_FACILITY: SmeFacility = {
   score: 70.98,
 };
 
-// Five months into a twelve-month term. Revenue share drifts down as revenue
-// grows against a fixed daily amount — the shape an SME should expect.
+// Five months into a six-month term, 6,803,810 x 21 business days collected
+// each month. Revenue share drifts down as revenue grows against a fixed daily
+// amount — the shape an SME should expect.
 export const MOCK_REPAYMENT_MONTHS: RepaymentMonth[] = [
   {
     month: "2026-04",
-    repaid: 76_213_326,
-    repaid_cumulative: 76_213_326,
+    repaid: 142_880_010,
+    repaid_cumulative: 142_880_010,
     revenue_share: 0.31,
   },
   {
     month: "2026-05",
-    repaid: 76_213_326,
-    repaid_cumulative: 152_426_652,
+    repaid: 142_880_010,
+    repaid_cumulative: 285_760_020,
     revenue_share: 0.29,
   },
   {
     month: "2026-06",
-    repaid: 76_213_326,
-    repaid_cumulative: 228_639_978,
+    repaid: 142_880_010,
+    repaid_cumulative: 428_640_030,
     revenue_share: 0.27,
   },
   {
     month: "2026-07",
-    repaid: 76_213_326,
-    repaid_cumulative: 304_853_304,
+    repaid: 142_880_010,
+    repaid_cumulative: 571_520_040,
     revenue_share: 0.26,
   },
   {
     month: "2026-08",
-    repaid: 76_213_326,
-    repaid_cumulative: 381_066_630,
+    repaid: 142_880_010,
+    repaid_cumulative: 714_400_050,
     revenue_share: 0.24,
   },
 ];

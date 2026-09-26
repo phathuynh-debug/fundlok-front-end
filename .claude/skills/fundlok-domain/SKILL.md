@@ -5,7 +5,7 @@ description: >-
   language, from the FundLok Handbook v3 (26 Aug 2026) — what the UI is allowed
   to say and must always show. Covers what FundLok is and is not (not a bank,
   not a lender, not a rating agency), how the rate and the 0–100 score work,
-  the fixed origination total, daily repayment, relief, extension, the 1.33x
+  the origination total, daily repayment, relief, extension, the 1.33x
   backstop, what an investor must see before committing, the four mandatory
   never-say/always-say phrasings (EN + VI), the bilingual rule, and brand
   visuals. Use this skill BEFORE writing or editing any user-facing copy, i18n
@@ -55,13 +55,13 @@ mechanics live in the backend repo's `fundlok-domain` skill.
 | --- | --- |
 | **Rate** | Starts from a reference rate (what commercial banks charge for unsecured lending) and moves with the business's internal score: stronger score → closer to the reference rate. **Capped at the statutory 20%/yr ceiling.** The quoted rate is **all-in — there is no second rate underneath it.** |
 | **Score** | A **0–100 internal assessment** that moves the rate between the reference rate and the ceiling. It is a **reference input to a decision**, never a credit rating. See §4. |
-| **Total repayable** | **Fixed at signing.** Does not grow because a month went badly, does not shrink because a month went well. Only an extension changes it. |
-| **Term** | Declared by the SME — **6 or 12 months. Twelve is the maximum; we never write longer.** |
+| **Total repayable** | **Set at signing.** A strong month never shrinks it. **If revenue drops and the term stretches, interest on the extra time is added, so the total goes up.** Nothing else changes it. |
+| **Term** | Declared by the SME — **1 to 6 months. Six is the maximum; we never write longer.** Same range the grading engine accepts (`LOAN_DURATIONS_MONTHS`). |
 | **Daily repayment** | A **fixed amount each business day** until the total is cleared — small, predictable, matched to a business that takes money in daily. |
-| **Relief (true-up)** | We check the daily amount against verified revenue at intervals. **If revenue fell short, the obligation for that period drops and the facility runs longer. If revenue was strong, we never ask for more.** Relief works in one direction only — down. **Relief extends duration; it never reduces the total owed.** |
+| **Relief (true-up)** | We check the daily amount against verified revenue at intervals. **If revenue fell short, the daily amount for that period drops and the term stretches until the shortfall is repaid. Interest runs on the new, longer term, so the total repayable goes up: less per day, for longer.** If revenue was strong, we never ask for more. Say it as: *if revenue drops, the term can stretch out and the daily repayment gets smaller.* Code: `stretchedTerm()` in `lib/facility-terms.ts`. |
 | **Missed payment** | One missed day raises a **warning** — not punitive, **not a default**. It moves the facility to a **watchlist**, and it exists so the conversation happens on day one, not month six. |
 | **Extension** | If the total is not cleared by the declared term, the facility extends with a fee set so the annualised cost stays what it was at signing. **The investor's expected yield is restored, not increased — nobody profits from the delay.** |
-| **Backstop** | A hard deadline at **1.33 × the declared term** (6mo → ~8mo, 12mo → ~16mo) at which **everything still outstanding falls due in full**. It protects the investor by bounding exposure in time, and **the SME knows the date from the day they sign** — so show it. |
+| **Backstop** | A hard deadline at **1.33 × the declared term** (3mo → ~4mo, 6mo → ~8mo) at which **everything still outstanding falls due in full**. It protects the investor by bounding exposure in time, and **the SME knows the date from the day they sign** — so show it. |
 | **Ending** | Four outcomes: repaid, repaid early, settled at the backstop, or written down. |
 | **Early repayment** | The benefit is **"no prepayment penalty"** — *not* "pay early, pay less". Paying early does **not** reduce the total. **Never sell it as a discount.** |
 | **Revenue evidence** | Tax records — VAT declarations and e-invoices. **The signed electronic original only.** Upload UI must reject PDFs, screenshots and spreadsheets, and say why: those can be edited and prove nothing. |
@@ -125,6 +125,8 @@ Stop and ask if a string is about to do any of these.
 - **Use rating language** in any form (see §4).
 - **Say approval is certain**, that no documents are needed, that there is no
   risk, or that everyone qualifies.
+- **Say the total never rises, stays the same or is unchanged when the term
+  stretches.** It goes up by the interest on the extra time.
 - **Use pressure in collections copy.** The first question on a missed payment
   is *what happened*, not *when will you pay*. Diagnose before escalating.
 - **Show an internal figure** — costs, margins, pricing inputs, projections —
@@ -236,6 +238,7 @@ Before a string, label or screen ships:
 - [ ] No regulatory-framework discussion.
 - [ ] Investor-facing? All of §3 is present, backstop included.
 - [ ] SME-facing? Framed as their outcome, and honest about the backstop date,
-      the fixed total, and that early repayment saves no money.
+      that the total goes up if the term stretches, and that early repayment
+      saves no money.
 - [ ] No internal cost/margin/projection figure on an external surface.
 - [ ] If unsure about legal structure: escalate, don't phrase around it.

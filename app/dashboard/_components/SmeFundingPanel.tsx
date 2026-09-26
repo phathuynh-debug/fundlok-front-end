@@ -188,8 +188,8 @@ export function SmeFundingPanel({ industry }: { industry?: string | null }) {
         </dl>
 
         {/* The two facts an SME is entitled to know from the day they sign:
-            what the total is (and that it never moves), and the date at which
-            anything still outstanding falls due in full. */}
+            what the total is (and that it only goes up if the term stretches),
+            and the date at which anything still outstanding falls due in full. */}
         <dl className="mt-5 grid grid-cols-1 gap-4 border-t border-border pt-5 sm:grid-cols-2">
           <div className="min-w-0">
             <dt className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -197,13 +197,21 @@ export function SmeFundingPanel({ industry }: { industry?: string | null }) {
             </dt>
             <dd className="mt-1 min-w-0">
               <TruncatedFigure
-                value={formatCurrency(funding.total_repayable, locale)}
+                value={formatCurrency(summary.total_repayable, locale)}
                 className="text-lg font-bold text-foreground"
               />
             </dd>
             <p className="mt-0.5 text-xs text-muted-foreground">
               {t("dashboard.smeFunding.fixedAtSigning")}
             </p>
+            {summary.extra_interest > 0 && (
+              <p className="mt-0.5 text-xs font-semibold text-foreground">
+                {t("dashboard.smeFunding.stretchNote", {
+                  amount: formatCurrency(summary.extra_interest, locale),
+                  days: summary.extra_business_days,
+                })}
+              </p>
+            )}
           </div>
           <div className="min-w-0">
             <dt className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
