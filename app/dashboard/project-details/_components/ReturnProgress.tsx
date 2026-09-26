@@ -47,12 +47,6 @@ export function ReturnProgress() {
           </div>
           <div>
             <p className="text-sm text-muted-foreground mb-1">
-              {t("investment.returnProgress.postPrincipalRate")}
-            </p>
-            <p className="text-xl font-bold">2%</p>
-          </div>
-          <div className="col-span-2 md:col-span-1">
-            <p className="text-sm text-muted-foreground mb-1">
               {t("investment.returnProgress.minBiweekly")}
             </p>
             <p className="text-xl font-bold">$1,200</p>
