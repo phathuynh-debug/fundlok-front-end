@@ -41,9 +41,9 @@ const dict = {
     daily: "Daily",
     fixedRate: "Fixed rate",
     variableRate: "Variable rate",
-    processTitle: "A clearer, technology-enabled funding journey",
+    processTitle: "A clearer, technology-enabled way to get funded",
     processSubtitle:
-      "FundLok is designed to make funding more flexible for SMEs and more transparent for investors, combining a customer-friendly experience with automation, data-driven assessment, secure fund handling, and clear repayment tracking.",
+      "FundLok makes funding more flexible for SMEs and more transparent for investors. Automation, data-driven assessment, secure fund handling and clear repayment tracking do the heavy lifting, so the experience stays simple.",
     ourSolution: "Our Solution",
     partnersEyebrow: "BACKED BY",
     partnersTitle: "Partners & programs",
@@ -81,9 +81,9 @@ const dict = {
     daily: "Hàng ngày",
     fixedRate: "Lãi suất cố định",
     variableRate: "Lãi suất thả nổi",
-    processTitle: "Hành trình gọi vốn rõ ràng hơn, hỗ trợ bởi công nghệ",
+    processTitle: "Vay vốn minh bạch hơn nhờ công nghệ",
     processSubtitle:
-      "FundLok được thiết kế để giúp việc gọi vốn linh hoạt hơn cho doanh nghiệp SME và minh bạch hơn cho nhà đầu tư, kết hợp trải nghiệm thân thiện với khách hàng cùng quy trình tự động hóa, thẩm định bằng dữ liệu, quản lý quỹ an toàn và theo dõi hoàn trả rõ ràng.",
+      "FundLok giúp doanh nghiệp SME gọi vốn linh hoạt hơn và giúp nhà đầu tư theo dõi minh bạch hơn. Tự động hóa, thẩm định dựa trên dữ liệu, quản lý dòng vốn an toàn và theo dõi hoàn trả rõ ràng lo phần phức tạp, để trải nghiệm luôn đơn giản.",
     ourSolution: "Giải pháp của chúng tôi",
     partnersEyebrow: "ĐỒNG HÀNH CÙNG",
     partnersTitle: "Đối tác & chương trình",
