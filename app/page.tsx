@@ -189,7 +189,7 @@ export default async function Page() {
 
   return (
     <>
-      <div className="relative min-h-screen w-full bg-background text-foreground overflow-x-hidden flex flex-col justify-between selection:bg-accent/20">
+      <div className="relative min-h-[100dvh] w-full bg-background text-foreground overflow-x-clip flex flex-col justify-between selection:bg-accent/20">
         <SiteHeader />
 
         {/* Right-edge scroll-spy rail showing the section currently in view */}
@@ -200,7 +200,7 @@ export default async function Page() {
           {/* Hero Section Container */}
           <section
             id="hero"
-            className="relative w-full min-h-[calc(100vh-76px)] flex flex-col items-center overflow-hidden scroll-mt-20"
+            className="relative w-full min-h-[calc(100dvh-76px)] flex flex-col items-center overflow-hidden scroll-mt-20"
           >
             {/* Client interactive GUI logic (waves + mockup + animated headers) */}
             <HeroInteractive strings={strings} />
@@ -303,7 +303,7 @@ export default async function Page() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Team Member 1: Huy Pham */}
-              <div className="flex flex-col bg-white/40 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-3xl p-5 shadow-lg backdrop-blur-md hover:scale-[1.01] transition-transform duration-300">
+              <div className="flex flex-col bg-card border border-border rounded-2xl p-5 transition-colors duration-200">
                 <div className="relative aspect-square w-full rounded-2xl overflow-hidden mb-5 bg-slate-100 dark:bg-slate-800">
                   <img
                     src="/images/huy.webp"
@@ -340,7 +340,7 @@ export default async function Page() {
               </div>
 
               {/* Team Member 2: Loc Vuong */}
-              <div className="flex flex-col bg-white/40 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-3xl p-5 shadow-lg backdrop-blur-md hover:scale-[1.01] transition-transform duration-300">
+              <div className="flex flex-col bg-card border border-border rounded-2xl p-5 transition-colors duration-200">
                 <div className="relative aspect-square w-full rounded-2xl overflow-hidden mb-5 bg-slate-100 dark:bg-slate-800">
                   <img
                     src="/images/loc.webp"
@@ -377,7 +377,7 @@ export default async function Page() {
               </div>
 
               {/* Team Member 3: Edward Wong */}
-              <div className="flex flex-col bg-white/40 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-3xl p-5 shadow-lg backdrop-blur-md hover:scale-[1.01] transition-transform duration-300">
+              <div className="flex flex-col bg-card border border-border rounded-2xl p-5 transition-colors duration-200">
                 <div className="relative aspect-square w-full rounded-2xl overflow-hidden mb-5 bg-slate-100 dark:bg-slate-800">
                   <img
                     src="/images/edward.webp"
