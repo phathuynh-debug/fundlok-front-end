@@ -1,7 +1,6 @@
 import {
   ArrowRight,
   Pencil,
-  Sparkles,
   Clock,
   Users,
   ShieldCheck,
@@ -240,7 +239,6 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
               {/* Hero Expected ROI Callout */}
               <div className="flex flex-col gap-1 rounded-xl bg-gradient-to-br from-emerald-500/15 via-emerald-500/10 to-teal-500/5 dark:from-emerald-500/20 dark:via-emerald-500/10 dark:to-teal-500/15 border border-emerald-500/30 p-3 shadow-2xs">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 font-mono flex items-center gap-1">
-                  <Sparkles className="h-3 w-3 text-emerald-500 shrink-0" />
                   {t("dashboard.projectCard.expectedRoi")}
                 </span>
                 <span
