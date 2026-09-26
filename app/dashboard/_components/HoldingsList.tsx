@@ -9,7 +9,6 @@ import {
   Medal,
   Sparkles,
   TrendingUp,
-  Trophy,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -77,7 +76,6 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
         const chrome = getIndustryChrome(holding.industry, "list");
         const Icon = chrome.icon;
         const rank = rankMap.get(holding.id) ?? 1;
-        const isTopYield = rank === 1;
         const isTopThree = rank <= 3;
 
         return (
@@ -121,14 +119,7 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
 
                 <div className="flex flex-wrap items-center gap-2">
                   {/* Ranking Badge */}
-                  {isTopYield ? (
-                    <Badge className="bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-mono text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
-                      <Trophy className="h-3 w-3 text-amber-500 shrink-0" />
-                      <span>
-                        {t("dashboard.investor.holdingTopYield", { rank })}
-                      </span>
-                    </Badge>
-                  ) : isTopThree ? (
+                  {isTopThree ? (
                     <Badge
                       variant="outline"
                       className="bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 font-mono text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1"

@@ -462,7 +462,6 @@
         "WATCHLIST": "Watchlist",
         "WRITTEN_DOWN": "Written down"
       },
-      "holdingTopYield": "Top Yield #{rank}",
       "holdingViewDetails": "View project details",
       "holdingsTitle": "Your Positions ({count})",
       "investorBearsLoss": "The investor bears this loss.",
