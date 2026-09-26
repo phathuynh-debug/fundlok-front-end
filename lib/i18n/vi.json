@@ -351,7 +351,7 @@
       "charts": {
         "allocationDesc": "Vốn của bạn hiện đang nằm ở đâu, theo từng ngành.",
         "allocationTitle": "Vốn theo ngành",
-        "capitalFlowDesc": "Lũy kế đến hiện tại, cả hai đều tính bằng đồng Việt Nam.",
+        "capitalFlowDesc": "Lũy kế đến nay, tính bằng VND.",
         "capitalFlowTitle": "Vốn giải ngân so với lợi nhuận nhận được",
         "capitalStatusDesc": "Tỷ trọng vốn giải ngân theo các giai đoạn khoản vay.",
         "capitalStatusTitle": "Phân bổ trạng thái nguồn vốn",
@@ -377,7 +377,7 @@
         "roi": "Tỷ suất trên vốn",
         "roiHint": "Lợi nhuận so với vốn đã giải ngân"
       },
-      "mockNotice": "Dữ liệu mẫu, hiển thị trong lúc màn hình này đang được hoàn thiện. Trang chưa kết nối với hệ thống backend, nên các số liệu bên dưới không phải danh mục thực tế của bạn.",
+      "mockNotice": "Hệ thống chưa được kết nối với tài khoản thật, danh mục bên dưới là danh mục mẫu.",
       "range": {
         "12M": "12 tháng",
         "3M": "3 tháng",
@@ -397,7 +397,7 @@
         "share": "Tỷ trọng",
         "status": "Trạng thái"
       },
-      "tableHint": "Muốn xem số liệu gốc? Chuyển sang chế độ bảng ở trên — mọi giá trị trên biểu đồ đều có ở đó.",
+      "tableHint": "Muốn xem số liệu gốc? Chuyển sang chế độ bảng ở trên. Mọi giá trị trên biểu đồ đều có ở đó.",
       "title": "Phân tích",
       "view": {
         "charts": "Biểu đồ",
@@ -465,10 +465,10 @@
       "holdingViewDetails": "Xem chi tiết dự án",
       "holdingsTitle": "Khoản đầu tư của bạn ({count})",
       "investorBearsLoss": "Nhà đầu tư chịu khoản lỗ này.",
-      "mockNotice": "Dữ liệu mẫu, hiển thị trong lúc màn hình này đang được hoàn thiện. Trang chưa kết nối với hệ thống backend, nên các khoản đầu tư và số liệu bên dưới không phải danh mục thực tế của bạn.",
-      "noInvestmentsDescription": "Hiện tại bạn chưa có khoản đầu tư nào. Hãy khám phá các cơ hội có sẵn để bắt đầu hành trình đầu tư.",
+      "mockNotice": "Hệ thống chưa được kết nối với tài khoản thật, danh mục bên dưới là danh mục mẫu.",
+      "noInvestmentsDescription": "Bạn chưa đầu tư vào doanh nghiệp nào. Xem các dự án đang gọi vốn để chọn khoản đầu tư đầu tiên.",
       "noInvestmentsTitle": "Chưa có khoản đầu tư nào",
-      "subtitle": "Theo dõi và quản lý các khoản đầu tư hiện tại của bạn",
+      "subtitle": "Số tiền bạn đã đầu tư, đã nhận về và kỳ nhận tiếp theo.",
       "title": "Danh mục đầu tư",
       "totalInvested": "Tổng đã đầu tư",
       "totalReturns": "Tổng lợi nhuận",
@@ -499,7 +499,7 @@
       "pending": "Chưa có",
       "pendingGrading": "Chờ điểm doanh nghiệp",
       "raisedOfTarget": "Đã gọi {raised} / {target}",
-      "sampleNotice": "Số liệu sàn mẫu. Tiến độ huy động, số nhà đầu tư, số ngày còn lại và điểm doanh nghiệp chỉ mang tính minh họa trong lúc API danh sách còn được hoàn thiện — chỉ tên doanh nghiệp, ngành, số tiền cần huy động và mục đích là dữ liệu thật.",
+      "sampleNotice": "Số liệu mẫu. Toàn bộ thông tin trên các thẻ này hiện chỉ để minh họa, chưa phải dữ liệu thật.",
       "score": "Điểm {score}/100",
       "status": {
         "active": "ĐANG HOẠT ĐỘNG",
@@ -1286,7 +1286,7 @@
       ],
       "download": "Tải xuống",
       "downloadingFile": "Đang tải tệp",
-      "reminderText": "Hãy xem xét kỹ tất cả tài liệu trước khi đầu tư. Cân nhắc mức độ rủi ro và điểm doanh nghiệp khi ra quyết định đầu tư, và lưu ý rằng nhà đầu tư chịu khoản lỗ nếu doanh nghiệp không đạt kỳ vọng.",
+      "reminderText": "Hãy đọc kỹ mọi tài liệu trước khi đầu tư. Cân nhắc mức độ rủi ro và điểm doanh nghiệp. Nếu doanh nghiệp không đạt kỳ vọng, bạn là người chịu khoản lỗ.",
       "reminderTitle": "Nhắc nhở thẩm định",
       "startingDownload": "Bắt đầu tải {filename}...",
       "subtitle": "Xem lại các tài liệu SME đã nộp để thẩm định",
@@ -1331,14 +1331,14 @@
       "title": "Đánh giá rủi ro FundLok"
     },
     "tab": {
-      "agreement": "Khi đầu tư, bạn đồng ý rằng tiền được giữ tại các đối tác ngân hàng lưu ký. FundLok không sở hữu số tiền này và không có quyền sử dụng cho mục đích riêng — chúng tôi chỉ có quyền ra lệnh trong các điều kiện do ngân hàng thực thi.",
+      "agreement": "Khi đầu tư, bạn đồng ý rằng tiền được giữ tại các đối tác ngân hàng lưu ký. FundLok không sở hữu số tiền này và không có quyền sử dụng cho mục đích riêng. Chúng tôi chỉ có quyền ra lệnh trong các điều kiện do ngân hàng thực thi.",
       "amountTooHighTitle": "Vượt quá số tiền còn lại",
-      "enterAmount": "Nhập số tiền bạn muốn đầu tư vào cơ hội này",
+      "enterAmount": "Bạn muốn đầu tư bao nhiêu?",
       "funded": "Đã tài trợ",
       "fundingProgress": "Tiến độ gọi vốn",
       "investNow": "Đầu tư ngay",
       "investmentAmount": "Số tiền đầu tư (VND)",
-      "investmentSuccessfulDescription": "Đã đầu tư thành công {amount} vào dự án này!",
+      "investmentSuccessfulDescription": "Bạn đã đầu tư {amount} vào dự án này.",
       "investmentSuccessfulTitle": "Đầu tư thành công",
       "makeInvestment": "Thực hiện đầu tư",
       "maxRemainingAmount": "Số tiền tối đa còn lại bạn có thể đầu tư là {amount}.",
