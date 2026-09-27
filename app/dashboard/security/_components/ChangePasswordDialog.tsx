@@ -81,11 +81,16 @@ export function ChangePasswordDialog({
         },
         onError: (apiError) =>
           setError(
-            apiErrorMessage(
-              apiError,
-              locale,
-              t("security.changePassword.errorGeneric"),
-            ),
+            // 400 is the backend refusing the current password: say so in the
+            // user's language rather than a generic failure, since it is the
+            // one error here the user can fix on the spot.
+            apiError?.status === 400
+              ? t("security.changePassword.errorWrongCurrent")
+              : apiErrorMessage(
+                  apiError,
+                  locale,
+                  t("security.changePassword.errorGeneric"),
+                ),
           ),
       },
     );

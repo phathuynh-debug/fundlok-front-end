@@ -98,7 +98,11 @@ test.describe("managing passkeys", () => {
     await dialog
       .getByRole("button", { name: t("dashboard.security.passkeys.add") })
       .click();
-    await expect(dialog.getByText("Passkey", { exact: true })).toBeVisible();
+    // Scoped to the list: in Vietnamese the dialog title is also "Passkey",
+    // so an unscoped match is ambiguous once the new device renders.
+    await expect(
+      dialog.getByRole("listitem").getByText("Passkey", { exact: true }),
+    ).toBeVisible();
 
     // Close first and wait for it: the dialog lists the registered device in
     // its own <li>, so while it is open the protection-row locator matches two
@@ -199,7 +203,11 @@ test.describe("signing in with a passkey", () => {
     await dialog
       .getByRole("button", { name: t("dashboard.security.passkeys.add") })
       .click();
-    await expect(dialog.getByText("Passkey", { exact: true })).toBeVisible();
+    // Scoped to the list: in Vietnamese the dialog title is also "Passkey",
+    // so an unscoped match is ambiguous once the new device renders.
+    await expect(
+      dialog.getByRole("listitem").getByText("Passkey", { exact: true }),
+    ).toBeVisible();
 
     // 2. Sign out, and back in with nothing but the passkey.
     await context.clearCookies({ name: "access_token" });

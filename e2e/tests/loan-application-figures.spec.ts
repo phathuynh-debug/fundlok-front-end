@@ -74,7 +74,9 @@ test.describe("the revenue step", () => {
 
     const panel = page.getByText(t("dashboard.sme.step2How"));
     await expect(panel).toBeVisible();
-    await expect(page.getByText(/48/)).toHaveCount(0);
+    // A standalone 48, the old file count, not any figure that happens to
+    // contain the digits (a VND total, a day counter).
+    await expect(page.getByText(/\b48\b/)).toHaveCount(0);
     await expect(page.getByText(/\.zip/)).toHaveCount(0);
     // And the heading cannot still promise a document to obtain.
     await expect(

@@ -65,11 +65,16 @@ export function TwoFactorDisableDialog({
         },
         onError: (apiError) =>
           setError(
-            apiErrorMessage(
-              apiError,
-              locale,
-              t("security.twoFactor.disableFailed"),
-            ),
+            // A wrong password is the one failure the user can fix on the
+            // spot, so name it in their language. The backend uses 400 for
+            // other refusals too, hence the check on its message.
+            apiError?.status === 400 && /password/i.test(apiError.message ?? "")
+              ? t("security.twoFactor.disableWrongPassword")
+              : apiErrorMessage(
+                  apiError,
+                  locale,
+                  t("security.twoFactor.disableFailed"),
+                ),
           ),
       },
     );

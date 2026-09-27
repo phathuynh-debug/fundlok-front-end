@@ -104,7 +104,8 @@ test("rejects a wrong password without revealing whether the email exists", asyn
 
   await expect(toast(page, t("auth.login.failedTitle"))).toBeVisible();
   // Same message the stub returns for an unknown address.
-  await expect(toast(page, "Incorrect email or password")).toBeVisible();
+  // Shown in the visitor's language, not the backend's English prose.
+  await expect(toast(page, t("auth.login.failedDescription"))).toBeVisible();
 
   const cookie = (await page.context().cookies()).find(
     (c) => c.name === "access_token",
@@ -121,7 +122,8 @@ test("an unknown email fails the same way", async ({ page }) => {
     .getByRole("button", { name: t("auth.login.submit"), exact: true })
     .click();
 
-  await expect(toast(page, "Incorrect email or password")).toBeVisible();
+  // Shown in the visitor's language, not the backend's English prose.
+  await expect(toast(page, t("auth.login.failedDescription"))).toBeVisible();
 });
 
 test("remember me extends the session cookie beyond the browser session", async ({

@@ -260,7 +260,9 @@ test.describe("change password", () => {
       .getByRole("button", { name: t("security.changePassword.submit") })
       .click();
 
-    await expect(page.getByText("Current password is incorrect")).toBeVisible();
+    await expect(
+      page.getByText(t("security.changePassword.errorWrongCurrent")),
+    ).toBeVisible();
   });
 
   test("succeeds and says how many other sessions were ended", async ({

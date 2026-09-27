@@ -62,7 +62,12 @@ for (const route of PUBLIC_ROUTES) {
 
 test("the landing page links to sign in", async ({ page }) => {
   await page.goto("/");
-  const loginLink = page.getByRole("link", { name: /sign in|log in/i }).first();
+  // The footer link is translated, so match the current locale's label too.
+  const loginLink = page
+    .getByRole("link", {
+      name: new RegExp(`${t("footer.logIn")}|sign in|log in`, "i"),
+    })
+    .first();
   await expect(loginLink).toBeVisible();
 });
 
