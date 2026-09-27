@@ -298,11 +298,15 @@ test.describe("the admin user preview", () => {
       .getByRole("button", { name: t("admin.userPreview.statuses.SUSPENDED") })
       .click();
 
-    // The outcome that matters: the row in the table now reads SUSPENDED.
-    // Scoped to a table cell rather than matching the bare word, which also
-    // appears on the panel's own status badge and button.
+    // The outcome that matters: the row in the table now reads as suspended
+    // (the raw enum is translated for display). Scoped to a table cell rather
+    // than matching the bare word, which also appears on the panel's own
+    // status badge and button.
     await expect(
-      page.getByRole("cell", { name: "SUSPENDED", exact: true }),
+      page.getByRole("cell", {
+        name: t("enums.userStatus.SUSPENDED"),
+        exact: true,
+      }),
     ).toBeVisible();
   });
 

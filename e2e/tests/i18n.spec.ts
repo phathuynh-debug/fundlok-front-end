@@ -135,7 +135,7 @@ test.describe("switching language on the marketing site", () => {
     const bodyText = () => page.locator("body").innerText();
 
     const english = await bodyText();
-    expect(english).toContain("Flexible Capital for MSMEs");
+    expect(english).toContain("Flexible capital for MSMEs");
 
     await page.getByRole("button", { name: "Vietnamese" }).click();
     await expect(
@@ -146,12 +146,14 @@ test.describe("switching language on the marketing site", () => {
     // One assertion per server-rendered section: they are separate reads of
     // the same dictionary and could regress independently.
     expect(vietnamese, "hero").toContain("Sàn vốn linh hoạt");
-    expect(vietnamese, "process section").toContain("Hành trình gọi vốn");
-    expect(vietnamese, "partners section").toContain("Đối tác & Chương trình");
+    expect(vietnamese, "process section").toContain(
+      "Vay vốn minh bạch hơn nhờ công nghệ",
+    );
+    expect(vietnamese, "partners section").toContain("Đối tác & chương trình");
     expect(vietnamese, "team section").toContain("Đội ngũ sáng lập");
     expect(vietnamese, "team bio").toContain("Huy dẫn dắt");
     expect(vietnamese, "old language must be gone").not.toContain(
-      "Flexible Capital for MSMEs",
+      "Flexible capital for MSMEs",
     );
   });
 
@@ -169,7 +171,7 @@ test.describe("switching language on the marketing site", () => {
     await expect(
       page.getByRole("heading", {
         level: 1,
-        name: /Flexible Capital for MSMEs/,
+        name: /Flexible capital for MSMEs/,
       }),
     ).toBeVisible();
   });
