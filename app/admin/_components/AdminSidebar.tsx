@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   Users,
   Briefcase,
+  Calculator,
   ScrollText,
   ServerCog,
   ShieldCheck,
@@ -34,6 +35,11 @@ const navItems: NavItem[] = [
     labelKey: "admin.sidebar.projects",
     href: "/admin/projects",
     icon: Briefcase,
+  },
+  {
+    labelKey: "admin.sidebar.rates",
+    href: "/admin/rates",
+    icon: Calculator,
   },
   {
     labelKey: "admin.sidebar.auditLogs",

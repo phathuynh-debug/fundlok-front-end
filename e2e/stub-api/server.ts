@@ -1040,12 +1040,119 @@ const server = createServer(async (req, res) => {
     return json(res, 201, run);
   }
 
+  // --- Public Rate Calculator ---------------------------------------------
+  if (path === "/api/v1/rates/calculate" && method === "POST") {
+    await readBody(req);
+    return json(res, 200, {
+      inquiry_id: "a98444f0-4591-4cf1-97b7-5f7564d8f161",
+      status: "success",
+      data: {
+        rate_range: {
+          min_rate_monthly: 1.2,
+          max_rate_monthly: 1.8,
+          apr_min: 14.4,
+          apr_max: 21.6,
+        },
+        estimated_monthly_payment: {
+          min: 142933333,
+          max: 147733333,
+        },
+        risk_profile: {
+          tier: "TIER_A",
+          growth_rate_pct: 25.0,
+          ebitda_margin_pct: 17.5,
+          debt_to_revenue_pct: 20.0,
+          is_operating_loss: false,
+        },
+      },
+    });
+  }
+
   // --- Admin ---------------------------------------------------------------
   // Guarded like the real backend: a non-admin session must get a 403 here, so
   // a test can prove the API is not the only thing keeping them out.
   if (path.startsWith("/admin/")) {
     if (user.role !== "ADMIN" && user.role !== "SYSTEM_ADMIN") {
       return detail(res, 403, "Not enough permissions");
+    }
+
+    if (path === "/admin/rates/inquiries" && method === "GET") {
+      const items = [
+        {
+          id: "a98444f0-4591-4cf1-97b7-5f7564d8f161",
+          created_at: "2026-09-26T15:45:00.000Z",
+          created_at_formatted: "26/09/2026 22:45",
+          industry: "retail_fmcg",
+          industry_display: "Retail FMCG",
+          operating_months: 36,
+          employee_count: 25,
+          tenure_staff_display: "36 mos / 25 staff",
+          revenue_l12m: 4000000000,
+          revenue_l12m_formatted: "4.000.000.000 ₫",
+          revenue_prev_12m: 3200000000,
+          cogs_l12m: 2400000000,
+          fixed_costs_l12m: 600000000,
+          variable_costs_l12m: 300000000,
+          yoy_growth_pct: 25.0,
+          yoy_growth_display: "+25.0%",
+          requested_amount: 800000000,
+          tenor_months: 6,
+          loan_ask_display: "800M ₫ / 6 mos",
+          estimated_rate_min: 1.2,
+          estimated_rate_max: 1.8,
+          calculated_rate_display: "1.2% - 1.8% / mo",
+          risk_tier: "TIER_A",
+          tier_display: "Tier A",
+          calculated_monthly_payment: 142933333,
+          calculated_monthly_payment_formatted: "142.933.333 ₫",
+          session_id: "sess_stub_123",
+          ip_address: "127.0.0.1",
+          user_agent: "Mozilla/5.0",
+        },
+      ];
+      return json(res, 200, {
+        total: items.length,
+        page: 1,
+        page_size: 20,
+        items,
+      });
+    }
+
+    const rateInquiryDetailMatch = path.match(
+      /^\/admin\/rates\/inquiries\/([^/]+)$/,
+    );
+    if (rateInquiryDetailMatch && method === "GET") {
+      return json(res, 200, {
+        id: rateInquiryDetailMatch[1],
+        created_at: "2026-09-26T15:45:00.000Z",
+        created_at_formatted: "26/09/2026 22:45",
+        industry: "retail_fmcg",
+        industry_display: "Retail FMCG",
+        operating_months: 36,
+        employee_count: 25,
+        tenure_staff_display: "36 mos / 25 staff",
+        revenue_l12m: 4000000000,
+        revenue_l12m_formatted: "4.000.000.000 ₫",
+        revenue_prev_12m: 3200000000,
+        cogs_l12m: 2400000000,
+        fixed_costs_l12m: 600000000,
+        variable_costs_l12m: 300000000,
+        yoy_growth_pct: 25.0,
+        yoy_growth_display: "+25.0%",
+        requested_amount: 800000000,
+        tenor_months: 6,
+        loan_ask_display: "800M ₫ / 6 mos",
+        estimated_rate_min: 1.2,
+        estimated_rate_max: 1.8,
+        calculated_rate_display: "1.2% - 1.8% / mo",
+        risk_tier: "TIER_A",
+        tier_display: "Tier A",
+        calculated_monthly_payment: 142933333,
+        calculated_monthly_payment_formatted: "142.933.333 ₫",
+        session_id: "sess_stub_123",
+        ip_address: "127.0.0.1",
+        user_agent: "Mozilla/5.0",
+      });
     }
 
     if (path === "/admin/overview" && method === "GET") {

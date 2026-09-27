@@ -100,10 +100,18 @@ export const LOANS_ENDPOINTS = {
     `/loans/applications/${applicationId}/figures`,
 } as const;
 
+export const RATE_CALCULATOR_ENDPOINTS = {
+  calculate: "/api/v1/rates/calculate",
+  inquiries: "/admin/rates/inquiries",
+  inquiryDetail: (id: string) => `/admin/rates/inquiries/${id}`,
+} as const;
+
 export const ADMIN_ENDPOINTS = {
   overview: "/admin/overview",
   auditLogs: "/admin/audit-logs",
   maintenance: "/system/maintenance",
+  rateInquiries: "/admin/rates/inquiries",
+  rateInquiryDetail: (id: string) => `/admin/rates/inquiries/${id}`,
   // The project preview: one company, its funding requests, and the owner's
   // latest KYB attempt — both halves of the two-approval gate in one payload.
   projectDetail: (id: string) => `/admin/projects/${id}`,

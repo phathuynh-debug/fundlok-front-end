@@ -78,7 +78,8 @@
       "overview": "Tổng quan",
       "projects": "Dự án",
       "systemSettings": "Cài đặt hệ thống",
-      "users": "Người dùng"
+      "users": "Người dùng",
+      "rates": "Yêu cầu định phí"
     },
     "stats": {
       "projects": "Dự án",
@@ -142,7 +143,56 @@
       "subtitle": "Quản lý người dùng nền tảng tại đây.",
       "title": "Người dùng"
     },
-    "welcome": "Chào mừng trở lại, {name}."
+    "welcome": "Chào mừng trở lại, {name}.",
+    "ratesDetail": {
+      "businessProfileTitle": "Hồ sơ & Quy mô doanh nghiệp",
+      "debtToRevenue": "Dư nợ / Doanh thu",
+      "ebitdaMargin": "Biên EBITDA",
+      "financialsTitle": "Chỉ số tài chính tự khai",
+      "loanTermsTitle": "Thông số khoản vay & Lãi suất tính toán",
+      "operatingLoss": "Có lỗ hoạt động",
+      "operatingProfit": "Hoạt động sinh lời",
+      "operatingStatus": "Tình trạng hoạt động",
+      "riskMetricsTitle": "Chỉ số rủi ro sơ bộ",
+      "seasonalityTitle": "Tính mùa vụ & Khách hàng trọng yếu",
+      "staff": "nhân sự",
+      "technicalTitle": "Thông tin phiên & Kỹ thuật"
+    },
+    "ratesPage": {
+      "subtitle": "Nhật ký các lượt tính lãi suất tham khảo từ khách hàng trên Landing Page.",
+      "title": "Yêu cầu định phí & Lãi suất"
+    },
+    "ratesSummary": {
+      "lifetimeInquiries": "Lượt định phí được ghi nhận",
+      "pageDemand": "Ước tính từ các yêu cầu",
+      "sampleDemand": "Tổng nhu cầu vốn",
+      "tierA": "Hồ sơ Tier A",
+      "tierADesc": "Hồ sơ chất lượng cao nhất",
+      "tierB": "Hồ sơ Tier B",
+      "tierBDesc": "Hồ sơ đạt chuẩn tài trợ",
+      "totalInquiries": "Tổng số yêu cầu"
+    },
+    "ratesTable": {
+      "actions": "Thao tác",
+      "allIndustries": "Tất cả ngành nghề",
+      "allTiers": "Tất cả phân hạng",
+      "calculatedRate": "Lãi suất tham khảo",
+      "copiedId": "Đã sao chép",
+      "copyId": "Sao chép ID",
+      "dateTime": "Thời gian",
+      "empty": "Chưa có lượt tính lãi suất nào phù hợp.",
+      "industry": "Ngành nghề",
+      "loanAsk": "Yêu cầu vay",
+      "monthlyPayment": "Ước tính góp/tháng",
+      "pageInfo": "Trang {current} / {total} ({count} kết quả)",
+      "refresh": "Làm mới",
+      "revenueL12m": "Doanh thu (L12M)",
+      "searchPlaceholder": "Tìm kiếm theo mã UUID, ngành, session...",
+      "tenureStaff": "Thâm niên / Nhân sự",
+      "tier": "Phân hạng",
+      "viewDetails": "Chi tiết",
+      "yoyGrowth": "Tăng trưởng YoY"
+    }
   },
   "auth": {
     "footer": {
@@ -1862,7 +1912,37 @@
     "top1": "Khách hàng lớn nhất, % doanh thu",
     "top3": "Top 3 khách hàng, % doanh thu",
     "variableCost": "Chi phí biến đổi khác, 12 tháng gần nhất",
-    "worstMonth": "Doanh thu tháng thấp nhất"
+    "worstMonth": "Doanh thu tháng thấp nhất",
+    "applyLoanButton": "Nộp đơn vay chính thức",
+    "aprLabel": "Lãi suất năm (APR)",
+    "copied": "Đã sao chép mã",
+    "copy": "Sao chép",
+    "debtToRevenueLabel": "Dư nợ / Doanh thu",
+    "ebitdaLabel": "Biên EBITDA",
+    "errorCode": {
+      "COSTS_EXCEED_REVENUE": "Chi phí của bạn bằng hoặc lớn hơn doanh thu nên chúng tôi chưa thể ước tính lãi suất. Vui lòng kiểm tra lại các số liệu chi phí.",
+      "HEADCOUNT_OUT_OF_BAND": "Số nhân sự này nằm ngoài quy mô doanh nghiệp chúng tôi có thể đánh giá.",
+      "INDUSTRY_UNSCOREABLE": "Chúng tôi chưa thể đưa ra lãi suất tham khảo cho ngành nghề này.",
+      "NO_RATE_RETURNED": "Số liệu bạn cung cấp chưa đủ để ước tính lãi suất.",
+      "REVENUE_BOTH_YEARS_REQUIRED": "Cần doanh thu của cả hai năm gần nhất. Tăng trưởng theo năm là một phần của ước tính, nên chỉ một năm là chưa đủ.",
+      "REVENUE_NOT_POSITIVE": "Doanh thu 12 tháng gần nhất phải lớn hơn 0.",
+      "REVENUE_TOO_SMALL": "Doanh thu năm này quá nhỏ để mô hình hóa theo từng tháng. Vui lòng kiểm tra lại số liệu.",
+      "UNSCOREABLE": "Chúng tôi chưa thể ước tính lãi suất từ các số liệu này."
+    },
+    "growthLabel": "Tăng trưởng doanh thu",
+    "inquiryIdLabel": "Mã tra cứu định phí",
+    "monthlyPaymentLabel": "Ước tính trả góp hàng tháng",
+    "monthlyRateLabel": "Lãi suất tháng",
+    "months": "tháng",
+    "operatingLossNotice": "Doanh nghiệp đang chịu lỗ hoạt động",
+    "operatingProfitNotice": "Doanh nghiệp vận hành sinh lời ổn định",
+    "operatingStatusLabel": "Sức khỏe dòng tiền",
+    "perMonth": "mỗi tháng",
+    "riskProfileTitle": "Chỉ số hồ sơ sơ bộ",
+    "tierExcellent": "Hồ sơ tối ưu",
+    "tierGood": "Hồ sơ đạt chuẩn",
+    "tierLabel": "Phân hạng hồ sơ",
+    "tierReview": "Cần thẩm định thêm"
   },
   "security": {
     "changePassword": {

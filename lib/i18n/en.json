@@ -78,7 +78,8 @@
       "overview": "Overview",
       "projects": "Projects",
       "systemSettings": "System settings",
-      "users": "Users"
+      "users": "Users",
+      "rates": "Rate Inquiries"
     },
     "stats": {
       "projects": "Projects",
@@ -142,7 +143,56 @@
       "subtitle": "Manage platform users from here.",
       "title": "Users"
     },
-    "welcome": "Welcome back, {name}."
+    "welcome": "Welcome back, {name}.",
+    "ratesDetail": {
+      "businessProfileTitle": "Business Profile & Scale",
+      "debtToRevenue": "Debt to Revenue",
+      "ebitdaMargin": "EBITDA Margin",
+      "financialsTitle": "Self-Reported Financials",
+      "loanTermsTitle": "Loan Terms & Calculation Output",
+      "operatingLoss": "Operating Loss",
+      "operatingProfit": "Profitable Operations",
+      "operatingStatus": "Operating Status",
+      "riskMetricsTitle": "Preliminary Risk Metrics",
+      "seasonalityTitle": "Seasonality & Key Customers",
+      "staff": "staff",
+      "technicalTitle": "Session & Client Telemetry"
+    },
+    "ratesPage": {
+      "subtitle": "Live inquiries and indicative rate calculations submitted from the public rate calculator.",
+      "title": "Rate Inquiries & Calculator Logs"
+    },
+    "ratesSummary": {
+      "lifetimeInquiries": "Recorded rate inquiries",
+      "pageDemand": "Estimated from inquiries",
+      "sampleDemand": "Total Funding Demand",
+      "tierA": "Tier A Inquiries",
+      "tierADesc": "Highest quality profile",
+      "tierB": "Tier B Inquiries",
+      "tierBDesc": "Eligible credit profile",
+      "totalInquiries": "Total Inquiries"
+    },
+    "ratesTable": {
+      "actions": "Actions",
+      "allIndustries": "All Industries",
+      "allTiers": "All Tiers",
+      "calculatedRate": "Calculated Rate",
+      "copiedId": "Copied",
+      "copyId": "Copy ID",
+      "dateTime": "Date & Time",
+      "empty": "No rate inquiries found.",
+      "industry": "Industry",
+      "loanAsk": "Loan Ask",
+      "monthlyPayment": "Monthly Payment",
+      "pageInfo": "Page {current} of {total} ({count} total)",
+      "refresh": "Refresh",
+      "revenueL12m": "Revenue (L12M)",
+      "searchPlaceholder": "Search by UUID, industry, session...",
+      "tenureStaff": "Tenure / Staff",
+      "tier": "Risk Tier",
+      "viewDetails": "Details",
+      "yoyGrowth": "YoY Growth"
+    }
   },
   "auth": {
     "footer": {
@@ -1862,7 +1912,37 @@
     "top1": "Largest customer, % of revenue",
     "top3": "Top 3 customers, % of revenue",
     "variableCost": "Other variable costs, last 12 months",
-    "worstMonth": "Worst month's revenue"
+    "worstMonth": "Worst month's revenue",
+    "applyLoanButton": "Apply for Funding",
+    "aprLabel": "Annual APR",
+    "copied": "Copied reference code",
+    "copy": "Copy",
+    "debtToRevenueLabel": "Debt to Revenue",
+    "ebitdaLabel": "EBITDA Margin",
+    "errorCode": {
+      "COSTS_EXCEED_REVENUE": "Your costs are equal to or greater than your revenue, so we cannot estimate a rate. Check the cost figures and try again.",
+      "HEADCOUNT_OUT_OF_BAND": "That headcount is outside the company sizes we can assess.",
+      "INDUSTRY_UNSCOREABLE": "We cannot give an indicative rate for that industry.",
+      "NO_RATE_RETURNED": "The figures you gave are not enough to estimate a rate.",
+      "REVENUE_BOTH_YEARS_REQUIRED": "We need revenue for both of the last two years. Year-on-year growth is part of the estimate, so a single year is not enough.",
+      "REVENUE_NOT_POSITIVE": "Revenue for the last 12 months has to be greater than zero.",
+      "REVENUE_TOO_SMALL": "That annual revenue is too small for us to model month by month. Check the figure and try again.",
+      "UNSCOREABLE": "We cannot estimate a rate from these figures."
+    },
+    "growthLabel": "YoY Revenue Growth",
+    "inquiryIdLabel": "Inquiry Reference ID",
+    "monthlyPaymentLabel": "Estimated Monthly Repayment",
+    "monthlyRateLabel": "Monthly Rate",
+    "months": "months",
+    "operatingLossNotice": "Operating at a deficit",
+    "operatingProfitNotice": "Healthy & profitable operations",
+    "operatingStatusLabel": "Cash Flow Health",
+    "perMonth": "per month",
+    "riskProfileTitle": "Preliminary Risk Profile",
+    "tierExcellent": "Strong Quality",
+    "tierGood": "Standard Fit",
+    "tierLabel": "Profile Tier",
+    "tierReview": "Under Review"
   },
   "security": {
     "changePassword": {

@@ -3,7 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
-import { AlertCircle, Info, Loader2, Sparkles } from "lucide-react";
+import {
+  AlertCircle,
+  Check,
+  Copy,
+  Info,
+  Loader2,
+  Sparkles,
+} from "lucide-react";
 import SiteHeader from "@/components/site-header";
 import SiteFooter from "@/components/site-footer";
 import { BackgroundBlobs } from "@/components/background-blobs";
@@ -12,9 +19,14 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NumericInput } from "@/components/ui/numeric-input";
-import { digitsOnly } from "@/lib/format-currency";
+import {
+  digitsOnly,
+  formatCurrency,
+  formatCompactCurrency,
+} from "@/lib/format-currency";
 import { useTranslations } from "@/lib/i18n";
-import { useRateEstimate } from "@/hooks/use-loans";
+import { useCalculateRate } from "@/hooks/use-rates";
+import { useTurnstile } from "@/hooks/use-turnstile";
 import { INDUSTRY_OPTIONS } from "@/lib/constants/industries";
 import {
   LOAN_DURATIONS_MONTHS,
@@ -24,7 +36,7 @@ import {
   LOAN_MIN_VND,
 } from "@/lib/constants/loan-constraints";
 import { cn } from "@/lib/utils";
-import { apiErrorMessage } from "@/lib/api-error-message";
+import type { ApiError } from "@/lib/types";
 
 /**
  * The public rate calculator.
@@ -40,6 +52,27 @@ import { apiErrorMessage } from "@/lib/api-error-message";
  * A range, with its assumptions and a not-an-offer line. Anything here that
  * reads as a quote is a compliance defect, not a copy preference.
  */
+
+/**
+ * What the visitor reads when the estimate is refused.
+ *
+ * The engine declines figures it cannot score — costs at or above revenue, a
+ * single year of revenue when growth is a scored factor — and its reason is
+ * English prose written for a log. This page defaults to Vietnamese, so the
+ * server also sends a stable `X-Error-Code`; the prose is the fallback for a
+ * code this build has no copy for, which beats showing nothing.
+ */
+function errorCopy(
+  error: (ApiError & { code?: string }) | null | undefined,
+  t: (key: string) => string,
+): string {
+  if (error?.code) {
+    const key = `ratePage.errorCode.${error.code}`;
+    const copy = t(key);
+    if (copy !== key) return copy;
+  }
+  return error?.message ?? t("ratePage.errorGeneric");
+}
 
 /** Digits only. Accepts the separators a Vietnamese keyboard produces. */
 function parseAmount(raw: string): number | null {
@@ -379,13 +412,40 @@ function ResultSkeleton() {
 
 /** Clearance for the sticky site header, so a scrolled-to panel does not tuck
  *  its own heading underneath it. */
+function getClientSessionId(): string {
+  if (typeof window === "undefined") return "";
+  try {
+    let id = window.sessionStorage.getItem("fundlok_rate_session");
+    if (!id) {
+      id =
+        "sess_" +
+        Math.random().toString(36).substring(2, 10) +
+        "_" +
+        Date.now().toString(36);
+      window.sessionStorage.setItem("fundlok_rate_session", id);
+    }
+    return id;
+  } catch {
+    return "";
+  }
+}
+
 const HEADER_CLEARANCE_PX = 88;
 
 export default function RateClient() {
   const { locale, t } = useTranslations();
-  const estimate = useRateEstimate();
+  const estimate = useCalculateRate();
+  const [copiedId, setCopiedId] = useState(false);
   const reduceMotion = useReducedMotion();
   const resultRef = useRef<HTMLDivElement>(null);
+
+  const copyInquiryId = (id: string) => {
+    if (typeof navigator !== "undefined") {
+      navigator.clipboard.writeText(id);
+      setCopiedId(true);
+      setTimeout(() => setCopiedId(false), 2000);
+    }
+  };
 
   const [industry, setIndustry] = useState("");
   const [operatingMonths, setOperatingMonths] = useState("");
@@ -401,6 +461,17 @@ export default function RateClient() {
   const [worstMonth, setWorstMonth] = useState("");
   const [top1, setTop1] = useState("");
   const [top3, setTop3] = useState("");
+
+  // Cloudflare Turnstile. /rates/calculate is public, unauthenticated, and
+  // inserts a rate_inquiries row per call, so without this the form is an open
+  // write endpoint with a UI attached. The token is single-use — Cloudflare
+  // rejects a replay with `timeout-or-duplicate` — so the widget is reset after
+  // every attempt, not just the successful ones.
+  const {
+    turnstileToken,
+    turnstileContainerRef,
+    reset: resetTurnstile,
+  } = useTurnstile();
 
   // Which fields the visitor has left, plus whether they have tried to submit.
   // Errors stay hidden until one of those is true: flagging "required" on a
@@ -432,7 +503,8 @@ export default function RateClient() {
       ? t("ratePage.error.required")
       : undefined;
 
-  const canSubmit = Object.keys(errors).length === 0 && !!industry.trim();
+  const canSubmit =
+    Object.keys(errors).length === 0 && !!industry.trim() && !!turnstileToken;
 
   // Brings the result panel into view once a band (or an error) has rendered —
   // the mobile case, where the panel sits a full screen below the button that
@@ -479,18 +551,27 @@ export default function RateClient() {
       industry,
       operating_months: Number(parseAmount(operatingMonths) ?? 0),
       employee_count: Number(parseAmount(employeeCount) ?? 0),
-      revenue_last_12m: parseAmount(revenueLast) ?? 0,
-      revenue_prior_12m: parseAmount(revenuePrior) ?? 0,
-      cogs_y1: parseAmount(cogs) ?? 0,
-      fixed_cost_y1: parseAmount(fixedCost) ?? 0,
-      variable_cost_excl_cogs_y1: parseAmount(variableCost) ?? 0,
-      loan_amount: parseAmount(loanAmount) ?? 0,
-      duration_months: duration,
-      revenue_best_month: parseAmount(bestMonth),
-      revenue_worst_month: parseAmount(worstMonth),
-      conc_top1_pct: parseAmount(top1),
-      conc_top3_pct: parseAmount(top3),
+      revenue_l12m: parseAmount(revenueLast) ?? 0,
+      revenue_prev_12m: parseAmount(revenuePrior) ?? 0,
+      cogs_l12m: parseAmount(cogs) ?? 0,
+      fixed_costs_l12m: parseAmount(fixedCost) ?? 0,
+      variable_costs_l12m: parseAmount(variableCost) ?? 0,
+      requested_amount: parseAmount(loanAmount) ?? 0,
+      tenor_months: duration,
+      seasonality: {
+        peak_month_revenue: parseAmount(bestMonth),
+        lowest_month_revenue: parseAmount(worstMonth),
+        top_1_customer_share: parseAmount(top1),
+        top_3_customer_share: parseAmount(top3),
+      },
+      session_id: getClientSessionId(),
+      turnstile_token: turnstileToken,
     });
+    // A Turnstile token is single-use whatever the server does with it, so the
+    // widget is reset on every attempt. Resetting only on success would leave a
+    // spent token in state after a 422, and the retry would fail the captcha
+    // rather than the validation the visitor was actually trying to fix.
+    resetTurnstile();
   };
 
   const numberFormat = locale === "vi" ? "vi-VN" : "en-US";
@@ -815,7 +896,17 @@ export default function RateClient() {
               </div>
             </div>
 
-            <Button type="submit" disabled={!canSubmit} className="w-full">
+            {process.env.NEXT_PUBLIC_DISABLE_TURNSTILE !== "true" && (
+              <div className="flex justify-center">
+                <div ref={turnstileContainerRef} />
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              disabled={!canSubmit || estimate.isPending}
+              className="w-full"
+            >
               {estimate.isPending && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
@@ -845,11 +936,7 @@ export default function RateClient() {
               <div className="flex items-start gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 p-3">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
                 <p className="text-xs leading-relaxed text-foreground">
-                  {apiErrorMessage(
-                    estimate.error,
-                    locale,
-                    t("ratePage.errorGeneric"),
-                  )}
+                  {errorCopy(estimate.error, t)}
                 </p>
               </div>
             )}
@@ -888,99 +975,235 @@ export default function RateClient() {
                     </motion.span>
                     {t("ratePage.resultTitle")}
                   </h2>
-                  {data.provisional && (
-                    <span className="shrink-0 rounded-md border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400">
-                      {t("ratePage.provisional")}
+                  {data.data?.risk_profile?.tier && (
+                    <span
+                      className={cn(
+                        "shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-semibold",
+                        data.data.risk_profile.tier === "TIER_A"
+                          ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                          : data.data.risk_profile.tier === "TIER_B"
+                            ? "border-blue-500/30 bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                            : "border-slate-500/30 bg-slate-500/10 text-slate-600 dark:text-slate-400",
+                      )}
+                    >
+                      {data.data.risk_profile.tier === "TIER_A"
+                        ? `Tier A • ${t("ratePage.tierExcellent")}`
+                        : data.data.risk_profile.tier === "TIER_B"
+                          ? `Tier B • ${t("ratePage.tierGood")}`
+                          : `Tier C • ${t("ratePage.tierReview")}`}
                     </span>
                   )}
                 </motion.div>
 
-                {/* Both as ranges. The visitor's CIC score is unknown, so a
-                    single figure would claim a precision this does not have. */}
+                {/* 2 Primary Figure Cards */}
                 <motion.div
                   variants={resultItemVariants}
                   className="grid gap-4 sm:grid-cols-2"
                 >
-                  <div className="space-y-1">
-                    <p className="stat-label">{t("ratePage.scoreLabel")}</p>
+                  {/* Monthly Rate & APR */}
+                  <div className="rounded-xl border border-border/80 bg-muted/20 p-4 space-y-1">
+                    <p className="stat-label">
+                      {t("ratePage.monthlyRateLabel")}
+                    </p>
                     <div className="flex flex-wrap items-baseline gap-x-1.5">
                       <motion.span
                         variants={figureVariants}
-                        className="origin-left text-2xl font-bold tabular-nums tracking-tight"
+                        className="origin-left text-2xl font-bold tabular-nums tracking-tight text-primary"
                       >
-                        {score(data.score_low)} – {score(data.score_high)}
+                        {data.data.rate_range.min_rate_monthly}% –{" "}
+                        {data.data.rate_range.max_rate_monthly}%
                       </motion.span>
                       <span className="text-xs text-muted-foreground">
-                        {t("ratePage.scoreOutOf")}
+                        / {t("ratePage.months")}
                       </span>
                     </div>
+                    <p className="text-[11px] text-muted-foreground pt-1">
+                      {t("ratePage.aprLabel")}: {data.data.rate_range.apr_min}%
+                      – {data.data.rate_range.apr_max}%
+                    </p>
                   </div>
-                  <div className="space-y-1">
-                    <p className="stat-label">{t("ratePage.rateLabel")}</p>
+
+                  {/* Monthly Payment */}
+                  <div className="rounded-xl border border-border/80 bg-muted/20 p-4 space-y-1">
+                    <p className="stat-label">
+                      {t("ratePage.monthlyPaymentLabel")}
+                    </p>
                     <div className="flex flex-wrap items-baseline gap-x-1.5">
                       <motion.span
                         variants={figureVariants}
-                        className="origin-left text-2xl font-bold tabular-nums tracking-tight"
+                        className="origin-left text-xl font-bold tabular-nums tracking-tight text-foreground"
                       >
-                        {pct(data.rate_low_pct)} – {pct(data.rate_high_pct)}
+                        {formatCompactCurrency(
+                          data.data.estimated_monthly_payment.min,
+                          locale,
+                        )}{" "}
+                        –{" "}
+                        {formatCompactCurrency(
+                          data.data.estimated_monthly_payment.max,
+                          locale,
+                        )}
                       </motion.span>
                       <span className="text-xs text-muted-foreground">
-                        {t("ratePage.perYear")}
+                        / {t("ratePage.months")}
                       </span>
                     </div>
+                    <p className="text-[11px] text-muted-foreground pt-1">
+                      {formatCurrency(
+                        data.data.estimated_monthly_payment.min,
+                        locale,
+                      )}{" "}
+                      –{" "}
+                      {formatCurrency(
+                        data.data.estimated_monthly_payment.max,
+                        locale,
+                      )}
+                    </p>
                   </div>
                 </motion.div>
+
+                {/* Risk Profile Details */}
+                <motion.div
+                  variants={resultItemVariants}
+                  className="space-y-2.5 rounded-xl border border-border/80 bg-muted/10 p-4"
+                >
+                  <p className="text-xs font-bold text-foreground">
+                    {t("ratePage.riskProfileTitle")}
+                  </p>
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div className="rounded-lg border bg-background/50 p-2">
+                      <span className="text-[10px] text-muted-foreground block truncate">
+                        {t("ratePage.growthLabel")}
+                      </span>
+                      <span
+                        className={cn(
+                          "tabular-nums text-xs font-bold",
+                          data.data.risk_profile.growth_rate_pct >= 0
+                            ? "text-emerald-500"
+                            : "text-rose-500",
+                        )}
+                      >
+                        {data.data.risk_profile.growth_rate_pct >= 0 ? "+" : ""}
+                        {data.data.risk_profile.growth_rate_pct}%
+                      </span>
+                    </div>
+
+                    <div className="rounded-lg border bg-background/50 p-2">
+                      <span className="text-[10px] text-muted-foreground block truncate">
+                        {t("ratePage.ebitdaLabel")}
+                      </span>
+                      <span className="tabular-nums text-xs font-bold text-foreground">
+                        {data.data.risk_profile.ebitda_margin_pct}%
+                      </span>
+                    </div>
+
+                    <div className="rounded-lg border bg-background/50 p-2">
+                      <span className="text-[10px] text-muted-foreground block truncate">
+                        {t("ratePage.debtToRevenueLabel")}
+                      </span>
+                      <span className="tabular-nums text-xs font-bold text-foreground">
+                        {data.data.risk_profile.debt_to_revenue_pct}%
+                      </span>
+                    </div>
+                  </div>
+
+                  <p className="text-[11px] text-muted-foreground pt-1">
+                    {data.data.risk_profile.is_operating_loss
+                      ? t("ratePage.operatingLossNotice")
+                      : t("ratePage.operatingProfitNotice")}
+                  </p>
+                </motion.div>
+
+                {/* Inquiry Reference Code */}
+                {data.inquiry_id && (
+                  <motion.div
+                    variants={resultItemVariants}
+                    className="flex items-center justify-between rounded-lg border border-border/60 bg-muted/20 px-3 py-2 text-xs"
+                  >
+                    <span className="text-muted-foreground">
+                      {t("ratePage.inquiryIdLabel")}:
+                    </span>
+                    <div className="flex items-center gap-1.5 tabular-nums">
+                      <span className="font-semibold text-foreground">
+                        {data.inquiry_id.slice(0, 8)}...
+                      </span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyInquiryId(data.inquiry_id)}
+                        className="h-6 w-6 p-0"
+                      >
+                        {copiedId ? (
+                          <Check className="h-3 w-3 text-emerald-500" />
+                        ) : (
+                          <Copy className="h-3 w-3" />
+                        )}
+                      </Button>
+                    </div>
+                  </motion.div>
+                )}
 
                 {/* Read with the number, not below it. */}
                 <motion.p
                   variants={resultItemVariants}
-                  className="text-xs font-medium leading-relaxed text-foreground"
+                  className="text-xs font-medium leading-relaxed text-muted-foreground"
                 >
                   {t("ratePage.notAnOffer")}
                 </motion.p>
 
-                <motion.div
-                  variants={resultItemVariants}
-                  className="space-y-1.5 border-t border-border/60 pt-3"
-                >
-                  <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                    <Info className="h-3 w-3" />
-                    {t("ratePage.assumptionsTitle")}
-                  </div>
-                  <ul className="space-y-1">
-                    {/* Translated by code. `assumptions` is the English
-                        fallback for a code this build predates. */}
-                    {data.assumption_codes.map((code, index) => {
-                      const key = `ratePage.assumption.${code}`;
-                      const translated = t(key);
-                      const line =
-                        translated === key
-                          ? (data.assumptions[index] ?? code)
-                          : translated;
-                      return (
-                        <li
-                          key={code}
-                          className="flex items-start gap-1.5 text-xs leading-relaxed text-muted-foreground"
-                        >
-                          <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-muted-foreground/60" />
-                          <span>{line}</span>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </motion.div>
+                {/* What the engine took on faith. It brackets an unknown
+                    credit-bureau score and assumes identity checks pass, so a
+                    band shown without these reads as a quote when it is an
+                    estimate. Rendered from codes rather than the server's
+                    English prose so a Vietnamese visitor gets Vietnamese. */}
+                {data.data.assumption_codes?.length > 0 && (
+                  <motion.div
+                    variants={resultItemVariants}
+                    className="space-y-2 rounded-lg border border-border/60 bg-muted/20 px-3 py-2.5"
+                  >
+                    <p className="stat-label">
+                      {t("ratePage.assumptionsTitle")}
+                    </p>
+                    <ul className="space-y-1.5">
+                      {data.data.assumption_codes.map((code) => {
+                        const key = `ratePage.assumption.${code}`;
+                        const copy = t(key);
+                        // An unrecognised code would otherwise print its own
+                        // lookup key on a public page.
+                        if (copy === key) return null;
+                        return (
+                          <li
+                            key={code}
+                            className="flex gap-1.5 text-[11px] leading-relaxed text-muted-foreground"
+                          >
+                            <span
+                              aria-hidden
+                              className="text-muted-foreground/60"
+                            >
+                              •
+                            </span>
+                            <span>{copy}</span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </motion.div>
+                )}
 
+                {/* Call to action */}
                 <motion.div
                   variants={resultItemVariants}
-                  className="rounded-xl border border-border/70 bg-muted/20 p-4"
+                  className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-2"
                 >
-                  <p className="text-sm font-bold">{t("ratePage.ctaTitle")}</p>
+                  <p className="text-sm font-bold text-foreground">
+                    {t("ratePage.ctaTitle")}
+                  </p>
                   <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
                     {t("ratePage.ctaBody")}
                   </p>
-                  <Button asChild size="sm" className="mt-3">
-                    <Link href="/login?mode=register">
-                      {t("ratePage.ctaButton")}
+                  <Button asChild size="sm" className="mt-2 w-full sm:w-auto">
+                    <Link href="/project-application">
+                      {t("ratePage.applyLoanButton")}
                     </Link>
                   </Button>
                 </motion.div>
