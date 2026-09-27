@@ -408,6 +408,27 @@ function detail(res: ServerResponse, status: number, message: string) {
   json(res, status, { detail: message });
 }
 
+const STUB_INVESTOR_LEAD_ID = "7c1f0c52-2f5e-4b8f-9a0e-3d1f5a9b2c10";
+
+function stubInvestorEstimate(tier: string) {
+  const byTier: Record<string, [number, number, number, number]> = {
+    conservative: [12.8, 0.5, 9.8, 16.12],
+    balanced: [14.0, 1.0, 10.5, 17.27],
+    growth: [15.2, 2.0, 10.7, 17.6],
+  };
+  const [loan, loss, net, apy] = byTier[tier] ?? byTier.balanced;
+  return {
+    loan_rate_pct: loan,
+    expected_loss_pct: loss,
+    fee_pct: 2.5,
+    net_per_loan_pct: net,
+    net_apy_pct: apy,
+    estimated_return_vnd: Math.round(1_000_000_000 * (apy / 100)),
+    avg_loan_months: 4,
+    capital_turns: 3,
+  };
+}
+
 async function readBody(
   req: IncomingMessage,
 ): Promise<Record<string, unknown>> {
@@ -613,6 +634,86 @@ const server = createServer(async (req, res) => {
     return json(res, 200, withOnboarding(req, STUB_USERS[asUser]), {
       "set-cookie": sessionCookie(asUser, 60 * 60),
     });
+  }
+
+  // The rate calculator and the investor tab are public on the real backend,
+  // so they are answered BEFORE the session guard below. Behind it, an
+  // anonymous /rate visitor got a 401 here that production never returns.
+  // --- Public Rate Calculator ---------------------------------------------
+  if (path === "/api/v1/rates/calculate" && method === "POST") {
+    await readBody(req);
+    return json(res, 200, {
+      inquiry_id: "a98444f0-4591-4cf1-97b7-5f7564d8f161",
+      status: "success",
+      data: {
+        rate_range: {
+          min_rate_monthly: 1.2,
+          max_rate_monthly: 1.8,
+          apr_min: 14.4,
+          apr_max: 21.6,
+        },
+        estimated_monthly_payment: {
+          min: 142933333,
+          max: 147733333,
+        },
+        risk_profile: {
+          tier: "TIER_A",
+          growth_rate_pct: 25.0,
+          ebitda_margin_pct: 17.5,
+          debt_to_revenue_pct: 20.0,
+          is_operating_loss: false,
+        },
+      },
+    });
+  }
+
+  // --- Investor tab of /rate --------------------------------------------------
+  // Figures are the prototype's locked scenario, so a spec can assert the
+  // page renders the server's walk-down rather than computing its own.
+  if (path === "/api/v1/rates/investor/tiers" && method === "GET") {
+    return json(res, 200, {
+      tiers: [
+        { risk_tier: "conservative", loan_rate_pct: 12.8 },
+        { risk_tier: "balanced", loan_rate_pct: 14.0 },
+        { risk_tier: "growth", loan_rate_pct: 15.2 },
+      ],
+    });
+  }
+
+  if (path === "/api/v1/rates/investor/leads" && method === "POST") {
+    const body = await readBody(req);
+    // The real backend 422s without both consents; the stub does too, so a
+    // spec proves the page actually sends them.
+    if (
+      body.acknowledged_illustrative !== true ||
+      body.consent_contact !== true ||
+      !body.full_name ||
+      !body.email
+    ) {
+      return detail(res, 422, "consents and contact details are required");
+    }
+    return json(res, 201, {
+      lead_id: STUB_INVESTOR_LEAD_ID,
+      reference: "FL-STUB42",
+      estimate: stubInvestorEstimate(String(body.risk_tier)),
+    });
+  }
+
+  const investorEstimateMatch = path.match(
+    /^\/api\/v1\/rates\/investor\/leads\/([^/]+)\/(estimate|signup)$/,
+  );
+  if (investorEstimateMatch && method === "POST") {
+    const body = await readBody(req);
+    if (investorEstimateMatch[1] !== STUB_INVESTOR_LEAD_ID) {
+      return detail(res, 404, "Enquiry not found");
+    }
+    if (investorEstimateMatch[2] === "signup") {
+      return json(res, 200, {
+        reference: "FL-STUB42",
+        signed_up_at: "2026-09-27T08:00:00.000Z",
+      });
+    }
+    return json(res, 200, stubInvestorEstimate(String(body.risk_tier)));
   }
 
   // --- Everything below needs a session ------------------------------------
@@ -1040,40 +1141,47 @@ const server = createServer(async (req, res) => {
     return json(res, 201, run);
   }
 
-  // --- Public Rate Calculator ---------------------------------------------
-  if (path === "/api/v1/rates/calculate" && method === "POST") {
-    await readBody(req);
-    return json(res, 200, {
-      inquiry_id: "a98444f0-4591-4cf1-97b7-5f7564d8f161",
-      status: "success",
-      data: {
-        rate_range: {
-          min_rate_monthly: 1.2,
-          max_rate_monthly: 1.8,
-          apr_min: 14.4,
-          apr_max: 21.6,
-        },
-        estimated_monthly_payment: {
-          min: 142933333,
-          max: 147733333,
-        },
-        risk_profile: {
-          tier: "TIER_A",
-          growth_rate_pct: 25.0,
-          ebitda_margin_pct: 17.5,
-          debt_to_revenue_pct: 20.0,
-          is_operating_loss: false,
-        },
-      },
-    });
-  }
-
   // --- Admin ---------------------------------------------------------------
   // Guarded like the real backend: a non-admin session must get a 403 here, so
   // a test can prove the API is not the only thing keeping them out.
   if (path.startsWith("/admin/")) {
     if (user.role !== "ADMIN" && user.role !== "SYSTEM_ADMIN") {
       return detail(res, 403, "Not enough permissions");
+    }
+
+    if (path === "/admin/rates/investor-leads" && method === "GET") {
+      const items = [
+        {
+          id: STUB_INVESTOR_LEAD_ID,
+          reference: "FL-STUB42",
+          created_at: "2026-09-27T07:30:00.000Z",
+          full_name: "Trần Thị Nhà Đầu Tư",
+          email: "investor.lead@example.com",
+          phone: "0901 234 567",
+          locale: "vi",
+          amount_vnd: 1000000000,
+          commitment_months: 12,
+          risk_tier: "balanced",
+          reinvestment_cadence: "monthly",
+          bank_rate_pct: 12.0,
+          loan_rate_pct: 14.0,
+          net_per_loan_pct: 10.5,
+          net_apy_pct: 17.27,
+          estimated_return_vnd: 172704000,
+          acknowledged_illustrative_at: "2026-09-27T07:29:00.000Z",
+          consented_contact_at: "2026-09-27T07:30:00.000Z",
+          signed_up_at: "2026-09-27T07:35:00.000Z",
+          signup_amount_vnd: 1000000000,
+          signup_commitment_months: 12,
+          signup_risk_tier: "growth",
+          signup_reinvestment_cadence: "daily",
+          signup_net_apy_pct: 22.1,
+          session_id: "sess_stub_456",
+          ip_address: "127.0.0.1",
+          user_agent: "Mozilla/5.0",
+        },
+      ];
+      return json(res, 200, { total: 1, page: 1, page_size: 15, items });
     }
 
     if (path === "/admin/rates/inquiries" && method === "GET") {

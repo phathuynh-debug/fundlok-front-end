@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { motion, useReducedMotion, type Variants } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   AlertCircle,
   Check,
@@ -15,15 +15,18 @@ import SiteHeader from "@/components/site-header";
 import SiteFooter from "@/components/site-footer";
 import { BackgroundBlobs } from "@/components/background-blobs";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NumericInput } from "@/components/ui/numeric-input";
+import { AmountInput, parseAmount } from "./amount-input";
+import { InvestorPanel } from "./investor-panel";
 import {
-  digitsOnly,
-  formatCurrency,
-  formatCompactCurrency,
-} from "@/lib/format-currency";
+  ResultBurst,
+  figureVariants,
+  resultItemVariants,
+  resultVariants,
+} from "./result-motion";
+import { formatCurrency, formatCompactCurrency } from "@/lib/format-currency";
 import { useTranslations } from "@/lib/i18n";
 import { useCalculateRate } from "@/hooks/use-rates";
 import { useTurnstile } from "@/hooks/use-turnstile";
@@ -72,93 +75,6 @@ function errorCopy(
     if (copy !== key) return copy;
   }
   return error?.message ?? t("ratePage.errorGeneric");
-}
-
-/** Digits only. Accepts the separators a Vietnamese keyboard produces. */
-function parseAmount(raw: string): number | null {
-  const normalized = raw.trim().replace(/[.,\s]/g, "");
-  if (!normalized) return null;
-  const value = Number(normalized);
-  return Number.isFinite(value) ? value : null;
-}
-
-/**
- * Thousand separators, in the reader's convention: "400.000.000" in Vietnamese,
- * "400,000,000" in English.
- *
- * Grouped with a regex rather than `toLocaleString`, which would route through
- * a double. VND amounts run to 13 digits here and a pasted value could be
- * longer; regex grouping is exact at any length and never rounds a figure the
- * applicant typed.
- */
-function groupDigits(digits: string, locale: string): string {
-  const separator = locale === "vi" ? "." : ",";
-  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, separator);
-}
-
-/**
- * A money field that formats as you type.
- *
- * State holds digits only; the separators exist just for reading. Formatting
- * on every keystroke would otherwise drop the caret to the end mid-edit — fine
- * while appending, maddening when correcting a digit in the middle — so the
- * caret is re-placed after the same NUMBER OF DIGITS it preceded, which is
- * stable across the separators shifting around it.
- */
-function AmountInput({
-  value,
-  onChange,
-  locale,
-  placeholder,
-  invalid,
-  onBlur,
-}: {
-  value: string;
-  onChange: (digits: string) => void;
-  locale: string;
-  placeholder?: string;
-  invalid?: boolean;
-  onBlur?: () => void;
-}) {
-  const ref = useRef<HTMLInputElement>(null);
-  const caretDigits = useRef<number | null>(null);
-
-  useEffect(() => {
-    const input = ref.current;
-    const target = caretDigits.current;
-    if (!input || target === null) return;
-    caretDigits.current = null;
-
-    const formatted = input.value;
-    let seen = 0;
-    let position = formatted.length;
-    for (let i = 0; i < formatted.length; i++) {
-      if (seen === target) {
-        position = i;
-        break;
-      }
-      if (/\d/.test(formatted[i])) seen += 1;
-    }
-    input.setSelectionRange(position, position);
-  }, [value]);
-
-  return (
-    <Input
-      ref={ref}
-      inputMode="numeric"
-      value={groupDigits(value, locale)}
-      placeholder={placeholder}
-      aria-invalid={invalid}
-      onBlur={onBlur}
-      onChange={(event) => {
-        const caret = event.target.selectionStart ?? event.target.value.length;
-        caretDigits.current = digitsOnly(
-          event.target.value.slice(0, caret),
-        ).length;
-        onChange(digitsOnly(event.target.value));
-      }}
-    />
-  );
 }
 
 const DURATIONS = LOAN_DURATIONS_MONTHS;
@@ -275,108 +191,6 @@ function validate(v: Values, t: (key: string) => string): Errors {
   return errors;
 }
 
-/* --------------------------------------------------------------------------
- * Result reveal
- *
- * Pressing Calculate is the one moment on this page worth marking: the visitor
- * has typed nine figures and is owed a payoff. The reveal is deliberately
- * DECORATIVE ONLY — nothing here adds or emphasises copy. A band is indicative
- * and provisional, so a flourish that read as "approved" would be a compliance
- * defect (see this file's header), which is why the celebration lives in motion
- * and never in words, and why the not-an-offer line keeps its place in the
- * stagger rather than being pushed below the fold.
- * ------------------------------------------------------------------------ */
-
-const resultVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.08, delayChildren: 0.04 },
-  },
-};
-
-const resultItemVariants: Variants = {
-  hidden: { opacity: 0, y: 12 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { type: "spring", stiffness: 260, damping: 22 },
-  },
-};
-
-/** The two headline figures overshoot slightly on the way in — the rest of the
- *  panel only rises. */
-const figureVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.82 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { type: "spring", stiffness: 340, damping: 15 },
-  },
-};
-
-/** Precomputed so the burst is identical on every run and costs nothing to
- *  render — a random spray would also re-randomise on every React re-render. */
-const BURST_PIECES = Array.from({ length: 16 }, (_, index) => {
-  const angle = (index / 16) * Math.PI * 2;
-  const distance = 52 + (index % 4) * 18;
-  return {
-    id: index,
-    x: Math.cos(angle) * distance,
-    y: Math.sin(angle) * distance * 0.7,
-    delay: (index % 5) * 0.025,
-  };
-});
-
-const BURST_COLORS = [
-  "bg-emerald-400",
-  "bg-emerald-500/70",
-  "bg-amber-400/80",
-] as const;
-
-/** One-shot confetti behind the result heading. Purely decorative: aria-hidden
- *  so a screen reader never meets it, and not rendered at all for a visitor who
- *  has asked for reduced motion. */
-function ResultBurst() {
-  return (
-    <div
-      aria-hidden
-      className="pointer-events-none absolute left-1/2 top-6 z-0 h-0 w-0"
-    >
-      {BURST_PIECES.map((piece) => (
-        <motion.span
-          key={piece.id}
-          className={cn(
-            "absolute h-1.5 w-1.5 rounded-full",
-            BURST_COLORS[piece.id % BURST_COLORS.length],
-          )}
-          // Single-value targets, not keyframe arrays: the piece starts visible
-          // at the origin and flies outward as it fades. Same shape of animation
-          // the rest of this page already uses.
-          initial={{ opacity: 1, scale: 1, x: 0, y: 0 }}
-          animate={{ opacity: 0, scale: 0.4, x: piece.x, y: piece.y }}
-          transition={{
-            duration: 1,
-            delay: piece.delay,
-            ease: "easeOut",
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-/**
- * What the result panel shows while the engine is thinking.
- *
- * Shaped like the answer it is waiting for: heading, two figure blocks, the
- * not-an-offer line, the assumptions list. A spinner would tell the visitor
- * that something is happening; this tells them what is about to arrive, and
- * the panel does not change height when it does.
- *
- * `bg-muted`, not the Skeleton default: `--accent` is the emerald brand colour
- * in light mode, so the stock component pulses bright green.
- */
 function ResultSkeleton() {
   const bar = "bg-muted";
   return (
@@ -432,7 +246,30 @@ function getClientSessionId(): string {
 
 const HEADER_CLEARANCE_PX = 88;
 
-export default function RateClient() {
+type Audience = "sme" | "investor";
+
+export default function RateClient({
+  initialAudience = "sme",
+}: {
+  initialAudience?: Audience;
+}) {
+  const [audience, setAudience] = useState<Audience>(initialAudience);
+  // Mounted on first visit, then kept (hidden) so switching back and forth
+  // keeps what the visitor typed, the lead, and the live estimate.
+  const [investorMounted, setInvestorMounted] = useState(
+    initialAudience === "investor",
+  );
+  const switchAudience = (next: Audience) => {
+    setAudience(next);
+    if (next === "investor") setInvestorMounted(true);
+    // Shareable and back-button friendly without a navigation: the tab is
+    // presentation state, so replaceState rather than a router push.
+    const url = new URL(window.location.href);
+    if (next === "investor") url.searchParams.set("for", "investor");
+    else url.searchParams.delete("for");
+    window.history.replaceState(null, "", url);
+  };
+
   const { locale, t } = useTranslations();
   const estimate = useCalculateRate();
   const [copiedId, setCopiedId] = useState(false);
@@ -672,544 +509,629 @@ export default function RateClient() {
             {t("ratePage.title")}
           </h1>
           <p className="mx-auto max-w-2xl text-sm leading-7 text-muted-foreground md:text-base">
-            {t("ratePage.subtitle")}
+            {audience === "investor"
+              ? t("ratePage.investor.subtitle")
+              : t("ratePage.subtitle")}
           </p>
         </motion.div>
 
-        <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
-          {/* ---------------- Form ---------------- */}
-          <motion.form
-            onSubmit={onSubmit}
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
-            className="space-y-5 rounded-2xl border border-border bg-card p-6 shadow-xs"
+        {/* Who is this for. Large and first on purpose: the two panels answer
+            different questions, and a visitor on the wrong one reads a
+            borrowing form as an investment page. */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.08, ease: "easeOut" }}
+          className="mx-auto mb-10 max-w-md space-y-2"
+        >
+          <p
+            id="rate-audience-label"
+            className="text-center text-xs font-medium text-muted-foreground"
           >
-            <div className="space-y-1">
-              <h2 className="text-lg font-bold">{t("ratePage.formTitle")}</h2>
-              <p className="text-xs text-muted-foreground">
-                {t("ratePage.formHint")}
-              </p>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="flex items-baseline gap-2 text-sm font-medium">
-                {t("ratePage.industry")}
-                <span className="text-xs text-destructive">*</span>
-              </label>
-              {/* The engine's own 15 industries, not a friendlier shortlist:
-                  anything else would have to be mapped on the server, and a
-                  silent mis-map prices the wrong sector. */}
-              <select
-                value={industry}
-                onChange={(e) => setIndustry(e.target.value)}
-                onBlur={() => markTouched("industry")}
-                aria-invalid={Boolean(industryError)}
-                className={cn(
-                  "h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
-                  industryError ? "border-destructive" : "border-input",
-                )}
-              >
-                <option value="">{t("ratePage.industryPlaceholder")}</option>
-                {INDUSTRY_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {t(`projectApplication.industries.${option.labelKey}`)}
-                  </option>
-                ))}
-              </select>
-              {industryError && (
-                <p className="flex items-start gap-1.5 text-xs leading-relaxed text-destructive">
-                  <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" />
-                  <span>{industryError}</span>
-                </p>
-              )}
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              {field(
-                "operatingMonths",
-                t("ratePage.operatingMonths"),
-                operatingMonths,
-                setOperatingMonths,
-                { hint: t("ratePage.operatingMonthsHint"), placeholder: "36" },
-              )}
-              {field(
-                "employeeCount",
-                t("ratePage.employeeCount"),
-                employeeCount,
-                setEmployeeCount,
-                { hint: t("ratePage.employeeCountHint"), placeholder: "25" },
-              )}
-            </div>
-
-            {field(
-              "revenueLast",
-              t("ratePage.revenueLast"),
-              revenueLast,
-              setRevenueLast,
-              {
-                amount: true,
-                placeholder: "4000000000",
-              },
-            )}
-            {field(
-              "revenuePrior",
-              t("ratePage.revenuePrior"),
-              revenuePrior,
-              setRevenuePrior,
-              {
-                amount: true,
-                hint: t("ratePage.revenuePriorHint"),
-                placeholder: "3200000000",
-              },
-            )}
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              {field("cogs", t("ratePage.cogs"), cogs, setCogs, {
-                amount: true,
-                placeholder: "2400000000",
-              })}
-              {field(
-                "fixedCost",
-                t("ratePage.fixedCost"),
-                fixedCost,
-                setFixedCost,
-                {
-                  amount: true,
-                  hint: t("ratePage.fixedCostHint"),
-                  placeholder: "600000000",
-                },
-              )}
-            </div>
-            {field(
-              "variableCost",
-              t("ratePage.variableCost"),
-              variableCost,
-              setVariableCost,
-              {
-                amount: true,
-                optional: true,
-                placeholder: "300000000",
-              },
-            )}
-
-            {field(
-              "loanAmount",
-              t("ratePage.loanAmount"),
-              loanAmount,
-              (val) => {
-                const num = Number(val);
-                if (num > LOAN_MAX) {
-                  setLoanAmount(String(LOAN_MAX));
-                } else {
-                  setLoanAmount(val);
-                }
-              },
-              {
-                amount: true,
-                hint: t("ratePage.loanAmountHint"),
-                placeholder: "800000000",
-              },
-            )}
-
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium">
-                  {t("ratePage.duration")}
-                  <span className="ml-2 text-xs text-destructive">*</span>
-                </label>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                  {duration} {locale === "vi" ? "tháng" : "months"}
-                </span>
-              </div>
-              <Slider
-                id="rateDurationSlider"
-                aria-label={t("ratePage.duration")}
-                min={LOAN_MIN_DURATION_MONTHS}
-                max={LOAN_MAX_DURATION_MONTHS}
-                step={1}
-                value={[duration]}
-                onValueChange={(val) => setDuration(val[0])}
-                className="py-2 cursor-pointer"
-              />
-              {/* 1 to 6 months: matches LOAN_DURATIONS_MONTHS. */}
-              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                {DURATIONS.map((months) => (
-                  <button
-                    key={months}
-                    type="button"
-                    onClick={() => setDuration(months)}
+            {t("ratePage.audience.label")}
+          </p>
+          <div
+            role="tablist"
+            aria-labelledby="rate-audience-label"
+            className="grid grid-cols-2 gap-1.5 rounded-xl border border-border bg-card p-1.5 shadow-xs"
+          >
+            {(["sme", "investor"] as const).map((option) => {
+              const active = audience === option;
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  role="tab"
+                  id={`rate-tab-${option}`}
+                  aria-selected={active}
+                  aria-controls={`rate-panel-${option}`}
+                  onClick={() => switchAudience(option)}
+                  className={cn(
+                    "rounded-lg px-4 py-3 text-left transition-colors active:scale-[0.98]",
+                    active
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-foreground hover:bg-muted/60",
+                  )}
+                >
+                  <span className="block text-sm font-bold">
+                    {t(`ratePage.audience.${option}`)}
+                  </span>
+                  <span
                     className={cn(
-                      "rounded-md border px-2 py-2 text-sm font-semibold transition-colors cursor-pointer",
-                      duration === months
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border bg-transparent text-muted-foreground hover:text-foreground",
+                      "block text-xs",
+                      active
+                        ? "text-primary-foreground/80"
+                        : "text-muted-foreground",
                     )}
                   >
-                    {months} {locale === "vi" ? "tháng" : "mo"}
-                  </button>
-                ))}
-              </div>
-            </div>
+                    {t(`ratePage.audience.${option}Hint`)}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </motion.div>
 
-            <div className="space-y-4 rounded-xl border border-border/70 bg-muted/20 p-4">
+        {investorMounted && (
+          <div
+            id="rate-panel-investor"
+            role="tabpanel"
+            aria-labelledby="rate-tab-investor"
+            hidden={audience !== "investor"}
+          >
+            <InvestorPanel getSessionId={getClientSessionId} />
+          </div>
+        )}
+
+        {/* Hidden rather than unmounted: its Turnstile widget renders once, on
+            mount, and the visitor's figures should survive a tab switch. A
+            plain wrapper, not a motion one, so `lg:sticky` inside still works. */}
+        <div
+          id="rate-panel-sme"
+          role="tabpanel"
+          aria-labelledby="rate-tab-sme"
+          hidden={audience !== "sme"}
+        >
+          <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
+            {/* ---------------- Form ---------------- */}
+            <motion.form
+              onSubmit={onSubmit}
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
+              className="space-y-5 rounded-2xl border border-border bg-card p-6 shadow-xs"
+            >
               <div className="space-y-1">
-                <h3 className="text-sm font-bold">
-                  {t("ratePage.optionalTitle")}
-                </h3>
-                <p className="text-xs leading-relaxed text-muted-foreground">
-                  {t("ratePage.optionalHint")}
+                <h2 className="text-lg font-bold">{t("ratePage.formTitle")}</h2>
+                <p className="text-xs text-muted-foreground">
+                  {t("ratePage.formHint")}
                 </p>
               </div>
+
+              <div className="space-y-1.5">
+                <label className="flex items-baseline gap-2 text-sm font-medium">
+                  {t("ratePage.industry")}
+                  <span className="text-xs text-destructive">*</span>
+                </label>
+                {/* The engine's own 15 industries, not a friendlier shortlist:
+                  anything else would have to be mapped on the server, and a
+                  silent mis-map prices the wrong sector. */}
+                <select
+                  value={industry}
+                  onChange={(e) => setIndustry(e.target.value)}
+                  onBlur={() => markTouched("industry")}
+                  aria-invalid={Boolean(industryError)}
+                  className={cn(
+                    "h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                    industryError ? "border-destructive" : "border-input",
+                  )}
+                >
+                  <option value="">{t("ratePage.industryPlaceholder")}</option>
+                  {INDUSTRY_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {t(`projectApplication.industries.${option.labelKey}`)}
+                    </option>
+                  ))}
+                </select>
+                {industryError && (
+                  <p className="flex items-start gap-1.5 text-xs leading-relaxed text-destructive">
+                    <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" />
+                    <span>{industryError}</span>
+                  </p>
+                )}
+              </div>
+
               <div className="grid gap-4 sm:grid-cols-2">
                 {field(
-                  "bestMonth",
-                  t("ratePage.bestMonth"),
-                  bestMonth,
-                  setBestMonth,
+                  "operatingMonths",
+                  t("ratePage.operatingMonths"),
+                  operatingMonths,
+                  setOperatingMonths,
                   {
-                    amount: true,
-                    optional: true,
-                    placeholder: "480000000",
+                    hint: t("ratePage.operatingMonthsHint"),
+                    placeholder: "36",
                   },
                 )}
                 {field(
-                  "worstMonth",
-                  t("ratePage.worstMonth"),
-                  worstMonth,
-                  setWorstMonth,
+                  "employeeCount",
+                  t("ratePage.employeeCount"),
+                  employeeCount,
+                  setEmployeeCount,
+                  { hint: t("ratePage.employeeCountHint"), placeholder: "25" },
+                )}
+              </div>
+
+              {field(
+                "revenueLast",
+                t("ratePage.revenueLast"),
+                revenueLast,
+                setRevenueLast,
+                {
+                  amount: true,
+                  placeholder: "4000000000",
+                },
+              )}
+              {field(
+                "revenuePrior",
+                t("ratePage.revenuePrior"),
+                revenuePrior,
+                setRevenuePrior,
+                {
+                  amount: true,
+                  hint: t("ratePage.revenuePriorHint"),
+                  placeholder: "3200000000",
+                },
+              )}
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                {field("cogs", t("ratePage.cogs"), cogs, setCogs, {
+                  amount: true,
+                  placeholder: "2400000000",
+                })}
+                {field(
+                  "fixedCost",
+                  t("ratePage.fixedCost"),
+                  fixedCost,
+                  setFixedCost,
                   {
                     amount: true,
-                    optional: true,
-                    placeholder: "210000000",
+                    hint: t("ratePage.fixedCostHint"),
+                    placeholder: "600000000",
                   },
                 )}
-                {field("top1", t("ratePage.top1"), top1, setTop1, {
-                  optional: true,
-                  placeholder: "18",
-                })}
-                {field("top3", t("ratePage.top3"), top3, setTop3, {
-                  optional: true,
-                  placeholder: "41",
-                })}
               </div>
-            </div>
-
-            {process.env.NEXT_PUBLIC_DISABLE_TURNSTILE !== "true" && (
-              <div className="flex justify-center">
-                <div ref={turnstileContainerRef} />
-              </div>
-            )}
-
-            <Button
-              type="submit"
-              disabled={!canSubmit || estimate.isPending}
-              className="w-full"
-            >
-              {estimate.isPending && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {field(
+                "variableCost",
+                t("ratePage.variableCost"),
+                variableCost,
+                setVariableCost,
+                {
+                  amount: true,
+                  optional: true,
+                  placeholder: "300000000",
+                },
               )}
-              {estimate.isPending
-                ? t("ratePage.calculating")
-                : t("ratePage.submit")}
-            </Button>
-          </motion.form>
 
-          {/* ---------------- Result ---------------- */}
-          <motion.div
-            ref={resultRef}
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.28, ease: "easeOut" }}
-            className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-xs lg:sticky lg:top-24"
-          >
-            {estimate.isPending && <ResultSkeleton />}
+              {field(
+                "loanAmount",
+                t("ratePage.loanAmount"),
+                loanAmount,
+                (val) => {
+                  const num = Number(val);
+                  if (num > LOAN_MAX) {
+                    setLoanAmount(String(LOAN_MAX));
+                  } else {
+                    setLoanAmount(val);
+                  }
+                },
+                {
+                  amount: true,
+                  hint: t("ratePage.loanAmountHint"),
+                  placeholder: "800000000",
+                },
+              )}
 
-            {!estimate.isPending && !data && !estimate.isError && (
-              <p className="py-12 text-center text-sm text-muted-foreground">
-                {t("ratePage.resultEmpty")}
-              </p>
-            )}
-
-            {!estimate.isPending && estimate.isError && (
-              <div className="flex items-start gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 p-3">
-                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
-                <p className="text-xs leading-relaxed text-foreground">
-                  {errorCopy(estimate.error, t)}
-                </p>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium">
+                    {t("ratePage.duration")}
+                    <span className="ml-2 text-xs text-destructive">*</span>
+                  </label>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                    {duration} {locale === "vi" ? "tháng" : "months"}
+                  </span>
+                </div>
+                <Slider
+                  id="rateDurationSlider"
+                  aria-label={t("ratePage.duration")}
+                  min={LOAN_MIN_DURATION_MONTHS}
+                  max={LOAN_MAX_DURATION_MONTHS}
+                  step={1}
+                  value={[duration]}
+                  onValueChange={(val) => setDuration(val[0])}
+                  className="py-2 cursor-pointer"
+                />
+                {/* 1 to 6 months: matches LOAN_DURATIONS_MONTHS. */}
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                  {DURATIONS.map((months) => (
+                    <button
+                      key={months}
+                      type="button"
+                      onClick={() => setDuration(months)}
+                      className={cn(
+                        "rounded-md border px-2 py-2 text-sm font-semibold transition-colors cursor-pointer",
+                        duration === months
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-transparent text-muted-foreground hover:text-foreground",
+                      )}
+                    >
+                      {months} {locale === "vi" ? "tháng" : "mo"}
+                    </button>
+                  ))}
+                </div>
               </div>
-            )}
 
-            {/* A SIBLING of the staggered panel below, not a child of it: the
+              <div className="space-y-4 rounded-xl border border-border/70 bg-muted/20 p-4">
+                <div className="space-y-1">
+                  <h3 className="text-sm font-bold">
+                    {t("ratePage.optionalTitle")}
+                  </h3>
+                  <p className="text-xs leading-relaxed text-muted-foreground">
+                    {t("ratePage.optionalHint")}
+                  </p>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {field(
+                    "bestMonth",
+                    t("ratePage.bestMonth"),
+                    bestMonth,
+                    setBestMonth,
+                    {
+                      amount: true,
+                      optional: true,
+                      placeholder: "480000000",
+                    },
+                  )}
+                  {field(
+                    "worstMonth",
+                    t("ratePage.worstMonth"),
+                    worstMonth,
+                    setWorstMonth,
+                    {
+                      amount: true,
+                      optional: true,
+                      placeholder: "210000000",
+                    },
+                  )}
+                  {field("top1", t("ratePage.top1"), top1, setTop1, {
+                    optional: true,
+                    placeholder: "18",
+                  })}
+                  {field("top3", t("ratePage.top3"), top3, setTop3, {
+                    optional: true,
+                    placeholder: "41",
+                  })}
+                </div>
+              </div>
+
+              {process.env.NEXT_PUBLIC_DISABLE_TURNSTILE !== "true" && (
+                <div className="flex justify-center">
+                  <div ref={turnstileContainerRef} />
+                </div>
+              )}
+
+              <Button
+                type="submit"
+                disabled={!canSubmit || estimate.isPending}
+                className="w-full"
+              >
+                {estimate.isPending && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                {estimate.isPending
+                  ? t("ratePage.calculating")
+                  : t("ratePage.submit")}
+              </Button>
+            </motion.form>
+
+            {/* ---------------- Result ---------------- */}
+            <motion.div
+              ref={resultRef}
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.28, ease: "easeOut" }}
+              className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-xs lg:sticky lg:top-24"
+            >
+              {estimate.isPending && <ResultSkeleton />}
+
+              {!estimate.isPending && !data && !estimate.isError && (
+                <p className="py-12 text-center text-sm text-muted-foreground">
+                  {t("ratePage.resultEmpty")}
+                </p>
+              )}
+
+              {!estimate.isPending && estimate.isError && (
+                <div className="flex items-start gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 p-3">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                  <p className="text-xs leading-relaxed text-foreground">
+                    {errorCopy(estimate.error, t)}
+                  </p>
+                </div>
+              )}
+
+              {/* A SIBLING of the staggered panel below, not a child of it: the
                 burst is chrome, and inside that container it would be dealt a
                 turn in the content stagger. Keyed separately so it replays per
                 calculation. */}
-            {data && !reduceMotion && (
-              <ResultBurst key={`burst-${estimate.submittedAt}`} />
-            )}
+              {data && !reduceMotion && (
+                <ResultBurst key={`burst-${estimate.submittedAt}`} />
+              )}
 
-            {data && (
-              <motion.div
-                // Keyed on the mutation's own timestamp so a recalculation
-                // replays the reveal. Without it React reuses the subtree and
-                // a visitor who tweaks a figure watches a new band appear with
-                // no acknowledgement that anything happened.
-                key={estimate.submittedAt}
-                variants={resultVariants}
-                initial="hidden"
-                animate="visible"
-                className="relative z-10 space-y-5"
-              >
+              {data && (
                 <motion.div
-                  variants={resultItemVariants}
-                  className="flex items-start justify-between gap-3"
+                  // Keyed on the mutation's own timestamp so a recalculation
+                  // replays the reveal. Without it React reuses the subtree and
+                  // a visitor who tweaks a figure watches a new band appear with
+                  // no acknowledgement that anything happened.
+                  key={estimate.submittedAt}
+                  variants={resultVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="relative z-10 space-y-5"
                 >
-                  <h2 className="flex items-center gap-2 text-lg font-bold">
-                    <motion.span
-                      variants={figureVariants}
-                      className="inline-flex"
-                      aria-hidden
-                    >
-                      <Sparkles className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
-                    </motion.span>
-                    {t("ratePage.resultTitle")}
-                  </h2>
-                  {data.data?.risk_profile?.tier && (
-                    <span
-                      className={cn(
-                        "shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-semibold",
-                        data.data.risk_profile.tier === "TIER_A"
-                          ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                          : data.data.risk_profile.tier === "TIER_B"
-                            ? "border-blue-500/30 bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                            : "border-slate-500/30 bg-slate-500/10 text-slate-600 dark:text-slate-400",
-                      )}
-                    >
-                      {data.data.risk_profile.tier === "TIER_A"
-                        ? `Tier A • ${t("ratePage.tierExcellent")}`
-                        : data.data.risk_profile.tier === "TIER_B"
-                          ? `Tier B • ${t("ratePage.tierGood")}`
-                          : `Tier C • ${t("ratePage.tierReview")}`}
-                    </span>
-                  )}
-                </motion.div>
-
-                {/* 2 Primary Figure Cards */}
-                <motion.div
-                  variants={resultItemVariants}
-                  className="grid gap-4 sm:grid-cols-2"
-                >
-                  {/* Monthly Rate & APR */}
-                  <div className="rounded-xl border border-border/80 bg-muted/20 p-4 space-y-1">
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                      {t("ratePage.monthlyRateLabel")}
-                    </p>
-                    <div className="flex items-baseline gap-1.5">
+                  <motion.div
+                    variants={resultItemVariants}
+                    className="flex items-start justify-between gap-3"
+                  >
+                    <h2 className="flex items-center gap-2 text-lg font-bold">
                       <motion.span
                         variants={figureVariants}
-                        className="origin-left font-mono text-2xl font-bold tracking-tight text-primary"
+                        className="inline-flex"
+                        aria-hidden
                       >
-                        {data.data.rate_range.min_rate_monthly}% –{" "}
-                        {data.data.rate_range.max_rate_monthly}%
+                        <Sparkles className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
                       </motion.span>
-                      <span className="text-xs text-muted-foreground">
-                        / {t("ratePage.months")}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-muted-foreground pt-1">
-                      {t("ratePage.aprLabel")}: {data.data.rate_range.apr_min}%
-                      – {data.data.rate_range.apr_max}%
-                    </p>
-                  </div>
-
-                  {/* Monthly Payment */}
-                  <div className="rounded-xl border border-border/80 bg-muted/20 p-4 space-y-1">
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                      {t("ratePage.monthlyPaymentLabel")}
-                    </p>
-                    <div className="flex items-baseline gap-1.5">
-                      <motion.span
-                        variants={figureVariants}
-                        className="origin-left font-mono text-xl font-bold tracking-tight text-foreground"
+                      {t("ratePage.resultTitle")}
+                    </h2>
+                    {data.data?.risk_profile?.tier && (
+                      <span
+                        className={cn(
+                          "shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-semibold",
+                          data.data.risk_profile.tier === "TIER_A"
+                            ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                            : data.data.risk_profile.tier === "TIER_B"
+                              ? "border-blue-500/30 bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                              : "border-slate-500/30 bg-slate-500/10 text-slate-600 dark:text-slate-400",
+                        )}
                       >
-                        {formatCompactCurrency(
+                        {data.data.risk_profile.tier === "TIER_A"
+                          ? `Tier A • ${t("ratePage.tierExcellent")}`
+                          : data.data.risk_profile.tier === "TIER_B"
+                            ? `Tier B • ${t("ratePage.tierGood")}`
+                            : `Tier C • ${t("ratePage.tierReview")}`}
+                      </span>
+                    )}
+                  </motion.div>
+
+                  {/* 2 Primary Figure Cards */}
+                  <motion.div
+                    variants={resultItemVariants}
+                    className="grid gap-4 sm:grid-cols-2"
+                  >
+                    {/* Monthly Rate & APR */}
+                    <div className="rounded-xl border border-border/80 bg-muted/20 p-4 space-y-1">
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        {t("ratePage.monthlyRateLabel")}
+                      </p>
+                      <div className="flex items-baseline gap-1.5">
+                        <motion.span
+                          variants={figureVariants}
+                          className="origin-left font-mono text-2xl font-bold tracking-tight text-primary"
+                        >
+                          {data.data.rate_range.min_rate_monthly}% –{" "}
+                          {data.data.rate_range.max_rate_monthly}%
+                        </motion.span>
+                        <span className="text-xs text-muted-foreground">
+                          / {t("ratePage.months")}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground pt-1">
+                        {t("ratePage.aprLabel")}: {data.data.rate_range.apr_min}
+                        % – {data.data.rate_range.apr_max}%
+                      </p>
+                    </div>
+
+                    {/* Monthly Payment */}
+                    <div className="rounded-xl border border-border/80 bg-muted/20 p-4 space-y-1">
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        {t("ratePage.monthlyPaymentLabel")}
+                      </p>
+                      <div className="flex items-baseline gap-1.5">
+                        <motion.span
+                          variants={figureVariants}
+                          className="origin-left font-mono text-xl font-bold tracking-tight text-foreground"
+                        >
+                          {formatCompactCurrency(
+                            data.data.estimated_monthly_payment.min,
+                            locale,
+                          )}{" "}
+                          –{" "}
+                          {formatCompactCurrency(
+                            data.data.estimated_monthly_payment.max,
+                            locale,
+                          )}
+                        </motion.span>
+                        <span className="text-xs text-muted-foreground">
+                          / {t("ratePage.months")}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground pt-1">
+                        {formatCurrency(
                           data.data.estimated_monthly_payment.min,
                           locale,
                         )}{" "}
                         –{" "}
-                        {formatCompactCurrency(
+                        {formatCurrency(
                           data.data.estimated_monthly_payment.max,
                           locale,
                         )}
-                      </motion.span>
-                      <span className="text-xs text-muted-foreground">
-                        / {t("ratePage.months")}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-muted-foreground pt-1">
-                      {formatCurrency(
-                        data.data.estimated_monthly_payment.min,
-                        locale,
-                      )}{" "}
-                      –{" "}
-                      {formatCurrency(
-                        data.data.estimated_monthly_payment.max,
-                        locale,
-                      )}
-                    </p>
-                  </div>
-                </motion.div>
-
-                {/* Risk Profile Details */}
-                <motion.div
-                  variants={resultItemVariants}
-                  className="space-y-2.5 rounded-xl border border-border/80 bg-muted/10 p-4"
-                >
-                  <p className="text-xs font-bold text-foreground">
-                    {t("ratePage.riskProfileTitle")}
-                  </p>
-                  <div className="grid grid-cols-3 gap-2 text-center">
-                    <div className="rounded-lg border bg-background/50 p-2">
-                      <span className="text-[10px] text-muted-foreground block truncate">
-                        {t("ratePage.growthLabel")}
-                      </span>
-                      <span
-                        className={cn(
-                          "font-mono text-xs font-bold",
-                          data.data.risk_profile.growth_rate_pct >= 0
-                            ? "text-emerald-500"
-                            : "text-rose-500",
-                        )}
-                      >
-                        {data.data.risk_profile.growth_rate_pct >= 0 ? "+" : ""}
-                        {data.data.risk_profile.growth_rate_pct}%
-                      </span>
-                    </div>
-
-                    <div className="rounded-lg border bg-background/50 p-2">
-                      <span className="text-[10px] text-muted-foreground block truncate">
-                        {t("ratePage.ebitdaLabel")}
-                      </span>
-                      <span className="font-mono text-xs font-bold text-foreground">
-                        {data.data.risk_profile.ebitda_margin_pct}%
-                      </span>
-                    </div>
-
-                    <div className="rounded-lg border bg-background/50 p-2">
-                      <span className="text-[10px] text-muted-foreground block truncate">
-                        {t("ratePage.debtToRevenueLabel")}
-                      </span>
-                      <span className="font-mono text-xs font-bold text-foreground">
-                        {data.data.risk_profile.debt_to_revenue_pct}%
-                      </span>
-                    </div>
-                  </div>
-
-                  <p className="text-[11px] text-muted-foreground pt-1">
-                    {data.data.risk_profile.is_operating_loss
-                      ? t("ratePage.operatingLossNotice")
-                      : t("ratePage.operatingProfitNotice")}
-                  </p>
-                </motion.div>
-
-                {/* Inquiry Reference Code */}
-                {data.inquiry_id && (
-                  <motion.div
-                    variants={resultItemVariants}
-                    className="flex items-center justify-between rounded-lg border border-border/60 bg-muted/20 px-3 py-2 text-xs"
-                  >
-                    <span className="text-muted-foreground">
-                      {t("ratePage.inquiryIdLabel")}:
-                    </span>
-                    <div className="flex items-center gap-1.5 font-mono">
-                      <span className="font-semibold text-foreground">
-                        {data.inquiry_id.slice(0, 8)}...
-                      </span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyInquiryId(data.inquiry_id)}
-                        className="h-6 w-6 p-0"
-                      >
-                        {copiedId ? (
-                          <Check className="h-3 w-3 text-emerald-500" />
-                        ) : (
-                          <Copy className="h-3 w-3" />
-                        )}
-                      </Button>
+                      </p>
                     </div>
                   </motion.div>
-                )}
 
-                {/* Read with the number, not below it. */}
-                <motion.p
-                  variants={resultItemVariants}
-                  className="text-xs font-medium leading-relaxed text-muted-foreground"
-                >
-                  {t("ratePage.notAnOffer")}
-                </motion.p>
+                  {/* Risk Profile Details */}
+                  <motion.div
+                    variants={resultItemVariants}
+                    className="space-y-2.5 rounded-xl border border-border/80 bg-muted/10 p-4"
+                  >
+                    <p className="text-xs font-bold text-foreground">
+                      {t("ratePage.riskProfileTitle")}
+                    </p>
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      <div className="rounded-lg border bg-background/50 p-2">
+                        <span className="text-[10px] text-muted-foreground block truncate">
+                          {t("ratePage.growthLabel")}
+                        </span>
+                        <span
+                          className={cn(
+                            "font-mono text-xs font-bold",
+                            data.data.risk_profile.growth_rate_pct >= 0
+                              ? "text-emerald-500"
+                              : "text-rose-500",
+                          )}
+                        >
+                          {data.data.risk_profile.growth_rate_pct >= 0
+                            ? "+"
+                            : ""}
+                          {data.data.risk_profile.growth_rate_pct}%
+                        </span>
+                      </div>
 
-                {/* What the engine took on faith. It brackets an unknown
+                      <div className="rounded-lg border bg-background/50 p-2">
+                        <span className="text-[10px] text-muted-foreground block truncate">
+                          {t("ratePage.ebitdaLabel")}
+                        </span>
+                        <span className="font-mono text-xs font-bold text-foreground">
+                          {data.data.risk_profile.ebitda_margin_pct}%
+                        </span>
+                      </div>
+
+                      <div className="rounded-lg border bg-background/50 p-2">
+                        <span className="text-[10px] text-muted-foreground block truncate">
+                          {t("ratePage.debtToRevenueLabel")}
+                        </span>
+                        <span className="font-mono text-xs font-bold text-foreground">
+                          {data.data.risk_profile.debt_to_revenue_pct}%
+                        </span>
+                      </div>
+                    </div>
+
+                    <p className="text-[11px] text-muted-foreground pt-1">
+                      {data.data.risk_profile.is_operating_loss
+                        ? t("ratePage.operatingLossNotice")
+                        : t("ratePage.operatingProfitNotice")}
+                    </p>
+                  </motion.div>
+
+                  {/* Inquiry Reference Code */}
+                  {data.inquiry_id && (
+                    <motion.div
+                      variants={resultItemVariants}
+                      className="flex items-center justify-between rounded-lg border border-border/60 bg-muted/20 px-3 py-2 text-xs"
+                    >
+                      <span className="text-muted-foreground">
+                        {t("ratePage.inquiryIdLabel")}:
+                      </span>
+                      <div className="flex items-center gap-1.5 font-mono">
+                        <span className="font-semibold text-foreground">
+                          {data.inquiry_id.slice(0, 8)}...
+                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => copyInquiryId(data.inquiry_id)}
+                          className="h-6 w-6 p-0"
+                        >
+                          {copiedId ? (
+                            <Check className="h-3 w-3 text-emerald-500" />
+                          ) : (
+                            <Copy className="h-3 w-3" />
+                          )}
+                        </Button>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Read with the number, not below it. */}
+                  <motion.p
+                    variants={resultItemVariants}
+                    className="text-xs font-medium leading-relaxed text-muted-foreground"
+                  >
+                    {t("ratePage.notAnOffer")}
+                  </motion.p>
+
+                  {/* What the engine took on faith. It brackets an unknown
                     credit-bureau score and assumes identity checks pass, so a
                     band shown without these reads as a quote when it is an
                     estimate. Rendered from codes rather than the server's
                     English prose so a Vietnamese visitor gets Vietnamese. */}
-                {data.data.assumption_codes?.length > 0 && (
+                  {data.data.assumption_codes?.length > 0 && (
+                    <motion.div
+                      variants={resultItemVariants}
+                      className="space-y-2 rounded-lg border border-border/60 bg-muted/20 px-3 py-2.5"
+                    >
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        {t("ratePage.assumptionsTitle")}
+                      </p>
+                      <ul className="space-y-1.5">
+                        {data.data.assumption_codes.map((code) => {
+                          const key = `ratePage.assumption.${code}`;
+                          const copy = t(key);
+                          // An unrecognised code would otherwise print its own
+                          // lookup key on a public page.
+                          if (copy === key) return null;
+                          return (
+                            <li
+                              key={code}
+                              className="flex gap-1.5 text-[11px] leading-relaxed text-muted-foreground"
+                            >
+                              <span
+                                aria-hidden
+                                className="text-muted-foreground/60"
+                              >
+                                •
+                              </span>
+                              <span>{copy}</span>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </motion.div>
+                  )}
+
+                  {/* Call to action */}
                   <motion.div
                     variants={resultItemVariants}
-                    className="space-y-2 rounded-lg border border-border/60 bg-muted/20 px-3 py-2.5"
+                    className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-2"
                   >
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                      {t("ratePage.assumptionsTitle")}
+                    <p className="text-sm font-bold text-foreground">
+                      {t("ratePage.ctaTitle")}
                     </p>
-                    <ul className="space-y-1.5">
-                      {data.data.assumption_codes.map((code) => {
-                        const key = `ratePage.assumption.${code}`;
-                        const copy = t(key);
-                        // An unrecognised code would otherwise print its own
-                        // lookup key on a public page.
-                        if (copy === key) return null;
-                        return (
-                          <li
-                            key={code}
-                            className="flex gap-1.5 text-[11px] leading-relaxed text-muted-foreground"
-                          >
-                            <span
-                              aria-hidden
-                              className="text-muted-foreground/60"
-                            >
-                              •
-                            </span>
-                            <span>{copy}</span>
-                          </li>
-                        );
-                      })}
-                    </ul>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                      {t("ratePage.ctaBody")}
+                    </p>
+                    <Button asChild size="sm" className="mt-2 w-full sm:w-auto">
+                      <Link href="/project-application">
+                        {t("ratePage.applyLoanButton")}
+                      </Link>
+                    </Button>
                   </motion.div>
-                )}
-
-                {/* Call to action */}
-                <motion.div
-                  variants={resultItemVariants}
-                  className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-2"
-                >
-                  <p className="text-sm font-bold text-foreground">
-                    {t("ratePage.ctaTitle")}
-                  </p>
-                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                    {t("ratePage.ctaBody")}
-                  </p>
-                  <Button asChild size="sm" className="mt-2 w-full sm:w-auto">
-                    <Link href="/project-application">
-                      {t("ratePage.applyLoanButton")}
-                    </Link>
-                  </Button>
                 </motion.div>
-              </motion.div>
-            )}
-          </motion.div>
+              )}
+            </motion.div>
+          </div>
         </div>
       </main>
 

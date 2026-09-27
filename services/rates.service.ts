@@ -130,6 +130,109 @@ export interface RateInquiriesQueryParams {
   search?: string;
 }
 
+// --------------------------------------------------------------------------
+// Investor tab
+// --------------------------------------------------------------------------
+
+export type InvestorRiskTier = "conservative" | "balanced" | "growth";
+export type InvestorCadence =
+  "none" | "quarterly" | "monthly" | "weekly" | "daily";
+export type InvestorCommitment = 6 | 12;
+
+/** The four inputs the yield depends on. No personal data. */
+export interface InvestorChoices {
+  amount_vnd: number;
+  commitment_months: InvestorCommitment;
+  risk_tier: InvestorRiskTier;
+  reinvestment_cadence: InvestorCadence;
+}
+
+/** "Calculate my target yield": this is what stores the lead. */
+export interface InvestorLeadCreateRequest extends InvestorChoices {
+  full_name: string;
+  email: string;
+  phone?: string | null;
+  locale?: "vi" | "en";
+  /** Must be literally true — the backend 422s anything else. */
+  acknowledged_illustrative: true;
+  consent_contact: true;
+  session_id?: string | null;
+  turnstile_token?: string | null;
+}
+
+/**
+ * The published walk-down, computed on the server. The internal rating per
+ * tier and the bank reference rate are deliberately absent: with the loan
+ * rate they solve the pricing formula.
+ */
+export interface InvestorEstimate {
+  loan_rate_pct: number;
+  expected_loss_pct: number;
+  fee_pct: number;
+  net_per_loan_pct: number;
+  net_apy_pct: number;
+  estimated_return_vnd: number;
+  avg_loan_months: number;
+  capital_turns: number;
+}
+
+export interface InvestorTiersResponse {
+  tiers: { risk_tier: InvestorRiskTier; loan_rate_pct: number }[];
+}
+
+export interface InvestorLeadResponse {
+  lead_id: string;
+  /** Human-readable, e.g. "FL-7K2QXD". Safe to show. */
+  reference: string;
+  estimate: InvestorEstimate;
+}
+
+export interface InvestorSignupResponse {
+  reference: string;
+  signed_up_at: string;
+}
+
+export interface InvestorLeadAdminItem extends InvestorChoices {
+  id: string;
+  reference: string;
+  created_at: string;
+  full_name: string;
+  email: string;
+  phone: string | null;
+  locale: string | null;
+  bank_rate_pct: number;
+  loan_rate_pct: number;
+  net_per_loan_pct: number;
+  net_apy_pct: number;
+  estimated_return_vnd: number;
+  acknowledged_illustrative_at: string;
+  consented_contact_at: string;
+  signed_up_at: string | null;
+  signup_amount_vnd: number | null;
+  signup_commitment_months: number | null;
+  signup_risk_tier: InvestorRiskTier | null;
+  signup_reinvestment_cadence: InvestorCadence | null;
+  signup_net_apy_pct: number | null;
+  session_id: string | null;
+  ip_address: string | null;
+  user_agent: string | null;
+}
+
+export interface InvestorLeadsAdminListResponse {
+  total: number;
+  page: number;
+  page_size: number;
+  items: InvestorLeadAdminItem[];
+}
+
+export interface InvestorLeadsQueryParams {
+  page?: number;
+  page_size?: number;
+  search?: string;
+  risk_tier?: InvestorRiskTier;
+  signed_up?: boolean;
+}
+
 export const ratesService = {
   calculate(payload: RateCalculateRequest) {
     return apiClient.post<RateCalculateResponse>(
@@ -148,6 +251,45 @@ export const ratesService = {
   getInquiryDetail(inquiryId: string) {
     return apiClient.get<RateInquiryAdminItem>(
       RATE_CALCULATOR_ENDPOINTS.inquiryDetail(inquiryId),
+    );
+  },
+  getInvestorTiers() {
+    return apiClient.get<InvestorTiersResponse>(
+      RATE_CALCULATOR_ENDPOINTS.investorTiers,
+    );
+  },
+
+  createInvestorLead(payload: InvestorLeadCreateRequest) {
+    return apiClient.post<InvestorLeadResponse>(
+      RATE_CALCULATOR_ENDPOINTS.investorLeads,
+      payload,
+    );
+  },
+
+  estimateInvestorLead(leadId: string, choices: InvestorChoices) {
+    return apiClient.post<InvestorEstimate>(
+      RATE_CALCULATOR_ENDPOINTS.investorEstimate(leadId),
+      choices,
+    );
+  },
+
+  signUpInvestorLead(leadId: string, choices: InvestorChoices) {
+    return apiClient.post<InvestorSignupResponse>(
+      RATE_CALCULATOR_ENDPOINTS.investorSignup(leadId),
+      choices,
+    );
+  },
+
+  getInvestorLeads(params: InvestorLeadsQueryParams = {}) {
+    return apiClient.get<InvestorLeadsAdminListResponse>(
+      RATE_CALCULATOR_ENDPOINTS.investorLeadsAdmin,
+      { params },
+    );
+  },
+
+  getInvestorLead(id: string) {
+    return apiClient.get<InvestorLeadAdminItem>(
+      RATE_CALCULATOR_ENDPOINTS.investorLeadAdmin(id),
     );
   },
 };
