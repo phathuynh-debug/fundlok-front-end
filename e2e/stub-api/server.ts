@@ -33,6 +33,7 @@ import {
   STUB_AUDIT_LOGS,
   STUB_PASSWORD,
   STUB_ADMIN_ONLY_PROJECT,
+  STUB_ADMIN_COMPLETE_PROJECT,
   STUB_PUBLIC_PROJECTS,
   STUB_USERS,
   projectsFor,
@@ -186,7 +187,11 @@ function scoreRunFor(applicationId: string) {
 
 /** Every company the admin console can open — listings plus admin-only ones. */
 function adminProjects() {
-  return [...STUB_PUBLIC_PROJECTS, STUB_ADMIN_ONLY_PROJECT];
+  return [
+    ...STUB_PUBLIC_PROJECTS,
+    STUB_ADMIN_ONLY_PROJECT,
+    STUB_ADMIN_COMPLETE_PROJECT,
+  ];
 }
 
 function adminProjectDetail(projectId: string) {
@@ -209,26 +214,37 @@ function adminProjectDetail(projectId: string) {
       // What the SME wizard collects: step 1 produces two, steps 4 and 5 one
       // each. One left PENDING on purpose — a presign that never completed is
       // a real state the panel has to surface rather than hide.
-      documents: [
-        {
-          id: `doc-charter-${projectId}`,
-          document_type: "legal_charter",
-          original_filename: "dieu-le-cong-ty.pdf",
-          content_type: "application/pdf",
-          file_size_bytes: 240000,
-          status: "UPLOADED",
-          uploaded_at: "2026-09-01T00:00:00Z",
-        },
-        {
-          id: `doc-reg-${projectId}`,
-          document_type: "business_registration",
-          original_filename: "giay-dang-ky-kinh-doanh.pdf",
-          content_type: "application/pdf",
-          file_size_bytes: 182000,
-          status: "PENDING",
-          uploaded_at: null,
-        },
-      ],
+      documents:
+        projectId === STUB_ADMIN_COMPLETE_PROJECT.id
+          ? REQUIRED_DOCUMENT_TYPES.map((type) => ({
+              id: `doc-${type}-${projectId}`,
+              document_type: type,
+              original_filename: `${type}.pdf`,
+              content_type: "application/pdf",
+              file_size_bytes: 120000,
+              status: "UPLOADED",
+              uploaded_at: "2026-09-01T00:00:00Z",
+            }))
+          : [
+              {
+                id: `doc-charter-${projectId}`,
+                document_type: "legal_charter",
+                original_filename: "dieu-le-cong-ty.pdf",
+                content_type: "application/pdf",
+                file_size_bytes: 240000,
+                status: "UPLOADED",
+                uploaded_at: "2026-09-01T00:00:00Z",
+              },
+              {
+                id: `doc-reg-${projectId}`,
+                document_type: "business_registration",
+                original_filename: "giay-dang-ky-kinh-doanh.pdf",
+                content_type: "application/pdf",
+                file_size_bytes: 182000,
+                status: "PENDING",
+                uploaded_at: null,
+              },
+            ],
     });
     // Parked by the engine — the state an operator is there to settle.
     adminKybAttempts.set(`kyb-${projectId}`, {
@@ -255,10 +271,39 @@ function adminProjectDetail(projectId: string) {
       {
         ...adminApplications.get(`app-${projectId}`)!,
         score_run: scoreRunFor(`app-${projectId}`),
+        missing_documents: missingDocumentsFor(`app-${projectId}`),
       },
     ],
     kyb: adminKybAttempts.get(`kyb-${projectId}`)!,
   };
+}
+
+const REQUIRED_DOCUMENT_TYPES = [
+  "legal_charter",
+  "business_registration",
+  "e_invoice_data",
+  "tax_filings",
+  "cic_report",
+];
+
+/** As app/admin/service.py: only an UPLOADED row counts, and an approved
+ * business verification stands in for the registration. */
+function missingDocumentsFor(applicationId: string): string[] {
+  const application = adminApplications.get(applicationId) as
+    { documents: { document_type: string; status: string }[] } | undefined;
+  if (!application) return [];
+  const kyb = adminKybAttempts.get(applicationId.replace(/^app-/, "kyb-")) as
+    { is_approved?: boolean } | undefined;
+  const uploaded = new Set(
+    application.documents
+      .filter((d) => d.status === "UPLOADED")
+      .map((d) => d.document_type),
+  );
+  return REQUIRED_DOCUMENT_TYPES.filter(
+    (type) =>
+      !uploaded.has(type) &&
+      !(type === "business_registration" && kyb?.is_approved),
+  );
 }
 
 /** Forced-503 switch for the unconfigured-server case. */
@@ -1482,6 +1527,15 @@ const server = createServer(async (req, res) => {
         return json(res, 409, {
           detail: `Application has already been ${application.admin_approval.toLowerCase()}`,
         });
+      }
+      const missing = missingDocumentsFor(decisionMatch[1]);
+      if (body.decision === "APPROVED" && missing.length > 0) {
+        return json(
+          res,
+          409,
+          { detail: `Required documents missing: ${missing.join(", ")}` },
+          { "x-error-code": "DOCUMENTS_MISSING" },
+        );
       }
       application.admin_approval = String(body.decision);
       application.decision_note = (body.note as string) ?? null;

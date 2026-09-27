@@ -116,7 +116,8 @@
       "title": "Xem nhanh hồ sơ",
       "documentMissing": "Còn thiếu",
       "documentFromKyb": "Lấy từ giấy chứng nhận đã xác minh doanh nghiệp",
-      "documentsMissingHint": "Còn {count} hồ sơ bắt buộc chưa tải lên. Phê duyệt lúc này là phê duyệt khi chưa có các hồ sơ đó."
+      "documentsMissingHint": "Còn {count} hồ sơ bắt buộc chưa có.",
+      "approveNeedsDocuments": "Chưa thể phê duyệt khi còn thiếu hồ sơ bắt buộc. Bạn vẫn có thể từ chối."
     },
     "projectsPage": {
       "subtitle": "Xem hồ sơ doanh nghiệp và tình trạng phê duyệt.",

@@ -255,6 +255,18 @@ export const STUB_ADMIN_ONLY_PROJECT = {
 };
 
 /**
+ * An admin-only company whose funding request has every required document on
+ * file, so the operator's Approve is available. The other admin companies are
+ * missing documents, and approval is refused for them (as the real API does).
+ */
+export const STUB_ADMIN_COMPLETE_PROJECT = {
+  ...STUB_PROJECT,
+  id: "20000000-0000-0000-0000-000000000005",
+  legal_name: "Complete Docs Co",
+  industry: "Manufacturing",
+};
+
+/**
  * The same company, but with the application still in DRAFT.
  *
  * The DRAFT branch of SmeDashboard renders the application wizard. That used

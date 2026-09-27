@@ -190,6 +190,12 @@ export interface AdminLoanApplication {
   documents: AdminApplicationDocument[];
   /** Null until the engine has run — no run means no opinion, not a zero. */
   score_run: AdminScoreRun | null;
+  /**
+   * Required documents not on file (document_type keys, wizard order). The
+   * API refuses an approval while any is listed. Optional: older responses
+   * omit it.
+   */
+  missing_documents?: string[];
 }
 
 export interface AdminProjectDetail {

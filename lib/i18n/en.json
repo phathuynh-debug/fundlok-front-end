@@ -116,7 +116,8 @@
       "title": "Project preview",
       "documentMissing": "Missing",
       "documentFromKyb": "From the verified business certificate",
-      "documentsMissingHint": "{count} required document(s) not uploaded. Approving now approves the request without them."
+      "documentsMissingHint": "{count} required document(s) not on file.",
+      "approveNeedsDocuments": "Approval is unavailable until every required document is on file. You can still reject."
     },
     "projectsPage": {
       "subtitle": "Review company applications and their approvals.",

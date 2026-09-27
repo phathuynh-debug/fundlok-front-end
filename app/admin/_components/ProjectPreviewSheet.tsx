@@ -276,6 +276,7 @@ export function ProjectPreviewSheet({
 
                       <DocumentList
                         documents={application.documents}
+                        missingDocuments={application.missing_documents}
                         registrationFromKyb={!!data.kyb?.is_approved}
                         t={t}
                         onOpen={setViewerDocument}
@@ -287,7 +288,6 @@ export function ProjectPreviewSheet({
                         </p>
                       )}
 
-
                       {application.admin_approval === "PENDING" && (
                         <DecisionControls
                           note={noteFor(application.id)}
@@ -295,6 +295,13 @@ export function ProjectPreviewSheet({
                             setNote(application.id, value)
                           }
                           disabled={deciding}
+                          // The API answers 409 until every required
+                          // document is on file; say so before the click.
+                          approveBlockedReason={
+                            (application.missing_documents?.length ?? 0) > 0
+                              ? t("admin.preview.approveNeedsDocuments")
+                              : null
+                          }
                           onApprove={() =>
                             handleApplication(application.id, "APPROVED")
                           }
@@ -484,11 +491,14 @@ const REQUIRED_DOCUMENT_TYPES = [
 
 function DocumentList({
   documents,
+  missingDocuments,
   registrationFromKyb,
   t,
   onOpen,
 }: {
   documents: AdminApplicationDocument[];
+  /** The API's own list — authoritative; computed here only when absent. */
+  missingDocuments?: string[];
   registrationFromKyb: boolean;
   t: (key: string) => string;
   onOpen: (document: AdminApplicationDocument) => void;
@@ -502,11 +512,14 @@ function DocumentList({
     (d) =>
       !(REQUIRED_DOCUMENT_TYPES as readonly string[]).includes(d.document_type),
   );
-  const missing = REQUIRED_DOCUMENT_TYPES.filter(
-    (type) =>
-      !byType.has(type) &&
-      !(type === "business_registration" && registrationFromKyb),
-  );
+  // A PENDING upload counts as missing: there is no object behind it.
+  const missing =
+    missingDocuments ??
+    REQUIRED_DOCUMENT_TYPES.filter(
+      (type) =>
+        byType.get(type)?.status !== "UPLOADED" &&
+        !(type === "business_registration" && registrationFromKyb),
+    );
 
   const uploadedRow = (document: AdminApplicationDocument) => {
     // Only a confirmed upload can be opened — there is no object behind a
@@ -648,6 +661,8 @@ interface DecisionControlsProps {
   note: string;
   onNoteChange: (value: string) => void;
   disabled: boolean;
+  /** When set, Approve is unavailable and this says why. Reject stays open. */
+  approveBlockedReason?: string | null;
   onApprove: () => void;
   onReject: () => void;
   approveLabel: string;
@@ -659,6 +674,7 @@ function DecisionControls({
   note,
   onNoteChange,
   disabled,
+  approveBlockedReason = null,
   onApprove,
   onReject,
   approveLabel,
@@ -679,7 +695,7 @@ function DecisionControls({
           type="button"
           size="sm"
           className="flex-1"
-          disabled={disabled}
+          disabled={disabled || !!approveBlockedReason}
           onClick={onApprove}
         >
           {disabled ? (
@@ -701,6 +717,11 @@ function DecisionControls({
           {rejectLabel}
         </Button>
       </div>
+      {approveBlockedReason && (
+        <p className="text-[11px] leading-relaxed text-destructive">
+          {approveBlockedReason}
+        </p>
+      )}
     </div>
   );
 }

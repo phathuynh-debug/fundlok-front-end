@@ -168,37 +168,49 @@ test.describe("the admin project preview", () => {
     ).toBeVisible();
   });
 
-  test("names the required documents the SME has not uploaded", async ({
+  test("names the missing documents and blocks approval until they arrive", async ({
     page,
   }) => {
-    // Read-only: the stub request holds a charter and a pending registration,
-    // so the e-invoices, tax filings and CIC report are missing.
+    // Read-only: the stub request holds a charter and a registration whose
+    // upload never completed, so four required documents are not on file.
     await openPreview(page, "Delta Foods JSC");
     const panel = page.getByRole("dialog");
 
     for (const type of ["e_invoice_data", "tax_filings", "cic_report"]) {
-      await expect(
-        panel.locator(`[data-missing-document="${type}"]`),
-      ).toBeVisible();
-      await expect(
-        panel.locator(`[data-missing-document="${type}"]`),
-      ).toContainText(t(`admin.preview.documentTypes.${type}`));
+      const row = panel.locator(`[data-missing-document="${type}"]`);
+      await expect(row).toBeVisible();
+      await expect(row).toContainText(t(`admin.preview.documentTypes.${type}`));
     }
     // Uploaded ones are not flagged.
     await expect(
       panel.locator('[data-missing-document="legal_charter"]'),
     ).toHaveCount(0);
+    // The pending registration counts as missing too.
     await expect(
       panel.getByText(
-        t("admin.preview.documentsMissingHint").replace("{count}", "3"),
+        t("admin.preview.documentsMissingHint").replace("{count}", "4"),
       ),
+    ).toBeVisible();
+
+    // The funding request's Approve (the last one; the first is the
+    // verification's) is unavailable and says why. Reject is not.
+    await expect(
+      panel.getByRole("button", { name: t("admin.preview.approve") }).last(),
+    ).toBeDisabled();
+    await expect(
+      panel.getByRole("button", { name: t("admin.preview.reject") }).last(),
+    ).toBeEnabled();
+    await expect(
+      panel.getByText(t("admin.preview.approveNeedsDocuments")),
     ).toBeVisible();
   });
 
   test("approving the funding request records the operator's half", async ({
     page,
   }) => {
-    await openPreview(page, "Delta Foods JSC");
+    // Its own company: approval needs every required document on file, and
+    // this is the one stub company that has them all.
+    await openPreview(page, "Complete Docs Co");
 
     const approve = page.getByRole("button", {
       name: t("admin.preview.approve"),
