@@ -8,11 +8,17 @@ import {
   useMemo,
   useState,
 } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  LOCALE_COOKIE,
+  localizedHref,
+  localizedPath,
+  parseLocalePath,
+} from "@/lib/locale-routing";
 import en from "./en.json";
 import vi from "./vi.json";
 
-export const LOCALE_COOKIE_NAME = "NEXT_LOCALE";
+export const LOCALE_COOKIE_NAME = LOCALE_COOKIE;
 
 export const supportedLocales = ["en", "vi"] as const;
 
@@ -84,6 +90,13 @@ type LocaleContextValue = {
   locale: Locale;
   setLocale: (locale: Locale) => void;
   t: (key: string, values?: Record<string, string | number>) => string;
+  /**
+   * An internal href in the current language: "/faq" becomes "/en/faq" on an
+   * English page. Links between public pages must go through this, or an
+   * English reader clicking "FAQ" lands on the Vietnamese URL, and on those
+   * pages the URL decides the language.
+   */
+  localize: (href: string) => string;
 };
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
@@ -95,8 +108,17 @@ export function LocaleProvider({
   initialLocale: Locale;
   children: React.ReactNode;
 }) {
-  const [locale, setLocaleState] = useState<Locale>(initialLocale);
+  // The language chosen for pages WITHOUT a per-language URL (dashboard,
+  // admin, ...): starts from the cookie the server read.
+  const [cookieLocale, setLocaleState] = useState<Locale>(initialLocale);
   const router = useRouter();
+  const pathname = usePathname() ?? "/";
+  // On a public page the URL decides (see lib/locale-routing.ts). Derived here
+  // rather than taken from `initialLocale` because the root layout does not
+  // re-render on client navigation: going from /faq to /en/faq would
+  // otherwise keep the Vietnamese value the layout was first rendered with.
+  const route = parseLocalePath(pathname);
+  const locale: Locale = route.locale ?? cookieLocale;
 
   useEffect(() => {
     document.documentElement.lang = locale;
@@ -109,6 +131,29 @@ export function LocaleProvider({
       writeLocaleCookie(nextLocale);
       setLocaleState(nextLocale);
 
+      // A public page has a URL per language: switching means going to the
+      // other one, keeping the query (?for=investor) and hash. The cookie is
+      // written first, so the proxy's preference redirect agrees with the move
+      // instead of bouncing it back.
+      //
+      // A FULL load, not router.push. /rate and /en/rate rewrite to the same
+      // page and differ only by a request header the client router cannot
+      // see, so a soft navigation re-rendered the client text in English
+      // while keeping the server-rendered <title>, canonical and <html lang>
+      // from the Vietnamese request. Verified in the browser: the tab read
+      // "Xem lãi suất…" on /en/rate. Switching language is rare; a reload is
+      // the price of every server-rendered part agreeing with the URL.
+      if (route.locale !== null) {
+        if (nextLocale !== route.locale) {
+          window.location.assign(
+            localizedPath(route.path, nextLocale) +
+              window.location.search +
+              window.location.hash,
+          );
+        }
+        return;
+      }
+
       // Client components re-render from context on the line above. Server
       // components do not — and the marketing pages build their copy on the
       // server from this very cookie (see app/page.tsx). Without this refresh
@@ -120,7 +165,7 @@ export function LocaleProvider({
       // the server would answer in the previous language.
       router.refresh();
     },
-    [router],
+    [router, route.locale, route.path],
   );
 
   const value = useMemo<LocaleContextValue>(
@@ -128,6 +173,7 @@ export function LocaleProvider({
       locale,
       setLocale,
       t: (key, values) => translate(dictionaries[locale], key, values),
+      localize: (href) => localizedHref(href, locale),
     }),
     [locale, setLocale],
   );

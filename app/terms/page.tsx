@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { TermsClient } from "./terms-client";
 import { SITE_URL } from "@/lib/site";
 import { getServerTranslations } from "@/lib/i18n/server";
-import { OG_LOCALE } from "@/lib/seo";
+import { localeAlternates, OG_LOCALE } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { locale, t } = await getServerTranslations();
@@ -23,13 +23,11 @@ export async function generateMetadata(): Promise<Metadata> {
       "SME credit platform terms",
       "private credit terms Vietnam",
     ],
-    alternates: {
-      canonical: "/terms",
-    },
+    alternates: localeAlternates("/terms", locale),
     openGraph: {
       title,
       description,
-      url: "/terms",
+      url: localeAlternates("/terms", locale).canonical,
       siteName: "FundLok",
       type: "website",
       locale: OG_LOCALE[locale],

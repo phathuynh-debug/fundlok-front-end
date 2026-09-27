@@ -54,7 +54,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
   const router = useRouter();
   const { toast } = useToast();
   const { mutate: register, isPending } = useRegister();
-  const { t, locale } = useTranslations();
+  const { t, locale, localize } = useTranslations();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,7 +105,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
           if (onSuccess) {
             setTimeout(() => onSuccess(email), 1200);
           } else {
-            setTimeout(() => router.push("/login"), 1200);
+            setTimeout(() => router.push(localize("/login")), 1200);
           }
         },
         onError: (error) => {
@@ -263,7 +263,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
       <p className="text-xs text-center text-muted-foreground pt-1">
         {t("auth.register.termsNotice").split("{termsLink}")[0]}
         <Link
-          href="/terms"
+          href={localize("/terms")}
           className="underline underline-offset-2 hover:text-foreground transition-colors font-medium"
         >
           {t("auth.footer.termsLink")}

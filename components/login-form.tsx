@@ -42,7 +42,7 @@ export function LoginForm() {
     totpError,
     cancelTotp,
   } = useLogin();
-  const { t, locale } = useTranslations();
+  const { t, locale, localize } = useTranslations();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -252,7 +252,7 @@ export function LoginForm() {
         <p className="text-xs text-center text-muted-foreground pt-1">
           {t("auth.login.termsNotice").split("{termsLink}")[0]}
           <Link
-            href="/terms"
+            href={localize("/terms")}
             className="underline underline-offset-2 hover:text-foreground transition-colors font-medium"
           >
             {t("auth.footer.termsLink")}

@@ -27,7 +27,7 @@ type CategoryKey = FaqCategory;
 const sectionId = (key: CategoryKey) => `faq-${key}`;
 
 export default function FaqClient() {
-  const { t } = useTranslations();
+  const { t, localize } = useTranslations();
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("general");
 
   // Highlight the pill of the category currently in view while scrolling.
@@ -155,7 +155,7 @@ export default function FaqClient() {
               {t("faqPage.ctaText")}
             </p>
             <Link
-              href="/contact"
+              href={localize("/contact")}
               className="inline-flex items-center gap-2 rounded-full bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-6 py-3 text-sm font-semibold text-white transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"
             >
               {t("faqPage.ctaButton")}

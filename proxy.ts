@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { SUSPENDED, middlewareService } from "@/services/middleware.service";
 import { applyBackendSecret } from "@/lib/backend-secret";
+import {
+  LOCALE_COOKIE,
+  LOCALE_HEADER,
+  localizedPath,
+  parseLocalePath,
+  type ParsedLocalePath,
+} from "@/lib/locale-routing";
 
 // Same default as next.config.ts and middleware.service.ts. Kept in step with
 // both: they all describe one hop, Next → FastAPI.
@@ -133,8 +140,30 @@ function isHandledRoute(pathname: string) {
   );
 }
 
+// Continue with the page, carrying the language the URL asked for.
+//
+// For /en/... the request is REWRITTEN to the unprefixed page (there is one
+// page component per route; the prefix is not a separate route tree) and the
+// header tells the server to render English. For an unprefixed localized page
+// the header says "vi". The header is always overwritten here, never passed
+// through, so a client cannot pick a localized page's language by sending it.
+function continueWithLocale(
+  request: NextRequest,
+  route: ParsedLocalePath,
+): NextResponse {
+  const headers = new Headers(request.headers);
+  headers.delete(LOCALE_HEADER);
+  if (route.locale) headers.set(LOCALE_HEADER, route.locale);
+  if (route.prefixed) {
+    const url = request.nextUrl.clone();
+    url.pathname = route.path;
+    return NextResponse.rewrite(url, { request: { headers } });
+  }
+  return NextResponse.next({ request: { headers } });
+}
+
 export async function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const rawPathname = request.nextUrl.pathname;
 
   // --- /api/* → FastAPI, stamped with the shared secret --------------------
   //
@@ -153,9 +182,9 @@ export async function proxy(request: NextRequest) {
   // this branch ever stops matching, API calls still reach the backend but
   // without the header — Cloudflare then rejects them loudly, which is a far
   // better failure than every request 404ing.
-  if (pathname.startsWith("/api/")) {
+  if (rawPathname.startsWith("/api/")) {
     const target = new URL(
-      pathname.slice("/api".length) + request.nextUrl.search,
+      rawPathname.slice("/api".length) + request.nextUrl.search,
       API_ORIGIN,
     );
     return NextResponse.rewrite(target, {
@@ -163,12 +192,58 @@ export async function proxy(request: NextRequest) {
     });
   }
 
+  // --- Language prefix -------------------------------------------------------
+  // Public pages have a URL per language: /rate (Vietnamese) and /en/rate
+  // (English). See lib/locale-routing.ts. Everything below this block works on
+  // the UNPREFIXED path, so every auth and role rule applies to /en/login
+  // exactly as it does to /login.
+  const route = parseLocalePath(rawPathname);
+  if (route.prefixed && route.locale === null) {
+    // /en/dashboard and friends: no English URL exists for pages that are not
+    // indexed, so send them to the one URL they have instead of a 404.
+    const url = request.nextUrl.clone();
+    url.pathname = route.path;
+    return NextResponse.redirect(url, 308);
+  }
+  // A visitor who EXPLICITLY chose a language (the switcher writes the cookie)
+  // and opens a public page in the other one is sent to their language's URL,
+  // so a returning English reader typing fundlok.com is not dropped into
+  // Vietnamese every visit.
+  //
+  // Safe for search: crawlers carry no cookie, so they always get exactly the
+  // URL they asked for and every URL keeps its own language. 307 plus
+  // no-store/Vary so neither the browser nor a CDN caches the redirect and
+  // replays it to someone without the cookie.
+  const preferred = request.cookies.get(LOCALE_COOKIE)?.value;
+  if (
+    route.locale !== null &&
+    (preferred === "en" || preferred === "vi") &&
+    preferred !== route.locale
+  ) {
+    const url = request.nextUrl.clone();
+    url.pathname = localizedPath(route.path, preferred);
+    const response = NextResponse.redirect(url, 307);
+    response.headers.set("Cache-Control", "private, no-store");
+    response.headers.set("Vary", "Cookie");
+    return response;
+  }
+
+  const pathname = route.path;
+  const pass = () => continueWithLocale(request, route);
+
+  // The marketing pages (why-us, rate, faq, contact, terms) have no auth or
+  // role rules. Returning here keeps them off the session lookup below: they
+  // are in the matcher only so the language header gets set.
+  if (route.locale !== null && !isHandledRoute(pathname)) {
+    return pass();
+  }
+
   // Phone side of the KYC QR handoff. Opened by scanning a QR on another
   // device, so there is no session cookie here — auth is the short-lived
   // handoff token in the query string, validated by the backend on submit.
   // Must bypass every session-based gate (login redirect, KYC gate, …).
   if (pathname.startsWith("/kyc/mobile")) {
-    return NextResponse.next();
+    return pass();
   }
   const accessToken = request.cookies.get("access_token")?.value;
   const isAuthenticated = !!accessToken;
@@ -244,8 +319,9 @@ export async function proxy(request: NextRequest) {
   //
   // Scope is deliberate and load-bearing: the flag is only READ on that route
   // and /maintenance itself. The public marketing pages (/why-us, /faq,
-  // /contact, …) aren't in the matcher at all, and `/` is matched but never
-  // reaches this branch — so browsing the site costs zero maintenance lookups.
+  // /contact, …) are matched only for the language header and return at
+  // "Language prefix" above, and `/` is matched but never reaches this branch
+  // — so browsing the site costs zero maintenance lookups.
   // The lookup itself is cached in middleware.service.ts; see the note there
   // for why prefetches can't simply be skipped instead.
   const isMaintenancePage = pathname === MAINTENANCE_ROUTE;
@@ -268,7 +344,7 @@ export async function proxy(request: NextRequest) {
 
   // Anything outside the auth/role-managed set just passes through.
   if (!isHandledRoute(pathname)) {
-    return NextResponse.next();
+    return pass();
   }
 
   // Verification is now on-demand, not a login gate. Fetch approval only when it
@@ -423,14 +499,24 @@ export async function proxy(request: NextRequest) {
   // is handled client-side now — the dashboard and application pages redirect
   // themselves. The middleware no longer counts projects.
 
-  return NextResponse.next();
+  return pass();
 }
 
 export const config = {
-  // Run only on app routes + the maintenance-relevant ones. Public marketing
-  // pages (/faq, /why-us, /contact, …) are intentionally absent so maintenance
-  // never blocks them.
+  // Run on app routes, the maintenance-relevant ones, and the public pages
+  // (for the language header only). The marketing pages return before any
+  // session or maintenance lookup, so maintenance never blocks them.
   matcher: [
+    // English URLs, and the Vietnamese public pages not already listed below:
+    // on these the URL decides the language, so the proxy must see them to set
+    // the header. They return before any session lookup (see "Language prefix").
+    "/en",
+    "/en/:path*",
+    "/why-us",
+    "/rate",
+    "/faq",
+    "/contact",
+    "/terms",
     // Every backend call the browser makes. Listed first because without it the
     // /api branch above never runs and the secret is never attached — the
     // failure would be silent, since next.config.ts still proxies the traffic.

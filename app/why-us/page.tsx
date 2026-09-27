@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { getSeoStrings, OG_LOCALE } from "@/lib/seo";
+import { getSeoStrings, localeAlternates, OG_LOCALE } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import WhyUsClient from "./why-us-client";
 
@@ -33,11 +33,11 @@ export async function generateMetadata(): Promise<Metadata> {
       "IBCOL 2023",
       "LENDMI",
     ],
-    alternates: { canonical: "/why-us" },
+    alternates: localeAlternates("/why-us", locale),
     openGraph: {
       title,
       description,
-      url: "/why-us",
+      url: localeAlternates("/why-us", locale).canonical,
       siteName: "FundLok",
       type: "website",
       locale: OG_LOCALE[locale],

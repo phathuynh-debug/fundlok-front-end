@@ -339,7 +339,7 @@ const TERMS_SECTIONS: SectionContent[] = [
 ];
 
 export function TermsClient() {
-  const { t, locale } = useTranslations();
+  const { t, locale, localize } = useTranslations();
   const isVi = locale === "vi";
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -376,7 +376,7 @@ export function TermsClient() {
         {/* Breadcrumb Navigation */}
         <div className="flex items-center justify-between gap-4 pb-8 border-b border-border/60">
           <Link
-            href="/"
+            href={localize("/")}
             className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors group"
           >
             <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
@@ -550,7 +550,9 @@ export function TermsClient() {
                 </p>
               </div>
               <Button asChild variant="outline" className="shrink-0">
-                <Link href="/contact">{t("auth.footer.supportLink")}</Link>
+                <Link href={localize("/contact")}>
+                  {t("auth.footer.supportLink")}
+                </Link>
               </Button>
             </div>
           </section>

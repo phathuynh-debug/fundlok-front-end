@@ -90,7 +90,7 @@ const achievementsData = {
 };
 
 export default function WhyUsClient() {
-  const { t, locale } = useTranslations();
+  const { t, locale, localize } = useTranslations();
   const currentLocale = locale === "vi" ? "vi" : "en";
 
   // Animation variants for smooth scroll/reveal
@@ -359,14 +359,14 @@ export default function WhyUsClient() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
-                href="/login"
+                href={localize("/login")}
                 className="w-full sm:w-auto rounded-full bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-8 py-3.5 text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95 flex items-center justify-center gap-2 group/btn"
               >
                 {t("header.enterApp")}
                 <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" />
               </Link>
               <Link
-                href="/"
+                href={localize("/")}
                 className="w-full sm:w-auto rounded-full border border-border bg-transparent hover:bg-zinc-100 dark:hover:bg-slate-800 text-foreground px-8 py-3.5 text-sm font-semibold transition-all duration-300 active:scale-95"
               >
                 {t("common.backToHome")}

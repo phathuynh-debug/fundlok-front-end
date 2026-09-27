@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { getSeoStrings, OG_LOCALE } from "@/lib/seo";
+import { getSeoStrings, localeAlternates, OG_LOCALE } from "@/lib/seo";
 import ContactClient from "./contact-client";
 import { SITE_URL } from "@/lib/site";
 
@@ -22,11 +22,11 @@ export async function generateMetadata(): Promise<Metadata> {
       "funding inquiries",
       "business financing support",
     ],
-    alternates: { canonical: "/contact" },
+    alternates: localeAlternates("/contact", locale),
     openGraph: {
       title,
       description,
-      url: "/contact",
+      url: localeAlternates("/contact", locale).canonical,
       siteName: "FundLok",
       type: "website",
       locale: OG_LOCALE[locale],

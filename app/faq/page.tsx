@@ -5,6 +5,7 @@ import vi from "@/lib/i18n/vi.json";
 import { FAQ_CATEGORIES, faqQuestionNumbers } from "@/lib/faq-questions";
 import {
   getSeoStrings,
+  localeAlternates,
   OG_LOCALE,
   resolveSeoLocale,
   type SeoLocale,
@@ -52,11 +53,11 @@ export async function generateMetadata(): Promise<Metadata> {
       // Search engines see every question verbatim, in the page's language.
       ...qaPairsFor(locale).map(({ question }) => question),
     ],
-    alternates: { canonical: "/faq" },
+    alternates: localeAlternates("/faq", locale),
     openGraph: {
       title,
       description,
-      url: "/faq",
+      url: localeAlternates("/faq", locale).canonical,
       siteName: "FundLok",
       type: "website",
       locale: OG_LOCALE[locale],

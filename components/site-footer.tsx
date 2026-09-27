@@ -62,7 +62,7 @@ const socialLinks = [
 ];
 
 export default function SiteFooter() {
-  const { t } = useTranslations();
+  const { t, localize } = useTranslations();
 
   return (
     <footer className="w-full border-t border-white/10 bg-[#0b1217] text-zinc-100">
@@ -74,7 +74,7 @@ export default function SiteFooter() {
               {aboutLinks.map((link) => (
                 <li key={link.labelKey}>
                   <Link
-                    href={link.href}
+                    href={localize(link.href)}
                     className="transition-colors hover:text-white"
                   >
                     {t(link.labelKey)}
@@ -91,7 +91,7 @@ export default function SiteFooter() {
               {supportLinks.map((link) => (
                 <li key={link.labelKey}>
                   <Link
-                    href={link.href}
+                    href={localize(link.href)}
                     className="transition-colors hover:text-white"
                   >
                     {t(link.labelKey)}
@@ -107,7 +107,7 @@ export default function SiteFooter() {
               {socialLinks.map(({ label, href, icon: Icon }) => (
                 <a
                   key={label}
-                  href={href}
+                  href={localize(href)}
                   target={href.startsWith("http") ? "_blank" : undefined}
                   rel={
                     href.startsWith("http") ? "noreferrer noopener" : undefined
@@ -123,7 +123,7 @@ export default function SiteFooter() {
               {t("footer.connectBody")}
             </p>
             <Link
-              href="/contact"
+              href={localize("/contact")}
               className="mt-6 inline-flex items-center gap-2 rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-white transition-colors duration-300 hover:bg-emerald-600"
             >
               {t("footer.getInTouch")}

@@ -41,7 +41,7 @@ export function AuthFormSwitcher({ initialMode }: AuthFormSwitcherProps) {
   const [direction, setDirection] = useState<Direction>(1);
   const [isAnimating, setIsAnimating] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState("");
-  const { t } = useTranslations();
+  const { t, localize } = useTranslations();
 
   const switchTo = (next: Mode) => {
     if (next === mode || isAnimating) return;
@@ -116,7 +116,7 @@ export function AuthFormSwitcher({ initialMode }: AuthFormSwitcherProps) {
                           new tab. The click is intercepted for the normal case
                           and left alone when a modifier key means "new tab". */}
                       <a
-                        href="/login?mode=register"
+                        href={localize("/login?mode=register")}
                         onClick={(event) => {
                           if (
                             event.metaKey ||
@@ -138,7 +138,7 @@ export function AuthFormSwitcher({ initialMode }: AuthFormSwitcherProps) {
                     <>
                       {t("auth.switcher.alreadyHaveAccount")}{" "}
                       <a
-                        href="/login"
+                        href={localize("/login")}
                         onClick={(event) => {
                           if (
                             event.metaKey ||

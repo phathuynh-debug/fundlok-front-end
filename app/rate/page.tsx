@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { getSeoStrings, OG_LOCALE } from "@/lib/seo";
+import { getSeoStrings, localeAlternates, OG_LOCALE } from "@/lib/seo";
 import RateClient from "./rate-client";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -19,11 +19,11 @@ export async function generateMetadata(): Promise<Metadata> {
       "working capital rate",
       "FundLok rate",
     ],
-    alternates: { canonical: "/rate" },
+    alternates: localeAlternates("/rate", locale),
     openGraph: {
       title,
       description,
-      url: "/rate",
+      url: localeAlternates("/rate", locale).canonical,
       siteName: "FundLok",
       type: "website",
       locale: OG_LOCALE[locale],

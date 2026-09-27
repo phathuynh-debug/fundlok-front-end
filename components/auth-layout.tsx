@@ -15,7 +15,7 @@ interface AuthLayoutProps {
 }
 
 export function AuthLayout({ children }: AuthLayoutProps) {
-  const { t } = useTranslations();
+  const { t, localize } = useTranslations();
 
   return (
     <motion.div
@@ -40,7 +40,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
 
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           <div>
-            <Link href="/" className="flex items-center gap-2">
+            <Link href={localize("/")} className="flex items-center gap-2">
               <Logo
                 alt={t("common.brandName")}
                 containerClassName="relative w-40 h-10"
@@ -87,7 +87,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
                 •
               </span>
               <Link
-                href="/terms"
+                href={localize("/terms")}
                 className="hover:text-slate-300 underline underline-offset-2 transition-colors"
               >
                 {t("auth.footer.termsLink")}
@@ -106,7 +106,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         {/* Mobile Header */}
         <header className="lg:hidden flex items-center justify-between p-6 border-b border-border bg-background/50 backdrop-blur-md">
           <Link
-            href="/"
+            href={localize("/")}
             className="flex items-center gap-2 group relative z-40"
           >
             <Logo alt={t("common.brandName")} />
@@ -128,7 +128,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
             <span>
               {t("auth.footer.helpPrefix")}{" "}
               <Link
-                href="/contact"
+                href={localize("/contact")}
                 className="text-foreground font-medium underline underline-offset-2 hover:text-accent transition-colors"
               >
                 {t("auth.footer.supportLink")}
@@ -138,7 +138,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
               •
             </span>
             <Link
-              href="/terms"
+              href={localize("/terms")}
               className="text-foreground font-medium underline underline-offset-2 hover:text-accent transition-colors"
             >
               {t("auth.footer.termsLink")}

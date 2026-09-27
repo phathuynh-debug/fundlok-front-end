@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { getSeoStrings, OG_LOCALE } from "@/lib/seo";
+import { getSeoStrings, OG_LOCALE, resolveSeoLocale } from "@/lib/seo";
 import { cookies } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -80,20 +80,15 @@ const SITE_KEYWORDS = [
   "IBCOL 2023",
 ];
 
-// Vietnamese unless the visitor has explicitly chosen English. Mirrors
-// DEFAULT_LOCALE in lib/i18n/index.tsx; the two must agree or the first paint
-// disagrees with the client tree that hydrates over it.
-function getLocaleFromCookie(cookieValue?: string | null) {
-  return cookieValue === "en" ? "en" : "vi";
-}
-
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const cookieStore = await cookies();
-  const locale = getLocaleFromCookie(cookieStore.get("NEXT_LOCALE")?.value);
+  // The URL on a localized public page (/en/...), else the cookie. Same
+  // resolver as the page and its metadata, so <html lang> matches the body.
+  const locale = await resolveSeoLocale();
   // Read server-side so the first paint already respects the preference —
   // see the note in components/appearance-provider.tsx.
   const reduceMotion = parseReduceMotionCookie(

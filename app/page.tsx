@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 
-import { getSeoStrings, OG_LOCALE } from "@/lib/seo";
-import { cookies } from "next/headers";
+import {
+  getSeoStrings,
+  localeAlternates,
+  OG_LOCALE,
+  resolveSeoLocale,
+} from "@/lib/seo";
 import SiteHeader from "@/components/site-header";
 import { SectionLocator } from "@/components/section-locator";
 import SiteFooter from "@/components/site-footer";
@@ -109,7 +113,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const { locale, seo } = await getSeoStrings();
 
   return {
-    alternates: { canonical: "/" },
+    alternates: localeAlternates("/", locale),
     title: seo.homeTitle,
     description: seo.homeDescription,
     keywords: [
@@ -134,6 +138,7 @@ export async function generateMetadata(): Promise<Metadata> {
       "FundLok founders",
     ],
     openGraph: {
+      url: localeAlternates("/", locale).canonical,
       title: seo.homeTitle,
       description: seo.homeOgDescription,
       type: "website",
@@ -149,12 +154,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const cookieStore = await cookies();
-  const cookieValue = cookieStore.get("NEXT_LOCALE")?.value;
-  // Same default as app/layout.tsx and lib/i18n: Vietnamese unless English was
-  // explicitly chosen. This page builds its copy on the server, so it resolves
-  // the cookie itself rather than reading the client context.
-  const locale = cookieValue === "en" ? "en" : "vi";
+  // This page builds its copy on the server, so it resolves the language
+  // itself rather than reading the client context: the URL (/ or /en), the
+  // same resolver the layout and metadata use.
+  const locale = await resolveSeoLocale();
   const currentLocale = locale;
   const strings = dict[currentLocale];
 
