@@ -18,6 +18,41 @@
       "time": "Thời gian",
       "title": "Nhật ký kiểm toán"
     },
+    "investorLeads": {
+      "acknowledged": "Đã xác nhận minh họa",
+      "allStatuses": "Mọi trạng thái",
+      "allTiers": "Mọi khẩu vị",
+      "atCalculate": "Khi bấm tính",
+      "atSignup": "Khi đăng ký",
+      "boardRate": "Lãi suất tham chiếu (nội bộ)",
+      "calculatedOnly": "Chỉ mới tính",
+      "col": {
+        "amount": "Số tiền",
+        "contact": "Liên hệ",
+        "date": "Ngày",
+        "netApy": "APY ròng đã hiển thị",
+        "reference": "Mã tham chiếu",
+        "status": "Trạng thái",
+        "tier": "Khẩu vị rủi ro"
+      },
+      "consented": "Đồng ý được liên hệ",
+      "empty": "Chưa có nhà đầu tư nào.",
+      "ip": "Địa chỉ IP",
+      "language": "Ngôn ngữ",
+      "months": "tháng",
+      "pricing": "Định giá đã dùng",
+      "record": "Hồ sơ",
+      "searchPlaceholder": "Tìm theo tên, email hoặc mã tham chiếu",
+      "signedUp": "Đã đăng ký",
+      "signedUpAt": "Ngày đăng ký",
+      "stat": {
+        "capital": "Vốn dự kiến",
+        "pageHint": "Trên trang này",
+        "signed": "Đã đăng ký",
+        "total": "Tổng số",
+        "totalHint": "Mọi người đã bấm tính"
+      }
+    },
     "loading": "Đang tải trang quản trị…",
     "pagination": {
       "next": "Sau",
@@ -87,6 +122,8 @@
     },
     "ratesPage": {
       "subtitle": "Nhật ký các lượt tính lãi suất tham khảo từ khách hàng trên Landing Page.",
+      "tabInvestor": "Nhà đầu tư quan tâm",
+      "tabSme": "Tra cứu lãi suất SME",
       "title": "Yêu cầu định phí & Lãi suất"
     },
     "ratesSummary": {
@@ -1861,6 +1898,13 @@
       "SECTOR_TABLE_DRAFT": "Dữ liệu rủi ro ngành vẫn là bản nháp đang chờ rà soát, nên ước tính này chỉ là tạm tính."
     },
     "assumptionsTitle": "Ước tính này dựa trên các giả định",
+    "audience": {
+      "investor": "Nhà đầu tư",
+      "investorHint": "Tôi muốn đầu tư",
+      "label": "Bạn là",
+      "sme": "Doanh nghiệp",
+      "smeHint": "Tôi cần vốn"
+    },
     "bestMonth": "Doanh thu tháng cao nhất",
     "calculating": "Đang tính…",
     "cogs": "Giá vốn hàng bán, 12 tháng gần nhất",
@@ -1906,6 +1950,73 @@
     "industry": "Ngành nghề",
     "industryPlaceholder": "Chọn ngành của bạn",
     "inquiryIdLabel": "Mã tra cứu định phí",
+    "investor": {
+      "amount": "Bạn muốn đầu tư bao nhiêu? (VND)",
+      "bridge": "Mỗi khoản vay kéo dài khoảng {avg} tháng. Trong {months} tháng cam kết, vốn của bạn quay vòng khoảng {turns} lần và được cho vay lại theo tần suất bạn chọn. Đó là lý do {net} mỗi khoản trở thành {apy} tính theo năm.",
+      "bridgeNone": "Mỗi khoản vay kéo dài khoảng {avg} tháng. Nếu không tái đầu tư, tiền của bạn chỉ làm việc {avg} trong {months} tháng cam kết, nên {net} mỗi khoản rút xuống còn {apy} tính theo năm.",
+      "cadence": "Tần suất tái đầu tư",
+      "cadenceHint": "Yếu tố này ảnh hưởng đến con số nhiều hơn mọi thứ khác trên trang. Tiền nằm không giữa các khoản vay thì không sinh lời.",
+      "cadenceOption": {
+        "daily": "Hàng ngày (tự động tái đầu tư)",
+        "monthly": "Hàng tháng",
+        "none": "Không (một khoản, giữ đến hết kỳ)",
+        "quarterly": "Hàng quý",
+        "weekly": "Hàng tuần"
+      },
+      "calculate": "Tính lợi suất mục tiêu",
+      "calculating": "Đang tính…",
+      "commitment": "Kỳ hạn cam kết",
+      "consent": "Tôi đồng ý để FundLok liên hệ về yêu cầu này và lưu các thông tin trên cho mục đích đó.",
+      "detailsLabel": "Thông tin của bạn",
+      "disclaimer": "Chỉ mang tính minh họa. Giả định theo mô hình định giá hiện tại của FundLok, tổn thất tín dụng dự kiến theo nhóm và tần suất tái đầu tư bạn chọn. Lợi nhuận thực tế phụ thuộc vào tỷ lệ vỡ nợ thực tế, tốc độ giải ngân vốn và việc thực hiện tái đầu tư. Không phải lợi nhuận được đảm bảo; FundLok không phải là ngân hàng và không đảm bảo gốc hay lãi.",
+      "email": "Email",
+      "emailPlaceholder": "ban@email.com",
+      "error": {
+        "amountMax": "Tối đa 1.000.000.000.000 VND",
+        "amountMin": "Tối thiểu 1.000.000 VND",
+        "consent": "Vui lòng đánh dấu để chúng tôi có thể liên hệ với bạn",
+        "email": "Vui lòng nhập email hợp lệ",
+        "name": "Vui lòng nhập họ và tên",
+        "phone": "Số điện thoại cần có 8 đến 15 chữ số"
+      },
+      "estReturn": "Tương ứng bao nhiêu trên số tiền của bạn",
+      "formHint": "Chọn số tiền, thời gian cam kết và mức rủi ro bạn muốn, rồi bấm tính.",
+      "formTitle": "Thông tin đầu tư",
+      "gateBody": "Những gì bạn sắp xem là minh họa. Không phải lời chào mời, không phải đề nghị đầu tư, và không phải lợi nhuận được đảm bảo. FundLok thu xếp vốn giữa SME và nhà đầu tư. Chúng tôi không nhận tiền gửi và không đảm bảo gốc hay lãi.",
+      "gateCheckbox": "Tôi hiểu. Đây là minh họa, không phải lời chào mời.",
+      "gateContinue": "Tiếp tục",
+      "gateTitle": "Trước khi tiếp tục",
+      "monthsShort": "{count} tháng",
+      "name": "Họ và tên",
+      "namePlaceholder": "Nguyễn Văn A",
+      "netApy": "APY ròng mục tiêu",
+      "optional": "(không bắt buộc)",
+      "phone": "Số điện thoại / Zalo",
+      "resultEmpty": "Điền thông tin bên trái rồi bấm tính. Lợi suất mục tiêu của bạn sẽ hiện ở đây.",
+      "resultHint": "Dựa trên giả định định giá hiện tại của chúng tôi. Không phải báo giá.",
+      "resultTitle": "Lợi suất mục tiêu (minh họa)",
+      "risk": "Khẩu vị rủi ro",
+      "signingUp": "Đang đăng ký…",
+      "signup": "Đăng ký để nhận thêm thông tin",
+      "subtitle": "Xem số tiền của bạn sinh lời ra sao. Khoảng 2 phút, chưa cần hồ sơ.",
+      "successBody": "Mã tham chiếu {reference}. Đội ngũ của chúng tôi sẽ liên hệ trực tiếp với bạn. Một đối một, không công khai, không chia sẻ.",
+      "successTitle": "Đã đăng ký.",
+      "tier": {
+        "balanced": "Cân bằng",
+        "conservative": "Thận trọng",
+        "growth": "Tăng trưởng"
+      },
+      "tierHint": {
+        "balanced": "Các khoản vay quanh mức {rate}%/năm. Đây là mức mặc định của chúng tôi.",
+        "conservative": "Các khoản vay quanh mức {rate}%/năm. Lợi suất thấp hơn, tổn thất dự kiến cũng thấp hơn.",
+        "growth": "Các khoản vay quanh mức {rate}%/năm. Lợi suất cao hơn, rủi ro cũng cao hơn."
+      },
+      "updating": "Đang cập nhật…",
+      "walkExpectedLoss": "Tỷ lệ tổn thất dự kiến (PD × LGD × EAD)",
+      "walkFee": "Phí của FundLok",
+      "walkLoanRate": "Lãi suất mỗi khoản vay (năm)",
+      "walkNetPerLoan": "Phần bạn giữ lại, mỗi khoản vay"
+    },
     "loanAmount": "Số tiền bạn cần",
     "loanAmountHint": "Từ 20.000.000 ₫ đến 1.000.000.000 ₫.",
     "monthlyPaymentLabel": "Ước tính trả góp hàng tháng",

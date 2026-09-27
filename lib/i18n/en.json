@@ -18,6 +18,41 @@
       "time": "Time",
       "title": "Audit logs"
     },
+    "investorLeads": {
+      "acknowledged": "Acknowledged illustration",
+      "allStatuses": "All statuses",
+      "allTiers": "All tiers",
+      "atCalculate": "At calculate",
+      "atSignup": "At sign-up",
+      "boardRate": "Board rate (internal)",
+      "calculatedOnly": "Calculated only",
+      "col": {
+        "amount": "Amount",
+        "contact": "Contact",
+        "date": "Date",
+        "netApy": "Net APY shown",
+        "reference": "Reference",
+        "status": "Status",
+        "tier": "Risk tier"
+      },
+      "consented": "Consented to contact",
+      "empty": "No investor leads yet.",
+      "ip": "IP address",
+      "language": "Language",
+      "months": "mo",
+      "pricing": "Pricing used",
+      "record": "Record",
+      "searchPlaceholder": "Search name, email or reference",
+      "signedUp": "Signed up",
+      "signedUpAt": "Signed up",
+      "stat": {
+        "capital": "Capital indicated",
+        "pageHint": "On this page",
+        "signed": "Signed up",
+        "total": "Total leads",
+        "totalHint": "Everyone who pressed calculate"
+      }
+    },
     "loading": "Loading admin…",
     "pagination": {
       "next": "Next",
@@ -87,6 +122,8 @@
     },
     "ratesPage": {
       "subtitle": "Live inquiries and indicative rate calculations submitted from the public rate calculator.",
+      "tabInvestor": "Investor leads",
+      "tabSme": "SME rate checks",
       "title": "Rate Inquiries & Calculator Logs"
     },
     "ratesSummary": {
@@ -1861,6 +1898,13 @@
       "SECTOR_TABLE_DRAFT": "Industry risk data is still a draft pending review, so this estimate is provisional."
     },
     "assumptionsTitle": "What this estimate assumes",
+    "audience": {
+      "investor": "An investor",
+      "investorHint": "I want to invest",
+      "label": "You are",
+      "sme": "A business",
+      "smeHint": "I need funding"
+    },
     "bestMonth": "Best month's revenue",
     "calculating": "Calculating…",
     "cogs": "Cost of goods sold, last 12 months",
@@ -1906,6 +1950,73 @@
     "industry": "Industry",
     "industryPlaceholder": "Select your industry",
     "inquiryIdLabel": "Inquiry Reference ID",
+    "investor": {
+      "amount": "How much do you want to invest? (VND)",
+      "bridge": "Loans run about {avg} months. Over a {months}-month commitment your capital turns over roughly {turns} times, going back out at the pace you picked. That is how {net} per loan becomes {apy} a year.",
+      "bridgeNone": "Loans run about {avg} months. Without reinvesting, your money only works for {avg} of your {months} committed months, so {net} per loan comes out to {apy} across the year.",
+      "cadence": "Reinvestment cadence",
+      "cadenceHint": "This moves the number more than anything else on the page. Money that sits idle between loans earns nothing.",
+      "cadenceOption": {
+        "daily": "Daily (auto-reinvest)",
+        "monthly": "Monthly",
+        "none": "None (one loan, held to the end)",
+        "quarterly": "Quarterly",
+        "weekly": "Weekly"
+      },
+      "calculate": "Calculate my target yield",
+      "calculating": "Calculating…",
+      "commitment": "Commitment period",
+      "consent": "FundLok may contact me about this enquiry and keep these details for that purpose.",
+      "detailsLabel": "Your details",
+      "disclaimer": "An illustration, nothing more. It assumes our current pricing model, the expected credit loss for the tier you picked, and the reinvestment pace you chose. What you actually earn depends on real defaults, how quickly capital gets deployed, and whether reinvestment actually happens. This is not a guaranteed return. FundLok is not a bank, and we do not guarantee your principal or your yield.",
+      "email": "Email",
+      "emailPlaceholder": "you@email.com",
+      "error": {
+        "amountMax": "Enter no more than 1,000,000,000,000 VND",
+        "amountMin": "Enter at least 1,000,000 VND",
+        "consent": "Tick this box so we can contact you",
+        "email": "Enter a valid email address",
+        "name": "Enter your full name",
+        "phone": "Enter a phone number of 8 to 15 digits"
+      },
+      "estReturn": "What that's worth on your amount",
+      "formHint": "Set your amount, how long you're committing, and how much risk you want, then press calculate.",
+      "formTitle": "Investment specs",
+      "gateBody": "What's behind this is an illustration. It is not an offer, not a solicitation, and not a guaranteed return. FundLok arranges funding between SMEs and investors. We don't take deposits, and we don't guarantee your principal or your yield.",
+      "gateCheckbox": "Got it. This is an illustration, not an offer.",
+      "gateContinue": "Continue",
+      "gateTitle": "Before you continue",
+      "monthsShort": "{count} months",
+      "name": "Full name",
+      "namePlaceholder": "Nguyễn Văn A",
+      "netApy": "Target net APY",
+      "optional": "(optional)",
+      "phone": "Phone / Zalo",
+      "resultEmpty": "Fill in your details on the left, then press calculate. Your target yield appears here.",
+      "resultHint": "Built from our current pricing assumptions. Not a quote.",
+      "resultTitle": "Target yield (illustrative)",
+      "risk": "Risk tolerance",
+      "signingUp": "Signing you up…",
+      "signup": "Sign up for more information",
+      "subtitle": "See what a commitment could earn. About two minutes, and no paperwork yet.",
+      "successBody": "Reference {reference}. Someone from our team will get back to you directly. One to one, never published, never shared.",
+      "successTitle": "You're signed up.",
+      "tier": {
+        "balanced": "Balanced",
+        "conservative": "Conservative",
+        "growth": "Growth"
+      },
+      "tierHint": {
+        "balanced": "Loans priced around {rate}% a year. This is where we sit by default.",
+        "conservative": "Loans priced around {rate}% a year. You earn less, and less of it is expected to go missing.",
+        "growth": "Loans priced around {rate}% a year. More yield, and more of it at risk."
+      },
+      "updating": "Updating…",
+      "walkExpectedLoss": "Expected loss rate (PD × LGD × EAD)",
+      "walkFee": "FundLok's fee",
+      "walkLoanRate": "Interest rate, per loan",
+      "walkNetPerLoan": "What you keep, per loan"
+    },
     "loanAmount": "How much you want",
     "loanAmountHint": "Between 20,000,000 ₫ and 1,000,000,000 ₫.",
     "monthlyPaymentLabel": "Estimated Monthly Repayment",

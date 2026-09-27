@@ -104,6 +104,15 @@ export const RATE_CALCULATOR_ENDPOINTS = {
   calculate: "/api/v1/rates/calculate",
   inquiries: "/admin/rates/inquiries",
   inquiryDetail: (id: string) => `/admin/rates/inquiries/${id}`,
+  investorTiers: "/api/v1/rates/investor/tiers",
+  investorLeads: "/api/v1/rates/investor/leads",
+  investorEstimate: (leadId: string) =>
+    `/api/v1/rates/investor/leads/${leadId}/estimate`,
+  investorSignup: (leadId: string) =>
+    `/api/v1/rates/investor/leads/${leadId}/signup`,
+  // Admin only. No /api/v1 alias exists for these: they hold personal data.
+  investorLeadsAdmin: "/admin/rates/investor-leads",
+  investorLeadAdmin: (id: string) => `/admin/rates/investor-leads/${id}`,
 } as const;
 
 export const ADMIN_ENDPOINTS = {

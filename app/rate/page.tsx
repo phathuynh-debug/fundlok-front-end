@@ -33,6 +33,17 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RatePage() {
-  return <RateClient />;
+export default async function RatePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ for?: string | string[] }>;
+}) {
+  // Read on the server so /rate?for=investor renders the investor tab in the
+  // first HTML, with no flash of the SME form while the client catches up.
+  const { for: audience } = await searchParams;
+  return (
+    <RateClient
+      initialAudience={audience === "investor" ? "investor" : "sme"}
+    />
+  );
 }
