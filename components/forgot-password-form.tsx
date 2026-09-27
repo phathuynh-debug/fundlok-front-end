@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Mail, Loader2, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
 import { useForgotPassword } from "@/app/forgot-password/use-forgot-password";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
@@ -20,7 +21,7 @@ export function ForgotPasswordForm() {
     reset: resetTurnstile,
   } = useTurnstile();
   const { toast } = useToast();
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const { forgotPassword, isPending, isSuccess } = useForgotPassword();
 
   const handleForgotPassword = (e: React.FormEvent) => {
@@ -33,7 +34,7 @@ export function ForgotPasswordForm() {
       toast({
         variant: "destructive",
         title: t("auth.forgotPassword.failedTitle"),
-        description: "Please complete the security check.",
+        description: t("auth.securityCheckRequired"),
       });
       return;
     }
@@ -51,8 +52,11 @@ export function ForgotPasswordForm() {
           toast({
             variant: "destructive",
             title: t("auth.forgotPassword.failedTitle"),
-            description:
-              error?.message || t("auth.forgotPassword.failedDescription"),
+            description: apiErrorMessage(
+              error,
+              locale,
+              t("auth.forgotPassword.failedDescription"),
+            ),
           });
           resetTurnstile();
         },

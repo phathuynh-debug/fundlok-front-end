@@ -19,13 +19,14 @@
 //   * Repayment is a FIXED AMOUNT EACH BUSINESS DAY, not a monthly instalment
 //     with a shifting principal/interest split. An amortisation table is bank
 //     mechanics and describes a different product.
-//   * The TOTAL REPAYABLE IS FIXED AT SIGNING. It does not grow because a
-//     period went badly or shrink because one went well, so `outstanding` is
-//     derived from that fixed total — never by summing future rows.
-//   * RELIEF RUNS ONE WAY ONLY. If verified revenue falls short the daily
-//     amount for that period drops and the facility runs LONGER; the total
-//     owed is unchanged and we never ask for more after a strong period.
-//   * The term is 6 or 12 months, and the BACKSTOP at 1.33x is shown, because
+//   * The TOTAL REPAYABLE IS SET AT SIGNING and a strong period never shrinks
+//     or raises it. `outstanding` is derived from the total — never by summing
+//     future rows.
+//   * WHEN REVENUE DROPS THE TERM STRETCHES AND THE TOTAL GOES UP. The daily
+//     amount for that period drops, the term runs longer until the shortfall
+//     is repaid, and interest on the extra time is added to the total (see
+//     stretchedTerm in lib/facility-terms.ts). Less per day, for longer.
+//   * The term is 1 to 6 months, and the BACKSTOP at 1.33x is shown, because
 //     the SME knows that date from the day they sign.
 //   * The score is 0-100. A letter grade ("B+") is rating-agency notation.
 
@@ -33,6 +34,7 @@ import {
   backstopDate,
   BUSINESS_DAYS_PER_PERIOD,
   RATE_CEILING_PCT,
+  stretchedTerm,
   type TermMonths,
 } from "@/lib/facility-terms";
 
@@ -84,15 +86,22 @@ export interface SmeFunding {
    * capped at the statutory 20%/yr ceiling.
    */
   interest_rate_pct: number;
-  /** Declared term: 6 or 12 months only. */
+  /** Declared term: 1 to 6 months. */
   term_months: TermMonths;
   /**
-   * Everything owed, fixed on the day the contract was signed. Settling early
-   * clears this balance; it does not reduce it.
+   * Everything owed as set on the day the contract was signed. Settling early
+   * clears this balance; it does not reduce it. If revenue drops and the term
+   * stretches, interest on the extra time is added on top (see
+   * FundingSummary.total_repayable).
    */
   total_repayable: number;
   /** The contractual fixed amount charged each business day, VND. */
   daily_amount: number;
+  /**
+   * The daily amount as a share of average daily verified revenue, as a
+   * decimal. The engine's affordability gate sits at 0.30.
+   */
+  revenue_share: number;
   /** When the omnibus account paid out, or null while still funding. */
   disbursed_at: string | null;
 }
@@ -108,15 +117,18 @@ export const MOCK_SME_FUNDING: SmeFunding = {
   // business days in the term: 7,447,917 x 126 = 938,437,542.
   total_repayable: 938437542,
   daily_amount: 7447917,
+  // ~28.6M VND average daily revenue: comfortably under the 0.30 gate.
+  revenue_share: 0.26,
   disbursed_at: "2026-05-18",
 };
 
 // Six true-up periods for a six-month term. Two collected in full, one where
 // revenue fell short and relief brought the daily amount down, one running now.
 //
-// The relief period is the point of this dataset: it collects less, the total
-// owed does not move, and the balance simply takes longer to clear — bounded
-// by the backstop date.
+// The relief period is the point of this dataset: it collects 46,996,257 less
+// than the contract, so the term stretches by 7 business days and interest on
+// those days (3,524,306) is added to the total — still bounded by the backstop
+// date.
 export const MOCK_REPAYMENT_PERIODS: RepaymentPeriod[] = [
   {
     number: 1,
@@ -139,8 +151,9 @@ export const MOCK_REPAYMENT_PERIODS: RepaymentPeriod[] = [
     start_date: "2026-07-17",
     end_date: "2026-08-14",
     business_days: BUSINESS_DAYS_PER_PERIOD,
-    // Verified revenue came in under the true-up threshold, so the obligation
-    // for this period dropped. Relief only ever moves in this direction.
+    // Verified revenue came in under the true-up threshold, so the daily
+    // amount for this period dropped and the term stretches to make it up.
+    // A strong period never raises the daily amount.
     daily_amount: 5210000,
     contractual_daily_amount: 7447917,
     status: "RELIEF_APPLIED",
@@ -177,9 +190,17 @@ export interface FundingSummary {
   /** Collected so far across settled periods, VND. */
   repaid: number;
   /**
+   * Everything owed now, VND: the total at signing plus interest on any extra
+   * business days the term stretched by after revenue dropped.
+   */
+  total_repayable: number;
+  /** Business days the term has stretched by because revenue dropped. */
+  extra_business_days: number;
+  /** Interest on those extra days, already included in total_repayable. */
+  extra_interest: number;
+  /**
    * Still owed, VND. Derived as `total_repayable - repaid` — NOT as the sum of
-   * the remaining rows. The total is fixed at signing, so a relief period
-   * changes how long collection takes, never how much is owed.
+   * the remaining rows, which would understate what a stretched term owes.
    */
   outstanding: number;
   /** Periods collected, relief periods included. */
@@ -203,6 +224,23 @@ export function summarizeFunding(
 ): FundingSummary {
   const collected = periods.filter((p) => isCollected(p.status));
   const repaid = collected.reduce((sum, p) => sum + periodTotal(p), 0);
+  // What relief periods collected below the contract. That shortfall is what
+  // stretches the term, and the stretch is what adds interest.
+  const shortfall = collected.reduce(
+    (sum, p) =>
+      p.contractual_daily_amount
+        ? sum + (p.contractual_daily_amount - p.daily_amount) * p.business_days
+        : sum,
+    0,
+  );
+  const { extraBusinessDays, extraInterest } = stretchedTerm(
+    funding.funded,
+    funding.interest_rate_pct,
+    funding.daily_amount,
+    shortfall,
+    funding.term_months,
+  );
+  const totalRepayable = funding.total_repayable + extraInterest;
 
   return {
     funded_pct:
@@ -210,7 +248,10 @@ export function summarizeFunding(
         ? 0
         : Math.round((funding.funded / funding.requested) * 1000) / 10,
     repaid,
-    outstanding: funding.total_repayable - repaid,
+    total_repayable: totalRepayable,
+    extra_business_days: extraBusinessDays,
+    extra_interest: extraInterest,
+    outstanding: totalRepayable - repaid,
     settled_count: collected.length,
     total_count: periods.length,
     // The schedule is authored in order, so the first uncollected row is the

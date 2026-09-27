@@ -77,7 +77,7 @@ export default function SiteHeader() {
           <SheetTrigger asChild>
             <button
               className="p-2.5 rounded-full hover:bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 transition-colors cursor-pointer outline-hidden"
-              aria-label="Toggle Navigation Menu"
+              aria-label={t("common.toggleMenu")}
             >
               <Menu className="w-5 h-5" />
             </button>

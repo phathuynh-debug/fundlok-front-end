@@ -45,6 +45,7 @@ import {
   DEFAULT_COUNTRY,
 } from "@/lib/vn-provinces";
 import { INDUSTRY_OPTIONS } from "@/lib/constants/industries";
+import { industryLabel } from "@/lib/industry-label";
 import {
   LOAN_DURATIONS_MONTHS,
   LOAN_MAX_DURATION_MONTHS,
@@ -57,6 +58,7 @@ import {
   MAX_EMPLOYEES,
   MIN_EMPLOYEES,
 } from "@/lib/constants/company-size";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 type ProjectApplicationValues = {
   legal_name: string;
@@ -234,7 +236,9 @@ export default function ProjectApplicationClient() {
         requested_amount: "",
         duration_months: "3",
         purpose: "",
-        repayment_preference: "",
+        // The only way a FundLok facility is repaid: a fixed amount each
+        // business day. Monthly/quarterly/lump-sum options do not exist.
+        repayment_preference: "DAILY",
       },
     },
   });
@@ -318,16 +322,8 @@ export default function ProjectApplicationClient() {
 
   const repaymentOptions = [
     {
-      value: "MONTHLY",
-      label: t("projectApplication.repaymentOptions.monthly"),
-    },
-    {
-      value: "QUARTERLY",
-      label: t("projectApplication.repaymentOptions.quarterly"),
-    },
-    {
-      value: "END_OF_TERM",
-      label: t("projectApplication.repaymentOptions.endOfTerm"),
+      value: "DAILY",
+      label: t("projectApplication.repaymentOptions.daily"),
     },
   ];
 
@@ -436,8 +432,11 @@ export default function ProjectApplicationClient() {
         toast({
           variant: "destructive",
           title: t("projectApplication.toasts.failedTitle"),
-          description:
-            error?.message || t("projectApplication.toasts.failedDescription"),
+          description: apiErrorMessage(
+            error,
+            locale,
+            t("projectApplication.toasts.failedDescription"),
+          ),
         });
       },
     });
@@ -461,10 +460,10 @@ export default function ProjectApplicationClient() {
           <LocaleSwitcher />
         </div>
         <div className="space-y-3">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
+          <p className="eyebrow text-primary">
             {t("projectApplication.eyebrow")}
           </p>
-          <h1 className="text-4xl font-bold tracking-tight text-foreground lg:text-5xl">
+          <h1 className="text-4xl font-bold leading-tight tracking-tight text-foreground lg:text-5xl">
             {t("projectApplication.title")}
           </h1>
           <p className="max-w-xl text-base leading-7 text-muted-foreground">
@@ -987,30 +986,19 @@ export default function ProjectApplicationClient() {
                   htmlFor="repaymentPreference"
                   error={errors.loan?.repayment_preference?.message}
                 >
-                  <Select
-                    value={selectedRepayment}
-                    onValueChange={(value) =>
-                      setValue("loan.repayment_preference", value, {
-                        shouldValidate: true,
-                      })
-                    }
-                    disabled={isPending}
+                  {/* Not a choice: every facility repays a fixed amount each
+                      business day, so this is shown, not selected. */}
+                  <p
+                    id="repaymentPreference"
+                    className="rounded-md border border-input bg-muted/40 px-3 py-2 text-sm text-foreground"
                   >
-                    <SelectTrigger id="repaymentPreference" className="w-full">
-                      <SelectValue
-                        placeholder={t(
-                          "projectApplication.placeholders.repaymentPreference",
-                        )}
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {repaymentOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    {repaymentOptions.find(
+                      (option) => option.value === selectedRepayment,
+                    )?.label ?? t("projectApplication.repaymentOptions.daily")}
+                  </p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {t("projectApplication.hints.repaymentPreference")}
+                  </p>
                 </Field>
 
                 <Field
@@ -1052,7 +1040,7 @@ export default function ProjectApplicationClient() {
 
                     <span>{t("projectApplication.fields.industry")}:</span>
                     <span className="text-foreground font-semibold">
-                      {getValues("industry")}
+                      {industryLabel(getValues("industry"), t)}
                     </span>
 
                     <span>{t("projectApplication.fields.employeeCount")}:</span>
@@ -1073,7 +1061,7 @@ export default function ProjectApplicationClient() {
                     <span>{t("projectApplication.info.locationTitle")}</span>
                   </h3>
                   <div className="grid grid-cols-[120px_1fr] gap-y-2 text-muted-foreground">
-                    <span>Address:</span>
+                    <span>{t("projectApplication.fields.address")}:</span>
                     <span className="text-foreground font-semibold leading-relaxed">
                       {getValues("address.street")}, {getValues("address.city")}
                       {getValues("address.state")

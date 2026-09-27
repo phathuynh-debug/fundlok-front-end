@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 
+import { ALLOWED_TERM_MONTHS } from "@/lib/facility-terms";
 import {
   BUSINESS_DAYS_PER_PERIOD,
   MOCK_REPAYMENT_PERIODS,
@@ -25,6 +26,7 @@ const funding = (overrides: Partial<SmeFunding> = {}): SmeFunding => ({
   term_months: 6,
   total_repayable: 536_250_000,
   daily_amount: 4_255_952,
+  revenue_share: 0.25,
   disbursed_at: null,
   ...overrides,
 });
@@ -59,10 +61,11 @@ describe("summarizeFunding", () => {
     expect(summary.repaid).toBe(21_000_000);
   });
 
-  it("derives outstanding from the fixed total, not from future rows", () => {
-    // THE load-bearing assertion. The total repayable is fixed at signing, so
-    // what is still owed is total minus collected — never the sum of the
-    // remaining schedule, which a relief period would understate.
+  it("stretches the term and adds interest when a relief period falls short", () => {
+    // THE load-bearing assertion. When revenue drops the daily amount drops
+    // and the term stretches until the shortfall is repaid; interest on the
+    // extra time is added, so the total goes UP. What is still owed is that
+    // total minus collected — never the sum of the remaining schedule.
     const summary = summarizeFunding(
       funding({ total_repayable: 500_000_000 }),
       [
@@ -83,8 +86,22 @@ describe("summarizeFunding", () => {
       ],
     );
     expect(summary.repaid).toBe(21_000_000 + 4_200_000);
-    // ...and the amount still owed is unchanged by that fact.
-    expect(summary.outstanding).toBe(500_000_000 - 25_200_000);
+    // ...16,800,000 short at the fixture's 4,255,952/day stretches the term by
+    // 4 business days, and 500M x 14% x 4 / 252 = 1,111,111 of extra interest.
+    expect(summary.extra_business_days).toBe(4);
+    expect(summary.extra_interest).toBe(1_111_111);
+    expect(summary.total_repayable).toBe(500_000_000 + 1_111_111);
+    expect(summary.outstanding).toBe(500_000_000 + 1_111_111 - 25_200_000);
+  });
+
+  it("keeps the signing total when every period is collected in full", () => {
+    const summary = summarizeFunding(
+      funding({ total_repayable: 500_000_000 }),
+      [period({ number: 1, status: "SETTLED" })],
+    );
+    expect(summary.extra_business_days).toBe(0);
+    expect(summary.extra_interest).toBe(0);
+    expect(summary.total_repayable).toBe(500_000_000);
   });
 
   it("treats a relief period as collected, not as still owing", () => {
@@ -120,8 +137,21 @@ describe("summarizeFunding", () => {
 });
 
 describe("MOCK_SME_FUNDING", () => {
-  it("declares a 6 or 12 month term", () => {
-    expect([6, 12]).toContain(MOCK_SME_FUNDING.term_months);
+  it("declares a term of 1 to 6 months", () => {
+    expect(ALLOWED_TERM_MONTHS as readonly number[]).toContain(
+      MOCK_SME_FUNDING.term_months,
+    );
+  });
+
+  it("adds interest for the days its relief period stretched the term", () => {
+    // 46,996,257 short at 7,447,917/day -> 7 extra business days, and
+    // 875,000,000 x 14.5% x 7 / 252 = 3,524,306.
+    const summary = summarizeFunding(MOCK_SME_FUNDING, MOCK_REPAYMENT_PERIODS);
+    expect(summary.extra_business_days).toBe(7);
+    expect(summary.extra_interest).toBe(3_524_306);
+    expect(summary.total_repayable).toBe(
+      MOCK_SME_FUNDING.total_repayable + 3_524_306,
+    );
   });
 
   it("never quotes a rate above the statutory ceiling", () => {
@@ -165,8 +195,8 @@ describe("MOCK_REPAYMENT_PERIODS", () => {
     }
   });
 
-  it("only ever applies relief downward", () => {
-    // Handbook §2: if revenue was strong we never ask for more.
+  it("only ever lowers the daily amount, never raises it", () => {
+    // A strong period never raises the daily amount.
     for (const p of MOCK_REPAYMENT_PERIODS) {
       if (p.contractual_daily_amount) {
         expect(p.daily_amount).toBeLessThan(p.contractual_daily_amount);

@@ -5,29 +5,50 @@ import { Banknote, Percent, Calendar, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTranslations } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format-currency";
+import { dailyRepaymentAmount } from "@/lib/facility-terms";
 import { staggerContainerVariants, springItemVariants } from "@/lib/animations";
 
 interface InvestmentKpisProps {
   /** VND, unformatted. Formatted here so the figure follows the UI locale
       instead of arriving as a pre-baked string. */
   loanAmountVnd?: number;
-  expectedRoi?: string;
+  /** All-in annual rate, e.g. 10.2 for 10.2%. */
+  interestRatePct?: number;
   /** Loan term in months; rendered per locale. */
   paybackMonths?: number;
   revenueShareRate?: string;
 }
 
 export function InvestmentKpis({
-  // Mock fallback while the page has no real loan attached: 800M VND sits
-  // inside the engine's 20M-1bn range, so it reads as a plausible loan.
-  loanAmountVnd = 800_000_000,
-  expectedRoi = "10.2%",
-  // 6, not an arbitrary number: the grading engine accepts 1-6 months
-  // (LOAN_DURATIONS_MONTHS), so an unoriginatable term is avoided.
-  paybackMonths = 6,
-  revenueShareRate = "8.5%",
+  loanAmountVnd,
+  interestRatePct,
+  paybackMonths,
+  revenueShareRate,
 }: InvestmentKpisProps) {
   const { locale, t } = useTranslations();
+
+  // If no loan data is passed at all, use the coherent mock set for demo previews.
+  // When a real project provides an amount but contract terms (rate, duration)
+  // are still pending, do not mix real principal with mock terms.
+  const isDemo =
+    loanAmountVnd === undefined &&
+    interestRatePct === undefined &&
+    paybackMonths === undefined &&
+    revenueShareRate === undefined;
+
+  const displayAmount = isDemo ? 800_000_000 : loanAmountVnd;
+  const displayRate = isDemo ? 10.2 : interestRatePct;
+  const displayMonths = isDemo ? 6 : paybackMonths;
+  const displayRevShare = isDemo ? "8.5%" : revenueShareRate;
+
+  // What the SME pays across the whole loan each business day — only derived
+  // when amount, rate and term are all present so figures strictly reconcile.
+  const dailyObligationVnd =
+    displayAmount !== undefined &&
+    displayRate !== undefined &&
+    displayMonths !== undefined
+      ? dailyRepaymentAmount(displayAmount, displayRate, displayMonths)
+      : null;
 
   return (
     <motion.div
@@ -55,7 +76,9 @@ export function InvestmentKpis({
               longer value clips at the card edge rather than overflowing it. */}
           <div className="min-w-0 mt-2">
             <div className="truncate whitespace-nowrap text-2xl md:text-xl font-bold tracking-tight text-foreground">
-              {formatCurrency(loanAmountVnd, locale)}
+              {displayAmount !== undefined
+                ? formatCurrency(displayAmount, locale)
+                : t("common.na")}
             </div>
           </div>
         </Card>
@@ -71,7 +94,9 @@ export function InvestmentKpis({
             </span>
           </div>
           <div className="text-3xl font-bold tracking-tight text-emerald-600 mt-2">
-            {expectedRoi}
+            {displayRate !== undefined
+              ? `${displayRate.toFixed(1)}%`
+              : t("common.na")}
           </div>
         </Card>
       </motion.div>
@@ -86,7 +111,9 @@ export function InvestmentKpis({
             </span>
           </div>
           <div className="text-3xl font-bold tracking-tight text-foreground mt-2">
-            {t("investment.kpis.months", { count: paybackMonths })}
+            {displayMonths !== undefined
+              ? t("investment.kpis.months", { count: displayMonths })
+              : t("common.na")}
           </div>
         </Card>
       </motion.div>
@@ -102,11 +129,30 @@ export function InvestmentKpis({
           </div>
           <div>
             <div className="text-3xl font-bold tracking-tight text-foreground mt-1">
-              {revenueShareRate}
+              {displayRevShare ?? t("common.na")}
             </div>
-            <span className="text-xs text-muted-foreground block mt-1">
-              {t("investment.kpis.ofDailyRevenue")}
+            {displayRevShare && (
+              <span className="text-xs text-muted-foreground block mt-1">
+                {t("investment.kpis.ofDailyRevenue")}
+              </span>
+            )}
+          </div>
+          {/* The % is the share of revenue; this is the fixed amount it comes
+              to each business day. */}
+          <div className="mt-3 min-w-0 border-t border-border pt-3">
+            <span className="text-xs font-medium text-muted-foreground block">
+              {t("investment.kpis.dailyObligation")}
             </span>
+            <div className="truncate whitespace-nowrap text-base font-bold text-foreground">
+              {dailyObligationVnd !== null
+                ? formatCurrency(dailyObligationVnd, locale)
+                : t("common.na")}
+            </div>
+            {dailyObligationVnd !== null && (
+              <span className="text-xs text-muted-foreground block">
+                {t("investment.kpis.perBusinessDay")}
+              </span>
+            )}
           </div>
         </Card>
       </motion.div>

@@ -1,6 +1,16 @@
+import type { Metadata } from "next";
+import { getServerTranslations } from "@/lib/i18n/server";
 import { Suspense } from "react";
 import ProjectDetailsClient from "./client";
 import { Loader2 } from "lucide-react";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerTranslations();
+  return {
+    title: t("seo.projectDetailsTitle"),
+    description: t("seo.projectDetailsDescription"),
+  };
+}
 
 export default function ProjectDetailsPage() {
   return (

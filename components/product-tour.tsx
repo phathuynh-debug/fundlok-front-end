@@ -201,7 +201,7 @@ export function TourOverlay({
         )}
         style={{ top, left }}
       >
-        <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+        <p className="eyebrow text-muted-foreground">
           {t("dashboard.tour.progress", {
             current: stepIndex + 1,
             total: stepCount,

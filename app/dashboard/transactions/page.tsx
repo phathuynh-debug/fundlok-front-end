@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import TransactionsClient from "./client";
+import { getServerTranslations } from "@/lib/i18n/server";
 
-export const metadata: Metadata = {
-  title: "Transactions",
-  description:
-    "Review every movement of funds across your FundLok account — investments, returns, deposits, withdrawals and fees.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerTranslations();
+  return {
+    title: t("seo.transactionsTitle"),
+    description: t("seo.transactionsDescription"),
+  };
+}
 
 export default function TransactionsPage() {
   return <TransactionsClient />;

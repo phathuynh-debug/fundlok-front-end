@@ -17,6 +17,7 @@
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.945 0.01 85);
   --muted-foreground: oklch(0.45 0 0);
+  --eyebrow: oklch(59.6% 0.145 163.225); /* emerald-600 */
   --accent: oklch(0.65 0.15 165);
   --accent-foreground: oklch(1 0 0);
   --destructive: oklch(0.577 0.245 27.325);
@@ -53,6 +54,7 @@
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
+  --eyebrow: oklch(76.5% 0.177 163.223); /* emerald-400 */
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.396 0.141 25.723);
@@ -76,8 +78,9 @@
 }
 
 @theme inline {
-  --font-sans: "Geist", "Geist Fallback";
-  --font-mono: "Geist", "Geist Fallback";
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -123,6 +126,36 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* --------------------------------------------------------------------------- */
+/* Shared typography roles. One element = one style, everywhere it appears.     */
+/* Uppercase letter-spacing is capped at 0.05em: wider tracking pulls           */
+/* Vietnamese tone marks away from their letters.                              */
+/* --------------------------------------------------------------------------- */
+
+/* Small section label above a heading. The colour is the public-page default;
+   add a text-* class where the surface needs another (e.g. the dark footer). */
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  line-height: var(--text-xs--line-height);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  /* Via a token rather than a dark: variant so a plain text-* class can still
+     override it in both themes (a variant would out-specify it in dark). */
+  color: var(--eyebrow);
+}
+
+/* Label above a figure in cards and KPIs. */
+@utility stat-label {
+  font-size: var(--text-xs);
+  line-height: var(--text-xs--line-height);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-muted-foreground);
 }
 
 /* Small thumb variant for range inputs */

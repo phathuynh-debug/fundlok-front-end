@@ -19,11 +19,11 @@ export async function generateMetadata(): Promise<Metadata> {
       "FundLok recognitions",
       "SME story",
       "flexible capital solutions",
-      "investor safety",
-      "stable daily income",
+      "investor transparency",
+      "daily repayment",
       "progressive repayment",
-      "revenue share lending",
-      "automated credit risk scoring",
+      "revenue-based financing",
+      "reference business score",
       "verified data financing",
       "Sustainability in Action 2024",
       "Australian Government",
@@ -68,7 +68,7 @@ const achievements = [
     name: "Top 10 Potential Project Global",
     awarder: "International Blockchain Olympiad 2023 (IBCOL)",
     description:
-      "Representing Vietnam (under the project name LENDMI), won a top-10 global spot for pioneering blockchain-based credit scoring and secure liquidity pooling for emerging markets.",
+      "Representing Vietnam (under the project name LENDMI), won a top-10 global spot for blockchain-based reference business scores and secure liquidity pooling for emerging markets.",
   },
 ];
 

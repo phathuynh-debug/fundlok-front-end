@@ -39,7 +39,7 @@ export function FigureField({ field }: { field: LiteFigureField }) {
             </span>
           )}
         </Label>
-        <span className="shrink-0 text-xs font-mono text-muted-foreground">
+        <span className="shrink-0 text-xs text-muted-foreground">
           {field.unit === "vnd" ? "₫" : "%"}
         </span>
       </div>
@@ -62,7 +62,7 @@ export function FigureField({ field }: { field: LiteFigureField }) {
         aria-describedby={`${field.key}-hint`}
         placeholder={field.unit === "vnd" ? "0" : "0-100"}
         className={cn(
-          "font-mono",
+          "tabular-nums",
           error && "border-destructive focus-visible:ring-destructive/30",
         )}
       />
@@ -70,7 +70,7 @@ export function FigureField({ field }: { field: LiteFigureField }) {
       {/* Echo the parsed value back, grouped — the cheapest way for someone
           typing 4 800 000 000 to catch a missing or extra zero. */}
       {field.unit === "vnd" && parsed !== null && !error && (
-        <p className="text-xs font-mono text-muted-foreground">
+        <p className="text-xs tabular-nums text-muted-foreground">
           {parsed.toLocaleString(locale === "vi" ? "vi-VN" : "en-US")} ₫
         </p>
       )}

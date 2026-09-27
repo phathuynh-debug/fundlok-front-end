@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, Medal, TrendingUp, Trophy } from "lucide-react";
+import { ArrowRight, Medal, TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/format-currency";
@@ -13,6 +13,7 @@ import { industryLabel } from "@/lib/industry-label";
 import { staggerContainerVariants, springItemVariants } from "@/lib/animations";
 import { cn } from "@/lib/utils";
 import { CONTROL_HOVER } from "@/lib/ui-tokens";
+import { dailyRepaymentAmount } from "@/lib/facility-terms";
 import { getIndustryChrome } from "./sme-dashboard-config";
 import {
   backstopDate,
@@ -44,6 +45,15 @@ const STATUS_STYLES: Record<HoldingStatus, string> = {
     "border-destructive/30 bg-destructive/10 text-destructive dark:text-destructive",
 };
 
+// Positions where the fixed contractual daily repayment is flowing.
+// RELIEF is handled separately to show the actual reduced relief payout.
+const RECEIVING_STATUSES: readonly HoldingStatus[] = [
+  "ACTIVE",
+  "REPAYING",
+  "WATCHLIST",
+  "EXTENDED",
+];
+
 export function HoldingsList({ holdings }: { holdings: Holding[] }) {
   const { locale, t } = useTranslations();
 
@@ -70,7 +80,6 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
         const chrome = getIndustryChrome(holding.industry, "list");
         const Icon = chrome.icon;
         const rank = rankMap.get(holding.id) ?? 1;
-        const isTopYield = rank === 1;
         const isTopThree = rank <= 3;
 
         return (
@@ -98,7 +107,10 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
                     <Icon className="h-5 w-5" />
                   </span>
                   <div className="min-w-0">
-                    <p className="truncate text-base font-bold text-foreground tracking-tight">
+                    <p
+                      className="truncate text-base font-bold text-foreground tracking-tight"
+                      title={holding.project_name}
+                    >
                       {holding.project_name}
                     </p>
                     <p
@@ -114,14 +126,7 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
 
                 <div className="flex flex-wrap items-center gap-2">
                   {/* Ranking Badge */}
-                  {isTopYield ? (
-                    <Badge className="bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 text-[11px] font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
-                      <Trophy className="h-3 w-3 text-amber-500 shrink-0" />
-                      <span>
-                        {t("dashboard.investor.holdingTopYield", { rank })}
-                      </span>
-                    </Badge>
-                  ) : isTopThree ? (
+                  {isTopThree ? (
                     <Badge
                       variant="outline"
                       className="bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 text-[11px] font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1"
@@ -166,31 +171,31 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
               </div>
 
               {/* Figures with attractive styling & standout Expected ROI */}
-              <dl className="grid grid-cols-2 gap-3 border-t border-border/60 pt-3 sm:grid-cols-4 items-center">
+              <dl className="grid grid-cols-2 items-start gap-3 border-t border-border/60 pt-3 lg:grid-cols-4">
                 <div className="min-w-0 space-y-1">
-                  <dt className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  <dt className="stat-label">
                     {t("dashboard.investor.holdingInvested")}
                   </dt>
-                  <dd className="min-w-0 truncate text-base font-bold text-foreground">
+                  <dd className="whitespace-nowrap text-sm font-bold tabular-nums text-foreground sm:text-base">
                     {formatCurrency(holding.invested, locale)}
                   </dd>
                 </div>
 
                 <div className="min-w-0 space-y-1">
-                  <dt className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  <dt className="stat-label">
                     {t("dashboard.investor.holdingReturned")}
                   </dt>
-                  <dd className="min-w-0 truncate text-base font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                  <dd className="flex items-center gap-1 whitespace-nowrap text-sm font-bold tabular-nums text-emerald-600 dark:text-emerald-400 sm:text-base">
                     <TrendingUp className="h-3.5 w-3.5 shrink-0" />
                     {formatCurrency(holding.returned, locale)}
                   </dd>
                 </div>
 
-                <div className="min-w-0 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/30 p-2.5 space-y-0.5">
-                  <dt className="text-[11px] font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
+                <div className="col-span-2 min-w-0 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/30 p-2.5 space-y-0.5 lg:col-span-1">
+                  <dt className="stat-label text-emerald-700 dark:text-emerald-300">
                     {t("dashboard.investor.holdingRoi")}
                   </dt>
-                  <dd className="truncate text-base font-bold text-emerald-600 dark:text-emerald-400">
+                  <dd className="break-words text-base font-bold tabular-nums text-emerald-600 dark:text-emerald-400">
                     {t("dashboard.investor.holdingRoiValue", {
                       min: holding.target_return_pct_min.toFixed(1),
                       max: holding.target_return_pct_max.toFixed(1),
@@ -198,16 +203,16 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
                     })}
                   </dd>
                   {/* A range on its own still reads as a promise without this */}
-                  <p className="truncate text-[10px] font-medium text-emerald-700/80 dark:text-emerald-300/80">
+                  <p className="break-words text-xs font-medium text-emerald-700 dark:text-emerald-300">
                     {t("dashboard.projectCard.notGuaranteed")}
                   </p>
                 </div>
 
-                <div className="min-w-0 space-y-1">
-                  <dt className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <div className="col-span-2 min-w-0 space-y-1 lg:col-span-1">
+                  <dt className="stat-label">
                     {t("dashboard.investor.holdingNextPayout")}
                   </dt>
-                  <dd className="truncate text-sm font-bold text-foreground">
+                  <dd className="text-sm font-bold tabular-nums text-foreground">
                     {holding.next_payout_date ? (
                       formatDate(holding.next_payout_date, locale)
                     ) : (
@@ -216,10 +221,42 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
                       </span>
                     )}
                   </dd>
+                  {/* The investor's own share of the SME's fixed daily
+                      repayment — only while repayments are (or are about to
+                      be) flowing. Uses the low end of the target range, and is
+                      labelled a target like the yield it comes from. */}
+                  {RECEIVING_STATUSES.includes(holding.status) && (
+                    <p className="break-words text-xs font-semibold text-foreground">
+                      {t("dashboard.investor.holdingDailyPayout", {
+                        amount: formatCurrency(
+                          dailyRepaymentAmount(
+                            holding.invested,
+                            holding.target_return_pct_min,
+                            holding.term_months,
+                          ),
+                          locale,
+                        ),
+                      })}
+                    </p>
+                  )}
+                  {/* When relief is active: show the reduced daily amount with
+                      a relief qualifier, or explicitly mark relief active. */}
+                  {holding.status === "RELIEF" && (
+                    <p className="break-words text-xs font-semibold text-amber-700 dark:text-amber-400">
+                      {holding.relief_daily_amount
+                        ? t("dashboard.investor.holdingDailyPayoutRelief", {
+                            amount: formatCurrency(
+                              holding.relief_daily_amount,
+                              locale,
+                            ),
+                          })
+                        : t("dashboard.investor.holdingReliefActive")}
+                    </p>
+                  )}
                   {/* Disclosed on every position: the date at which everything
                       still outstanding falls due in full. */}
                   {holding.disbursed_at && (
-                    <p className="truncate text-[10px] text-muted-foreground">
+                    <p className="break-words text-xs text-muted-foreground">
                       {t("dashboard.investor.holdingBackstop", {
                         date: formatDate(
                           backstopDate(

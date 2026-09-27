@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import AnalyticsClient from "./client";
+import { getServerTranslations } from "@/lib/i18n/server";
 
-export const metadata: Metadata = {
-  title: "Analytics",
-  description:
-    "Track capital deployed, returns received, and how your portfolio is allocated across industries.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerTranslations();
+  return {
+    title: t("seo.analyticsTitle"),
+    description: t("seo.analyticsDescription"),
+  };
+}
 
 export default function AnalyticsPage() {
   return <AnalyticsClient />;

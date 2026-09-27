@@ -25,6 +25,7 @@ import { cn, getInitials } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useCurrentUser } from "@/hooks/use-authentication";
 import { useTranslations } from "@/lib/i18n";
+import { roleLabel } from "@/lib/enum-labels";
 import Logo from "@/components/logo";
 import { NotificationsPanel } from "@/components/notifications-panel";
 import { CONTROL_ICON_IDLE, CONTROL_IDLE } from "@/lib/ui-tokens";
@@ -301,9 +302,11 @@ export function Sidebar() {
               <p className="text-sm font-medium text-foreground truncate">
                 {user?.full_name || t("common.fundlokUser")}
               </p>
-              <p className="text-xs text-muted-foreground truncate">
+              <p className="text-xs text-muted-foreground break-words">
                 {user?.role
-                  ? `${user.role} ${t("dashboard.sidebar.memberSuffix")}`
+                  ? t("dashboard.sidebar.roleMember", {
+                      role: roleLabel(t, user.role),
+                    })
                   : t("dashboard.sidebar.verifiedMember")}
               </p>
             </div>

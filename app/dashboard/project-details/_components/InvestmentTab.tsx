@@ -40,7 +40,7 @@ export function InvestmentTab() {
     if (isNaN(numericAmount) || numericAmount <= 0) {
       toast({
         variant: "destructive",
-        title: t("investment.tab.validationErrorTitle"),
+        title: t("investment.tab.invalidAmountTitle"),
         description: t("investment.tab.validAmount"),
       });
       return;
@@ -49,7 +49,7 @@ export function InvestmentTab() {
     if (numericAmount > maxAmount) {
       toast({
         variant: "destructive",
-        title: t("investment.tab.validationErrorTitle"),
+        title: t("investment.tab.amountTooHighTitle"),
         description: t("investment.tab.maxRemainingAmount", {
           amount: formatCurrency(maxAmount, locale),
         }),
@@ -95,20 +95,16 @@ export function InvestmentTab() {
         </div>
 
         {/* Funded / Remaining Labels */}
-        <div className="grid grid-cols-2 gap-4 pt-2 border-t">
+        <div className="grid grid-cols-1 gap-4 pt-2 border-t min-[420px]:grid-cols-2">
           <div className="min-w-0">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              {t("investment.tab.funded")}
-            </p>
-            <p className="mt-1 min-w-0 truncate text-xl font-bold text-foreground">
+            <p className="stat-label">{t("investment.tab.funded")}</p>
+            <p className="mt-1 whitespace-nowrap text-lg font-bold tabular-nums text-foreground sm:text-xl">
               {formatCurrency(fundedAmount, locale)}
             </p>
           </div>
           <div className="min-w-0">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              {t("investment.tab.remaining")}
-            </p>
-            <p className="mt-1 min-w-0 truncate text-xl font-bold text-foreground">
+            <p className="stat-label">{t("investment.tab.remaining")}</p>
+            <p className="mt-1 whitespace-nowrap text-lg font-bold tabular-nums text-foreground sm:text-xl">
               {formatCurrency(remainingAmount, locale)}
             </p>
           </div>
@@ -164,7 +160,7 @@ export function InvestmentTab() {
                 ? t("investment.tab.processing")
                 : t("investment.tab.investNow")}
             </Button>
-            <p className="text-center text-xs text-muted-foreground/80 leading-relaxed px-4">
+            <p className="text-center text-xs text-muted-foreground leading-relaxed px-4">
               {t("investment.tab.agreement")}
             </p>
           </div>

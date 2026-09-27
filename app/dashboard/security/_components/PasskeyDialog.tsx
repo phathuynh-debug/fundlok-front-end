@@ -21,6 +21,7 @@ import {
 import { formatDate } from "@/lib/format-date";
 import { useTranslations } from "@/lib/i18n";
 import { isPasskeyCancellation, isPasskeySupported } from "@/lib/passkeys";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 /**
  * Add and remove passkeys.
@@ -65,7 +66,7 @@ export function PasskeyDialog({
         toast({
           variant: "destructive",
           title: t("dashboard.security.passkeys.addFailedTitle"),
-          description: error?.message,
+          description: apiErrorMessage(error, locale, t("common.tryAgain")),
         });
       },
     });
@@ -84,7 +85,7 @@ export function PasskeyDialog({
         toast({
           variant: "destructive",
           title: t("dashboard.security.passkeys.removeFailedTitle"),
-          description: error?.message,
+          description: apiErrorMessage(error, locale, t("common.tryAgain")),
         }),
     });
   };

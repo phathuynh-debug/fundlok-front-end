@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/table";
 import { formatCurrency } from "@/lib/format-currency";
 import { useTranslations } from "@/lib/i18n";
+import { industryLabel } from "@/lib/industry-label";
 import {
   monthTickLabel,
   type CapitalStatusAllocation,
@@ -102,7 +103,7 @@ export function AnalyticsTableView({
             {allocation.map((row) => (
               <TableRow key={row.industry}>
                 <TableCell className="text-sm font-medium whitespace-nowrap">
-                  {row.industry}
+                  {industryLabel(row.industry, t)}
                 </TableCell>
                 <TableCell className="text-right text-sm font-medium tabular-nums whitespace-nowrap">
                   {formatCurrency(row.deployed, locale)}

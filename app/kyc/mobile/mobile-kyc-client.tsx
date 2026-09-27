@@ -20,13 +20,14 @@ import { CaptureTabs } from "../_components/gverify/CaptureTabs";
 import { useGVerifyKyc } from "../_components/gverify/useGVerifyKyc";
 import type { GVerifyVerifyResponse } from "@/services/gverify.service";
 import type { ApiError } from "@/lib/types";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 // Phone side of the QR handoff: opened by scanning the desktop QR, carries a
 // short-lived token in the query string (?token=…) instead of a login cookie.
 // The camera opens directly on each tile (rear for the ID, front for the
 // selfie); the desktop discovers the verdict through its polling status query.
 export function MobileKycClient() {
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const token = useSearchParams().get("token") ?? "";
   const { images, setFile, reset, allReady, submit, submitting } =
     useGVerifyKyc({
@@ -48,7 +49,7 @@ export function MobileKycClient() {
       setFailure(
         apiError?.status === 401
           ? t("kyc.gv.mobileExpired")
-          : apiError?.message || t("kyc.gv.failedHint"),
+          : apiErrorMessage(apiError, locale, t("kyc.gv.failedHint")),
       );
     }
   };

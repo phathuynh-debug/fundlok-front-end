@@ -424,7 +424,7 @@ export function TermsClient() {
 
         {/* Mandatory Invariant / Custody Notice Banner */}
         <aside
-          aria-label="Compliance Notice"
+          aria-label={t("termsPage.noticeTitle")}
           className="mb-10 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 dark:bg-emerald-950/20 p-5 md:p-6 backdrop-blur-md"
         >
           <div className="flex items-start gap-4">
@@ -446,7 +446,7 @@ export function TermsClient() {
         <div className="grid gap-10 lg:grid-cols-[260px_1fr]">
           {/* Sidebar Navigation */}
           <nav
-            aria-label="Terms of service contents"
+            aria-label={t("termsPage.tableOfContents")}
             className="hidden lg:block space-y-6 sticky top-24 self-start"
           >
             <div className="rounded-2xl border border-border/60 bg-card/60 p-4 backdrop-blur-md">
@@ -460,10 +460,10 @@ export function TermsClient() {
                       href={`#${sec.id}`}
                       className="flex items-center justify-between rounded-lg px-2.5 py-1.5 font-medium text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors group"
                     >
-                      <span className="truncate">
+                      <span className="min-w-0 break-words">
                         {isVi ? sec.titleVi : sec.titleEn}
                       </span>
-                      <ChevronRight className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <ChevronRight className="h-3.5 w-3.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </a>
                   </li>
                 ))}
@@ -510,7 +510,7 @@ export function TermsClient() {
                   className="rounded-3xl border border-border/60 bg-card/60 p-6 md:p-8 shadow-sm backdrop-blur-md scroll-mt-24 space-y-8"
                 >
                   <div className="border-b border-border/50 pb-4">
-                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                    <span className="eyebrow">
                       {isVi ? sec.badgeVi : sec.badgeEn}
                     </span>
                     <h2 className="text-2xl font-bold tracking-tight text-foreground mt-1">

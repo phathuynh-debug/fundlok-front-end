@@ -26,7 +26,10 @@ test.describe("an SME with a project", () => {
       page.getByRole("heading", { name: STUB_PROJECT.legal_name }),
     ).toBeVisible();
     await expect(page.getByText(STUB_PROJECT.tax_id)).toBeVisible();
-    await expect(page.getByText(STUB_PROJECT.status).first()).toBeVisible();
+    // The status is shown as a translated label, not the raw enum.
+    await expect(
+      page.getByText(t(`enums.projectStatus.${STUB_PROJECT.status}`)).first(),
+    ).toBeVisible();
   });
 
   test("sees the funding and repayment panel", async ({ page }) => {

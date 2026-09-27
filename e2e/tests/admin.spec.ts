@@ -43,7 +43,10 @@ test.describe("as an admin", () => {
     await expect(
       page.getByRole("heading", { name: t("admin.auditLogs.title") }),
     ).toBeVisible();
-    await expect(page.getByText("SIGN_IN").first()).toBeVisible();
+    // Actions are shown as translated labels, not raw backend codes.
+    await expect(
+      page.getByText(t("enums.auditAction.SIGN_IN"), { exact: true }).first(),
+    ).toBeVisible();
     await expect(
       page.getByText(STUB_USERS.investor.email).first(),
     ).toBeVisible();
@@ -150,7 +153,9 @@ test.describe("the admin project preview", () => {
 
     // A presign that never completed is surfaced, not hidden — that document
     // is missing as far as a reviewer is concerned.
-    await expect(page.getByText("PENDING").last()).toBeVisible();
+    await expect(
+      page.getByText(t("enums.documentStatus.PENDING")).last(),
+    ).toBeVisible();
   });
 
   test("approving the funding request records the operator's half", async ({
@@ -166,13 +171,17 @@ test.describe("the admin project preview", () => {
     // Asserted on the CONTROLS rather than on badge text: "PENDING" also
     // labels a document whose upload never completed, and matching on the
     // word alone would conflate the two.
-    await expect(page.getByText("MANUAL_REVIEW")).toBeVisible();
+    await expect(
+      page.getByText(t("enums.verificationStatus.MANUAL_REVIEW")),
+    ).toBeVisible();
     await expect(approve).toHaveCount(2);
 
     // The last belongs to the funding request; the first is the engine's.
     await approve.last().click();
 
-    await expect(page.getByText("APPROVED")).toBeVisible();
+    await expect(
+      page.getByText(t("enums.approval.APPROVED"), { exact: true }).first(),
+    ).toBeVisible();
     // One-way: the funding request's controls retire, leaving only the
     // engine's, so it cannot be re-decided from the panel.
     await expect(approve).toHaveCount(1);
@@ -183,14 +192,18 @@ test.describe("the admin project preview", () => {
   }) => {
     // Its own company, so the approval above cannot pre-empt this.
     await openPreview(page, "Northwind IT");
-    await expect(page.getByText("MANUAL_REVIEW")).toBeVisible();
+    await expect(
+      page.getByText(t("enums.verificationStatus.MANUAL_REVIEW")),
+    ).toBeVisible();
 
     await page
       .getByRole("button", { name: t("admin.preview.approve") })
       .first()
       .click();
 
-    await expect(page.getByText("MANUAL_REVIEW")).toHaveCount(0);
+    await expect(
+      page.getByText(t("enums.verificationStatus.MANUAL_REVIEW")),
+    ).toHaveCount(0);
   });
 
   test("shows no score until the engine is run, then shows one", async ({
@@ -211,8 +224,14 @@ test.describe("the admin project preview", () => {
     await expect(page.getByText("75.91")).toBeVisible();
     await expect(page.getByText("13.93%")).toBeVisible();
     // Status and decision are separate axes and both are shown.
-    await expect(page.getByText("READY")).toBeVisible();
-    await expect(page.getByText("APPROVED").first()).toBeVisible();
+    await expect(
+      page.getByText(t("enums.scoreRunStatus.READY"), { exact: true }),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByText(t("enums.scoreDecision.APPROVED"), { exact: true })
+        .first(),
+    ).toBeVisible();
   });
 
   test("an ungraded run reads as blocked, not as a pending score", async ({
@@ -236,10 +255,14 @@ test.describe("the admin project preview", () => {
 
     // The decision badge carries the destructive token, not the neutral one
     // the status badge uses — that contrast is the whole point of the change.
-    await expect(panel.getByText("INSUFFICIENT_DATA")).toHaveClass(
-      /bg-destructive/,
-    );
-    await expect(panel.getByText("READY")).not.toHaveClass(/bg-destructive/);
+    await expect(
+      panel.getByText(t("enums.scoreDecision.INSUFFICIENT_DATA"), {
+        exact: true,
+      }),
+    ).toHaveClass(/bg-destructive/);
+    await expect(
+      panel.getByText(t("enums.scoreRunStatus.READY"), { exact: true }),
+    ).not.toHaveClass(/bg-destructive/);
   });
 
   test("both tables offer a preview", async ({ page }) => {
@@ -298,11 +321,15 @@ test.describe("the admin user preview", () => {
       .getByRole("button", { name: t("admin.userPreview.statuses.SUSPENDED") })
       .click();
 
-    // The outcome that matters: the row in the table now reads SUSPENDED.
-    // Scoped to a table cell rather than matching the bare word, which also
-    // appears on the panel's own status badge and button.
+    // The outcome that matters: the row in the table now reads as suspended
+    // (the raw enum is translated for display). Scoped to a table cell rather
+    // than matching the bare word, which also appears on the panel's own
+    // status badge and button.
     await expect(
-      page.getByRole("cell", { name: "SUSPENDED", exact: true }),
+      page.getByRole("cell", {
+        name: t("enums.userStatus.SUSPENDED"),
+        exact: true,
+      }),
     ).toBeVisible();
   });
 

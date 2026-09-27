@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
 import { authenticationService } from "@/services/authentication.service";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 interface VerifyEmailNoticeProps {
   // Email the verification link was sent to (the address just registered).
@@ -25,7 +26,7 @@ export function VerifyEmailNotice({
   onBackToLogin,
 }: VerifyEmailNoticeProps) {
   const { toast } = useToast();
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const [isResending, setIsResending] = useState(false);
 
   const handleResend = async () => {
@@ -39,11 +40,12 @@ export function VerifyEmailNotice({
     } catch (err) {
       toast({
         variant: "destructive",
-        title: t("auth.verifyEmail.resendFailed"),
-        description:
-          err instanceof Error
-            ? err.message
-            : t("auth.verifyEmail.resendFailed"),
+        title: t("common.error"),
+        description: apiErrorMessage(
+          err,
+          locale,
+          t("auth.verifyEmail.resendFailed"),
+        ),
       });
     } finally {
       setIsResending(false);
@@ -76,11 +78,11 @@ export function VerifyEmailNotice({
         </p>
 
         {email ? (
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-slate-100 px-3 py-1.5 text-xs text-slate-700 dark:bg-slate-900 dark:text-slate-300 lg:text-sm">
+          <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-border bg-slate-100 px-3 py-1.5 text-xs text-slate-700 dark:bg-slate-900 dark:text-slate-300 lg:text-sm">
             <span className="font-semibold text-muted-foreground">
               {t("auth.verifyEmail.statusLabel")}:
             </span>
-            <span className="font-mono">{email}</span>
+            <span className="min-w-0 break-all">{email}</span>
           </div>
         ) : null}
       </div>

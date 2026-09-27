@@ -21,12 +21,12 @@ import { LocaleProvider } from "@/lib/i18n";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { SITE_URL } from "@/lib/site";
 const geistSans = Geist({
-  subsets: ["latin"],
+  subsets: ["latin", "vietnamese"],
   variable: "--font-geist-sans",
 });
 
 const geistMono = Geist_Mono({
-  subsets: ["latin"],
+  subsets: ["latin", "vietnamese"],
   variable: "--font-geist-mono",
 });
 
@@ -72,8 +72,8 @@ const SITE_KEYWORDS = [
   "on-chain credit",
   "investor portal",
   "flexible funding",
-  "AI credit scoring",
-  "DeFi lending",
+  "AI business score",
+  "on-chain SME funding",
   "Sustainability in Action",
   "Australian Government",
   "SIHUB FinTech",

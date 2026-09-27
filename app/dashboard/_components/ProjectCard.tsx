@@ -1,6 +1,7 @@
 import {
   ArrowRight,
   Pencil,
+  HelpCircle,
   Clock,
   Users,
   ShieldCheck,
@@ -13,6 +14,11 @@ import {
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { Project } from "@/services/projects.service";
 import Link from "next/link";
 import { useTranslations } from "@/lib/i18n";
@@ -176,7 +182,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
             record it just filed. */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <div className="flex flex-col gap-1">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <span className="stat-label">
               {t("dashboard.projectCard.industry")}
             </span>
             <Badge
@@ -197,10 +203,10 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
             <>
               {/* Asking Amount */}
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <span className="stat-label">
                   {t("dashboard.projectCard.askingAmount")}
                 </span>
-                <span className="text-lg font-bold text-foreground">
+                <span className="text-base font-bold tabular-nums text-foreground sm:text-lg">
                   {askingAmount === undefined
                     ? t("dashboard.projectCard.pending")
                     : formatCurrency(askingAmount, locale)}
@@ -216,7 +222,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
 
               {/* Duration */}
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <span className="stat-label">
                   {t("dashboard.projectCard.duration")}
                 </span>
                 <span className="text-base font-bold text-foreground flex items-center gap-1.5">
@@ -238,12 +244,26 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
 
               {/* Hero Expected ROI Callout */}
               <div className="flex flex-col gap-1 rounded-xl bg-gradient-to-br from-emerald-500/15 via-emerald-500/10 to-teal-500/5 dark:from-emerald-500/20 dark:via-emerald-500/10 dark:to-teal-500/15 border border-emerald-500/30 p-3 shadow-2xs">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
+                <span className="stat-label flex items-center gap-1 text-emerald-700 dark:text-emerald-300">
                   {t("dashboard.projectCard.expectedRoi")}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        aria-label={t("dashboard.projectCard.expectedRoiHint")}
+                        className="text-emerald-600/70 hover:text-emerald-700 dark:text-emerald-400/70 dark:hover:text-emerald-300"
+                      >
+                        <HelpCircle className="h-3 w-3" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      {t("dashboard.projectCard.expectedRoiHint")}
+                    </TooltipContent>
+                  </Tooltip>
                 </span>
                 <span
                   className={cn(
-                    "text-xl font-bold",
+                    "text-xl font-bold tabular-nums",
                     expectedRoiPct === undefined
                       ? "text-muted-foreground"
                       : "text-emerald-600 dark:text-emerald-400",
@@ -254,25 +274,21 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                     : `${expectedRoiPct.toFixed(1)}%`}
                 </span>
                 {/* Handbook §5.13 / §8: a projected return is never presented
-                    as a promise. The figure is labelled a target and carries
-                    the disclaimer inline — an investor must not be able to read
-                    it as a fixed or guaranteed yield. */}
+                    as a promise. The figure carries the "target, not
+                    guaranteed" disclaimer inline (the tooltip above expands
+                    on it) — an investor must not be able to read it as a
+                    fixed or guaranteed yield. */}
                 {expectedRoiPct !== undefined && (
-                  <>
-                    <span className="text-[10px] font-medium text-emerald-700/80 dark:text-emerald-300/80">
-                      {t("dashboard.projectCard.annualizedReturn")}
-                    </span>
-                    <span className="text-[10px] font-medium text-muted-foreground">
-                      {t("dashboard.projectCard.notGuaranteed")}
-                    </span>
-                  </>
+                  <span className="break-words text-xs font-medium text-muted-foreground">
+                    {t("dashboard.projectCard.notGuaranteed")}
+                  </span>
                 )}
               </div>
             </>
           ) : (
             <>
               <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-muted-foreground">
+                <span className="stat-label">
                   {t("dashboard.projectCard.taxId")}
                 </span>
                 <span className="text-base font-semibold">
@@ -280,7 +296,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                 </span>
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-muted-foreground">
+                <span className="stat-label">
                   {t("dashboard.projectCard.incorporation")}
                 </span>
                 <span className="text-base font-semibold">
@@ -288,7 +304,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                 </span>
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-muted-foreground">
+                <span className="stat-label">
                   {t("dashboard.projectCard.location")}
                 </span>
                 <span className="text-base font-semibold">{location}</span>
@@ -302,11 +318,14 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
             already full at four columns for an investor. Clamped to two lines
             so a long purpose cannot push the cards in a list out of rhythm. */}
         <div className="flex flex-col gap-1 pt-1">
-          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+          <span className="stat-label flex items-center gap-1.5">
             <Target className="h-3.5 w-3.5 shrink-0" />
             {t("dashboard.projectCard.loanPurpose")}
           </span>
           <p
+            // Clamped for list rhythm; the full text is on hover and on the
+            // details page.
+            title={loanApplication?.purpose?.trim() || undefined}
             className={cn(
               "text-sm leading-relaxed line-clamp-2",
               loanApplication?.purpose

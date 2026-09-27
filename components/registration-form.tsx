@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useRegister } from "@/hooks/use-authentication";
 import { User, Mail, Lock, Phone, Loader2, Eye, EyeOff } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 const normalizePhoneNumber = (value: string) =>
   value.trim().replace(/[\s().-]/g, "");
@@ -53,7 +54,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
   const router = useRouter();
   const { toast } = useToast();
   const { mutate: register, isPending } = useRegister();
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,7 +81,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
       toast({
         variant: "destructive",
         title: t("auth.register.validationErrorTitle"),
-        description: "Please complete the security check.",
+        description: t("auth.securityCheckRequired"),
       });
       return;
     }
@@ -114,7 +115,11 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
           toast({
             variant: "destructive",
             title: t("auth.register.failedTitle"),
-            description: error?.message || t("auth.register.failedDescription"),
+            description: apiErrorMessage(
+              error,
+              locale,
+              t("auth.register.failedDescription"),
+            ),
           });
         },
       },

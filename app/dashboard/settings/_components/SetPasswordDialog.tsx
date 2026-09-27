@@ -16,6 +16,8 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useSetPassword } from "@/hooks/use-users";
 import { PASSWORD_MIN_LENGTH } from "@/services/users.service";
+import { apiErrorMessage } from "@/lib/api-error-message";
+import { useTranslations } from "@/lib/i18n";
 
 // Sets a FIRST password, for accounts created without one (OAuth sign-in).
 // There's no "current password" field because there is no current password —
@@ -34,6 +36,7 @@ export function SetPasswordDialog({
   t,
 }: SetPasswordDialogProps) {
   const { toast } = useToast();
+  const { locale } = useTranslations();
   const setPassword = useSetPassword();
 
   const [newPassword, setNewPassword] = useState("");
@@ -91,9 +94,11 @@ export function SetPasswordDialog({
         onError: (err) => {
           // Show it inline next to the fields, not only as a toast that
           // disappears while the user is still looking at the form.
-          const message =
-            err?.message ||
-            t("dashboard.settings.profile.setPasswordDialog.failedDescription");
+          const message = apiErrorMessage(
+            err,
+            locale,
+            t("dashboard.settings.profile.setPasswordDialog.failedDescription"),
+          );
           setError(message);
           toast({
             variant: "destructive",

@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "@/lib/i18n";
 
 // A single column definition: how to label the header and render each cell.
 export interface Column<T> {
@@ -50,10 +51,11 @@ export function DataTable<T>({
   getRowKey,
   isLoading,
   isFetching,
-  emptyMessage = "No results found.",
+  emptyMessage,
   onRowClick,
   getRowLabel,
 }: DataTableProps<T>) {
+  const { t } = useTranslations();
   const colCount = columns.length;
 
   return (
@@ -88,7 +90,7 @@ export function DataTable<T>({
                 colSpan={colCount}
                 className="h-32 text-center text-sm text-muted-foreground"
               >
-                {emptyMessage}
+                {emptyMessage ?? t("admin.table.noResults")}
               </TableCell>
             </TableRow>
           ) : (

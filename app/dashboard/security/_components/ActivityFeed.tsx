@@ -4,6 +4,7 @@ import { AlertTriangle, Info, ShieldAlert } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { formatDateTime } from "@/lib/format-date";
 import { useTranslations } from "@/lib/i18n";
+import { enumLabel } from "@/lib/enum-labels";
 import { cn } from "@/lib/utils";
 import type {
   SecurityEvent,
@@ -53,6 +54,11 @@ const ACTION_KEYS: Record<string, string> = {
   PAYOUT_ACCOUNT_CHANGED:
     "dashboard.security.activity.events.payoutAccountAdded",
   TWO_FACTOR_ENABLED: "dashboard.security.activity.events.twoFactorEnabled",
+  TOTP_ENABLED: "dashboard.security.activity.events.twoFactorEnabled",
+  TOTP_DISABLED: "dashboard.security.activity.events.twoFactorDisabled",
+  PASSKEY_ADDED: "dashboard.security.activity.events.passkeyAdded",
+  PASSKEY_REMOVED: "dashboard.security.activity.events.passkeyRemoved",
+  PASSWORD_SET: "dashboard.security.activity.events.passwordSet",
 };
 
 function getEventContext(
@@ -88,7 +94,7 @@ function getEventContext(
       ? details.bank
       : typeof details.bank_name === "string"
         ? details.bank_name
-        : "Bank Account";
+        : t("dashboard.security.activity.bankAccountFallback");
 
   const count = typeof details.count === "number" ? details.count : 1;
 
@@ -101,7 +107,9 @@ function actionLabel(
 ): string {
   const key = ACTION_KEYS[event.action];
   if (!key) {
-    return event.action.replace(/_/g, " ");
+    // Not a security event we word ourselves: use the shared audit-action
+    // label, which falls back to a readable form of the code.
+    return enumLabel(t, "auditAction", event.action);
   }
   const context = getEventContext(event, t);
   return t(key, context);

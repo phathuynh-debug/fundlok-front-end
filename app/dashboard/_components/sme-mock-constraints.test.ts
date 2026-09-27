@@ -75,15 +75,12 @@ describe("SME mock loans obey the grading engine's constraints", () => {
   });
 });
 
-// The engine's YAML still accepts 3- and 9-month terms, but the FundLok
-// Handbook v3 §2 says an SME declares 6 or 12 months and twelve is the
-// maximum. The two disagree, and that disagreement is for the CEO to settle —
-// not for a mock file. Until it is settled these mocks sit in the INTERSECTION
-// of both rules, which is always safe: a 6 or 12 month term satisfies the
-// handbook and the engine at once.
+// Settled by the product owner: a term is 1 to 6 months, which is exactly what
+// the engine accepts. ALLOWED_TERM_MONTHS now re-exports LOAN_DURATIONS_MONTHS,
+// so the product rule and the engine cannot disagree again.
 describe("SME mock terms also satisfy the handbook, not just the engine", () => {
   it.each(SME_MOCK_LOANS)(
-    "$label declares 6 or 12 months",
+    "$label declares a term of 1 to 6 months",
     ({ term_months }) => {
       expect(ALLOWED_TERM_MONTHS as readonly number[]).toContain(term_months);
     },

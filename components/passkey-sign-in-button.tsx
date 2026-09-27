@@ -9,6 +9,7 @@ import { usePasskeyLogin } from "@/hooks/use-authentication";
 import { landingRouteFor } from "@/app/login/use-login";
 import { isPasskeyCancellation, isPasskeySupported } from "@/lib/passkeys";
 import { useTranslations } from "@/lib/i18n";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 /**
  * "Sign in with a passkey" — no email, no password.
@@ -24,7 +25,7 @@ import { useTranslations } from "@/lib/i18n";
  * `useState` initialiser would produce a hydration mismatch.
  */
 export function PasskeySignInButton() {
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const { toast } = useToast();
   const router = useRouter();
   const signIn = usePasskeyLogin();
@@ -48,7 +49,11 @@ export function PasskeySignInButton() {
         toast({
           variant: "destructive",
           title: t("auth.login.passkeyFailedTitle"),
-          description: error?.message || t("auth.login.passkeyFailedBody"),
+          description: apiErrorMessage(
+            error,
+            locale,
+            t("auth.login.passkeyFailedBody"),
+          ),
         });
       },
     });

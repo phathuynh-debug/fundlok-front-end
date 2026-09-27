@@ -77,7 +77,7 @@ test.describe("Terms of Service page and links", () => {
 
     const footerTerms = page
       .locator("footer")
-      .getByRole("link", { name: /Terms of Service/i });
+      .getByRole("link", { name: new RegExp(t("footer.terms"), "i") });
     await expect(footerTerms).toBeVisible();
     await footerTerms.click();
 

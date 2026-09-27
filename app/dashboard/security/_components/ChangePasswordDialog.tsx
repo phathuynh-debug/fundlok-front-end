@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { useChangePassword } from "@/hooks/use-authentication";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 const MIN_LENGTH = 8;
 
@@ -26,7 +27,7 @@ export function ChangePasswordDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const { toast } = useToast();
   const { mutate: changePassword, isPending } = useChangePassword();
 
@@ -80,7 +81,16 @@ export function ChangePasswordDialog({
         },
         onError: (apiError) =>
           setError(
-            apiError?.message ?? t("security.changePassword.errorGeneric"),
+            // 400 is the backend refusing the current password: say so in the
+            // user's language rather than a generic failure, since it is the
+            // one error here the user can fix on the spot.
+            apiError?.status === 400
+              ? t("security.changePassword.errorWrongCurrent")
+              : apiErrorMessage(
+                  apiError,
+                  locale,
+                  t("security.changePassword.errorGeneric"),
+                ),
           ),
       },
     );

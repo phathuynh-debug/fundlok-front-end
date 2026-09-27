@@ -67,7 +67,7 @@ export function AnalyticsKpiCards({
       variants={staggerContainerVariants}
       initial="hidden"
       animate="show"
-      className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"
+      className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-4"
     >
       {tiles.map((tile) => (
         <motion.div
@@ -76,9 +76,7 @@ export function AnalyticsKpiCards({
           className="min-w-0 bg-card text-card-foreground border border-border rounded-xl shadow-xs p-5 space-y-1"
         >
           <div className="flex items-center justify-between gap-2">
-            <span className="text-xs font-semibold text-muted-foreground uppercase font-mono tracking-wider">
-              {tile.label}
-            </span>
+            <span className="stat-label">{tile.label}</span>
             <tile.icon
               className="h-4 w-4 text-muted-foreground/70 shrink-0"
               aria-hidden="true"

@@ -80,10 +80,12 @@ function BreadcrumbSeparator({
   );
 }
 
+// Server-safe primitive (no i18n hook): callers pass a translated `label`.
 function BreadcrumbEllipsis({
   className,
+  label = "More",
   ...props
-}: React.ComponentProps<"span">) {
+}: React.ComponentProps<"span"> & { label?: string }) {
   return (
     <span
       data-slot="breadcrumb-ellipsis"
@@ -93,7 +95,7 @@ function BreadcrumbEllipsis({
       {...props}
     >
       <MoreHorizontal className="size-4" />
-      <span className="sr-only">More</span>
+      <span className="sr-only">{label}</span>
     </span>
   );
 }

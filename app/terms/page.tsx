@@ -1,42 +1,50 @@
 import type { Metadata } from "next";
 import { TermsClient } from "./terms-client";
 import { SITE_URL } from "@/lib/site";
+import { getServerTranslations } from "@/lib/i18n/server";
+import { OG_LOCALE } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Terms and Conditions of Service — FundLok",
-  description:
-    "Review the Terms and Conditions of Service and Personal Data Protection Policy governing the FundLok financial technology platform.",
-  keywords: [
-    "FundLok terms",
-    "FundLok terms of service",
-    "điều khoản dịch vụ FundLok",
-    "điều khoản và điều kiện",
-    "chính sách bảo mật",
-    "SME credit platform terms",
-    "private credit terms Vietnam",
-  ],
-  alternates: {
-    canonical: "/terms",
-  },
-  openGraph: {
-    title: "Terms and Conditions of Service — FundLok",
-    description:
-      "Review the Terms and Conditions of Service and Personal Data Protection Policy governing the FundLok financial technology platform.",
-    url: "/terms",
-    siteName: "FundLok",
-    type: "website",
-  },
-  twitter: {
-    card: "summary",
-    title: "Terms and Conditions of Service — FundLok",
-    description:
-      "Review the Terms and Conditions of Service and Personal Data Protection Policy governing the FundLok financial technology platform.",
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { locale, t } = await getServerTranslations();
+  // The root layout's template already appends "| FundLok", so the title
+  // carries no brand suffix of its own.
+  const title = t("seo.termsTitle");
+  const description = t("seo.termsDescription");
+
+  return {
+    title,
+    description,
+    keywords: [
+      "FundLok terms",
+      "FundLok terms of service",
+      "điều khoản dịch vụ FundLok",
+      "điều khoản và điều kiện",
+      "chính sách bảo mật",
+      "SME credit platform terms",
+      "private credit terms Vietnam",
+    ],
+    alternates: {
+      canonical: "/terms",
+    },
+    openGraph: {
+      title,
+      description,
+      url: "/terms",
+      siteName: "FundLok",
+      type: "website",
+      locale: OG_LOCALE[locale],
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+}
 
 const termsJsonLd = {
   "@context": "https://schema.org",

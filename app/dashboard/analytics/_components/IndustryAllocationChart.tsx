@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/chart";
 import { formatCompactCurrency } from "@/lib/format-currency";
 import { useTranslations } from "@/lib/i18n";
+import { industryLabel } from "@/lib/industry-label";
 import { SERIES_COLORS } from "./chart-colors";
 import { CurrencyChartTooltip } from "./CurrencyChartTooltip";
 import type { IndustryAllocation } from "./mock-analytics";
@@ -36,6 +37,11 @@ export function IndustryAllocationChart({
   const { locale, t } = useTranslations();
 
   const deployedLabel = t("dashboard.analytics.series.deployed");
+  // The axis reads the label straight from the data, so translate it here.
+  const data = allocation.map((row) => ({
+    ...row,
+    industry: industryLabel(row.industry, t),
+  }));
 
   const chartConfig = {
     deployed: { label: deployedLabel, theme: SERIES_COLORS.deployed },
@@ -48,7 +54,7 @@ export function IndustryAllocationChart({
     >
       <BarChart
         accessibilityLayer
-        data={allocation}
+        data={data}
         layout="vertical"
         margin={{ top: 4, right: 84, left: 4, bottom: 4 }}
       >

@@ -147,7 +147,9 @@ test.describe("enrolment", () => {
       .getByRole("button", { name: t("security.twoFactor.verifyAndEnable") })
       .click();
 
-    await expect(dialog.getByText(/not valid/i)).toBeVisible();
+    await expect(
+      dialog.getByText(t("security.twoFactor.codeInvalid")),
+    ).toBeVisible();
     // Still on the code step, nothing enabled.
     await expect(
       dialog.getByText(t("security.twoFactor.recoveryWarning")),
@@ -259,7 +261,9 @@ test.describe("sign-in with 2FA", () => {
   }) => {
     await signIn(page);
 
-    await expect(page.getByText(t("auth.login.twoFactorTitle"))).toBeVisible();
+    await expect(
+      page.getByText(t("auth.login.twoFactorTitle"), { exact: true }),
+    ).toBeVisible();
 
     // The decisive assertion: no session cookie exists yet.
     const cookie = (await context.cookies()).find(
@@ -274,7 +278,9 @@ test.describe("sign-in with 2FA", () => {
     page,
   }) => {
     await signIn(page);
-    await expect(page.getByText(t("auth.login.twoFactorTitle"))).toBeVisible();
+    await expect(
+      page.getByText(t("auth.login.twoFactorTitle"), { exact: true }),
+    ).toBeVisible();
 
     // Re-submitting the password would burn the five-minute challenge.
     await expect(page.getByLabel(t("auth.login.emailLabel"))).toHaveCount(0);
@@ -304,7 +310,7 @@ test.describe("sign-in with 2FA", () => {
       .getByRole("button", { name: t("auth.login.twoFactorVerify") })
       .click();
 
-    await expect(page.getByText(/not valid/i)).toBeVisible();
+    await expect(page.getByText(t("auth.login.twoFactorFailed"))).toBeVisible();
     await expect(page).toHaveURL(/\/login/);
     expect(
       (await context.cookies()).find((c) => c.name === "access_token"),
@@ -330,7 +336,9 @@ test.describe("sign-in with 2FA", () => {
       .click();
 
     await expect(page.getByLabel(t("auth.login.emailLabel"))).toBeVisible();
-    await expect(page.getByText(t("auth.login.twoFactorTitle"))).toHaveCount(0);
+    await expect(
+      page.getByText(t("auth.login.twoFactorTitle"), { exact: true }),
+    ).toHaveCount(0);
   });
 });
 
@@ -390,7 +398,9 @@ test.describe("turning it off", () => {
       .getByRole("button", { name: t("security.twoFactor.confirmDisable") })
       .click();
 
-    await expect(dialog.getByText(/password is incorrect/i)).toBeVisible();
+    await expect(
+      dialog.getByText(t("security.twoFactor.disableWrongPassword")),
+    ).toBeVisible();
   });
 
   test("turns it off with the password and a code", async ({ page }) => {

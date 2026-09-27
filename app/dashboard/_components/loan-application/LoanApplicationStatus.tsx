@@ -48,7 +48,13 @@ const EXPECTED_DOCUMENT_TYPES: LoanDocumentType[] = [
   "cic_report",
 ];
 
+// DAILY is the only repayment a facility has. The others are kept so
+// applications submitted before that was enforced still render a label.
 const REPAYMENT_LABELS: Record<string, { en: string; vi: string }> = {
+  DAILY: {
+    en: "Fixed amount each business day",
+    vi: "Khoản cố định mỗi ngày làm việc",
+  },
   MONTHLY: { en: "Monthly", vi: "Hàng tháng" },
   QUARTERLY: { en: "Quarterly", vi: "Hàng quý" },
   END_OF_TERM: { en: "End of term", vi: "Cuối kỳ" },
@@ -177,7 +183,7 @@ export function LoanApplicationStatus({
       {/* Header band */}
       <div className="flex flex-col gap-4 border-b border-border/60 bg-muted/30 p-5 sm:flex-row sm:items-center sm:justify-between md:p-6">
         <div className="space-y-1">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+          <span className="eyebrow block text-muted-foreground">
             {t("dashboard.sme.statusSubmittedEyebrow")}
           </span>
           <h3 className="text-xl font-bold tracking-tight text-foreground">
@@ -333,7 +339,7 @@ export function LoanApplicationStatus({
         {/* Key facts row */}
         <dl className="grid grid-cols-2 gap-x-4 gap-y-4 rounded-xl border border-border/60 bg-muted/20 p-4 sm:grid-cols-4">
           <div className="space-y-0.5">
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+            <dt className="stat-label">
               {t("dashboard.sme.statusRequestedAmount")}
             </dt>
             <dd className="text-sm font-bold text-foreground">
@@ -344,7 +350,7 @@ export function LoanApplicationStatus({
           </div>
           {repaymentLabel && (
             <div className="space-y-0.5">
-              <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              <dt className="stat-label">
                 {t("dashboard.sme.statusRepaymentPreference")}
               </dt>
               <dd className="text-sm font-bold text-foreground">
@@ -354,7 +360,7 @@ export function LoanApplicationStatus({
           )}
           {submittedAt && (
             <div className="space-y-0.5">
-              <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              <dt className="stat-label">
                 {t("dashboard.sme.statusStepSubmitted")}
               </dt>
               <dd className="text-sm font-bold text-foreground">
@@ -363,9 +369,7 @@ export function LoanApplicationStatus({
             </div>
           )}
           <div className="space-y-0.5">
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-              {t("dashboard.sme.statusReference")}
-            </dt>
+            <dt className="stat-label">{t("dashboard.sme.statusReference")}</dt>
             <dd className="font-mono text-sm font-bold uppercase text-foreground">
               {loanApplication.id.slice(0, 8)}
             </dd>
@@ -394,16 +398,16 @@ export function LoanApplicationStatus({
                 <li key={type} className="flex items-center gap-3 py-3">
                   <span
                     className={cn(
-                      "flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-[9px] font-bold tracking-wide",
+                      "flex h-9 w-9 shrink-0 items-center justify-center rounded-md font-mono text-[10px] font-bold",
                       doc
                         ? "bg-foreground/5 text-foreground/70"
-                        : "bg-muted text-muted-foreground/60",
+                        : "bg-muted text-muted-foreground",
                     )}
                   >
                     {doc ? extOf(doc.original_filename) : "—"}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-foreground">
+                    <p className="break-words text-sm font-medium text-foreground">
                       {label}
                     </p>
                     {doc && (

@@ -24,18 +24,18 @@ const InstagramIcon = (props: SVGProps<SVGSVGElement>) => (
 );
 
 const aboutLinks = [
-  { label: "Our Story", href: "/why-us" },
-  { label: "Our Solution", href: "/#process" },
-  { label: "Team", href: "/#team" },
-  { label: "Achievements", href: "/why-us#achievements" },
+  { labelKey: "footer.ourStory", href: "/why-us" },
+  { labelKey: "footer.ourSolution", href: "/#process" },
+  { labelKey: "footer.team", href: "/#team" },
+  { labelKey: "footer.achievements", href: "/why-us#achievements" },
 ];
 
 const supportLinks = [
-  { label: "Contact Us", href: "/contact" },
-  { label: "Project Application", href: "/project-application" },
-  { label: "Terms of Service", href: "/terms" },
-  { label: "Log In", href: "/login" },
-  { label: "Register", href: "/login?mode=register" },
+  { labelKey: "footer.contactUs", href: "/contact" },
+  { labelKey: "footer.projectApplication", href: "/project-application" },
+  { labelKey: "footer.terms", href: "/terms" },
+  { labelKey: "footer.logIn", href: "/login" },
+  { labelKey: "footer.register", href: "/login?mode=register" },
 ];
 
 const socialLinks = [
@@ -69,34 +69,32 @@ export default function SiteFooter() {
       <div className="mx-auto max-w-6xl px-6 py-14 md:py-16">
         <div className="grid gap-12 md:grid-cols-[1.05fr_1.05fr_1.3fr]">
           <div>
-            <h4 className="text-[13px] font-black uppercase tracking-[0.22em] text-white/95">
-              About Us
-            </h4>
+            <h2 className="eyebrow text-white/95">{t("footer.aboutUs")}</h2>
             <ul className="mt-6 space-y-3 text-sm text-zinc-300">
               {aboutLinks.map((link) => (
-                <li key={link.label}>
+                <li key={link.labelKey}>
                   <Link
                     href={link.href}
                     className="transition-colors hover:text-white"
                   >
-                    {link.label}
+                    {t(link.labelKey)}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
           <div>
-            <h4 className="text-[13px] font-black uppercase tracking-[0.22em] text-white/95">
-              Customer Support
-            </h4>
+            <h2 className="eyebrow text-white/95">
+              {t("footer.customerSupport")}
+            </h2>
             <ul className="mt-6 space-y-3 text-sm text-zinc-300">
               {supportLinks.map((link) => (
-                <li key={link.label}>
+                <li key={link.labelKey}>
                   <Link
                     href={link.href}
                     className="transition-colors hover:text-white"
                   >
-                    {link.label}
+                    {t(link.labelKey)}
                   </Link>
                 </li>
               ))}
@@ -104,9 +102,7 @@ export default function SiteFooter() {
           </div>
 
           <div>
-            <h4 className="text-[13px] font-black uppercase tracking-[0.22em] text-white/95">
-              Connect With Us
-            </h4>
+            <h2 className="eyebrow text-white/95">{t("footer.connect")}</h2>
             <div className="mt-5 flex items-center gap-3">
               {socialLinks.map(({ label, href, icon: Icon }) => (
                 <a
@@ -124,24 +120,21 @@ export default function SiteFooter() {
               ))}
             </div>
             <p className="mt-5 max-w-sm text-sm leading-6 text-zinc-300">
-              Want to reach the team directly or get updates about FundLok?
-              Visit the contact page for the quickest response.
+              {t("footer.connectBody")}
             </p>
             <Link
               href="/contact"
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-emerald-500 px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white transition-colors duration-300 hover:bg-emerald-600"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-white transition-colors duration-300 hover:bg-emerald-600"
             >
-              Get in the Loop
+              {t("footer.getInTouch")}
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>
 
-        <div className="mt-12 border-t border-white/10 pt-6 text-[10px] leading-5 text-zinc-500 md:flex md:items-center md:justify-between">
+        <div className="mt-12 border-t border-white/10 pt-6 text-xs leading-5 text-zinc-400 md:flex md:items-center md:justify-between">
           <p>{t("common.copyright")}</p>
-          <p className="mt-2 md:mt-0">
-            FundLok builds flexible capital tools for SMEs and investors.
-          </p>
+          <p className="mt-2 md:mt-0">{t("footer.tagline")}</p>
         </div>
       </div>
     </footer>

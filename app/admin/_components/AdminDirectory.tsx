@@ -24,6 +24,9 @@ import { ProjectPreviewSheet } from "./ProjectPreviewSheet";
 import { UserPreviewSheet } from "./UserPreviewSheet";
 import { useTranslations } from "@/lib/i18n";
 import { getInitials } from "@/lib/utils";
+import { enumLabel, roleLabel } from "@/lib/enum-labels";
+import { formatDate as formatLocaleDate } from "@/lib/format-date";
+import { industryLabel } from "@/lib/industry-label";
 
 const PAGE_SIZE = 14;
 
@@ -32,15 +35,10 @@ type TranslateFn = (
   values?: Record<string, string | number>,
 ) => string;
 
-function formatDate(value?: string | null) {
-  if (!value) return "—";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "—";
-  return date.toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+// The app's locale, not the browser's: toLocaleDateString(undefined) printed
+// an English month on the Vietnamese site for anyone with an English browser.
+function formatDate(value: string | null | undefined, locale: string) {
+  return formatLocaleDate(value, locale) || "—";
 }
 
 function statusVariant(status: string) {
@@ -52,7 +50,10 @@ function statusVariant(status: string) {
 
 // Column configs — each table just declares how to render its cells.
 // Built with `t` so the headers localize with the active language.
-const buildUserColumns = (t: TranslateFn): Column<AdminUserRow>[] => [
+const buildUserColumns = (
+  t: TranslateFn,
+  locale: string,
+): Column<AdminUserRow>[] => [
   {
     key: "name",
     header: t("admin.table.name"),
@@ -82,22 +83,29 @@ const buildUserColumns = (t: TranslateFn): Column<AdminUserRow>[] => [
   {
     key: "role",
     header: t("admin.table.role"),
-    render: (u) => <Badge variant="outline">{u.role}</Badge>,
+    render: (u) => <Badge variant="outline">{roleLabel(t, u.role)}</Badge>,
   },
   {
     key: "status",
     header: t("admin.table.status"),
-    render: (u) => <Badge variant={statusVariant(u.status)}>{u.status}</Badge>,
+    render: (u) => (
+      <Badge variant={statusVariant(u.status)}>
+        {enumLabel(t, "userStatus", u.status)}
+      </Badge>
+    ),
   },
   {
     key: "joined",
     header: t("admin.table.joined"),
     cellClassName: "text-muted-foreground",
-    render: (u) => formatDate(u.created_at),
+    render: (u) => formatDate(u.created_at, locale),
   },
 ];
 
-const buildProjectColumns = (t: TranslateFn): Column<AdminProjectRow>[] => [
+const buildProjectColumns = (
+  t: TranslateFn,
+  locale: string,
+): Column<AdminProjectRow>[] => [
   {
     key: "legal_name",
     header: t("admin.table.legalName"),
@@ -108,18 +116,22 @@ const buildProjectColumns = (t: TranslateFn): Column<AdminProjectRow>[] => [
     key: "industry",
     header: t("admin.table.industry"),
     cellClassName: "text-muted-foreground",
-    render: (p) => p.industry || "—",
+    render: (p) => industryLabel(p.industry, t) || "—",
   },
   {
     key: "status",
     header: t("admin.table.status"),
-    render: (p) => <Badge variant={statusVariant(p.status)}>{p.status}</Badge>,
+    render: (p) => (
+      <Badge variant={statusVariant(p.status)}>
+        {enumLabel(t, "projectStatus", p.status)}
+      </Badge>
+    ),
   },
   {
     key: "created",
     header: t("admin.table.created"),
     cellClassName: "text-muted-foreground",
-    render: (p) => formatDate(p.created_at),
+    render: (p) => formatDate(p.created_at, locale),
   },
 ];
 
@@ -134,7 +146,7 @@ const buildProjectColumns = (t: TranslateFn): Column<AdminProjectRow>[] => [
  * the admin guard has passed — the query is enabled unconditionally here.
  */
 export function AdminDirectory({ mode }: { mode: AdminMode }) {
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
 
   const [page, setPage] = useState(1);
   const [searchInput, setSearchInput] = useState("");
@@ -219,7 +231,11 @@ export function AdminDirectory({ mode }: { mode: AdminMode }) {
                 </SelectItem>
                 {statusOptions.map((s) => (
                   <SelectItem key={s} value={s}>
-                    {s}
+                    {enumLabel(
+                      t,
+                      mode === "users" ? "userStatus" : "projectStatus",
+                      s,
+                    )}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -243,7 +259,7 @@ export function AdminDirectory({ mode }: { mode: AdminMode }) {
                   </SelectItem>
                   {roleOptions.map((r) => (
                     <SelectItem key={r} value={r}>
-                      {r}
+                      {roleLabel(t, r)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -279,7 +295,7 @@ export function AdminDirectory({ mode }: { mode: AdminMode }) {
 
         {mode === "users" ? (
           <DataTable<AdminUserRow>
-            columns={buildUserColumns(t)}
+            columns={buildUserColumns(t, locale)}
             rows={rows as AdminUserRow[]}
             getRowKey={(u) => u.id}
             isLoading={isOverviewLoading}
@@ -295,7 +311,7 @@ export function AdminDirectory({ mode }: { mode: AdminMode }) {
           />
         ) : (
           <DataTable<AdminProjectRow>
-            columns={buildProjectColumns(t)}
+            columns={buildProjectColumns(t, locale)}
             rows={rows as AdminProjectRow[]}
             getRowKey={(p) => p.id}
             isLoading={isOverviewLoading}

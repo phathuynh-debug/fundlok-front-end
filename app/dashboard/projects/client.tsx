@@ -23,6 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslations } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format-currency";
+import { dailyRepaymentAmount } from "@/lib/facility-terms";
 import { industryLabel } from "@/lib/industry-label";
 
 interface SecondaryMarketListing {
@@ -51,7 +52,8 @@ interface SecondaryMarketListing {
   actualRoi: number;
   actualRoiVsExpected: number;
   principalProgressPercent: number;
-  dailyRevenueRate: number;
+  /** The fixed amount this position receives each business day, VND. */
+  dailyRepaymentVnd: number;
   consecutivePayments: number;
   totalPaymentsMade: number;
   totalPaymentsMissed: number;
@@ -70,12 +72,12 @@ const mockSecondaryMarket: SecondaryMarketListing[] = [
     askingPricePremium: 7.5,
     originalInvestment: 500000000,
     loanPercentage: 100,
-    timeRemainingDays: 120,
-    totalActiveDays: 180,
+    timeRemainingDays: 90,
+    totalActiveDays: 90,
     actualRoi: 12.0,
     actualRoiVsExpected: 17.6,
     principalProgressPercent: 65,
-    dailyRevenueRate: 8.5,
+    dailyRepaymentVnd: dailyRepaymentAmount(500_000_000, 13, 6),
     consecutivePayments: 26,
     totalPaymentsMade: 26,
     totalPaymentsMissed: 0,
@@ -92,12 +94,12 @@ const mockSecondaryMarket: SecondaryMarketListing[] = [
     askingPricePremium: -8.0,
     originalInvestment: 250000000,
     loanPercentage: 50,
-    timeRemainingDays: 95,
-    totalActiveDays: 120,
+    timeRemainingDays: 60,
+    totalActiveDays: 60,
     actualRoi: 10.5,
     actualRoiVsExpected: 5.0,
     principalProgressPercent: 40,
-    dailyRevenueRate: 6.2,
+    dailyRepaymentVnd: dailyRepaymentAmount(250_000_000, 12, 4),
     consecutivePayments: 18,
     totalPaymentsMade: 18,
     totalPaymentsMissed: 0,
@@ -114,12 +116,12 @@ const mockSecondaryMarket: SecondaryMarketListing[] = [
     askingPricePremium: 4.0,
     originalInvestment: 750000000,
     loanPercentage: 75,
-    timeRemainingDays: 145,
-    totalActiveDays: 200,
+    timeRemainingDays: 30,
+    totalActiveDays: 150,
     actualRoi: 13.8,
     actualRoiVsExpected: 22.0,
     principalProgressPercent: 80,
-    dailyRevenueRate: 9.5,
+    dailyRepaymentVnd: dailyRepaymentAmount(750_000_000, 14, 6),
     consecutivePayments: 35,
     totalPaymentsMade: 35,
     totalPaymentsMissed: 0,
@@ -187,7 +189,7 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
       <div className="grid grid-cols-2 md:grid-cols-5 gap-6 pt-2">
         {/* Asking Price */}
         <div className="space-y-1">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+          <span className="stat-label block">
             {t("dashboard.projects.secondary.askingPrice")}
           </span>
           <div className="text-xl font-bold text-foreground">
@@ -202,7 +204,7 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
 
         {/* Original Investment */}
         <div className="space-y-1">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+          <span className="stat-label block">
             {t("dashboard.projects.secondary.originalInvestment")}
           </span>
           <div className="text-xl font-bold text-foreground">
@@ -217,7 +219,7 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
 
         {/* Time Remaining */}
         <div className="space-y-1">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+          <span className="stat-label block">
             {t("dashboard.projects.secondary.timeRemaining")}
           </span>
           <div className="text-xl font-bold text-foreground flex items-center gap-1.5">
@@ -237,7 +239,7 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
 
         {/* Actual ROI */}
         <div className="space-y-1">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+          <span className="stat-label block">
             {t("dashboard.projects.secondary.actualRoi")}
           </span>
           <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
@@ -252,15 +254,15 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
 
         {/* Principal Progress */}
         <div className="space-y-1">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+          <span className="stat-label block">
             {t("dashboard.projects.secondary.principalProgress")}
           </span>
           <div className="text-xl font-bold text-foreground">
             {listing.principalProgressPercent}%
           </div>
           <span className="text-xs font-medium text-muted-foreground">
-            {t("dashboard.projects.secondary.dailyRate", {
-              percent: listing.dailyRevenueRate.toFixed(1),
+            {t("dashboard.projects.secondary.dailyRepaymentPerDay", {
+              amount: formatCurrency(listing.dailyRepaymentVnd, locale),
             })}
           </span>
         </div>
@@ -286,11 +288,11 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
         </div>
         <div className="space-y-1">
           <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">
-            {t("dashboard.projects.secondary.revenueShare")}
+            {t("dashboard.projects.secondary.dailyRepayment")}
           </h4>
           <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
-            {t("dashboard.projects.secondary.revenueShareTerms", {
-              percent: listing.dailyRevenueRate.toFixed(1),
+            {t("dashboard.projects.secondary.dailyRepaymentTerms", {
+              amount: formatCurrency(listing.dailyRepaymentVnd, locale),
             })}
           </p>
         </div>

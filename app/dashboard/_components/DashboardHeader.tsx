@@ -141,7 +141,7 @@ export function DashboardHeader() {
             size="icon"
             className="h-9 w-9"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
-            aria-label="Toggle menu"
+            aria-label={t("common.toggleMenu")}
           >
             {mobileMenuOpen ? (
               <X className="h-5 w-5" />

@@ -27,6 +27,7 @@ import { StatusBlock } from "../status-block";
 import { CaptureTabs } from "./CaptureTabs";
 import { useGVerifyKyc } from "./useGVerifyKyc";
 import type { ApiError } from "@/lib/types";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 // Investor KYC via GVerify (Datatrust) — an in-app flow: the user stages ID
 // front/back + a portrait, we submit them in one call, and the verdict comes
@@ -34,7 +35,7 @@ import type { ApiError } from "@/lib/types";
 export function GVerifyKycClient() {
   const searchParams = useSearchParams();
   const { toast } = useToast();
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const { data: user } = useCurrentUser();
   const { images, setFile, reset, allReady, submit, submitting } =
     useGVerifyKyc();
@@ -75,8 +76,11 @@ export function GVerifyKycClient() {
       toast({
         variant: "destructive",
         title: t("kyc.gv.errorTitle"),
-        description:
-          (err as ApiError)?.message || t("kyc.startErrorDescription"),
+        description: apiErrorMessage(
+          err,
+          locale,
+          t("kyc.startErrorDescription"),
+        ),
       });
     }
   };
@@ -107,7 +111,11 @@ export function GVerifyKycClient() {
       toast({
         variant: "destructive",
         title: t("kyc.gv.errorTitle"),
-        description: apiError?.message || t("kyc.startErrorDescription"),
+        description: apiErrorMessage(
+          apiError,
+          locale,
+          t("kyc.startErrorDescription"),
+        ),
       });
     }
   };

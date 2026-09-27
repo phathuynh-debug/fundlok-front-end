@@ -92,9 +92,7 @@ export default function InvestPage() {
         </div>
 
         <div className="rounded-xl border bg-muted/30 p-5">
-          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            {t("investConfirm.amountLabel")}
-          </p>
+          <p className="stat-label">{t("investConfirm.amountLabel")}</p>
           {/* `vi-VN` puts a non-breaking space before the ₫, so the whole
               figure is one unbreakable token — at 3xl a ten-digit amount is
               wider than this card and pushes the page into horizontal scroll.

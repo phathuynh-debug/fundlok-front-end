@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import { SelectRoleClient } from "./select-role-client";
+import { getServerTranslations } from "@/lib/i18n/server";
 
-export const metadata: Metadata = {
-  title: "Choose your account type",
-  description:
-    "Tell us how you'll use FundLok — apply for SME funding or invest in private credit opportunities.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerTranslations();
+  return {
+    title: t("seo.selectRoleTitle"),
+    description: t("seo.selectRoleDescription"),
+  };
+}
 
 export default function Page() {
   return <SelectRoleClient />;

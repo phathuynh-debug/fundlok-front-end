@@ -61,7 +61,7 @@ export function ReviewRow({ docKey, label }: ReviewRowProps) {
       </div>
 
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold text-foreground truncate">
+        <p className="text-sm font-semibold text-foreground break-words">
           {label}
         </p>
         {file ? (
