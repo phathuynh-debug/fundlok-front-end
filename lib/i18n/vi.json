@@ -1150,7 +1150,7 @@
       },
       "statusApprovedBadge": "Đã duyệt",
       "statusApprovedNote": "Chúng tôi sẽ gửi email đề nghị tài trợ, gồm tổng số tiền phải trả, số tiền trả mỗi ngày và hạn tất toán cuối cùng, trước khi ký bất kỳ giấy tờ nào.",
-      "statusApprovedSubtitle": "Hồ sơ của bạn đã qua bước xét duyệt. Chúng tôi sẽ liên hệ qua email về bước tiếp theo — chưa có cam kết nào cho đến khi bạn xem và ký đề nghị tài trợ.",
+      "statusApprovedSubtitle": "Hồ sơ của bạn đã qua bước xét duyệt. Dưới đây là điểm doanh nghiệp và lãi suất tham khảo được dùng để duyệt; chưa có cam kết nào cho đến khi bạn xem và ký đề nghị tài trợ.",
       "statusApprovedTitle": "Đã duyệt — sẽ có đề nghị tài trợ",
       "statusDocuments": "Tài liệu",
       "statusDocumentsReceivedCount": "Đã nhận {count}/{total}",
@@ -1220,7 +1220,25 @@
       "vatZipLabel": "Tải lên tệp .zip chứa tất cả 48 tệp thuế GTGT (24 tờ khai + 24 xác nhận)",
       "viewDocument": "Xem",
       "whereToFindThese": "Tìm các số liệu này ở đâu",
-      "whyWeNeedThis": "Lý do cần hồ sơ"
+      "whyWeNeedThis": "Lý do cần hồ sơ",
+      "approval": {
+        "heading": "Căn cứ duyệt hồ sơ của bạn",
+        "score": "Điểm doanh nghiệp",
+        "rate": "Lãi suất tham khảo",
+        "perYear": "/ năm",
+        "rateNote": "Đã bao gồm mọi chi phí, tính một lần trên số tiền vay.",
+        "scorePending": "Điểm doanh nghiệp và lãi suất tham khảo sẽ được xác nhận trong đề nghị tài trợ.",
+        "amount": "Số tiền đề nghị",
+        "term": "Thời hạn",
+        "months": "{n} tháng",
+        "total": "Tổng số tiền phải trả",
+        "daily": "Khoảng mỗi ngày làm việc",
+        "disclaimer": "Điểm doanh nghiệp và lãi suất tham khảo là đánh giá nội bộ của FundLok, không phải xếp hạng tín dụng. Số tiền mỗi ngày là ước tính; đề nghị tài trợ bạn ký sẽ xác nhận mọi con số. Vốn được huy động từ nhà đầu tư và không được bảo đảm.",
+        "celebrateTitle": "Chúc mừng!",
+        "celebrateBody": "Đề nghị tài trợ của {company} đã được duyệt.",
+        "celebrateNext": "Tiếp theo, chúng tôi sẽ gửi đề nghị tài trợ để bạn xem và ký. Sau đó hồ sơ sẽ được giới thiệu tới nhà đầu tư.",
+        "celebrateCta": "Xem chi tiết"
+      }
     },
     "smeAnalytics": {
       "charts": {

@@ -8,9 +8,12 @@ import type { ProjectLoanApplication } from "@/services/projects.service";
 import type { LoanDocumentType } from "@/services/uploads.service";
 import type { IndustryTheme } from "../sme-dashboard-config";
 import { formatDate } from "@/lib/format-date";
+import { ApprovalCelebration, ApprovalSummary } from "./ApprovalSummary";
 
 interface LoanApplicationStatusProps {
   loanApplication: ProjectLoanApplication;
+  /** For the approval celebration's greeting. */
+  companyName?: string | null;
   locale: string;
   theme: IndustryTheme;
   t: (key: string) => string;
@@ -127,6 +130,7 @@ function extOf(filename: string): string {
 
 export function LoanApplicationStatus({
   loanApplication,
+  companyName = null,
   locale,
   theme,
   t,
@@ -164,7 +168,19 @@ export function LoanApplicationStatus({
   // that was not DRAFT, so a decided application kept telling the applicant
   // their documents were still being read. The three outcomes it can now
   // show are the three the backend can put on `status` after submission.
-  const decided = DECIDED_PRESENTATION[loanApplication.status] ?? null;
+  // An operator approval does not move `status` (it is one half of the
+  // two-approval gate); it arrives as `approval`, and the applicant sees the
+  // approved presentation from then on.
+  const approval = loanApplication.approval ?? null;
+  const decided =
+    DECIDED_PRESENTATION[loanApplication.status] ??
+    (approval ? DECIDED_PRESENTATION.APPROVED : null);
+  // "Still missing — send these for a re-review" belongs to a refusal. An
+  // approval required the documents, and the registration is normally the
+  // verified certificate rather than an upload, so listing it there would
+  // tell an approved applicant they are missing something they are not.
+  const showMissing =
+    decided?.finalStep === "rejected" && missingTypes.length > 0;
   // Trimmed: an operator who tabbed through the field leaves whitespace, and
   // an empty reason box is worse than no reason box.
   const decisionNote = loanApplication.decision_note?.trim() || null;
@@ -296,10 +312,27 @@ export function LoanApplicationStatus({
           ))}
         </div>
 
+        {approval && (
+          <>
+            <ApprovalSummary
+              approval={approval}
+              requestedAmount={requestedAmount}
+              locale={locale}
+              t={t}
+            />
+            <ApprovalCelebration
+              applicationId={loanApplication.id}
+              approval={approval}
+              companyName={companyName}
+              t={t}
+            />
+          </>
+        )}
+
         {/* Why the answer is what it is. An outcome with no explanation is
             the thing an applicant phones about, so the operator's reason and
             any gap in the file are stated here rather than left to email. */}
-        {decided && (decisionNote || missingTypes.length > 0) && (
+        {decided && (decisionNote || showMissing) && (
           <div
             className={cn(
               "space-y-3 rounded-xl border p-4",
@@ -317,7 +350,7 @@ export function LoanApplicationStatus({
               </div>
             )}
 
-            {missingTypes.length > 0 && (
+            {showMissing && (
               <div className="space-y-1">
                 <h4 className="text-xs font-semibold uppercase tracking-wide text-foreground">
                   {t("dashboard.sme.statusMissingHeading")}

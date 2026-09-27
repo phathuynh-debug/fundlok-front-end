@@ -18,6 +18,7 @@ export type StubUserKey =
   | "unapprovedSme"
   | "smeDraftApplication"
   | "smeRejectedApplication"
+  | "smeApprovedApplication"
   | "twoFactor"
   | "suspended"
   | "expiredSession";
@@ -87,6 +88,15 @@ export const STUB_USERS: Record<StubUserKey, StubUser> = {
     id: "00000000-0000-0000-0000-0000000000aa",
     email: "sme-rejected@e2e.test",
     full_name: "SME Refused",
+    role: "SME",
+  },
+  // An operator-approved request: `status` stays UNDER_REVIEW (approval is
+  // one half of the gate) and the outcome arrives as `approval`.
+  smeApprovedApplication: {
+    ...base,
+    id: "00000000-0000-0000-0000-0000000000ab",
+    email: "sme-approved@e2e.test",
+    full_name: "SME Approved",
     role: "SME",
   },
   // Same role, but /projects comes back empty — the dashboard's "apply for
@@ -319,11 +329,56 @@ export const STUB_PROJECT_REJECTED_APPLICATION = {
   },
 };
 
+/**
+ * An approved request, shaped like the backend's LoanApprovalOut: the score
+ * and rate of the reference application in docs (60.16, 15.19% on 50m over
+ * 5 months).
+ */
+export const STUB_PROJECT_APPROVED_APPLICATION = {
+  ...STUB_PROJECT,
+  id: "20000000-0000-0000-0000-00000000000b",
+  loan_application: {
+    ...STUB_PROJECT.loan_application,
+    id: "30000000-0000-0000-0000-00000000000b",
+    project_id: "20000000-0000-0000-0000-00000000000b",
+    requested_amount: "50000000",
+    duration_months: 5,
+    repayment_preference: "DAILY",
+    status: "UNDER_REVIEW",
+    decided_at: "2026-09-27T09:00:00+07:00",
+    // As a real approval has them: the registration came from the verified
+    // business certificate, so it is the one type not uploaded.
+    documents: (
+      ["legal_charter", "e_invoice_data", "tax_filings", "cic_report"] as const
+    ).map((document_type, i) => ({
+      id: `approved-doc-${i}`,
+      document_type,
+      original_filename: `${document_type}.pdf`,
+      content_type: "application/pdf",
+      file_size_bytes: 120000,
+      status: "UPLOADED",
+      uploaded_at: "2026-09-20T00:00:00Z",
+    })),
+    approval: {
+      approved_at: "2026-09-27T09:00:00+07:00",
+      business_score: 60.16,
+      reference_rate_pct: 15.19,
+      duration_months: 5,
+      total_repayment_vnd: 53164039,
+      estimated_daily_repayment_vnd: 483309,
+      engine_version: "1.0.0",
+      params_version: "wb-v1-20260917",
+    },
+  },
+};
+
 export function projectsFor(key: StubUserKey) {
   if (key === "sme" || key === "unapprovedSme") return [STUB_PROJECT];
   if (key === "smeDraftApplication") return [STUB_PROJECT_DRAFT_APPLICATION];
   if (key === "smeRejectedApplication")
     return [STUB_PROJECT_REJECTED_APPLICATION];
+  if (key === "smeApprovedApplication")
+    return [STUB_PROJECT_APPROVED_APPLICATION];
   return [];
 }
 

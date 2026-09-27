@@ -1150,7 +1150,7 @@
       },
       "statusApprovedBadge": "Approved",
       "statusApprovedNote": "We will email you the offer, including the total repayable, the daily amount and the backstop date, before anything is signed.",
-      "statusApprovedSubtitle": "Your request has cleared review. We will be in touch by email with the next step — nothing is committed until you have seen and signed the offer.",
+      "statusApprovedSubtitle": "Your request has cleared review. Below are the business score and reference rate it was approved on; nothing is committed until you have seen and signed the offer.",
       "statusApprovedTitle": "Approved — offer to follow",
       "statusDocuments": "Documents",
       "statusDocumentsReceivedCount": "{count}/{total} received",
@@ -1220,7 +1220,25 @@
       "vatZipLabel": "Upload .zip containing all 48 VAT files (24 declarations + 24 confirmations)",
       "viewDocument": "View",
       "whereToFindThese": "Where to find these numbers",
-      "whyWeNeedThis": "Why we need this"
+      "whyWeNeedThis": "Why we need this",
+      "approval": {
+        "heading": "What your request was approved on",
+        "score": "Business score",
+        "rate": "Reference rate",
+        "perYear": "/ year",
+        "rateNote": "All-in and flat: interest is charged once on the amount borrowed.",
+        "scorePending": "Your business score and reference rate will be confirmed in the offer.",
+        "amount": "Amount requested",
+        "term": "Term",
+        "months": "{n} months",
+        "total": "Total to repay",
+        "daily": "About per business day",
+        "disclaimer": "The business score and reference rate are FundLok's internal assessment, not a credit rating. The daily amount is an estimate; the offer you sign confirms every figure. Funding comes from investors and is not guaranteed.",
+        "celebrateTitle": "Congratulations!",
+        "celebrateBody": "The funding request for {company} has been approved.",
+        "celebrateNext": "Next, we will send you the offer to review and sign. Your request is then presented to investors.",
+        "celebrateCta": "See the details"
+      }
     },
     "smeAnalytics": {
       "charts": {

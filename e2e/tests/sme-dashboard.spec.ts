@@ -192,3 +192,66 @@ test.describe("an SME whose application was refused", () => {
     await expect(page.getByText("Financial Statement")).toHaveCount(0);
   });
 });
+
+test.describe("an SME whose request was approved", () => {
+  test.beforeEach(async ({ context }) => {
+    await signInAs(context, "smeApprovedApplication");
+  });
+
+  test("is congratulated once, with the score and rate", async ({ page }) => {
+    await page.goto("/dashboard");
+
+    const dialog = page.getByRole("dialog", {
+      name: t("dashboard.sme.approval.celebrateTitle"),
+    });
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toContainText(t("dashboard.sme.approval.score"));
+    // The numbers count up; wait for where they land.
+    await expect(dialog).toContainText("60.16");
+    await expect(dialog).toContainText("15.19%");
+
+    await dialog
+      .getByRole("button", { name: t("dashboard.sme.approval.celebrateCta") })
+      .click();
+    await expect(dialog).toHaveCount(0);
+
+    // Seen once: a reload does not celebrate again.
+    await page.reload();
+    await expect(page.getByTestId("approval-summary")).toBeVisible();
+    await expect(
+      page.getByRole("dialog", {
+        name: t("dashboard.sme.approval.celebrateTitle"),
+      }),
+    ).toHaveCount(0);
+  });
+
+  test("shows the decision as the finished last step, with the terms", async ({
+    page,
+  }) => {
+    await page.goto("/dashboard");
+    await page.keyboard.press("Escape");
+
+    await expect(
+      page.getByRole("heading", {
+        name: t("dashboard.sme.statusApprovedTitle"),
+      }),
+    ).toBeVisible();
+    // No longer "awaiting review", although `status` is still UNDER_REVIEW.
+    await expect(
+      page.getByText(t("dashboard.sme.statusReviewNote")),
+    ).toHaveCount(0);
+
+    const summary = page.getByTestId("approval-summary");
+    await expect(summary).toContainText("60.16");
+    await expect(summary).toContainText("15.19%");
+    await expect(summary).toContainText(/53[.,]164[.,]039/);
+    await expect(summary).toContainText(/483[.,]309/);
+    // The compliance wording: a reference, not a rating, and no promise.
+    await expect(summary).toContainText(t("dashboard.sme.approval.disclaimer"));
+    // Nothing is "still missing" on an approval (the registration is the
+    // verified certificate, not an upload).
+    await expect(
+      page.getByText(t("dashboard.sme.statusMissingHeading")),
+    ).toHaveCount(0);
+  });
+});

@@ -43,6 +43,29 @@ export interface ProjectLoanApplication {
   decision_note: string | null;
   decided_at: string | null;
   documents: ApplicationDocument[];
+  /**
+   * Present once an operator has approved the request (status stays
+   * UNDER_REVIEW: approval is one half of the two-approval gate). Carries the
+   * stored score and rate the decision rests on. Optional: older responses
+   * omit it.
+   */
+  approval?: LoanApproval | null;
+}
+
+/** The applicant-facing summary of an approval (backend LoanApprovalOut). */
+export interface LoanApproval {
+  approved_at: string | null;
+  /** 0-100 business score — a reference input, never a credit rating. */
+  business_score: number | null;
+  /** All-in annual reference rate, % per year. */
+  reference_rate_pct: number | null;
+  duration_months: number | null;
+  /** Principal plus flat interest, charged once (INV-2). */
+  total_repayment_vnd: number | null;
+  /** An estimate until the business-day calendar exists. */
+  estimated_daily_repayment_vnd: number | null;
+  engine_version: string | null;
+  params_version: string | null;
 }
 
 export interface Project {

@@ -336,6 +336,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
         ) : (
           <LoanApplicationStatus
             loanApplication={project.loan_application}
+            companyName={project.legal_name}
             locale={locale}
             theme={theme}
             t={t}
