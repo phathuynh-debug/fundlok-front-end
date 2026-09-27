@@ -7,6 +7,7 @@ import {
   useReducedMotion,
   useScroll,
   useTransform,
+  type MotionValue,
 } from "framer-motion";
 import { Building2, Banknote } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
@@ -17,7 +18,7 @@ const contentData = {
     sme: {
       steps: [
         {
-          title: "Apply & KYC",
+          title: "Apply & KYB",
           detailTitle: "Apply & verify online",
           badge: "Step 1 · Apply",
           tags: [
@@ -187,7 +188,7 @@ const contentData = {
     sme: {
       steps: [
         {
-          title: "Đăng ký & KYC",
+          title: "Đăng ký & KYB",
           detailTitle: "Đăng ký & xác thực trực tuyến",
           badge: "Bước 1 · Đăng ký",
           tags: [
@@ -877,32 +878,28 @@ export function InteractiveFlow() {
    * three times across the whole section rather than once per frame (3.B).
    */
   const sequenceRef = useRef<HTMLDivElement>(null);
-  // "end start", not "end end": the panel is pinned from the moment the
-  // wrapper's top reaches the viewport top until its BOTTOM does, so that is
-  // the span progress has to map onto. Measuring to "end end" instead leaves
-  // the last stage holding for a whole extra viewport while the first three
-  // get one each.
+  // Pinned from the moment the wrapper's top reaches viewport top ("start start")
+  // until the container's bottom reaches the viewport bottom ("end end"), which is
+  // the exact point where sticky top-0 ceases to stick. This guarantees that all stages
+  // — including the final stage — receive their full scroll distance inside the block.
   const { scrollYProgress } = useScroll({
     target: sequenceRef,
-    offset: ["start start", "end start"],
+    offset: ["start start", "end end"],
   });
   const progressWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
   useMotionValueEvent(scrollYProgress, "change", (v) => {
     const idx = Math.min(steps.length - 1, Math.floor(v * steps.length));
     setActiveStep((prev) => (prev === idx ? prev : idx));
-  });
 
-  useEffect(() => {
-    if (
-      activeStep === steps.length - 1 &&
-      !celebrated.current &&
-      !reduceMotion
-    ) {
+    // Celebrate when the reader finishes scrolling through the final stage
+    if (v >= 0.92 && !celebrated.current && !reduceMotion) {
       celebrated.current = true;
       triggerConfetti();
+    } else if (v < 0.75 && celebrated.current) {
+      celebrated.current = false;
     }
-  }, [activeStep, steps.length, reduceMotion]);
+  });
 
   const handleRoleChange = (newRole: "sme" | "investor") => {
     setRole(newRole);
@@ -1008,90 +1005,243 @@ export function InteractiveFlow() {
    * cap height (ế, ữ, ộ) and a zero-leading display line clips them. The English
    * copy would have looked fine and the production language would not.
    */
-  const stageDetail = (s: (typeof steps)[number], idx: number) => (
-    <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
-      <div>
-        <p className="mb-5 font-mono text-xs text-muted-foreground">
-          {String(idx + 1).padStart(2, "0")}
-        </p>
+  function ScrollProgressItem({
+    progress,
+    range,
+    className = "",
+    children,
+  }: {
+    progress: MotionValue<number>;
+    range: [number, number];
+    className?: string;
+    children: React.ReactNode;
+  }) {
+    const opacity = useTransform(progress, range, [0, 1], { clamp: true });
+    const y = useTransform(progress, range, [14, 0], { clamp: true });
 
-        <h3 className="mb-6 max-w-[14ch] font-sans text-4xl font-extrabold leading-[1.1] tracking-tighter text-foreground md:text-6xl lg:text-7xl">
-          {(s as { detailTitle?: string }).detailTitle || s.title}
-        </h3>
+    return (
+      <motion.div style={{ opacity, y }} className={className}>
+        {children}
+      </motion.div>
+    );
+  }
 
-        <p className="mb-8 max-w-[52ch] font-sans text-base leading-relaxed text-muted-foreground md:text-lg">
-          {s.desc}
-        </p>
+  function ScrollDrivenStageDetail({
+    s,
+    idx,
+    totalSteps,
+    currentLocale,
+    scrollYProgress,
+  }: {
+    s: (typeof contentData)["en"]["sme"]["steps"][number];
+    idx: number;
+    totalSteps: number;
+    currentLocale: string;
+    scrollYProgress: MotionValue<number>;
+  }) {
+    // Normalize scroll progress within this stage's span (idx / totalSteps -> (idx + 1) / totalSteps)
+    const stageProgress = useTransform(
+      scrollYProgress,
+      [idx / totalSteps, (idx + 1) / totalSteps],
+      [0, 1],
+      { clamp: true },
+    );
 
-        <div className="flex flex-wrap gap-2">
-          {s.tags.map((tag, tIdx) => (
-            <span
-              key={tIdx}
-              className="rounded-full border border-border px-3 py-1 font-sans text-xs text-muted-foreground"
-            >
-              {tag}
-            </span>
-          ))}
+    const cards = [
+      [currentLocale === "vi" ? "Cách hoạt động" : "How this works", s.how],
+      [
+        currentLocale === "vi" ? "Tại sao quan trọng" : "Why this matters",
+        s.why,
+      ],
+      [
+        currentLocale === "vi" ? "Công nghệ hỗ trợ" : "Technology behind it",
+        s.tech,
+      ],
+      [s.journeyTitle, s.emphasis],
+    ];
+
+    const cardRanges: [number, number][] = [
+      [0.02, 0.14],
+      [0.14, 0.26],
+      [0.26, 0.38],
+      [0.38, 0.5],
+    ];
+
+    const rowRanges: [number, number][] = [
+      [0.58, 0.67],
+      [0.67, 0.76],
+      [0.76, 0.85],
+      [0.85, 0.94],
+    ];
+
+    return (
+      <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+        <div>
+          <p className="mb-5 font-mono text-xs text-muted-foreground">
+            {String(idx + 1).padStart(2, "0")}
+          </p>
+
+          <h3 className="mb-6 max-w-[14ch] font-sans text-4xl font-extrabold leading-[1.1] tracking-tighter text-foreground md:text-6xl lg:text-7xl">
+            {(s as { detailTitle?: string }).detailTitle || s.title}
+          </h3>
+
+          <p className="mb-8 max-w-[52ch] font-sans text-base leading-relaxed text-muted-foreground md:text-lg">
+            {s.desc}
+          </p>
+
+          <div className="flex flex-wrap gap-2">
+            {s.tags.map((tag, tIdx) => (
+              <span
+                key={tIdx}
+                className="rounded-full border border-border px-3 py-1 font-sans text-xs text-muted-foreground"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Supporting detail: items appear one by one as the reader scrolls within this stage */}
+        <div className="flex flex-col gap-8 lg:pt-16">
+          <div className="grid gap-6 sm:grid-cols-2">
+            {cards.map(([label, body], cIdx) => (
+              <ScrollProgressItem
+                key={label}
+                progress={stageProgress}
+                range={cardRanges[cIdx] ?? [0, 1]}
+                className="border-t border-border pt-4"
+              >
+                <h4 className="mb-2 font-sans text-xs font-semibold text-foreground">
+                  {label}
+                </h4>
+                <p className="font-sans text-xs leading-relaxed text-muted-foreground">
+                  {body}
+                </p>
+              </ScrollProgressItem>
+            ))}
+          </div>
+
+          <dl className="border-t border-border pt-4">
+            <ScrollProgressItem progress={stageProgress} range={[0.5, 0.58]}>
+              <dt className="mb-3 font-sans text-xs font-semibold text-foreground">
+                {currentLocale === "vi"
+                  ? "Các bước thực hiện"
+                  : "What happens here"}
+              </dt>
+            </ScrollProgressItem>
+            {s.rows.map((row, rIdx) => (
+              <ScrollProgressItem
+                key={rIdx}
+                progress={stageProgress}
+                range={rowRanges[rIdx] ?? [0.58, 0.95]}
+                className="flex items-start justify-between gap-6 py-2"
+              >
+                <dd className="font-sans text-xs text-muted-foreground">
+                  {row[0]}
+                </dd>
+                <dd className="shrink-0 text-right font-sans text-xs font-bold text-foreground">
+                  {row[1]}
+                </dd>
+              </ScrollProgressItem>
+            ))}
+          </dl>
         </div>
       </div>
+    );
+  }
 
-      {/* Supporting detail. Hairlines instead of cards: at this scale a boxed
-          panel next to 72px type reads as a second, competing headline. */}
-      <div className="flex flex-col gap-8 lg:pt-16">
-        <div className="grid gap-6 sm:grid-cols-2">
-          {[
-            [
-              currentLocale === "vi" ? "Cách hoạt động" : "How this works",
-              s.how,
-            ],
-            [
-              currentLocale === "vi"
-                ? "Tại sao quan trọng"
-                : "Why this matters",
-              s.why,
-            ],
-            [
-              currentLocale === "vi"
-                ? "Công nghệ hỗ trợ"
-                : "Technology behind it",
-              s.tech,
-            ],
-            [s.journeyTitle, s.emphasis],
-          ].map(([label, body]) => (
-            <div key={label} className="border-t border-border pt-4">
-              <h4 className="mb-2 font-sans text-xs font-semibold text-foreground">
-                {label}
-              </h4>
-              <p className="font-sans text-xs leading-relaxed text-muted-foreground">
-                {body}
-              </p>
-            </div>
-          ))}
+  function StaticStageDetail({
+    s,
+    idx,
+    currentLocale,
+  }: {
+    s: (typeof contentData)["en"]["sme"]["steps"][number];
+    idx: number;
+    currentLocale: string;
+  }) {
+    return (
+      <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+        <div>
+          <p className="mb-5 font-mono text-xs text-muted-foreground">
+            {String(idx + 1).padStart(2, "0")}
+          </p>
+
+          <h3 className="mb-6 max-w-[14ch] font-sans text-4xl font-extrabold leading-[1.1] tracking-tighter text-foreground md:text-6xl lg:text-7xl">
+            {(s as { detailTitle?: string }).detailTitle || s.title}
+          </h3>
+
+          <p className="mb-8 max-w-[52ch] font-sans text-base leading-relaxed text-muted-foreground md:text-lg">
+            {s.desc}
+          </p>
+
+          <div className="flex flex-wrap gap-2">
+            {s.tags.map((tag, tIdx) => (
+              <span
+                key={tIdx}
+                className="rounded-full border border-border px-3 py-1 font-sans text-xs text-muted-foreground"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
         </div>
 
-        <dl className="border-t border-border pt-4">
-          <dt className="mb-3 font-sans text-xs font-semibold text-foreground">
-            {currentLocale === "vi"
-              ? "Các bước thực hiện"
-              : "What happens here"}
-          </dt>
-          {s.rows.map((row, rIdx) => (
-            <div
-              key={rIdx}
-              className="flex items-start justify-between gap-6 py-2"
-            >
-              <dd className="font-sans text-xs text-muted-foreground">
-                {row[0]}
-              </dd>
-              <dd className="shrink-0 text-right font-sans text-xs font-bold text-foreground">
-                {row[1]}
-              </dd>
-            </div>
-          ))}
-        </dl>
+        <div className="flex flex-col gap-8 lg:pt-16">
+          <div className="grid gap-6 sm:grid-cols-2">
+            {[
+              [
+                currentLocale === "vi" ? "Cách hoạt động" : "How this works",
+                s.how,
+              ],
+              [
+                currentLocale === "vi"
+                  ? "Tại sao quan trọng"
+                  : "Why this matters",
+                s.why,
+              ],
+              [
+                currentLocale === "vi"
+                  ? "Công nghệ hỗ trợ"
+                  : "Technology behind it",
+                s.tech,
+              ],
+              [s.journeyTitle, s.emphasis],
+            ].map(([label, body]) => (
+              <div key={label} className="border-t border-border pt-4">
+                <h4 className="mb-2 font-sans text-xs font-semibold text-foreground">
+                  {label}
+                </h4>
+                <p className="font-sans text-xs leading-relaxed text-muted-foreground">
+                  {body}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <dl className="border-t border-border pt-4">
+            <dt className="mb-3 font-sans text-xs font-semibold text-foreground">
+              {currentLocale === "vi"
+                ? "Các bước thực hiện"
+                : "What happens here"}
+            </dt>
+            {s.rows.map((row, rIdx) => (
+              <div
+                key={rIdx}
+                className="flex items-start justify-between gap-6 py-2"
+              >
+                <dd className="font-sans text-xs text-muted-foreground">
+                  {row[0]}
+                </dd>
+                <dd className="shrink-0 text-right font-sans text-xs font-bold text-foreground">
+                  {row[1]}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   const audienceRail = (
     <div className="flex gap-1 rounded-2xl border border-border bg-card p-1.5">
@@ -1120,7 +1270,13 @@ export function InteractiveFlow() {
         {audienceGate}
         <div className="space-y-14">
           {steps.map((s, idx) => (
-            <div key={`${role}-${idx}`}>{stageDetail(s, idx)}</div>
+            <div key={`${role}-${idx}`}>
+              <StaticStageDetail
+                s={s}
+                idx={idx}
+                currentLocale={currentLocale}
+              />
+            </div>
           ))}
         </div>
       </div>
@@ -1136,10 +1292,10 @@ export function InteractiveFlow() {
 
       {audienceGate}
 
-      {/* Exactly one viewport of scroll per stage. */}
+      {/* Exactly one viewport of scroll per stage, plus the pinned viewport height. */}
       <div
         ref={sequenceRef}
-        style={{ height: `${steps.length * 100}vh` }}
+        style={{ height: `${steps.length * 100 + 100}vh` }}
         className="relative"
       >
         <div className="sticky top-0 flex min-h-[100dvh] flex-col">
@@ -1197,20 +1353,19 @@ export function InteractiveFlow() {
 
           <div className="flex flex-1 flex-col justify-center py-12">
             {/* The stage itself. Cross-fades as the scroll crosses each boundary. */}
-            {/* No AnimatePresence here, deliberately. With mode="wait" the
-                incoming stage cannot mount until the outgoing one has finished
-                exiting, so scrolling faster than that exit (which is how people
-                actually scroll) backs the queue up and the panel settles on the
-                wrong stage while the indicator shows the right one. A keyed
-                remount has no exit to wait for: React swaps the subtree at once
-                and the new stage fades in, so the two cannot disagree. */}
             <motion.div
               key={`${role}-${activeStep}`}
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
             >
-              {stageDetail(step, activeStep)}
+              <ScrollDrivenStageDetail
+                s={step}
+                idx={activeStep}
+                totalSteps={steps.length}
+                currentLocale={currentLocale}
+                scrollYProgress={scrollYProgress}
+              />
             </motion.div>
           </div>
         </div>
