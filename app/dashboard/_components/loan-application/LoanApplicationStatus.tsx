@@ -27,6 +27,10 @@ const DOCUMENT_LABELS: Record<LoanDocumentType, { en: string; vi: string }> = {
   financial_report: { en: "Financial Statement", vi: "Báo cáo tài chính" },
   e_invoice_data: { en: "E-Invoice Data", vi: "Dữ liệu hóa đơn điện tử" },
   cic_report: { en: "CIC Credit Report", vi: "Báo cáo tín dụng CIC" },
+  tax_filings: {
+    en: "Financial statements & VAT filings",
+    vi: "Báo cáo tài chính & tờ khai thuế GTGT",
+  },
 };
 
 const DOCUMENT_ORDER = Object.keys(DOCUMENT_LABELS) as LoanDocumentType[];
@@ -45,6 +49,7 @@ const EXPECTED_DOCUMENT_TYPES: LoanDocumentType[] = [
   "legal_charter",
   "business_registration",
   "e_invoice_data",
+  "tax_filings",
   "cic_report",
 ];
 

@@ -268,10 +268,17 @@ export function ProjectPreviewSheet({
                       <ScoreRunSummary
                         run={application.score_run}
                         t={t}
-                        // Scoring needs a SUBMITTED application: the engine
+                        // Scoring needs a submitted application: the engine
                         // would otherwise grade figures the SME has not
-                        // finished entering, and the API answers 400.
-                        canRun={application.status === "SUBMITTED"}
+                        // finished entering, and the API answers 400. The
+                        // first run moves it to UNDER_REVIEW; it can be run
+                        // again until the request is decided (the API answers
+                        // 409 after that, and for a locked run).
+                        canRun={
+                          application.status === "SUBMITTED" ||
+                          (application.status === "UNDER_REVIEW" &&
+                            application.admin_approval === "PENDING")
+                        }
                         running={scoringId === application.id}
                         onRun={() => handleScore(application.id)}
                       />
@@ -439,6 +446,28 @@ function ScoreRunSummary({
             : t("admin.preview.scoreInsufficientHint")}
         </p>
       )}
+      {/* Which inputs, by name — "missing financial inputs" alone left the
+          operator re-running a score that could not change. */}
+      {run.decision === "INSUFFICIENT_DATA" &&
+        (run.missing_inputs?.length ?? 0) > 0 && (
+          <div className="space-y-1">
+            <p className="text-[11px] font-semibold text-destructive">
+              {t("admin.preview.missingInputs")}
+            </p>
+            <ul className="list-disc space-y-0.5 pl-4 text-[11px] text-destructive">
+              {run.missing_inputs!.map((key) => {
+                const label = t(`admin.preview.missingInput.${key}`);
+                return (
+                  <li key={key}>
+                    {label === `admin.preview.missingInput.${key}`
+                      ? key
+                      : label}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
       {/* Provenance: which engine and parameter set produced this, so a quote
           stays traceable after either is bumped. */}
       {(run.engine_version || run.params_version) && (

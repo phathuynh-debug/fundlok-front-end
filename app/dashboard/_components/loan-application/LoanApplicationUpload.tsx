@@ -144,7 +144,9 @@ function LoanApplicationWizard() {
                       </div>
                     )}
 
-                    {/* Steps 2-3 are typed figures, not uploads. Rendered from
+                    {/* Step 2: the e-invoice zip is the revenue evidence, and
+                        the revenue figures are read out of it (locked while it
+                        is attached). Figures are rendered from
                         LITE_FIGURE_FIELDS so the field set is data, not markup. */}
                     {currentStep === 2 && (
                       <div className="space-y-4">
@@ -154,6 +156,11 @@ function LoanApplicationWizard() {
                         <p className="text-sm text-muted-foreground">
                           {t("dashboard.sme.lite.revenueSubtitle")}
                         </p>
+                        <UploadField
+                          docKey="eInvoiceData"
+                          label={t("dashboard.sme.eInvoiceData")}
+                        />
+                        <EInvoiceReadout />
                         <div className="space-y-5">
                           {figureFieldsForStep(2).map((field) => (
                             <FigureField key={field.key} field={field} />
@@ -162,6 +169,10 @@ function LoanApplicationWizard() {
                       </div>
                     )}
 
+                    {/* Step 3: the tax filings fill cost of goods sold and
+                        owner withdrawal (locked); the customer shares come from
+                        step 2's invoices; fixed and variable cost are typed,
+                        with the statement's admin/selling lines as hints. */}
                     {currentStep === 3 && (
                       <div className="space-y-4">
                         <h4 className="text-lg font-bold text-foreground">
@@ -170,6 +181,11 @@ function LoanApplicationWizard() {
                         <p className="text-sm text-muted-foreground">
                           {t("dashboard.sme.lite.costsSubtitle")}
                         </p>
+                        <UploadField
+                          docKey="taxFilings"
+                          label={t("dashboard.sme.taxFilings")}
+                        />
+                        <TaxFilingsReadout />
                         <div className="space-y-5">
                           {figureFieldsForStep(3).map((field) => (
                             <FigureField key={field.key} field={field} />
@@ -179,18 +195,6 @@ function LoanApplicationWizard() {
                     )}
 
                     {currentStep === 4 && (
-                      <div className="space-y-4">
-                        <h4 className="text-lg font-bold text-foreground">
-                          {t("dashboard.sme.eInvoiceData")}
-                        </h4>
-                        <UploadField
-                          docKey="eInvoiceData"
-                          label={t("dashboard.sme.eInvoiceData")}
-                        />
-                      </div>
-                    )}
-
-                    {currentStep === 5 && (
                       <div className="space-y-4">
                         <h4 className="text-lg font-bold text-foreground">
                           {t("dashboard.sme.cicCreditReport")}
@@ -205,6 +209,7 @@ function LoanApplicationWizard() {
                           docKey="cicReport"
                           label={t("dashboard.sme.cicCreditReport")}
                         />
+                        <CicReadout />
                       </div>
                     )}
                   </div>
@@ -364,6 +369,202 @@ function ReusedDocumentField({ label, url }: { label: string; url: string }) {
           {t("dashboard.sme.viewDocument")}
         </a>
       </div>
+    </div>
+  );
+}
+
+/**
+ * What the attached e-invoice zip was read as: the months found, or that it
+ * is still being read. Shown between the upload and the figures it fills, so
+ * the SME sees where the locked numbers came from.
+ */
+function EInvoiceReadout() {
+  const { eInvoicePreview, isReadingEInvoices, t } =
+    useLoanApplicationContext();
+
+  if (isReadingEInvoices) {
+    return (
+      <p className="flex items-center gap-2 text-xs text-muted-foreground">
+        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        {t("dashboard.sme.eInvoiceReading")}
+      </p>
+    );
+  }
+  if (!eInvoicePreview) return null;
+
+  const partial = eInvoicePreview.revenue_last_12m === null;
+  return (
+    <div
+      className={cn(
+        "rounded-xl border px-3 py-2.5 text-xs leading-relaxed",
+        partial
+          ? "border-amber-500/40 bg-amber-500/5 text-amber-800 dark:text-amber-200"
+          : "border-emerald-500/40 bg-emerald-500/5 text-emerald-800 dark:text-emerald-200",
+      )}
+    >
+      <p className="font-semibold">
+        {t("dashboard.sme.eInvoiceReadSummary")
+          .replace("{count}", String(eInvoicePreview.months_covered))
+          .replace("{start}", eInvoicePreview.period_start)
+          .replace("{end}", eInvoicePreview.period_end)}
+      </p>
+      <p>
+        {partial
+          ? t("dashboard.sme.eInvoicePartialYear")
+          : t("dashboard.sme.eInvoiceFilledFigures")}
+      </p>
+    </div>
+  );
+}
+
+/**
+ * What the attached tax filings were read as: the fiscal year of the
+ * statements and, when the monthly VAT declarations were included, how many
+ * months. Mirrors EInvoiceReadout.
+ */
+function TaxFilingsReadout() {
+  const { taxFilingsPreview, isReadingTaxFilings, t } =
+    useLoanApplicationContext();
+
+  if (isReadingTaxFilings) {
+    return (
+      <p className="flex items-center gap-2 text-xs text-muted-foreground">
+        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        {t("dashboard.sme.taxFilingsReading")}
+      </p>
+    );
+  }
+  if (!taxFilingsPreview) return null;
+
+  // A loss year states no owner-withdrawal share, so that field stays typed.
+  const noProfit = taxFilingsPreview.owner_withdrawal_pct === null;
+  return (
+    <div
+      className={cn(
+        "rounded-xl border px-3 py-2.5 text-xs leading-relaxed",
+        noProfit
+          ? "border-amber-500/40 bg-amber-500/5 text-amber-800 dark:text-amber-200"
+          : "border-emerald-500/40 bg-emerald-500/5 text-emerald-800 dark:text-emerald-200",
+      )}
+    >
+      <p className="font-semibold">
+        {t("dashboard.sme.taxFilingsReadSummary").replace(
+          "{year}",
+          String(taxFilingsPreview.fiscal_year),
+        )}
+        {taxFilingsPreview.vat_months > 0 &&
+          ` · ${t("dashboard.sme.taxFilingsVatMonths").replace(
+            "{count}",
+            String(taxFilingsPreview.vat_months),
+          )}`}
+      </p>
+      <p>
+        {noProfit
+          ? t("dashboard.sme.taxFilingsNoProfit")
+          : t("dashboard.sme.taxFilingsFilledFigures")}
+      </p>
+    </div>
+  );
+}
+
+/**
+ * What the attached CIC report was read as: CIC's score and rank, when it
+ * was scored, and the current debt position. Nothing on step 4 is filled from
+ * it; this is so the SME sees what underwriting will see, and catches the
+ * wrong report (or a scan) before Send.
+ */
+function CicReadout() {
+  const { cicPreview, isReadingCic, t, locale } = useLoanApplicationContext();
+
+  if (isReadingCic) {
+    return (
+      <p className="flex items-center gap-2 text-xs text-muted-foreground">
+        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        {t("dashboard.sme.cicReading")}
+      </p>
+    );
+  }
+  if (!cicPreview) return null;
+
+  const has = (code: string) =>
+    cicPreview.warnings.some((w) => w.code === code);
+  const notes = [
+    cicPreview.score === null && t("dashboard.sme.cicNote.NO_SCORE"),
+    has("INDIVIDUAL_REPORT") && t("dashboard.sme.cicNote.INDIVIDUAL_REPORT"),
+    has("STALE_REPORT") &&
+      t("dashboard.sme.cicNote.STALE_REPORT").replace(
+        "{days}",
+        String(cicPreview.age_days ?? ""),
+      ),
+    (has("BAD_DEBT") || has("ATTENTION_DEBT") || has("NEGATIVE_HISTORY")) &&
+      t("dashboard.sme.cicNote.DEBT_ISSUES"),
+  ].filter(Boolean) as string[];
+
+  const formatDate = (iso: string | null) =>
+    iso
+      ? new Date(`${iso}T00:00:00`).toLocaleDateString(
+          locale === "vi" ? "vi-VN" : "en-GB",
+        )
+      : "—";
+  const million = (n: number | null) =>
+    n === null
+      ? "—"
+      : `${n.toLocaleString(locale === "vi" ? "vi-VN" : "en-US")} ${t("dashboard.sme.cicMillionVnd")}`;
+
+  const rows: [string, string][] = [
+    [
+      t("dashboard.sme.cicScore"),
+      cicPreview.score === null ? "—" : String(cicPreview.score),
+    ],
+    [
+      t("dashboard.sme.cicRank"),
+      cicPreview.rank === null
+        ? "—"
+        : `${cicPreview.rank}${
+            cicPreview.rank_label
+              ? ` · ${t(`dashboard.sme.cicRankLabel.${cicPreview.rank_label}`)}`
+              : ""
+          }`,
+    ],
+    [
+      t("dashboard.sme.cicPercentile"),
+      cicPreview.percentile === null
+        ? "—"
+        : t("dashboard.sme.cicPercentileValue").replace(
+            "{pct}",
+            String(cicPreview.percentile),
+          ),
+    ],
+    [t("dashboard.sme.cicScoredOn"), formatDate(cicPreview.scored_on)],
+    [
+      t("dashboard.sme.cicTotalDebt"),
+      million(cicPreview.debt_total_vnd_million),
+    ],
+  ];
+
+  return (
+    <div
+      className={cn(
+        "rounded-xl border px-3 py-2.5 text-xs leading-relaxed space-y-2",
+        notes.length
+          ? "border-amber-500/40 bg-amber-500/5 text-amber-800 dark:text-amber-200"
+          : "border-emerald-500/40 bg-emerald-500/5 text-emerald-800 dark:text-emerald-200",
+      )}
+    >
+      <p className="font-semibold">{t("dashboard.sme.cicReadSummary")}</p>
+      <dl className="grid grid-cols-2 gap-x-4 gap-y-1">
+        {rows.map(([label, value]) => (
+          <div key={label} className="contents">
+            <dt className="text-muted-foreground">{label}</dt>
+            <dd className="font-medium tabular-nums text-foreground">
+              {value}
+            </dd>
+          </div>
+        ))}
+      </dl>
+      {notes.map((note) => (
+        <p key={note}>{note}</p>
+      ))}
     </div>
   );
 }

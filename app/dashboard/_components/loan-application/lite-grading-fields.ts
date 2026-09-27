@@ -52,6 +52,13 @@ export interface LiteFigureField {
   hintKey: string;
   /** `GradingInput` field this feeds, per grading-input-sources.md §3.1. */
   gradingInput: string;
+  /** A VND amount where 0 is a real answer (no such cost), not a slip. */
+  allowZero?: boolean;
+  /**
+   * The year-end statement line shown under the input as a reference, for
+   * figures the SME types because no filing states them (fixed/variable).
+   */
+  statementHint?: "admin_expense_vnd" | "selling_expense_vnd";
 }
 
 export const LITE_FIGURE_FIELDS: readonly LiteFigureField[] = [
@@ -115,6 +122,7 @@ export const LITE_FIGURE_FIELDS: readonly LiteFigureField[] = [
     labelKey: "dashboard.sme.lite.fixedCostY1",
     hintKey: "dashboard.sme.lite.fixedCostY1Hint",
     gradingInput: "fixed_cost_y1",
+    statementHint: "admin_expense_vnd",
   },
   {
     key: "variable_cost_excl_cogs_y1",
@@ -124,6 +132,9 @@ export const LITE_FIGURE_FIELDS: readonly LiteFigureField[] = [
     labelKey: "dashboard.sme.lite.variableCostY1",
     hintKey: "dashboard.sme.lite.variableCostY1Hint",
     gradingInput: "variable_cost_excl_cogs_y1",
+    // Many small firms book no selling expense at all; the backend accepts 0.
+    allowZero: true,
+    statementHint: "selling_expense_vnd",
   },
   {
     key: "owner_withdrawal_pct",
@@ -168,7 +179,8 @@ export const REQUIRED_LITE_FIGURE_KEYS: readonly LiteFigureKey[] =
   LITE_FIGURE_FIELDS.filter((f) => f.required).map((f) => f.key);
 
 /**
- * Percentages are 0–100; VND amounts must be positive and are capped well
+ * Percentages are 0–100; VND amounts must be positive (or zero where the
+ * field allows it) and are capped well
  * above any plausible SME turnover so a mistyped extra digit is caught rather
  * than silently grading a company as a conglomerate.
  */
@@ -217,6 +229,7 @@ export type FigureError =
   | "worst_exceeds_best"
   | "month_exceeds_year"
   | "top1_exceeds_top3"
+  | "costs_exceed_revenue"
   | null;
 
 export function validateFigure(
@@ -240,7 +253,8 @@ export function validateFigure(
 
   const value = Number(digits);
   if (!Number.isFinite(value)) return "not_a_number";
-  return value <= 0 || value > VND_MAX ? "out_of_range" : null;
+  if (value === 0) return field.allowZero ? null : "out_of_range";
+  return value < 0 || value > VND_MAX ? "out_of_range" : null;
 }
 
 /**
@@ -340,6 +354,23 @@ export function validateFigureConsistency(
   // larger than theirs combined.
   if (top1 !== null && top3 !== null && top1 > top3) {
     errors.conc_top1_pct = "top1_exceeds_top3";
+  }
+
+  // The engine refuses to grade a year that made no profit, so total cost has
+  // to stay below revenue. Blamed on fixed cost: it is typed (cost of goods
+  // sold usually comes locked from the statements), and it is the line most
+  // often over-stated by counting the same spend twice.
+  const cogs = n("cogs_y1");
+  const fixed = n("fixed_cost_y1");
+  const variable = n("variable_cost_excl_cogs_y1");
+  if (
+    year !== null &&
+    cogs !== null &&
+    fixed !== null &&
+    variable !== null &&
+    cogs + fixed + variable >= year
+  ) {
+    errors.fixed_cost_y1 = "costs_exceed_revenue";
   }
 
   return errors;

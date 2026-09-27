@@ -77,6 +77,11 @@ export const FILES_ENDPOINTS = {
 export const UPLOADS_ENDPOINTS = {
   initUpload: "/uploads/init-upload",
   confirm: "/uploads/confirm",
+  // Reads the e-invoice zip the moment it is picked, to prefill step 2.
+  einvoicePreview: "/uploads/einvoice-preview",
+  // Reads the tax filings (statement XML, or the folder .zip) to prefill step 3.
+  taxFilingsPreview: "/uploads/tax-filings-preview",
+  cicPreview: "/uploads/cic-preview",
 } as const;
 
 export const LOANS_ENDPOINTS = {

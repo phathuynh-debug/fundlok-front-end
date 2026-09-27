@@ -166,6 +166,12 @@ export interface AdminScoreRun {
   engine_version: string | null;
   params_version: string | null;
   created_at: string | null;
+  /**
+   * On an INSUFFICIENT_DATA run: the grading inputs still missing now (e.g.
+   * "kyc_aml_passed"), so the panel can say why there is no score. Optional:
+   * older responses omit it.
+   */
+  missing_inputs?: string[];
 }
 
 export interface AdminLoanApplication {

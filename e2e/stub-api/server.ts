@@ -157,6 +157,7 @@ function notificationsFor(key: StubUserKey): StubNotification[] {
 
 /** Score runs produced during a run, keyed by application id. */
 const adminScoreRuns = new Map<string, Record<string, unknown>>();
+const adminScoreRunCounts = new Map<string, number>();
 
 function scoreRunFor(applicationId: string) {
   const run = adminScoreRuns.get(applicationId);
@@ -175,6 +176,11 @@ function scoreRunFor(applicationId: string) {
     engine_version: "1.0.0",
     params_version: "wb-v1-20260917",
     created_at: new Date().toISOString(),
+    // What the real API names on an ungraded run: the inputs still absent.
+    missing_inputs:
+      run.decision === "INSUFFICIENT_DATA"
+        ? ["duration_months", "kyc_aml_passed"]
+        : [],
   };
 }
 
@@ -1108,6 +1114,26 @@ const server = createServer(async (req, res) => {
     }
     const body = await readBody(req);
     const applicationId = String(body.application_id);
+    // Like the real backend: a run moves the application to UNDER_REVIEW,
+    // and it can be run again only while undecided and not locked.
+    const application = adminApplications.get(applicationId) as
+      Record<string, unknown> | undefined;
+    if (application && application.admin_approval !== "PENDING") {
+      return detail(
+        res,
+        409,
+        "This application has been decided; its score is not re-run",
+      );
+    }
+    if (adminScoreRuns.get(applicationId)?.status === "LOCKED") {
+      return detail(
+        res,
+        409,
+        "A locked score run already backs this application; it is not re-run",
+      );
+    }
+    const runNumber = (adminScoreRunCounts.get(applicationId) ?? 0) + 1;
+    adminScoreRunCounts.set(applicationId, runNumber);
     // One company has no financials behind it, so the engine declines to
     // grade it. That is a 201 with a decision, not an error — the operator
     // gets an answer, just not a score.
@@ -1137,8 +1163,122 @@ const server = createServer(async (req, res) => {
           fired_gates: [],
           versions: { engine: "1.0.0", params: "wb-v1-20260917" },
         };
+    // Each run is a new one, as in the real score_runs table.
+    run.id = `run-${applicationId}-${runNumber}`;
     adminScoreRuns.set(applicationId, run);
+    if (application) application.status = "UNDER_REVIEW";
     return json(res, 201, run);
+  }
+
+  // --- Step-2 e-invoice preview -------------------------------------------
+  // The real endpoint reads the raw .zip body. The stub cannot parse xlsx, so
+  // it answers with a fixed 12-month year; a body containing "BROKEN" gets the
+  // not-a-zip refusal, so a spec can drive the error path.
+  if (path === "/uploads/einvoice-preview" && method === "POST") {
+    const chunks: Buffer[] = [];
+    for await (const chunk of req) chunks.push(chunk as Buffer);
+    if (Buffer.concat(chunks).toString("latin1").includes("BROKEN")) {
+      return json(
+        res,
+        422,
+        { detail: "The upload is not a readable .zip" },
+        { "x-error-code": "EINVOICE_NOT_A_ZIP" },
+      );
+    }
+    const months = Array.from({ length: 12 }, (_, i) => {
+      const month = ((8 + i) % 12) + 1;
+      const year = 2025 + (8 + i >= 12 ? 1 : 0);
+      return {
+        period: `${String(month).padStart(2, "0")}/${year}`,
+        revenue_vnd: 5_000_000_000 + i * 100_000_000,
+      };
+    });
+    const amounts = months.map((m) => m.revenue_vnd);
+    return json(res, 200, {
+      seller_tax_code: "0312345678",
+      period_start: months[0].period,
+      period_end: months[11].period,
+      months_covered: 12,
+      monthly_revenue: months,
+      revenue_last_12m: amounts.reduce((a, b) => a + b, 0),
+      revenue_best_month: Math.max(...amounts),
+      revenue_worst_month: Math.min(...amounts),
+      conc_top1_pct: 9.99,
+      conc_top3_pct: 22.29,
+      warnings: [],
+    });
+  }
+
+  // The step-4 read of the CIC report, shaped like the reference report: an
+  // individual's, score 629, rank 2, 17 million of standard card debt.
+  if (path === "/uploads/cic-preview" && method === "POST") {
+    const chunks: Buffer[] = [];
+    for await (const chunk of req) chunks.push(chunk as Buffer);
+    if (Buffer.concat(chunks).toString("latin1").includes("BROKEN")) {
+      return json(
+        res,
+        422,
+        { detail: "This PDF is not a CIC credit report" },
+        { "x-error-code": "CIC_NOT_CIC" },
+      );
+    }
+    return json(res, 200, {
+      subject_type: "individual",
+      subject_name: "NGUYỄN VĂN MẪU",
+      score: 629,
+      rank: 2,
+      rank_band: [622, 644],
+      rank_label: "very_good",
+      percentile: 85,
+      scored_on: "2026-04-23",
+      queried_on: "2026-05-07",
+      age_days: 20,
+      lenders: 1,
+      debt_total_vnd_million: 17,
+      debt_attention_vnd_million: 0,
+      debt_bad_vnd_million: 0,
+      negative_history: false,
+      signed: false,
+      warnings: [
+        { code: "UNSIGNED", detail: "the PDF carries no digital signature" },
+        { code: "INDIVIDUAL_REPORT", detail: "an individual's report" },
+      ],
+    });
+  }
+
+  // The step-3 read of the tax filings. Shaped like the reference FY2025
+  // TT133 package: selling expense 0, nothing paid out to the owners.
+  if (path === "/uploads/tax-filings-preview" && method === "POST") {
+    const chunks: Buffer[] = [];
+    for await (const chunk of req) chunks.push(chunk as Buffer);
+    if (Buffer.concat(chunks).toString("latin1").includes("BROKEN")) {
+      return json(
+        res,
+        422,
+        {
+          detail:
+            "No year-end financial statement (B02 package XML) in the .zip",
+        },
+        { "x-error-code": "TAXFILINGS_NO_STATEMENTS" },
+      );
+    }
+    return json(res, 200, {
+      fiscal_year: 2025,
+      regime: "TT133",
+      signed: true,
+      tax_code: "0312345678",
+      // Below the stub invoices' 66.6bn year, so the costs leave a profit.
+      cogs_y1: 40_000_000_000,
+      owner_withdrawal_pct: 0,
+      admin_expense_vnd: 3_160_138_988,
+      selling_expense_vnd: 0,
+      revenue_net_vnd: 70_000_000_000,
+      net_profit_vnd: 1_491_457_916,
+      interest_expense_vnd: 2_485_096_004,
+      vat_months: 24,
+      vat_period: "08/2024–07/2026",
+      warnings: [],
+    });
   }
 
   // --- Admin ---------------------------------------------------------------
