@@ -45,9 +45,8 @@ const STATUS_STYLES: Record<HoldingStatus, string> = {
     "border-destructive/30 bg-destructive/10 text-destructive dark:text-destructive",
 };
 
-// Positions where the fixed daily repayment is (or is about to start) flowing.
-// RELIEF is left out: the daily amount is reduced for that period, so the
-// contractual figure would overstate what the investor receives.
+// Positions where the fixed contractual daily repayment is flowing.
+// RELIEF is handled separately to show the actual reduced relief payout.
 const RECEIVING_STATUSES: readonly HoldingStatus[] = [
   "ACTIVE",
   "REPAYING",
@@ -238,6 +237,20 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
                           locale,
                         ),
                       })}
+                    </p>
+                  )}
+                  {/* When relief is active: show the reduced daily amount with
+                      a relief qualifier, or explicitly mark relief active. */}
+                  {holding.status === "RELIEF" && (
+                    <p className="break-words text-xs font-semibold text-amber-700 dark:text-amber-400">
+                      {holding.relief_daily_amount
+                        ? t("dashboard.investor.holdingDailyPayoutRelief", {
+                            amount: formatCurrency(
+                              holding.relief_daily_amount,
+                              locale,
+                            ),
+                          })
+                        : t("dashboard.investor.holdingReliefActive")}
                     </p>
                   )}
                   {/* Disclosed on every position: the date at which everything

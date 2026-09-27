@@ -112,6 +112,11 @@ export interface Holding {
    * input to the investor's own decision, not a credit rating (§2, §4).
    */
   score: number;
+  /**
+   * If the position is in RELIEF, the temporarily reduced daily payout
+   * arriving to this investor across the relief period, in VND.
+   */
+  relief_daily_amount?: number;
 }
 
 // Eight positions spanning the whole lifecycle — the healthy path AND the four
@@ -198,6 +203,7 @@ export const MOCK_HOLDINGS: Holding[] = [
     // period dropped and the term stretches to make it up. Interest on the
     // extra time raises the total repayable.
     status: "RELIEF",
+    relief_daily_amount: 2264167,
     disbursed_at: "2026-05-20",
     score: 68,
   },

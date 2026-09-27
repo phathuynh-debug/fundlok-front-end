@@ -238,6 +238,7 @@ export function summarizeFunding(
     funding.interest_rate_pct,
     funding.daily_amount,
     shortfall,
+    funding.term_months,
   );
   const totalRepayable = funding.total_repayable + extraInterest;
 

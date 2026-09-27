@@ -25,16 +25,30 @@ describe("dailyRepaymentAmount", () => {
 describe("stretchedTerm", () => {
   it("stretches the term and adds interest when revenue drops", () => {
     // The SME funding mock's relief period: 46,996,257 short at 7,447,917/day.
-    expect(stretchedTerm(875_000_000, 14.5, 7_447_917, 46_996_257)).toEqual({
+    expect(stretchedTerm(875_000_000, 14.5, 7_447_917, 46_996_257, 6)).toEqual({
       extraBusinessDays: 7,
       extraInterest: 3_524_306,
+      cappedAtBackstop: false,
     });
   });
 
+  it("caps the stretch and interest at the 1.33x fixed backstop", () => {
+    // Massive shortfall (e.g. 500,000,000) would stretch 68 days without a cap.
+    // Over a 6-month term (126 days), the 1.33x backstop (168 days) caps extra days at 42.
+    expect(stretchedTerm(875_000_000, 14.5, 7_447_917, 500_000_000, 6)).toEqual(
+      {
+        extraBusinessDays: 42,
+        extraInterest: 21_145_833,
+        cappedAtBackstop: true,
+      },
+    );
+  });
+
   it("adds nothing when nothing fell short", () => {
-    expect(stretchedTerm(875_000_000, 14.5, 7_447_917, 0)).toEqual({
+    expect(stretchedTerm(875_000_000, 14.5, 7_447_917, 0, 6)).toEqual({
       extraBusinessDays: 0,
       extraInterest: 0,
+      cappedAtBackstop: false,
     });
   });
 });

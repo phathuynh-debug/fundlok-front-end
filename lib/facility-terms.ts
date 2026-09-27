@@ -55,6 +55,32 @@ export function dailyRepaymentAmount(
 }
 
 /**
+ * The hard deadline sits at 1.33x the declared term, and everything still
+ * outstanding falls due in full on that date. The SME knows it from the day
+ * they sign and it is disclosed on every listing — so it is derived from the
+ * contract, never chosen per screen. A stretched term never moves it.
+ *
+ * 3 months -> ~4 months. 6 months -> ~8 months.
+ */
+export const BACKSTOP_MULTIPLIER = 1.33;
+
+/**
+ * Maximum extra business days a facility can stretch before hitting the
+ * 1.33x backstop deadline. Everything still outstanding falls due in full
+ * on that date, and no interest runs past it.
+ */
+export function maxStretchBusinessDays(termMonths: number): number {
+  const backstopMonths = Math.round(termMonths * BACKSTOP_MULTIPLIER);
+  return Math.max(0, (backstopMonths - termMonths) * BUSINESS_DAYS_PER_PERIOD);
+}
+
+export interface StretchedTermResult {
+  extraBusinessDays: number;
+  extraInterest: number;
+  cappedAtBackstop: boolean;
+}
+
+/**
  * THE RULE WHEN REVENUE DROPS: the daily repayment is lowered and the term
  * stretches until the shortfall is repaid. Interest runs on the new, longer
  * term, so the total repayable goes UP — the SME pays less each day, for
@@ -64,6 +90,9 @@ export function dailyRepaymentAmount(
  * have, returns the business days the term stretches by and the extra interest
  * those days carry (simple interest on the principal, at the signing rate).
  *
+ * When termMonths is provided, extraBusinessDays is strictly capped at the
+ * fixed 1.33x backstop date — interest does not run past the backstop.
+ *
  * 46,996,257 short at 7,447,917/day -> 7 extra days; on 875,000,000 at
  * 14.5%/yr that is 875,000,000 x 0.145 x 7 / 252 = 3,524,306.
  */
@@ -72,27 +101,28 @@ export function stretchedTerm(
   annualRatePct: number,
   contractualDailyAmount: number,
   shortfall: number,
-): { extraBusinessDays: number; extraInterest: number } {
+  termMonths?: number,
+): StretchedTermResult {
   if (shortfall <= 0 || contractualDailyAmount <= 0) {
-    return { extraBusinessDays: 0, extraInterest: 0 };
+    return { extraBusinessDays: 0, extraInterest: 0, cappedAtBackstop: false };
   }
-  const extraBusinessDays = Math.ceil(shortfall / contractualDailyAmount);
+  let extraBusinessDays = Math.ceil(shortfall / contractualDailyAmount);
+  let cappedAtBackstop = false;
+
+  if (termMonths !== undefined && termMonths > 0) {
+    const maxDays = maxStretchBusinessDays(termMonths);
+    if (extraBusinessDays > maxDays) {
+      extraBusinessDays = maxDays;
+      cappedAtBackstop = true;
+    }
+  }
+
   const extraInterest = Math.round(
     (principal * (annualRatePct / 100) * extraBusinessDays) /
       BUSINESS_DAYS_PER_YEAR,
   );
-  return { extraBusinessDays, extraInterest };
+  return { extraBusinessDays, extraInterest, cappedAtBackstop };
 }
-
-/**
- * The hard deadline sits at 1.33x the declared term, and everything still
- * outstanding falls due in full on that date. The SME knows it from the day
- * they sign and it is disclosed on every listing — so it is derived from the
- * contract, never chosen per screen. A stretched term never moves it.
- *
- * 3 months -> ~4 months. 6 months -> ~8 months.
- */
-export const BACKSTOP_MULTIPLIER = 1.33;
 
 export function backstopDate(disbursedAt: string, term: TermMonths): string {
   const date = new Date(`${disbursedAt}T00:00:00Z`);
