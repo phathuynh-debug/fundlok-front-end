@@ -12,7 +12,8 @@ export type LoanDocumentType =
   | "vat_tax_zip"
   | "financial_report"
   | "e_invoice_data"
-  | "cic_report";
+  | "cic_report"
+  | "tax_filings";
 
 export interface InitUploadPayload {
   loan_application_id: string;
@@ -50,6 +51,65 @@ export interface ConfirmUploadsResponse {
   documents: ApplicationDocument[];
 }
 
+/** What the e-invoice zip says, read before Send to prefill step 2. */
+export interface EInvoicePreview {
+  seller_tax_code: string;
+  period_start: string; // MM/YYYY
+  period_end: string;
+  months_covered: number;
+  monthly_revenue: { period: string; revenue_vnd: number }[];
+  /** Only from 12 consecutive months; null means the SME types it. */
+  revenue_last_12m: number | null;
+  revenue_best_month: number | null;
+  revenue_worst_month: number | null;
+  conc_top1_pct: number | null;
+  conc_top3_pct: number | null;
+  warnings: { code: string; detail: string }[];
+}
+
+/** What the tax filings say, read before Send to prefill step 3. */
+export interface TaxFilingsPreview {
+  fiscal_year: number;
+  regime: string; // "TT133" | "TT200"
+  signed: boolean;
+  tax_code: string;
+  cogs_y1: number;
+  /** % of net profit paid to owners; null when the year made no profit. */
+  owner_withdrawal_pct: number | null;
+  /** Hints for the two typed cost fields — no filing splits fixed/variable. */
+  admin_expense_vnd: number;
+  selling_expense_vnd: number;
+  revenue_net_vnd: number;
+  net_profit_vnd: number;
+  interest_expense_vnd: number;
+  vat_months: number;
+  vat_period: string | null;
+  warnings: { code: string; detail: string }[];
+}
+
+/** What the CIC report was read as. Amounts are CIC's unit, million đồng. */
+export interface CicPreview {
+  /** "individual" is a person's report — usually the owner's. */
+  subject_type: "individual" | "business";
+  subject_name: string | null;
+  score: number | null;
+  rank: number | null;
+  rank_band: [number, number] | null;
+  rank_label:
+    "very_good" | "good" | "average" | "below_average" | "poor" | null;
+  percentile: number | null;
+  scored_on: string | null; // ISO date
+  queried_on: string | null;
+  age_days: number | null;
+  lenders: number;
+  debt_total_vnd_million: number | null;
+  debt_attention_vnd_million: number | null;
+  debt_bad_vnd_million: number | null;
+  negative_history: boolean | null;
+  signed: boolean;
+  warnings: { code: string; detail: string }[];
+}
+
 export interface UploadedDocument {
   documentId: string;
   fileKey: string;
@@ -69,10 +129,16 @@ export const DOCUMENT_TYPE_RULES: Record<
   // accept — a spreadsheet can be edited and proves nothing, so .xlsx and .csv
   // are rejected at upload rather than at verification. A .zip is still allowed
   // as a container for the signed XMLs. The backend mirror
-  // (app/uploads/schemas.py) still lists xlsx/csv and must be tightened too —
-  // it, not this file, is the actual gate.
-  e_invoice_data: { extensions: ["zip", "xml"], maxSizeMb: 100 },
+  // (app/uploads/schemas.py) enforces the same list, and it is the gate that
+  // actually holds.
+  // One .zip: the folder of the tax portal's monthly invoice-list exports.
+  // The backend opens it at confirm and reads every month, so a loose .xlsx
+  // (one month) is refused here with a message saying to zip the folder.
+  e_invoice_data: { extensions: ["zip"], maxSizeMb: 100 },
   cic_report: { extensions: ["pdf"], maxSizeMb: 25 },
+  // Step 3: the year-end statement XML (B02 package), or the .zip of the tax
+  // folder holding it with the monthly VAT declarations.
+  tax_filings: { extensions: ["zip", "xml"], maxSizeMb: 100 },
 };
 
 const CONTENT_TYPES_BY_EXTENSION: Record<string, string[]> = {
@@ -144,6 +210,41 @@ export const uploadsService = {
           onProgress?.(Math.round((event.loaded / event.total) * 100));
         }
       },
+    });
+  },
+
+  // The raw zip as the request body — the backend reads it and stores
+  // nothing. Advisory: confirm re-parses the stored file at Send.
+  async previewEInvoice(loanApplicationId: string, file: File) {
+    return apiClient.post<EInvoicePreview>(
+      UPLOADS_ENDPOINTS.einvoicePreview,
+      file,
+      {
+        params: { loan_application_id: loanApplicationId },
+        headers: { "Content-Type": "application/zip" },
+      },
+    );
+  },
+
+  // Raw body again: a .zip of the folder or the statement .xml alone.
+  async previewTaxFilings(loanApplicationId: string, file: File) {
+    const isZip = file.name.toLowerCase().endsWith(".zip");
+    return apiClient.post<TaxFilingsPreview>(
+      UPLOADS_ENDPOINTS.taxFilingsPreview,
+      file,
+      {
+        params: { loan_application_id: loanApplicationId },
+        headers: {
+          "Content-Type": isZip ? "application/zip" : "application/xml",
+        },
+      },
+    );
+  },
+
+  async previewCic(loanApplicationId: string, file: File) {
+    return apiClient.post<CicPreview>(UPLOADS_ENDPOINTS.cicPreview, file, {
+      params: { loan_application_id: loanApplicationId },
+      headers: { "Content-Type": "application/pdf" },
     });
   },
 

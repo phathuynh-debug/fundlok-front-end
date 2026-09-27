@@ -74,6 +74,12 @@ describe("validateFigure", () => {
     expect(validateFigure(REVENUE, "0")).toBe("out_of_range");
   });
 
+  it("accepts a zero variable cost, which many small firms really have", () => {
+    const variable = field("variable_cost_excl_cogs_y1");
+    expect(validateFigure(variable, "0")).toBeNull();
+    expect(validateFigure(field("fixed_cost_y1"), "0")).toBe("out_of_range");
+  });
+
   it("catches a mistyped extra digit rather than grading a conglomerate", () => {
     expect(validateFigure(REVENUE, "500000000000")).toBeNull(); // 500bn, ok
     expect(validateFigure(REVENUE, "5000000000000")).toBe("out_of_range");
@@ -179,6 +185,35 @@ describe("validateFigureConsistency", () => {
         withValues({ conc_top1_pct: "66", conc_top3_pct: "55" }),
       ),
     ).toEqual({ conc_top1_pct: "top1_exceeds_top3" });
+  });
+
+  it("blames fixed cost when the costs leave no profit", () => {
+    // The case that reached a score run: each cost line typed as the cost of
+    // goods sold, 192bn of cost against 72.7bn of revenue.
+    expect(
+      validateFigureConsistency(
+        withValues({
+          revenue_last_12m: "72693906116",
+          cogs_y1: "64130972146",
+          fixed_cost_y1: "64130972146",
+          variable_cost_excl_cogs_y1: "64130972146",
+        }),
+      ),
+    ).toEqual({ fixed_cost_y1: "costs_exceed_revenue" });
+  });
+
+  it("refuses costs exactly equal to revenue, and accepts a real profit", () => {
+    const costs = (fixed: string) =>
+      validateFigureConsistency(
+        withValues({
+          revenue_last_12m: "1000",
+          cogs_y1: "600",
+          fixed_cost_y1: fixed,
+          variable_cost_excl_cogs_y1: "0",
+        }),
+      );
+    expect(costs("400")).toEqual({ fixed_cost_y1: "costs_exceed_revenue" });
+    expect(costs("399")).toEqual({});
   });
 
   it("allows the largest customer to BE the top three", () => {

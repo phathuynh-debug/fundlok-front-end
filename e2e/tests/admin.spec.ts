@@ -107,6 +107,16 @@ test("a non-admin session is refused by the API as well as the router", async ({
 // something owns a different project — otherwise one test's approval is the
 // next test's starting state.
 
+/** "Run scoring" before the first run, "Run again" after it. */
+function runButton(scope: import("@playwright/test").Locator) {
+  const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return scope.getByRole("button", {
+    name: new RegExp(
+      `^(${escape(t("admin.preview.runScoring"))}|${escape(t("admin.preview.rescore"))})$`,
+    ),
+  });
+}
+
 test.describe("the admin project preview", () => {
   const openPreview = async (
     page: import("@playwright/test").Page,
@@ -234,15 +244,40 @@ test.describe("the admin project preview", () => {
     ).toBeVisible();
   });
 
+  test("a run can be run again while the request is undecided", async ({
+    page,
+  }) => {
+    // Its own company: this one mutates score-run state too.
+    await openPreview(page, "Ungraded Trading Co");
+    const panel = page.getByRole("dialog");
+
+    // The stub's score-run state is shared, so another test may already have
+    // run this company: start from whichever button is showing.
+    await runButton(panel).click();
+    await expect(
+      panel.getByText(t("admin.preview.scoreInsufficientHint")),
+    ).toBeVisible();
+
+    // The first run moves the request to UNDER_REVIEW; the button stays so
+    // the operator can score again once the inputs change.
+    const again = panel.getByRole("button", {
+      name: t("admin.preview.rescore"),
+    });
+    await expect(again).toBeEnabled();
+    await again.click();
+    await expect(
+      page.getByText(t("admin.preview.scoreInconclusive")).first(),
+    ).toBeVisible();
+  });
+
   test("an ungraded run reads as blocked, not as a pending score", async ({
     page,
   }) => {
     // Its own company: this one mutates score-run state too.
     await openPreview(page, "Ungraded Trading Co");
 
-    await page
-      .getByRole("button", { name: t("admin.preview.runScoring") })
-      .click();
+    // Shared stub state: the re-run test may have scored this company first.
+    await runButton(page.getByRole("dialog")).click();
 
     // Scoped to the panel: the toast reports the same decision, and matching
     // page-wide picks up its copy and its aria-live announcement too.
@@ -251,6 +286,10 @@ test.describe("the admin project preview", () => {
     // The engine answered — it just has no score to give.
     await expect(
       panel.getByText(t("admin.preview.scoreInsufficientHint")),
+    ).toBeVisible();
+    // And it says which inputs are missing, by name.
+    await expect(
+      panel.getByText(t("admin.preview.missingInput.kyc_aml_passed")),
     ).toBeVisible();
 
     // The decision badge carries the destructive token, not the neutral one

@@ -14,6 +14,7 @@ const DOCUMENT_LABEL_KEYS: Record<DocumentKey, string> = {
   companyCharter: "dashboard.sme.companyCharter",
   companyRegistration: "dashboard.sme.companyRegistration",
   eInvoiceData: "dashboard.sme.eInvoiceData",
+  taxFilings: "dashboard.sme.taxFilings",
   cicReport: "dashboard.sme.cicCreditReport",
 };
 

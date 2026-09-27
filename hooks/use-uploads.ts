@@ -6,6 +6,9 @@ import {
   uploadsService,
   type ConfirmUploadsPayload,
   type ConfirmUploadsResponse,
+  type EInvoicePreview,
+  type CicPreview,
+  type TaxFilingsPreview,
   type LoanDocumentType,
   type UploadedDocument,
 } from "@/services/uploads.service";
@@ -31,5 +34,43 @@ export function useUploadLoanDocument() {
 export function useConfirmUploads() {
   return useMutation<ConfirmUploadsResponse, ApiError, ConfirmUploadsPayload>({
     mutationFn: (payload) => uploadsService.confirm(payload),
+  });
+}
+
+// Reads the e-invoice zip as soon as it is picked (step 2), for the prefill.
+export function usePreviewEInvoice() {
+  return useMutation<
+    EInvoicePreview,
+    ApiError,
+    { loanApplicationId: string; file: File }
+  >({
+    mutationFn: ({ loanApplicationId, file }) =>
+      uploadsService.previewEInvoice(loanApplicationId, file),
+    retry: false,
+  });
+}
+
+// Reads the tax filings as soon as they are picked (step 3), for the prefill.
+export function usePreviewCic() {
+  return useMutation<
+    CicPreview,
+    ApiError,
+    { loanApplicationId: string; file: File }
+  >({
+    mutationFn: ({ loanApplicationId, file }) =>
+      uploadsService.previewCic(loanApplicationId, file),
+    retry: false,
+  });
+}
+
+export function usePreviewTaxFilings() {
+  return useMutation<
+    TaxFilingsPreview,
+    ApiError,
+    { loanApplicationId: string; file: File }
+  >({
+    mutationFn: ({ loanApplicationId, file }) =>
+      uploadsService.previewTaxFilings(loanApplicationId, file),
+    retry: false,
   });
 }
