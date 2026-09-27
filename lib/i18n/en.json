@@ -1785,7 +1785,7 @@
       "city": "City is required",
       "country": "Country is required",
       "durationMonths": "Choose a loan term between 1 and 6 months",
-      "employeeCount": "Enter a headcount between 1 and 200 — this platform funds SMEs only",
+      "employeeCount": "Enter a headcount between 1 and 200. FundLok arranges funding for SMEs only.",
       "incorporationDate": "Incorporation date is required",
       "incorporationDateFormat": "Enter a real date in the format YYYY-MM-DD.",
       "incorporationDateFuture": "The incorporation date cannot be in the future.",
@@ -1819,7 +1819,7 @@
     "employeeCount": "Employees",
     "employeeCountHint": "Headcount today, including the owner.",
     "error": {
-      "costsExceedRevenue": "Your costs add up to more than your revenue for the same period, so there is nothing to lend against. Check these figures.",
+      "costsExceedRevenue": "Your costs add up to more than your revenue for the same period, so there's no room for a daily repayment. Check these figures.",
       "employeeRange": "Between 1 and 200 employees.",
       "loanRange": "Must be between 20,000,000 ₫ and 1,000,000,000 ₫.",
       "monthExceedsYear": "A single month cannot be more than the whole year's revenue.",

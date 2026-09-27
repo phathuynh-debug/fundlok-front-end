@@ -1785,7 +1785,7 @@
       "city": "Vui lòng nhập thành phố",
       "country": "Vui lòng nhập quốc gia",
       "durationMonths": "Chọn thời hạn vay từ 1 đến 6 tháng",
-      "employeeCount": "Nhập số nhân viên từ 1 đến 200 — nền tảng chỉ tài trợ doanh nghiệp SME",
+      "employeeCount": "Nhập số nhân viên từ 1 đến 200. FundLok chỉ thu xếp vốn cho doanh nghiệp vừa và nhỏ.",
       "incorporationDate": "Vui lòng nhập ngày thành lập",
       "incorporationDateFormat": "Vui lòng nhập ngày hợp lệ theo định dạng YYYY-MM-DD.",
       "incorporationDateFuture": "Ngày thành lập không thể ở tương lai.",
@@ -1819,7 +1819,7 @@
     "employeeCount": "Số nhân sự",
     "employeeCountHint": "Số nhân sự hiện tại, tính cả chủ doanh nghiệp.",
     "error": {
-      "costsExceedRevenue": "Tổng chi phí của bạn lớn hơn doanh thu cùng kỳ, nên không còn nguồn để tài trợ. Hãy kiểm tra lại các số liệu này.",
+      "costsExceedRevenue": "Tổng chi phí lớn hơn doanh thu cùng kỳ, nên không còn dư địa cho khoản trả hằng ngày. Hãy kiểm tra lại số liệu.",
       "employeeRange": "Từ 1 đến 200 nhân sự.",
       "loanRange": "Phải từ 20.000.000 ₫ đến 1.000.000.000 ₫.",
       "monthExceedsYear": "Doanh thu một tháng không thể lớn hơn doanh thu cả năm.",
