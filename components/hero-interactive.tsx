@@ -61,7 +61,7 @@ export function HeroInteractive({ strings }: HeroInteractiveProps) {
       <GuillocheWaves activeIndex={0} />
 
       {/* Centered Content Wrapper (Restricted max-w-4xl width) */}
-      <div className="relative z-10 w-full max-w-4xl mx-auto flex-1 flex flex-col items-center justify-between pt-10 pb-4 px-4">
+      <div className="relative z-10 w-full max-w-4xl mx-auto flex-1 flex flex-col items-center justify-between pt-4 md:pt-6 pb-2 px-4">
         {/* Animated text content wrapper.
             The title and subtitle animate on TRANSFORM ONLY — no `opacity` in
             `initial`. An `initial={{ opacity: 0 }}` is serialised into the SSR
@@ -75,13 +75,13 @@ export function HeroInteractive({ strings }: HeroInteractiveProps) {
           initial={{ y: -20 }}
           animate={{ y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-center px-4 flex flex-col items-center mb-6 max-w-3xl mx-auto"
+          className="text-center px-4 flex flex-col items-center mb-3 md:mb-4 max-w-3xl mx-auto"
         >
           <motion.h1
             initial={{ y: -10 }}
             animate={{ y: 0 }}
             transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
-            className="font-sans text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground leading-[1.15] mb-4 tracking-tight"
+            className="font-sans text-3xl sm:text-4xl md:text-5xl font-extrabold text-foreground leading-[1.15] mb-2.5 tracking-tight max-w-2xl"
           >
             {strings.heroTitle}
           </motion.h1>
@@ -89,7 +89,7 @@ export function HeroInteractive({ strings }: HeroInteractiveProps) {
             initial={{ y: 10 }}
             animate={{ y: 0 }}
             transition={{ duration: 0.8, delay: 0.35, ease: "easeOut" }}
-            className="font-sans text-xs md:text-sm text-muted-foreground leading-relaxed max-w-2xl"
+            className="font-sans text-xs md:text-sm text-muted-foreground leading-relaxed max-w-xl"
           >
             {strings.heroSubtitle}
           </motion.p>
