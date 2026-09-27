@@ -80,6 +80,19 @@
       "download": "Tải xuống",
       "engineHeading": "Hệ thống xác minh",
       "kybResolved": "Đã xử lý xác minh",
+      "missingInput": {
+        "cic_score": "Điểm tín dụng CIC (báo cáo CIC)",
+        "cogs_y1": "Giá vốn hàng bán (hồ sơ thuế)",
+        "company_size": "Số lượng nhân viên (biểu mẫu doanh nghiệp)",
+        "duration_months": "Thời hạn vay (biểu mẫu doanh nghiệp)",
+        "fixed_cost_y1": "Chi phí cố định (bước 3)",
+        "industry": "Ngành (biểu mẫu doanh nghiệp)",
+        "kyc_aml_passed": "Xác minh doanh nghiệp cho mã số thuế này",
+        "monthly_revenue": "Doanh thu 24 tháng (tờ khai GTGT trong hồ sơ thuế)",
+        "operating_months": "Ngày thành lập (biểu mẫu doanh nghiệp)",
+        "variable_cost_excl_cogs_y1": "Chi phí biến đổi (bước 3)"
+      },
+      "missingInputs": "Còn thiếu để tính điểm:",
       "noApplications": "Chưa có đề nghị vay nào.",
       "noDocuments": "Chưa tải lên hồ sơ nào.",
       "noKyb": "Doanh nghiệp này chưa bắt đầu xác minh.",
@@ -100,20 +113,7 @@
       "scoreNeedsSubmitted": "Việc tính điểm chỉ chạy sau khi doanh nghiệp đã gửi đề nghị này.",
       "scoreRate": "Lãi suất tham khảo",
       "subtitle": "Cần cả hai phê duyệt trước khi đề nghị vay được tiếp tục.",
-      "title": "Xem nhanh hồ sơ",
-      "missingInputs": "Còn thiếu để tính điểm:",
-      "missingInput": {
-        "industry": "Ngành (biểu mẫu doanh nghiệp)",
-        "company_size": "Số lượng nhân viên (biểu mẫu doanh nghiệp)",
-        "duration_months": "Thời hạn vay (biểu mẫu doanh nghiệp)",
-        "operating_months": "Ngày thành lập (biểu mẫu doanh nghiệp)",
-        "monthly_revenue": "Doanh thu 24 tháng (tờ khai GTGT trong hồ sơ thuế)",
-        "cogs_y1": "Giá vốn hàng bán (hồ sơ thuế)",
-        "fixed_cost_y1": "Chi phí cố định (bước 3)",
-        "variable_cost_excl_cogs_y1": "Chi phí biến đổi (bước 3)",
-        "cic_score": "Điểm tín dụng CIC (báo cáo CIC)",
-        "kyc_aml_passed": "Xác minh doanh nghiệp cho mã số thuế này"
-      }
+      "title": "Xem nhanh hồ sơ"
     },
     "projectsPage": {
       "subtitle": "Xem hồ sơ doanh nghiệp và tình trạng phê duyệt.",
@@ -988,13 +988,41 @@
       "backBtn": "Quay lại",
       "chooseFile": "Chọn tệp",
       "cicCreditReport": "Báo cáo tín dụng CIC khách hàng",
+      "cicError": {
+        "FILE_TOO_LARGE": "Tệp quá lớn. Báo cáo CIC dạng PDF thường nhỏ hơn 1 MB.",
+        "NOT_A_PDF": "Báo cáo CIC phải là tệp PDF tải về từ cổng thông tin hoặc ứng dụng CIC.",
+        "NOT_CIC": "Tệp PDF này không phải báo cáo tín dụng CIC. Hãy tải báo cáo từ cổng thông tin hoặc ứng dụng CIC.",
+        "UNREADABLE_PDF": "Không đọc được nội dung PDF này. Hãy tải lên tệp PDF gốc từ CIC, không phải bản scan hay ảnh chụp."
+      },
+      "cicMillionVnd": "triệu ₫",
+      "cicNote": {
+        "DEBT_ISSUES": "Báo cáo có nợ quá hạn hoặc nợ xấu. Đội ngũ của chúng tôi sẽ hỏi bạn về tình hình.",
+        "INDIVIDUAL_REPORT": "Đây là báo cáo cá nhân (thường của chủ doanh nghiệp), không phải của doanh nghiệp. Báo cáo vẫn được chấp nhận; nếu doanh nghiệp có báo cáo CIC riêng, hãy tải báo cáo đó lên.",
+        "NO_SCORE": "Không tìm thấy điểm tín dụng trong báo cáo này. Báo cáo vẫn được lưu; đội ngũ của chúng tôi sẽ xem xét.",
+        "STALE_REPORT": "Điểm này đã {days} ngày và CIC cập nhật điểm hằng tháng. Báo cáo mới hơn sẽ phản ánh chính xác hơn."
+      },
+      "cicPercentile": "Cao hơn",
+      "cicPercentileValue": "{pct}% khách hàng vay",
+      "cicRank": "Hạng CIC",
+      "cicRankLabel": {
+        "average": "Trung bình",
+        "below_average": "Dưới trung bình",
+        "good": "Tốt",
+        "poor": "Xấu",
+        "very_good": "Rất tốt"
+      },
+      "cicReadSummary": "Nội dung báo cáo CIC của bạn",
+      "cicReading": "Đang đọc báo cáo CIC…",
       "cicReportHelpText": "Báo cáo CIC (Trung tâm thông tin tín dụng) là bắt buộc để đánh giá mức độ uy tín tín dụng. Bạn có thể lấy báo cáo này từ cổng thông tin CIC của Ngân hàng Nhà nước Việt Nam.",
       "cicReportSubtitle": "Tất cả các trường đánh dấu * là bắt buộc.",
       "cicReportTitle": "Bước 5 – Báo cáo CIC khách hàng",
+      "cicScore": "Điểm tín dụng CIC",
+      "cicScoredOn": "Ngày CIC chấm điểm",
       "cicStep1": "Truy cập cổng thông tin CIC của Ngân hàng Nhà nước Việt Nam",
       "cicStep2": "Đăng nhập bằng mã số thuế doanh nghiệp của bạn",
       "cicStep3": "Yêu cầu báo cáo tín dụng đầy đủ (Báo cáo tín dụng)",
       "cicStep4": "Tải xuống và tải lên tệp PDF tại đây",
+      "cicTotalDebt": "Dư nợ hiện tại",
       "city": "Thành phố",
       "clickToUpload": "Nhấp để tải tệp lên",
       "companyCharter": "Điều lệ công ty",
@@ -1007,17 +1035,17 @@
       "documentsStillUploadingTitle": "Tài liệu đang được tải lên",
       "eInvoiceData": "Dữ liệu hóa đơn điện tử trong 12 tháng gần nhất",
       "eInvoiceError": {
-        "MIXED_SELLERS": "Tệp .zip có hóa đơn của nhiều doanh nghiệp. Chỉ đưa vào hóa đơn của doanh nghiệp bạn.",
+        "ARCHIVE_TOO_LARGE": "Tệp .zip quá lớn. Chỉ đưa vào các tệp xuất theo tháng.",
         "DUPLICATE_MONTH": "Có một tháng xuất hiện hai lần trong tệp .zip. Mỗi tháng chỉ giữ một tệp.",
-        "NOT_A_MONTH": "Mỗi tệp phải gồm đúng một tháng dương lịch. Vui lòng xuất danh sách hóa đơn theo từng tháng.",
-        "NOT_A_LISTING": "Có tệp trong .zip không phải danh sách hóa đơn của cổng thuế. Hãy dùng chức năng \"xuất Excel\" của cổng cho từng tháng.",
-        "UNREADABLE_LISTING": "Không đọc được một tệp trong .zip. Vui lòng xuất lại từ cổng hóa đơn điện tử.",
         "EMPTY_LISTING": "Có một tháng trong .zip không có hóa đơn nào. Vui lòng bỏ tệp đó hoặc xuất lại.",
-        "UNSUPPORTED_FILE": "Tệp .zip chỉ được chứa các tệp .xlsx xuất theo tháng từ cổng hóa đơn điện tử.",
-        "NO_LISTINGS": "Tệp .zip không có tệp hóa đơn nào.",
+        "MIXED_SELLERS": "Tệp .zip có hóa đơn của nhiều doanh nghiệp. Chỉ đưa vào hóa đơn của doanh nghiệp bạn.",
+        "NOT_A_LISTING": "Có tệp trong .zip không phải danh sách hóa đơn của cổng thuế. Hãy dùng chức năng \"xuất Excel\" của cổng cho từng tháng.",
+        "NOT_A_MONTH": "Mỗi tệp phải gồm đúng một tháng dương lịch. Vui lòng xuất danh sách hóa đơn theo từng tháng.",
         "NOT_A_ZIP": "Tệp không phải là .zip hợp lệ. Vui lòng nén lại thư mục và tải lên.",
+        "NO_LISTINGS": "Tệp .zip không có tệp hóa đơn nào.",
         "TOO_MANY_FILES": "Tệp .zip có quá nhiều tệp. Chỉ đưa vào các tệp xuất theo tháng.",
-        "ARCHIVE_TOO_LARGE": "Tệp .zip quá lớn. Chỉ đưa vào các tệp xuất theo tháng."
+        "UNREADABLE_LISTING": "Không đọc được một tệp trong .zip. Vui lòng xuất lại từ cổng hóa đơn điện tử.",
+        "UNSUPPORTED_FILE": "Tệp .zip chỉ được chứa các tệp .xlsx xuất theo tháng từ cổng hóa đơn điện tử."
       },
       "eInvoiceFilledFigures": "Doanh thu 12 tháng gần nhất, tháng cao nhất và tháng thấp nhất đã được điền từ các hóa đơn này.",
       "eInvoicePartialYear": "Không đủ 12 tháng liên tiếp, nên bạn cần tự nhập doanh thu 12 tháng gần nhất. Bổ sung các tháng còn thiếu sẽ tự điền số này.",
@@ -1028,6 +1056,7 @@
       "emptyCta": "Đăng ký vay vốn",
       "emptyDescription": "Bạn chưa có hồ sơ vay vốn nào. Hãy bắt đầu để mô tả doanh nghiệp và yêu cầu khoản vay — chúng tôi sẽ xác minh doanh nghiệp (KYB) trong quá trình này.",
       "emptyTitle": "Sẵn sàng huy động vốn?",
+      "figureFromFilings": "Đọc từ hồ sơ thuế của bạn. Gỡ tệp nếu muốn tự nhập.",
       "figureFromInvoices": "Đọc từ hóa đơn điện tử (bước 2). Gỡ tệp đó nếu muốn tự nhập.",
       "fileTooLargeError": "Tệp quá lớn. Dung lượng tối đa là {maxSize} MB.",
       "fileUploadFailed": "Tải lên thất bại. Vui lòng thử lại.",
@@ -1051,13 +1080,13 @@
         "costsTitle": "Chi phí — năm tài chính gần nhất",
         "editFigures": "Sửa số liệu",
         "error": {
+          "costs_exceed_revenue": "Giá vốn hàng bán, chi phí cố định và chi phí biến đổi cộng lại bằng hoặc lớn hơn doanh thu 12 tháng gần nhất, tức là không có lợi nhuận. Hãy kiểm tra lại: mỗi khoản chi phí chỉ tính một lần.",
           "month_exceeds_year": "Doanh thu một tháng không thể cao hơn tổng 12 tháng.",
           "not_a_number": "Chỉ nhập chữ số.",
           "out_of_range": "Giá trị có vẻ ngoài phạm vi — vui lòng kiểm tra lại.",
           "required": "Chỉ tiêu này là bắt buộc.",
           "top1_exceeds_top3": "Khách hàng lớn nhất nằm trong nhóm 3 khách hàng lớn nhất, nên tỷ lệ này không thể vượt quá tỷ lệ của nhóm 3.",
-          "worst_exceeds_best": "Tháng thấp nhất không thể cao hơn tháng cao nhất.",
-          "costs_exceed_revenue": "Giá vốn hàng bán, chi phí cố định và chi phí biến đổi cộng lại bằng hoặc lớn hơn doanh thu 12 tháng gần nhất, tức là không có lợi nhuận. Hãy kiểm tra lại: mỗi khoản chi phí chỉ tính một lần."
+          "worst_exceeds_best": "Tháng thấp nhất không thể cao hơn tháng cao nhất."
         },
         "fixedCostY1": "Chi phí cố định",
         "fixedCostY1Hint": "Tiền thuê, lương, bảo hiểm — các chi phí phải trả dù có bán được hay không.",
@@ -1111,6 +1140,10 @@
       "sending": "Đang gửi...",
       "sentStatus": "Đã gửi",
       "stateProvince": "Bang/Tỉnh",
+      "statementHint": {
+        "admin_expense_vnd": "Điền sẵn từ chi phí quản lý doanh nghiệp trên báo cáo tài chính ({amount}). Hãy điều chỉnh nếu một phần chi phí này thay đổi theo doanh thu.",
+        "selling_expense_vnd": "Điền sẵn từ chi phí bán hàng trên báo cáo tài chính ({amount}). Nhập 0 nếu không có."
+      },
       "statusApprovedBadge": "Đã duyệt",
       "statusApprovedNote": "Chúng tôi sẽ gửi email đề nghị tài trợ, gồm tổng số tiền phải trả, số tiền trả mỗi ngày và hạn tất toán cuối cùng, trước khi ký bất kỳ giấy tờ nào.",
       "statusApprovedSubtitle": "Hồ sơ của bạn đã qua bước xét duyệt. Chúng tôi sẽ liên hệ qua email về bước tiếp theo — chưa có cam kết nào cho đến khi bạn xem và ký đề nghị tài trợ.",
@@ -1155,6 +1188,21 @@
       "submitLoanApplication": "Gửi hồ sơ vay",
       "submittingApplication": "Đang gửi hồ sơ...",
       "systemRecordDetails": "Chi tiết hồ sơ hệ thống",
+      "taxFilings": "Hồ sơ thuế: báo cáo tài chính năm và tờ khai thuế GTGT",
+      "taxFilingsError": {
+        "ARCHIVE_TOO_LARGE": "Tệp quá lớn. Chỉ đưa vào các tờ khai GTGT hằng tháng và báo cáo tài chính năm.",
+        "NOT_A_ZIP": "Tệp không phải .zip đọc được. Hãy nén lại thư mục rồi tải lên.",
+        "NOT_STATEMENTS": "Tệp XML này không phải báo cáo tài chính năm. Hãy tải bộ báo cáo tài chính xuất từ HTKK.",
+        "NO_STATEMENTS": "Tệp .zip chưa có báo cáo tài chính năm (tệp XML bộ báo cáo từ HTKK). Hãy bổ sung rồi tải lại.",
+        "TOO_MANY_FILES": "Tệp .zip có quá nhiều tệp. Chỉ đưa vào các tờ khai GTGT hằng tháng và báo cáo tài chính năm.",
+        "UNREADABLE_STATEMENTS": "Không đọc được báo cáo tài chính. Hãy xuất lại từ HTKK và tải tệp XML gốc."
+      },
+      "taxFilingsFilledFigures": "Giá vốn hàng bán và tỷ lệ lợi nhuận chủ sở hữu rút ra được đọc từ báo cáo tài chính. Chi phí cố định và chi phí biến đổi được điền sẵn từ chi phí quản lý và chi phí bán hàng: hãy kiểm tra và điều chỉnh nếu cần.",
+      "taxFilingsFormat": "Tải thư mục hồ sơ thuế lên dưới dạng một tệp .zip, hoặc chỉ tệp XML báo cáo tài chính năm.",
+      "taxFilingsNoProfit": "Giá vốn hàng bán đã được điền. Năm này không có lợi nhuận nên bạn tự nhập tỷ lệ chủ sở hữu rút vốn (nhập 0 nếu không rút).",
+      "taxFilingsReadSummary": "Đã đọc báo cáo tài chính năm {year}",
+      "taxFilingsReading": "Đang đọc hồ sơ thuế…",
+      "taxFilingsVatMonths": "{count} tháng tờ khai thuế GTGT",
       "taxId": "Mã số thuế",
       "uploadComplete": "Đã tải lên",
       "uploadFailedDescription": "Đã xảy ra lỗi khi tải lên tài liệu của bạn. Vui lòng thử lại.",
@@ -1168,55 +1216,7 @@
       "vatZipLabel": "Tải lên tệp .zip chứa tất cả 48 tệp thuế GTGT (24 tờ khai + 24 xác nhận)",
       "viewDocument": "Xem",
       "whereToFindThese": "Tìm các số liệu này ở đâu",
-      "whyWeNeedThis": "Lý do cần hồ sơ",
-      "taxFilings": "Hồ sơ thuế: báo cáo tài chính năm và tờ khai thuế GTGT",
-      "taxFilingsFormat": "Tải thư mục hồ sơ thuế lên dưới dạng một tệp .zip, hoặc chỉ tệp XML báo cáo tài chính năm.",
-      "taxFilingsReading": "Đang đọc hồ sơ thuế…",
-      "taxFilingsReadSummary": "Đã đọc báo cáo tài chính năm {year}",
-      "taxFilingsVatMonths": "{count} tháng tờ khai thuế GTGT",
-      "taxFilingsFilledFigures": "Giá vốn hàng bán và tỷ lệ lợi nhuận chủ sở hữu rút ra được đọc từ báo cáo tài chính. Chi phí cố định và chi phí biến đổi được điền sẵn từ chi phí quản lý và chi phí bán hàng: hãy kiểm tra và điều chỉnh nếu cần.",
-      "taxFilingsNoProfit": "Giá vốn hàng bán đã được điền. Năm này không có lợi nhuận nên bạn tự nhập tỷ lệ chủ sở hữu rút vốn (nhập 0 nếu không rút).",
-      "figureFromFilings": "Đọc từ hồ sơ thuế của bạn. Gỡ tệp nếu muốn tự nhập.",
-      "statementHint": {
-        "admin_expense_vnd": "Điền sẵn từ chi phí quản lý doanh nghiệp trên báo cáo tài chính ({amount}). Hãy điều chỉnh nếu một phần chi phí này thay đổi theo doanh thu.",
-        "selling_expense_vnd": "Điền sẵn từ chi phí bán hàng trên báo cáo tài chính ({amount}). Nhập 0 nếu không có."
-      },
-      "taxFilingsError": {
-        "NO_STATEMENTS": "Tệp .zip chưa có báo cáo tài chính năm (tệp XML bộ báo cáo từ HTKK). Hãy bổ sung rồi tải lại.",
-        "NOT_STATEMENTS": "Tệp XML này không phải báo cáo tài chính năm. Hãy tải bộ báo cáo tài chính xuất từ HTKK.",
-        "UNREADABLE_STATEMENTS": "Không đọc được báo cáo tài chính. Hãy xuất lại từ HTKK và tải tệp XML gốc.",
-        "NOT_A_ZIP": "Tệp không phải .zip đọc được. Hãy nén lại thư mục rồi tải lên.",
-        "TOO_MANY_FILES": "Tệp .zip có quá nhiều tệp. Chỉ đưa vào các tờ khai GTGT hằng tháng và báo cáo tài chính năm.",
-        "ARCHIVE_TOO_LARGE": "Tệp quá lớn. Chỉ đưa vào các tờ khai GTGT hằng tháng và báo cáo tài chính năm."
-      },
-      "cicReading": "Đang đọc báo cáo CIC…",
-      "cicReadSummary": "Nội dung báo cáo CIC của bạn",
-      "cicScore": "Điểm tín dụng CIC",
-      "cicRank": "Hạng CIC",
-      "cicPercentile": "Cao hơn",
-      "cicPercentileValue": "{pct}% khách hàng vay",
-      "cicScoredOn": "Ngày CIC chấm điểm",
-      "cicTotalDebt": "Dư nợ hiện tại",
-      "cicMillionVnd": "triệu ₫",
-      "cicRankLabel": {
-        "very_good": "Rất tốt",
-        "good": "Tốt",
-        "average": "Trung bình",
-        "below_average": "Dưới trung bình",
-        "poor": "Xấu"
-      },
-      "cicNote": {
-        "NO_SCORE": "Không tìm thấy điểm tín dụng trong báo cáo này. Báo cáo vẫn được lưu; đội ngũ của chúng tôi sẽ xem xét.",
-        "INDIVIDUAL_REPORT": "Đây là báo cáo cá nhân (thường của chủ doanh nghiệp), không phải của doanh nghiệp. Báo cáo vẫn được chấp nhận; nếu doanh nghiệp có báo cáo CIC riêng, hãy tải báo cáo đó lên.",
-        "STALE_REPORT": "Điểm này đã {days} ngày và CIC cập nhật điểm hằng tháng. Báo cáo mới hơn sẽ phản ánh chính xác hơn.",
-        "DEBT_ISSUES": "Báo cáo có nợ quá hạn hoặc nợ xấu. Đội ngũ của chúng tôi sẽ hỏi bạn về tình hình."
-      },
-      "cicError": {
-        "NOT_A_PDF": "Báo cáo CIC phải là tệp PDF tải về từ cổng thông tin hoặc ứng dụng CIC.",
-        "UNREADABLE_PDF": "Không đọc được nội dung PDF này. Hãy tải lên tệp PDF gốc từ CIC, không phải bản scan hay ảnh chụp.",
-        "NOT_CIC": "Tệp PDF này không phải báo cáo tín dụng CIC. Hãy tải báo cáo từ cổng thông tin hoặc ứng dụng CIC.",
-        "FILE_TOO_LARGE": "Tệp quá lớn. Báo cáo CIC dạng PDF thường nhỏ hơn 1 MB."
-      }
+      "whyWeNeedThis": "Lý do cần hồ sơ"
     },
     "smeAnalytics": {
       "charts": {
