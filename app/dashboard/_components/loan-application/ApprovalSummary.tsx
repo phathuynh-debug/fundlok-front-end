@@ -204,12 +204,10 @@ export function ApprovalCelebration({
   const close = () => {
     markSeen(applicationId);
     setOpen(false);
-    document
-      .querySelector('[data-testid="approval-summary"]')
-      ?.scrollIntoView({
-        behavior: reduce ? "auto" : "smooth",
-        block: "center",
-      });
+    document.querySelector('[data-testid="approval-summary"]')?.scrollIntoView({
+      behavior: reduce ? "auto" : "smooth",
+      block: "center",
+    });
   };
 
   useEffect(() => {

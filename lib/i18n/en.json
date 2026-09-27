@@ -66,9 +66,12 @@
       "applicationDecided": "Decision recorded",
       "applicationsHeading": "Funding requests",
       "approve": "Approve",
+      "approveNeedsDocuments": "Approval is unavailable until every required document is on file. You can still reject.",
       "companyHeading": "Company",
       "decisionFailed": "Could not record the decision",
+      "documentFromKyb": "From the verified business certificate",
       "documentLinkExpiry": "This link expires in 10 minutes.",
+      "documentMissing": "Missing",
       "documentTypes": {
         "business_registration": "Business registration",
         "cic_report": "CIC report",
@@ -78,6 +81,7 @@
       },
       "documentUnavailable": "This document could not be opened.",
       "documentsHeading": "Documents",
+      "documentsMissingHint": "{count} required document(s) not on file.",
       "download": "Download",
       "engineHeading": "Verification engine",
       "kybResolved": "Verification resolved",
@@ -113,11 +117,7 @@
       "scoreNeedsSubmitted": "Scoring runs once the business has submitted this request.",
       "scoreRate": "Reference rate",
       "subtitle": "Both approvals are required before a funding request can proceed.",
-      "title": "Project preview",
-      "documentMissing": "Missing",
-      "documentFromKyb": "From the verified business certificate",
-      "documentsMissingHint": "{count} required document(s) not on file.",
-      "approveNeedsDocuments": "Approval is unavailable until every required document is on file. You can still reject."
+      "title": "Project preview"
     },
     "projectsPage": {
       "subtitle": "Review company applications and their approvals.",
@@ -989,6 +989,24 @@
       "applicationSubmitted": "Application submitted",
       "applicationSubmittedDescription": "Your loan application and documents have been uploaded successfully.",
       "applicationSubmittedTitle": "Application submitted",
+      "approval": {
+        "amount": "Amount requested",
+        "celebrateBody": "The funding request for {company} has been approved.",
+        "celebrateCta": "See the details",
+        "celebrateNext": "Next, we will send you the offer to review and sign. Your request is then presented to investors.",
+        "celebrateTitle": "Congratulations!",
+        "daily": "About per business day",
+        "disclaimer": "The business score and reference rate are FundLok's internal assessment, not a credit rating. The daily amount is an estimate; the offer you sign confirms every figure. Funding comes from investors and is not guaranteed.",
+        "heading": "What your request was approved on",
+        "months": "{n} months",
+        "perYear": "/ year",
+        "rate": "Reference rate",
+        "rateNote": "All-in and flat: interest is charged once on the amount borrowed.",
+        "score": "Business score",
+        "scorePending": "Your business score and reference rate will be confirmed in the offer.",
+        "term": "Term",
+        "total": "Total to repay"
+      },
       "backBtn": "Back",
       "chooseFile": "Choose file",
       "cicCreditReport": "Customer CIC credit report",
@@ -1220,25 +1238,7 @@
       "vatZipLabel": "Upload .zip containing all 48 VAT files (24 declarations + 24 confirmations)",
       "viewDocument": "View",
       "whereToFindThese": "Where to find these numbers",
-      "whyWeNeedThis": "Why we need this",
-      "approval": {
-        "heading": "What your request was approved on",
-        "score": "Business score",
-        "rate": "Reference rate",
-        "perYear": "/ year",
-        "rateNote": "All-in and flat: interest is charged once on the amount borrowed.",
-        "scorePending": "Your business score and reference rate will be confirmed in the offer.",
-        "amount": "Amount requested",
-        "term": "Term",
-        "months": "{n} months",
-        "total": "Total to repay",
-        "daily": "About per business day",
-        "disclaimer": "The business score and reference rate are FundLok's internal assessment, not a credit rating. The daily amount is an estimate; the offer you sign confirms every figure. Funding comes from investors and is not guaranteed.",
-        "celebrateTitle": "Congratulations!",
-        "celebrateBody": "The funding request for {company} has been approved.",
-        "celebrateNext": "Next, we will send you the offer to review and sign. Your request is then presented to investors.",
-        "celebrateCta": "See the details"
-      }
+      "whyWeNeedThis": "Why we need this"
     },
     "smeAnalytics": {
       "charts": {

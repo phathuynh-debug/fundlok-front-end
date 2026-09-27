@@ -66,9 +66,12 @@
       "applicationDecided": "Đã ghi nhận quyết định",
       "applicationsHeading": "Đề nghị vay",
       "approve": "Phê duyệt",
+      "approveNeedsDocuments": "Chưa thể phê duyệt khi còn thiếu hồ sơ bắt buộc. Bạn vẫn có thể từ chối.",
       "companyHeading": "Doanh nghiệp",
       "decisionFailed": "Không thể ghi nhận quyết định",
+      "documentFromKyb": "Lấy từ giấy chứng nhận đã xác minh doanh nghiệp",
       "documentLinkExpiry": "Liên kết này hết hạn sau 10 phút.",
+      "documentMissing": "Còn thiếu",
       "documentTypes": {
         "business_registration": "Giấy đăng ký kinh doanh",
         "cic_report": "Báo cáo CIC",
@@ -78,6 +81,7 @@
       },
       "documentUnavailable": "Không thể mở hồ sơ này.",
       "documentsHeading": "Hồ sơ",
+      "documentsMissingHint": "Còn {count} hồ sơ bắt buộc chưa có.",
       "download": "Tải xuống",
       "engineHeading": "Hệ thống xác minh",
       "kybResolved": "Đã xử lý xác minh",
@@ -113,11 +117,7 @@
       "scoreNeedsSubmitted": "Việc tính điểm chỉ chạy sau khi doanh nghiệp đã gửi đề nghị này.",
       "scoreRate": "Lãi suất tham khảo",
       "subtitle": "Cần cả hai phê duyệt trước khi đề nghị vay được tiếp tục.",
-      "title": "Xem nhanh hồ sơ",
-      "documentMissing": "Còn thiếu",
-      "documentFromKyb": "Lấy từ giấy chứng nhận đã xác minh doanh nghiệp",
-      "documentsMissingHint": "Còn {count} hồ sơ bắt buộc chưa có.",
-      "approveNeedsDocuments": "Chưa thể phê duyệt khi còn thiếu hồ sơ bắt buộc. Bạn vẫn có thể từ chối."
+      "title": "Xem nhanh hồ sơ"
     },
     "projectsPage": {
       "subtitle": "Xem hồ sơ doanh nghiệp và tình trạng phê duyệt.",
@@ -989,6 +989,24 @@
       "applicationSubmitted": "Đã gửi hồ sơ",
       "applicationSubmittedDescription": "Hồ sơ vay và tài liệu của bạn đã được tải lên thành công.",
       "applicationSubmittedTitle": "Đã gửi hồ sơ",
+      "approval": {
+        "amount": "Số tiền đề nghị",
+        "celebrateBody": "Đề nghị tài trợ của {company} đã được duyệt.",
+        "celebrateCta": "Xem chi tiết",
+        "celebrateNext": "Tiếp theo, chúng tôi sẽ gửi đề nghị tài trợ để bạn xem và ký. Sau đó hồ sơ sẽ được giới thiệu tới nhà đầu tư.",
+        "celebrateTitle": "Chúc mừng!",
+        "daily": "Khoảng mỗi ngày làm việc",
+        "disclaimer": "Điểm doanh nghiệp và lãi suất tham khảo là đánh giá nội bộ của FundLok, không phải xếp hạng tín dụng. Số tiền mỗi ngày là ước tính; đề nghị tài trợ bạn ký sẽ xác nhận mọi con số. Vốn được huy động từ nhà đầu tư và không được bảo đảm.",
+        "heading": "Căn cứ duyệt hồ sơ của bạn",
+        "months": "{n} tháng",
+        "perYear": "/ năm",
+        "rate": "Lãi suất tham khảo",
+        "rateNote": "Đã bao gồm mọi chi phí, tính một lần trên số tiền vay.",
+        "score": "Điểm doanh nghiệp",
+        "scorePending": "Điểm doanh nghiệp và lãi suất tham khảo sẽ được xác nhận trong đề nghị tài trợ.",
+        "term": "Thời hạn",
+        "total": "Tổng số tiền phải trả"
+      },
       "backBtn": "Quay lại",
       "chooseFile": "Chọn tệp",
       "cicCreditReport": "Báo cáo tín dụng CIC khách hàng",
@@ -1220,25 +1238,7 @@
       "vatZipLabel": "Tải lên tệp .zip chứa tất cả 48 tệp thuế GTGT (24 tờ khai + 24 xác nhận)",
       "viewDocument": "Xem",
       "whereToFindThese": "Tìm các số liệu này ở đâu",
-      "whyWeNeedThis": "Lý do cần hồ sơ",
-      "approval": {
-        "heading": "Căn cứ duyệt hồ sơ của bạn",
-        "score": "Điểm doanh nghiệp",
-        "rate": "Lãi suất tham khảo",
-        "perYear": "/ năm",
-        "rateNote": "Đã bao gồm mọi chi phí, tính một lần trên số tiền vay.",
-        "scorePending": "Điểm doanh nghiệp và lãi suất tham khảo sẽ được xác nhận trong đề nghị tài trợ.",
-        "amount": "Số tiền đề nghị",
-        "term": "Thời hạn",
-        "months": "{n} tháng",
-        "total": "Tổng số tiền phải trả",
-        "daily": "Khoảng mỗi ngày làm việc",
-        "disclaimer": "Điểm doanh nghiệp và lãi suất tham khảo là đánh giá nội bộ của FundLok, không phải xếp hạng tín dụng. Số tiền mỗi ngày là ước tính; đề nghị tài trợ bạn ký sẽ xác nhận mọi con số. Vốn được huy động từ nhà đầu tư và không được bảo đảm.",
-        "celebrateTitle": "Chúc mừng!",
-        "celebrateBody": "Đề nghị tài trợ của {company} đã được duyệt.",
-        "celebrateNext": "Tiếp theo, chúng tôi sẽ gửi đề nghị tài trợ để bạn xem và ký. Sau đó hồ sơ sẽ được giới thiệu tới nhà đầu tư.",
-        "celebrateCta": "Xem chi tiết"
-      }
+      "whyWeNeedThis": "Lý do cần hồ sơ"
     },
     "smeAnalytics": {
       "charts": {
