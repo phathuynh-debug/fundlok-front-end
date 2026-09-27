@@ -203,9 +203,6 @@ export function ProjectPreviewSheet({
                       {data.kyb.rejection_reason}
                     </p>
                   )}
-                  {/* Only a parked attempt is an operator's to settle — an
-                      APPROVED or REJECTED one is the provider's own verdict and
-                      the API answers 409. */}
                   {data.kyb.status === "MANUAL_REVIEW" && (
                     <DecisionControls
                       note={noteFor(data.kyb.id)}
@@ -268,12 +265,6 @@ export function ProjectPreviewSheet({
                       <ScoreRunSummary
                         run={application.score_run}
                         t={t}
-                        // Scoring needs a submitted application: the engine
-                        // would otherwise grade figures the SME has not
-                        // finished entering, and the API answers 400. The
-                        // first run moves it to UNDER_REVIEW; it can be run
-                        // again until the request is decided (the API answers
-                        // 409 after that, and for a locked run).
                         canRun={
                           application.status === "SUBMITTED" ||
                           (application.status === "UNDER_REVIEW" &&
@@ -285,6 +276,7 @@ export function ProjectPreviewSheet({
 
                       <DocumentList
                         documents={application.documents}
+                        registrationFromKyb={!!data.kyb?.is_approved}
                         t={t}
                         onOpen={setViewerDocument}
                       />
@@ -295,8 +287,7 @@ export function ProjectPreviewSheet({
                         </p>
                       )}
 
-                      {/* One-way: a decided application answers 409, so the
-                          controls retire once a verdict exists. */}
+
                       {application.admin_approval === "PENDING" && (
                         <DecisionControls
                           note={noteFor(application.id)}
@@ -475,73 +466,130 @@ function ScoreRunSummary({
           {run.engine_version} · {run.params_version}
         </p>
       )}
-      {/* A LOCKED run is the basis a contract gets created on, so it is not
-          re-run from here — a new one would leave which run backed the
-          decision ambiguous. */}
       {run.status !== "LOCKED" && canRun && runButton}
     </div>
   );
 }
 
+// What the SME wizard requires, in wizard order. Kept beside the checklist
+// that renders it; the wizard's own list is STEP_DOCUMENTS in
+// useLoanApplication.ts.
+const REQUIRED_DOCUMENT_TYPES = [
+  "legal_charter",
+  "business_registration",
+  "e_invoice_data",
+  "tax_filings",
+  "cic_report",
+] as const;
+
 function DocumentList({
   documents,
+  registrationFromKyb,
   t,
   onOpen,
 }: {
   documents: AdminApplicationDocument[];
+  registrationFromKyb: boolean;
   t: (key: string) => string;
   onOpen: (document: AdminApplicationDocument) => void;
 }) {
-  if (documents.length === 0) {
+  const labelFor = (type: string) => {
+    const label = t(`admin.preview.documentTypes.${type}`);
+    return label.startsWith("admin.preview.") ? type : label;
+  };
+  const byType = new Map(documents.map((d) => [d.document_type, d]));
+  const extras = documents.filter(
+    (d) =>
+      !(REQUIRED_DOCUMENT_TYPES as readonly string[]).includes(d.document_type),
+  );
+  const missing = REQUIRED_DOCUMENT_TYPES.filter(
+    (type) =>
+      !byType.has(type) &&
+      !(type === "business_registration" && registrationFromKyb),
+  );
+
+  const uploadedRow = (document: AdminApplicationDocument) => {
+    // Only a confirmed upload can be opened — there is no object behind a
+    // PENDING row, so it stays inert rather than offering a dead link.
+    const openable = document.status === "UPLOADED";
     return (
-      <p className="text-xs text-muted-foreground">
-        {t("admin.preview.noDocuments")}
-      </p>
+      <li key={document.id}>
+        <button
+          type="button"
+          disabled={!openable}
+          onClick={() => onOpen(document)}
+          className={cn(
+            "flex w-full items-center gap-2 rounded-md px-1 py-1 text-left text-xs text-muted-foreground",
+            openable
+              ? "cursor-pointer hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              : "cursor-default",
+          )}
+        >
+          <FileText className="h-3.5 w-3.5 shrink-0" aria-hidden />
+          <span className="font-medium text-foreground">
+            {labelFor(document.document_type)}
+          </span>
+          <span className="truncate">{document.original_filename}</span>
+          {/* PENDING means the presign was issued but the object never
+              landed — worth flagging, not hiding. */}
+          {!openable && (
+            <Badge variant="secondary" className="ml-auto shrink-0">
+              {enumLabel(t, "documentStatus", document.status)}
+            </Badge>
+          )}
+        </button>
+      </li>
     );
-  }
+  };
+
   return (
-    <ul className="space-y-1.5">
-      {documents.map((document) => {
-        const label = t(
-          `admin.preview.documentTypes.${document.document_type}`,
-        );
-        // Only a confirmed upload can be opened — there is no object behind a
-        // PENDING row, so it stays inert rather than offering a dead link.
-        const openable = document.status === "UPLOADED";
-        return (
-          <li key={document.id}>
-            <button
-              type="button"
-              disabled={!openable}
-              onClick={() => onOpen(document)}
-              className={cn(
-                "flex w-full items-center gap-2 rounded-md px-1 py-1 text-left text-xs text-muted-foreground",
-                openable
-                  ? "cursor-pointer hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  : "cursor-default",
-              )}
+    <div className="space-y-2">
+      <ul className="space-y-1.5">
+        {REQUIRED_DOCUMENT_TYPES.map((type) => {
+          const document = byType.get(type);
+          if (document) return uploadedRow(document);
+          if (type === "business_registration" && registrationFromKyb) {
+            return (
+              <li
+                key={type}
+                className="flex items-center gap-2 px-1 py-1 text-xs text-muted-foreground"
+              >
+                <ShieldCheck className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                <span className="font-medium text-foreground">
+                  {labelFor(type)}
+                </span>
+                <span className="truncate">
+                  {t("admin.preview.documentFromKyb")}
+                </span>
+              </li>
+            );
+          }
+          return (
+            <li
+              key={type}
+              data-missing-document={type}
+              className="flex items-center gap-2 px-1 py-1 text-xs text-destructive"
             >
-              <FileText className="h-3.5 w-3.5 shrink-0" aria-hidden />
-              <span className="font-medium text-foreground">
-                {/* An unmapped type falls back to the raw key rather than the
-                    missing-key string. */}
-                {label.startsWith("admin.preview.")
-                  ? document.document_type
-                  : label}
-              </span>
-              <span className="truncate">{document.original_filename}</span>
-              {/* PENDING means the presign was issued but the object never
-                  landed — worth flagging, not hiding. */}
-              {!openable && (
-                <Badge variant="secondary" className="ml-auto shrink-0">
-                  {enumLabel(t, "documentStatus", document.status)}
-                </Badge>
-              )}
-            </button>
-          </li>
-        );
-      })}
-    </ul>
+              <AlertTriangle className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              <span className="font-medium">{labelFor(type)}</span>
+              <Badge variant="destructive" className="ml-auto shrink-0">
+                {t("admin.preview.documentMissing")}
+              </Badge>
+            </li>
+          );
+        })}
+        {extras.map(uploadedRow)}
+      </ul>
+      {/* The Approve button is the next thing on the panel. */}
+      {missing.length > 0 && (
+        <p className="text-[11px] leading-relaxed text-destructive">
+          {t("admin.preview.documentsMissingHint").replace(
+            "{count}",
+            String(missing.length),
+          )}
+        </p>
+      )}
+    </div>
   );
 }
 

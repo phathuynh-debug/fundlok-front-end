@@ -168,6 +168,33 @@ test.describe("the admin project preview", () => {
     ).toBeVisible();
   });
 
+  test("names the required documents the SME has not uploaded", async ({
+    page,
+  }) => {
+    // Read-only: the stub request holds a charter and a pending registration,
+    // so the e-invoices, tax filings and CIC report are missing.
+    await openPreview(page, "Delta Foods JSC");
+    const panel = page.getByRole("dialog");
+
+    for (const type of ["e_invoice_data", "tax_filings", "cic_report"]) {
+      await expect(
+        panel.locator(`[data-missing-document="${type}"]`),
+      ).toBeVisible();
+      await expect(
+        panel.locator(`[data-missing-document="${type}"]`),
+      ).toContainText(t(`admin.preview.documentTypes.${type}`));
+    }
+    // Uploaded ones are not flagged.
+    await expect(
+      panel.locator('[data-missing-document="legal_charter"]'),
+    ).toHaveCount(0);
+    await expect(
+      panel.getByText(
+        t("admin.preview.documentsMissingHint").replace("{count}", "3"),
+      ),
+    ).toBeVisible();
+  });
+
   test("approving the funding request records the operator's half", async ({
     page,
   }) => {

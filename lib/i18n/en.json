@@ -73,7 +73,8 @@
         "business_registration": "Business registration",
         "cic_report": "CIC report",
         "e_invoice_data": "E-invoice data",
-        "legal_charter": "Company charter"
+        "legal_charter": "Company charter",
+        "tax_filings": "Tax filings"
       },
       "documentUnavailable": "This document could not be opened.",
       "documentsHeading": "Documents",
@@ -94,7 +95,6 @@
       },
       "missingInputs": "Missing for a score:",
       "noApplications": "No funding requests yet.",
-      "noDocuments": "No documents uploaded yet.",
       "noKyb": "This company has not started business verification yet.",
       "noScoreRun": "The grading engine has not run for this request yet.",
       "notPreviewable": "This file type cannot be shown in the browser. Download it to open it.",
@@ -113,7 +113,10 @@
       "scoreNeedsSubmitted": "Scoring runs once the business has submitted this request.",
       "scoreRate": "Reference rate",
       "subtitle": "Both approvals are required before a funding request can proceed.",
-      "title": "Project preview"
+      "title": "Project preview",
+      "documentMissing": "Missing",
+      "documentFromKyb": "From the verified business certificate",
+      "documentsMissingHint": "{count} required document(s) not uploaded. Approving now approves the request without them."
     },
     "projectsPage": {
       "subtitle": "Review company applications and their approvals.",

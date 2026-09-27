@@ -73,7 +73,8 @@
         "business_registration": "Giấy đăng ký kinh doanh",
         "cic_report": "Báo cáo CIC",
         "e_invoice_data": "Dữ liệu hóa đơn điện tử",
-        "legal_charter": "Điều lệ công ty"
+        "legal_charter": "Điều lệ công ty",
+        "tax_filings": "Hồ sơ thuế"
       },
       "documentUnavailable": "Không thể mở hồ sơ này.",
       "documentsHeading": "Hồ sơ",
@@ -94,7 +95,6 @@
       },
       "missingInputs": "Còn thiếu để tính điểm:",
       "noApplications": "Chưa có đề nghị vay nào.",
-      "noDocuments": "Chưa tải lên hồ sơ nào.",
       "noKyb": "Doanh nghiệp này chưa bắt đầu xác minh.",
       "noScoreRun": "Hệ thống tính điểm chưa chạy cho đề nghị này.",
       "notPreviewable": "Không thể xem loại tệp này trên trình duyệt. Hãy tải xuống để mở.",
@@ -113,7 +113,10 @@
       "scoreNeedsSubmitted": "Việc tính điểm chỉ chạy sau khi doanh nghiệp đã gửi đề nghị này.",
       "scoreRate": "Lãi suất tham khảo",
       "subtitle": "Cần cả hai phê duyệt trước khi đề nghị vay được tiếp tục.",
-      "title": "Xem nhanh hồ sơ"
+      "title": "Xem nhanh hồ sơ",
+      "documentMissing": "Còn thiếu",
+      "documentFromKyb": "Lấy từ giấy chứng nhận đã xác minh doanh nghiệp",
+      "documentsMissingHint": "Còn {count} hồ sơ bắt buộc chưa tải lên. Phê duyệt lúc này là phê duyệt khi chưa có các hồ sơ đó."
     },
     "projectsPage": {
       "subtitle": "Xem hồ sơ doanh nghiệp và tình trạng phê duyệt.",
