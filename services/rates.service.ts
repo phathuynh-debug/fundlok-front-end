@@ -18,7 +18,9 @@ export interface RateCalculateRequest {
     top_1_customer_share?: number | string | null; // 0 - 100
     top_3_customer_share?: number | string | null; // 0 - 100
   };
-  /** Contact for follow-up, stored with the inquiry. Required. */
+  /** Contact for follow-up, stored with the inquiry. All required. */
+  full_name: string;
+  company_name: string;
   email: string;
   phone: string;
   /** Must be true: storing the contact needs consent (Decree 13/2023). */
@@ -108,6 +110,8 @@ export interface RateInquiryAdminItem {
   ip_address?: string | null;
   user_agent?: string | null;
   /** Contact for follow-up; null on inquiries made before the form asked. */
+  full_name?: string | null;
+  company_name?: string | null;
   email?: string | null;
   phone?: string | null;
   consented_contact_at?: string | null;

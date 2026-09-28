@@ -161,6 +161,17 @@ export function RecentLeads({
             className="grid grid-cols-[1fr_auto] items-start gap-3 px-5 py-3"
           >
             <div className="min-w-0 space-y-1">
+              {item.full_name && (
+                <p className="truncate text-sm font-medium text-foreground">
+                  {item.full_name}
+                  {item.company_name && (
+                    <span className="font-normal text-muted-foreground">
+                      {" "}
+                      · {item.company_name}
+                    </span>
+                  )}
+                </p>
+              )}
               <Contact email={item.email} phone={item.phone} />
               <p className="truncate text-[11px] text-muted-foreground">
                 {item.industry_display || item.industry} ·{" "}

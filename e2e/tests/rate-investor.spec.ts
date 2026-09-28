@@ -111,7 +111,9 @@ test("the yield stays hidden until details are given, then updates live", async 
   await expect(page.getByText("10,50%").first()).toBeVisible();
 
   // Contact details lock once the lead exists.
-  await expect(page.getByLabel(t("ratePage.investor.name"))).toBeDisabled();
+  await expect(
+    panel(page).getByLabel(t("ratePage.investor.name")),
+  ).toBeDisabled();
 
   // Live: a new tier re-prices without asking for details again.
   await page
@@ -139,12 +141,12 @@ test("signing up shows the reference to quote", async ({ page }) => {
 test("switching tabs keeps what was typed", async ({ page }) => {
   await page.goto("/rate?for=investor");
   await passGate(page);
-  await page.getByLabel(t("ratePage.investor.name")).fill("Giữ Nguyên");
+  await panel(page).getByLabel(t("ratePage.investor.name")).fill("Giữ Nguyên");
   await page
     .getByRole("tab", { name: new RegExp(t("ratePage.audience.sme")) })
     .click();
   await investorTab(page).click();
-  await expect(page.getByLabel(t("ratePage.investor.name"))).toHaveValue(
+  await expect(panel(page).getByLabel(t("ratePage.investor.name"))).toHaveValue(
     "Giữ Nguyên",
   );
 });

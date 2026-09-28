@@ -69,6 +69,8 @@ export function RateInquiriesDirectory() {
           item.industry_display.toLowerCase().includes(q)) ||
         (item.industry && item.industry.toLowerCase().includes(q)) ||
         (item.session_id && item.session_id.toLowerCase().includes(q)) ||
+        (item.full_name && item.full_name.toLowerCase().includes(q)) ||
+        (item.company_name && item.company_name.toLowerCase().includes(q)) ||
         (item.email && item.email.toLowerCase().includes(q)) ||
         (item.phone &&
           /\d/.test(q) &&
@@ -114,8 +116,18 @@ export function RateInquiriesDirectory() {
       cellClassName: "text-xs",
       // Who to call back. Inquiries from before the form asked have none.
       render: (item) =>
-        item.email || item.phone ? (
+        item.full_name || item.email || item.phone ? (
           <div className="space-y-0.5">
+            {item.full_name && (
+              <p className="truncate font-medium text-foreground">
+                {item.full_name}
+              </p>
+            )}
+            {item.company_name && (
+              <p className="truncate text-muted-foreground">
+                {item.company_name}
+              </p>
+            )}
             {item.email && (
               <a
                 href={`mailto:${item.email}`}

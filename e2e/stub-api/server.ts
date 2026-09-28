@@ -1401,6 +1401,8 @@ const server = createServer(async (req, res) => {
           session_id: "sess_stub_123",
           ip_address: "127.0.0.1",
           user_agent: "Mozilla/5.0",
+          full_name: "Lê Thị Chủ Shop",
+          company_name: "Công ty TNHH Bán Lẻ Mẫu",
           email: "owner@retail.vn",
           phone: "0912 345 678",
           consented_contact_at: "2026-09-26T15:45:00.000Z",

@@ -36,6 +36,8 @@ test.describe("as an admin", () => {
 
     const sme = page.getByTestId("recent-sme-leads");
     await expect(sme).toContainText(t("admin.recentLeads.smeTitle"));
+    await expect(sme).toContainText("Lê Thị Chủ Shop");
+    await expect(sme).toContainText("Công ty TNHH Bán Lẻ Mẫu");
     await expect(
       sme.getByRole("link", { name: "owner@retail.vn" }),
     ).toHaveAttribute("href", "mailto:owner@retail.vn");

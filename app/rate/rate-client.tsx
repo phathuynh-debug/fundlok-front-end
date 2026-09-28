@@ -127,7 +127,10 @@ function validate(v: Values, t: (key: string) => string): Errors {
     if (!(v[key] ?? "").trim()) errors[key] = t(e("required"));
   }
 
-  // Contact, so the team can follow up on the estimate.
+  // Contact, so the team can follow up on the estimate. All required.
+  if ((v.fullName ?? "").trim().length < 2) errors.fullName = t(e("fullName"));
+  if ((v.companyName ?? "").trim().length < 2)
+    errors.companyName = t(e("companyName"));
   const email = (v.email ?? "").trim();
   if (!email) errors.email = t(e("required"));
   else if (!EMAIL_RE.test(email)) errors.email = t(e("email"));
@@ -315,6 +318,8 @@ export default function RateClient({
   const [worstMonth, setWorstMonth] = useState("");
   const [top1, setTop1] = useState("");
   const [top3, setTop3] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [companyName, setCompanyName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   // Decree 13/2023: storing an email and phone needs the visitor's consent,
@@ -349,6 +354,8 @@ export default function RateClient({
     worstMonth,
     top1,
     top3,
+    fullName,
+    companyName,
     email,
     phone,
   };
@@ -429,6 +436,8 @@ export default function RateClient({
         top_1_customer_share: parseAmount(top1),
         top_3_customer_share: parseAmount(top3),
       },
+      full_name: fullName.trim(),
+      company_name: companyName.trim(),
       email: email.trim(),
       phone: phone.trim(),
       consent_contact: true,
@@ -645,6 +654,55 @@ export default function RateClient({
                 <legend className="px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                   {t("ratePage.contactLabel")}
                 </legend>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <label htmlFor="sme-name" className="text-sm font-medium">
+                      {t("ratePage.fullName")}{" "}
+                      <span className="text-xs text-destructive">*</span>
+                    </label>
+                    <Input
+                      id="sme-name"
+                      autoComplete="name"
+                      maxLength={120}
+                      value={fullName}
+                      placeholder={t("ratePage.fullNamePlaceholder")}
+                      aria-invalid={Boolean(showError("fullName"))}
+                      onChange={(e) => setFullName(e.target.value)}
+                      onBlur={() => markTouched("fullName")}
+                    />
+                    {showError("fullName") && (
+                      <p className="flex items-start gap-1.5 text-xs leading-relaxed text-destructive">
+                        <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" />
+                        <span>{showError("fullName")}</span>
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-1.5">
+                    <label
+                      htmlFor="sme-company"
+                      className="text-sm font-medium"
+                    >
+                      {t("ratePage.companyName")}{" "}
+                      <span className="text-xs text-destructive">*</span>
+                    </label>
+                    <Input
+                      id="sme-company"
+                      autoComplete="organization"
+                      maxLength={200}
+                      value={companyName}
+                      placeholder={t("ratePage.companyNamePlaceholder")}
+                      aria-invalid={Boolean(showError("companyName"))}
+                      onChange={(e) => setCompanyName(e.target.value)}
+                      onBlur={() => markTouched("companyName")}
+                    />
+                    {showError("companyName") && (
+                      <p className="flex items-start gap-1.5 text-xs leading-relaxed text-destructive">
+                        <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" />
+                        <span>{showError("companyName")}</span>
+                      </p>
+                    )}
+                  </div>
+                </div>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="space-y-1.5">
                     <label htmlFor="sme-email" className="text-sm font-medium">

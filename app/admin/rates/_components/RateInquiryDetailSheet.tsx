@@ -126,6 +126,19 @@ export function RateInquiryDetailSheet({
               </>
             )}
           </SheetDescription>
+          {(inquiry.full_name || inquiry.company_name) && (
+            <p className="pt-1 text-sm">
+              <span className="font-semibold text-foreground">
+                {inquiry.full_name}
+              </span>
+              {inquiry.full_name && inquiry.company_name && (
+                <span className="text-muted-foreground"> · </span>
+              )}
+              <span className="text-muted-foreground">
+                {inquiry.company_name}
+              </span>
+            </p>
+          )}
           {(inquiry.email || inquiry.phone) && (
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-1 text-sm">
               {inquiry.email && (
