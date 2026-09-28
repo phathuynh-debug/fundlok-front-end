@@ -222,15 +222,14 @@ function AssessmentVisual() {
 
 /* --------------------------------------------------------- SME: daily */
 
-function DailyVisual({ daily, monthly }: { daily: string; monthly: string }) {
+function DailyVisual() {
   const { t } = useTranslations();
   return (
     <div className="flex h-full w-full max-w-lg flex-col justify-center gap-3">
       <div className="flex flex-col gap-1.5">
-        <div className="flex items-baseline justify-between gap-2">
-          <Label>{t("welcome.visuals.monthlyPayment")}</Label>
-          <Label className="text-foreground">{monthly}</Label>
-        </div>
+        <Label className="text-left">
+          {t("welcome.visuals.monthlyPayment")}
+        </Label>
         <motion.div
           className="h-9 w-full rounded-lg border border-border bg-muted sm:h-11"
           style={{ originX: 0 }}
@@ -250,16 +249,11 @@ function DailyVisual({ daily, monthly }: { daily: string; monthly: string }) {
       </motion.div>
 
       <div className="flex flex-col gap-1.5">
-        <div className="flex items-baseline justify-between gap-2">
-          <Label>
-            {t("welcome.visuals.dailyPayments", {
-              days: BUSINESS_DAYS_PER_PERIOD,
-            })}
-          </Label>
-          <Label className="text-foreground">
-            {t("welcome.visuals.perDay", { amount: daily })}
-          </Label>
-        </div>
+        <Label className="text-left">
+          {t("welcome.visuals.dailyPayments", {
+            days: BUSINESS_DAYS_PER_PERIOD,
+          })}
+        </Label>
         <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
           {Array.from({ length: BUSINESS_DAYS_PER_PERIOD }, (_, index) => (
             <motion.div
@@ -745,15 +739,7 @@ function DailyBenefitVisual() {
 
 /* ------------------------------------------------------------- switch */
 
-export function WelcomeVisual({
-  id,
-  daily,
-  monthly,
-}: {
-  id: WelcomeSlideId;
-  daily: string;
-  monthly: string;
-}) {
+export function WelcomeVisual({ id }: { id: WelcomeSlideId }) {
   return (
     <div
       aria-hidden="true"
@@ -762,7 +748,7 @@ export function WelcomeVisual({
       {id === "hello" && <HelloVisual />}
       {id === "intro" && <SmeIntroVisual />}
       {id === "assessment" && <AssessmentVisual />}
-      {id === "daily" && <DailyVisual daily={daily} monthly={monthly} />}
+      {id === "daily" && <DailyVisual />}
       {id === "relief" && <ReliefVisual />}
       {id === "extension" && <ExtensionVisual />}
       {id === "rules" && <RulesVisual />}

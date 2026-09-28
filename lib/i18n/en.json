@@ -2356,58 +2356,53 @@
     },
     "investor": {
       "dailyBenefit": {
+        "body": "Returns are targets, not guarantees. You bear the loss if a business doesn't repay.",
         "items": {
-          "1": "Less exposure: part of your principal returns every business day, so the amount at risk shrinks over time rather than all at once at the end.",
-          "2": "Earlier warning: one missed day raises a flag straight away.",
-          "3": "Put it back to work: returned money lands in your balance, and you can reinvest it in new projects sooner, earning returns on returns.",
-          "4": "Returns are targets, not guarantees. If a business doesn't repay, you bear the loss."
+          "1": "Your exposure shrinks every day.",
+          "2": "One missed day raises a flag.",
+          "3": "Reinvest sooner."
         },
-        "title": "Your money starts coming back from day one."
+        "title": "Money comes back from day one."
       },
       "disclosure": {
-        "body": "FundLok connects you with Vietnamese SMEs whose revenue we verify. You lend directly to the business, and you see what stands behind every opportunity before you commit.",
-        "title": "Fund real businesses, with a clear view of the risk."
+        "body": "Every listing shows what's behind it before you commit.",
+        "title": "Fund real businesses."
       },
       "journey": {
-        "items": {
-          "1": "Browse listings with the score, verified revenue, fees, risks and final settlement date.",
-          "2": "Commit. Your funds are held with our custodial bank partners.",
-          "3": "Once the project is funded, the money goes to the business.",
-          "4": "Repayments come back to you every business day."
-        },
+        "body": "Pick, commit, fund, then get paid every business day. Funds sit with our custodial bank partners.",
         "title": "From listing to repayment."
       },
       "riskRate": {
-        "body": "Each business gets a reference score from its verified revenue, costs, credit behaviour and sector. The score sets the rate: stronger businesses pay closer to what banks charge, and riskier ones pay more to reflect that risk.",
-        "title": "Stronger business, lower rate. Weaker, higher."
+        "body": "Stronger businesses pay less; riskier ones pay more.",
+        "title": "Risk sets the rate."
       }
     },
     "sme": {
       "assessment": {
-        "body": "Your business score comes from four areas: revenue stability and growth, cost quality, credit behaviour, and your sector's outlook. We read it from tax records and e-invoices you already have.",
-        "title": "We look at how your business runs, not what it owns."
+        "body": "Your reference score comes from tax records and e-invoices, not assets.",
+        "title": "We look at how you run your business."
       },
       "daily": {
-        "body": "You repay a fixed amount every business day until the total is cleared. It's the same money as a monthly payment, just split across the month. Example: borrow {principal} at {rate}%/year for {months} months. The total is {total}, which is {daily} per business day. Over {days} business days that's about {monthlyMillions} million ₫, the same as one monthly payment.",
-        "title": "Same money, smaller pieces."
+        "body": "A fixed amount each business day. Together it equals one monthly payment.",
+        "title": "Same money, paid daily."
       },
       "extension": {
-        "body": "The shortfall turns into extra time, rounded up to whole weeks. Your daily amount drops for the rest of the loan. Interest runs at the same rate on the added days, so the total goes up a little. You can extend more than once, up to your final settlement date.",
-        "title": "Pay less each day, for a little longer."
+        "body": "Relief becomes extra time. Your daily amount drops; the total rises slightly from interest on the added days.",
+        "title": "Pay less each day, for a bit longer."
       },
       "intro": {
-        "body": "Your revenue is your strongest asset. We turn verified revenue into growth capital. You don't need to pledge property, and repayment follows how your business actually earns.",
-        "title": "Capital that moves with your revenue."
+        "body": "No property to pledge. Repayment fits how your business earns.",
+        "title": "Capital that follows your revenue."
       },
       "relief": {
-        "body": "When you sign, your daily amount is set as a share of your average revenue. After each month closes, we check your verified e-invoice revenue. If that share of your actual revenue came in below what you paid, the difference is your relief.",
-        "title": "A slow month doesn't break your loan."
+        "body": "After the month closes, send us your verified revenue. If your agreed share of it is less than you paid, the difference becomes relief.",
+        "title": "Slow month? Request relief."
       },
       "rules": {
         "items": {
-          "1": "Relief is agreed after a month closes. Until then, each day is paid in full.",
-          "2": "Paying less without an agreed extension counts as a missed payment, with late interest of 150% of your rate on the overdue amount. Talk to us first; one missed day and we'll check in.",
-          "3": "Every loan has a final settlement date, set when you sign, when anything still owed falls due."
+          "1": "Within a month, every day is paid in full.",
+          "2": "Paying less without approved relief is a missed payment, with 150% late interest.",
+          "3": "Anything left falls due on the final settlement date."
         },
         "title": "Three things to know."
       }
@@ -2434,11 +2429,10 @@
       "interestRate": "Interest rate",
       "lower": "Lower",
       "month": "Month {n}",
-      "monthClosed": "Month closes, then relief is reviewed",
+      "monthClosed": "Month closes → you request relief",
       "monthlyPayment": "One monthly payment",
       "noCollateral": "No property to pledge",
       "paidEachMonth": "What you paid",
-      "perDay": "{amount} / day",
       "plusWeek": "+1 week",
       "reinvest": "Reinvest in new projects",
       "reliefGap": "Relief",

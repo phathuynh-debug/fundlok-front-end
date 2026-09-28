@@ -6,16 +6,10 @@ import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { useAppearance } from "@/components/appearance-provider";
 import { WelcomeVisual } from "@/components/welcome/welcome-visuals";
 import {
-  WELCOME_DAILY_EXAMPLE,
   welcomeSlideKey,
   welcomeSlidesForRole,
 } from "@/lib/constants/welcome-slides";
-import {
-  BUSINESS_DAYS_PER_PERIOD,
-  dailyRepaymentAmount,
-} from "@/lib/facility-terms";
-import { formatCurrency } from "@/lib/format-currency";
-import { supportedLocales, useTranslations, type Locale } from "@/lib/i18n";
+import { supportedLocales, useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import type { SelectableRole } from "@/services/authentication.service";
 
@@ -39,28 +33,6 @@ const slideVariants = {
   exit: (direction: number) => ({ opacity: 0, x: direction * -48 }),
 };
 
-function useWorkedExample(locale: Locale) {
-  const { principal, annualRatePct, termMonths } = WELCOME_DAILY_EXAMPLE;
-  const daily = dailyRepaymentAmount(principal, annualRatePct, termMonths);
-  const total = principal * (1 + (annualRatePct / 100) * (termMonths / 12));
-  const monthly = daily * BUSINESS_DAYS_PER_PERIOD;
-  const monthlyMillions = new Intl.NumberFormat(
-    locale === "vi" ? "vi-VN" : "en-US",
-    { maximumFractionDigits: 2 },
-  ).format(monthly / 1_000_000);
-
-  return {
-    principal: formatCurrency(principal, locale),
-    rate: annualRatePct,
-    months: termMonths,
-    total: formatCurrency(total, locale),
-    daily: formatCurrency(daily, locale),
-    days: BUSINESS_DAYS_PER_PERIOD,
-    monthly: formatCurrency(monthly, locale),
-    monthlyMillions,
-  };
-}
-
 export function WelcomeCutscreen({
   role,
   onFinish,
@@ -78,7 +50,6 @@ export function WelcomeCutscreen({
   const { t, locale, setLocale } = useTranslations();
   const { reduceMotion } = useAppearance();
   const slides = welcomeSlidesForRole(role);
-  const example = useWorkedExample(locale);
 
   const [[index, direction], setPosition] = useState<[number, number]>([0, 0]);
   const [furthest, setFurthest] = useState(0);
@@ -150,7 +121,7 @@ export function WelcomeCutscreen({
   const base = welcomeSlideKey(role, slide.id);
   // Not every slide has a body (the greeting, the list slides): `t` returns
   // the key itself for a missing entry.
-  const body = t(`${base}.body`, example);
+  const body = t(`${base}.body`);
   const titleId = `welcome-${slide.id}-title`;
   const primaryLabel = isFirst
     ? t("welcome.common.getStarted")
@@ -251,11 +222,7 @@ export function WelcomeCutscreen({
                       : "h-[clamp(11rem,34vh,18rem)]",
                 )}
               >
-                <WelcomeVisual
-                  id={slide.id}
-                  daily={example.daily}
-                  monthly={example.monthly}
-                />
+                <WelcomeVisual id={slide.id} />
               </div>
 
               <div className="flex w-full max-w-2xl flex-col items-center gap-3">

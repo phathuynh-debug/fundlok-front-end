@@ -2356,58 +2356,53 @@
     },
     "investor": {
       "dailyBenefit": {
+        "body": "Lợi nhuận là mục tiêu, không phải cam kết. Bạn chịu khoản lỗ nếu doanh nghiệp không trả được.",
         "items": {
-          "1": "Giảm rủi ro: một phần vốn gốc quay về mỗi ngày làm việc, nên số tiền chịu rủi ro giảm dần thay vì dồn hết vào cuối kỳ.",
-          "2": "Cảnh báo sớm: chỉ cần trễ một ngày là hệ thống báo ngay.",
-          "3": "Tái đầu tư sớm hơn: tiền hoàn trả về số dư của bạn, và bạn có thể đầu tư tiếp vào dự án mới sớm hơn, để lợi nhuận tiếp tục sinh lợi nhuận.",
-          "4": "Lợi nhuận là mục tiêu, không phải cam kết. Nếu doanh nghiệp không trả được nợ, bạn chịu khoản lỗ."
+          "1": "Rủi ro giảm dần mỗi ngày.",
+          "2": "Trễ một ngày là có cảnh báo.",
+          "3": "Tái đầu tư sớm hơn."
         },
-        "title": "Tiền bắt đầu quay về từ ngày đầu tiên."
+        "title": "Tiền quay về từ ngày đầu."
       },
       "disclosure": {
-        "body": "FundLok kết nối bạn với các doanh nghiệp vừa và nhỏ Việt Nam có doanh thu đã được xác minh. Bạn cho doanh nghiệp vay trực tiếp, và thấy rõ nền tảng của từng cơ hội trước khi quyết định.",
-        "title": "Cấp vốn cho doanh nghiệp thật, với góc nhìn rõ ràng về rủi ro."
+        "body": "Mỗi dự án hiển thị đầy đủ thông tin trước khi bạn quyết định.",
+        "title": "Cấp vốn cho doanh nghiệp thật."
       },
       "journey": {
-        "items": {
-          "1": "Xem dự án kèm điểm, doanh thu đã xác minh, phí, rủi ro và hạn tất toán cuối cùng.",
-          "2": "Cam kết đầu tư. Tiền được giữ tại các đối tác ngân hàng lưu ký.",
-          "3": "Khi dự án đủ vốn, tiền được giải ngân cho doanh nghiệp.",
-          "4": "Tiền hoàn trả về với bạn mỗi ngày làm việc."
-        },
+        "body": "Chọn dự án, cam kết, giải ngân, rồi nhận tiền về mỗi ngày làm việc. Tiền được giữ tại các đối tác ngân hàng lưu ký.",
         "title": "Từ dự án đến hoàn trả."
       },
       "riskRate": {
-        "body": "Mỗi doanh nghiệp có một điểm doanh nghiệp tham khảo, dựa trên doanh thu đã xác minh, chi phí, hành vi tín dụng và ngành nghề. Điểm số quyết định lãi suất: doanh nghiệp vững trả gần mức ngân hàng, doanh nghiệp rủi ro hơn trả cao hơn để phản ánh rủi ro đó.",
-        "title": "Doanh nghiệp càng vững, lãi suất càng thấp."
+        "body": "Doanh nghiệp càng vững, lãi suất càng thấp.",
+        "title": "Rủi ro quyết định lãi suất."
       }
     },
     "sme": {
       "assessment": {
-        "body": "Điểm doanh nghiệp tham khảo dựa trên bốn nhóm: độ ổn định và tăng trưởng doanh thu, chất lượng chi phí, hành vi tín dụng và triển vọng ngành. Dữ liệu lấy từ hồ sơ thuế và hóa đơn điện tử bạn đã có sẵn.",
-        "title": "Chúng tôi nhìn vào cách doanh nghiệp vận hành, không phải tài sản sở hữu."
+        "body": "Điểm doanh nghiệp tham khảo dựa trên hồ sơ thuế và hóa đơn điện tử, không dựa trên tài sản.",
+        "title": "Chúng tôi xem cách bạn kinh doanh."
       },
       "daily": {
-        "body": "Bạn trả một số tiền cố định mỗi ngày làm việc cho đến khi trả hết tổng số tiền. Tổng cộng vẫn bằng khoản trả hằng tháng, chỉ được chia đều theo ngày. Ví dụ: vay {principal}, lãi {rate}%/năm, trong {months} tháng. Tổng phải trả là {total}, tức {daily} mỗi ngày làm việc. {days} ngày làm việc cộng lại khoảng {monthlyMillions} triệu ₫, đúng bằng một kỳ trả hằng tháng.",
-        "title": "Cùng số tiền, chia nhỏ hơn."
+        "body": "Bạn trả một khoản cố định mỗi ngày làm việc. Cộng lại bằng đúng một kỳ trả hằng tháng.",
+        "title": "Cùng số tiền, chia theo ngày."
       },
       "extension": {
-        "body": "Phần thiếu hụt được đổi thành thời gian, làm tròn lên theo tuần. Số tiền trả mỗi ngày giảm cho phần còn lại của khoản vay. Lãi tính cùng mức lãi suất cho những ngày thêm, nên tổng số tiền tăng nhẹ. Bạn có thể gia hạn nhiều lần, trong giới hạn hạn tất toán cuối cùng.",
-        "title": "Trả ít hơn mỗi ngày, trong thời gian dài hơn một chút."
+        "body": "Phần hỗ trợ được đổi thành thêm thời gian. Tiền trả mỗi ngày giảm; tổng tiền tăng nhẹ do lãi của những ngày thêm.",
+        "title": "Trả ít hơn mỗi ngày, lâu hơn một chút."
       },
       "intro": {
-        "body": "Doanh thu là tài sản mạnh nhất của doanh nghiệp. FundLok biến doanh thu đã xác minh thành vốn tăng trưởng. Không cần thế chấp tài sản, và việc trả nợ bám theo cách doanh nghiệp thực sự kiếm tiền.",
-        "title": "Vốn vận hành theo doanh thu của bạn."
+        "body": "Không cần thế chấp. Trả nợ theo cách doanh nghiệp bạn kiếm tiền.",
+        "title": "Vốn theo doanh thu của bạn."
       },
       "relief": {
-        "body": "Khi ký, số tiền trả mỗi ngày được tính theo một tỷ lệ trên doanh thu trung bình của bạn. Sau khi mỗi tháng kết thúc, chúng tôi đối chiếu doanh thu đã xác minh qua hóa đơn điện tử. Nếu tỷ lệ đó trên doanh thu thực tế thấp hơn số bạn đã trả, phần chênh lệch là phần được hỗ trợ.",
-        "title": "Một tháng chậm không làm hỏng khoản vay của bạn."
+        "body": "Khi tháng kết thúc, bạn gửi doanh thu đã xác minh cho chúng tôi. Nếu tỷ lệ đã thống nhất trên doanh thu đó thấp hơn số bạn đã trả, phần chênh lệch được hỗ trợ.",
+        "title": "Tháng chậm? Gửi yêu cầu hỗ trợ."
       },
       "rules": {
         "items": {
-          "1": "Hỗ trợ được thống nhất sau khi tháng kết thúc. Trong tháng, mỗi ngày vẫn trả đủ.",
-          "2": "Trả thiếu khi chưa có gia hạn được chấp thuận sẽ tính là trễ hạn, với lãi chậm trả bằng 150% lãi suất trên khoản quá hạn. Hãy liên hệ chúng tôi trước; chỉ cần trễ một ngày, chúng tôi sẽ chủ động hỏi thăm.",
-          "3": "Mỗi khoản vay có hạn tất toán cuối cùng, cố định từ ngày ký, khi mọi khoản còn lại đến hạn thanh toán đầy đủ."
+          "1": "Trong tháng, mỗi ngày vẫn trả đủ.",
+          "2": "Trả thiếu khi chưa được duyệt hỗ trợ là trễ hạn, tính lãi chậm trả 150%.",
+          "3": "Mọi khoản còn lại đến hạn vào ngày tất toán cuối cùng."
         },
         "title": "Ba điều cần biết."
       }
@@ -2434,11 +2429,10 @@
       "interestRate": "Lãi suất",
       "lower": "Thấp hơn",
       "month": "Tháng {n}",
-      "monthClosed": "Tháng kết thúc, sau đó xét hỗ trợ",
+      "monthClosed": "Tháng kết thúc → bạn gửi yêu cầu hỗ trợ",
       "monthlyPayment": "Một kỳ trả hằng tháng",
       "noCollateral": "Không cần thế chấp tài sản",
       "paidEachMonth": "Số bạn đã trả",
-      "perDay": "{amount} / ngày",
       "plusWeek": "+1 tuần",
       "reinvest": "Tái đầu tư vào dự án mới",
       "reliefGap": "Phần được hỗ trợ",

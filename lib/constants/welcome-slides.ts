@@ -49,8 +49,8 @@ const INVESTOR_SLIDES: readonly WelcomeSlide[] = [
   { id: "hello" },
   { id: "disclosure" },
   { id: "riskRate" },
-  { id: "journey", items: 4 },
-  { id: "dailyBenefit", items: 4 },
+  { id: "journey" },
+  { id: "dailyBenefit", items: 3 },
   { id: "ready" },
 ];
 
@@ -70,13 +70,3 @@ export function welcomeSlideKey(
   if (id === "hello" || id === "ready") return `welcome.common.${id}`;
   return `welcome.${role === "SME" ? "sme" : "investor"}.${id}`;
 }
-
-/**
- * The worked example on the SME "daily" slide. From the repayment rules of
- * 25 Sep 2026: within the 100,000,000 VND borrower cap, a 3-month term.
- */
-export const WELCOME_DAILY_EXAMPLE = {
-  principal: 100_000_000,
-  annualRatePct: 15,
-  termMonths: 3,
-} as const;

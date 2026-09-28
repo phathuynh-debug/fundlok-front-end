@@ -84,8 +84,9 @@ test.describe("an SME arriving for the first time", () => {
     );
   });
 
-  test("explains daily repayment with the worked example", async ({ page }) => {
-    // 100,000,000 at 15%/yr over 3 months: 103,750,000 over 63 business days.
+  test("explains that daily repayment adds up to one monthly payment", async ({
+    page,
+  }) => {
     await page.goto("/dashboard");
     await page
       .getByRole("button", { name: t("welcome.common.getStarted") })
@@ -95,8 +96,19 @@ test.describe("an SME arriving for the first time", () => {
 
     const welcome = cutscreen(page);
     await expect(welcome).toContainText(t("welcome.sme.daily.title"));
-    await expect(welcome).toContainText("1.646.825");
-    await expect(welcome).toContainText("103.750.000");
+    await expect(welcome).toContainText(t("welcome.sme.daily.body"));
+  });
+
+  test("says relief is requested by the SME", async ({ page }) => {
+    // FundLok does not scan revenue each month: after a slow month the SME
+    // sends it in and asks for relief.
+    await page.goto("/dashboard");
+    await page
+      .getByRole("button", { name: t("welcome.common.getStarted") })
+      .click();
+    for (let slide = 0; slide < 3; slide += 1) await next(page);
+
+    await expect(cutscreen(page)).toContainText(t("welcome.sme.relief.body"));
   });
 
   test("says the total rises on extension and a shortfall without one is a missed payment", async ({
@@ -164,7 +176,7 @@ test.describe("an investor arriving for the first time", () => {
     for (let slide = 0; slide < 3; slide += 1) await next(page);
 
     await expect(cutscreen(page)).toContainText(
-      t("welcome.investor.dailyBenefit.items.4"),
+      t("welcome.investor.dailyBenefit.body"),
     );
   });
 
