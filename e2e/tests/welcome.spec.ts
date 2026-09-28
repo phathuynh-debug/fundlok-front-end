@@ -155,9 +155,7 @@ test.describe("an SME arriving for the first time", () => {
 test.describe("an investor arriving for the first time", () => {
   test.beforeEach(firstRun("investor"));
 
-  test("is shown what every listing discloses, including who bears the loss", async ({
-    page,
-  }) => {
+  test("is shown what every listing discloses", async ({ page }) => {
     await page.goto("/dashboard");
     await page
       .getByRole("button", { name: t("welcome.common.getStarted") })
@@ -165,7 +163,9 @@ test.describe("an investor arriving for the first time", () => {
 
     const welcome = cutscreen(page);
     await expect(welcome).toContainText(t("welcome.investor.disclosure.title"));
-    await expect(welcome).toContainText(t("welcome.visuals.discloseLoss"));
+    await expect(welcome).toContainText(
+      t("welcome.visuals.discloseMonitoring"),
+    );
   });
 
   test("is told returns are targets, not guarantees", async ({ page }) => {
@@ -176,7 +176,7 @@ test.describe("an investor arriving for the first time", () => {
     for (let slide = 0; slide < 3; slide += 1) await next(page);
 
     await expect(cutscreen(page)).toContainText(
-      t("welcome.investor.dailyBenefit.body"),
+      t("welcome.investor.dailyBenefit.note"),
     );
   });
 

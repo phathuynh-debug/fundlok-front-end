@@ -2356,12 +2356,12 @@
     },
     "investor": {
       "dailyBenefit": {
-        "body": "Lợi nhuận là mục tiêu, không phải cam kết. Bạn chịu khoản lỗ nếu doanh nghiệp không trả được.",
         "items": {
           "1": "Rủi ro giảm dần mỗi ngày.",
-          "2": "Trễ một ngày là có cảnh báo.",
-          "3": "Tái đầu tư sớm hơn."
+          "2": "Trễ một kỳ trả là có cảnh báo, giúp theo dõi khoản vay sát hơn.",
+          "3": "Tái đầu tư sớm hơn để tận dụng lãi kép."
         },
+        "note": "Lợi nhuận là mục tiêu, không phải cam kết.",
         "title": "Tiền quay về từ ngày đầu."
       },
       "disclosure": {
@@ -2414,7 +2414,7 @@
       "discloseFees": "Phí",
       "discloseFinalDate": "Hạn tất toán cuối cùng",
       "discloseFreshness": "Độ mới của dữ liệu",
-      "discloseLoss": "Nếu doanh nghiệp không trả được nợ, bạn chịu khoản lỗ",
+      "discloseMonitoring": "Theo dõi hoàn trả hằng ngày",
       "discloseRevenue": "Doanh thu đã xác minh",
       "discloseRisks": "Rủi ro tập trung và dữ liệu còn thiếu",
       "discloseScore": "Điểm doanh nghiệp tham khảo",

@@ -2356,12 +2356,12 @@
     },
     "investor": {
       "dailyBenefit": {
-        "body": "Returns are targets, not guarantees. You bear the loss if a business doesn't repay.",
         "items": {
           "1": "Your exposure shrinks every day.",
-          "2": "One missed day raises a flag.",
-          "3": "Reinvest sooner."
+          "2": "One missed payment raises a flag, for closer loan monitoring.",
+          "3": "Reinvest sooner to put compounding to work."
         },
+        "note": "Returns are targets, not guarantees.",
         "title": "Money comes back from day one."
       },
       "disclosure": {
@@ -2414,7 +2414,7 @@
       "discloseFees": "Fees",
       "discloseFinalDate": "Final settlement date",
       "discloseFreshness": "How fresh the data is",
-      "discloseLoss": "If the business doesn't repay, you bear the loss",
+      "discloseMonitoring": "Daily repayment monitoring",
       "discloseRevenue": "Verified revenue behind it",
       "discloseRisks": "Concentration risks and data gaps",
       "discloseScore": "Business reference score",

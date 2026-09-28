@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import {
-  AlertTriangle,
+  Activity,
   ArrowDown,
   ArrowUp,
   BadgeCheck,
@@ -536,6 +536,7 @@ function DisclosureVisual() {
     { icon: Wallet, label: t("welcome.visuals.discloseFees") },
     { icon: ListChecks, label: t("welcome.visuals.discloseRisks") },
     { icon: CalendarClock, label: t("welcome.visuals.discloseFinalDate") },
+    { icon: Activity, label: t("welcome.visuals.discloseMonitoring") },
   ];
   return (
     <motion.div
@@ -575,17 +576,6 @@ function DisclosureVisual() {
             </motion.span>
           </motion.div>
         ))}
-        <motion.div
-          className="mt-0.5 flex items-center gap-2.5 rounded-lg border border-amber-400/40 bg-amber-400/10 px-2.5 py-1.5"
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 + rows.length * 0.22, ease: EASE }}
-        >
-          <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-400" />
-          <span className="min-w-0 text-xs text-foreground">
-            {t("welcome.visuals.discloseLoss")}
-          </span>
-        </motion.div>
       </div>
     </motion.div>
   );
