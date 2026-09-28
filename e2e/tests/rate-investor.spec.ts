@@ -27,7 +27,12 @@ async function fillDetails(page: Page) {
   await panel(page)
     .getByLabel(t("ratePage.investor.email"))
     .fill("thu@example.com");
-  await page.getByText(t("ratePage.investor.consent")).click();
+  // Required on both forms: the team follows up by phone.
+  await panel(page)
+    .getByLabel(t("ratePage.investor.phone"))
+    .fill("0901 234 567");
+  // Scoped: the business form carries the same consent sentence.
+  await panel(page).getByText(t("ratePage.investor.consent")).click();
 }
 
 test("the SME form is the default and the investor tab is one click away", async ({

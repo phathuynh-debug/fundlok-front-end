@@ -18,6 +18,11 @@ export interface RateCalculateRequest {
     top_1_customer_share?: number | string | null; // 0 - 100
     top_3_customer_share?: number | string | null; // 0 - 100
   };
+  /** Contact for follow-up, stored with the inquiry. Required. */
+  email: string;
+  phone: string;
+  /** Must be true: storing the contact needs consent (Decree 13/2023). */
+  consent_contact: true;
   session_id?: string | null;
   /**
    * Cloudflare Turnstile. The endpoint is public, unauthenticated, and writes a
@@ -102,6 +107,10 @@ export interface RateInquiryAdminItem {
   session_id?: string | null;
   ip_address?: string | null;
   user_agent?: string | null;
+  /** Contact for follow-up; null on inquiries made before the form asked. */
+  email?: string | null;
+  phone?: string | null;
+  consented_contact_at?: string | null;
   // Breakdown & additional risk metrics
   peak_month_revenue?: number | null;
   lowest_month_revenue?: number | null;

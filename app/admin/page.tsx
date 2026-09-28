@@ -8,6 +8,7 @@ import { useAdminOverview } from "@/hooks/use-admin";
 import { isAdminRole } from "@/services/authentication.service";
 import { Loader2, Users, Briefcase, ShieldCheck } from "lucide-react";
 import { AdminPageLoader } from "./_components/AdminDirectory";
+import { RecentLeads } from "./_components/RecentLeads";
 import { useTranslations } from "@/lib/i18n";
 import { roleLabel } from "@/lib/enum-labels";
 import { CONTROL_HOVER } from "@/lib/ui-tokens";
@@ -16,7 +17,7 @@ import { cn } from "@/lib/utils";
 export default function AdminPage() {
   const { user, isLoading } = useRequireAuth();
   const router = useRouter();
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const isAdmin = !isLoading && isAdminRole(user?.role);
 
   // The overview is stats only — the users and projects tables have their own
@@ -107,6 +108,20 @@ export default function AdminPage() {
             {roleLabel(t, user.role)}
           </p>
         </div>
+      </div>
+
+      {/* Who asked for a rate on the public /rate page, with how to reach
+          them — the follow-up list, on the first screen an admin sees. */}
+      <div className="space-y-3">
+        <div>
+          <h2 className="text-lg font-semibold text-foreground">
+            {t("admin.recentLeads.title")}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {t("admin.recentLeads.subtitle")}
+          </p>
+        </div>
+        <RecentLeads enabled={isAdmin} locale={locale} t={t} />
       </div>
     </div>
   );

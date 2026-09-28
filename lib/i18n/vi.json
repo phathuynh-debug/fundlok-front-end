@@ -172,7 +172,8 @@
       "tenureStaff": "Thâm niên / Nhân sự",
       "tier": "Phân hạng",
       "viewDetails": "Chi tiết",
-      "yoyGrowth": "Tăng trưởng YoY"
+      "yoyGrowth": "Tăng trưởng YoY",
+      "contact": "Liên hệ"
     },
     "sidebar": {
       "auditLogs": "Nhật ký kiểm toán",
@@ -246,7 +247,17 @@
       "subtitle": "Quản lý người dùng nền tảng tại đây.",
       "title": "Người dùng"
     },
-    "welcome": "Chào mừng trở lại, {name}."
+    "welcome": "Chào mừng trở lại, {name}.",
+    "recentLeads": {
+      "title": "Khách hàng tiềm năng mới",
+      "subtitle": "Những người đã xem lãi suất trên trang lãi suất công khai, kèm cách liên hệ. Tất cả đều đã đồng ý để được liên hệ.",
+      "smeTitle": "Doanh nghiệp (ước tính lãi suất)",
+      "investorTitle": "Nhà đầu tư (ước tính lợi suất)",
+      "viewAll": "Xem tất cả",
+      "empty": "Chưa có khách hàng tiềm năng.",
+      "error": "Không tải được danh sách.",
+      "months": "{count} tháng"
+    }
   },
   "auth": {
     "footer": {
@@ -2032,7 +2043,10 @@
       "required": "Bắt buộc",
       "tooLarge": "Con số này có vẻ quá lớn. Hãy kiểm tra lại số chữ số.",
       "top1ExceedsTop3": "Khách hàng lớn nhất nằm trong nhóm ba khách hàng lớn nhất, nên không thể cao hơn.",
-      "worstExceedsBest": "Tháng thấp nhất không thể cao hơn tháng cao nhất."
+      "worstExceedsBest": "Tháng thấp nhất không thể cao hơn tháng cao nhất.",
+      "email": "Vui lòng nhập email hợp lệ",
+      "phone": "Số điện thoại cần có 8 đến 15 chữ số",
+      "consent": "Vui lòng đánh dấu để chúng tôi có thể liên hệ với bạn"
     },
     "errorCode": {
       "COSTS_EXCEED_REVENUE": "Chi phí của bạn bằng hoặc lớn hơn doanh thu nên chúng tôi chưa thể ước tính lãi suất. Vui lòng kiểm tra lại các số liệu chi phí.",
@@ -2047,7 +2061,7 @@
     "errorGeneric": "Chúng tôi chưa tính được lãi suất từ các số liệu này. Hãy kiểm tra lại và thử lần nữa.",
     "fixedCost": "Chi phí cố định, 12 tháng gần nhất",
     "fixedCostHint": "Tiền thuê, lương, bảo hiểm: các khoản phải trả dù có bán được hay không.",
-    "formHint": "Mọi số liệu chỉ nằm trên trình duyệt của bạn cho đến khi bấm Tính, và không có gì được lưu lại.",
+    "formHint": "Số liệu chỉ nằm trên trình duyệt của bạn cho đến khi bấm Tính. Khi bấm Tính, số liệu và thông tin liên hệ được lưu để FundLok liên hệ tư vấn cho bạn.",
     "formTitle": "Doanh nghiệp của bạn",
     "growthLabel": "Tăng trưởng doanh thu",
     "industry": "Ngành nghề",
@@ -2156,7 +2170,12 @@
     "top1": "Khách hàng lớn nhất, % doanh thu",
     "top3": "Top 3 khách hàng, % doanh thu",
     "variableCost": "Chi phí biến đổi khác, 12 tháng gần nhất",
-    "worstMonth": "Doanh thu tháng thấp nhất"
+    "worstMonth": "Doanh thu tháng thấp nhất",
+    "contactLabel": "Thông tin liên hệ",
+    "email": "Email",
+    "phone": "Số điện thoại / Zalo",
+    "emailPlaceholder": "ban@congty.vn",
+    "consent": "Tôi đồng ý để FundLok liên hệ về yêu cầu này và lưu các thông tin trên cho mục đích đó."
   },
   "security": {
     "changePassword": {

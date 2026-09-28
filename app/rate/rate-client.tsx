@@ -18,6 +18,8 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NumericInput } from "@/components/ui/numeric-input";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { AmountInput, parseAmount } from "./amount-input";
 import { InvestorPanel } from "./investor-panel";
 import {
@@ -93,6 +95,11 @@ const LOAN_MAX = LOAN_MAX_VND;
 type Values = Record<string, string>;
 type Errors = Record<string, string>;
 
+// Mirrors the backend's validate_contact_phone: 8-15 digits, with the
+// separators people actually type. Same rule as the investor form.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_RE = /^[0-9+()\s.-]{8,20}$/;
+
 /**
  * Per-field validation, keyed by field name so each message renders under the
  * input that caused it.
@@ -119,6 +126,16 @@ function validate(v: Values, t: (key: string) => string): Errors {
   ]) {
     if (!(v[key] ?? "").trim()) errors[key] = t(e("required"));
   }
+
+  // Contact, so the team can follow up on the estimate.
+  const email = (v.email ?? "").trim();
+  if (!email) errors.email = t(e("required"));
+  else if (!EMAIL_RE.test(email)) errors.email = t(e("email"));
+  const phone = (v.phone ?? "").trim();
+  const digits = phone.replace(/\D/g, "").length;
+  if (!phone) errors.phone = t(e("required"));
+  else if (!PHONE_RE.test(phone) || digits < 8 || digits > 15)
+    errors.phone = t(e("phone"));
 
   const months = num("operatingMonths");
   if (!errors.operatingMonths && (months === null || months < 1)) {
@@ -298,6 +315,11 @@ export default function RateClient({
   const [worstMonth, setWorstMonth] = useState("");
   const [top1, setTop1] = useState("");
   const [top3, setTop3] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  // Decree 13/2023: storing an email and phone needs the visitor's consent,
+  // and the backend refuses the request without it.
+  const [consent, setConsent] = useState(false);
 
   // Cloudflare Turnstile. /rates/calculate is public, unauthenticated, and
   // inserts a rate_inquiries row per call, so without this the form is an open
@@ -310,9 +332,6 @@ export default function RateClient({
     reset: resetTurnstile,
   } = useTurnstile();
 
-  // Which fields the visitor has left, plus whether they have tried to submit.
-  // Errors stay hidden until one of those is true: flagging "required" on a
-  // field nobody has reached yet is nagging, not help.
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
 
@@ -330,9 +349,15 @@ export default function RateClient({
     worstMonth,
     top1,
     top3,
+    email,
+    phone,
   };
 
   const errors = validate(values, t);
+  const consentError =
+    (submitAttempted || touched.consent) && !consent
+      ? t("ratePage.error.consent")
+      : undefined;
   const showError = (key: string) =>
     (submitAttempted || touched[key]) && errors[key] ? errors[key] : undefined;
   const industryError =
@@ -341,7 +366,10 @@ export default function RateClient({
       : undefined;
 
   const canSubmit =
-    Object.keys(errors).length === 0 && !!industry.trim() && !!turnstileToken;
+    Object.keys(errors).length === 0 &&
+    !!industry.trim() &&
+    consent &&
+    !!turnstileToken;
 
   // Brings the result panel into view once a band (or an error) has rendered —
   // the mobile case, where the panel sits a full screen below the button that
@@ -401,6 +429,9 @@ export default function RateClient({
         top_1_customer_share: parseAmount(top1),
         top_3_customer_share: parseAmount(top3),
       },
+      email: email.trim(),
+      phone: phone.trim(),
+      consent_contact: true,
       session_id: getClientSessionId(),
       turnstile_token: turnstileToken,
     });
@@ -608,6 +639,62 @@ export default function RateClient({
                 </p>
               </div>
 
+              {/* Contact, so the team can follow up on the estimate. Same
+                  fields and rule as the investor form. */}
+              <fieldset className="space-y-3 rounded-xl border border-border/70 bg-muted/20 p-4">
+                <legend className="px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  {t("ratePage.contactLabel")}
+                </legend>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <label htmlFor="sme-email" className="text-sm font-medium">
+                      {t("ratePage.email")}{" "}
+                      <span className="text-xs text-destructive">*</span>
+                    </label>
+                    <Input
+                      id="sme-email"
+                      type="email"
+                      autoComplete="email"
+                      maxLength={254}
+                      value={email}
+                      placeholder={t("ratePage.emailPlaceholder")}
+                      aria-invalid={Boolean(showError("email"))}
+                      onChange={(e) => setEmail(e.target.value)}
+                      onBlur={() => markTouched("email")}
+                    />
+                    {showError("email") && (
+                      <p className="flex items-start gap-1.5 text-xs leading-relaxed text-destructive">
+                        <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" />
+                        <span>{showError("email")}</span>
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-1.5">
+                    <label htmlFor="sme-phone" className="text-sm font-medium">
+                      {t("ratePage.phone")}{" "}
+                      <span className="text-xs text-destructive">*</span>
+                    </label>
+                    <Input
+                      id="sme-phone"
+                      type="tel"
+                      autoComplete="tel"
+                      maxLength={20}
+                      value={phone}
+                      placeholder="09xx xxx xxx"
+                      aria-invalid={Boolean(showError("phone"))}
+                      onChange={(e) => setPhone(e.target.value)}
+                      onBlur={() => markTouched("phone")}
+                    />
+                    {showError("phone") && (
+                      <p className="flex items-start gap-1.5 text-xs leading-relaxed text-destructive">
+                        <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" />
+                        <span>{showError("phone")}</span>
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </fieldset>
+
               <div className="space-y-1.5">
                 <label className="flex items-baseline gap-2 text-sm font-medium">
                   {t("ratePage.industry")}
@@ -813,6 +900,28 @@ export default function RateClient({
                     placeholder: "41",
                   })}
                 </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="flex cursor-pointer items-start gap-2 text-sm leading-relaxed">
+                  <Checkbox
+                    id="sme-consent"
+                    className="mt-0.5"
+                    checked={consent}
+                    aria-invalid={Boolean(consentError)}
+                    onCheckedChange={(value) => {
+                      setConsent(value === true);
+                      markTouched("consent");
+                    }}
+                  />
+                  <span>{t("ratePage.consent")}</span>
+                </label>
+                {consentError && (
+                  <p className="flex items-start gap-1.5 text-xs leading-relaxed text-destructive">
+                    <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" />
+                    <span>{consentError}</span>
+                  </p>
+                )}
               </div>
 
               {process.env.NEXT_PUBLIC_DISABLE_TURNSTILE !== "true" && (

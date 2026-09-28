@@ -172,7 +172,8 @@
       "tenureStaff": "Tenure / Staff",
       "tier": "Risk Tier",
       "viewDetails": "Details",
-      "yoyGrowth": "YoY Growth"
+      "yoyGrowth": "YoY Growth",
+      "contact": "Contact"
     },
     "sidebar": {
       "auditLogs": "Audit logs",
@@ -246,7 +247,17 @@
       "subtitle": "Manage platform users from here.",
       "title": "Users"
     },
-    "welcome": "Welcome back, {name}."
+    "welcome": "Welcome back, {name}.",
+    "recentLeads": {
+      "title": "Recent leads",
+      "subtitle": "People who asked for a rate on the public rate page, with how to reach them. All gave consent to be contacted.",
+      "smeTitle": "Businesses (rate estimates)",
+      "investorTitle": "Investors (yield estimates)",
+      "viewAll": "View all",
+      "empty": "No leads yet.",
+      "error": "Could not load leads.",
+      "months": "{count} mo"
+    }
   },
   "auth": {
     "footer": {
@@ -2032,7 +2043,10 @@
       "required": "Required",
       "tooLarge": "That looks too large. Check the number of digits.",
       "top1ExceedsTop3": "Your largest customer is part of your top three, so this cannot be higher.",
-      "worstExceedsBest": "Your worst month cannot be higher than your best month."
+      "worstExceedsBest": "Your worst month cannot be higher than your best month.",
+      "email": "Enter a valid email address",
+      "phone": "Enter a phone number of 8 to 15 digits",
+      "consent": "Tick this box so we can contact you"
     },
     "errorCode": {
       "COSTS_EXCEED_REVENUE": "Your costs are equal to or greater than your revenue, so we cannot estimate a rate. Check the cost figures and try again.",
@@ -2047,7 +2061,7 @@
     "errorGeneric": "We could not work out a rate from these figures. Check the amounts and try again.",
     "fixedCost": "Fixed costs, last 12 months",
     "fixedCostHint": "Rent, salaries, insurance: what you pay whether you sell or not.",
-    "formHint": "Every figure stays in your browser until you press Calculate, and nothing is saved.",
+    "formHint": "Your figures stay in your browser until you press Calculate. When you do, the figures and your contact details are saved so FundLok can follow up with you.",
     "formTitle": "Your business",
     "growthLabel": "YoY Revenue Growth",
     "industry": "Industry",
@@ -2156,7 +2170,12 @@
     "top1": "Largest customer, % of revenue",
     "top3": "Top 3 customers, % of revenue",
     "variableCost": "Other variable costs, last 12 months",
-    "worstMonth": "Worst month's revenue"
+    "worstMonth": "Worst month's revenue",
+    "contactLabel": "Your contact details",
+    "email": "Email",
+    "phone": "Phone / Zalo",
+    "emailPlaceholder": "you@company.vn",
+    "consent": "FundLok may contact me about this enquiry and keep these details for that purpose."
   },
   "security": {
     "changePassword": {

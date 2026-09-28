@@ -69,6 +69,10 @@ export function RateInquiriesDirectory() {
           item.industry_display.toLowerCase().includes(q)) ||
         (item.industry && item.industry.toLowerCase().includes(q)) ||
         (item.session_id && item.session_id.toLowerCase().includes(q)) ||
+        (item.email && item.email.toLowerCase().includes(q)) ||
+        (item.phone &&
+          /\d/.test(q) &&
+          item.phone.replace(/\D/g, "").includes(q.replace(/\D/g, ""))) ||
         (item.tier_display && item.tier_display.toLowerCase().includes(q)),
     );
   }, [data?.items, searchQuery]);
@@ -103,6 +107,37 @@ export function RateInquiriesDirectory() {
       cellClassName:
         "whitespace-nowrap font-mono text-xs text-muted-foreground",
       render: (item) => item.created_at_formatted || item.created_at || "—",
+    },
+    {
+      key: "contact",
+      header: t("admin.ratesTable.contact"),
+      cellClassName: "text-xs",
+      // Who to call back. Inquiries from before the form asked have none.
+      render: (item) =>
+        item.email || item.phone ? (
+          <div className="space-y-0.5">
+            {item.email && (
+              <a
+                href={`mailto:${item.email}`}
+                className="block truncate text-foreground hover:underline"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {item.email}
+              </a>
+            )}
+            {item.phone && (
+              <a
+                href={`tel:${item.phone.replace(/[^0-9+]/g, "")}`}
+                className="block whitespace-nowrap font-mono text-muted-foreground hover:underline"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {item.phone}
+              </a>
+            )}
+          </div>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
     },
     {
       key: "industry",

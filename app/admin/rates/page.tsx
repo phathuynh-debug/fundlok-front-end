@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { isAdminRole } from "@/services/authentication.service";
 import { useTranslations } from "@/lib/i18n";
@@ -36,20 +36,33 @@ export default function AdminRatesPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="sme" className="gap-6">
-        <TabsList>
-          <TabsTrigger value="sme">{t("admin.ratesPage.tabSme")}</TabsTrigger>
-          <TabsTrigger value="investor">
-            {t("admin.ratesPage.tabInvestor")}
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="sme">
-          <RateInquiriesDirectory />
-        </TabsContent>
-        <TabsContent value="investor">
-          <InvestorLeadsDirectory />
-        </TabsContent>
-      </Tabs>
+      <Suspense fallback={null}>
+        <RatesTabs />
+      </Suspense>
     </div>
+  );
+}
+
+// `?tab=investor` opens the investor leads (the overview links here).
+// useSearchParams needs the Suspense boundary above in the App Router.
+function RatesTabs() {
+  const { t } = useTranslations();
+  const initial =
+    useSearchParams().get("tab") === "investor" ? "investor" : "sme";
+  return (
+    <Tabs defaultValue={initial} className="gap-6">
+      <TabsList>
+        <TabsTrigger value="sme">{t("admin.ratesPage.tabSme")}</TabsTrigger>
+        <TabsTrigger value="investor">
+          {t("admin.ratesPage.tabInvestor")}
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="sme">
+        <RateInquiriesDirectory />
+      </TabsContent>
+      <TabsContent value="investor">
+        <InvestorLeadsDirectory />
+      </TabsContent>
+    </Tabs>
   );
 }

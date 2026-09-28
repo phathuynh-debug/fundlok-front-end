@@ -29,6 +29,39 @@ test.describe("as an admin", () => {
     ).toBeVisible();
   });
 
+  test("the overview lists recent rate-page leads with how to reach them", async ({
+    page,
+  }) => {
+    await page.goto("/admin");
+
+    const sme = page.getByTestId("recent-sme-leads");
+    await expect(sme).toContainText(t("admin.recentLeads.smeTitle"));
+    await expect(
+      sme.getByRole("link", { name: "owner@retail.vn" }),
+    ).toHaveAttribute("href", "mailto:owner@retail.vn");
+    await expect(
+      sme.getByRole("link", { name: "0912 345 678" }),
+    ).toHaveAttribute("href", "tel:0912345678");
+
+    const investors = page.getByTestId("recent-investor-leads");
+    await expect(investors).toContainText("Trần Thị Nhà Đầu Tư");
+    await expect(
+      investors.getByRole("link", { name: "investor.lead@example.com" }),
+    ).toBeVisible();
+    await expect(
+      investors.getByRole("link", { name: "0901 234 567" }),
+    ).toBeVisible();
+
+    // "View all" opens the matching tab of the full lists.
+    await investors
+      .getByRole("link", { name: t("admin.recentLeads.viewAll") })
+      .click();
+    await expect(page).toHaveURL(/\/admin\/rates\?tab=investor/);
+    await expect(
+      page.getByRole("tab", { name: t("admin.ratesPage.tabInvestor") }),
+    ).toHaveAttribute("aria-selected", "true");
+  });
+
   test("the users page lists users from the API", async ({ page }) => {
     await page.goto("/admin/users");
 

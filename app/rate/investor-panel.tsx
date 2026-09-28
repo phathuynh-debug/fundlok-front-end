@@ -198,7 +198,8 @@ function InvestorCalculator({ getSessionId }: { getSessionId: () => string }) {
   if (name.trim().length < 2) errors.name = t("ratePage.investor.error.name");
   if (!EMAIL_RE.test(email.trim()))
     errors.email = t("ratePage.investor.error.email");
-  if (phone.trim()) {
+  // Required: the team follows up by phone, on both rate-page forms.
+  {
     const digits = phone.replace(/\D/g, "").length;
     if (!PHONE_RE.test(phone.trim()) || digits < 8 || digits > 15)
       errors.phone = t("ratePage.investor.error.phone");
@@ -257,7 +258,7 @@ function InvestorCalculator({ getSessionId }: { getSessionId: () => string }) {
         ...choices,
         full_name: name.trim(),
         email: email.trim(),
-        phone: phone.trim() || null,
+        phone: phone.trim(),
         locale: locale === "vi" ? "vi" : "en",
         acknowledged_illustrative: true,
         consent_contact: true,
@@ -382,9 +383,7 @@ function InvestorCalculator({ getSessionId }: { getSessionId: () => string }) {
             <div className="space-y-1.5">
               <label htmlFor="inv-phone" className="text-sm font-medium">
                 {t("ratePage.investor.phone")}{" "}
-                <span className="text-xs font-normal text-muted-foreground">
-                  {t("ratePage.investor.optional")}
-                </span>
+                <span className="text-xs text-destructive">*</span>
               </label>
               <Input
                 id="inv-phone"

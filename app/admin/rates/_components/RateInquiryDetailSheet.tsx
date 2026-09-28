@@ -126,6 +126,26 @@ export function RateInquiryDetailSheet({
               </>
             )}
           </SheetDescription>
+          {(inquiry.email || inquiry.phone) && (
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-1 text-sm">
+              {inquiry.email && (
+                <a
+                  href={`mailto:${inquiry.email}`}
+                  className="text-foreground hover:underline"
+                >
+                  {inquiry.email}
+                </a>
+              )}
+              {inquiry.phone && (
+                <a
+                  href={`tel:${inquiry.phone.replace(/[^0-9+]/g, "")}`}
+                  className="font-mono text-muted-foreground hover:underline"
+                >
+                  {inquiry.phone}
+                </a>
+              )}
+            </div>
+          )}
         </SheetHeader>
 
         <div className="space-y-6 pt-5">
