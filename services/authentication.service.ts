@@ -60,7 +60,9 @@ export interface TotpChallenge {
 
 export type LoginResult = User | TotpChallenge;
 
-export function isTotpChallenge(result: LoginResult): result is TotpChallenge {
+export function isTotpChallenge(
+  result: LoginResult | OAuthLoginResult,
+): result is TotpChallenge {
   return (result as TotpChallenge)?.totp_required === true;
 }
 
@@ -125,6 +127,10 @@ export interface OAuthTokenResponse {
   access_token: string;
   refresh_token: string;
 }
+
+// Same rule as LoginResult: an account with 2FA enabled gets a challenge from
+// the social sign-in too, not a session. Narrow with isTotpChallenge().
+export type OAuthLoginResult = OAuthTokenResponse | TotpChallenge;
 
 export interface ForgotPasswordPayload {
   email: string;
@@ -240,10 +246,7 @@ export const authenticationService = {
   },
 
   oauthLogin(payload: OAuthLoginPayload) {
-    return apiClient.post<OAuthTokenResponse>(
-      AUTH_ENDPOINTS.oauthLogin,
-      payload,
-    );
+    return apiClient.post<OAuthLoginResult>(AUTH_ENDPOINTS.oauthLogin, payload);
   },
 
   // Returns the created User. No tokens — caller redirects to login.

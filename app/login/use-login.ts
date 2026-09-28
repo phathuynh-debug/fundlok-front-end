@@ -11,7 +11,7 @@ import {
   type LoginPayload,
   type LoginResult,
   type OAuthLoginPayload,
-  type OAuthTokenResponse,
+  type OAuthLoginResult,
   type User,
 } from "@/services/authentication.service";
 import { usersService } from "@/services/users.service";
@@ -105,12 +105,19 @@ export function useLogin() {
   });
 
   const googleLogin = useMutation<
-    OAuthTokenResponse,
+    OAuthLoginResult,
     ApiError,
     OAuthLoginPayload
   >({
     mutationFn: (payload) => authenticationService.oauthLogin(payload),
-    onSuccess: async () => {
+    onSuccess: async (result) => {
+      // A 2FA account gets the same code step as the password form. remember is
+      // true because a social sign-in always issues persistent cookies (the
+      // backend's choice — there is no "keep me signed in" box on that path).
+      if (isTotpChallenge(result)) {
+        setChallenge({ token: result.challenge_token, remember: true });
+        return;
+      }
       const current = await hydrateCurrentUser(queryClient);
       router.push(landingRouteFor(current));
     },
