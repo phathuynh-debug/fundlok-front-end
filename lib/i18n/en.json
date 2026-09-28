@@ -2383,8 +2383,8 @@
         "title": "We look at how you run your business."
       },
       "daily": {
-        "body": "A fixed amount each business day. Together it equals one monthly payment.",
-        "title": "Same money, paid daily."
+        "body": "Your monthly total is exactly what you'd pay monthly. You don't pay a single đồng more; each payment is just lighter.",
+        "title": "Same money, just split by day."
       },
       "extension": {
         "body": "Relief becomes extra time. Your daily amount drops; the total rises slightly from interest on the added days.",
@@ -2401,7 +2401,7 @@
       "rules": {
         "items": {
           "1": "Within a month, every day is paid in full.",
-          "2": "Paying less without approved relief is a missed payment, with 150% late interest.",
+          "2": "Paying less without approval counts as a missed payment, so contact FundLok and we'll help.",
           "3": "Anything left falls due on the final settlement date."
         },
         "title": "Three things to know."
@@ -2410,7 +2410,7 @@
     "visuals": {
       "atRisk": "Still at risk",
       "businessScore": "Business reference score",
-      "dailyPayments": "{days} business days",
+      "dailyPayments": "Paying daily · {days} business days",
       "discloseFees": "Fees",
       "discloseFinalDate": "Final settlement date",
       "discloseFreshness": "How fresh the data is",
@@ -2430,13 +2430,14 @@
       "lower": "Lower",
       "month": "Month {n}",
       "monthClosed": "Month closes → you request relief",
-      "monthlyPayment": "One monthly payment",
+      "monthlyPayment": "Paying monthly",
       "noCollateral": "No property to pledge",
       "paidEachMonth": "What you paid",
       "plusWeek": "+1 week",
       "reinvest": "Reinvest in new projects",
       "reliefGap": "Relief",
       "returned": "Returned to you",
+      "sameTotal": "Same total each month",
       "shareOfRevenue": "Agreed share of actual revenue",
       "stepBrowse": "Browse",
       "stepCommit": "Commit",

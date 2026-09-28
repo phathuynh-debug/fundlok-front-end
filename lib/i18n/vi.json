@@ -2383,8 +2383,8 @@
         "title": "Chúng tôi xem cách bạn kinh doanh."
       },
       "daily": {
-        "body": "Bạn trả một khoản cố định mỗi ngày làm việc. Cộng lại bằng đúng một kỳ trả hằng tháng.",
-        "title": "Cùng số tiền, chia theo ngày."
+        "body": "Tổng tiền mỗi tháng giống hệt trả theo tháng. Bạn không trả thêm đồng nào, chỉ là mỗi lần trả nhẹ hơn.",
+        "title": "Cùng một số tiền, chỉ chia nhỏ theo ngày."
       },
       "extension": {
         "body": "Phần hỗ trợ được đổi thành thêm thời gian. Tiền trả mỗi ngày giảm; tổng tiền tăng nhẹ do lãi của những ngày thêm.",
@@ -2401,7 +2401,7 @@
       "rules": {
         "items": {
           "1": "Trong tháng, mỗi ngày vẫn trả đủ.",
-          "2": "Trả thiếu khi chưa được duyệt hỗ trợ là trễ hạn, tính lãi chậm trả 150%.",
+          "2": "Trả thiếu khi chưa được duyệt được tính là trễ hạn, vì vậy hãy liên hệ với FundLok để hỗ trợ bạn",
           "3": "Mọi khoản còn lại đến hạn vào ngày tất toán cuối cùng."
         },
         "title": "Ba điều cần biết."
@@ -2410,7 +2410,7 @@
     "visuals": {
       "atRisk": "Vốn còn chịu rủi ro",
       "businessScore": "Điểm doanh nghiệp tham khảo",
-      "dailyPayments": "{days} ngày làm việc",
+      "dailyPayments": "Trả theo ngày · {days} ngày làm việc",
       "discloseFees": "Phí",
       "discloseFinalDate": "Hạn tất toán cuối cùng",
       "discloseFreshness": "Độ mới của dữ liệu",
@@ -2430,13 +2430,14 @@
       "lower": "Thấp hơn",
       "month": "Tháng {n}",
       "monthClosed": "Tháng kết thúc → bạn gửi yêu cầu hỗ trợ",
-      "monthlyPayment": "Một kỳ trả hằng tháng",
+      "monthlyPayment": "Trả theo tháng",
       "noCollateral": "Không cần thế chấp tài sản",
       "paidEachMonth": "Số bạn đã trả",
       "plusWeek": "+1 tuần",
       "reinvest": "Tái đầu tư vào dự án mới",
       "reliefGap": "Phần được hỗ trợ",
       "returned": "Đã quay về với bạn",
+      "sameTotal": "Tổng mỗi tháng như nhau",
       "shareOfRevenue": "Tỷ lệ đã thống nhất × doanh thu thực tế",
       "stepBrowse": "Xem dự án",
       "stepCommit": "Cam kết",

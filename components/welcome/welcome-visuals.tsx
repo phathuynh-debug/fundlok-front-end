@@ -224,48 +224,63 @@ function AssessmentVisual() {
 
 function DailyVisual() {
   const { t } = useTranslations();
+  // The two bars are the same width, height and colour on purpose: one
+  // monthly payment and a month of daily payments are the same money. The
+  // daily bar is simply the monthly one cut into business days.
   return (
-    <div className="flex h-full w-full max-w-lg flex-col justify-center gap-3">
+    <div className="flex h-full w-full max-w-lg flex-col justify-center gap-2 text-left">
       <div className="flex flex-col gap-1.5">
-        <Label className="text-left">
+        <Label className="text-foreground">
           {t("welcome.visuals.monthlyPayment")}
         </Label>
         <motion.div
-          className="h-9 w-full rounded-lg border border-border bg-muted sm:h-11"
+          className="h-10 w-full rounded-lg bg-brand sm:h-12"
           style={{ originX: 0 }}
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
-          transition={{ duration: 0.7, ease: EASE }}
+          transition={{ duration: 0.8, ease: EASE }}
         />
       </div>
 
       <motion.div
-        className="text-center text-lg font-bold text-brand"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.8 }}
+        className="text-center text-4xl font-bold leading-none text-brand sm:text-5xl"
+        initial={{ opacity: 0, scale: 0.6 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.8, type: "spring", stiffness: 260, damping: 18 }}
       >
         =
       </motion.div>
 
       <div className="flex flex-col gap-1.5">
-        <Label className="text-left">
+        <Label className="text-foreground">
           {t("welcome.visuals.dailyPayments", {
             days: BUSINESS_DAYS_PER_PERIOD,
           })}
         </Label>
-        <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
+        <div className="flex h-10 w-full gap-0.5 sm:h-12 sm:gap-1">
           {Array.from({ length: BUSINESS_DAYS_PER_PERIOD }, (_, index) => (
             <motion.div
               key={index}
-              className="h-5 rounded bg-brand sm:h-6"
-              initial={{ opacity: 0, scale: 0.4 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 1 + index * 0.05, ease: EASE }}
+              className="h-full flex-1 rounded-[3px] bg-brand"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.1 + index * 0.04, ease: EASE }}
             />
           ))}
         </div>
       </div>
+
+      <motion.div
+        className="mt-2 inline-flex items-center gap-2 self-center rounded-full border border-brand/60 bg-brand/10 px-3 py-1.5"
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 2.1, ease: EASE }}
+      >
+        <Check className="h-4 w-4 text-brand" />
+        <Label className="text-foreground">
+          {t("welcome.visuals.sameTotal")}
+        </Label>
+      </motion.div>
     </div>
   );
 }
