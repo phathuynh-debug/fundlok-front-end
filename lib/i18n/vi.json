@@ -2330,5 +2330,124 @@
     "tableOfContents": "Mục lục điều khoản",
     "title": "Điều khoản và Điều kiện sử dụng dịch vụ FundLok",
     "version": "Phiên bản: Tháng 9 năm 2026"
+  },
+  "welcome": {
+    "common": {
+      "back": "Quay lại",
+      "close": "Đóng",
+      "getStarted": "Bắt đầu",
+      "goToSlide": "Đến trang {n}",
+      "hello": {
+        "title": "Chào mừng đến với FundLok"
+      },
+      "language": "Ngôn ngữ",
+      "languages": {
+        "en": "English",
+        "vi": "Tiếng Việt"
+      },
+      "next": "Tiếp",
+      "progress": "Trang {current} / {total}",
+      "ready": {
+        "body": "Chúc bạn trải nghiệm FundLok thật tốt.",
+        "cta": "Vào bảng điều khiển",
+        "title": "Sẵn sàng bắt đầu?"
+      },
+      "replay": "Cách FundLok vận hành"
+    },
+    "investor": {
+      "dailyBenefit": {
+        "body": "Lợi nhuận là mục tiêu, không phải cam kết. Bạn chịu khoản lỗ nếu doanh nghiệp không trả được.",
+        "items": {
+          "1": "Rủi ro giảm dần mỗi ngày.",
+          "2": "Trễ một ngày là có cảnh báo.",
+          "3": "Tái đầu tư sớm hơn."
+        },
+        "title": "Tiền quay về từ ngày đầu."
+      },
+      "disclosure": {
+        "body": "Mỗi dự án hiển thị đầy đủ thông tin trước khi bạn quyết định.",
+        "title": "Cấp vốn cho doanh nghiệp thật."
+      },
+      "journey": {
+        "body": "Chọn dự án, cam kết, giải ngân, rồi nhận tiền về mỗi ngày làm việc. Tiền được giữ tại các đối tác ngân hàng lưu ký.",
+        "title": "Từ dự án đến hoàn trả."
+      },
+      "riskRate": {
+        "body": "Doanh nghiệp càng vững, lãi suất càng thấp.",
+        "title": "Rủi ro quyết định lãi suất."
+      }
+    },
+    "sme": {
+      "assessment": {
+        "body": "Điểm doanh nghiệp tham khảo dựa trên hồ sơ thuế và hóa đơn điện tử, không dựa trên tài sản.",
+        "title": "Chúng tôi xem cách bạn kinh doanh."
+      },
+      "daily": {
+        "body": "Tổng tiền mỗi tháng giống hệt trả theo tháng. Bạn không trả thêm đồng nào, chỉ là mỗi lần trả nhẹ hơn.",
+        "title": "Cùng một số tiền, chỉ chia nhỏ theo ngày."
+      },
+      "extension": {
+        "body": "Phần hỗ trợ được đổi thành thêm thời gian. Tiền trả mỗi ngày giảm; tổng tiền tăng nhẹ do lãi của những ngày thêm.",
+        "title": "Trả ít hơn mỗi ngày, lâu hơn một chút."
+      },
+      "intro": {
+        "body": "Không cần thế chấp. Trả nợ theo cách doanh nghiệp bạn kiếm tiền.",
+        "title": "Vốn theo doanh thu của bạn."
+      },
+      "relief": {
+        "body": "Khi tháng kết thúc, bạn gửi doanh thu đã xác minh cho chúng tôi. Nếu tỷ lệ đã thống nhất trên doanh thu đó thấp hơn số bạn đã trả, phần chênh lệch được hỗ trợ.",
+        "title": "Tháng chậm? Gửi yêu cầu hỗ trợ."
+      },
+      "rules": {
+        "items": {
+          "1": "Trong tháng, mỗi ngày vẫn trả đủ.",
+          "2": "Trả thiếu khi chưa được duyệt được tính là trễ hạn, vì vậy hãy liên hệ với FundLok để hỗ trợ bạn",
+          "3": "Mọi khoản còn lại đến hạn vào ngày tất toán cuối cùng."
+        },
+        "title": "Ba điều cần biết."
+      }
+    },
+    "visuals": {
+      "atRisk": "Vốn còn chịu rủi ro",
+      "businessScore": "Điểm doanh nghiệp tham khảo",
+      "dailyPayments": "Trả theo ngày · {days} ngày làm việc",
+      "discloseFees": "Phí",
+      "discloseFinalDate": "Hạn tất toán cuối cùng",
+      "discloseFreshness": "Độ mới của dữ liệu",
+      "discloseLoss": "Nếu doanh nghiệp không trả được nợ, bạn chịu khoản lỗ",
+      "discloseRevenue": "Doanh thu đã xác minh",
+      "discloseRisks": "Rủi ro tập trung và dữ liệu còn thiếu",
+      "discloseScore": "Điểm doanh nghiệp tham khảo",
+      "eachDay": "Mỗi ngày",
+      "factorCosts": "Chất lượng chi phí",
+      "factorCredit": "Hành vi tín dụng",
+      "factorRevenue": "Ổn định & tăng trưởng doanh thu",
+      "factorSector": "Triển vọng ngành",
+      "finalDate": "Hạn tất toán cuối cùng",
+      "growthCapital": "Vốn tăng trưởng",
+      "higher": "Cao hơn",
+      "interestRate": "Lãi suất",
+      "lower": "Thấp hơn",
+      "month": "Tháng {n}",
+      "monthClosed": "Tháng kết thúc → bạn gửi yêu cầu hỗ trợ",
+      "monthlyPayment": "Trả theo tháng",
+      "noCollateral": "Không cần thế chấp tài sản",
+      "paidEachMonth": "Số bạn đã trả",
+      "plusWeek": "+1 tuần",
+      "reinvest": "Tái đầu tư vào dự án mới",
+      "reliefGap": "Phần được hỗ trợ",
+      "returned": "Đã quay về với bạn",
+      "sameTotal": "Tổng mỗi tháng như nhau",
+      "shareOfRevenue": "Tỷ lệ đã thống nhất × doanh thu thực tế",
+      "stepBrowse": "Xem dự án",
+      "stepCommit": "Cam kết",
+      "stepDisburse": "Giải ngân",
+      "stepRepay": "Hoàn trả hằng ngày",
+      "stronger": "Vững hơn",
+      "today": "Hôm nay",
+      "total": "Tổng",
+      "verifiedRevenue": "Doanh thu đã xác minh",
+      "weaker": "Yếu hơn"
+    }
   }
 }

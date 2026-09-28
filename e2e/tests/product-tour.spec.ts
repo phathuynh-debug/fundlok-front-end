@@ -2,6 +2,7 @@ import { test, expect } from "@playwright/test";
 
 import { signInAs } from "../support/auth";
 import { t } from "../support/i18n";
+import { finishWelcome } from "../support/welcome";
 
 // The first-run walkthrough. Unlike every other spec these sign in WITHOUT
 // suppressing the tour, because the tour is the thing under test.
@@ -10,6 +11,10 @@ import { t } from "../support/i18n";
 // not use the same product, and showing one the other's guidance would breach
 // least-privilege by role (fundlok-domain §9) as surely as showing them the
 // other's data.
+//
+// On a first run the welcome cutscreen plays first and hands over to the tour
+// from its last slide, so first-run specs step through it (welcome.spec.ts
+// covers the cutscreen itself).
 
 const firstRun =
   (user: "sme" | "smeNoProject" | "investor") =>
@@ -23,6 +28,7 @@ test.describe("an SME arriving for the first time", () => {
     page,
   }) => {
     await page.goto("/dashboard");
+    await finishWelcome(page, "SME");
 
     const tour = page.getByRole("dialog");
     await expect(tour).toBeVisible();
@@ -40,6 +46,7 @@ test.describe("an SME arriving for the first time", () => {
     // Handbook §5 forbids saying approval is certain. The step that invites an
     // SME to apply is exactly where that promise would creep in.
     await page.goto("/dashboard");
+    await finishWelcome(page, "SME");
 
     const tour = page.getByRole("dialog");
     await tour.getByRole("button", { name: t("dashboard.tour.next") }).click();
@@ -50,6 +57,7 @@ test.describe("an SME arriving for the first time", () => {
 
   test("never shows the investor walkthrough", async ({ page }) => {
     await page.goto("/dashboard");
+    await finishWelcome(page, "SME");
 
     const tour = page.getByRole("dialog");
     await expect(tour).toBeVisible();
@@ -68,6 +76,7 @@ test.describe("an investor arriving for the first time", () => {
     // §3: score, verified revenue, fees and the backstop date. §1: the
     // investor bears the loss. Both belong in the first thing they read.
     await page.goto("/dashboard");
+    await finishWelcome(page, "INVESTOR");
 
     const tour = page.getByRole("dialog");
     await expect(tour).toContainText(
@@ -82,6 +91,7 @@ test.describe("an investor arriving for the first time", () => {
 
   test("never shows the SME walkthrough", async ({ page }) => {
     await page.goto("/dashboard");
+    await finishWelcome(page, "INVESTOR");
 
     await expect(page.getByRole("dialog")).not.toContainText(
       t("dashboard.tour.steps.smeApply.title"),
@@ -168,6 +178,7 @@ test.describe("dismissing it", () => {
     // so skipping has to reach the account rather than only this device's
     // storage. Asserting on the request is what proves that actually happens.
     await page.goto("/dashboard");
+    await finishWelcome(page, "INVESTOR");
 
     const tour = page.getByRole("dialog");
     await expect(tour).toBeVisible();
@@ -185,6 +196,7 @@ test.describe("dismissing it", () => {
 
   test("closes on Escape, like every other overlay", async ({ page }) => {
     await page.goto("/dashboard");
+    await finishWelcome(page, "INVESTOR");
 
     await expect(page.getByRole("dialog")).toBeVisible();
     await page.keyboard.press("Escape");
@@ -193,6 +205,7 @@ test.describe("dismissing it", () => {
 
   test("can be stepped all the way to the end", async ({ page }) => {
     await page.goto("/dashboard");
+    await finishWelcome(page, "INVESTOR");
 
     const tour = page.getByRole("dialog");
     const next = tour.getByRole("button", { name: t("dashboard.tour.next") });

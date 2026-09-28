@@ -2330,5 +2330,124 @@
     "tableOfContents": "Table of contents",
     "title": "FundLok Terms and Conditions of Service",
     "version": "Version: September 2026"
+  },
+  "welcome": {
+    "common": {
+      "back": "Back",
+      "close": "Close",
+      "getStarted": "Get started",
+      "goToSlide": "Go to slide {n}",
+      "hello": {
+        "title": "Welcome to FundLok"
+      },
+      "language": "Language",
+      "languages": {
+        "en": "English",
+        "vi": "Tiếng Việt"
+      },
+      "next": "Next",
+      "progress": "Slide {current} of {total}",
+      "ready": {
+        "body": "Enjoy FundLok.",
+        "cta": "Go to my dashboard",
+        "title": "Ready to start?"
+      },
+      "replay": "How FundLok works"
+    },
+    "investor": {
+      "dailyBenefit": {
+        "body": "Returns are targets, not guarantees. You bear the loss if a business doesn't repay.",
+        "items": {
+          "1": "Your exposure shrinks every day.",
+          "2": "One missed day raises a flag.",
+          "3": "Reinvest sooner."
+        },
+        "title": "Money comes back from day one."
+      },
+      "disclosure": {
+        "body": "Every listing shows what's behind it before you commit.",
+        "title": "Fund real businesses."
+      },
+      "journey": {
+        "body": "Pick, commit, fund, then get paid every business day. Funds sit with our custodial bank partners.",
+        "title": "From listing to repayment."
+      },
+      "riskRate": {
+        "body": "Stronger businesses pay less; riskier ones pay more.",
+        "title": "Risk sets the rate."
+      }
+    },
+    "sme": {
+      "assessment": {
+        "body": "Your reference score comes from tax records and e-invoices, not assets.",
+        "title": "We look at how you run your business."
+      },
+      "daily": {
+        "body": "Your monthly total is exactly what you'd pay monthly. You don't pay a single đồng more; each payment is just lighter.",
+        "title": "Same money, just split by day."
+      },
+      "extension": {
+        "body": "Relief becomes extra time. Your daily amount drops; the total rises slightly from interest on the added days.",
+        "title": "Pay less each day, for a bit longer."
+      },
+      "intro": {
+        "body": "No property to pledge. Repayment fits how your business earns.",
+        "title": "Capital that follows your revenue."
+      },
+      "relief": {
+        "body": "After the month closes, send us your verified revenue. If your agreed share of it is less than you paid, the difference becomes relief.",
+        "title": "Slow month? Request relief."
+      },
+      "rules": {
+        "items": {
+          "1": "Within a month, every day is paid in full.",
+          "2": "Paying less without approval counts as a missed payment, so contact FundLok and we'll help.",
+          "3": "Anything left falls due on the final settlement date."
+        },
+        "title": "Three things to know."
+      }
+    },
+    "visuals": {
+      "atRisk": "Still at risk",
+      "businessScore": "Business reference score",
+      "dailyPayments": "Paying daily · {days} business days",
+      "discloseFees": "Fees",
+      "discloseFinalDate": "Final settlement date",
+      "discloseFreshness": "How fresh the data is",
+      "discloseLoss": "If the business doesn't repay, you bear the loss",
+      "discloseRevenue": "Verified revenue behind it",
+      "discloseRisks": "Concentration risks and data gaps",
+      "discloseScore": "Business reference score",
+      "eachDay": "Each day",
+      "factorCosts": "Cost quality",
+      "factorCredit": "Credit behaviour",
+      "factorRevenue": "Revenue stability & growth",
+      "factorSector": "Sector outlook",
+      "finalDate": "Final settlement date",
+      "growthCapital": "Growth capital",
+      "higher": "Higher",
+      "interestRate": "Interest rate",
+      "lower": "Lower",
+      "month": "Month {n}",
+      "monthClosed": "Month closes → you request relief",
+      "monthlyPayment": "Paying monthly",
+      "noCollateral": "No property to pledge",
+      "paidEachMonth": "What you paid",
+      "plusWeek": "+1 week",
+      "reinvest": "Reinvest in new projects",
+      "reliefGap": "Relief",
+      "returned": "Returned to you",
+      "sameTotal": "Same total each month",
+      "shareOfRevenue": "Agreed share of actual revenue",
+      "stepBrowse": "Browse",
+      "stepCommit": "Commit",
+      "stepDisburse": "Disbursed",
+      "stepRepay": "Daily repayments",
+      "stronger": "Stronger",
+      "today": "Today",
+      "total": "Total",
+      "verifiedRevenue": "Verified revenue",
+      "weaker": "Weaker"
+    }
   }
 }

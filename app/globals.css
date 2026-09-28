@@ -31,6 +31,9 @@
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
   --radius: 0.625rem;
+  /* Logo colours: lime (the "Lok") and the swirl's blue. */
+  --brand: oklch(0.86 0.21 128);
+  --brand-blue: oklch(0.7 0.14 235);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -77,7 +80,28 @@
   --sidebar-ring: oklch(0.439 0 0);
 }
 
+/* The brand stage: the first-run welcome cutscreen. Always very dark teal with
+   the logo's lime as the accent, whatever the user's theme — Handbook §7.3
+   puts the brand on dark grounds only. Declared after .dark so an element
+   carrying both classes takes these values, while dark: variants still apply. */
+.brand-stage {
+  --background: oklch(0.17 0.03 205);
+  --foreground: oklch(0.97 0.006 200);
+  --card: oklch(0.215 0.032 205);
+  --card-foreground: oklch(0.97 0.006 200);
+  --primary: oklch(0.86 0.21 128);
+  --primary-foreground: oklch(0.2 0.035 205);
+  --muted: oklch(0.26 0.03 205);
+  --muted-foreground: oklch(0.76 0.02 200);
+  --border: oklch(0.33 0.032 205);
+  --input: oklch(0.33 0.032 205);
+  --ring: oklch(0.86 0.21 128);
+  --eyebrow: oklch(0.86 0.21 128);
+}
+
 @theme inline {
+  --color-brand: var(--brand);
+  --color-brand-blue: var(--brand-blue);
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono:
     var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;

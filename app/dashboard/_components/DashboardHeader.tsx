@@ -24,6 +24,7 @@ import { usePathname } from "next/navigation";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { TourReplayButton } from "@/components/tour-replay-button";
+import { WelcomeReplayButton } from "@/components/welcome-replay-button";
 import { useTranslations } from "@/lib/i18n";
 import { cn, getInitials } from "@/lib/utils";
 import { CONTROL_IDLE } from "@/lib/ui-tokens";
@@ -69,6 +70,8 @@ export function DashboardHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isSME = user?.role === "SME";
+  // The welcome cutscreen exists for the two customer roles only.
+  const hasWelcome = isSME || user?.role === "INVESTOR";
 
   const filteredNavItems = navItems.filter((item) => {
     if (isSME && item.href === "/dashboard/projects") return false;
@@ -116,6 +119,7 @@ export function DashboardHeader() {
           <div className="flex items-center gap-1.5">
             <LocaleSwitcher />
             <ThemeToggle />
+            {hasWelcome && <WelcomeReplayButton />}
             <TourReplayButton />
           </div>
 
@@ -136,6 +140,7 @@ export function DashboardHeader() {
         <div className="flex md:hidden items-center gap-1.5">
           <LocaleSwitcher />
           <ThemeToggle />
+          {hasWelcome && <WelcomeReplayButton />}
           <Button
             variant="ghost"
             size="icon"

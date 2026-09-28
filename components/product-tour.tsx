@@ -1,10 +1,21 @@
 "use client";
 
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useAppearance } from "@/components/appearance-provider";
+import { WelcomeCutscreen } from "@/components/welcome/welcome-cutscreen";
+import { welcomeSlidesForRole } from "@/lib/constants/welcome-slides";
 import {
+  useFirstRunStatus,
   useProductTour,
   type ProductTour as ProductTourState,
   type SpotlightRect,
@@ -41,21 +52,86 @@ export function useProductTourControls(): ProductTourState {
   return value;
 }
 
+/**
+ * The welcome cutscreen that plays before the tour on a first run, and on
+ * demand from its own replay button.
+ */
+interface WelcomeControls {
+  replay: () => void;
+}
+
+const WelcomeContext = createContext<WelcomeControls | null>(null);
+
+export function useWelcomeControls(): WelcomeControls {
+  const value = useContext(WelcomeContext);
+  if (!value) {
+    throw new Error(
+      "useWelcomeControls must be used within a ProductTourProvider",
+    );
+  }
+  return value;
+}
+
 export function ProductTourProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const onDashboard = pathname === "/dashboard";
+  const { role, status } = useFirstRunStatus();
+  const hasWelcome = welcomeSlidesForRole(role).length > 0;
+
+  // One first-run experience in two parts, recorded by ONE account field
+  // (onboarding_tour_completed_at): the cutscreen explains how FundLok works,
+  // then the tour shows where things are. Both are derived rather than set in
+  // an effect — the cutscreen is open while this account is unseen and it has
+  // not been finished in this visit.
+  const [welcomeFinished, setWelcomeFinished] = useState(false);
+  const [welcomeReplaying, setWelcomeReplaying] = useState(false);
+  const firstRunWelcome =
+    onDashboard && hasWelcome && status === "unseen" && !welcomeFinished;
 
   // `enabled` gates only the AUTOMATIC first-run open: that belongs on the
   // dashboard landing page, where the targets live and where interrupting
   // someone costs nothing. Replaying from the help button works anywhere.
-  const tour = useProductTour({ enabled: pathname === "/dashboard" });
+  // Roles with a cutscreen start the tour from its last slide instead.
+  const tour = useProductTour({ enabled: onDashboard && !hasWelcome });
+  const { restart, dismiss } = tour;
+
+  const finishFirstRun = useCallback(() => {
+    setWelcomeFinished(true);
+    // Straight into the tour. Where none of its targets are on the page (a
+    // phone, where the sidebar is hidden) there is no tour to finish, so the
+    // first run is recorded here instead — otherwise the cutscreen would
+    // return on every visit.
+    if (!restart()) dismiss();
+  }, [restart, dismiss]);
+
+  const welcome = useMemo<WelcomeControls>(
+    () => ({ replay: () => setWelcomeReplaying(true) }),
+    [],
+  );
 
   return (
     <ProductTourContext.Provider value={tour}>
-      {children}
+      <WelcomeContext.Provider value={welcome}>
+        {children}
+        {role && hasWelcome && (
+          <>
+            {firstRunWelcome && !welcomeReplaying && (
+              <WelcomeCutscreen role={role} onFinish={finishFirstRun} />
+            )}
+            {welcomeReplaying && (
+              <WelcomeCutscreen
+                role={role}
+                onFinish={() => setWelcomeReplaying(false)}
+                onClose={() => setWelcomeReplaying(false)}
+              />
+            )}
+          </>
+        )}
+      </WelcomeContext.Provider>
     </ProductTourContext.Provider>
   );
 }
