@@ -368,7 +368,11 @@ export function TermsClient() {
   }, [searchQuery, isVi]);
 
   return (
-    <div className="relative min-h-screen w-full bg-background text-foreground overflow-x-hidden">
+    // overflow-x-clip, not -hidden: `hidden` makes this wrapper a scroll
+    // container, and the sticky table of contents below then sticks to it
+    // (i.e. never) instead of the viewport. `clip` hides the background
+    // blobs' overflow without that side effect.
+    <div className="relative min-h-screen w-full bg-background text-foreground overflow-x-clip">
       <SiteHeader />
       <BackgroundBlobs variant="compact" />
 
@@ -447,7 +451,9 @@ export function TermsClient() {
           {/* Sidebar Navigation */}
           <nav
             aria-label={t("termsPage.tableOfContents")}
-            className="hidden lg:block space-y-6 sticky top-24 self-start"
+            // Stays in view while the terms scroll; capped to the viewport so
+            // a short screen scrolls the list rather than losing its end.
+            className="hidden lg:block space-y-6 sticky top-24 self-start max-h-[calc(100dvh-7rem)] overflow-y-auto"
           >
             <div className="rounded-2xl border border-border/60 bg-card/60 p-4 backdrop-blur-md">
               <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3 px-2">

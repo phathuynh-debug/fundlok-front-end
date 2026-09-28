@@ -158,6 +158,7 @@
       "allIndustries": "Tất cả ngành nghề",
       "allTiers": "Tất cả phân hạng",
       "calculatedRate": "Lãi suất tham khảo",
+      "contact": "Liên hệ",
       "copiedId": "Đã sao chép",
       "copyId": "Sao chép ID",
       "dateTime": "Thời gian",
@@ -172,8 +173,17 @@
       "tenureStaff": "Thâm niên / Nhân sự",
       "tier": "Phân hạng",
       "viewDetails": "Chi tiết",
-      "yoyGrowth": "Tăng trưởng YoY",
-      "contact": "Liên hệ"
+      "yoyGrowth": "Tăng trưởng YoY"
+    },
+    "recentLeads": {
+      "empty": "Chưa có khách hàng tiềm năng.",
+      "error": "Không tải được danh sách.",
+      "investorTitle": "Nhà đầu tư (ước tính lợi suất)",
+      "months": "{count} tháng",
+      "smeTitle": "Doanh nghiệp (ước tính lãi suất)",
+      "subtitle": "Những người đã xem lãi suất trên trang lãi suất công khai, kèm cách liên hệ. Tất cả đều đã đồng ý để được liên hệ.",
+      "title": "Khách hàng tiềm năng mới",
+      "viewAll": "Xem tất cả"
     },
     "sidebar": {
       "auditLogs": "Nhật ký kiểm toán",
@@ -247,17 +257,7 @@
       "subtitle": "Quản lý người dùng nền tảng tại đây.",
       "title": "Người dùng"
     },
-    "welcome": "Chào mừng trở lại, {name}.",
-    "recentLeads": {
-      "title": "Khách hàng tiềm năng mới",
-      "subtitle": "Những người đã xem lãi suất trên trang lãi suất công khai, kèm cách liên hệ. Tất cả đều đã đồng ý để được liên hệ.",
-      "smeTitle": "Doanh nghiệp (ước tính lãi suất)",
-      "investorTitle": "Nhà đầu tư (ước tính lợi suất)",
-      "viewAll": "Xem tất cả",
-      "empty": "Chưa có khách hàng tiềm năng.",
-      "error": "Không tải được danh sách.",
-      "months": "{count} tháng"
-    }
+    "welcome": "Chào mừng trở lại, {name}."
   },
   "auth": {
     "footer": {
@@ -2022,6 +2022,8 @@
     "bestMonth": "Doanh thu tháng cao nhất",
     "calculating": "Đang tính…",
     "cogs": "Giá vốn hàng bán, 12 tháng gần nhất",
+    "consent": "Tôi đồng ý để FundLok liên hệ về yêu cầu này và lưu các thông tin trên cho mục đích đó.",
+    "contactLabel": "Thông tin liên hệ",
     "copied": "Đã sao chép mã",
     "copy": "Sao chép",
     "ctaBody": "Tạo tài khoản và chúng tôi sẽ hướng dẫn bạn qua hồ sơ đầy đủ.",
@@ -2030,23 +2032,25 @@
     "debtToRevenueLabel": "Dư nợ / Doanh thu",
     "duration": "Trong bao lâu",
     "ebitdaLabel": "Biên EBITDA",
+    "email": "Email",
+    "emailPlaceholder": "ban@congty.vn",
     "employeeCount": "Số nhân sự",
     "employeeCountHint": "Số nhân sự hiện tại, tính cả chủ doanh nghiệp.",
     "error": {
+      "consent": "Vui lòng đánh dấu để chúng tôi có thể liên hệ với bạn",
       "costsExceedRevenue": "Tổng chi phí lớn hơn doanh thu cùng kỳ, nên không còn dư địa cho khoản trả hằng ngày. Hãy kiểm tra lại số liệu.",
+      "email": "Vui lòng nhập email hợp lệ",
       "employeeRange": "Từ 1 đến 200 nhân sự.",
       "loanRange": "Phải từ 20.000.000 ₫ đến 1.000.000.000 ₫.",
       "monthExceedsYear": "Doanh thu một tháng không thể lớn hơn doanh thu cả năm.",
       "mustBePositive": "Phải lớn hơn 0.",
       "operatingRange": "Nhập số tháng, tối thiểu 1.",
       "percentRange": "Phải từ 0 đến 100.",
+      "phone": "Số điện thoại cần có 8 đến 15 chữ số",
       "required": "Bắt buộc",
       "tooLarge": "Con số này có vẻ quá lớn. Hãy kiểm tra lại số chữ số.",
       "top1ExceedsTop3": "Khách hàng lớn nhất nằm trong nhóm ba khách hàng lớn nhất, nên không thể cao hơn.",
-      "worstExceedsBest": "Tháng thấp nhất không thể cao hơn tháng cao nhất.",
-      "email": "Vui lòng nhập email hợp lệ",
-      "phone": "Số điện thoại cần có 8 đến 15 chữ số",
-      "consent": "Vui lòng đánh dấu để chúng tôi có thể liên hệ với bạn"
+      "worstExceedsBest": "Tháng thấp nhất không thể cao hơn tháng cao nhất."
     },
     "errorCode": {
       "COSTS_EXCEED_REVENUE": "Chi phí của bạn bằng hoặc lớn hơn doanh thu nên chúng tôi chưa thể ước tính lãi suất. Vui lòng kiểm tra lại các số liệu chi phí.",
@@ -2149,6 +2153,7 @@
     "optionalTitle": "Làm rõ thêm ước tính",
     "perMonth": "mỗi tháng",
     "perYear": "mỗi năm",
+    "phone": "Số điện thoại / Zalo",
     "provisional": "Tạm tính",
     "rateLabel": "Lãi suất tham khảo",
     "required": "Bắt buộc",
@@ -2170,12 +2175,7 @@
     "top1": "Khách hàng lớn nhất, % doanh thu",
     "top3": "Top 3 khách hàng, % doanh thu",
     "variableCost": "Chi phí biến đổi khác, 12 tháng gần nhất",
-    "worstMonth": "Doanh thu tháng thấp nhất",
-    "contactLabel": "Thông tin liên hệ",
-    "email": "Email",
-    "phone": "Số điện thoại / Zalo",
-    "emailPlaceholder": "ban@congty.vn",
-    "consent": "Tôi đồng ý để FundLok liên hệ về yêu cầu này và lưu các thông tin trên cho mục đích đó."
+    "worstMonth": "Doanh thu tháng thấp nhất"
   },
   "security": {
     "changePassword": {

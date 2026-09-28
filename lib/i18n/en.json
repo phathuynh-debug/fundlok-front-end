@@ -158,6 +158,7 @@
       "allIndustries": "All Industries",
       "allTiers": "All Tiers",
       "calculatedRate": "Calculated Rate",
+      "contact": "Contact",
       "copiedId": "Copied",
       "copyId": "Copy ID",
       "dateTime": "Date & Time",
@@ -172,8 +173,17 @@
       "tenureStaff": "Tenure / Staff",
       "tier": "Risk Tier",
       "viewDetails": "Details",
-      "yoyGrowth": "YoY Growth",
-      "contact": "Contact"
+      "yoyGrowth": "YoY Growth"
+    },
+    "recentLeads": {
+      "empty": "No leads yet.",
+      "error": "Could not load leads.",
+      "investorTitle": "Investors (yield estimates)",
+      "months": "{count} mo",
+      "smeTitle": "Businesses (rate estimates)",
+      "subtitle": "People who asked for a rate on the public rate page, with how to reach them. All gave consent to be contacted.",
+      "title": "Recent leads",
+      "viewAll": "View all"
     },
     "sidebar": {
       "auditLogs": "Audit logs",
@@ -247,17 +257,7 @@
       "subtitle": "Manage platform users from here.",
       "title": "Users"
     },
-    "welcome": "Welcome back, {name}.",
-    "recentLeads": {
-      "title": "Recent leads",
-      "subtitle": "People who asked for a rate on the public rate page, with how to reach them. All gave consent to be contacted.",
-      "smeTitle": "Businesses (rate estimates)",
-      "investorTitle": "Investors (yield estimates)",
-      "viewAll": "View all",
-      "empty": "No leads yet.",
-      "error": "Could not load leads.",
-      "months": "{count} mo"
-    }
+    "welcome": "Welcome back, {name}."
   },
   "auth": {
     "footer": {
@@ -2022,6 +2022,8 @@
     "bestMonth": "Best month's revenue",
     "calculating": "Calculating…",
     "cogs": "Cost of goods sold, last 12 months",
+    "consent": "FundLok may contact me about this enquiry and keep these details for that purpose.",
+    "contactLabel": "Your contact details",
     "copied": "Copied reference code",
     "copy": "Copy",
     "ctaBody": "Create an account and we'll take you through the full application.",
@@ -2030,23 +2032,25 @@
     "debtToRevenueLabel": "Debt to Revenue",
     "duration": "Over how long",
     "ebitdaLabel": "EBITDA Margin",
+    "email": "Email",
+    "emailPlaceholder": "you@company.vn",
     "employeeCount": "Employees",
     "employeeCountHint": "Headcount today, including the owner.",
     "error": {
+      "consent": "Tick this box so we can contact you",
       "costsExceedRevenue": "Your costs add up to more than your revenue for the same period, so there's no room for a daily repayment. Check these figures.",
+      "email": "Enter a valid email address",
       "employeeRange": "Between 1 and 200 employees.",
       "loanRange": "Must be between 20,000,000 ₫ and 1,000,000,000 ₫.",
       "monthExceedsYear": "A single month cannot be more than the whole year's revenue.",
       "mustBePositive": "Must be greater than zero.",
       "operatingRange": "Enter the number of months, at least 1.",
       "percentRange": "Must be between 0 and 100.",
+      "phone": "Enter a phone number of 8 to 15 digits",
       "required": "Required",
       "tooLarge": "That looks too large. Check the number of digits.",
       "top1ExceedsTop3": "Your largest customer is part of your top three, so this cannot be higher.",
-      "worstExceedsBest": "Your worst month cannot be higher than your best month.",
-      "email": "Enter a valid email address",
-      "phone": "Enter a phone number of 8 to 15 digits",
-      "consent": "Tick this box so we can contact you"
+      "worstExceedsBest": "Your worst month cannot be higher than your best month."
     },
     "errorCode": {
       "COSTS_EXCEED_REVENUE": "Your costs are equal to or greater than your revenue, so we cannot estimate a rate. Check the cost figures and try again.",
@@ -2149,6 +2153,7 @@
     "optionalTitle": "Sharpen the estimate",
     "perMonth": "per month",
     "perYear": "per year",
+    "phone": "Phone / Zalo",
     "provisional": "Provisional",
     "rateLabel": "Reference rate",
     "required": "Required",
@@ -2170,12 +2175,7 @@
     "top1": "Largest customer, % of revenue",
     "top3": "Top 3 customers, % of revenue",
     "variableCost": "Other variable costs, last 12 months",
-    "worstMonth": "Worst month's revenue",
-    "contactLabel": "Your contact details",
-    "email": "Email",
-    "phone": "Phone / Zalo",
-    "emailPlaceholder": "you@company.vn",
-    "consent": "FundLok may contact me about this enquiry and keep these details for that purpose."
+    "worstMonth": "Worst month's revenue"
   },
   "security": {
     "changePassword": {
