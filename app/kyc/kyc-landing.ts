@@ -1,4 +1,5 @@
 import type { UserRole } from "@/services/authentication.service";
+import { safeNextPath } from "@/lib/safe-next-path";
 
 // Where to send a user once KYC is approved — same targets as the post-login /
 // post-role-selection landing. Middleware re-validates, so this is the
@@ -17,23 +18,5 @@ export function postVerificationTarget(
   next: string | null | undefined,
   role?: UserRole | string | null,
 ): string {
-  if (
-    next &&
-    next.startsWith("/") &&
-    !next.startsWith("//") &&
-    !next.startsWith("/\\")
-  ) {
-    try {
-      const parsed = new URL(next, "http://localhost");
-      if (
-        parsed.origin === "http://localhost" &&
-        parsed.pathname.startsWith("/")
-      ) {
-        return `${parsed.pathname}${parsed.search}${parsed.hash}`;
-      }
-    } catch {
-      // Invalid URL - fall through to fallback
-    }
-  }
-  return kycLandingForRole(role);
+  return safeNextPath(next) ?? kycLandingForRole(role);
 }

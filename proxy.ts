@@ -8,6 +8,7 @@ import {
   parseLocalePath,
   type ParsedLocalePath,
 } from "@/lib/locale-routing";
+import { safeNextPath } from "@/lib/safe-next-path";
 
 // Same default as next.config.ts and middleware.service.ts. Kept in step with
 // both: they all describe one hop, Next → FastAPI.
@@ -97,31 +98,6 @@ function requiredVerificationForPath(
   if (role === "INVESTOR" && matches(INVESTOR_KYC_ROUTES)) return "KYC";
   if (role === "SME" && matches(SME_KYB_ROUTES)) return "KYB";
   return null;
-}
-
-// Only accept same-origin absolute paths as a post-verification redirect target,
-// so a crafted ?next= can't turn /kyc into an open redirect.
-function safeNextPath(next: string | null): string | null {
-  if (
-    !next ||
-    !next.startsWith("/") ||
-    next.startsWith("//") ||
-    next.startsWith("/\\")
-  ) {
-    return null;
-  }
-  try {
-    const parsed = new URL(next, "http://localhost");
-    if (
-      parsed.origin === "http://localhost" &&
-      parsed.pathname.startsWith("/")
-    ) {
-      return `${parsed.pathname}${parsed.search}${parsed.hash}`;
-    }
-    return null;
-  } catch {
-    return null;
-  }
 }
 
 // Paths whose auth/role rules are handled below. The matcher only runs

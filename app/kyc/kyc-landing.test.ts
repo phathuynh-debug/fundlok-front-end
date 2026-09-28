@@ -55,4 +55,16 @@ describe("postVerificationTarget", () => {
       "/dashboard",
     );
   });
+
+  // Regression: these normalise to "//evil.com", which window.location.replace
+  // would follow off-site.
+  it.each([
+    "/.//evil.com",
+    "/..//evil.com",
+    "/%2e//evil.com",
+    "/a/..//evil.com",
+  ])("falls back to the role landing for dot-segment bypass %j", (payload) => {
+    expect(postVerificationTarget(payload, "INVESTOR")).toBe("/dashboard");
+    expect(postVerificationTarget(payload, "SME")).toBe("/project-application");
+  });
 });
