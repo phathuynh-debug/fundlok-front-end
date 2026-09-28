@@ -25,6 +25,18 @@ export interface SpotlightRect {
 /** Breathing room between the target's edge and the cut-out. */
 const PADDING = 8;
 
+/**
+ * Is this step's target actually rendered? Present in the DOM is not enough:
+ * the sidebar is `hidden md:flex`, so on a phone its items exist with no box.
+ * Counting those opened a tour that drew nothing and could never be finished
+ * — so the first run was never recorded, and the welcome cutscreen that shares
+ * that record came back on every visit.
+ */
+export function isTargetVisible(selector: string): boolean {
+  const element = document.querySelector(selector);
+  return Boolean(element && element.getClientRects().length > 0);
+}
+
 function measure(selector: string): SpotlightRect | null {
   const element = document.querySelector(selector);
   if (!element) return null;
@@ -65,9 +77,7 @@ export function useTourEngine(): TourEngine {
     // Steps whose target is not on the page are dropped rather than pointing
     // at nothing — a narrow viewport, or a step of the form the SME has not
     // reached yet.
-    const live = candidates.filter((step) =>
-      Boolean(document.querySelector(step.target)),
-    );
+    const live = candidates.filter((step) => isTargetVisible(step.target));
     if (live.length === 0) return false;
     setSteps(live);
     setStepIndex(0);

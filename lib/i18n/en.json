@@ -2330,5 +2330,129 @@
     "tableOfContents": "Table of contents",
     "title": "FundLok Terms and Conditions of Service",
     "version": "Version: September 2026"
+  },
+  "welcome": {
+    "common": {
+      "back": "Back",
+      "close": "Close",
+      "getStarted": "Get started",
+      "goToSlide": "Go to slide {n}",
+      "hello": {
+        "title": "Welcome to FundLok"
+      },
+      "language": "Language",
+      "languages": {
+        "en": "English",
+        "vi": "Tiếng Việt"
+      },
+      "next": "Next",
+      "progress": "Slide {current} of {total}",
+      "ready": {
+        "body": "Enjoy FundLok.",
+        "cta": "Go to my dashboard",
+        "title": "Ready to start?"
+      },
+      "replay": "How FundLok works"
+    },
+    "investor": {
+      "dailyBenefit": {
+        "items": {
+          "1": "Less exposure: part of your principal returns every business day, so the amount at risk shrinks over time rather than all at once at the end.",
+          "2": "Earlier warning: one missed day raises a flag straight away.",
+          "3": "Put it back to work: returned money lands in your balance, and you can reinvest it in new projects sooner, earning returns on returns.",
+          "4": "Returns are targets, not guarantees. If a business doesn't repay, you bear the loss."
+        },
+        "title": "Your money starts coming back from day one."
+      },
+      "disclosure": {
+        "body": "FundLok connects you with Vietnamese SMEs whose revenue we verify. You lend directly to the business, and you see what stands behind every opportunity before you commit.",
+        "title": "Fund real businesses, with a clear view of the risk."
+      },
+      "journey": {
+        "items": {
+          "1": "Browse listings with the score, verified revenue, fees, risks and final settlement date.",
+          "2": "Commit. Your funds are held with our custodial bank partners.",
+          "3": "Once the project is funded, the money goes to the business.",
+          "4": "Repayments come back to you every business day."
+        },
+        "title": "From listing to repayment."
+      },
+      "riskRate": {
+        "body": "Each business gets a reference score from its verified revenue, costs, credit behaviour and sector. The score sets the rate: stronger businesses pay closer to what banks charge, and riskier ones pay more to reflect that risk.",
+        "title": "Stronger business, lower rate. Weaker, higher."
+      }
+    },
+    "sme": {
+      "assessment": {
+        "body": "Your business score comes from four areas: revenue stability and growth, cost quality, credit behaviour, and your sector's outlook. We read it from tax records and e-invoices you already have.",
+        "title": "We look at how your business runs, not what it owns."
+      },
+      "daily": {
+        "body": "You repay a fixed amount every business day until the total is cleared. It's the same money as a monthly payment, just split across the month. Example: borrow {principal} at {rate}%/year for {months} months. The total is {total}, which is {daily} per business day. Over {days} business days that's about {monthlyMillions} million ₫, the same as one monthly payment.",
+        "title": "Same money, smaller pieces."
+      },
+      "extension": {
+        "body": "The shortfall turns into extra time, rounded up to whole weeks. Your daily amount drops for the rest of the loan. Interest runs at the same rate on the added days, so the total goes up a little. You can extend more than once, up to your final settlement date.",
+        "title": "Pay less each day, for a little longer."
+      },
+      "intro": {
+        "body": "Your revenue is your strongest asset. We turn verified revenue into growth capital. You don't need to pledge property, and repayment follows how your business actually earns.",
+        "title": "Capital that moves with your revenue."
+      },
+      "relief": {
+        "body": "When you sign, your daily amount is set as a share of your average revenue. After each month closes, we check your verified e-invoice revenue. If that share of your actual revenue came in below what you paid, the difference is your relief.",
+        "title": "A slow month doesn't break your loan."
+      },
+      "rules": {
+        "items": {
+          "1": "Relief is agreed after a month closes. Until then, each day is paid in full.",
+          "2": "Paying less without an agreed extension counts as a missed payment, with late interest of 150% of your rate on the overdue amount. Talk to us first; one missed day and we'll check in.",
+          "3": "Every loan has a final settlement date, set when you sign, when anything still owed falls due."
+        },
+        "title": "Three things to know."
+      }
+    },
+    "visuals": {
+      "atRisk": "Still at risk",
+      "businessScore": "Business reference score",
+      "dailyPayments": "{days} business days",
+      "discloseFees": "Fees",
+      "discloseFinalDate": "Final settlement date",
+      "discloseFreshness": "How fresh the data is",
+      "discloseLoss": "If the business doesn't repay, you bear the loss",
+      "discloseRevenue": "Verified revenue behind it",
+      "discloseRisks": "Concentration risks and data gaps",
+      "discloseScore": "Business reference score",
+      "eachDay": "Each day",
+      "factorCosts": "Cost quality",
+      "factorCredit": "Credit behaviour",
+      "factorRevenue": "Revenue stability & growth",
+      "factorSector": "Sector outlook",
+      "finalDate": "Final settlement date",
+      "growthCapital": "Growth capital",
+      "higher": "Higher",
+      "interestRate": "Interest rate",
+      "lower": "Lower",
+      "month": "Month {n}",
+      "monthClosed": "Month closes, then relief is reviewed",
+      "monthlyPayment": "One monthly payment",
+      "noCollateral": "No property to pledge",
+      "paidEachMonth": "What you paid",
+      "perDay": "{amount} / day",
+      "plusWeek": "+1 week",
+      "reinvest": "Reinvest in new projects",
+      "reliefGap": "Relief",
+      "returned": "Returned to you",
+      "shareOfRevenue": "Agreed share of actual revenue",
+      "stepBrowse": "Browse",
+      "stepCommit": "Commit",
+      "stepDisburse": "Disbursed",
+      "stepRepay": "Daily repayments",
+      "stronger": "Stronger",
+      "today": "Today",
+      "total": "Total",
+      "verifiedRevenue": "Verified revenue",
+      "weaker": "Weaker"
+    }
   }
 }

@@ -9,7 +9,11 @@ import {
   type TourStep,
 } from "@/lib/constants/tour-steps";
 import type { SelectableRole } from "@/services/authentication.service";
-import { useTourEngine, type SpotlightRect } from "@/hooks/use-tour-engine";
+import {
+  isTargetVisible,
+  useTourEngine,
+  type SpotlightRect,
+} from "@/hooks/use-tour-engine";
 
 export type { SpotlightRect };
 
@@ -76,22 +80,56 @@ export interface ProductTour {
   isLastStep: boolean;
   next: () => void;
   back: () => void;
-  /** Replay from step one, regardless of whether it has been seen. */
-  restart: () => void;
+  /**
+   * Replay from step one, regardless of whether it has been seen. Returns
+   * false when none of the steps' targets are on the page (a narrow viewport).
+   */
+  restart: () => boolean;
   /** Finish or skip — both mean "do not show this again". */
   dismiss: () => void;
 }
 
-export function useProductTour({ enabled }: { enabled: boolean }): ProductTour {
+export type FirstRunStatus = "pending" | "seen" | "unseen";
+
+/**
+ * Has this account been onboarded yet? Shared by the dashboard tour and the
+ * welcome cutscreen, which count as ONE first-run experience: the cutscreen
+ * plays first, the tour follows, and dismissing the tour records both against
+ * the same account field.
+ *
+ * "pending" until /users/me and the role are known — opening either and then
+ * discovering the account was onboarded months ago is worse than a beat of
+ * delay.
+ */
+export function useFirstRunStatus(): {
+  role: SelectableRole | null;
+  status: FirstRunStatus;
+} {
   const { data: user, isPending: isUserPending } = useCurrentUser();
-  const completeTour = useCompleteOnboardingTour();
   const role = (user?.role ?? null) as SelectableRole | null;
 
   // The server is the authority when it has an opinion. `undefined` means the
   // backend never sent the field; `null` means it did and this account has not
   // been onboarded yet — a distinction the fallback depends on.
   const serverSeen = user?.onboarding_tour_completed_at;
-  const serverKnows = serverSeen !== undefined;
+
+  if (isUserPending || !role) return { role, status: "pending" };
+  // The server wins outright when it has an opinion. A local mirror that
+  // disagrees is stale — a dismissal whose write failed, or one recorded
+  // before the account column existed — and letting it outrank the account
+  // would hide the walkthrough forever with no way back.
+  if (serverSeen !== undefined) {
+    return { role, status: serverSeen === null ? "unseen" : "seen" };
+  }
+  return {
+    role,
+    status: readSeen(tourStorageKey(role)) ? "seen" : "unseen",
+  };
+}
+
+export function useProductTour({ enabled }: { enabled: boolean }): ProductTour {
+  const { role, status } = useFirstRunStatus();
+  const completeTour = useCompleteOnboardingTour();
 
   const engine = useTourEngine();
   const { open, close } = engine;
@@ -118,27 +156,15 @@ export function useProductTour({ enabled }: { enabled: boolean }): ProductTour {
   // lay out before a selector resolves, and a synchronous setState in an
   // effect is banned here anyway (react-hooks/set-state-in-effect).
   useEffect(() => {
-    if (!enabled || !role || candidateSteps.length === 0) return;
-    // Wait for /users/me rather than racing it: opening the tour and then
-    // discovering the account was onboarded months ago is worse than a beat
-    // of delay.
-    if (isUserPending) return;
-    // The server wins outright when it has an opinion. A local mirror that
-    // disagrees is stale — a dismissal whose write failed, or one recorded
-    // before the account column existed — and letting it outrank the account
-    // would hide the walkthrough forever with no way back.
-    if (serverKnows) {
-      if (serverSeen !== null) return;
-    } else if (readSeen(tourStorageKey(role))) {
-      return;
-    }
+    if (!enabled || candidateSteps.length === 0) return;
+    if (status !== "unseen") return;
 
     const deadline = Date.now() + RESOLVE_TIMEOUT_MS;
     let timer: ReturnType<typeof setTimeout>;
 
     const attempt = () => {
       const live = candidateSteps.filter((step) =>
-        Boolean(document.querySelector(step.target)),
+        isTargetVisible(step.target),
       );
 
       if (live.length === candidateSteps.length || Date.now() >= deadline) {
@@ -153,15 +179,7 @@ export function useProductTour({ enabled }: { enabled: boolean }): ProductTour {
 
     timer = setTimeout(attempt, RESOLVE_POLL_MS);
     return () => clearTimeout(timer);
-  }, [
-    enabled,
-    role,
-    candidateSteps,
-    isUserPending,
-    serverKnows,
-    serverSeen,
-    openNow,
-  ]);
+  }, [enabled, candidateSteps, status, openNow]);
 
   const dismiss = useCallback(() => {
     // Mirror locally first so the overlay cannot flicker back while the write
@@ -180,9 +198,7 @@ export function useProductTour({ enabled }: { enabled: boolean }): ProductTour {
    * exist there. Dismissing afterwards re-POSTs the completion, which the
    * backend treats as a no-op rather than moving the original timestamp.
    */
-  const restart = useCallback(() => {
-    openNow();
-  }, [openNow]);
+  const restart = useCallback(() => openNow(), [openNow]);
 
   return { ...engine, restart, dismiss };
 }
