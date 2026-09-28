@@ -122,6 +122,9 @@ export function WelcomeCutscreen({
   // Not every slide has a body (the greeting, the list slides): `t` returns
   // the key itself for a missing entry.
   const body = t(`${base}.body`);
+  // An optional small print line under the bullets (e.g. "returns are
+  // targets, not guarantees").
+  const note = t(`${base}.note`);
   const titleId = `welcome-${slide.id}-title`;
   const primaryLabel = isFirst
     ? t("welcome.common.getStarted")
@@ -263,6 +266,17 @@ export function WelcomeCutscreen({
                       </motion.li>
                     ))}
                   </ul>
+                )}
+
+                {note !== `${base}.note` && (
+                  <motion.p
+                    className="text-xs text-muted-foreground sm:text-sm"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.8 }}
+                  >
+                    {note}
+                  </motion.p>
                 )}
 
                 {slide.id === "hello" && (
