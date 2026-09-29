@@ -61,6 +61,7 @@
       "conflictMany": "Đã xác minh trên {count} tài khoản khác",
       "conflictOne": "Đã xác minh trên 1 tài khoản khác",
       "decisionHeading": "Quyết định của bạn",
+      "detailLoadFailed": "Không thể tải chi tiết lượt xác minh danh tính. Vui lòng thử lại.",
       "empty": "Không có lượt xác minh nào đang chờ xét duyệt.",
       "emptyOther": "Không có lượt xác minh nào ở trạng thái này.",
       "faceMatchValue": "Tương đồng {score}%",

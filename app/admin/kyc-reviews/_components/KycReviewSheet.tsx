@@ -60,7 +60,7 @@ export function KycReviewSheet({
   const { t, locale } = useTranslations();
   const { toast } = useToast();
   const { data: me } = useCurrentUser();
-  const { data, isLoading } = useAdminKycVerification(verificationId);
+  const { data, isLoading, isError } = useAdminKycVerification(verificationId);
   const { mutateAsync: resolve, isPending } = useResolveKycVerification();
 
   // Keyed by attempt id: a note typed against one investor must not follow
@@ -110,7 +110,11 @@ export function KycReviewSheet({
           </SheetDescription>
         </SheetHeader>
 
-        {isLoading || !data ? (
+        {isError ? (
+          <p role="alert" className="px-4 py-6 text-sm text-destructive">
+            {t("admin.kycReviews.detailLoadFailed")}
+          </p>
+        ) : isLoading || !data ? (
           <div className="flex h-40 items-center justify-center">
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
           </div>

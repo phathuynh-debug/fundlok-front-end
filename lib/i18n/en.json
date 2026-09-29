@@ -61,6 +61,7 @@
       "conflictMany": "Also verified on {count} other accounts",
       "conflictOne": "Also verified on 1 other account",
       "decisionHeading": "Your decision",
+      "detailLoadFailed": "Couldn't load identity check details. Please try again.",
       "empty": "No identity checks are waiting for review.",
       "emptyOther": "No identity checks with this status.",
       "faceMatchValue": "{score}% similar",
