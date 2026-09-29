@@ -1533,6 +1533,7 @@
       "PASSKEY_ADDED": "Đã thêm passkey",
       "PASSKEY_REMOVED": "Đã xóa passkey",
       "PASSWORD_CHANGED": "Đã đổi mật khẩu",
+      "PASSWORD_RESET": "Đã đặt lại mật khẩu",
       "PASSWORD_SET": "Đã đặt mật khẩu",
       "PLACE": "Đã đặt lệnh",
       "PRESIGN": "Đã cấp liên kết tải lên",

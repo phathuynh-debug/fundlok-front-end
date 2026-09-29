@@ -1533,6 +1533,7 @@
       "PASSKEY_ADDED": "Passkey added",
       "PASSKEY_REMOVED": "Passkey removed",
       "PASSWORD_CHANGED": "Password changed",
+      "PASSWORD_RESET": "Password reset",
       "PASSWORD_SET": "Password set",
       "PLACE": "Order placed",
       "PRESIGN": "Upload link issued",
