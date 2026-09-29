@@ -56,3 +56,8 @@ certificates
 
 # E2E build output
 /.next-e2e/
+
+# vbsec security scan reports and fix logs: they list unfixed vulnerabilities
+# by file and line, so they never go into git (or a deployment).
+vbsec-reports/
+.vbsec-tmp/
