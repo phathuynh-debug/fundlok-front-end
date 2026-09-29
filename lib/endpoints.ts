@@ -133,6 +133,15 @@ export const ADMIN_ENDPOINTS = {
   // one-way: a decided record answers 409, never a silent overwrite.
   resolveKybVerification: (id: string) =>
     `/admin/kyb-verifications/${id}/resolve`,
+  // Investor KYC attempts the engine parked in MANUAL_REVIEW (an ID number
+  // already verified on another account). The list defaults to that queue.
+  kycVerifications: "/admin/kyc-verifications",
+  kycVerification: (id: string) => `/admin/kyc-verifications/${id}`,
+  // A 10-minute read URL for one submitted image.
+  kycImage: (id: string, name: string) =>
+    `/admin/kyc-verifications/${id}/images/${name}`,
+  resolveKycVerification: (id: string) =>
+    `/admin/kyc-verifications/${id}/resolve`,
   applicationDecision: (id: string) => `/admin/applications/${id}/decision`,
   // Account status. SUSPENDED is a real deny server-side, not a label.
   userStatus: (id: string) => `/admin/users/${id}/status`,

@@ -53,6 +53,66 @@
         "totalHint": "Mọi người đã bấm tính"
       }
     },
+    "kycReviews": {
+      "alreadyDecided": "Lượt xác minh này đã được quyết định.",
+      "approve": "Duyệt",
+      "attemptHeading": "Lượt xác minh này",
+      "conflictHeading": "Đã xác minh trên",
+      "conflictMany": "Đã xác minh trên {count} tài khoản khác",
+      "conflictOne": "Đã xác minh trên 1 tài khoản khác",
+      "decisionHeading": "Quyết định của bạn",
+      "empty": "Không có lượt xác minh nào đang chờ xét duyệt.",
+      "emptyOther": "Không có lượt xác minh nào ở trạng thái này.",
+      "faceMatchValue": "Tương đồng {score}%",
+      "fields": {
+        "accountStatus": "Trạng thái tài khoản",
+        "dateOfBirth": "Ngày sinh",
+        "email": "Email",
+        "faceMatch": "So khớp khuôn mặt",
+        "idNumber": "Số CCCD",
+        "joined": "Ngày tham gia",
+        "nameOnCard": "Tên trên thẻ",
+        "submitted": "Ngày gửi",
+        "verified": "Ngày xác minh"
+      },
+      "imageMissing": "Không được lưu",
+      "imageOpen": "Mở {name} kích thước đầy đủ",
+      "images": {
+        "id_back": "CCCD, mặt sau",
+        "id_front": "CCCD, mặt trước",
+        "portrait": "Ảnh chân dung"
+      },
+      "imagesHeading": "Ảnh đã gửi",
+      "noConflict": "Hiện không còn trùng",
+      "notePlaceholder": "Vì sao bạn duyệt hoặc từ chối? Bắt buộc khi duyệt. Chỉ nhân viên xem được ghi chú này.",
+      "noteRequired": "Hãy thêm ghi chú để duyệt. Duyệt sẽ bỏ qua một cảnh báo gian lận, nên lý do cần được lưu lại.",
+      "reject": "Từ chối",
+      "rejectHint": "Nếu từ chối, nhà đầu tư sẽ thấy: “Chúng tôi không thể hoàn tất xác minh danh tính của bạn. Vui lòng liên hệ bộ phận hỗ trợ.” Họ có thể gửi lại.",
+      "resolveFailed": "Không thể lưu quyết định",
+      "resolved": "Đã lưu quyết định",
+      "rowLabel": "Xét duyệt lượt xác minh của {name}",
+      "selfBlocked": "Bạn không thể tự xét duyệt lượt xác minh của chính mình.",
+      "sheetSubtitle": "So sánh CCCD và ảnh chân dung đã gửi với tài khoản đang giữ số CCCD này.",
+      "sheetTitle": "Xác minh danh tính",
+      "subtitle": "Các lượt xác minh danh tính nhà đầu tư mà hệ thống không thể tự duyệt.",
+      "table": {
+        "conflicts": "Lý do gắn cờ",
+        "idNumber": "Số CCCD",
+        "investor": "Nhà đầu tư",
+        "nameOnCard": "Tên trên thẻ",
+        "status": "Trạng thái",
+        "submitted": "Ngày gửi"
+      },
+      "tabs": {
+        "APPROVED": "Đã duyệt",
+        "MANUAL_REVIEW": "Chờ xét duyệt",
+        "REJECTED": "Đã từ chối"
+      },
+      "title": "Xét duyệt KYC",
+      "whyDuplicate": "Số CCCD này đã được xác minh trên một tài khoản FundLok khác. Ảnh cắt từ CCCD của người khác vẫn có thể qua bước so khớp khuôn mặt, vì vậy hãy kiểm tra hai tài khoản có cùng một người trước khi duyệt.",
+      "whyHeading": "Vì sao cần xét duyệt",
+      "whyNoConflict": "Tài khoản từng giữ số CCCD này không còn được duyệt, nên hiện không còn trùng. Hãy quyết định dựa trên các bằng chứng bên dưới."
+    },
     "loading": "Đang tải trang quản trị…",
     "pagination": {
       "next": "Sau",
@@ -188,6 +248,7 @@
     "sidebar": {
       "auditLogs": "Nhật ký kiểm toán",
       "badge": "Quản trị",
+      "kycReviews": "Xét duyệt KYC",
       "logout": "Đăng xuất",
       "overview": "Tổng quan",
       "projects": "Dự án",
@@ -1466,6 +1527,7 @@
       "CREATE_BUSINESS": "Đã tạo doanh nghiệp",
       "DISBURSEMENT": "Giải ngân",
       "KYB_MANUAL_REVIEW_RESOLVED": "Đã xử lý xem xét xác minh doanh nghiệp",
+      "KYC_MANUAL_REVIEW_RESOLVED": "Đã xử lý xét duyệt xác minh danh tính",
       "LINK": "Đã liên kết tài khoản",
       "PASSKEY_ADDED": "Đã thêm passkey",
       "PASSKEY_REMOVED": "Đã xóa passkey",
@@ -1761,6 +1823,7 @@
       "failedHint": "Đối tác xác minh gặp sự cố khi xử lý yêu cầu của bạn. Vui lòng thử lại sau ít phút.",
       "failedTitle": "Đã xảy ra sự cố",
       "frontLabel": "CCCD/CMND — mặt trước",
+      "inReviewHint": "Chúng tôi cần kiểm tra thủ công một số thông tin trên giấy tờ của bạn. Đội ngũ FundLok sẽ liên hệ với bạn, bạn không cần gửi lại.",
       "invalidType": "Ảnh phải ở định dạng JPEG hoặc PNG",
       "mobileApprovedHint": "Bạn đã được xác minh. Hãy đóng trang này và quay lại máy tính.",
       "mobileExpired": "Liên kết đã hết hạn. Hãy quay lại máy tính và tạo mã QR mới.",

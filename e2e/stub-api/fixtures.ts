@@ -476,3 +476,97 @@ export const STUB_AUDIT_LOGS = [
     created_at: "2026-05-02T08:30:00+07:00",
   },
 ];
+
+// --- Admin KYC review ------------------------------------------------------ //
+//
+// Attempts the GVerify engine parked because their ID number was already
+// verified on another account. One per test that settles an attempt: the suite
+// runs fully parallel against one stub process, so a test that approves a row
+// must not remove it from under a test that is still reading the queue.
+
+const KYC_OWNER = {
+  id: "00000000-0000-4000-8000-0000000c0001",
+  email: "real.owner@example.com",
+  full_name: "Nguyễn Văn Chủ",
+  status: "ACTIVE",
+  created_at: "2026-04-02T09:00:00+07:00",
+};
+
+const KYC_OWNER_CONFLICT = {
+  verification_id: "00000000-0000-4000-8000-0000000c0a01",
+  user: KYC_OWNER,
+  full_name: "NGUYEN VAN CHU",
+  date_of_birth: "12/05/1988",
+  approved_at: "2026-04-02T09:20:00+07:00",
+};
+
+function parkedKycAttempt(
+  id: string,
+  email: string,
+  fullName: string,
+  createdAt: string,
+) {
+  return {
+    id,
+    status: "MANUAL_REVIEW",
+    is_approved: false,
+    rejection_reason: "Your verification needs a manual review",
+    person_number: "079188001234",
+    full_name: "NGUYEN VAN CHU",
+    date_of_birth: "12/05/1988",
+    face_match_score: 0.91,
+    created_at: createdAt,
+    user: {
+      id: `${id}-user`,
+      email,
+      full_name: fullName,
+      status: "ACTIVE",
+      created_at: "2026-09-27T21:00:00+07:00",
+    },
+    conflicts: [KYC_OWNER_CONFLICT],
+  };
+}
+
+/** Read-only: listed and opened, never settled. */
+export const STUB_KYC_REVIEW_LISTED = parkedKycAttempt(
+  "00000000-0000-4000-8000-0000000c0b01",
+  "second.account@example.com",
+  "Chủ Tài Khoản Hai",
+  "2026-09-28T08:15:00+07:00",
+);
+/** Settled by the approve test. */
+export const STUB_KYC_REVIEW_TO_APPROVE = parkedKycAttempt(
+  "00000000-0000-4000-8000-0000000c0b02",
+  "lost.access@example.com",
+  "Chủ Mất Quyền Truy Cập",
+  "2026-09-28T09:40:00+07:00",
+);
+/** Settled by the reject test. */
+export const STUB_KYC_REVIEW_TO_REJECT = parkedKycAttempt(
+  "00000000-0000-4000-8000-0000000c0b03",
+  "impostor@example.com",
+  "Người Mạo Danh",
+  "2026-09-28T10:05:00+07:00",
+);
+
+/** The owner's own attempt: the history under the "Approved" tab. */
+export const STUB_KYC_OWNER_APPROVED = {
+  id: KYC_OWNER_CONFLICT.verification_id,
+  status: "APPROVED",
+  is_approved: true,
+  rejection_reason: null,
+  person_number: "079188001234",
+  full_name: "NGUYEN VAN CHU",
+  date_of_birth: "12/05/1988",
+  face_match_score: 0.96,
+  created_at: "2026-04-02T09:20:00+07:00",
+  user: KYC_OWNER,
+  conflicts: [],
+};
+
+export const STUB_KYC_REVIEWS = [
+  STUB_KYC_OWNER_APPROVED,
+  STUB_KYC_REVIEW_LISTED,
+  STUB_KYC_REVIEW_TO_APPROVE,
+  STUB_KYC_REVIEW_TO_REJECT,
+];

@@ -10,6 +10,7 @@ import {
   XCircle,
   AlertTriangle,
   RotateCcw,
+  Clock,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -20,7 +21,7 @@ import { CaptureTabs } from "../_components/gverify/CaptureTabs";
 import { useGVerifyKyc } from "../_components/gverify/useGVerifyKyc";
 import type { GVerifyVerifyResponse } from "@/services/gverify.service";
 import type { ApiError } from "@/lib/types";
-import { apiErrorMessage } from "@/lib/api-error-message";
+import { apiErrorMessage, backendText } from "@/lib/api-error-message";
 
 // Phone side of the QR handoff: opened by scanning the desktop QR, carries a
 // short-lived token in the query string (?token=…) instead of a login cookie.
@@ -85,11 +86,22 @@ export function MobileKycClient() {
             title={t("kyc.approvedTitle")}
             hint={t("kyc.gv.mobileApprovedHint")}
           />
+        ) : /* --- Parked for ops review: nothing to retake --- */ verdict?.status ===
+          "MANUAL_REVIEW" ? (
+          <StatusBlock
+            icon={<Clock className="h-12 w-12 text-amber-500" />}
+            title={t("kyc.inReviewTitle")}
+            hint={t("kyc.gv.inReviewHint")}
+          />
         ) : /* --- Rejected: show reason, retake --- */ verdict ? (
           <StatusBlock
             icon={<XCircle className="h-12 w-12 text-destructive" />}
             title={t("kyc.declinedTitle")}
-            hint={verdict.rejection_reason || t("kyc.declinedHint")}
+            hint={backendText(
+              verdict.rejection_reason,
+              locale,
+              t("kyc.declinedHint"),
+            )}
           >
             <Button className="h-11 w-full" onClick={retake}>
               <RotateCcw className="mr-2 h-4 w-4" />

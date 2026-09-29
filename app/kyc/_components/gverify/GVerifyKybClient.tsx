@@ -32,7 +32,7 @@ import { StatusBlock } from "../status-block";
 import { DocumentCaptureField } from "./DocumentCaptureField";
 import { useGVerifyKyb } from "./useGVerifyKyb";
 import type { ApiError } from "@/lib/types";
-import { apiErrorMessage } from "@/lib/api-error-message";
+import { apiErrorMessage, backendText } from "@/lib/api-error-message";
 
 // HOUSEHOLD was dropped 2026-07-15 per the provider integration guide — OCR X
 // business verification covers company and branch certificates.
@@ -190,7 +190,11 @@ export function GVerifyKybClient() {
             )}
             hint={
               status.status === "REJECTED"
-                ? status.rejection_reason || t("kyc.declinedHint")
+                ? backendText(
+                    status.rejection_reason,
+                    locale,
+                    t("kyc.declinedHint"),
+                  )
                 : t("kyc.gv.failedHint")
             }
           >

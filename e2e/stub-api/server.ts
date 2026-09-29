@@ -31,6 +31,7 @@ import {
   STUB_ADMIN_STATS,
   STUB_ADMIN_USERS,
   STUB_AUDIT_LOGS,
+  STUB_KYC_REVIEWS,
   STUB_PASSWORD,
   STUB_ADMIN_ONLY_PROJECT,
   STUB_ADMIN_COMPLETE_PROJECT,
@@ -106,6 +107,15 @@ interface StubAdminKyb {
 
 const adminApplications = new Map<string, StubAdminApplication>();
 const adminKybAttempts = new Map<string, StubAdminKyb>();
+// Admin KYC review rows, keyed by attempt id. Deep-copied so a settled row
+// never mutates the exported fixture a spec compares against.
+const kycReviews = new Map<
+  string,
+  Record<string, unknown> & { status: string }
+>(STUB_KYC_REVIEWS.map((row) => [row.id, structuredClone(row)]));
+// A 1x1 PNG: enough for <img> to load, so the tile renders its image state.
+const STUB_KYC_IMAGE_URL =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
 const adminProjectSeeded = new Set<string>();
 
 /** Status changes made during a run, keyed by stub user id. */
@@ -1567,6 +1577,73 @@ const server = createServer(async (req, res) => {
         attempt.rejection_reason = (body.note as string) ?? null;
       }
       return json(res, 200, attempt);
+    }
+
+    // --- Admin KYC review -------------------------------------------------- //
+    // Mutable per attempt id; see STUB_KYC_REVIEWS for why each settling test
+    // owns its own row. Mirrors app/admin/service.py's rules: approving needs
+    // a note, only MANUAL_REVIEW settles, and the investor-facing reason on a
+    // rejection is fixed, never the note.
+    if (path === "/admin/kyc-verifications" && method === "GET") {
+      const status = url.searchParams.get("status") ?? "MANUAL_REVIEW";
+      return json(
+        res,
+        200,
+        [...kycReviews.values()].filter((row) => row.status === status),
+      );
+    }
+
+    const kycImageMatch = path.match(
+      /^\/admin\/kyc-verifications\/([^/]+)\/images\/([^/]+)$/,
+    );
+    if (kycImageMatch && method === "GET") {
+      if (!kycReviews.has(kycImageMatch[1])) {
+        return json(res, 404, { detail: "KYC verification not found" });
+      }
+      // The back of the card "was not stored": retention is best-effort, and
+      // the panel has to render that case.
+      if (kycImageMatch[2] === "id_back") {
+        return json(res, 404, { detail: "This image was not stored" });
+      }
+      return json(res, 200, {
+        url: STUB_KYC_IMAGE_URL,
+        expires_in: 600,
+        content_type: "image/png",
+      });
+    }
+
+    const kycDetailMatch = path.match(/^\/admin\/kyc-verifications\/([^/]+)$/);
+    if (kycDetailMatch && method === "GET") {
+      const row = kycReviews.get(kycDetailMatch[1]);
+      if (!row) return json(res, 404, { detail: "KYC verification not found" });
+      return json(res, 200, row);
+    }
+
+    const kycResolveMatch = path.match(
+      /^\/admin\/kyc-verifications\/([^/]+)\/resolve$/,
+    );
+    if (kycResolveMatch && method === "POST") {
+      const body = await readBody(req);
+      const row = kycReviews.get(kycResolveMatch[1]);
+      if (!row) return json(res, 404, { detail: "KYC verification not found" });
+      if (row.status !== "MANUAL_REVIEW") {
+        return json(res, 409, {
+          detail: `Only a MANUAL_REVIEW attempt can be resolved (this one is ${row.status})`,
+        });
+      }
+      const note = String(body.note ?? "").trim();
+      if (body.decision === "APPROVED" && !note) {
+        return json(res, 400, {
+          detail: "A note is required to approve a flagged verification",
+        });
+      }
+      row.status = String(body.decision);
+      row.is_approved = row.status === "APPROVED";
+      row.rejection_reason =
+        row.status === "APPROVED"
+          ? null
+          : "We could not complete your identity verification. Please contact support.";
+      return json(res, 200, row);
     }
 
     if (path === "/admin/audit-logs" && method === "GET") {
