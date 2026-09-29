@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -29,6 +29,7 @@ import { useCurrentUser } from "@/hooks/use-authentication";
 import { useGVerifyKybStatus, useGVerifyStatus } from "@/hooks/use-gverify";
 import type { GVerifyKybDocumentType } from "@/services/gverify.service";
 import { postVerificationTarget } from "../../kyc-landing";
+import { useFinishVerification } from "../../use-finish-verification";
 import { StatusBlock } from "../status-block";
 import { DocumentCaptureField } from "./DocumentCaptureField";
 import { KycCapturePanel } from "./KycCapturePanel";
@@ -99,17 +100,10 @@ export function GVerifyKybClient() {
 
   // Approval changes what the SERVER will do with this session: proxy.ts routes
   // on /gverify/kyb/status, and it has already answered "not approved" for this
-  // page load. A soft client navigation can be served from router state that
-  // predates the verdict and quietly land the user back on /kyc — reported from
-  // the field as "it says verified and then just sits there until I refresh".
-  // A full document load is the only hop that guarantees the proxy re-evaluates
-  // from scratch. `replace` so Back does not return to the verification screen.
-  useEffect(() => {
-    if (isApproved) {
-      const id = setTimeout(() => window.location.replace(landing), 1200);
-      return () => clearTimeout(id);
-    }
-  }, [isApproved, landing]);
+  // page load, so the next hop must be a full document load. In a verification
+  // tab the original tab makes that hop and this one closes
+  // (useFinishVerification).
+  useFinishVerification(isApproved, landing);
 
   const handleSubmit = async () => {
     try {

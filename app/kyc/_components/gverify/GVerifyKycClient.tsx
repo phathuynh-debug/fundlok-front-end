@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Loader2, CheckCircle2, ArrowLeft, Clock } from "lucide-react";
@@ -12,6 +11,7 @@ import { useTranslations } from "@/lib/i18n";
 import { useCurrentUser } from "@/hooks/use-authentication";
 import { useGVerifyStatus } from "@/hooks/use-gverify";
 import { postVerificationTarget } from "../../kyc-landing";
+import { useFinishVerification } from "../../use-finish-verification";
 import { StatusBlock } from "../status-block";
 import { KycCapturePanel } from "./KycCapturePanel";
 
@@ -29,17 +29,9 @@ export function GVerifyKycClient() {
   const landing = postVerificationTarget(searchParams.get("next"), user?.role);
   const isApproved = status?.is_approved === true;
 
-  // Once approved, head into the app after a brief confirmation. Full document
-  // load rather than a client navigation, for the same reason as the KYB screen
-  // (see GVerifyKybClient): the proxy gates this route on the verification
-  // status it read BEFORE the verdict existed, so the hop has to re-enter the
-  // server rather than reuse router state.
-  useEffect(() => {
-    if (isApproved) {
-      const id = setTimeout(() => window.location.replace(landing), 1200);
-      return () => clearTimeout(id);
-    }
-  }, [isApproved, landing]);
+  // Once approved: hand back to the tab that opened this one, or head into
+  // the app here (see useFinishVerification).
+  useFinishVerification(isApproved, landing);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/50 p-6">

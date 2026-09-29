@@ -15,6 +15,7 @@ export type StubUserKey =
   | "unverifiedEmail"
   | "noRole"
   | "unapprovedInvestor"
+  | "unapprovedInvestorTab"
   | "unapprovedSme"
   | "unapprovedSmeIdentity"
   | "smeDraftApplication"
@@ -159,6 +160,15 @@ export const STUB_USERS: Record<StubUserKey, StubUser> = {
     ...base,
     id: "00000000-0000-0000-0000-0000000000a8",
     email: "unapproved-investor@e2e.test",
+    role: "INVESTOR",
+    is_approved: false,
+  },
+  // Verifies during the two-tab KYC test only, so parallel tests that rely on
+  // `unapprovedInvestor` staying unverified are unaffected.
+  unapprovedInvestorTab: {
+    ...base,
+    id: "00000000-0000-0000-0000-0000000000ab",
+    email: "unapproved-investor-tab@e2e.test",
     role: "INVESTOR",
     is_approved: false,
   },

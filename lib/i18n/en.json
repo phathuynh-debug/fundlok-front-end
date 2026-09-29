@@ -1882,6 +1882,10 @@
       "typeCompany": "Company",
       "typeLabel": "Certificate type"
     },
+    "newTab": {
+      "description": "Finish verifying there. This page continues on its own once you're approved.",
+      "title": "Verification opened in a new tab"
+    },
     "retryBtn": "Try again",
     "returnBtn": "Return",
     "startErrorDescription": "Something went wrong starting verification. Please try again.",

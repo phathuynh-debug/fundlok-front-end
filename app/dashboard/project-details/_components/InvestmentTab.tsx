@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Banknote } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format-currency";
+import { useVerificationGate } from "@/hooks/use-verification-gate";
 
 export function InvestmentTab() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export function InvestmentTab() {
   const [isPending, setIsPending] = useState(false);
   const { toast } = useToast();
   const { t, locale } = useTranslations();
+  const { proceed } = useVerificationGate();
 
   // VND, matching every other money surface. 375M is the mock per-investor cap.
   const maxAmount = 375_000_000;
@@ -29,10 +31,10 @@ export function InvestmentTab() {
   const fundedAmount = (targetAmount * progressPercent) / 100;
   const remainingAmount = targetAmount - fundedAmount;
 
-  // Investing requires an approved KYC. Rather than gate the button here, we
-  // hand off to the /dashboard/invest route, which the proxy hard-gates: an
-  // unverified investor is bounced to /kyc?next=… and returned here after
-  // approval. So this handler only validates the amount, then navigates.
+  // Investing requires an approved KYC. An unverified investor gets KYC in a
+  // new tab; when it's approved that tab closes and this one goes on to
+  // /dashboard/invest. The proxy still hard-gates that route, so a direct
+  // visit is bounced to /kyc?next=… in the same tab as before.
   const handleInvest = (e: React.FormEvent) => {
     e.preventDefault();
     const numericAmount = parseFloat(amount);
@@ -57,10 +59,13 @@ export function InvestmentTab() {
       return;
     }
 
-    setIsPending(true);
     const params = new URLSearchParams({ amount: String(numericAmount) });
     if (projectId) params.set("projectId", projectId);
-    router.push(`/dashboard/invest?${params.toString()}`);
+    const target = `/dashboard/invest?${params.toString()}`;
+    proceed(target, () => {
+      setIsPending(true);
+      router.push(target);
+    });
   };
 
   return (

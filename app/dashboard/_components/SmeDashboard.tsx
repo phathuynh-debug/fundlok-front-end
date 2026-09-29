@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { getIndustryTheme } from "./sme-dashboard-config";
 import { formatDate, formatDateTime } from "@/lib/format-date";
 import { enumLabel } from "@/lib/enum-labels";
+import { useVerificationGate } from "@/hooks/use-verification-gate";
 import { LoanApplicationUpload } from "./loan-application/LoanApplicationUpload";
 import { LoanApplicationStatus } from "./loan-application/LoanApplicationStatus";
 import { SmeFundingPanel } from "./SmeFundingPanel";
@@ -32,6 +33,7 @@ interface SmeDashboardProps {
 export function SmeDashboard({ projects }: SmeDashboardProps) {
   const project = projects[0];
   const { locale, t } = useTranslations();
+  const { needsVerification, openVerification } = useVerificationGate();
 
   // No project yet → invite the SME to apply. "Apply for funding" links to
   // /project-application, which the proxy KYB-gates: an unverified SME is sent
@@ -57,7 +59,17 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
             </p>
           </div>
           <Button asChild size="lg" className="gap-2" data-tour="sme-apply">
-            <Link href="/project-application">
+            <Link
+              href="/project-application"
+              onClick={(event) => {
+                // An SME without an approved KYB verifies in a new tab; this
+                // one continues to the application once it's approved.
+                if (needsVerification("/project-application")) {
+                  event.preventDefault();
+                  openVerification("/project-application");
+                }
+              }}
+            >
               {t("dashboard.sme.emptyCta")}
               <ArrowRight className="h-4 w-4" />
             </Link>

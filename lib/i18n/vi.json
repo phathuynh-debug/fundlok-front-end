@@ -1882,6 +1882,10 @@
       "typeCompany": "Doanh nghiệp",
       "typeLabel": "Loại giấy chứng nhận"
     },
+    "newTab": {
+      "description": "Vui lòng hoàn tất xác minh ở tab đó. Trang này sẽ tự tiếp tục khi bạn được duyệt.",
+      "title": "Đã mở xác minh trong tab mới"
+    },
     "retryBtn": "Thử lại",
     "returnBtn": "Quay lại",
     "startErrorDescription": "Đã xảy ra lỗi khi bắt đầu xác minh. Vui lòng thử lại.",
