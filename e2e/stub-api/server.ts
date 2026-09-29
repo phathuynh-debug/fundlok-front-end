@@ -328,6 +328,12 @@ let setupUnavailable = false;
  * the change itself. Only ever set by POST /gverify/kyb/verify.
  */
 const kybApproved = new Set<string>();
+/**
+ * Accounts whose own identity check (GVerify KYC) passed during the run. SMEs
+ * do it as step 2 of KYB; investors' fixtures already carry is_approved.
+ */
+const kycApproved = new Set<string>();
+const STUB_KYC_PERSON_NUMBER = "079203001234";
 
 function totpState(key: string) {
   if (!twoFactor.has(key)) {
@@ -1052,6 +1058,23 @@ const server = createServer(async (req, res) => {
   // A KYB submission. The real provider returns the verdict synchronously, so
   // there is no webhook to wait on: the attempt is terminal by the time this
   // responds, and the caller counts as approved from here on.
+  // A personal identity check (ID card + selfie). Synchronous like the real
+  // provider; the stub approves and records it for /gverify/kyc/status.
+  if (path === "/gverify/kyc/verify" && method === "POST") {
+    kycApproved.add(key);
+    return json(res, 201, {
+      verification_id: "00000000-0000-0000-0000-0000000000c1",
+      status: "APPROVED",
+      is_approved: true,
+      rejection_reason: null,
+      person_number: STUB_KYC_PERSON_NUMBER,
+      full_name: user.full_name ?? null,
+      date_of_birth: "01/01/1990",
+      face_match_score: 0.93,
+      created_at: new Date().toISOString(),
+    });
+  }
+
   if (path === "/gverify/kyb/verify" && method === "POST") {
     kybApproved.add(key);
     return json(res, 201, {
@@ -1072,7 +1095,8 @@ const server = createServer(async (req, res) => {
   if (path === "/gverify/kyc/status" || path === "/gverify/kyb/status") {
     const approved =
       user.is_approved ||
-      (path === "/gverify/kyb/status" && kybApproved.has(key));
+      (path === "/gverify/kyb/status" && kybApproved.has(key)) ||
+      (path === "/gverify/kyc/status" && kycApproved.has(key));
     // KYB additionally carries what the certificate OCR read, which the SME
     // project application prefills from. Null (not absent) when the fixture
     // has no certificate data — that is the real endpoint's shape too.
@@ -1085,10 +1109,22 @@ const server = createServer(async (req, res) => {
             date_of_establishment: user.kyb?.date_of_establishment ?? null,
           }
         : {};
+    // KYC additionally carries who was verified: the KYB identity step shows
+    // the name and the last digits of the CCCD.
+    const person =
+      path === "/gverify/kyc/status" && approved
+        ? {
+            verification_id: "00000000-0000-0000-0000-0000000000c1",
+            is_terminal: true,
+            person_number: STUB_KYC_PERSON_NUMBER,
+            full_name: user.full_name ?? null,
+          }
+        : {};
     return json(res, 200, {
       is_approved: approved,
       status: approved ? "APPROVED" : "PENDING",
       ...certificate,
+      ...person,
     });
   }
 

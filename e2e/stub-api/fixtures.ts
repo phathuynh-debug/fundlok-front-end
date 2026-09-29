@@ -16,6 +16,7 @@ export type StubUserKey =
   | "noRole"
   | "unapprovedInvestor"
   | "unapprovedSme"
+  | "unapprovedSmeIdentity"
   | "smeDraftApplication"
   | "smeRejectedApplication"
   | "smeApprovedApplication"
@@ -183,6 +184,15 @@ export const STUB_USERS: Record<StubUserKey, StubUser> = {
     ...base,
     id: "00000000-0000-0000-0000-0000000000a9",
     email: "unapproved-sme@e2e.test",
+    role: "SME",
+    is_approved: false,
+  },
+  // Never verifies anything during the run, so a test can rely on it staying
+  // unverified while other tests approve `unapprovedSme` in parallel.
+  unapprovedSmeIdentity: {
+    ...base,
+    id: "00000000-0000-0000-0000-0000000000aa",
+    email: "unapproved-sme-identity@e2e.test",
     role: "SME",
     is_approved: false,
   },

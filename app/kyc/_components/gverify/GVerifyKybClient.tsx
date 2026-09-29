@@ -14,6 +14,7 @@ import {
   ArrowRight,
   FileText,
   Clock,
+  IdCard,
 } from "lucide-react";
 
 import Link from "next/link";
@@ -25,11 +26,12 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
 import { useCurrentUser } from "@/hooks/use-authentication";
-import { useGVerifyKybStatus } from "@/hooks/use-gverify";
+import { useGVerifyKybStatus, useGVerifyStatus } from "@/hooks/use-gverify";
 import type { GVerifyKybDocumentType } from "@/services/gverify.service";
 import { postVerificationTarget } from "../../kyc-landing";
 import { StatusBlock } from "../status-block";
 import { DocumentCaptureField } from "./DocumentCaptureField";
+import { KycCapturePanel } from "./KycCapturePanel";
 import { useGVerifyKyb } from "./useGVerifyKyb";
 import type { ApiError } from "@/lib/types";
 import { apiErrorMessage, backendText } from "@/lib/api-error-message";
@@ -53,16 +55,24 @@ const DOCUMENT_TYPES: Array<{
   },
 ];
 
-// SME business verification via GVerify eKYB — an in-app flow: the SME uploads
-// the business registration certificate (photo or PDF), we OCR it and
-// cross-check the tax code against the state registry, and the verdict comes
-// back synchronously.
+// SME business verification via GVerify eKYB — an in-app flow in three steps:
+//   1. the business registration certificate (photo or PDF);
+//   2. the applicant's own identity — the same GVerify KYC investors do (ID
+//      card + selfie, or the phone QR handoff), skipped once approved;
+//   3. review & submit: we OCR the certificate, cross-check the tax code
+//      against the state registry, and — with GVERIFY_KYB_REQUIRE_REP_MATCH on
+//      — require the verified CCCD to be a legal representative on it.
+// The verdict comes back synchronously.
 export function GVerifyKybClient() {
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const { t, locale } = useTranslations();
   const { data: user } = useCurrentUser();
   const { data: status } = useGVerifyKybStatus();
+  // The applicant's personal identity check (step 2). Separate query and
+  // cache from the business status above.
+  const { data: identity } = useGVerifyStatus();
+  const identityVerified = identity?.is_approved === true;
   const {
     document,
     setFile,
@@ -79,9 +89,10 @@ export function GVerifyKybClient() {
   // After a REJECTED/FAILED verdict the result screen shows first; "try again"
   // flips into capture mode for a fresh attempt.
   const [retaking, setRetaking] = useState(false);
-  // Two-step wizard: 1 = certificate type + upload; 2 = review & submit.
-  // Step 2 is reachable only once a document is staged.
-  const [step, setStep] = useState<1 | 2>(1);
+  // Three-step wizard: 1 = certificate type + upload; 2 = the applicant's
+  // identity; 3 = review & submit. Step 2 needs a staged document, step 3 an
+  // approved identity as well.
+  const [step, setStep] = useState<1 | 2 | 3>(1);
 
   const landing = postVerificationTarget(searchParams.get("next"), user?.role);
   const isApproved = status?.is_approved === true;
@@ -111,15 +122,16 @@ export function GVerifyKybClient() {
     } catch (err) {
       const apiError = err as ApiError;
       setRetaking(false);
-      setStep(1);
+      // The backend refuses a KYB without an approved identity (when the
+      // representative check is on) before spending any provider call.
+      const needsIdentity = apiError?.code === "KYC_REQUIRED";
+      setStep(needsIdentity ? 2 : 1);
       toast({
         variant: "destructive",
         title: t("kyc.gv.errorTitle"),
-        description: apiErrorMessage(
-          apiError,
-          locale,
-          t("kyc.startErrorDescription"),
-        ),
+        description: needsIdentity
+          ? t("kyc.kyb.kycRequired")
+          : apiErrorMessage(apiError, locale, t("kyc.startErrorDescription")),
       });
     }
   };
@@ -127,9 +139,14 @@ export function GVerifyKybClient() {
   const showResult =
     !retaking && (status?.status === "REJECTED" || status?.status === "FAILED");
 
-  // The review step is only ever rendered with a staged document — if the
-  // file vanishes (reset after rejection, type switch), fall back to step 1.
-  const activeStep: 1 | 2 = ready ? step : 1;
+  // Later steps are only ever rendered with what they need: no staged
+  // document (reset after rejection, type switch) falls back to step 1, and
+  // the review needs an approved identity.
+  const activeStep: 1 | 2 | 3 = !ready
+    ? 1
+    : step === 3 && !identityVerified
+      ? 2
+      : step;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/50 p-6">
@@ -189,13 +206,15 @@ export function GVerifyKybClient() {
                 : "kyc.gv.failedTitle",
             )}
             hint={
-              status.status === "REJECTED"
-                ? backendText(
-                    status.rejection_reason,
-                    locale,
-                    t("kyc.declinedHint"),
-                  )
-                : t("kyc.gv.failedHint")
+              status.status !== "REJECTED"
+                ? t("kyc.gv.failedHint")
+                : status.rejection_code === "NOT_A_REPRESENTATIVE"
+                  ? t("kyc.kyb.notRepresentativeHint")
+                  : backendText(
+                      status.rejection_reason,
+                      locale,
+                      t("kyc.declinedHint"),
+                    )
             }
           >
             <Button
@@ -224,44 +243,54 @@ export function GVerifyKybClient() {
               </div>
             </div>
 
-            {/* Step indicator — step 2 is locked until a document is staged. */}
-            <div className="grid grid-cols-2 gap-2" role="tablist">
-              <button
-                type="button"
-                role="tab"
-                aria-selected={activeStep === 1}
-                disabled={submitting}
-                onClick={() => setStep(1)}
-                className={cn(
-                  "flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2.5 text-xs font-medium transition-colors",
-                  activeStep === 1
-                    ? "border-primary bg-primary/10 text-foreground"
-                    : "border-border bg-muted/20 text-muted-foreground hover:border-primary/40",
-                )}
-              >
-                {ready ? (
-                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
-                ) : (
-                  <FileText className="h-3.5 w-3.5 shrink-0" />
-                )}
-                {t("kyc.kyb.stepDocument")}
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={activeStep === 2}
-                disabled={!ready || submitting}
-                onClick={() => setStep(2)}
-                className={cn(
-                  "flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2.5 text-xs font-medium transition-colors",
-                  activeStep === 2
-                    ? "border-primary bg-primary/10 text-foreground"
-                    : "border-border bg-muted/20 text-muted-foreground hover:border-primary/40",
-                  !ready && "cursor-not-allowed opacity-50",
-                )}
-              >
-                {t("kyc.kyb.stepReview")}
-              </button>
+            {/* Step indicator — each step unlocks once the previous is done. */}
+            <div className="grid grid-cols-3 gap-2" role="tablist">
+              {[
+                {
+                  n: 1 as const,
+                  label: t("kyc.kyb.stepDocument"),
+                  done: ready,
+                  enabled: true,
+                  Icon: FileText,
+                },
+                {
+                  n: 2 as const,
+                  label: t("kyc.kyb.stepIdentity"),
+                  done: identityVerified,
+                  enabled: ready,
+                  Icon: IdCard,
+                },
+                {
+                  n: 3 as const,
+                  label: t("kyc.kyb.stepReview"),
+                  done: false,
+                  enabled: ready && identityVerified,
+                  Icon: null,
+                },
+              ].map(({ n, label, done, enabled, Icon }) => (
+                <button
+                  key={n}
+                  type="button"
+                  role="tab"
+                  aria-selected={activeStep === n}
+                  disabled={!enabled || submitting}
+                  onClick={() => setStep(n)}
+                  className={cn(
+                    "flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2.5 text-xs font-medium transition-colors",
+                    activeStep === n
+                      ? "border-primary bg-primary/10 text-foreground"
+                      : "border-border bg-muted/20 text-muted-foreground hover:border-primary/40",
+                    !enabled && "cursor-not-allowed opacity-50",
+                  )}
+                >
+                  {done ? (
+                    <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
+                  ) : (
+                    Icon && <Icon className="h-3.5 w-3.5 shrink-0" />
+                  )}
+                  {label}
+                </button>
+              ))}
             </div>
 
             {activeStep === 1 ? (
@@ -347,8 +376,94 @@ export function GVerifyKybClient() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </>
+            ) : activeStep === 2 ? (
+              /* --- Step 2: the applicant's identity --- */
+              !identity ? (
+                <StatusBlock
+                  icon={
+                    <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                  }
+                  title={t("kyc.inProgress")}
+                  hint={t("kyc.checking")}
+                />
+              ) : identityVerified ? (
+                <>
+                  <div className="space-y-3 rounded-xl border border-border bg-muted/30 p-4 text-left">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />
+                      <span className="text-sm font-semibold text-foreground">
+                        {t("kyc.kyb.identityVerifiedTitle")}
+                      </span>
+                    </div>
+                    <div className="border-t border-border pt-3">
+                      <p className="text-sm font-medium text-foreground">
+                        {identity.full_name || "—"}
+                      </p>
+                      {identity.person_number && (
+                        <p className="font-mono text-xs text-muted-foreground tabular-nums">
+                          CCCD •••• {identity.person_number.slice(-4)}
+                        </p>
+                      )}
+                    </div>
+                    <p className="text-xs leading-relaxed text-muted-foreground">
+                      {t("kyc.kyb.identityVerifiedHint")}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-12 flex-1"
+                      onClick={() => setStep(1)}
+                    >
+                      <ArrowLeft className="mr-2 h-4 w-4" />
+                      {t("kyc.kyb.backBtn")}
+                    </Button>
+                    <Button
+                      type="button"
+                      className="h-12 flex-[2] text-base font-medium"
+                      onClick={() => setStep(3)}
+                    >
+                      {t("kyc.continueBtn")}
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </div>
+                </>
+              ) : identity.status === "MANUAL_REVIEW" ? (
+                /* Parked for ops review: nothing to retake until it's settled. */
+                <StatusBlock
+                  icon={<Clock className="h-12 w-12 text-amber-500" />}
+                  title={t("kyc.inReviewTitle")}
+                  hint={t("kyc.gv.inReviewHint")}
+                >
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-11 w-full"
+                    onClick={() => setStep(1)}
+                  >
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    {t("kyc.kyb.backBtn")}
+                  </Button>
+                </StatusBlock>
+              ) : (
+                <KycCapturePanel
+                  onBack={() => setStep(1)}
+                  heading={
+                    <div className="space-y-1.5 text-left">
+                      <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                        <IdCard className="h-5 w-5 text-primary" />
+                        {t("kyc.kyb.identityTitle")}
+                      </h2>
+                      <p className="text-sm leading-relaxed text-muted-foreground">
+                        {t("kyc.kyb.identityHint")}
+                      </p>
+                    </div>
+                  }
+                />
+              )
             ) : (
-              /* --- Step 2: review & submit --- */
+              /* --- Step 3: review & submit --- */
               <>
                 <div className="space-y-3 rounded-xl border border-border bg-muted/30 p-4 text-left">
                   <div className="flex items-center justify-between">
@@ -385,6 +500,21 @@ export function GVerifyKybClient() {
                       </p>
                     </div>
                   </div>
+                  {identityVerified && (
+                    <div className="flex items-center justify-between gap-3 border-t border-border pt-3">
+                      <span className="text-xs text-muted-foreground">
+                        {t("kyc.kyb.reviewIdentity")}
+                      </span>
+                      <span className="text-right text-sm font-medium text-foreground">
+                        {identity?.full_name || "—"}
+                        {identity?.person_number && (
+                          <span className="block font-mono text-xs font-normal text-muted-foreground tabular-nums">
+                            CCCD •••• {identity.person_number.slice(-4)}
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <p className="text-xs leading-relaxed text-muted-foreground">
@@ -397,7 +527,7 @@ export function GVerifyKybClient() {
                     variant="outline"
                     className="h-12 flex-1"
                     disabled={submitting}
-                    onClick={() => setStep(1)}
+                    onClick={() => setStep(2)}
                   >
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     {t("kyc.kyb.backBtn")}
@@ -405,7 +535,7 @@ export function GVerifyKybClient() {
                   <Button
                     type="button"
                     className="h-12 flex-[2] text-base font-medium"
-                    disabled={!ready || submitting}
+                    disabled={!ready || !identityVerified || submitting}
                     onClick={handleSubmit}
                   >
                     {submitting ? (

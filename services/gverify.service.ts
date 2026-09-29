@@ -4,8 +4,9 @@ import { GVERIFY_ENDPOINTS } from "@/lib/endpoints";
 // GVerify attempt statuses (backend spec:
 // docs/specs/gverify/ekyc-kyc-verification.md). Every attempt ends terminal
 // within the request that created it; "NOT_STARTED" is our synthetic value for
-// a user with no attempts (the status endpoint 404s). MANUAL_REVIEW is
-// KYB-only: borderline results parked for an ops decision.
+// a user with no attempts (the status endpoint 404s). MANUAL_REVIEW parks an
+// attempt for an ops decision (KYB borderline results; KYC with a CCCD that is
+// already verified on another account).
 export type GVerifyStatus =
   "PENDING" | "APPROVED" | "REJECTED" | "FAILED" | "MANUAL_REVIEW";
 
@@ -100,6 +101,9 @@ export interface GVerifyKybVerifyResponse {
   status: GVerifyStatus;
   is_approved: boolean;
   rejection_reason: string | null;
+  // Machine-readable cause when defined, e.g. NOT_A_REPRESENTATIVE (the
+  // verified identity is not a legal representative on the certificate).
+  rejection_code?: string | null;
   tax_code: string | null;
   business_name: string | null;
   business_type: string | null;
@@ -115,6 +119,7 @@ export interface GVerifyKybStatusResponse {
   is_terminal: boolean;
   is_approved: boolean;
   rejection_reason: string | null;
+  rejection_code?: string | null;
   tax_code: string | null;
   business_name: string | null;
   // Read verbatim off the certificate — one free-text line, not structured
@@ -150,6 +155,7 @@ export function kybVerifyResponseToStatus(
     is_terminal: true,
     is_approved: data.is_approved,
     rejection_reason: data.rejection_reason,
+    rejection_code: data.rejection_code ?? null,
     tax_code: data.tax_code,
     business_name: data.business_name,
     updated_at: data.created_at,

@@ -235,6 +235,34 @@ test.describe("on-demand verification gate", () => {
   });
 });
 
+// A 1x1 PNG: enough to pass the capture's type check.
+const TINY_PNG = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+  "base64",
+);
+
+async function completeIdentityStep(page: import("@playwright/test").Page) {
+  await expect(
+    page.getByRole("heading", { name: t("kyc.kyb.identityTitle") }),
+  ).toBeVisible();
+  for (const slot of ["front", "back", "portrait"]) {
+    await page.locator(`#gverify-${slot}`).setInputFiles({
+      name: `${slot}.png`,
+      mimeType: "image/png",
+      buffer: TINY_PNG,
+    });
+  }
+  await page
+    .getByRole("button", { name: t("kyc.gv.submitBtn"), exact: true })
+    .click();
+  await expect(
+    page.getByText(t("kyc.kyb.identityVerifiedTitle")),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: t("kyc.continueBtn"), exact: true })
+    .click();
+}
+
 // --- Post-verification redirect ---------------------------------------------
 // The whole point of the ?next= handoff is that finishing verification returns
 // the SME to the action they were blocked on. Reported broken by hand: the
@@ -264,6 +292,12 @@ test.describe("finishing KYB returns the SME to their action", () => {
     await page
       .getByRole("button", { name: t("kyc.continueBtn"), exact: true })
       .click();
+
+    // Step 2: the SME's own identity (ID card front/back + selfie), the same
+    // check investors do. The capture tabs advance on their own after each.
+    await completeIdentityStep(page);
+
+    // Step 3: review & submit the business verification.
     await page
       .getByRole("button", { name: t("kyc.gv.submitBtn"), exact: true })
       .click();
@@ -381,4 +415,32 @@ test.describe("an expired session", () => {
       "",
     );
   });
+});
+
+test("the KYB review step stays locked until the SME's identity is verified", async ({
+  page,
+  context,
+}) => {
+  await signInAs(context, "unapprovedSmeIdentity");
+  await page.goto("/kyc");
+
+  await page
+    .locator('input[type="file"]')
+    .first()
+    .setInputFiles({
+      name: "certificate.pdf",
+      mimeType: "application/pdf",
+      buffer: Buffer.from("%PDF-1.4 stub certificate"),
+    });
+  await page
+    .getByRole("button", { name: t("kyc.continueBtn"), exact: true })
+    .click();
+
+  // On the identity step, the review tab can't be opened yet.
+  await expect(
+    page.getByRole("heading", { name: t("kyc.kyb.identityTitle") }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("tab", { name: t("kyc.kyb.stepReview") }),
+  ).toBeDisabled();
 });
