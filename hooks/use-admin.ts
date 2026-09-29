@@ -12,6 +12,10 @@ import {
   type AdminDecisionPayload,
   type AdminDocumentUrl,
   type AdminKybVerification,
+  type AdminKycImageName,
+  type AdminKycImageUrl,
+  type AdminKycStatus,
+  type AdminKycVerification,
   type AdminLoanApplication,
   type AdminOverview,
   type AdminOverviewParams,
@@ -35,6 +39,13 @@ export const adminKeys = {
     [...adminKeys.all, "document-url", documentId] as const,
   projectDetail: (projectId: string) =>
     [...adminKeys.all, "project", projectId] as const,
+  kycAll: () => [...adminKeys.all, "kyc"] as const,
+  kycQueue: (status: AdminKycStatus) =>
+    [...adminKeys.kycAll(), "list", status] as const,
+  kycVerification: (id: string) =>
+    [...adminKeys.kycAll(), "detail", id] as const,
+  kycImage: (id: string, name: AdminKycImageName) =>
+    [...adminKeys.kycAll(), "image", id, name] as const,
 };
 
 export function useAdminOverview(
@@ -163,5 +174,57 @@ export function useAdminDocumentUrl(documentId: string | null) {
     enabled: documentId !== null,
     staleTime: 0,
     retry: false,
+  });
+}
+
+// --- KYC manual review ------------------------------------------------------ //
+
+// KYC attempts in one status. Defaults to the review queue; staleTime is short
+// because the queue is worked by several people.
+export function useAdminKycVerifications(
+  status: AdminKycStatus = "MANUAL_REVIEW",
+) {
+  return useQuery<AdminKycVerification[], ApiError>({
+    queryKey: adminKeys.kycQueue(status),
+    queryFn: () => adminService.getKycVerifications(status),
+    staleTime: 15 * 1000,
+    retry: false,
+    placeholderData: keepPreviousData,
+  });
+}
+
+// One attempt, only while its review panel is open. staleTime 0: the conflict
+// list is recomputed server-side and may have changed since the queue loaded.
+export function useAdminKycVerification(id: string | null) {
+  return useQuery<AdminKycVerification, ApiError>({
+    queryKey: adminKeys.kycVerification(id ?? ""),
+    queryFn: () => adminService.getKycVerification(id as string),
+    enabled: id !== null,
+    staleTime: 0,
+    retry: false,
+  });
+}
+
+// A read URL for one submitted image. staleTime 0 for the same reason as
+// useAdminDocumentUrl: the URL expires in 10 minutes.
+export function useAdminKycImageUrl(id: string, name: AdminKycImageName) {
+  return useQuery<AdminKycImageUrl, ApiError>({
+    queryKey: adminKeys.kycImage(id, name),
+    queryFn: () => adminService.getKycImageUrl(id, name),
+    staleTime: 0,
+    retry: false,
+  });
+}
+
+// Settles a parked attempt. Invalidates every KYC query: the attempt leaves the
+// queue, joins another status list, and may become (or stop being) the
+// conflict shown on other attempts.
+export function useResolveKycVerification() {
+  const queryClient = useQueryClient();
+  return useMutation<AdminKycVerification, ApiError, DecisionInput>({
+    mutationFn: ({ id, body }) => adminService.resolveKycVerification(id, body),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: adminKeys.kycAll() });
+    },
   });
 }

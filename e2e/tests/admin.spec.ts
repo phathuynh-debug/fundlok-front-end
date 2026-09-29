@@ -3,6 +3,10 @@ import { test, expect } from "@playwright/test";
 import {
   STUB_ADMIN_STATS,
   STUB_ADMIN_USERS,
+  STUB_KYC_OWNER_APPROVED,
+  STUB_KYC_REVIEW_LISTED,
+  STUB_KYC_REVIEW_TO_APPROVE,
+  STUB_KYC_REVIEW_TO_REJECT,
   STUB_USERS,
 } from "../stub-api/fixtures";
 import { signInAs } from "../support/auth";
@@ -461,4 +465,173 @@ test.describe("the admin user preview", () => {
       }),
     ).toHaveCount(0);
   });
+});
+
+// KYC review: investor identity checks the engine parked because the ID number
+// was already verified on another account. Each settling test owns its own
+// stub row (see STUB_KYC_REVIEWS) so parallel tests never race over one.
+test.describe("KYC review", () => {
+  test.beforeEach(async ({ context }) => {
+    await signInAs(context, "admin");
+  });
+
+  // Rows are labelled by the account holder's name (DataTable getRowLabel).
+  const rowFor = (
+    page: import("@playwright/test").Page,
+    user: { full_name: string | null; email: string },
+  ) =>
+    page.getByRole("button", {
+      name: t("admin.kycReviews.rowLabel", {
+        name: user.full_name || user.email,
+      }),
+    });
+
+  const openReview = async (
+    page: import("@playwright/test").Page,
+    user: { full_name: string | null; email: string },
+  ) => {
+    await page.goto("/admin/kyc-reviews");
+    await rowFor(page, user).click();
+    const panel = page.getByRole("dialog");
+    await expect(panel).toBeVisible();
+    return panel;
+  };
+
+  test("the sidebar links to the review queue", async ({ page }) => {
+    await page.goto("/admin");
+    await page
+      .getByRole("link", { name: t("admin.sidebar.kycReviews") })
+      .click();
+    await expect(page).toHaveURL(/\/admin\/kyc-reviews$/);
+    await expect(
+      page.getByRole("heading", { name: t("admin.kycReviews.title") }),
+    ).toBeVisible();
+  });
+
+  test("the queue lists parked attempts and why they were flagged", async ({
+    page,
+  }) => {
+    await page.goto("/admin/kyc-reviews");
+
+    const row = rowFor(page, STUB_KYC_REVIEW_LISTED.user);
+    await expect(row).toContainText(STUB_KYC_REVIEW_LISTED.person_number);
+    await expect(row).toContainText(t("admin.kycReviews.conflictOne"));
+    // History is a separate tab: the already-verified owner is not queued.
+    await expect(
+      page.getByText(STUB_KYC_OWNER_APPROVED.user.email),
+    ).toHaveCount(0);
+  });
+
+  test("the approved tab shows past verifications", async ({ page }) => {
+    await page.goto("/admin/kyc-reviews");
+    await page
+      .getByRole("tab", { name: t("admin.kycReviews.tabs.APPROVED") })
+      .click();
+
+    await expect(rowFor(page, STUB_KYC_OWNER_APPROVED.user)).toBeVisible();
+  });
+
+  test("the panel shows both accounts and the submitted images", async ({
+    page,
+  }) => {
+    const panel = await openReview(page, STUB_KYC_REVIEW_LISTED.user);
+
+    await expect(panel).toContainText(t("admin.kycReviews.whyDuplicate"));
+    // This attempt, and the account that already holds the ID number.
+    await expect(panel).toContainText(STUB_KYC_REVIEW_LISTED.user.email);
+    await expect(panel).toContainText(
+      STUB_KYC_REVIEW_LISTED.conflicts[0].user.email,
+    );
+    await expect(panel).toContainText(
+      t("admin.kycReviews.faceMatchValue", { score: 91 }),
+    );
+    // Two stored images render; the back was never stored and says so.
+    await expect(
+      panel.getByRole("img", { name: t("admin.kycReviews.images.id_front") }),
+    ).toBeVisible();
+    await expect(
+      panel.getByRole("img", { name: t("admin.kycReviews.images.portrait") }),
+    ).toBeVisible();
+    await expect(panel).toContainText(t("admin.kycReviews.imageMissing"));
+  });
+
+  test("approving is disabled until there is a note", async ({ page }) => {
+    const panel = await openReview(page, STUB_KYC_REVIEW_LISTED.user);
+    const approve = panel.getByRole("button", {
+      name: t("admin.kycReviews.approve"),
+    });
+
+    await expect(approve).toBeDisabled();
+    await expect(panel).toContainText(t("admin.kycReviews.noteRequired"));
+
+    await panel.getByRole("textbox").fill("   ");
+    await expect(approve).toBeDisabled();
+
+    await panel.getByRole("textbox").fill("Called the owner");
+    await expect(approve).toBeEnabled();
+  });
+
+  test("approving with a note takes the attempt out of the queue", async ({
+    page,
+  }) => {
+    const user = STUB_KYC_REVIEW_TO_APPROVE.user;
+    const panel = await openReview(page, user);
+
+    await panel
+      .getByRole("textbox")
+      .fill("Same person: lost access to the old account, confirmed by phone");
+    await panel
+      .getByRole("button", { name: t("admin.kycReviews.approve") })
+      .click();
+
+    await expect(
+      page.getByText(t("admin.kycReviews.resolved"), { exact: true }),
+    ).toBeVisible();
+    await expect(panel).toBeHidden();
+    await expect(rowFor(page, user)).toHaveCount(0);
+  });
+
+  test("rejecting needs no note and takes the attempt out of the queue", async ({
+    page,
+  }) => {
+    const user = STUB_KYC_REVIEW_TO_REJECT.user;
+    const panel = await openReview(page, user);
+
+    await expect(panel).toContainText(t("admin.kycReviews.rejectHint"));
+    await panel
+      .getByRole("button", { name: t("admin.kycReviews.reject") })
+      .click();
+
+    await expect(
+      page.getByText(t("admin.kycReviews.resolved"), { exact: true }),
+    ).toBeVisible();
+    await expect(rowFor(page, user)).toHaveCount(0);
+    await page
+      .getByRole("tab", { name: t("admin.kycReviews.tabs.REJECTED") })
+      .click();
+    await expect(rowFor(page, user)).toBeVisible();
+  });
+
+  test("a decided attempt offers no decision controls", async ({ page }) => {
+    await page.goto("/admin/kyc-reviews");
+    await page
+      .getByRole("tab", { name: t("admin.kycReviews.tabs.APPROVED") })
+      .click();
+    await rowFor(page, STUB_KYC_OWNER_APPROVED.user).click();
+    const panel = page.getByRole("dialog");
+
+    await expect(panel).toContainText(t("admin.kycReviews.alreadyDecided"));
+    await expect(
+      panel.getByRole("button", { name: t("admin.kycReviews.approve") }),
+    ).toHaveCount(0);
+  });
+});
+
+test("non-admins cannot open the KYC review queue", async ({
+  context,
+  page,
+}) => {
+  await signInAs(context, "investor");
+  await page.goto("/admin/kyc-reviews");
+  await expect(page).not.toHaveURL(/\/admin\/kyc-reviews/);
 });

@@ -53,6 +53,67 @@
         "totalHint": "Everyone who pressed calculate"
       }
     },
+    "kycReviews": {
+      "alreadyDecided": "This identity check has already been decided.",
+      "approve": "Approve",
+      "attemptHeading": "This attempt",
+      "conflictHeading": "Already verified on",
+      "conflictMany": "Also verified on {count} other accounts",
+      "conflictOne": "Also verified on 1 other account",
+      "decisionHeading": "Your decision",
+      "detailLoadFailed": "Couldn't load identity check details. Please try again.",
+      "empty": "No identity checks are waiting for review.",
+      "emptyOther": "No identity checks with this status.",
+      "faceMatchValue": "{score}% similar",
+      "fields": {
+        "accountStatus": "Account status",
+        "dateOfBirth": "Date of birth",
+        "email": "Email",
+        "faceMatch": "Face match",
+        "idNumber": "ID number",
+        "joined": "Joined",
+        "nameOnCard": "Name on card",
+        "submitted": "Submitted",
+        "verified": "Verified"
+      },
+      "imageMissing": "Not stored",
+      "imageOpen": "Open {name} full size",
+      "images": {
+        "id_back": "ID card, back",
+        "id_front": "ID card, front",
+        "portrait": "Selfie"
+      },
+      "imagesHeading": "Submitted images",
+      "noConflict": "No conflict now",
+      "notePlaceholder": "Why are you approving or rejecting? Required to approve. Only staff can see this note.",
+      "noteRequired": "Add a note to approve. Approving overrides a fraud check, so the reason has to be on record.",
+      "reject": "Reject",
+      "rejectHint": "If you reject, the investor sees: “We could not complete your identity verification. Please contact support.” They can submit again.",
+      "resolveFailed": "Couldn't save the decision",
+      "resolved": "Decision saved",
+      "rowLabel": "Review identity check for {name}",
+      "selfBlocked": "You can't review your own identity check.",
+      "sheetSubtitle": "Compare the submitted ID and selfie with the account that already holds this ID number.",
+      "sheetTitle": "Identity check",
+      "subtitle": "Investor identity checks the system couldn't approve on its own.",
+      "table": {
+        "conflicts": "Why flagged",
+        "idNumber": "ID number",
+        "investor": "Investor",
+        "nameOnCard": "Name on card",
+        "status": "Status",
+        "submitted": "Submitted"
+      },
+      "tabs": {
+        "APPROVED": "Approved",
+        "MANUAL_REVIEW": "Waiting for review",
+        "REJECTED": "Rejected"
+      },
+      "title": "KYC reviews",
+      "whyDuplicate": "This ID number is already verified on another FundLok account. A photo cut from someone's ID card can pass the face match, so check that both accounts belong to the same person before approving.",
+      "whyHeading": "Why this needs review",
+      "whyNoConflict": "The account that held this ID number is no longer approved, so nothing conflicts now. Decide on the evidence below."
+    },
     "loading": "Loading admin…",
     "pagination": {
       "next": "Next",
@@ -188,6 +249,7 @@
     "sidebar": {
       "auditLogs": "Audit logs",
       "badge": "Admin",
+      "kycReviews": "KYC reviews",
       "logout": "Log out",
       "overview": "Overview",
       "projects": "Projects",
@@ -1466,6 +1528,7 @@
       "CREATE_BUSINESS": "Business created",
       "DISBURSEMENT": "Disbursement",
       "KYB_MANUAL_REVIEW_RESOLVED": "Business verification review resolved",
+      "KYC_MANUAL_REVIEW_RESOLVED": "Identity verification review resolved",
       "LINK": "Account linked",
       "PASSKEY_ADDED": "Passkey added",
       "PASSKEY_REMOVED": "Passkey removed",
@@ -1761,6 +1824,7 @@
       "failedHint": "Our verification provider had a problem processing your request. Please try again in a moment.",
       "failedTitle": "Something went wrong",
       "frontLabel": "ID card — front",
+      "inReviewHint": "We need to check a few details on your ID by hand. Our team will contact you, and you don't need to submit again.",
       "invalidType": "Must be a JPEG or PNG image",
       "mobileApprovedHint": "You're verified. You can close this page and return to your computer.",
       "mobileExpired": "This link has expired. Go back to your computer and generate a new QR code.",

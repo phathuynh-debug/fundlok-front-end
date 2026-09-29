@@ -10,6 +10,7 @@ import {
   ScrollText,
   ServerCog,
   ShieldCheck,
+  ScanFace,
   LogOut,
   Loader2,
   type LucideIcon,
@@ -35,6 +36,11 @@ const navItems: NavItem[] = [
     labelKey: "admin.sidebar.projects",
     href: "/admin/projects",
     icon: Briefcase,
+  },
+  {
+    labelKey: "admin.sidebar.kycReviews",
+    href: "/admin/kyc-reviews",
+    icon: ScanFace,
   },
   {
     labelKey: "admin.sidebar.rates",

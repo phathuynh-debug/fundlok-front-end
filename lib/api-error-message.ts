@@ -1,18 +1,34 @@
 /**
+ * Text the backend wrote, shown only where it can be read.
+ *
+ * The backend writes its messages in English only. On the English site its
+ * specific wording is shown when there is some; on any other locale the
+ * caller's translated fallback is shown instead, so the Vietnamese site never
+ * carries an English sentence.
+ */
+export function backendText(
+  text: unknown,
+  locale: string,
+  fallback: string,
+): string {
+  if (locale !== "en") return fallback;
+  return typeof text === "string" && text.trim() ? text : fallback;
+}
+
+/**
  * The message to show for a failed API call.
  *
- * The backend writes its error details in English only. Showing them first
- * (`error.message || t(...)`) put English sentences in toasts on the
- * Vietnamese site. So: on the English site the backend's specific reason is
- * still shown when there is one; on any other locale the caller's translated
- * fallback is shown instead.
+ * Showing the backend detail first (`error.message || t(...)`) put English
+ * sentences in toasts on the Vietnamese site; see backendText.
  */
 export function apiErrorMessage(
   error: unknown,
   locale: string,
   fallback: string,
 ): string {
-  if (locale !== "en") return fallback;
-  const message = (error as { message?: unknown } | null | undefined)?.message;
-  return typeof message === "string" && message.trim() ? message : fallback;
+  return backendText(
+    (error as { message?: unknown } | null | undefined)?.message,
+    locale,
+    fallback,
+  );
 }

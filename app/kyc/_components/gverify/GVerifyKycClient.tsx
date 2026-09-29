@@ -13,6 +13,7 @@ import {
   RotateCcw,
   Smartphone,
   ArrowLeft,
+  Clock,
 } from "lucide-react";
 
 import Link from "next/link";
@@ -27,7 +28,7 @@ import { StatusBlock } from "../status-block";
 import { CaptureTabs } from "./CaptureTabs";
 import { useGVerifyKyc } from "./useGVerifyKyc";
 import type { ApiError } from "@/lib/types";
-import { apiErrorMessage } from "@/lib/api-error-message";
+import { apiErrorMessage, backendText } from "@/lib/api-error-message";
 
 // Investor KYC via GVerify (Datatrust) — an in-app flow: the user stages ID
 // front/back + a portrait, we submit them in one call, and the verdict comes
@@ -162,6 +163,14 @@ export function GVerifyKycClient() {
             title={t("kyc.inProgress")}
             hint={t("kyc.checking")}
           />
+        ) : /* --- Parked for ops review. No retry: the backend refuses a new
+               attempt until someone settles this one. --- */ status.status ===
+          "MANUAL_REVIEW" ? (
+          <StatusBlock
+            icon={<Clock className="h-12 w-12 text-amber-500" />}
+            title={t("kyc.inReviewTitle")}
+            hint={t("kyc.gv.inReviewHint")}
+          />
         ) : /* --- Phone handoff: QR + wait for the phone's verdict --- */ phoneActive &&
           phone ? (
           <div className="space-y-5">
@@ -209,7 +218,11 @@ export function GVerifyKycClient() {
             )}
             hint={
               status.status === "REJECTED"
-                ? status.rejection_reason || t("kyc.declinedHint")
+                ? backendText(
+                    status.rejection_reason,
+                    locale,
+                    t("kyc.declinedHint"),
+                  )
                 : t("kyc.gv.failedHint")
             }
           >

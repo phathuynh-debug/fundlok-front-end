@@ -135,6 +135,63 @@ export interface AdminKybVerification {
   updated_at: string | null;
 }
 
+// --- KYC manual review ------------------------------------------------------ //
+//
+// The GVerify KYC engine parks an investor's attempt when the face match would
+// approve but another account already holds an APPROVED KYC with the same ID
+// number. Face match can't tell a real selfie from the card's own portrait, so
+// an operator compares the two accounts and decides.
+
+export type AdminKycStatus =
+  "MANUAL_REVIEW" | "APPROVED" | "REJECTED" | "FAILED";
+
+/** The three images an attempt stores, in the order a reviewer reads them. */
+export const KYC_IMAGE_NAMES = ["id_front", "id_back", "portrait"] as const;
+export type AdminKycImageName = (typeof KYC_IMAGE_NAMES)[number];
+
+export interface AdminKycAccountRef {
+  id: string;
+  email: string;
+  full_name: string | null;
+  status: string;
+  created_at: string | null;
+}
+
+/** Another account already APPROVED with the same ID number. */
+export interface AdminKycConflict {
+  verification_id: string;
+  user: AdminKycAccountRef;
+  /** What OCR read on THAT account's card. */
+  full_name: string | null;
+  date_of_birth: string | null;
+  approved_at: string | null;
+}
+
+export interface AdminKycVerification {
+  id: string;
+  status: AdminKycStatus | string;
+  is_approved: boolean;
+  /** What the investor sees. Never the operator's note. */
+  rejection_reason: string | null;
+  person_number: string | null;
+  /** Name and date of birth as OCR read them on this card. */
+  full_name: string | null;
+  date_of_birth: string | null;
+  /** 0-1 similarity; the verdict itself is the provider's, not a threshold. */
+  face_match_score: number | null;
+  created_at: string | null;
+  user: AdminKycAccountRef;
+  /** Recomputed on every read. Empty means nothing conflicts any more. */
+  conflicts: AdminKycConflict[];
+}
+
+export interface AdminKycImageUrl {
+  url: string;
+  /** Seconds the URL stays valid — 600. */
+  expires_in: number;
+  content_type: string;
+}
+
 // One file the SME uploaded on the loan-application wizard. Metadata only —
 // there is no download endpoint yet, so the panel shows WHAT was supplied
 // rather than pretending to offer the file.
@@ -263,6 +320,37 @@ export const adminService = {
   resolveKybVerification(verificationId: string, body: AdminDecisionPayload) {
     return apiClient.post<AdminKybVerification>(
       ADMIN_ENDPOINTS.resolveKybVerification(verificationId),
+      body,
+    );
+  },
+
+  // Admin only. KYC attempts in one status, oldest first (the queue order).
+  getKycVerifications(status: AdminKycStatus = "MANUAL_REVIEW") {
+    return apiClient.get<AdminKycVerification[]>(
+      ADMIN_ENDPOINTS.kycVerifications,
+      { params: { status } },
+    );
+  },
+
+  getKycVerification(verificationId: string) {
+    return apiClient.get<AdminKycVerification>(
+      ADMIN_ENDPOINTS.kycVerification(verificationId),
+    );
+  },
+
+  // Fetched per image while the review panel is open; 404 when storage was
+  // down at the time and nothing was kept.
+  getKycImageUrl(verificationId: string, name: AdminKycImageName) {
+    return apiClient.get<AdminKycImageUrl>(
+      ADMIN_ENDPOINTS.kycImage(verificationId, name),
+    );
+  },
+
+  // Admin only. 400 when approving without a note (it overrides a fraud
+  // signal), 403 on your own attempt, 409 if it is no longer parked.
+  resolveKycVerification(verificationId: string, body: AdminDecisionPayload) {
+    return apiClient.post<AdminKycVerification>(
+      ADMIN_ENDPOINTS.resolveKycVerification(verificationId),
       body,
     );
   },
