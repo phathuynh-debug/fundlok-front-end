@@ -9,8 +9,15 @@ import {
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import { Building2, Banknote } from "lucide-react";
+import {
+  Building2,
+  Banknote,
+  ChevronDown,
+  ArrowRight,
+  type LucideIcon,
+} from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
 // Content structures for both roles in both English and Vietnamese
 const contentData = {
@@ -373,6 +380,89 @@ const contentData = {
     },
   },
 };
+
+/**
+ * The audience gate: "SME or investor?", the question the section opens with.
+ *
+ * It is a tall scroll track (GATE_TRACK_VH) with one viewport-sized panel
+ * pinned inside it, and the track's scroll progress (0 → 1) drives three beats:
+ *
+ *   approach  the panel is still scrolling into view. The heading drops in and
+ *             the two cards slide in from opposite edges of the screen.
+ *   hold      the panel is pinned with both cards seated, so the reader has a
+ *             moment to choose.
+ *   release   the panel fades as the track ends and the sequence takes over.
+ *
+ * Not choosing is a choice: the sequence starts on the SME flow, so scrolling
+ * straight through the hold shows the Business process by default.
+ */
+const GATE_TRACK_VH = 185;
+
+/**
+ * One choice on the gate.
+ *
+ * `x` and `opacity` are the scroll-driven entrance and live on a wrapper that
+ * does nothing else. The button inside owns the hover and selected colours.
+ * They must not share an element: a CSS transition on the element framer-motion
+ * writes `transform` to turns every scroll frame into a 300ms ease, so that card
+ * trails behind its neighbour instead of tracking the scrollbar.
+ */
+function AudienceGateCard({
+  icon: Icon,
+  label,
+  blurb,
+  cta,
+  selected,
+  onChoose,
+  x,
+  opacity,
+}: {
+  icon: LucideIcon;
+  label: string;
+  blurb: string;
+  cta: string;
+  selected: boolean;
+  onChoose: () => void;
+  x: MotionValue<string>;
+  opacity: MotionValue<number>;
+}) {
+  return (
+    <motion.div style={{ x, opacity }} className="h-full">
+      <button
+        type="button"
+        onClick={onChoose}
+        aria-pressed={selected}
+        className={cn(
+          "group flex h-full w-full cursor-pointer flex-col items-start gap-2 rounded-2xl border p-4 text-left transition-[background-color,border-color,box-shadow] md:gap-3 md:p-8",
+          selected
+            ? "border-emerald-500 bg-emerald-500/10 shadow-lg shadow-emerald-500/10"
+            : "border-border bg-card hover:border-emerald-500/50 hover:shadow-md",
+        )}
+      >
+        <span
+          className={cn(
+            "flex h-10 w-10 items-center justify-center rounded-full transition-colors md:h-12 md:w-12",
+            selected
+              ? "bg-emerald-600 text-white"
+              : "bg-muted text-muted-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400",
+          )}
+        >
+          <Icon className="h-5 w-5 md:h-6 md:w-6" strokeWidth={1.75} />
+        </span>
+        <span className="font-sans text-xl font-extrabold tracking-tight text-foreground md:text-2xl">
+          {label}
+        </span>
+        <span className="font-sans text-sm leading-relaxed text-muted-foreground">
+          {blurb}
+        </span>
+        <span className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 md:mt-2">
+          {cta}
+          <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1" />
+        </span>
+      </button>
+    </motion.div>
+  );
+}
 
 export function InteractiveFlow() {
   const { locale } = useTranslations();
@@ -916,6 +1006,10 @@ export function InteractiveFlow() {
         currentLocale === "vi"
           ? "Tôi đang tìm nguồn vốn cho doanh nghiệp của mình."
           : "I am looking for funding for my business.",
+      cta:
+        currentLocale === "vi"
+          ? "Xem quy trình Doanh nghiệp"
+          : "View Business flow",
     },
     {
       key: "investor" as const,
@@ -926,17 +1020,72 @@ export function InteractiveFlow() {
         currentLocale === "vi"
           ? "Tôi muốn cấp vốn cho các doanh nghiệp đã được thẩm định."
           : "I want to fund businesses that have been assessed.",
+      cta:
+        currentLocale === "vi"
+          ? "Xem quy trình Nhà đầu tư"
+          : "View Investor flow",
     },
   ];
+
+  const gateContainerRef = useRef<HTMLDivElement>(null);
+
+  // Scroll progress across the whole gate track (approach + hold), 0 → 1.
+  const { scrollYProgress: gateTrackProgress } = useScroll({
+    target: gateContainerRef,
+    offset: ["start end", "end end"],
+  });
+
+  // The same number, copied through a plain function on purpose.
+  //
+  // framer-motion 12 hands a `useScroll({ target })` value that goes straight
+  // into `useTransform(v, [in], [out])` to the browser's native ViewTimeline
+  // instead of computing it in JS. For a target taller than the screen the
+  // native "entry" range ends when the target's TOP reaches the top of the
+  // screen, not when its bottom reaches the bottom, and its keyframes only
+  // cover the ranges given, so anything outside them falls back to the inline
+  // style. Opacity peaked early, faded back to 0 before the panel had pinned
+  // and the hold was an empty screen, while `x` (not accelerated) stayed on the
+  // JS progress. One value, one clock: everything below reads this copy.
+  const gateProgress = useTransform(gateTrackProgress, (v) => v);
+
+  // Landmarks, as fractions of the track: ~0.12 the panel's content is just
+  // below the fold, 0.54 (100/185) its top reaches the top of the screen and it
+  // pins, 1 the track ends and the sequence takes over.
+  //
+  // Approach: the heading drops in and the cards travel in from opposite screen
+  // edges, seated a moment before the panel locks. The travel is in vw, not px,
+  // so it starts off-screen at any width and needs no window read (which would
+  // make the server render differ from the client).
+  const headerY = useTransform(gateProgress, [0.1, 0.44], [-35, 0]);
+  const headerOpacity = useTransform(gateProgress, [0.1, 0.38], [0, 1]);
+  const leftCardX = useTransform(gateProgress, [0.12, 0.48], ["-45vw", "0vw"]);
+  const rightCardX = useTransform(gateProgress, [0.12, 0.48], ["45vw", "0vw"]);
+  const cardOpacity = useTransform(gateProgress, [0.12, 0.42], [0, 1]);
+
+  // Hold: the "keep scrolling" hint shows while the cards are seated.
+  const hintOpacity = useTransform(
+    gateProgress,
+    [0.5, 0.58, 0.82, 0.88],
+    [0, 1, 1, 0],
+  );
+
+  // Release: the whole panel eases away as the track ends.
+  const gateExitOpacity = useTransform(gateProgress, [0.86, 0.98], [1, 0]);
+  const gateExitScale = useTransform(gateProgress, [0.86, 0.98], [1, 0.96]);
+  const gateExitY = useTransform(gateProgress, [0.86, 0.98], [0, -18]);
+
+  // Cards that are still transparent (approach) or already fading (release)
+  // must not catch clicks meant for the page behind them.
+  const gateInteractive = useTransform(gateProgress, (v) =>
+    v > 0.4 && v < 0.93 ? "auto" : "none",
+  );
 
   /**
    * Picking an audience takes you to the sequence.
    *
-   * The old control was a pair of small pills above the fold: easy to miss, and
-   * nothing happened when you used it, so the reader had no idea it had chosen
-   * their path through the rest of the section. Now it is the question the
-   * section opens with, and answering it moves you to the first stage so the
-   * next thing you do is simply scroll.
+   * The sequence starts on the SME flow, so there is nothing to "default" to
+   * when the reader scrolls past without choosing: that already IS the Business
+   * process. A choice, from here or from the rail, is simply kept.
    */
   const chooseAudience = (key: "sme" | "investor") => {
     handleRoleChange(key);
@@ -946,7 +1095,7 @@ export function InteractiveFlow() {
     });
   };
 
-  const audienceGate = (
+  const staticAudienceGate = (
     <div className="mx-auto mb-14 max-w-3xl text-center lg:mb-20">
       <h3 className="mb-3 font-sans text-3xl font-extrabold leading-[1.15] tracking-tighter text-foreground md:text-5xl">
         {currentLocale === "vi"
@@ -1267,7 +1416,7 @@ export function InteractiveFlow() {
   if (reduceMotion) {
     return (
       <div className="w-full">
-        {audienceGate}
+        {staticAudienceGate}
         <div className="space-y-14">
           {steps.map((s, idx) => (
             <div key={`${role}-${idx}`}>
@@ -1290,7 +1439,98 @@ export function InteractiveFlow() {
         className="pointer-events-none absolute inset-0 z-50 h-full w-full"
       />
 
-      {audienceGate}
+      {/* Too short to pin a whole screen of content (a phone on its side, a
+          window with devtools docked): show the plain, unpinned gate instead.
+          Pure CSS, so rotating never unmounts the element useScroll tracks.
+          639px is where the pinned content stops fitting on a phone. */}
+      <div className="hidden [@media(max-height:639px)]:block">
+        {staticAudienceGate}
+      </div>
+
+      {/* Audience gate: a scroll track with one viewport-tall panel pinned
+          inside it (see GATE_TRACK_VH). No overflow clip on the panel: the
+          cards travel in from the edges of the SCREEN, and the page wrapper
+          already clips horizontally. */}
+      <div
+        ref={gateContainerRef}
+        style={{ height: `${GATE_TRACK_VH}vh` }}
+        className="relative w-full [@media(max-height:639px)]:hidden"
+      >
+        <div className="sticky top-0 flex min-h-[100dvh] w-full flex-col items-center justify-center px-4 pb-8 pt-28 md:pt-24">
+          <motion.div
+            style={{
+              opacity: gateExitOpacity,
+              scale: gateExitScale,
+              y: gateExitY,
+              pointerEvents: gateInteractive,
+            }}
+            className="mx-auto w-full max-w-3xl text-center"
+          >
+            <motion.div style={{ y: headerY, opacity: headerOpacity }}>
+              <h3
+                id="audience-gate-title"
+                className="mb-3 font-sans text-2xl font-extrabold leading-[1.15] tracking-tighter text-foreground sm:text-3xl md:text-5xl"
+              >
+                {currentLocale === "vi"
+                  ? "Bạn là doanh nghiệp hay nhà đầu tư?"
+                  : "Are you an SME or an investor?"}
+              </h3>
+              {/* On a short screen the hint below says the same, and the room is needed. */}
+              <p className="mx-auto mb-5 max-w-[48ch] font-sans text-sm text-muted-foreground md:mb-8 md:text-base [@media(max-height:700px)]:hidden">
+                {currentLocale === "vi"
+                  ? "Chọn một bên để xem đúng quy trình dành cho bạn."
+                  : "Pick one to see the process that applies to you."}
+              </p>
+            </motion.div>
+
+            <div
+              role="group"
+              aria-labelledby="audience-gate-title"
+              className="grid gap-3 sm:grid-cols-2 sm:gap-4"
+            >
+              {audiences.map((a, i) => (
+                <AudienceGateCard
+                  key={a.key}
+                  icon={a.icon}
+                  label={a.label}
+                  blurb={a.blurb}
+                  cta={a.cta}
+                  selected={role === a.key}
+                  onChoose={() => chooseAudience(a.key)}
+                  x={i === 0 ? leftCardX : rightCardX}
+                  opacity={cardOpacity}
+                />
+              ))}
+            </div>
+
+            {/* Hint for scrolling harder */}
+            <motion.div
+              style={{ opacity: hintOpacity }}
+              className="mt-5 flex flex-col items-center justify-center gap-2 md:mt-8"
+            >
+              <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/80 px-4 py-1.5 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur-sm">
+                <span>
+                  {currentLocale === "vi"
+                    ? "Chọn một bên hoặc cuộn tiếp để xem quy trình Doanh nghiệp mặc định"
+                    : "Choose an option or scroll to continue with Business process by default"}
+                </span>
+                <motion.span
+                  aria-hidden
+                  animate={{ y: [0, 3, 0] }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  className="inline-block text-emerald-600 dark:text-emerald-400"
+                >
+                  <ChevronDown className="h-4 w-4" />
+                </motion.span>
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </div>
 
       {/* Exactly one viewport of scroll per stage, plus the pinned viewport height. */}
       <div
