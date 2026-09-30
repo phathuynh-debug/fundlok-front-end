@@ -50,7 +50,7 @@ export function usePreviewEInvoice() {
   });
 }
 
-// Reads the tax filings as soon as they are picked (step 3), for the prefill.
+// Reads the CIC report as soon as it is picked (step 3), for its score and debt.
 export function usePreviewCic() {
   return useMutation<
     CicPreview,
@@ -63,6 +63,8 @@ export function usePreviewCic() {
   });
 }
 
+// Reads the tax filings as soon as they are picked (step 2), for the prefill
+// and the monthly VAT revenue the year before the invoices is worked out from.
 export function usePreviewTaxFilings() {
   return useMutation<
     TaxFilingsPreview,

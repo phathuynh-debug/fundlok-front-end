@@ -67,7 +67,7 @@ export interface EInvoicePreview {
   warnings: { code: string; detail: string }[];
 }
 
-/** What the tax filings say, read before Send to prefill step 3. */
+/** What the tax filings say, read before Send to prefill step 2. */
 export interface TaxFilingsPreview {
   fiscal_year: number;
   regime: string; // "TT133" | "TT200"
@@ -76,14 +76,33 @@ export interface TaxFilingsPreview {
   cogs_y1: number;
   /** % of net profit paid to owners; null when the year made no profit. */
   owner_withdrawal_pct: number | null;
-  /** Hints for the two typed cost fields — no filing splits fixed/variable. */
+  /**
+   * Fixed and variable cost, by the backend's stated rule (no filing labels a
+   * cost fixed or variable): fixed = management expense + financial expense,
+   * variable = selling expense.
+   */
+  fixed_cost_y1: number;
+  variable_cost_excl_cogs_y1: number;
+  /**
+   * What they are made of. The management expense is line 26 on TT200 and the
+   * combined line 24 on TT133, which has no selling line (0 here). The
+   * financial expense is line 22 and includes the interest of line 23.
+   */
   admin_expense_vnd: number;
   selling_expense_vnd: number;
+  financial_expense_vnd: number;
   revenue_net_vnd: number;
   net_profit_vnd: number;
   interest_expense_vnd: number;
   vat_months: number;
   vat_period: string | null;
+  /**
+   * The signed monthly VAT revenue, oldest first, empty when the upload was the
+   * statement alone. It is what the year BEFORE the e-invoice window is worked
+   * out from. Optional so this build still runs against a backend that does not
+   * send it yet: absent reads as "no declarations".
+   */
+  vat_monthly_revenue?: { period: string; revenue_vnd: number }[];
   warnings: { code: string; detail: string }[];
 }
 
@@ -136,8 +155,8 @@ export const DOCUMENT_TYPE_RULES: Record<
   // (one month) is refused here with a message saying to zip the folder.
   e_invoice_data: { extensions: ["zip"], maxSizeMb: 100 },
   cic_report: { extensions: ["pdf"], maxSizeMb: 25 },
-  // Step 3: the year-end statement XML (B02 package), or the .zip of the tax
-  // folder holding it with the monthly VAT declarations.
+  // The year-end statement XML (B02 package), or the .zip of the tax folder
+  // holding it with the monthly VAT declarations.
   tax_filings: { extensions: ["zip", "xml"], maxSizeMb: 100 },
 };
 

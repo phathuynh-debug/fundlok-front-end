@@ -91,9 +91,9 @@ export function ReviewStep() {
         ))}
       </div>
 
-      {/* The typed figures. These are the grading inputs, so they get read back
-          verbatim before sending — a mistyped zero is the likeliest error in
-          the whole flow and the only place to catch it is here. */}
+      {/* The figures the files gave. These are the grading inputs, so they get
+          read back verbatim before sending: a file for the wrong company or
+          period shows up here as a number that does not look right. */}
       <div className="space-y-2 rounded-xl border border-border bg-muted/20 p-4">
         <h5 className="text-sm font-bold text-foreground">
           {t("dashboard.sme.lite.reviewFiguresTitle")}

@@ -5,13 +5,25 @@ import { CheckCircle2, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLoanApplicationContext } from "./LoanApplicationContext";
 
+// Step 2 takes two files, so its "how to obtain it" is one line per file.
+const STEP_2_FILES = [
+  {
+    labelKey: "dashboard.sme.fileLabel.eInvoices",
+    howKey: "dashboard.sme.step2HowInvoices",
+  },
+  {
+    labelKey: "dashboard.sme.fileLabel.taxFilings",
+    howKey: "dashboard.sme.step2HowFilings",
+  },
+] as const;
+
 // The "why we need this / how to obtain it" panel shown beside each collection
 // step. Content is keyed off the current step.
 export function DocumentInfoPanel() {
   const { currentStep, theme, t } = useLoanApplicationContext();
 
-  // Every collection step now takes a file (steps 2 and 3 read their
-  // figures out of one), so each says how to obtain it.
+  // Every collection step takes a file (step 2 reads its figures out of two),
+  // so each says how to obtain it.
   const secondHeading = t("dashboard.sme.howToObtainIt");
 
   return (
@@ -31,12 +43,25 @@ export function DocumentInfoPanel() {
           <CheckCircle2 className={cn("h-4 w-4", theme.accentColor)} />
           {secondHeading}
         </h5>
-        <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-          {t(`dashboard.sme.step${currentStep}How`)}
-        </p>
+        {currentStep === 2 ? (
+          <ul className="space-y-2.5 text-xs sm:text-sm text-muted-foreground leading-relaxed">
+            {STEP_2_FILES.map(({ labelKey, howKey }) => (
+              <li key={howKey}>
+                <span className="font-semibold text-foreground">
+                  {t(labelKey)}.
+                </span>{" "}
+                {t(howKey)}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+            {t(`dashboard.sme.step${currentStep}How`)}
+          </p>
+        )}
       </div>
 
-      {currentStep === 4 && (
+      {currentStep === 3 && (
         <div className="pt-2 border-t border-border/40 space-y-2">
           <h6 className="font-bold text-xs text-foreground uppercase tracking-wide">
             {t("dashboard.sme.howToObtainCic")}

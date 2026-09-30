@@ -453,6 +453,32 @@ const SUSPENDED_KEYS = new Set<StubUserKey>(["suspended"]);
  */
 const EXPIRED_KEYS = new Set<StubUserKey>(["expiredSession"]);
 
+/**
+ * The stub's signed VAT series, oldest first from 08/2024 (the reference
+ * folder's first month). It lines up with the stub e-invoices, which run
+ * 09/2025-08/2026:
+ *   - 09/2025 onward carries the SAME amounts as the invoices, as real filings
+ *     do, so nothing here contradicts them;
+ *   - the year BEFORE the invoices, 09/2024-08/2025, is a flat 4bn a month, so
+ *     the worked-out prior year is exactly 48bn;
+ *   - 08/2024 is deliberately different (3.9bn), so a spec can prove a month
+ *     outside that year is left out of the sum.
+ * `count` 12 stops at 07/2025, one month short of the year before the invoices.
+ */
+function stubVatSeries(count: number) {
+  return Array.from({ length: count }, (_, i) => {
+    const index = 2024 * 12 + 7 + i; // 08/2024 + i, as months since year 0
+    const period = `${String((index % 12) + 1).padStart(2, "0")}/${Math.floor(index / 12)}`;
+    const revenue_vnd =
+      i === 0
+        ? 3_900_000_000
+        : i <= 12
+          ? 4_000_000_000
+          : 5_000_000_000 + (i - 13) * 100_000_000;
+    return { period, revenue_vnd };
+  });
+}
+
 function json(
   res: ServerResponse,
   status: number,
@@ -1337,12 +1363,20 @@ const server = createServer(async (req, res) => {
     });
   }
 
-  // The step-3 read of the tax filings. Shaped like the reference FY2025
-  // TT133 package: selling expense 0, nothing paid out to the owners.
+  // The read of the tax filings. Shaped like the reference FY2025 TT133
+  // package: selling expense 0, nothing paid out to the owners. The body picks
+  // the variant, since the stub cannot open a zip:
+  //   NOVAT    the statement alone, no VAT declarations
+  //   PARTIAL  declarations that stop a month short of the year before the stub
+  //            invoices
+  //   NOPROFIT a loss year, so there is no owners' share of profit to read
+  //   LOSS     cost of goods sold above the stub invoices' revenue
+  // anything else is the full 24 months and the reference statements.
   if (path === "/uploads/tax-filings-preview" && method === "POST") {
     const chunks: Buffer[] = [];
     for await (const chunk of req) chunks.push(chunk as Buffer);
-    if (Buffer.concat(chunks).toString("latin1").includes("BROKEN")) {
+    const body = Buffer.concat(chunks).toString("latin1");
+    if (body.includes("BROKEN")) {
       return json(
         res,
         422,
@@ -1353,22 +1387,42 @@ const server = createServer(async (req, res) => {
         { "x-error-code": "TAXFILINGS_NO_STATEMENTS" },
       );
     }
+    const vat = body.includes("NOVAT")
+      ? []
+      : stubVatSeries(body.includes("PARTIAL") ? 12 : 24);
+    const noProfit = body.includes("NOPROFIT");
+    const warnings: { code: string; detail: string }[] = [];
+    if (noProfit) {
+      warnings.push({
+        code: "NO_PROFIT",
+        detail: "net profit is not positive; owner withdrawal share left blank",
+      });
+    }
     return json(res, 200, {
       fiscal_year: 2025,
       regime: "TT133",
       signed: true,
       tax_code: "0312345678",
-      // Below the stub invoices' 66.6bn year, so the costs leave a profit.
-      cogs_y1: 40_000_000_000,
-      owner_withdrawal_pct: 0,
+      // Below the stub invoices' 66.6bn year, so the costs leave a profit
+      // (unless the body asks for a loss).
+      cogs_y1: body.includes("LOSS") ? 70_000_000_000 : 40_000_000_000,
+      owner_withdrawal_pct: noProfit ? null : 0,
+      // Fixed cost = management expense (line 24) + financial expense (line 22);
+      // a TT133 statement has no selling line, so variable cost is 0.
+      fixed_cost_y1: 3_160_138_988 + 2_492_864_367,
+      variable_cost_excl_cogs_y1: 0,
       admin_expense_vnd: 3_160_138_988,
       selling_expense_vnd: 0,
+      financial_expense_vnd: 2_492_864_367,
       revenue_net_vnd: 70_000_000_000,
       net_profit_vnd: 1_491_457_916,
       interest_expense_vnd: 2_485_096_004,
-      vat_months: 24,
-      vat_period: "08/2024–07/2026",
-      warnings: [],
+      vat_months: vat.length,
+      vat_period: vat.length
+        ? `${vat[0].period}–${vat[vat.length - 1].period}`
+        : null,
+      vat_monthly_revenue: vat,
+      warnings,
     });
   }
 

@@ -8,11 +8,12 @@ import { useLoanApplication, type DocumentKey } from "./useLoanApplication";
 const STEP_FOR_DOCUMENT: Record<DocumentKey, number> = {
   companyCharter: 1,
   companyRegistration: 1,
-  // The e-invoice zip is the revenue evidence, so it lives on the revenue step.
+  // Revenue and costs are one step: the e-invoices are the revenue evidence and
+  // the tax filings the cost evidence, and the filings also carry the year of
+  // revenue before the invoices.
   eInvoiceData: 2,
-  // The tax filings are the cost evidence, so they live on the costs step.
-  taxFilings: 3,
-  cicReport: 4,
+  taxFilings: 2,
+  cicReport: 3,
 };
 
 // The whole loan-application wizard shares one state object: the hook's state +
@@ -72,11 +73,11 @@ export function LoanApplicationProvider({
 
   const stepLabel = (step: number) => {
     if (step === 1) return locale === "vi" ? "Hồ sơ pháp lý" : "Legal Docs";
-    // Steps 2-3 collect typed figures now, so the labels name the numbers
-    // being asked for rather than the documents that used to carry them.
-    if (step === 2) return locale === "vi" ? "Doanh thu" : "Revenue";
-    if (step === 3) return locale === "vi" ? "Chi phí" : "Costs";
-    if (step === 4) return "CIC";
+    // Step 2 asks for figures, so the label names the numbers rather than the
+    // documents that carry them.
+    if (step === 2)
+      return locale === "vi" ? "Doanh thu & chi phí" : "Revenue & costs";
+    if (step === 3) return "CIC";
     return t("dashboard.sme.reviewStepLabel");
   };
 

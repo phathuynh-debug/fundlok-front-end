@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
-  clampPercentInput,
   LITE_FIGURE_FIELDS,
   REQUIRED_LITE_FIGURE_KEYS,
   figureFieldsForStep,
+  figureFieldsInGroup,
   parseFigure,
   validateFigure,
   type LiteFigureField,
@@ -22,16 +22,40 @@ const BEST_MONTH = field("revenue_best_month"); // optional, vnd
 const CONC = field("conc_top1_pct"); // optional, pct
 
 describe("lite figure config", () => {
-  it("places every field on a step the wizard renders", () => {
+  it("collects every figure on step 2, revenue and costs together", () => {
     for (const f of LITE_FIGURE_FIELDS) {
-      expect([2, 3]).toContain(f.step);
+      expect(f.step).toBe(2);
     }
+    expect(figureFieldsForStep(2)).toHaveLength(LITE_FIGURE_FIELDS.length);
   });
 
-  it("covers both figure steps", () => {
-    expect(figureFieldsForStep(2).length).toBeGreaterThan(0);
-    expect(figureFieldsForStep(3).length).toBeGreaterThan(0);
+  it("asks for no figures on the steps around it", () => {
+    // Step 1 is the legal documents, step 3 the CIC report.
+    expect(figureFieldsForStep(1)).toHaveLength(0);
+    expect(figureFieldsForStep(3)).toHaveLength(0);
     expect(figureFieldsForStep(4)).toHaveLength(0);
+  });
+
+  it("lays step 2 out as a revenue block and a costs block", () => {
+    const revenue = figureFieldsInGroup("revenue").map((f) => f.key);
+    const costs = figureFieldsInGroup("costs").map((f) => f.key);
+
+    expect(revenue).toEqual([
+      "revenue_last_12m",
+      "revenue_prior_12m",
+      "revenue_best_month",
+      "revenue_worst_month",
+    ]);
+    expect(costs).toEqual([
+      "cogs_y1",
+      "fixed_cost_y1",
+      "variable_cost_excl_cogs_y1",
+      "owner_withdrawal_pct",
+      "conc_top1_pct",
+      "conc_top3_pct",
+    ]);
+    // Every figure is in exactly one block.
+    expect(revenue.length + costs.length).toBe(LITE_FIGURE_FIELDS.length);
   });
 
   it("has no duplicate keys", () => {
@@ -39,9 +63,61 @@ describe("lite figure config", () => {
     expect(new Set(keys).size).toBe(keys.length);
   });
 
+  it("reads every figure from a file: none is typed", () => {
+    for (const f of LITE_FIGURE_FIELDS) {
+      expect(["invoices", "statements", "vat"]).toContain(f.source.from);
+      // ...and says where it came from, in words.
+      expect(f.sourceNoteKey).toMatch(/^dashboard\.sme\.figureFrom/);
+    }
+  });
+
+  it("takes the customer figures and revenue from the e-invoices", () => {
+    const fromInvoices = LITE_FIGURE_FIELDS.filter(
+      (f) => f.source.from === "invoices",
+    ).map((f) => f.key);
+    expect(fromInvoices).toEqual([
+      "revenue_last_12m",
+      "revenue_best_month",
+      "revenue_worst_month",
+      "conc_top1_pct",
+      "conc_top3_pct",
+    ]);
+  });
+
+  it("reads fixed and variable cost as the backend's statement rule worked them out", () => {
+    // Fixed = management expense + financial expense, variable = selling
+    // expense; no filing labels a cost either way. The rule lives in the
+    // backend's statement parser, which grading also uses, so what is shown
+    // here is what is graded.
+    expect(field("fixed_cost_y1").source).toEqual({
+      from: "statements",
+      read: "fixed_cost_y1",
+    });
+    expect(field("variable_cost_excl_cogs_y1").source).toEqual({
+      from: "statements",
+      read: "variable_cost_excl_cogs_y1",
+    });
+  });
+
+  it("works the year before the invoices out from both files", () => {
+    expect(field("revenue_prior_12m").source).toEqual({ from: "vat" });
+  });
+
+  it("explains a variable cost of 0 as none booked, and nothing else", () => {
+    // A 0 next to a cost reads like missing data; for selling expense it is
+    // the statements' answer. Only that field has such a note.
+    expect(field("variable_cost_excl_cogs_y1").zeroNoteKey).toBe(
+      "dashboard.sme.figureSellingNone",
+    );
+    const withZeroNote = LITE_FIGURE_FIELDS.filter((f) => f.zeroNoteKey);
+    expect(withZeroNote.map((f) => f.key)).toEqual([
+      "variable_cost_excl_cogs_y1",
+    ]);
+  });
+
   it("names the GradingInput field each figure feeds", () => {
-    // The whole point of the typed path is that these reach the engine; a
-    // field with no mapping is a field nobody can use.
+    // The whole point is that these reach the engine; a field with no
+    // mapping is a field nobody can use.
     for (const f of LITE_FIGURE_FIELDS) {
       expect(f.gradingInput.length).toBeGreaterThan(0);
     }
@@ -265,57 +341,5 @@ describe("validateFigureConsistency", () => {
         }),
       ),
     ).toEqual({});
-  });
-});
-
-describe("clampPercentInput", () => {
-  it("holds a value above 100 at 100", () => {
-    // The reported case: typing into "Top 3 customers, % of revenue" ran past
-    // 100 and only failed at Send.
-    expect(clampPercentInput("2323")).toBe("100");
-    expect(clampPercentInput("101")).toBe("100");
-  });
-
-  it("holds a negative at 0", () => {
-    // Not typeable on a numeric keypad, but reachable by paste.
-    expect(clampPercentInput("-5")).toBe("0");
-  });
-
-  it("leaves a value inside the range exactly as typed", () => {
-    // Including the raw spelling — reformatting mid-typing moves the caret.
-    expect(clampPercentInput("23")).toBe("23");
-    expect(clampPercentInput("0")).toBe("0");
-    expect(clampPercentInput("100")).toBe("100");
-  });
-
-  it("leaves an empty field empty", () => {
-    // Coercing blank to "0" would make an optional figure look answered, and
-    // 0% concentration is a claim rather than a default.
-    expect(clampPercentInput("")).toBe("");
-    expect(clampPercentInput("   ")).toBe("   ");
-  });
-
-  it("does not rewrite something that is not a number", () => {
-    // The existing not_a_number error should get to explain itself.
-    expect(clampPercentInput("abc")).toBe("abc");
-    expect(clampPercentInput("12abc")).toBe("12abc");
-  });
-
-  it("reads a separator in a percentage as a decimal point", () => {
-    // Not as grouping. There is nothing to group below 100, and reading
-    // "19.81" as 1981 is what produced the silent clamp to 100.
-    expect(clampPercentInput("19.81")).toBe("19.81");
-    expect(clampPercentInput("19,81")).toBe("19,81");
-    // So "1.000" is one percent, and stays exactly as typed.
-    expect(clampPercentInput("1.000")).toBe("1.000");
-    // Still clamped when the decimal itself runs past the ceiling.
-    expect(clampPercentInput("100.5")).toBe("100");
-  });
-
-  it("leaves a half-typed decimal alone", () => {
-    // Runs on every keystroke, so "19." is a moment in typing "19.81", not an
-    // error to rewrite.
-    expect(clampPercentInput("19.")).toBe("19.");
-    expect(clampPercentInput("-")).toBe("-");
   });
 });

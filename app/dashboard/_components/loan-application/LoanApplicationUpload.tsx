@@ -14,8 +14,7 @@ import {
 import { DocumentPreviewDialog } from "./DocumentPreviewDialog";
 import { StepIndicator } from "./StepIndicator";
 import { UploadField } from "./UploadField";
-import { FigureField } from "./FigureField";
-import { figureFieldsForStep } from "./lite-grading-fields";
+import { RevenueCostsStep } from "./RevenueCostsStep";
 import { DocumentInfoPanel } from "./DocumentInfoPanel";
 import { ReviewStep } from "./ReviewStep";
 
@@ -144,57 +143,11 @@ function LoanApplicationWizard() {
                       </div>
                     )}
 
-                    {/* Step 2: the e-invoice zip is the revenue evidence, and
-                        the revenue figures are read out of it (locked while it
-                        is attached). Figures are rendered from
-                        LITE_FIGURE_FIELDS so the field set is data, not markup. */}
-                    {currentStep === 2 && (
-                      <div className="space-y-4">
-                        <h4 className="text-lg font-bold text-foreground">
-                          {t("dashboard.sme.lite.revenueTitle")}
-                        </h4>
-                        <p className="text-sm text-muted-foreground">
-                          {t("dashboard.sme.lite.revenueSubtitle")}
-                        </p>
-                        <UploadField
-                          docKey="eInvoiceData"
-                          label={t("dashboard.sme.eInvoiceData")}
-                        />
-                        <EInvoiceReadout />
-                        <div className="space-y-5">
-                          {figureFieldsForStep(2).map((field) => (
-                            <FigureField key={field.key} field={field} />
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                    {/* Step 2: revenue and costs, from two files (see
+                        RevenueCostsStep). */}
+                    {currentStep === 2 && <RevenueCostsStep />}
 
-                    {/* Step 3: the tax filings fill cost of goods sold and
-                        owner withdrawal (locked); the customer shares come from
-                        step 2's invoices; fixed and variable cost are typed,
-                        with the statement's admin/selling lines as hints. */}
                     {currentStep === 3 && (
-                      <div className="space-y-4">
-                        <h4 className="text-lg font-bold text-foreground">
-                          {t("dashboard.sme.lite.costsTitle")}
-                        </h4>
-                        <p className="text-sm text-muted-foreground">
-                          {t("dashboard.sme.lite.costsSubtitle")}
-                        </p>
-                        <UploadField
-                          docKey="taxFilings"
-                          label={t("dashboard.sme.taxFilings")}
-                        />
-                        <TaxFilingsReadout />
-                        <div className="space-y-5">
-                          {figureFieldsForStep(3).map((field) => (
-                            <FigureField key={field.key} field={field} />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {currentStep === 4 && (
                       <div className="space-y-4">
                         <h4 className="text-lg font-bold text-foreground">
                           {t("dashboard.sme.cicCreditReport")}
@@ -239,7 +192,15 @@ function LoanApplicationWizard() {
                   <div className="md:hidden border-t border-border/40 my-4" />
 
                   {/* Right Column: Why & How panel */}
-                  <div className="space-y-4 p-4 md:pl-6 flex flex-col justify-center">
+                  <div
+                    className={cn(
+                      "space-y-4 p-4 md:pl-6 flex flex-col",
+                      // Step 2 is the tall one (two files, then ten figures).
+                      // Centred, the how-to would float beside the figures;
+                      // at the top it sits next to the files it explains.
+                      currentStep === 2 ? "justify-start" : "justify-center",
+                    )}
+                  >
                     <div data-tour="loan-info">
                       <DocumentInfoPanel />
                     </div>
@@ -374,102 +335,8 @@ function ReusedDocumentField({ label, url }: { label: string; url: string }) {
 }
 
 /**
- * What the attached e-invoice zip was read as: the months found, or that it
- * is still being read. Shown between the upload and the figures it fills, so
- * the SME sees where the locked numbers came from.
- */
-function EInvoiceReadout() {
-  const { eInvoicePreview, isReadingEInvoices, t } =
-    useLoanApplicationContext();
-
-  if (isReadingEInvoices) {
-    return (
-      <p className="flex items-center gap-2 text-xs text-muted-foreground">
-        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-        {t("dashboard.sme.eInvoiceReading")}
-      </p>
-    );
-  }
-  if (!eInvoicePreview) return null;
-
-  const partial = eInvoicePreview.revenue_last_12m === null;
-  return (
-    <div
-      className={cn(
-        "rounded-xl border px-3 py-2.5 text-xs leading-relaxed",
-        partial
-          ? "border-amber-500/40 bg-amber-500/5 text-amber-800 dark:text-amber-200"
-          : "border-emerald-500/40 bg-emerald-500/5 text-emerald-800 dark:text-emerald-200",
-      )}
-    >
-      <p className="font-semibold">
-        {t("dashboard.sme.eInvoiceReadSummary")
-          .replace("{count}", String(eInvoicePreview.months_covered))
-          .replace("{start}", eInvoicePreview.period_start)
-          .replace("{end}", eInvoicePreview.period_end)}
-      </p>
-      <p>
-        {partial
-          ? t("dashboard.sme.eInvoicePartialYear")
-          : t("dashboard.sme.eInvoiceFilledFigures")}
-      </p>
-    </div>
-  );
-}
-
-/**
- * What the attached tax filings were read as: the fiscal year of the
- * statements and, when the monthly VAT declarations were included, how many
- * months. Mirrors EInvoiceReadout.
- */
-function TaxFilingsReadout() {
-  const { taxFilingsPreview, isReadingTaxFilings, t } =
-    useLoanApplicationContext();
-
-  if (isReadingTaxFilings) {
-    return (
-      <p className="flex items-center gap-2 text-xs text-muted-foreground">
-        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-        {t("dashboard.sme.taxFilingsReading")}
-      </p>
-    );
-  }
-  if (!taxFilingsPreview) return null;
-
-  // A loss year states no owner-withdrawal share, so that field stays typed.
-  const noProfit = taxFilingsPreview.owner_withdrawal_pct === null;
-  return (
-    <div
-      className={cn(
-        "rounded-xl border px-3 py-2.5 text-xs leading-relaxed",
-        noProfit
-          ? "border-amber-500/40 bg-amber-500/5 text-amber-800 dark:text-amber-200"
-          : "border-emerald-500/40 bg-emerald-500/5 text-emerald-800 dark:text-emerald-200",
-      )}
-    >
-      <p className="font-semibold">
-        {t("dashboard.sme.taxFilingsReadSummary").replace(
-          "{year}",
-          String(taxFilingsPreview.fiscal_year),
-        )}
-        {taxFilingsPreview.vat_months > 0 &&
-          ` · ${t("dashboard.sme.taxFilingsVatMonths").replace(
-            "{count}",
-            String(taxFilingsPreview.vat_months),
-          )}`}
-      </p>
-      <p>
-        {noProfit
-          ? t("dashboard.sme.taxFilingsNoProfit")
-          : t("dashboard.sme.taxFilingsFilledFigures")}
-      </p>
-    </div>
-  );
-}
-
-/**
  * What the attached CIC report was read as: CIC's score and rank, when it
- * was scored, and the current debt position. Nothing on step 4 is filled from
+ * was scored, and the current debt position. Nothing on the CIC step is filled from
  * it; this is so the SME sees what underwriting will see, and catches the
  * wrong report (or a scan) before Send.
  */

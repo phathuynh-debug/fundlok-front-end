@@ -1,16 +1,25 @@
 /**
- * The figures the SME types on steps 2 and 3, replacing the document uploads
- * that used to stand in for them.
+ * The figures on step 2 (revenue and costs).
  *
- * Why typed instead of uploaded: the documents those steps asked for are the
- * highest-friction thing in the whole flow — 48 files for VAT alone — and
- * `docs/specs/underwriting/grading-input-sources.md` §3.1 records that every
- * field they were meant to supply (#7 `monthly_revenue`, #8 `cogs_y1`,
- * #19 `cic_score`) is still marked **Unparsed**. So today they cost the
- * applicant everything and give the grading engine nothing. Two of the engine's
- * required inputs — #9 `fixed_cost_y1` and #10 `variable_cost_excl_cogs_y1` —
- * are additionally marked "Not stated by any statutory document", so no
- * document could ever supply them; a person has to enter them either way.
+ * None of them is typed. Each is read out of one of the two files that step
+ * takes, or worked out from both, and is shown read-only: the applicant cannot
+ * type over a number the files state, and cannot supply one they do not. A
+ * figure the files cannot state stays blank, and while a required one is blank
+ * the step stays blocked until the files are replaced (see figures-from-files).
+ *
+ * Why files and not typing: a typed number can simply be wrong, and the signed
+ * originals cannot. It is also what the documents these figures used to be
+ * asked for as (48 VAT files, a financial report) were for, without the
+ * friction — `docs/specs/underwriting/grading-input-sources.md` §3.1.
+ *
+ * Fixed and variable cost are the one place a RULE stands in for a fact. No
+ * filing labels a cost fixed or variable, so the backend's statement parser
+ * (`app/uploads/parsers/statements.py`) applies one: fixed cost is the
+ * management expense (B02 line 24 on a TT133 statement, line 26 on TT200) plus
+ * the financial expense (line 22, interest included), and variable cost is the
+ * selling expense (line 25). A TT133 statement has no line 25, so its variable
+ * cost is 0. The backend applies the same rule when it grades, so what is shown
+ * here is what is graded.
  *
  * ⚠️ FIELD LIST IS PROVISIONAL. The Lite spec calls for 6 required + 5
  * optional fields. That document was not available when this was written, so
@@ -40,10 +49,42 @@ export type LiteFigureKey =
 /** How a value is formatted and bounded. VND amounts are whole đồng. */
 export type LiteFigureUnit = "vnd" | "pct";
 
+/** The two blocks step 2 is laid out in. */
+export type FigureGroup = "revenue" | "costs";
+
+/**
+ * Where a figure is read from. Every figure has exactly one place, and `read`
+ * names the property of that file's preview that states it, so the mapping is
+ * type-checked against what the backend sends.
+ */
+export type FigureSource =
+  | {
+      from: "invoices";
+      read:
+        | "revenue_last_12m"
+        | "revenue_best_month"
+        | "revenue_worst_month"
+        | "conc_top1_pct"
+        | "conc_top3_pct";
+    }
+  | {
+      from: "statements";
+      read:
+        | "cogs_y1"
+        | "fixed_cost_y1"
+        | "variable_cost_excl_cogs_y1"
+        | "owner_withdrawal_pct";
+    }
+  // Neither file states it: it is the VAT declarations' months that fall in the
+  // 12 before the invoices (see prior-year-revenue.ts), so it needs both.
+  | { from: "vat" };
+
 export interface LiteFigureField {
   key: LiteFigureKey;
-  /** Wizard step that collects it. */
-  step: 2 | 3;
+  /** Wizard step that collects it: revenue and costs share step 2. */
+  step: 2;
+  /** Which block of the step it sits in. */
+  group: FigureGroup;
   required: boolean;
   unit: LiteFigureUnit;
   /** i18n key for the field label. */
@@ -54,79 +95,101 @@ export interface LiteFigureField {
   gradingInput: string;
   /** A VND amount where 0 is a real answer (no such cost), not a slip. */
   allowZero?: boolean;
+  /** The file, and the property in it, this figure is read from. */
+  source: FigureSource;
+  /** i18n key for the note under a value, saying where it came from. */
+  sourceNoteKey: string;
   /**
-   * The year-end statement line shown under the input as a reference, for
-   * figures the SME types because no filing states them (fixed/variable).
+   * Shown instead of `sourceNoteKey` when the file states 0. For a cost, 0
+   * means none was booked: an answer, but one that reads like missing data.
    */
-  statementHint?: "admin_expense_vnd" | "selling_expense_vnd";
+  zeroNoteKey?: string;
 }
 
 export const LITE_FIGURE_FIELDS: readonly LiteFigureField[] = [
-  // --- Step 2: revenue (replaces the 48-file `vat_tax_zip`) ---------------
+  // --- Revenue (replaces the 48-file `vat_tax_zip`) -----------------------
   {
     key: "revenue_last_12m",
     step: 2,
+    group: "revenue",
     required: true,
     unit: "vnd",
     labelKey: "dashboard.sme.lite.revenueLast12m",
     hintKey: "dashboard.sme.lite.revenueLast12mHint",
     gradingInput: "monthly_revenue (m13..m24)",
+    source: { from: "invoices", read: "revenue_last_12m" },
+    sourceNoteKey: "dashboard.sme.figureFromInvoices",
   },
   {
     key: "revenue_prior_12m",
     step: 2,
+    group: "revenue",
     required: true,
     unit: "vnd",
     labelKey: "dashboard.sme.lite.revenuePrior12m",
     hintKey: "dashboard.sme.lite.revenuePrior12mHint",
     gradingInput: "monthly_revenue (m1..m12)",
+    source: { from: "vat" },
+    sourceNoteKey: "dashboard.sme.figureFromVat",
   },
   // The engine scores revenue *stability*, which a single annual total cannot
-  // express. Best/worst month is a two-field proxy for the shape of the year —
-  // far cheaper than typing 24 values, and it keeps the stability factor from
-  // reading a flat synthetic series as perfectly stable.
+  // express. Best/worst month is a two-field proxy for the shape of the year,
+  // read off the invoices' monthly totals, and it keeps the stability factor
+  // from reading a flat synthetic series as perfectly stable.
   {
     key: "revenue_best_month",
     step: 2,
+    group: "revenue",
     required: false,
     unit: "vnd",
     labelKey: "dashboard.sme.lite.revenueBestMonth",
     hintKey: "dashboard.sme.lite.revenueBestMonthHint",
     gradingInput: "monthly_revenue (variability)",
+    source: { from: "invoices", read: "revenue_best_month" },
+    sourceNoteKey: "dashboard.sme.figureFromInvoices",
   },
   {
     key: "revenue_worst_month",
     step: 2,
+    group: "revenue",
     required: false,
     unit: "vnd",
     labelKey: "dashboard.sme.lite.revenueWorstMonth",
     hintKey: "dashboard.sme.lite.revenueWorstMonthHint",
     gradingInput: "monthly_revenue (variability)",
+    source: { from: "invoices", read: "revenue_worst_month" },
+    sourceNoteKey: "dashboard.sme.figureFromInvoices",
   },
 
-  // --- Step 3: costs and concentration (replaces `financial_report`) ------
+  // --- Costs and concentration (replaces `financial_report`) --------------
   {
     key: "cogs_y1",
-    step: 3,
+    step: 2,
+    group: "costs",
     required: true,
     unit: "vnd",
     labelKey: "dashboard.sme.lite.cogsY1",
     hintKey: "dashboard.sme.lite.cogsY1Hint",
     gradingInput: "cogs_y1",
+    source: { from: "statements", read: "cogs_y1" },
+    sourceNoteKey: "dashboard.sme.figureFromFilings",
   },
   {
     key: "fixed_cost_y1",
-    step: 3,
+    step: 2,
+    group: "costs",
     required: true,
     unit: "vnd",
     labelKey: "dashboard.sme.lite.fixedCostY1",
     hintKey: "dashboard.sme.lite.fixedCostY1Hint",
     gradingInput: "fixed_cost_y1",
-    statementHint: "admin_expense_vnd",
+    source: { from: "statements", read: "fixed_cost_y1" },
+    sourceNoteKey: "dashboard.sme.figureFromFixed",
   },
   {
     key: "variable_cost_excl_cogs_y1",
-    step: 3,
+    step: 2,
+    group: "costs",
     required: true,
     unit: "vnd",
     labelKey: "dashboard.sme.lite.variableCostY1",
@@ -134,42 +197,57 @@ export const LITE_FIGURE_FIELDS: readonly LiteFigureField[] = [
     gradingInput: "variable_cost_excl_cogs_y1",
     // Many small firms book no selling expense at all; the backend accepts 0.
     allowZero: true,
-    statementHint: "selling_expense_vnd",
+    source: { from: "statements", read: "variable_cost_excl_cogs_y1" },
+    sourceNoteKey: "dashboard.sme.figureFromSelling",
+    zeroNoteKey: "dashboard.sme.figureSellingNone",
   },
   {
     key: "owner_withdrawal_pct",
-    step: 3,
+    step: 2,
+    group: "costs",
     required: false,
     unit: "pct",
     labelKey: "dashboard.sme.lite.ownerWithdrawal",
     hintKey: "dashboard.sme.lite.ownerWithdrawalHint",
     gradingInput: "owner_withdrawal",
+    source: { from: "statements", read: "owner_withdrawal_pct" },
+    sourceNoteKey: "dashboard.sme.figureFromFilings",
   },
   {
     key: "conc_top1_pct",
-    step: 3,
+    step: 2,
+    group: "costs",
     required: false,
     unit: "pct",
     labelKey: "dashboard.sme.lite.concTop1",
     hintKey: "dashboard.sme.lite.concTop1Hint",
     gradingInput: "conc_top1_pct",
+    source: { from: "invoices", read: "conc_top1_pct" },
+    sourceNoteKey: "dashboard.sme.figureFromInvoices",
   },
   {
     key: "conc_top3_pct",
-    step: 3,
+    step: 2,
+    group: "costs",
     required: false,
     unit: "pct",
     labelKey: "dashboard.sme.lite.concTop3",
     hintKey: "dashboard.sme.lite.concTop3Hint",
     gradingInput: "conc_top3_pct",
+    source: { from: "invoices", read: "conc_top3_pct" },
+    sourceNoteKey: "dashboard.sme.figureFromInvoices",
   },
 ] as const;
 
-/** Steps whose content is typed figures rather than a file upload. */
-export const LITE_FIGURE_STEPS: readonly number[] = [2, 3];
+/** Steps whose content is figures as well as files. */
+export const LITE_FIGURE_STEPS: readonly number[] = [2];
 
 export function figureFieldsForStep(step: number): LiteFigureField[] {
   return LITE_FIGURE_FIELDS.filter((f) => f.step === step);
+}
+
+export function figureFieldsInGroup(group: FigureGroup): LiteFigureField[] {
+  return LITE_FIGURE_FIELDS.filter((f) => f.group === group);
 }
 
 export const LITE_FIGURE_KEYS: readonly LiteFigureKey[] =
@@ -180,13 +258,12 @@ export const REQUIRED_LITE_FIGURE_KEYS: readonly LiteFigureKey[] =
 
 /**
  * Percentages are 0–100; VND amounts must be positive (or zero where the
- * field allows it) and are capped well
- * above any plausible SME turnover so a mistyped extra digit is caught rather
- * than silently grading a company as a conglomerate.
+ * field allows it) and are capped well above any plausible SME turnover, so a
+ * figure read wrongly is caught rather than silently grading a company as a
+ * conglomerate.
  */
 const VND_MAX = 1_000_000_000_000; // 1 trillion đồng
 
-export const PERCENT_MIN = 0;
 export const PERCENT_MAX = 100;
 
 /**
@@ -199,11 +276,12 @@ export const PERCENT_MAX = 100;
  * decimal point, and `19.81` is nineteen point eight one percent.
  *
  * Sharing one normaliser between them is what turned a measured concentration
- * of 19.81% into 1981, which `clampPercentInput` then pinned to 100 — the
- * worst possible value for that factor, arrived at silently, from a figure the
- * applicant typed correctly. Concentration comes off an e-invoice export with
- * two decimals, so this is not a rounding difference; it is a different
- * number reaching the engine.
+ * of 19.81% into 1981, which the input's clamp then pinned to 100 — the worst
+ * possible value for that factor, arrived at silently, from a figure that was
+ * correct. Concentration comes off an e-invoice export with two decimals, so
+ * this is not a rounding difference; it is a different number reaching the
+ * engine. Nothing is typed any more, but the figures still travel as strings
+ * and the two units still read a "." differently.
  */
 const VND_DIGITS = /^\d+$/;
 const PERCENT_NUMBER = /^\d+(?:[.,]\d+)?$/;
@@ -258,40 +336,7 @@ export function validateFigure(
 }
 
 /**
- * Hold a percentage inside 0-100 as it is typed.
- *
- * A share of revenue above 100% describes nothing, and the backend rejects it
- * — but only at Send, several steps later. Clamping at the input turns a
- * late error into an impossible state.
- *
- * Deliberately narrow:
- *   - only `pct` fields; a VND amount has no such ceiling.
- *   - an empty string stays empty. Coercing a blank field to "0" would make
- *     an optional figure look answered, and 0% concentration is a claim, not
- *     a default.
- *   - anything that is not a clean number is returned untouched, so the
- *     existing `not_a_number` error still gets to explain itself rather than
- *     being silently rewritten.
- *   - a decimal is a value, not a violation. This runs on every keystroke, so
- *     it also has to leave a half-typed "19." and a lone "-" alone rather than
- *     rewriting them mid-word.
- */
-export function clampPercentInput(raw: string): string {
-  const trimmed = raw.trim();
-  if (!trimmed) return raw;
-
-  const cleaned = stripSpaces(trimmed).replace(",", ".");
-  if (!/^-?\d+(?:\.\d*)?$/.test(cleaned)) return raw;
-
-  const value = Number(cleaned.endsWith(".") ? cleaned.slice(0, -1) : cleaned);
-  if (!Number.isFinite(value)) return raw;
-  if (value > PERCENT_MAX) return String(PERCENT_MAX);
-  if (value < PERCENT_MIN) return String(PERCENT_MIN);
-  return raw;
-}
-
-/**
- * The number behind the typed string, for submitting and for comparing.
+ * The number behind a figure's string, for submitting and for comparing.
  * `null` when blank or unparseable.
  *
  * `unit` is required, not defaulted: a default is how a percentage came to be
@@ -357,9 +402,9 @@ export function validateFigureConsistency(
   }
 
   // The engine refuses to grade a year that made no profit, so total cost has
-  // to stay below revenue. Blamed on fixed cost: it is typed (cost of goods
-  // sold usually comes locked from the statements), and it is the line most
-  // often over-stated by counting the same spend twice.
+  // to stay below revenue. Nothing on this step can be edited, so this is a
+  // statement about the files, not a slip to fix; it is shown under fixed cost,
+  // the last of the three costs to be read and the one that tips the sum.
   const cogs = n("cogs_y1");
   const fixed = n("fixed_cost_y1");
   const variable = n("variable_cost_excl_cogs_y1");

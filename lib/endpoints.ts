@@ -79,7 +79,7 @@ export const UPLOADS_ENDPOINTS = {
   confirm: "/uploads/confirm",
   // Reads the e-invoice zip the moment it is picked, to prefill step 2.
   einvoicePreview: "/uploads/einvoice-preview",
-  // Reads the tax filings (statement XML, or the folder .zip) to prefill step 3.
+  // Reads the tax filings (statement XML, or the folder .zip) to prefill step 2.
   taxFilingsPreview: "/uploads/tax-filings-preview",
   cicPreview: "/uploads/cic-preview",
 } as const;

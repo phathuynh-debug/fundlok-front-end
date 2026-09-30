@@ -63,7 +63,7 @@ export function tourStorageKey(role: SelectableRole): string {
  * A different job from the dashboard tour above. That one orients someone in
  * the product; this one answers "what is this screen actually asking me for,
  * and what happens after I send it" — the questions an SME owner has while
- * looking at six numbered circles and two upload boxes.
+ * looking at four numbered circles and two upload boxes.
  *
  * On demand only. It never opens itself: the wizard already explains each
  * document in its side panel, and interrupting someone who is part-way through
@@ -71,7 +71,7 @@ export function tourStorageKey(role: SelectableRole): string {
  *
  * Steps whose target is not on the page are dropped by the engine, so this
  * list is safe to run from any step of the form — the upload boxes exist on
- * the document steps, the figure fields on steps 2-3, and the send button only
+ * the document steps, the figure fields on step 2, and the send button only
  * on the review screen.
  */
 export const DOCUMENT_GUIDE_STEPS: readonly TourStep[] = [

@@ -23,20 +23,21 @@ import {
 } from "@/services/uploads.service";
 import {
   LITE_FIGURE_FIELDS,
-  clampPercentInput,
   validateFigureConsistency,
   type LiteFigureField,
-  LITE_FIGURE_KEYS,
   figureFieldsForStep,
   parseFigure,
   validateFigure,
   type FigureError,
   type LiteFigureKey,
 } from "./lite-grading-fields";
+import { figureFilesRead, figuresFromFiles } from "./figures-from-files";
+import { priorYearRevenue } from "./prior-year-revenue";
 
-// Steps 2 and 3 each take one file that the figures are read out of: the
-// e-invoice zip (revenue) and the tax filings (costs). See readEInvoices and
-// readTaxFilings.
+// Step 2 takes two files and every figure on it is read out of them: the
+// e-invoice zip (revenue, customers) and the tax filings (costs, and, through
+// the VAT declarations in them, the year of revenue before the invoices). See
+// figuresFromFiles.
 export type DocumentKey =
   | "companyCharter"
   | "companyRegistration"
@@ -75,79 +76,25 @@ export const DOCUMENT_TYPES: Record<DocumentKey, LoanDocumentType> = {
   cicReport: "cic_report",
 };
 
-// Steps 2 and 3 take BOTH a file and figures: the file is the evidence and
-// the figures it can state are read out of it.
+// Step 2 takes BOTH files and figures: the files are the evidence and the
+// figures they can state are read out of them.
 const STEP_DOCUMENTS: Record<number, DocumentKey[]> = {
   1: ["companyCharter", "companyRegistration"],
-  2: ["eInvoiceData"],
-  3: ["taxFilings"],
-  4: ["cicReport"],
+  2: ["eInvoiceData", "taxFilings"],
+  3: ["cicReport"],
 };
 
 const ALL_DOCUMENT_KEYS = Object.keys(DOCUMENT_TYPES) as DocumentKey[];
 
-// 1 legal · 2 revenue (e-invoices) · 3 costs · 4 CIC · 5 review-and-send.
-// The e-invoice upload used to be a step of its own; it now lives on the
-// revenue step it is evidence for.
-const REVIEW_STEP = 5;
-const TOTAL_STEPS = 5;
+// 1 legal · 2 revenue and costs (e-invoices + tax filings) · 3 CIC · 4 review
+// and send. Revenue and costs used to be two steps, each with a file of its
+// own. The second file also answers the first step's last question (the year
+// of revenue before the invoices), so they are asked together.
+const REVIEW_STEP = 4;
+const TOTAL_STEPS = 4;
 export const EINVOICE_STEP = 2;
-export const TAX_FILINGS_STEP = 3;
-export const CIC_STEP = 4;
-
-// The figures the e-invoices supply. Filled from the preview and locked while
-// the zip is attached, so the figures cannot drift from the evidence they
-// came from. The two customer shares are step-3 fields, but only the invoices
-// know who the customers are, so step 2's upload fills them.
-const EINVOICE_FIGURES: Partial<Record<LiteFigureKey, keyof EInvoicePreview>> =
-  {
-    revenue_last_12m: "revenue_last_12m",
-    revenue_best_month: "revenue_best_month",
-    revenue_worst_month: "revenue_worst_month",
-    conc_top1_pct: "conc_top1_pct",
-    conc_top3_pct: "conc_top3_pct",
-  };
-
-// The step-3 figures the year-end statements state outright. Fixed and
-// variable cost are deliberately absent: no filing splits costs by behaviour,
-// so the SME types them (the statements' admin and selling expense are shown
-// as hints).
-const TAX_FILINGS_FIGURES: Partial<
-  Record<LiteFigureKey, keyof TaxFilingsPreview>
-> = {
-  cogs_y1: "cogs_y1",
-  owner_withdrawal_pct: "owner_withdrawal_pct",
-};
-
-// The statement lines nearest to the two costs no filing splits by behaviour.
-// Filled as a STARTING POINT, not locked: administration is mostly fixed and
-// selling mostly variable, but only the SME knows the real split.
-const TAX_FILINGS_SUGGESTED: Partial<
-  Record<LiteFigureKey, keyof TaxFilingsPreview>
-> = {
-  fixed_cost_y1: "admin_expense_vnd",
-  variable_cost_excl_cogs_y1: "selling_expense_vnd",
-};
-
-/** The numeric values a preview supplies for a figure map. */
-function prefillFrom<P>(
-  map: Partial<Record<LiteFigureKey, keyof P>>,
-  preview: P,
-): { values: Partial<FigureValues>; filled: LiteFigureKey[] } {
-  const values: Partial<FigureValues> = {};
-  const filled: LiteFigureKey[] = [];
-  for (const [figure, source] of Object.entries(map) as [
-    LiteFigureKey,
-    keyof P,
-  ][]) {
-    const value = preview[source];
-    if (typeof value === "number") {
-      values[figure] = String(value);
-      filled.push(figure);
-    }
-  }
-  return { values, filled };
-}
+export const TAX_FILINGS_STEP = 2;
+export const CIC_STEP = 3;
 
 const emptyUpload = (): DocumentUpload => ({
   file: null,
@@ -201,29 +148,15 @@ export function useLoanApplication({
   const previewTaxFilings = usePreviewTaxFilings();
   const previewCic = usePreviewCic();
   // What the attached CIC report says. Shown only: the score feeds grading
-  // from the stored file at Send, and there is no figure on step 4 to fill.
+  // from the stored file at Send, and there is no figure on the CIC step to fill.
   const [cicPreview, setCicPreview] = useState<CicPreview | null>(null);
-  // What each attached evidence file says, and which figures it filled. Kept
-  // per source so removing one file clears only its own figures.
+  // What each attached evidence file says. Every step-2 figure is worked out
+  // from these two at read time (see figuresFromFiles), so removing or replacing
+  // a file takes its figures with it and nothing is left behind looking typed.
   const [eInvoicePreview, setEInvoicePreview] =
     useState<EInvoicePreview | null>(null);
-  const [eInvoiceLocked, setEInvoiceLocked] = useState<LiteFigureKey[]>([]);
   const [taxFilingsPreview, setTaxFilingsPreview] =
     useState<TaxFilingsPreview | null>(null);
-  const [taxLocked, setTaxLocked] = useState<LiteFigureKey[]>([]);
-  // What the filings suggested for the editable costs, to clear them with
-  // the file only while the SME has left them as suggested.
-  const [taxSuggested, setTaxSuggested] = useState<Partial<FigureValues>>({});
-  const lockedFigures = [...eInvoiceLocked, ...taxLocked];
-  // Which file a locked figure was read from, for the note under it.
-  const figureLockSource = (
-    key: LiteFigureKey,
-  ): "invoices" | "filings" | null =>
-    eInvoiceLocked.includes(key)
-      ? "invoices"
-      : taxLocked.includes(key)
-        ? "filings"
-        : null;
 
   const [documents, setDocuments] = useState<DocumentUploads>(
     () =>
@@ -232,20 +165,14 @@ export function useLoanApplication({
       ) as DocumentUploads,
   );
 
-  // Typed figures for steps 2-3. Local UI state, like the staged files: they
-  // do not round-trip to the server until Send.
-  const [figures, setFigures] = useState<FigureValues>(
-    () =>
-      Object.fromEntries(LITE_FIGURE_KEYS.map((k) => [k, ""])) as FigureValues,
+  // Every step-2 figure, read out of the two files. There is no state behind
+  // it, so there is nothing to type into and nothing on the step can be edited.
+  const figures: FigureValues = figuresFromFiles(
+    eInvoicePreview,
+    taxFilingsPreview,
   );
-  // Only populated once a field has been visited, so the form does not open
-  // covered in "required" errors.
-  const [figureErrors, setFigureErrors] = useState<FigureErrors>(
-    () =>
-      Object.fromEntries(
-        LITE_FIGURE_KEYS.map((k) => [k, null]),
-      ) as FigureErrors,
-  );
+  // Whether, and why not, the year before the invoices could be worked out.
+  const priorYear = priorYearRevenue(eInvoicePreview, taxFilingsPreview);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -259,8 +186,8 @@ export function useLoanApplication({
   const validationMessage = (key: DocumentKey, file: File): string | null => {
     const error = validateLoanDocumentFile(DOCUMENT_TYPES[key], file);
     if (!error) return null;
-    // Step 4 reads a whole folder of monthly exports. A single loose export is
-    // the likeliest mistake, so name the fix rather than list extensions.
+    // The e-invoice file is a whole folder of monthly exports. A single loose
+    // export is the likeliest mistake, so name the fix, not the extensions.
     if (error.code === "invalid_extension" && key === "eInvoiceData") {
       return t("dashboard.sme.eInvoiceZipFolder");
     }
@@ -309,59 +236,15 @@ export function useLoanApplication({
     if (key === "cicReport") void readCic(file);
   };
 
-  const clearFigures = (keys: LiteFigureKey[]) =>
-    setFigures((prev) => {
-      const next = { ...prev };
-      for (const k of keys) next[k] = "";
-      return next;
-    });
-
-  const fillFigures = (
-    values: Partial<FigureValues>,
-    keys: LiteFigureKey[],
-  ) => {
-    setFigures((prev) => ({ ...prev, ...values }));
-    setFigureErrors((prev) => {
-      const next = { ...prev };
-      for (const k of keys) next[k] = null;
-      return next;
-    });
-  };
-
-  // Clears the figures a file filled in, so removing or replacing it can
-  // never leave its numbers behind looking typed.
-  const releaseEInvoiceFigures = () => {
-    setEInvoicePreview(null);
-    clearFigures(eInvoiceLocked);
-    setEInvoiceLocked([]);
-  };
-
-  const releaseTaxFilingsFigures = () => {
-    setTaxFilingsPreview(null);
-    clearFigures([
-      ...taxLocked,
-      ...(Object.keys(taxSuggested) as LiteFigureKey[]).filter(
-        (k) => figures[k] === taxSuggested[k],
-      ),
-    ]);
-    setTaxLocked([]);
-    setTaxSuggested({});
-  };
-
   // Reads the zip on the server as soon as it is picked and fills step 2 from
   // it. Advisory: confirm re-parses the STORED file at Send, so a preview can
   // not plant a figure the evidence does not support.
   const readEInvoices = async (file: File) => {
-    releaseEInvoiceFigures();
+    setEInvoicePreview(null);
     try {
-      const preview = await previewEInvoice.mutateAsync({
-        loanApplicationId,
-        file,
-      });
-      const { values, filled } = prefillFrom(EINVOICE_FIGURES, preview);
-      fillFigures(values, filled);
-      setEInvoiceLocked(filled);
-      setEInvoicePreview(preview);
+      setEInvoicePreview(
+        await previewEInvoice.mutateAsync({ loanApplicationId, file }),
+      );
     } catch (err) {
       const { message, code } = (err ?? {}) as {
         message?: string;
@@ -375,29 +258,16 @@ export function useLoanApplication({
     }
   };
 
-  // Reads the tax filings as soon as they are picked and fills step 3's
-  // statutory figures (cost of goods sold, owner withdrawal). Same contract as
-  // readEInvoices: advisory, re-parsed from storage at Send.
+  // Reads the tax filings as soon as they are picked and fills the statutory
+  // figures (cost of goods sold, owner withdrawal). Its VAT series is also what
+  // the year before the invoices is worked out from (see priorYear). Same
+  // contract as readEInvoices: advisory, re-parsed from storage at Send.
   const readTaxFilings = async (file: File) => {
-    releaseTaxFilingsFigures();
+    setTaxFilingsPreview(null);
     try {
-      const preview = await previewTaxFilings.mutateAsync({
-        loanApplicationId,
-        file,
-      });
-      const { values, filled } = prefillFrom(TAX_FILINGS_FIGURES, preview);
-      // Suggestions only fill blanks: never overwrite what the SME typed.
-      const suggested = prefillFrom(TAX_FILINGS_SUGGESTED, preview);
-      const blanks = suggested.filled.filter(
-        (k) => !figures[k].trim() || figures[k] === taxSuggested[k],
+      setTaxFilingsPreview(
+        await previewTaxFilings.mutateAsync({ loanApplicationId, file }),
       );
-      const suggestedValues = Object.fromEntries(
-        blanks.map((k) => [k, suggested.values[k]]),
-      ) as Partial<FigureValues>;
-      fillFigures({ ...values, ...suggestedValues }, [...filled, ...blanks]);
-      setTaxLocked(filled);
-      setTaxSuggested(suggestedValues);
-      setTaxFilingsPreview(preview);
     } catch (err) {
       const { message, code } = (err ?? {}) as {
         message?: string;
@@ -432,8 +302,7 @@ export function useLoanApplication({
   };
 
   // The server's refusal of an evidence file, in the SME's language when the
-  // code is known (EINVOICE_* for step 2, TAXFILINGS_* for step 3, CIC_* for
-  // step 4).
+  // code is known (EINVOICE_* and TAXFILINGS_* for step 2, CIC_* for step 3).
   const evidenceErrorCopy = (code?: string, message?: string): string => {
     const prefixes: [string, string][] = [
       ["EINVOICE_", "dashboard.sme.eInvoiceError."],
@@ -452,60 +321,35 @@ export function useLoanApplication({
 
   const removeFile = (key: DocumentKey) => {
     updateDocument(key, emptyUpload());
-    if (key === "eInvoiceData") releaseEInvoiceFigures();
-    if (key === "taxFilings") releaseTaxFilingsFigures();
+    if (key === "eInvoiceData") setEInvoicePreview(null);
+    if (key === "taxFilings") setTaxFilingsPreview(null);
     if (key === "cicReport") setCicPreview(null);
   };
 
-  // --- Typed figures ---
+  // --- Figures ---
 
-  const setFigure = (key: LiteFigureKey, raw: string) => {
-    // Read from the attached e-invoices: remove the zip to type it instead.
-    if (lockedFigures.includes(key)) return;
-    // Percentages are held inside 0-100 as they are typed, so an impossible
-    // share never survives to become a 422 at Send. Applied here rather than
-    // in the input so every caller of setFigure gets it.
-    const field = LITE_FIGURE_FIELDS.find((f) => f.key === key);
-    const next = field?.unit === "pct" ? clampPercentInput(raw) : raw;
-    setFigures((prev) => ({ ...prev, [key]: next }));
-    // Clear a stale error as soon as the value becomes valid; don't introduce
-    // a new one mid-typing (that fires "not a number" on an empty string).
-    setFigureErrors((prev) => (prev[key] ? { ...prev, [key]: null } : prev));
-  };
+  // Cross-field rules, worked out once per render and blamed on the field they
+  // show under (see validateFigureConsistency).
+  const consistency = validateFigureConsistency(figures);
 
-  /** Validate on blur — the point at which the user has finished the value. */
-  const blurFigure = (key: LiteFigureKey) => {
-    const field = LITE_FIGURE_FIELDS.find((f) => f.key === key);
-    if (!field) return;
-    setFigureErrors((prev) => ({
-      ...prev,
-      [key]: validateFigure(field, figures[key]),
-    }));
-  };
-
-  // Per-field errors plus the cross-field rules. The consistency errors are
-  // blamed on a specific input so they can render under it, rather than in a
-  // toast naming a snake_case field the applicant never saw.
+  // A figure's own problem first, then the rules that involve several figures.
   const figureErrorFor = (field: LiteFigureField): FigureError =>
-    validateFigure(field, figures[field.key]) ??
-    validateFigureConsistency(figures)[field.key] ??
-    null;
+    validateFigure(field, figures[field.key]) ?? consistency[field.key] ?? null;
 
   const isFigureStepValid = (step: number): boolean =>
     figureFieldsForStep(step).every((field) => figureErrorFor(field) === null);
 
-  /** Marks every invalid field on a step so the user can see what is missing. */
-  const revealFigureErrors = (step: number) => {
-    const fields = figureFieldsForStep(step);
-    if (!fields.length) return;
-    setFigureErrors((prev) => {
-      const next = { ...prev };
-      for (const field of fields) {
-        next[field.key] = figureErrorFor(field);
-      }
-      return next;
-    });
-  };
+  // What to show under each figure. Only once the file(s) it is read from have
+  // been read: before that, a blank figure is just a file not yet chosen and
+  // the upload tile is the thing to act on.
+  const figureErrors = Object.fromEntries(
+    LITE_FIGURE_FIELDS.map((field) => [
+      field.key,
+      figureFilesRead(field, eInvoicePreview, taxFilingsPreview)
+        ? figureErrorFor(field)
+        : null,
+    ]),
+  ) as FigureErrors;
 
   // --- Uploading ---
 
@@ -680,7 +524,7 @@ export function useLoanApplication({
     const hasDocs = !!STEP_DOCUMENTS[step];
     const hasFigures = figureFieldsForStep(step).length > 0;
     if (!hasDocs && !hasFigures) return false;
-    // Still reading the zip: the figures it will fill are not in yet.
+    // Still reading a zip: the figures it will fill are not in yet.
     if (step === EINVOICE_STEP && previewEInvoice.isPending) return false;
     if (step === TAX_FILINGS_STEP && previewTaxFilings.isPending) return false;
     if (step === CIC_STEP && previewCic.isPending) return false;
@@ -697,12 +541,11 @@ export function useLoanApplication({
     return true;
   };
 
-  // A figure step's problem is per-field, so surface it on the fields rather
-  // than in a toast that cannot say which number is missing.
+  // With both files in, a blocked figure step is a figure the files did not
+  // state; the fields say which, and the toast says what to do about it.
   const reportBlockedStep = (step: number) => {
     // A missing or refused file is the thing to fix first on a mixed step.
     if (figureFieldsForStep(step).length && areStepDocumentsReady(step)) {
-      revealFigureErrors(step);
       toast({
         variant: "destructive",
         title: t("dashboard.sme.lite.missingFiguresTitle"),
@@ -779,10 +622,10 @@ export function useLoanApplication({
     isReadingTaxFilings: previewTaxFilings.isPending,
     cicPreview,
     isReadingCic: previewCic.isPending,
-    lockedFigures,
-    figureLockSource,
     figures,
     figureErrors,
+    // Whether, and why not, the year before the invoices could be worked out.
+    priorYear,
     currentStep,
     totalSteps: TOTAL_STEPS,
     reviewStep: REVIEW_STEP,
@@ -799,10 +642,6 @@ export function useLoanApplication({
     handleFileChange,
     removeFile,
     retryUpload,
-
-    // Typed-figure actions
-    setFigure,
-    blurFigure,
 
     // Step navigation
     goToStep,
