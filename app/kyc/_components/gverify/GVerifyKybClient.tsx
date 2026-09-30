@@ -27,6 +27,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
 import { useCurrentUser } from "@/hooks/use-authentication";
 import { useGVerifyKybStatus, useGVerifyStatus } from "@/hooks/use-gverify";
+import { KYB_IDENTITY_STEP } from "@/lib/kyb-flow";
 import type { GVerifyKybDocumentType } from "@/services/gverify.service";
 import { postVerificationTarget } from "../../kyc-landing";
 import { useFinishVerification } from "../../use-finish-verification";
@@ -59,7 +60,9 @@ const DOCUMENT_TYPES: Array<{
 // SME business verification via GVerify eKYB — an in-app flow in three steps:
 //   1. the business registration certificate (photo or PDF);
 //   2. the applicant's own identity — the same GVerify KYC investors do (ID
-//      card + selfie, or the phone QR handoff), skipped once approved;
+//      card + selfie, or the phone QR handoff), skipped once approved. Always
+//      shown in production; hidden only for local testing (lib/kyb-flow.ts),
+//      when the flow is 1 → 3;
 //   3. review & submit: we OCR the certificate, cross-check the tax code
 //      against the state registry, and — with GVERIFY_KYB_REQUIRE_REP_MATCH on
 //      — require the verified CCCD to be a legal representative on it.
@@ -70,9 +73,10 @@ export function GVerifyKybClient() {
   const { t, locale } = useTranslations();
   const { data: user } = useCurrentUser();
   const { data: status } = useGVerifyKybStatus();
+  const identityRequired = KYB_IDENTITY_STEP;
   // The applicant's personal identity check (step 2). Separate query and
-  // cache from the business status above.
-  const { data: identity } = useGVerifyStatus();
+  // cache from the business status above; not fetched when the step is off.
+  const { data: identity } = useGVerifyStatus({ enabled: identityRequired });
   const identityVerified = identity?.is_approved === true;
   const {
     document,
@@ -119,7 +123,7 @@ export function GVerifyKybClient() {
       // The backend refuses a KYB without an approved identity (when the
       // representative check is on) before spending any provider call.
       const needsIdentity = apiError?.code === "KYC_REQUIRED";
-      setStep(needsIdentity ? 2 : 1);
+      setStep(needsIdentity && identityRequired ? 2 : 1);
       toast({
         variant: "destructive",
         title: t("kyc.gv.errorTitle"),
@@ -138,9 +142,12 @@ export function GVerifyKybClient() {
   // the review needs an approved identity.
   const activeStep: 1 | 2 | 3 = !ready
     ? 1
-    : step === 3 && !identityVerified
-      ? 2
-      : step;
+    : !identityRequired && step === 2
+      ? 3
+      : step === 3 && identityRequired && !identityVerified
+        ? 2
+        : step;
+  const reviewUnlocked = ready && (!identityRequired || identityVerified);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/50 p-6">
@@ -238,7 +245,13 @@ export function GVerifyKybClient() {
             </div>
 
             {/* Step indicator — each step unlocks once the previous is done. */}
-            <div className="grid grid-cols-3 gap-2" role="tablist">
+            <div
+              className={cn(
+                "grid gap-2",
+                identityRequired ? "grid-cols-3" : "grid-cols-2",
+              )}
+              role="tablist"
+            >
               {[
                 {
                   n: 1 as const,
@@ -258,33 +271,35 @@ export function GVerifyKybClient() {
                   n: 3 as const,
                   label: t("kyc.kyb.stepReview"),
                   done: false,
-                  enabled: ready && identityVerified,
+                  enabled: reviewUnlocked,
                   Icon: null,
                 },
-              ].map(({ n, label, done, enabled, Icon }) => (
-                <button
-                  key={n}
-                  type="button"
-                  role="tab"
-                  aria-selected={activeStep === n}
-                  disabled={!enabled || submitting}
-                  onClick={() => setStep(n)}
-                  className={cn(
-                    "flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2.5 text-xs font-medium transition-colors",
-                    activeStep === n
-                      ? "border-primary bg-primary/10 text-foreground"
-                      : "border-border bg-muted/20 text-muted-foreground hover:border-primary/40",
-                    !enabled && "cursor-not-allowed opacity-50",
-                  )}
-                >
-                  {done ? (
-                    <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
-                  ) : (
-                    Icon && <Icon className="h-3.5 w-3.5 shrink-0" />
-                  )}
-                  {label}
-                </button>
-              ))}
+              ]
+                .filter(({ n }) => n !== 2 || identityRequired)
+                .map(({ n, label, done, enabled, Icon }, index) => (
+                  <button
+                    key={n}
+                    type="button"
+                    role="tab"
+                    aria-selected={activeStep === n}
+                    disabled={!enabled || submitting}
+                    onClick={() => setStep(n)}
+                    className={cn(
+                      "flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2.5 text-xs font-medium transition-colors",
+                      activeStep === n
+                        ? "border-primary bg-primary/10 text-foreground"
+                        : "border-border bg-muted/20 text-muted-foreground hover:border-primary/40",
+                      !enabled && "cursor-not-allowed opacity-50",
+                    )}
+                  >
+                    {done ? (
+                      <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
+                    ) : (
+                      Icon && <Icon className="h-3.5 w-3.5 shrink-0" />
+                    )}
+                    {index + 1}. {label}
+                  </button>
+                ))}
             </div>
 
             {activeStep === 1 ? (
@@ -364,7 +379,7 @@ export function GVerifyKybClient() {
                   type="button"
                   className="h-12 w-full text-base font-medium"
                   disabled={!ready || submitting}
-                  onClick={() => setStep(2)}
+                  onClick={() => setStep(identityRequired ? 2 : 3)}
                 >
                   {t("kyc.continueBtn")}
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -521,7 +536,7 @@ export function GVerifyKybClient() {
                     variant="outline"
                     className="h-12 flex-1"
                     disabled={submitting}
-                    onClick={() => setStep(2)}
+                    onClick={() => setStep(identityRequired ? 2 : 1)}
                   >
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     {t("kyc.kyb.backBtn")}
@@ -529,7 +544,7 @@ export function GVerifyKybClient() {
                   <Button
                     type="button"
                     className="h-12 flex-[2] text-base font-medium"
-                    disabled={!ready || !identityVerified || submitting}
+                    disabled={!reviewUnlocked || submitting}
                     onClick={handleSubmit}
                   >
                     {submitting ? (
