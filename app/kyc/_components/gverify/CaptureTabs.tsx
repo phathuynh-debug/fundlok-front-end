@@ -21,18 +21,12 @@ interface CaptureTabsProps {
   images: Record<CaptureSlot, StagedImage>;
   disabled: boolean;
   onSelect: (slot: CaptureSlot, file: File | null) => void;
-  cameraCapture?: boolean;
 }
 
 // One tab per capture (ID front / ID back / selfie) showing per-slot progress,
 // with a single active capture field below. Staging a photo auto-advances to
 // the next empty tab. Shared by the desktop and phone capture screens.
-export function CaptureTabs({
-  images,
-  disabled,
-  onSelect,
-  cameraCapture = false,
-}: CaptureTabsProps) {
+export function CaptureTabs({ images, disabled, onSelect }: CaptureTabsProps) {
   const { t } = useTranslations();
   const [active, setActive] = useState<CaptureSlot>("front");
 
@@ -84,8 +78,11 @@ export function CaptureTabs({
         image={images[active]}
         disabled={disabled}
         onSelect={handleSelect}
-        cameraCapture={cameraCapture}
       />
+
+      <p className="text-xs leading-relaxed text-muted-foreground">
+        {t("kyc.gv.liveOnlyNote")}
+      </p>
     </div>
   );
 }

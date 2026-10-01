@@ -16,7 +16,6 @@ import { enumLabel } from "@/lib/enum-labels";
 import { useVerificationGate } from "@/hooks/use-verification-gate";
 import { LoanApplicationUpload } from "./loan-application/LoanApplicationUpload";
 import { LoanApplicationStatus } from "./loan-application/LoanApplicationStatus";
-import { SmeFundingPanel } from "./SmeFundingPanel";
 
 type ProjectAddress = {
   street?: string;
@@ -354,13 +353,6 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
             t={t}
           />
         ))}
-
-      {/* Funding and repayment. Everything above is real project data; this
-          panel is sample data and says so, because the contract, ledger and
-          amortization-schedule modules have no read API yet. It sits last so
-          the SME's actual outstanding work — the application wizard — stays
-          above it. */}
-      <SmeFundingPanel industry={project.industry} />
     </motion.div>
   );
 }

@@ -200,15 +200,11 @@ export function KycCapturePanel({
         </div>
       )}
 
-      {/* One tab per capture; the in-app guided camera (framing overlay)
-          opens on desktop too — it falls back to the file picker when
-          getUserMedia is unavailable (e.g. plain-http LAN origins). */}
-      <CaptureTabs
-        images={images}
-        disabled={submitting}
-        onSelect={setFile}
-        cameraCapture
-      />
+      {/* One tab per capture. Each photo is taken live with the in-app guided
+          camera (framing overlay); there is no way to upload one. Where the
+          camera cannot open (no webcam, blocked, or a plain-http origin) the
+          field says why, and the phone button below is the way on. */}
+      <CaptureTabs images={images} disabled={submitting} onSelect={setFile} />
 
       <p className="text-xs leading-relaxed text-muted-foreground">
         {t("kyc.gv.consent")}

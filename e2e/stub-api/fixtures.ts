@@ -16,6 +16,7 @@ export type StubUserKey =
   | "noRole"
   | "unapprovedInvestor"
   | "unapprovedInvestorTab"
+  | "unapprovedInvestorCamera"
   | "unapprovedSme"
   | "unapprovedSmeIdentity"
   | "smeDraftApplication"
@@ -172,6 +173,17 @@ export const STUB_USERS: Record<StubUserKey, StubUser> = {
     role: "INVESTOR",
     is_approved: false,
   },
+  // Takes its identity photos and submits them in kyc-capture.spec.ts, which
+  // verifies it. Its own account for the same reason as the one above: the stub
+  // remembers an approval, and every other spec that needs an investor who is
+  // still unverified would otherwise find this one approved.
+  unapprovedInvestorCamera: {
+    ...base,
+    id: "00000000-0000-0000-0000-0000000000b4",
+    email: "unapproved-investor-camera@e2e.test",
+    role: "INVESTOR",
+    is_approved: false,
+  },
   // Suspended: the backend refuses this account on every request, so the proxy
   // must route it to /suspended rather than looping it through /login.
   suspended: {
@@ -295,6 +307,30 @@ export const STUB_ADMIN_COMPLETE_PROJECT = {
   legal_name: "Complete Docs Co",
   industry: "Manufacturing",
 };
+
+/**
+ * Admin-only companies that are still DRAFT, with every required document on
+ * file. They are the two halves of the two-approval gate's own fixtures: the
+ * stub records each decision and each approved score, so a test that walks one
+ * company through the gate has to own it. A business is ACTIVE only when both
+ * halves are in, and the two companies cover both orders they can arrive in.
+ */
+export const STUB_ADMIN_GATE_PROJECTS = [
+  {
+    ...STUB_PROJECT,
+    id: "20000000-0000-0000-0000-000000000006",
+    legal_name: "Riverside Packaging Co",
+    industry: "Manufacturing",
+    status: "DRAFT",
+  },
+  {
+    ...STUB_PROJECT,
+    id: "20000000-0000-0000-0000-000000000007",
+    legal_name: "Harbor Logistics Co",
+    industry: "Logistics",
+    status: "DRAFT",
+  },
+];
 
 /**
  * The same company, but with the application still in DRAFT.

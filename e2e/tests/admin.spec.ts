@@ -11,6 +11,7 @@ import {
 } from "../stub-api/fixtures";
 import { signInAs } from "../support/auth";
 import { t } from "../support/i18n";
+import { toast } from "../support/ui";
 
 // The /admin area. Access control is covered in auth-gating.spec.ts; this file
 // is about the screens themselves rendering the API's data.
@@ -137,9 +138,11 @@ test("a non-admin session is refused by the API as well as the router", async ({
 });
 
 // --- Project preview: the two-approval gate ---------------------------------
-// A funding request needs BOTH the verification engine's approval and an
-// operator's. The preview is where an operator sees which half is missing and
-// supplies theirs.
+// A business goes live (ACTIVE) only when BOTH halves are in: the operator's
+// decision on the funding request and the engine's score run approved (locked).
+// The preview is where an operator sees which half is missing and supplies
+// theirs. It once offered only the first, so an approved request never reached
+// Active and nothing on the screen said why.
 //
 // The stub records DECISIONS, and that state is mutable and shared by every
 // test in a worker (same caveat as the 2FA fixture). So each test that decides
@@ -380,6 +383,98 @@ test.describe("the admin project preview", () => {
     await expect(
       panel.getByText(t("enums.scoreRunStatus.READY"), { exact: true }),
     ).not.toHaveClass(/bg-destructive/);
+  });
+
+  // The gate. Each of these walks a company of its own through it, because the
+  // stub records every decision and every approved score.
+  test.describe("the two-approval gate", () => {
+    const approveRequest = (panel: import("@playwright/test").Locator) =>
+      // The last one belongs to the funding request; the first is the
+      // business verification's. Exact, because "Approve score" contains it.
+      panel
+        .getByRole("button", { name: t("admin.preview.approve"), exact: true })
+        .last();
+    const approveScore = (panel: import("@playwright/test").Locator) =>
+      panel.getByRole("button", { name: t("admin.preview.approveScore") });
+    const status = (
+      panel: import("@playwright/test").Locator,
+      value: "DRAFT" | "ACTIVE",
+    ) => panel.getByText(t(`enums.projectStatus.${value}`), { exact: true });
+
+    test("approving the request alone leaves the business in Draft and says what is missing", async ({
+      page,
+    }) => {
+      await openPreview(page, "Riverside Packaging Co");
+      const panel = page.getByRole("dialog");
+      await expect(status(panel, "DRAFT")).toBeVisible();
+
+      // The engine's answer first: ready, and recommending approval.
+      await runButton(panel).click();
+      await expect(
+        panel.getByText(t("enums.scoreRunStatus.READY"), { exact: true }),
+      ).toBeVisible();
+
+      // The operator's half. The business must NOT go live on this alone.
+      await approveRequest(panel).click();
+      await expect(panel.getByTestId("gate-hint")).toHaveText(
+        t("admin.preview.awaitingScoreApproval"),
+      );
+      await expect(status(panel, "DRAFT")).toBeVisible();
+      await expect(status(panel, "ACTIVE")).toHaveCount(0);
+
+      // The engine's half is the missing one, and it can be given from here.
+      await approveScore(panel).click();
+      await expect(toast(page, t("admin.preview.scoreApproved"))).toBeVisible();
+      await expect(status(panel, "ACTIVE")).toBeVisible();
+      await expect(status(panel, "DRAFT")).toHaveCount(0);
+      await expect(
+        panel.getByText(t("enums.scoreRunStatus.LOCKED"), { exact: true }),
+      ).toBeVisible();
+      // Nothing is still missing, and it is one-way: no second approval.
+      await expect(panel.getByTestId("gate-hint")).toHaveCount(0);
+      await expect(approveScore(panel)).toHaveCount(0);
+
+      // The table the preview was opened from says Active too, not Draft. The
+      // toast takes the first Escape and the sheet the next.
+      await expect(async () => {
+        await page.keyboard.press("Escape");
+        await expect(panel).toBeHidden({ timeout: 1000 });
+      }).toPass();
+      await expect(
+        page.getByRole("button", { name: /Riverside Packaging Co/ }),
+      ).toContainText(t("enums.projectStatus.ACTIVE"));
+    });
+
+    test("either half can come second: the score first, then the request", async ({
+      page,
+    }) => {
+      await openPreview(page, "Harbor Logistics Co");
+      const panel = page.getByRole("dialog");
+
+      await runButton(panel).click();
+      await approveScore(panel).click();
+      await expect(panel.getByTestId("gate-hint")).toHaveText(
+        t("admin.preview.awaitingRequestApproval"),
+      );
+      await expect(status(panel, "DRAFT")).toBeVisible();
+
+      await approveRequest(panel).click();
+      await expect(status(panel, "ACTIVE")).toBeVisible();
+      await expect(panel.getByTestId("gate-hint")).toHaveCount(0);
+    });
+
+    test("a score with no verdict cannot be approved", async ({ page }) => {
+      // The engine declined to grade this company, so there is nothing to
+      // approve: approving it would put a business live on no score at all.
+      await openPreview(page, "Ungraded Trading Co");
+      const panel = page.getByRole("dialog");
+
+      await runButton(panel).click();
+      await expect(
+        panel.getByText(t("admin.preview.scoreInsufficientHint")),
+      ).toBeVisible();
+      await expect(approveScore(panel)).toHaveCount(0);
+    });
   });
 
   test("both tables offer a preview", async ({ page }) => {

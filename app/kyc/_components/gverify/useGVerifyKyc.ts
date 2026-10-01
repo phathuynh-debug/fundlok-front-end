@@ -14,7 +14,6 @@ export const CAPTURE_SLOTS: CaptureSlot[] = ["front", "back", "portrait"];
 // Mirror of the backend limits (app/gverify re-validates server-side).
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 const ACCEPTED_TYPES = ["image/jpeg", "image/png"];
-export const CAPTURE_ACCEPT = ACCEPTED_TYPES.join(",");
 
 // i18n key suffix under kyc.gv.* — translated where rendered.
 export type CaptureError = "invalidType" | "tooLarge" | "processFailed" | null;

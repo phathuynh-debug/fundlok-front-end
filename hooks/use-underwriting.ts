@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { adminKeys } from "@/hooks/use-admin";
 import {
   underwritingService,
+  type ScoreRunApproveOut,
   type ScoreRunCreatePayload,
   type ScoreRunOut,
 } from "@/services/underwriting.service";
@@ -33,6 +34,28 @@ export function useStartScoreRun(projectId: string | null) {
           queryKey: adminKeys.projectDetail(projectId),
         });
       }
+    },
+  });
+}
+
+/**
+ * Approve (lock) a READY score run: the engine's half of the two-approval gate.
+ *
+ * Invalidates the project preview AND the overview table. Which approval lands
+ * second is the one that puts the business live, so the status in the table
+ * the preview was opened from can change as a result of this click.
+ */
+export function useApproveScoreRun(projectId: string | null) {
+  const queryClient = useQueryClient();
+  return useMutation<ScoreRunApproveOut, ApiError, string>({
+    mutationFn: (scoreRunId) => underwritingService.approveScoreRun(scoreRunId),
+    onSuccess: () => {
+      if (projectId) {
+        void queryClient.invalidateQueries({
+          queryKey: adminKeys.projectDetail(projectId),
+        });
+      }
+      void queryClient.invalidateQueries({ queryKey: adminKeys.overviewAll() });
     },
   });
 }

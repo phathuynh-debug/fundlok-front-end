@@ -30,8 +30,10 @@ import {
 
 export const adminKeys = {
   all: ["admin"] as const,
+  // Every variant of the overview (users or projects, any page or search).
+  overviewAll: () => [...adminKeys.all, "overview"] as const,
   overview: (params: AdminOverviewParams) =>
-    [...adminKeys.all, "overview", params] as const,
+    [...adminKeys.overviewAll(), params] as const,
   auditLogs: (params: AuditLogParams) =>
     [...adminKeys.all, "audit-logs", params] as const,
   maintenance: () => [...adminKeys.all, "maintenance"] as const,
@@ -132,7 +134,8 @@ export function useResolveKybVerification(projectId: string | null) {
 }
 
 // The operator half. Same invalidation reasoning, plus the overview list shows
-// project status that a decision can move.
+// project status that a decision can move: the approval that arrives second is
+// the one that puts a business live, and the table must not go on saying Draft.
 export function useDecideApplication(projectId: string | null) {
   const queryClient = useQueryClient();
   return useMutation<AdminLoanApplication, ApiError, DecisionInput>({
@@ -143,6 +146,7 @@ export function useDecideApplication(projectId: string | null) {
           queryKey: adminKeys.projectDetail(projectId),
         });
       }
+      void queryClient.invalidateQueries({ queryKey: adminKeys.overviewAll() });
     },
   });
 }

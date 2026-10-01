@@ -1,16 +1,18 @@
 import { test, expect } from "@playwright/test";
 
-import {
-  MOCK_REPAYMENT_PERIODS,
-  MOCK_SME_FUNDING,
-  summarizeFunding,
-} from "../../app/dashboard/_components/mock-sme-funding";
-import { formatCurrency } from "../../lib/format-currency";
 import { STUB_PROJECT } from "../stub-api/fixtures";
 import { signInAs } from "../support/auth";
-import { normalizeSpaces, t } from "../support/i18n";
+import { t } from "../support/i18n";
 
-const summary = summarizeFunding(MOCK_SME_FUNDING, MOCK_REPAYMENT_PERIODS);
+/**
+ * The amber "sample data" notice, in either language. The dashboard used to end
+ * with a panel of sample funding and repayment figures that carried one; it
+ * shows nothing of the kind now, so any such notice would be the panel back.
+ */
+const SAMPLE_NOTICE = /Dữ liệu mẫu|Sample data/;
+
+/** The raised amount of the old sample panel (875.000.000 ₫, 14 investors). */
+const SAMPLE_RAISED = "875.000.000";
 
 test.describe("an SME with a project", () => {
   test.beforeEach(async ({ context }) => {
@@ -19,7 +21,7 @@ test.describe("an SME with a project", () => {
 
   test("sees its real company profile in the hero", async ({ page }) => {
     // Everything in the hero comes from GET /projects — the stub's fixture —
-    // so this proves the real data path, not the mock panel below it.
+    // so this proves the real data path.
     await page.goto("/dashboard");
 
     await expect(
@@ -32,78 +34,32 @@ test.describe("an SME with a project", () => {
     ).toBeVisible();
   });
 
-  test("sees the funding and repayment panel", async ({ page }) => {
-    await page.goto("/dashboard");
-
-    await expect(
-      page.getByRole("heading", { name: t("dashboard.smeFunding.title") }),
-    ).toBeVisible();
-
-    // Raised, and the percentage derived from it.
-    await expect(
-      page.getByText(
-        normalizeSpaces(formatCurrency(MOCK_SME_FUNDING.funded, "vi")),
-        { exact: false },
-      ),
-    ).toBeVisible();
-    await expect(page.getByText(`${summary.funded_pct}%`)).toBeVisible();
-  });
-
-  test("distinguishes the mocked figures from the real profile", async ({
-    page,
-  }) => {
+  test("sees no sample funding or repayment figures", async ({ page }) => {
+    // The dashboard used to end with a panel of invented figures: 875m raised
+    // of 1bn, 14 investors, a repayment schedule. Nothing real backs them (the
+    // contract and ledger have no read API), and showing them to every SME,
+    // approved or not, said things that were not true.
     await page.goto("/dashboard");
     await expect(
-      page.getByText(t("dashboard.smeFunding.mockNotice")),
+      page.getByRole("heading", { name: STUB_PROJECT.legal_name }),
     ).toBeVisible();
-  });
 
-  test("renders the full repayment schedule", async ({ page }) => {
-    await page.goto("/dashboard");
-
-    const schedule = page.getByRole("list").filter({
-      hasText: t("dashboard.smeFunding.status.CURRENT"),
-    });
-    await expect(schedule.getByRole("listitem")).toHaveCount(
-      MOCK_REPAYMENT_PERIODS.length,
+    await expect(page.getByText(SAMPLE_NOTICE)).toHaveCount(0);
+    await expect(page.getByText(SAMPLE_RAISED, { exact: false })).toHaveCount(
+      0,
     );
-
-    await expect(
-      page.getByText(
-        t("dashboard.smeFunding.scheduleProgress", {
-          done: summary.settled_count,
-          total: summary.total_count,
-        }),
-      ),
-    ).toBeVisible();
   });
 
-  test("shows relief as its own state, and says the total did not move", async ({
+  test("is not told about funding before there is an approval", async ({
     page,
   }) => {
-    // Relief is the mechanic an SME most needs to understand: the daily
-    // amount came down, the total owed did not. Flattening it into "paid"
-    // would erase the distinction the handbook insists on (fundlok-domain §2).
+    // This application is still with the reviewers (SUBMITTED).
     await page.goto("/dashboard");
     await expect(
-      page.getByText(t("dashboard.smeFunding.status.RELIEF_APPLIED")).first(),
+      page.getByRole("heading", { name: STUB_PROJECT.legal_name }),
     ).toBeVisible();
-    await expect(
-      page.getByText(t("dashboard.smeFunding.fixedAtSigning")),
-    ).toBeVisible();
-  });
 
-  test("discloses the backstop date and the early-settlement rule", async ({
-    page,
-  }) => {
-    // Both are things an SME is entitled to know from the day they sign.
-    await page.goto("/dashboard");
-    await expect(
-      page.getByText(t("dashboard.smeFunding.backstopHint")),
-    ).toBeVisible();
-    await expect(
-      page.getByText(t("dashboard.smeFunding.earlyRepaymentNote")),
-    ).toBeVisible();
+    await expect(page.getByTestId("funding-status")).toHaveCount(0);
   });
 
   test("is kept off the marketplace", async ({ page }) => {
@@ -125,7 +81,7 @@ test.describe("an SME with no project yet", () => {
     ).toHaveAttribute("href", "/project-application");
   });
 
-  test("sees no funding panel, because there is nothing funded", async ({
+  test("sees no sample figures, because there is nothing funded", async ({
     page,
     context,
   }) => {
@@ -133,8 +89,10 @@ test.describe("an SME with no project yet", () => {
     await page.goto("/dashboard");
 
     await expect(
-      page.getByRole("heading", { name: t("dashboard.smeFunding.title") }),
-    ).toHaveCount(0);
+      page.getByRole("heading", { name: t("dashboard.sme.emptyTitle") }),
+    ).toBeVisible();
+    await expect(page.getByText(SAMPLE_NOTICE)).toHaveCount(0);
+    await expect(page.getByTestId("funding-status")).toHaveCount(0);
   });
 });
 
@@ -166,6 +124,8 @@ test.describe("an SME whose application was refused", () => {
     await expect(
       page.getByText(t("dashboard.sme.statusReviewNote")),
     ).toHaveCount(0);
+    // A refusal has no funding to speak of.
+    await expect(page.getByTestId("funding-status")).toHaveCount(0);
   });
 
   test("shows the reviewer's reason and what is still missing", async ({
@@ -253,5 +213,26 @@ test.describe("an SME whose request was approved", () => {
     await expect(
       page.getByText(t("dashboard.sme.statusMissingHeading")),
     ).toHaveCount(0);
+  });
+
+  test("says that nothing has been invested yet, and shows no sample figures", async ({
+    page,
+  }) => {
+    // Approved is not funded: investors fund the listing after the offer is
+    // signed. There is nothing real to show about funding, so the dashboard
+    // says so rather than inventing progress.
+    await page.goto("/dashboard");
+    await page.keyboard.press("Escape");
+
+    const funding = page.getByTestId("funding-status");
+    await expect(funding).toBeVisible();
+    await expect(funding).toContainText(t("dashboard.sme.funding.none"));
+    // No promise: whether investors fund it is theirs to decide.
+    await expect(funding).toContainText(t("dashboard.sme.funding.noneHint"));
+
+    await expect(page.getByText(SAMPLE_NOTICE)).toHaveCount(0);
+    await expect(page.getByText(SAMPLE_RAISED, { exact: false })).toHaveCount(
+      0,
+    );
   });
 });

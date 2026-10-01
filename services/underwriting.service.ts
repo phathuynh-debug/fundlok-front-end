@@ -30,6 +30,13 @@ export interface ScoreRunOut {
   versions: Record<string, string> | null;
 }
 
+/** What locking a run answers with. */
+export interface ScoreRunApproveOut {
+  id: string;
+  status: ScoreRunStatus | string;
+  locked_at: string | null;
+}
+
 export interface ScoreRunCreatePayload {
   application_id: string;
   /** Free-text run mode the backend records; null for a normal run. */
@@ -44,5 +51,15 @@ export const underwritingService = {
       mode: null,
       ...body,
     });
+  },
+
+  // Admin only. The engine's half of the two-approval gate: locks a READY run
+  // as the basis for the decision. 400 unless the run is READY; locking a
+  // locked run changes nothing. If the operator has already approved the
+  // request, the business goes ACTIVE in this same call.
+  approveScoreRun(scoreRunId: string) {
+    return apiClient.post<ScoreRunApproveOut>(
+      UNDERWRITING_ENDPOINTS.approveScoreRun(scoreRunId),
+    );
   },
 };

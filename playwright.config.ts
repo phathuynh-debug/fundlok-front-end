@@ -60,7 +60,20 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: {
+        ...devices["Desktop Chrome"],
+        // The identity photos are taken live (there is no upload), so the
+        // browser needs a camera. Chromium's fake device streams a test
+        // pattern, and the second flag answers the permission prompt. A spec
+        // that wants the camera blocked or missing stubs getUserMedia itself.
+        permissions: ["camera"],
+        launchOptions: {
+          args: [
+            "--use-fake-device-for-media-stream",
+            "--use-fake-ui-for-media-stream",
+          ],
+        },
+      },
     },
   ],
 

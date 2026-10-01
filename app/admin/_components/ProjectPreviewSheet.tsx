@@ -31,7 +31,7 @@ import {
   useDecideApplication,
   useResolveKybVerification,
 } from "@/hooks/use-admin";
-import { useStartScoreRun } from "@/hooks/use-underwriting";
+import { useApproveScoreRun, useStartScoreRun } from "@/hooks/use-underwriting";
 import { useTranslations } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format-currency";
 import { formatDate } from "@/lib/format-date";
@@ -47,10 +47,17 @@ import { apiErrorMessage } from "@/lib/api-error-message";
 
 // The admin project preview.
 //
-// A funding request needs TWO approvals before it can become a contract: the
-// verification engine's (GVerify KYB) and an operator's. This panel shows both
-// side by side so it is obvious WHICH one is missing, and lets the operator
-// supply the half that is theirs to give.
+// A business goes live (ACTIVE) and a request can become a contract only when
+// BOTH halves of the two-approval gate are in: the operator's decision on the
+// request, and the grading engine's score run approved (locked). Either can
+// come second, and whichever does puts the business live. The business
+// verification (GVerify KYB) sits beside them as a precondition: it is what
+// stands in for the registration document the operator's approval requires.
+//
+// This panel shows each piece next to the thing it belongs to, says which half
+// is still missing, and lets the operator supply the halves that are theirs to
+// give. It once offered only the first, so an approved request never reached
+// Active: nothing here could approve the score.
 //
 // A Sheet rather than a Dialog: the content is a list that can run long, and a
 // side panel keeps the table it was opened from in view.
@@ -86,6 +93,9 @@ export function ProjectPreviewSheet({
   // a bare boolean so one request's spinner cannot appear on another's row.
   const [scoringId, setScoringId] = useState<string | null>(null);
   const { mutateAsync: startScoreRun } = useStartScoreRun(projectId);
+  // Which run is being approved; null = none. By id for the same reason.
+  const [approvingScoreId, setApprovingScoreId] = useState<string | null>(null);
+  const { mutateAsync: approveScoreRun } = useApproveScoreRun(projectId);
 
   const handleScore = async (applicationId: string) => {
     setScoringId(applicationId);
@@ -119,6 +129,18 @@ export function ProjectPreviewSheet({
       title: t("admin.preview.decisionFailed"),
       description: apiErrorMessage(err, locale, t("common.tryAgain")),
     });
+
+  const handleApproveScore = async (runId: string) => {
+    setApprovingScoreId(runId);
+    try {
+      await approveScoreRun(runId);
+      toast({ title: t("admin.preview.scoreApproved") });
+    } catch (err) {
+      fail(err);
+    } finally {
+      setApprovingScoreId(null);
+    }
+  };
 
   const handleKyb = async (id: string, decision: AdminDecision) => {
     try {
@@ -181,7 +203,7 @@ export function ProjectPreviewSheet({
 
             <Separator />
 
-            {/* --- Half one: the verification engine --- */}
+            {/* --- The business verification (KYB) --- */}
             <section className="space-y-3">
               <h3 className="text-sm font-semibold">
                 {t("admin.preview.engineHeading")}
@@ -221,7 +243,7 @@ export function ProjectPreviewSheet({
 
             <Separator />
 
-            {/* --- Half two: the operator, per funding request --- */}
+            {/* --- The operator and the engine, per funding request --- */}
             <section className="space-y-3">
               <h3 className="text-sm font-semibold">
                 {t("admin.preview.applicationsHeading")}
@@ -272,7 +294,17 @@ export function ProjectPreviewSheet({
                         }
                         running={scoringId === application.id}
                         onRun={() => handleScore(application.id)}
+                        approving={
+                          application.score_run !== null &&
+                          approvingScoreId === application.score_run.id
+                        }
+                        onApprove={() =>
+                          application.score_run &&
+                          handleApproveScore(application.score_run.id)
+                        }
                       />
+
+                      <GateHint application={application} t={t} />
 
                       <DocumentList
                         documents={application.documents}
@@ -349,12 +381,16 @@ function ScoreRunSummary({
   canRun,
   running,
   onRun,
+  approving,
+  onApprove,
 }: {
   run: AdminScoreRun | null;
   t: (key: string) => string;
   canRun: boolean;
   running: boolean;
   onRun: () => void;
+  approving: boolean;
+  onApprove: () => void;
 }) {
   const runButton = (
     <Button
@@ -392,9 +428,8 @@ function ScoreRunSummary({
   // is no score behind the Approve button sitting directly below — and a grey
   // badge next to two em-dashes reads, at a glance, like a score that simply
   // has not loaded yet.
-  const noVerdict =
-    run.decision === "INSUFFICIENT_DATA" || run.decision === "AI_PENDING";
-  const blocked = noVerdict || run.decision === "REJECT";
+  const noVerdict = hasNoVerdict(run);
+  const blocked = isBlockedRun(run);
 
   return (
     <div
@@ -473,8 +508,82 @@ function ScoreRunSummary({
           {run.engine_version} · {run.params_version}
         </p>
       )}
+      {/* The engine's half of the gate. Only a finished run with a real
+          verdict can be approved: approving one the engine refused, or could
+          not grade, would put a business live on no score at all. */}
+      {run.status === "READY" && !blocked && (
+        <div className="space-y-1.5 border-t border-border pt-3">
+          <Button
+            type="button"
+            size="sm"
+            className="w-full"
+            disabled={approving}
+            onClick={onApprove}
+          >
+            {approving ? (
+              <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <ShieldCheck className="mr-2 h-3.5 w-3.5" />
+            )}
+            {t("admin.preview.approveScore")}
+          </Button>
+          <p className="text-[11px] leading-relaxed text-muted-foreground">
+            {t("admin.preview.approveScoreHint")}
+          </p>
+        </div>
+      )}
       {run.status !== "LOCKED" && canRun && runButton}
     </div>
+  );
+}
+
+/** The engine declined to grade: it has no verdict to give. */
+function hasNoVerdict(run: AdminScoreRun): boolean {
+  return run.decision === "INSUFFICIENT_DATA" || run.decision === "AI_PENDING";
+}
+
+/** No verdict, or a refusal: either way there is no score to stand behind. */
+function isBlockedRun(run: AdminScoreRun): boolean {
+  return hasNoVerdict(run) || run.decision === "REJECT";
+}
+
+// Which half of the gate is still missing, in words. Shown only when exactly one
+// half is in: that is the moment someone asks why the business is still Draft.
+// With neither in, the subtitle says what is needed; with both, the status at
+// the top of the panel already reads Active.
+function GateHint({
+  application,
+  t,
+}: {
+  application: AdminLoanApplication;
+  t: (key: string) => string;
+}) {
+  const run = application.score_run;
+  const approved = application.admin_approval === "APPROVED";
+  const scoreLocked = run?.status === "LOCKED";
+
+  let key: string | null = null;
+  if (approved && !scoreLocked) {
+    if (!run) key = "admin.preview.awaitingScoreRun";
+    else if (isBlockedRun(run)) key = "admin.preview.awaitingScoreBlocked";
+    else key = "admin.preview.awaitingScoreApproval";
+  } else if (
+    !approved &&
+    scoreLocked &&
+    application.admin_approval === "PENDING"
+  ) {
+    key = "admin.preview.awaitingRequestApproval";
+  }
+  if (!key) return null;
+
+  return (
+    <p
+      role="status"
+      data-testid="gate-hint"
+      className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs leading-relaxed text-amber-800 dark:text-amber-200"
+    >
+      {t(key)}
+    </p>
   );
 }
 

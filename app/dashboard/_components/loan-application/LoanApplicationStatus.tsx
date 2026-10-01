@@ -9,6 +9,7 @@ import type { LoanDocumentType } from "@/services/uploads.service";
 import type { IndustryTheme } from "../sme-dashboard-config";
 import { formatDate } from "@/lib/format-date";
 import { ApprovalCelebration, ApprovalSummary } from "./ApprovalSummary";
+import { FundingStatus } from "./FundingStatus";
 
 interface LoanApplicationStatusProps {
   loanApplication: ProjectLoanApplication;
@@ -328,6 +329,10 @@ export function LoanApplicationStatus({
             />
           </>
         )}
+
+        {/* Approved is not funded: investors fund the listing after the offer is
+            signed, and nothing has been invested yet. */}
+        {decided?.finalStep === "done" && <FundingStatus t={t} />}
 
         {/* Why the answer is what it is. An outcome with no explanation is
             the thing an applicant phones about, so the operator's reason and

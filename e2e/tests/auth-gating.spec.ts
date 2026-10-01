@@ -2,6 +2,7 @@ import { test, expect } from "@playwright/test";
 
 import { signInAs } from "../support/auth";
 import { t } from "../support/i18n";
+import { takeIdentityPhotos } from "../support/kyc";
 
 /**
  * The proxy.ts route matrix.
@@ -235,23 +236,12 @@ test.describe("on-demand verification gate", () => {
   });
 });
 
-// A 1x1 PNG: enough to pass the capture's type check.
-const TINY_PNG = Buffer.from(
-  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
-  "base64",
-);
-
 async function completeIdentityStep(page: import("@playwright/test").Page) {
   await expect(
     page.getByRole("heading", { name: t("kyc.kyb.identityTitle") }),
   ).toBeVisible();
-  for (const slot of ["front", "back", "portrait"]) {
-    await page.locator(`#gverify-${slot}`).setInputFiles({
-      name: `${slot}.png`,
-      mimeType: "image/png",
-      buffer: TINY_PNG,
-    });
-  }
+  // Taken with the (fake) camera: the app accepts no uploaded photo.
+  await takeIdentityPhotos(page);
   await page
     .getByRole("button", { name: t("kyc.gv.submitBtn"), exact: true })
     .click();

@@ -6,7 +6,6 @@ import {
   LOAN_MIN_VND,
   isAllowedLoanDuration,
 } from "@/lib/constants/loan-constraints";
-import { MOCK_SME_FUNDING } from "./mock-sme-funding";
 import { MOCK_SME_FACILITY } from "../analytics/_components/sme/mock-sme-analytics";
 import { ALLOWED_TERM_MONTHS } from "@/lib/facility-terms";
 
@@ -23,11 +22,6 @@ import { ALLOWED_TERM_MONTHS } from "@/lib/facility-terms";
 
 /** Every SME-facing mock loan, as {label, principal VND, term months}. */
 const SME_MOCK_LOANS = [
-  {
-    label: "MOCK_SME_FUNDING (dashboard funding panel)",
-    principal: MOCK_SME_FUNDING.requested,
-    term_months: MOCK_SME_FUNDING.term_months,
-  },
   {
     label: "MOCK_SME_FACILITY (SME analytics)",
     principal: MOCK_SME_FACILITY.principal,
@@ -59,13 +53,6 @@ describe("SME mock loans obey the grading engine's constraints", () => {
       expect(Number.isInteger(principal)).toBe(true);
     },
   );
-
-  it("only ever funds up to what was requested", () => {
-    expect(MOCK_SME_FUNDING.funded).toBeLessThanOrEqual(
-      MOCK_SME_FUNDING.requested,
-    );
-    expect(MOCK_SME_FUNDING.funded).toBeGreaterThanOrEqual(0);
-  });
 
   it("guards a term the engine rejects", () => {
     // Proves the assertion above can actually fail: 10 months is the value

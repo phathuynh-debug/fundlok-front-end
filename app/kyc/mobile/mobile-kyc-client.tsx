@@ -25,8 +25,9 @@ import { apiErrorMessage, backendText } from "@/lib/api-error-message";
 
 // Phone side of the QR handoff: opened by scanning the desktop QR, carries a
 // short-lived token in the query string (?token=…) instead of a login cookie.
-// The camera opens directly on each tile (rear for the ID, front for the
-// selfie); the desktop discovers the verdict through its polling status query.
+// The in-app camera opens on each tile (rear camera for the ID, front for the
+// selfie); there is no way to pick a photo from the phone. The desktop
+// discovers the verdict through its polling status query.
 export function MobileKycClient() {
   const { t, locale } = useTranslations();
   const token = useSearchParams().get("token") ?? "";
@@ -140,7 +141,6 @@ export function MobileKycClient() {
               images={images}
               disabled={submitting}
               onSelect={setFile}
-              cameraCapture
             />
 
             <p className="text-xs leading-relaxed text-muted-foreground">

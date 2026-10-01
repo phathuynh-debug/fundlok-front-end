@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
-import { X, Camera, ImageIcon, Loader2 } from "lucide-react";
+import { X, Camera, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "@/lib/i18n";
@@ -12,16 +13,34 @@ const CARD_ASPECT = 85.6 / 53.98;
 
 export type CaptureGuide = "card" | "face";
 
+// Why the camera could not be opened, for the message the parent shows.
+//   unsupported  no camera API here, or the page is not on a secure origin
+//   denied       the user (or a policy) blocked camera access
+//   failed       no camera found, or it is in use by another app
+export type CameraProblem = "unsupported" | "denied" | "failed";
+
 interface CameraCaptureDialogProps {
   guide: CaptureGuide;
   title: string;
   onCapture: (file: File) => void;
   onClose: () => void;
-  // Camera unavailable (no permission / insecure context) — parent falls back
-  // to the native file input.
-  onUnavailable: () => void;
-  // "Choose from library" escape hatch — parent opens the file input.
-  onPickFile: () => void;
+  // The camera could not be opened. There is deliberately no file-picker
+  // fallback and no "choose from library": these photos exist to show who is
+  // registering, so they are taken live or not at all. The parent says why and
+  // the person retries, or continues on their phone.
+  onUnavailable: (problem: CameraProblem) => void;
+}
+
+function problemFrom(error: unknown): CameraProblem {
+  const name = error instanceof DOMException ? error.name : "";
+  if (
+    name === "NotAllowedError" ||
+    name === "PermissionDeniedError" ||
+    name === "SecurityError"
+  ) {
+    return "denied";
+  }
+  return "failed";
 }
 
 export function cameraSupported(): boolean {
@@ -35,14 +54,15 @@ export function cameraSupported(): boolean {
 // Full-screen in-app camera with a framing guide: a card-shaped rectangle for
 // ID sides, an oval for the selfie. The capture is CROPPED to the guide box,
 // so whatever the user fits inside the frame is exactly what gets submitted —
-// no more "card too far away" rejections from the face-match provider.
+// no more "card too far away" rejections from the face-match provider. It is
+// the only way a photo gets into the verification: nothing here, or in the
+// field that opens it, accepts a file from the device.
 export function CameraCaptureDialog({
   guide,
   title,
   onCapture,
   onClose,
   onUnavailable,
-  onPickFile,
 }: CameraCaptureDialogProps) {
   const { t } = useTranslations();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -72,8 +92,8 @@ export function CameraCaptureDialog({
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
-      } catch {
-        if (!cancelled) onUnavailable();
+      } catch (error) {
+        if (!cancelled) onUnavailable(problemFrom(error));
       }
     })();
     return () => {
@@ -136,7 +156,12 @@ export function CameraCaptureDialog({
     }
   }, [guide, onCapture]);
 
-  return (
+  // Rendered into <body>, not where the field sits: a full-screen overlay must
+  // not inherit its caller's layout. Inside the field's `space-y-2` the dialog
+  // picked up an 8px bottom margin, which shrank the fixed box and left a strip
+  // of the page showing under the shutter. It is only ever mounted after a tap,
+  // so `document` is always there.
+  return createPortal(
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -209,16 +234,7 @@ export function CameraCaptureDialog({
       </div>
 
       {/* Controls */}
-      <div className="flex items-center justify-between bg-black px-8 py-5">
-        <Button
-          type="button"
-          variant="ghost"
-          className="text-white hover:bg-white/10 hover:text-white"
-          onClick={onPickFile}
-        >
-          <ImageIcon className="mr-2 h-4 w-4" />
-          {t("kyc.gv.chooseFromLibrary")}
-        </Button>
+      <div className="flex items-center justify-center bg-black px-8 py-5">
         <button
           type="button"
           disabled={!ready || capturing}
@@ -232,9 +248,8 @@ export function CameraCaptureDialog({
             <Camera className="h-7 w-7 text-white" />
           )}
         </button>
-        {/* Spacer to keep the shutter centered */}
-        <div className="w-24" aria-hidden />
       </div>
-    </motion.div>
+    </motion.div>,
+    document.body,
   );
 }

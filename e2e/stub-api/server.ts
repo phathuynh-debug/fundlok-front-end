@@ -35,6 +35,7 @@ import {
   STUB_PASSWORD,
   STUB_ADMIN_ONLY_PROJECT,
   STUB_ADMIN_COMPLETE_PROJECT,
+  STUB_ADMIN_GATE_PROJECTS,
   STUB_PUBLIC_PROJECTS,
   STUB_USERS,
   projectsFor,
@@ -195,13 +196,46 @@ function scoreRunFor(applicationId: string) {
   };
 }
 
+/**
+ * Project statuses earned during a run. A company goes DRAFT -> ACTIVE the
+ * moment BOTH halves of the gate are in (see activateIfBothHalves), which a
+ * stateless fixture cannot express.
+ */
+const adminProjectStatuses = new Map<string, string>();
+
 /** Every company the admin console can open — listings plus admin-only ones. */
 function adminProjects() {
   return [
     ...STUB_PUBLIC_PROJECTS,
     STUB_ADMIN_ONLY_PROJECT,
     STUB_ADMIN_COMPLETE_PROJECT,
-  ];
+    ...STUB_ADMIN_GATE_PROJECTS,
+  ].map((project) => ({
+    ...project,
+    status: adminProjectStatuses.get(project.id) ?? project.status,
+  }));
+}
+
+/** Companies whose funding request has every required document on file. */
+const COMPLETE_DOCUMENT_PROJECT_IDS = new Set<string>([
+  STUB_ADMIN_COMPLETE_PROJECT.id,
+  ...STUB_ADMIN_GATE_PROJECTS.map((project) => project.id),
+]);
+
+/**
+ * As app/projects/service.py activate_project_if_approved: a DRAFT business goes
+ * ACTIVE once the operator has approved the request AND a score run for it is
+ * LOCKED, whichever of the two arrives second. Only DRAFT moves.
+ */
+function activateIfBothHalves(applicationId: string) {
+  const application = adminApplications.get(applicationId) as
+    { admin_approval?: string } | undefined;
+  if (application?.admin_approval !== "APPROVED") return;
+  if (adminScoreRuns.get(applicationId)?.status !== "LOCKED") return;
+  const projectId = applicationId.replace(/^app-/, "");
+  const project = adminProjects().find((p) => p.id === projectId);
+  if (project?.status === "DRAFT")
+    adminProjectStatuses.set(projectId, "ACTIVE");
 }
 
 function adminProjectDetail(projectId: string) {
@@ -224,37 +258,36 @@ function adminProjectDetail(projectId: string) {
       // What the SME wizard collects: step 1 produces two, steps 4 and 5 one
       // each. One left PENDING on purpose — a presign that never completed is
       // a real state the panel has to surface rather than hide.
-      documents:
-        projectId === STUB_ADMIN_COMPLETE_PROJECT.id
-          ? REQUIRED_DOCUMENT_TYPES.map((type) => ({
-              id: `doc-${type}-${projectId}`,
-              document_type: type,
-              original_filename: `${type}.pdf`,
+      documents: COMPLETE_DOCUMENT_PROJECT_IDS.has(projectId)
+        ? REQUIRED_DOCUMENT_TYPES.map((type) => ({
+            id: `doc-${type}-${projectId}`,
+            document_type: type,
+            original_filename: `${type}.pdf`,
+            content_type: "application/pdf",
+            file_size_bytes: 120000,
+            status: "UPLOADED",
+            uploaded_at: "2026-09-01T00:00:00Z",
+          }))
+        : [
+            {
+              id: `doc-charter-${projectId}`,
+              document_type: "legal_charter",
+              original_filename: "dieu-le-cong-ty.pdf",
               content_type: "application/pdf",
-              file_size_bytes: 120000,
+              file_size_bytes: 240000,
               status: "UPLOADED",
               uploaded_at: "2026-09-01T00:00:00Z",
-            }))
-          : [
-              {
-                id: `doc-charter-${projectId}`,
-                document_type: "legal_charter",
-                original_filename: "dieu-le-cong-ty.pdf",
-                content_type: "application/pdf",
-                file_size_bytes: 240000,
-                status: "UPLOADED",
-                uploaded_at: "2026-09-01T00:00:00Z",
-              },
-              {
-                id: `doc-reg-${projectId}`,
-                document_type: "business_registration",
-                original_filename: "giay-dang-ky-kinh-doanh.pdf",
-                content_type: "application/pdf",
-                file_size_bytes: 182000,
-                status: "PENDING",
-                uploaded_at: null,
-              },
-            ],
+            },
+            {
+              id: `doc-reg-${projectId}`,
+              document_type: "business_registration",
+              original_filename: "giay-dang-ky-kinh-doanh.pdf",
+              content_type: "application/pdf",
+              file_size_bytes: 182000,
+              status: "PENDING",
+              uploaded_at: null,
+            },
+          ],
     });
     // Parked by the engine — the state an operator is there to settle.
     adminKybAttempts.set(`kyb-${projectId}`, {
@@ -1287,6 +1320,35 @@ const server = createServer(async (req, res) => {
     return json(res, 201, run);
   }
 
+  // The engine's half of the gate. Admin only (SYSTEM_ADMIN is refused too),
+  // like the real route, and only a READY run can be locked.
+  const approveRunMatch = path.match(
+    /^\/underwriting\/score-runs\/([^/]+)\/approve$/,
+  );
+  if (approveRunMatch && method === "POST") {
+    if (user.role !== "ADMIN") {
+      return detail(res, 403, "Not authorized for this action");
+    }
+    const found = [...adminScoreRuns.entries()].find(
+      ([, run]) => run.id === approveRunMatch[1],
+    );
+    if (!found) return detail(res, 404, "Score run not found");
+    const [applicationId, run] = found;
+    if (run.status !== "LOCKED") {
+      if (run.status !== "READY") {
+        return detail(res, 400, "Score run must be READY to approve");
+      }
+      run.status = "LOCKED";
+      run.locked_at = new Date().toISOString();
+      activateIfBothHalves(applicationId);
+    }
+    return json(res, 200, {
+      id: run.id,
+      locked_at: run.locked_at ?? null,
+      status: run.status,
+    });
+  }
+
   // --- Step-2 e-invoice preview -------------------------------------------
   // The real endpoint reads the raw .zip body. The stub cannot parse xlsx, so
   // it answers with a fixed 12-month year; a body containing "BROKEN" gets the
@@ -1645,6 +1707,7 @@ const server = createServer(async (req, res) => {
       application.admin_approval = String(body.decision);
       application.decision_note = (body.note as string) ?? null;
       application.decided_at = new Date().toISOString();
+      if (body.decision === "APPROVED") activateIfBothHalves(decisionMatch[1]);
       return json(res, 200, application);
     }
 

@@ -1,8 +1,9 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 
 import { STUB_PUBLIC_PROJECTS } from "../stub-api/fixtures";
 import { signInAs } from "../support/auth";
 import { t } from "../support/i18n";
+import { takeIdentityPhotos } from "../support/kyc";
 
 // Verification in its own tab. An unverified investor who presses Invest gets
 // KYC in a NEW tab; once approved, that tab closes itself and the original tab
@@ -12,18 +13,40 @@ import { t } from "../support/i18n";
 
 const project = STUB_PUBLIC_PROJECTS[0];
 
-// A 1x1 PNG: enough to pass the capture's type check.
-const TINY_PNG = Buffer.from(
-  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
-  "base64",
-);
+/**
+ * Open the project page and wait until the Invest button knows this investor is
+ * not verified.
+ *
+ * The gate (hooks/use-verification-gate.ts) decides from the KYC status query.
+ * Until that has loaded it treats the investor as verified and just navigates,
+ * with the proxy's redirect as the backstop. A click that lands before the
+ * status does therefore opens no tab, and under load (these specs now run a
+ * camera too) it sometimes did. Waiting for the response, then for the page to
+ * have rendered it, removes the race instead of retrying around it.
+ */
+async function openProjectPage(page: Page) {
+  await Promise.all([
+    page.waitForResponse(
+      (response) =>
+        response.url().includes("/gverify/kyc/status") && response.ok(),
+    ),
+    page.goto(`/dashboard/project-details?id=${project.id}`),
+  ]);
+  // Two frames: enough for React to have committed the query result.
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+      ),
+  );
+}
 
 test("Invest opens KYC in a new tab, which closes and returns the user to the action", async ({
   page,
   context,
 }) => {
   await signInAs(context, "unapprovedInvestorTab");
-  await page.goto(`/dashboard/project-details?id=${project.id}`);
+  await openProjectPage(page);
 
   await page.locator("#investmentAmount").fill("131");
   const [verification] = await Promise.all([
@@ -42,13 +65,8 @@ test("Invest opens KYC in a new tab, which closes and returns the user to the ac
   const next = new URL(verification.url()).searchParams.get("next");
   expect(next).toBe(`/dashboard/invest?amount=131&projectId=${project.id}`);
 
-  for (const slot of ["front", "back", "portrait"]) {
-    await verification.locator(`#gverify-${slot}`).setInputFiles({
-      name: `${slot}.png`,
-      mimeType: "image/png",
-      buffer: TINY_PNG,
-    });
-  }
+  // Taken with the (fake) camera: the app accepts no uploaded photo.
+  await takeIdentityPhotos(verification);
   const closed = verification.waitForEvent("close");
   await verification
     .getByRole("button", { name: t("kyc.gv.submitBtn"), exact: true })
@@ -88,7 +106,7 @@ test("pressing Invest again reuses the open verification tab", async ({
   context,
 }) => {
   await signInAs(context, "unapprovedInvestor");
-  await page.goto(`/dashboard/project-details?id=${project.id}`);
+  await openProjectPage(page);
   await page.locator("#investmentAmount").fill("131");
 
   const invest = page.getByRole("button", {
