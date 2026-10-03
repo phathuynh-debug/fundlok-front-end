@@ -65,3 +65,4 @@ vbsec-reports/
 # partykit (own mini-package; see party/package.json)
 /party/node_modules
 /party/.partykit
+/party/.wrangler
