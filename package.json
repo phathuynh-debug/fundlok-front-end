@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "dev:https": "next dev --experimental-https",
-    "build": "next build",
+    "build": "next build && node scripts/deploy-partykit.mjs",
     "start": "next start",
     "lint": "eslint",
     "lint:fix": "eslint . --fix && prettier --write .",
