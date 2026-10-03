@@ -29,7 +29,6 @@ const COUNTRY_KEYS = new Set(["viet nam", "vietnam"]);
 
 // Diacritic- and case-insensitive key, so an OCR pass that drops accents still
 // matches. NFD splits the combining marks off; "đ" has no decomposed form, so
-// it is folded by hand.
 function toKey(value: string): string {
   return value
     .normalize("NFD")
