@@ -1,0 +1,15 @@
+{
+  "name": "fundlok-party",
+  "private": true,
+  "description": "PartyKit server for live notification pushes. Its own package so the CLI's dev tooling stays out of the app's lockfile and audit.",
+  "scripts": {
+    "dev": "partykit dev",
+    "deploy": "partykit deploy"
+  },
+  "devDependencies": {
+    "partykit": "^0.0.115"
+  },
+  "dependencies": {
+    "jose": "^6.0.0"
+  }
+}

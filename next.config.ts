@@ -42,7 +42,7 @@ const nextConfig: NextConfig = {
         // are stable and the art changes rarely, so cache it for a day and
         // let the CDN keep serving while it revalidates in the background.
         // Changing one of these images means giving it a new filename.
-        source: "/:dir(images|logo|achivements)/:path*",
+        source: "/:dir(images|logo|achivements|videos)/:path*",
         headers: [
           {
             key: "Cache-Control",

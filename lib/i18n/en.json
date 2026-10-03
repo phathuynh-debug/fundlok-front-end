@@ -649,7 +649,10 @@
           "title": "Why each one is asked for"
         }
       },
-      "title": "About this form"
+      "title": "About this form",
+      "videoDescription": "A short video showing how to prepare and upload each document.",
+      "videoOpen": "Watch the guide video",
+      "videoTitle": "Document guide video"
     },
     "header": {
       "home": "Home",

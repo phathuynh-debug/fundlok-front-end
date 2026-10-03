@@ -22,6 +22,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     ".claude/**",
     ".agents/**",
+    // Separate package with its own tsconfig-less Workers runtime.
+    "party/**",
     "node_modules/**",
   ]),
 ]);

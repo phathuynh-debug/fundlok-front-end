@@ -29,6 +29,12 @@ export interface NotificationList {
   unread: number;
 }
 
+export interface RealtimeToken {
+  token: string;
+  /** Seconds. Short on purpose: it only has to survive the handshake. */
+  expires_in: number;
+}
+
 export const notificationsService = {
   list(limit?: number) {
     return apiClient.get<NotificationList>(NOTIFICATION_ENDPOINTS.list, {
@@ -46,5 +52,10 @@ export const notificationsService = {
     return apiClient.post<{ updated: number }>(
       NOTIFICATION_ENDPOINTS.markAllRead,
     );
+  },
+
+  /** 404 when the backend has realtime switched off — callers stay on polling. */
+  realtimeToken() {
+    return apiClient.post<RealtimeToken>(NOTIFICATION_ENDPOINTS.realtimeToken);
   },
 };

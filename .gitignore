@@ -61,3 +61,7 @@ certificates
 # by file and line, so they never go into git (or a deployment).
 vbsec-reports/
 .vbsec-tmp/
+
+# partykit (own mini-package; see party/package.json)
+/party/node_modules
+/party/.partykit

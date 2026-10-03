@@ -19,6 +19,7 @@ import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { CONTROL_IDLE } from "@/lib/ui-tokens";
 import { useCurrentUser } from "@/hooks/use-authentication";
+import { useNotificationsRealtime } from "@/hooks/use-notifications-realtime";
 import {
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
@@ -73,6 +74,7 @@ export function NotificationsPanel() {
   const { data: user } = useCurrentUser();
   // The sidebar mounts before the session resolves; asking for notifications
   // without one is a guaranteed 401.
+  useNotificationsRealtime(user?.id);
   const { data, isLoading } = useNotifications(Boolean(user));
   const { mutate: markRead } = useMarkNotificationRead();
   const { mutate: markAllRead, isPending: isMarkingAll } =

@@ -2,6 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { DocumentGuide } from "@/components/document-guide";
+import { DocumentGuideVideo } from "@/components/document-guide-video";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, Loader2, AlertCircle, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -67,7 +68,8 @@ function LoanApplicationWizard() {
     >
       {/* Top-right rather than beside the title: the heading is centred, and
           a button in that flow would pull it off-centre. */}
-      <div className="flex justify-end -mb-4">
+      <div className="flex justify-end items-center gap-1 -mb-4">
+        <DocumentGuideVideo />
         <DocumentGuide />
       </div>
 

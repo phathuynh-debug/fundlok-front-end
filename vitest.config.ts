@@ -14,6 +14,7 @@ export default defineConfig({
     include: ["**/*.{test,spec}.{ts,tsx}"],
     exclude: [
       "node_modules",
+      "party/**",
       ".next",
       ".next-e2e",
       "dist",

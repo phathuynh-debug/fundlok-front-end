@@ -1,0 +1,76 @@
+name: Deploy PartyKit
+
+# Deploys party/ (the live-notification relay) to the PartyKit platform.
+#
+# Runs only when something under party/ changes on `production`, or by hand.
+# It is independent of the Vercel deploy: the frontend only needs the host, and
+# the relay does not depend on the frontend build.
+#
+# Required repository secrets (Settings -> Secrets and variables -> Actions):
+#   PARTYKIT_LOGIN            GitHub username that owns the PartyKit project
+#   PARTYKIT_TOKEN            from `npx partykit token generate` (run while logged in)
+#   PARTYKIT_JWT_SECRET       must equal the backend's PARTYKIT_JWT_SECRET
+#   PARTYKIT_PUBLISH_SECRET   must equal the backend's PARTYKIT_PUBLISH_SECRET
+
+on:
+  push:
+    branches:
+      - production
+    paths:
+      - "party/**"
+      - ".github/workflows/deploy-partykit.yml"
+  workflow_dispatch:
+
+# Two deploys of the same project at once would race; the newer one wins.
+concurrency:
+  group: deploy-partykit
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to PartyKit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: party
+    env:
+      PARTYKIT_LOGIN: ${{ secrets.PARTYKIT_LOGIN }}
+      PARTYKIT_TOKEN: ${{ secrets.PARTYKIT_TOKEN }}
+      PARTYKIT_JWT_SECRET: ${{ secrets.PARTYKIT_JWT_SECRET }}
+      PARTYKIT_PUBLISH_SECRET: ${{ secrets.PARTYKIT_PUBLISH_SECRET }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: party/package-lock.json
+
+      - name: Check required secrets
+        run: |
+          for name in PARTYKIT_LOGIN PARTYKIT_TOKEN PARTYKIT_JWT_SECRET PARTYKIT_PUBLISH_SECRET; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Repository secret $name is not set"
+              missing=1
+            fi
+          done
+          [ -z "${missing:-}" ]
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      # The two secrets are passed as deploy variables so the repo's secrets
+      # stay the single source of truth; the server reads them from env.
+      - name: Deploy
+        run: >
+          npx partykit deploy
+          --var "PARTYKIT_JWT_SECRET=$PARTYKIT_JWT_SECRET"
+          "PARTYKIT_PUBLISH_SECRET=$PARTYKIT_PUBLISH_SECRET"

@@ -18,6 +18,10 @@ vi.mock("@/hooks/use-authentication", () => ({
   useCurrentUser: () => ({ data: { id: "u1", email: "sme@example.com" } }),
 }));
 
+vi.mock("@/hooks/use-notifications-realtime", () => ({
+  useNotificationsRealtime: vi.fn(),
+}));
+
 const markRead = vi.fn();
 const markAllRead = vi.fn();
 let listResult: { data: NotificationList | undefined; isLoading: boolean };
