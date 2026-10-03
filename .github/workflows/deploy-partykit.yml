@@ -1,16 +1,22 @@
 name: Deploy PartyKit
 
-# Deploys party/ (the live-notification relay) to the PartyKit platform.
+# Deploys party/ (the live-notification relay) to OUR OWN Cloudflare account
+# (PartyKit "cloud-prem"), not the hosted partykit.dev platform.
 #
 # Runs only when something under party/ changes on `production`, or by hand.
 # It is independent of the Vercel deploy: the frontend only needs the host, and
 # the relay does not depend on the frontend build.
 #
-# Required repository secrets (Settings -> Secrets and variables -> Actions):
-#   PARTYKIT_LOGIN            GitHub username that owns the PartyKit project
-#   PARTYKIT_TOKEN            from `npx partykit token generate` (run while logged in)
+# Repository secrets (Settings -> Secrets and variables -> Actions -> Secrets):
+#   CLOUDFLARE_ACCOUNT_ID     the account that will run the worker
+#   CLOUDFLARE_API_TOKEN      created from the "Edit Cloudflare Workers" template
 #   PARTYKIT_JWT_SECRET       must equal the backend's PARTYKIT_JWT_SECRET
 #   PARTYKIT_PUBLISH_SECRET   must equal the backend's PARTYKIT_PUBLISH_SECRET
+# Repository variable (same page -> Variables):
+#   PARTYKIT_DOMAIN           hostname the relay is served on, e.g. realtime.fundlok.com.
+#                             It must be a domain in that Cloudflare account. This
+#                             value is also the backend's PARTYKIT_HOST and the
+#                             frontend's NEXT_PUBLIC_PARTYKIT_HOST.
 
 on:
   push:
@@ -31,17 +37,18 @@ permissions:
 
 jobs:
   deploy:
-    name: Deploy to PartyKit
+    name: Deploy to Cloudflare
     runs-on: ubuntu-latest
     timeout-minutes: 10
     defaults:
       run:
         working-directory: party
     env:
-      PARTYKIT_LOGIN: ${{ secrets.PARTYKIT_LOGIN }}
-      PARTYKIT_TOKEN: ${{ secrets.PARTYKIT_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       PARTYKIT_JWT_SECRET: ${{ secrets.PARTYKIT_JWT_SECRET }}
       PARTYKIT_PUBLISH_SECRET: ${{ secrets.PARTYKIT_PUBLISH_SECRET }}
+      PARTYKIT_DOMAIN: ${{ vars.PARTYKIT_DOMAIN }}
 
     steps:
       - name: Checkout
@@ -54,11 +61,11 @@ jobs:
           cache: npm
           cache-dependency-path: party/package-lock.json
 
-      - name: Check required secrets
+      - name: Check required secrets and variables
         run: |
-          for name in PARTYKIT_LOGIN PARTYKIT_TOKEN PARTYKIT_JWT_SECRET PARTYKIT_PUBLISH_SECRET; do
+          for name in CLOUDFLARE_ACCOUNT_ID CLOUDFLARE_API_TOKEN PARTYKIT_JWT_SECRET PARTYKIT_PUBLISH_SECRET PARTYKIT_DOMAIN; do
             if [ -z "${!name}" ]; then
-              echo "::error::Repository secret $name is not set"
+              echo "::error::$name is not set (repository secret/variable)"
               missing=1
             fi
           done
@@ -72,5 +79,16 @@ jobs:
       - name: Deploy
         run: >
           npx partykit deploy
+          --domain "$PARTYKIT_DOMAIN"
           --var "PARTYKIT_JWT_SECRET=$PARTYKIT_JWT_SECRET"
           "PARTYKIT_PUBLISH_SECRET=$PARTYKIT_PUBLISH_SECRET"
+
+      - name: Summary
+        run: |
+          {
+            echo "### PartyKit deployed"
+            echo ""
+            echo "Host (no scheme): \`$PARTYKIT_DOMAIN\`"
+            echo ""
+            echo "Set this as the backend's \`PARTYKIT_HOST\` and Vercel's \`NEXT_PUBLIC_PARTYKIT_HOST\`."
+          } >> "$GITHUB_STEP_SUMMARY"
