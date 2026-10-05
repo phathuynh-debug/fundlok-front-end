@@ -752,6 +752,8 @@
       "score": "Điểm {score}/100"
     },
     "projects": {
+      "comingSoonDescription": "Chúng tôi đang hoàn thiện mục này. Vui lòng quay lại sau.",
+      "comingSoonTitle": "Thị trường thứ cấp sắp ra mắt",
       "filterLabel": "Lọc:",
       "investNow": "Đầu tư ngay",
       "noProjectsDescription": "Chúng tôi không tìm thấy cơ hội nào phù hợp với tiêu chí của bạn. Hãy thử điều chỉnh truy vấn tìm kiếm hoặc bộ lọc.",

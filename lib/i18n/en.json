@@ -752,6 +752,8 @@
       "score": "Score {score}/100"
     },
     "projects": {
+      "comingSoonDescription": "We're still working on this section. Please check back later.",
+      "comingSoonTitle": "Secondary market is coming soon",
       "filterLabel": "Filter:",
       "investNow": "Invest now",
       "noProjectsDescription": "We couldn't find any opportunities matching your criteria. Try adjusting your search query or filters.",
