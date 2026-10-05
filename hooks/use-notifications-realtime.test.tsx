@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 
 import { useNotificationsRealtime } from "./use-notifications-realtime";
 import { notificationKeys } from "./use-notifications";
+import { projectKeys } from "./use-projects";
 
 type Listener = (e: { data?: string }) => void;
 const sockets: {
@@ -67,6 +68,8 @@ describe("useNotificationsRealtime", () => {
       data: JSON.stringify({ type: "notifications.changed" }),
     });
     expect(spy).toHaveBeenCalledWith({ queryKey: notificationKeys.all });
+    // The dashboard's application status comes from the projects query.
+    expect(spy).toHaveBeenCalledWith({ queryKey: projectKeys.all });
   });
 
   it("ignores unrelated messages and closes on unmount", () => {
