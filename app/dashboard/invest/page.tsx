@@ -4,16 +4,23 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
+  AlertCircle,
   ArrowLeft,
-  CheckCircle2,
   Banknote,
   Loader2,
   ShieldCheck,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { TruncatedFigure } from "@/components/truncated-figure";
-import { useToast } from "@/hooks/use-toast";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { useTranslations } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format-currency";
@@ -27,31 +34,26 @@ import { cn } from "@/lib/utils";
 export default function InvestPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { toast } = useToast();
   const { t, locale } = useTranslations();
   const { isLoading } = useRequireAuth();
 
   const amount = Number(searchParams.get("amount") || 0);
   const [isPending, setIsPending] = useState(false);
-  const [done, setDone] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [attempted, setAttempted] = useState(false);
 
   const formattedAmount = formatCurrency(amount, locale);
 
   const handleConfirm = () => {
     setIsPending(true);
-    // Mock settlement — no real order is placed yet. Kept as a stand-in until
-    // the marketplace order endpoint exists.
+    // Platform does not have a payment gateway integrated yet.
+    // Rather than reporting a successful investment, inform the investor
+    // via a modal dialog and an inline notification.
     setTimeout(() => {
       setIsPending(false);
-      setDone(true);
-      toast({
-        title: t("investConfirm.successTitle"),
-        description: t("investConfirm.successDescription").replace(
-          "{amount}",
-          formattedAmount,
-        ),
-      });
-    }, 1200);
+      setAttempted(true);
+      setDialogOpen(true);
+    }, 600);
   };
 
   if (isLoading) {
@@ -111,10 +113,36 @@ export default function InvestPage() {
           </div>
         </div>
 
-        {done ? (
-          <div className="flex items-center justify-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 py-4 text-sm font-semibold text-emerald-600">
-            <CheckCircle2 className="h-5 w-5" />
-            {t("investConfirm.doneHint")}
+        {attempted ? (
+          <div className="space-y-4">
+            <div className="flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
+              <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
+              <div className="space-y-1">
+                <p className="font-semibold text-foreground">
+                  {t("investConfirm.unavailableTitle")}
+                </p>
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  {t("investConfirm.unavailableDescription")}
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Button
+                type="button"
+                className="h-11 flex-1"
+                onClick={() => router.push("/dashboard/projects")}
+              >
+                {t("investConfirm.unavailableAction")}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="h-11 flex-1"
+                onClick={() => setDialogOpen(true)}
+              >
+                {t("investConfirm.viewDetailsNotice")}
+              </Button>
+            </div>
           </div>
         ) : (
           <Button
@@ -133,18 +161,38 @@ export default function InvestPage() {
             )}
           </Button>
         )}
-
-        {done && (
-          <Button
-            type="button"
-            variant="outline"
-            className="h-11 w-full"
-            onClick={() => router.push("/dashboard")}
-          >
-            {t("investConfirm.goToDashboard")}
-          </Button>
-        )}
       </Card>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader className="items-center text-center">
+            <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">
+              <AlertCircle className="h-6 w-6" />
+            </div>
+            <DialogTitle className="text-xl font-bold">
+              {t("investConfirm.unavailableTitle")}
+            </DialogTitle>
+            <DialogDescription className="text-sm leading-relaxed text-muted-foreground">
+              {t("investConfirm.unavailableDescription")}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4 flex-col gap-2 sm:flex-col">
+            <Button
+              className="w-full"
+              onClick={() => router.push("/dashboard/projects")}
+            >
+              {t("investConfirm.unavailableAction")}
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => setDialogOpen(false)}
+            >
+              {t("common.close")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
