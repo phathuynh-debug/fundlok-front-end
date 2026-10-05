@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import Link from "next/link";
 import QRCode from "react-qr-code";
 import {
   ShieldCheck,
@@ -10,6 +11,7 @@ import {
   RotateCcw,
   Smartphone,
   ArrowLeft,
+  Headphones,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -19,6 +21,8 @@ import { useGVerifyHandoff, useGVerifyStatus } from "@/hooks/use-gverify";
 import { StatusBlock } from "../status-block";
 import { CaptureTabs } from "./CaptureTabs";
 import { useGVerifyKyc } from "./useGVerifyKyc";
+import { useVerificationFailures } from "../use-verification-failures";
+import { VerificationHelpDialog } from "../VerificationHelpDialog";
 import type { ApiError } from "@/lib/types";
 import { apiErrorMessage, backendText } from "@/lib/api-error-message";
 
@@ -33,12 +37,15 @@ import { apiErrorMessage, backendText } from "@/lib/api-error-message";
 export function KycCapturePanel({
   heading,
   onBack,
+  flow = "kyc",
 }: {
   // Shown above the capture tabs. Defaults to the investor KYC heading.
   heading?: ReactNode;
   // When set, the capture state offers a Back button (e.g. to the previous
   // KYB step).
   onBack?: () => void;
+  // Flow identity: 'kyc' for investor personal KYC, 'kyb' when embedded in SME KYB.
+  flow?: "kyc" | "kyb";
 }) {
   const { toast } = useToast();
   const { t, locale } = useTranslations();
@@ -46,6 +53,13 @@ export function KycCapturePanel({
     useGVerifyKyc();
   const { mutateAsync: createHandoff, isPending: creatingHandoff } =
     useGVerifyHandoff();
+  const {
+    failureCount,
+    isDialogOpen,
+    setIsDialogOpen,
+    recordFailure,
+    resetFailures,
+  } = useVerificationFailures(flow);
 
   // After a REJECTED/FAILED verdict the result screen shows first; "try again"
   // flips into capture mode for a fresh attempt (a new attempt row server-side).
@@ -61,6 +75,12 @@ export function KycCapturePanel({
   } | null>(null);
   const { data: status } = useGVerifyStatus({ poll: phone !== null });
 
+  useEffect(() => {
+    if (status?.is_approved) {
+      resetFailures();
+    }
+  }, [status?.is_approved, resetFailures]);
+
   // The phone produced a fresh verdict → the QR panel yields to the normal
   // status rendering. Derived, not stored: the phone state itself is cleared by
   // the user's next action (retry), or the parent moves on (approved).
@@ -69,6 +89,24 @@ export function KycCapturePanel({
     !!status?.is_terminal &&
     status.verification_id !== phone.baselineId;
   const phoneActive = phone !== null && !phoneVerdictArrived;
+
+  const lastRecordedPhoneAttemptRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (
+      phoneVerdictArrived &&
+      status?.verification_id &&
+      status.verification_id !== lastRecordedPhoneAttemptRef.current &&
+      (status.status === "REJECTED" || status.status === "FAILED")
+    ) {
+      lastRecordedPhoneAttemptRef.current = status.verification_id;
+      recordFailure();
+    }
+  }, [
+    phoneVerdictArrived,
+    status?.verification_id,
+    status?.status,
+    recordFailure,
+  ]);
 
   const fail = (err: unknown) =>
     toast({
@@ -97,9 +135,15 @@ export function KycCapturePanel({
     try {
       const verdict = await submit();
       setRetaking(false);
-      if (verdict.status === "REJECTED") reset();
+      if (verdict.status === "REJECTED" || verdict.status === "FAILED") {
+        reset();
+        recordFailure();
+      } else if (verdict.status === "APPROVED") {
+        resetFailures();
+      }
     } catch (err) {
       setRetaking(false);
+      recordFailure();
       fail(err);
     }
   };
@@ -146,40 +190,61 @@ export function KycCapturePanel({
   /* --- Last attempt rejected / provider failure --- */
   if (showResult && status) {
     return (
-      <StatusBlock
-        icon={
-          status.status === "REJECTED" ? (
-            <XCircle className="h-12 w-12 text-destructive" />
-          ) : (
-            <AlertTriangle className="h-12 w-12 text-amber-500" />
-          )
-        }
-        title={t(
-          status.status === "REJECTED"
-            ? "kyc.declinedTitle"
-            : "kyc.gv.failedTitle",
-        )}
-        hint={
-          status.status === "REJECTED"
-            ? backendText(
-                status.rejection_reason,
-                locale,
-                t("kyc.declinedHint"),
-              )
-            : t("kyc.gv.failedHint")
-        }
-      >
-        <Button
-          className="h-11 w-full"
-          onClick={() => {
-            setPhone(null);
-            setRetaking(true);
-          }}
+      <>
+        <StatusBlock
+          icon={
+            status.status === "REJECTED" ? (
+              <XCircle className="h-12 w-12 text-destructive" />
+            ) : (
+              <AlertTriangle className="h-12 w-12 text-amber-500" />
+            )
+          }
+          title={t(
+            status.status === "REJECTED"
+              ? "kyc.declinedTitle"
+              : "kyc.gv.failedTitle",
+          )}
+          hint={
+            status.status === "REJECTED"
+              ? backendText(
+                  status.rejection_reason,
+                  locale,
+                  t("kyc.declinedHint"),
+                )
+              : t("kyc.gv.failedHint")
+          }
         >
-          <RotateCcw className="mr-2 h-4 w-4" />
-          {t("kyc.retryBtn")}
-        </Button>
-      </StatusBlock>
+          <div className="flex flex-col gap-2 w-full">
+            <Button
+              className="h-11 w-full"
+              onClick={() => {
+                setPhone(null);
+                setRetaking(true);
+              }}
+            >
+              <RotateCcw className="mr-2 h-4 w-4" />
+              {t("kyc.retryBtn")}
+            </Button>
+            {failureCount >= 3 && (
+              <Button
+                variant="outline"
+                asChild
+                className="h-11 w-full border-border bg-card hover:bg-accent text-foreground"
+              >
+                <Link href="/contact?purpose=support">
+                  <Headphones className="mr-2 h-4 w-4" />
+                  {t("kyc.contactSupportBtn")}
+                </Link>
+              </Button>
+            )}
+          </div>
+        </StatusBlock>
+        <VerificationHelpDialog
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          flow={flow}
+        />
+      </>
     );
   }
 
@@ -262,6 +327,12 @@ export function KycCapturePanel({
         )}
         {t("kyc.gv.phoneBtn")}
       </Button>
+
+      <VerificationHelpDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        flow={flow}
+      />
     </>
   );
 }

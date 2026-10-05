@@ -1807,6 +1807,7 @@
     "approvedHint": "You're all set. Taking you to your dashboard…",
     "approvedTitle": "Identity verified",
     "checking": "Checking your verification…",
+    "contactSupportBtn": "Contact support",
     "continueBtn": "Continue",
     "declinedHint": "We couldn't verify your identity. You can try again.",
     "declinedTitle": "Verification failed",
@@ -1851,6 +1852,13 @@
       "tabFront": "ID front",
       "tabSelfie": "Selfie",
       "tooLarge": "Image exceeds the 10MB limit"
+    },
+    "helpDialog": {
+      "closeBtn": "Try again later",
+      "contactBtn": "Contact support",
+      "kybDescription": "We noticed you've encountered multiple verification issues with your business documents. Please contact our support team so we can assist you directly.",
+      "kycDescription": "We noticed you've had 3 unsuccessful verification attempts. Our support team is ready to help you complete your verification inquiry directly.",
+      "title": "Need help with verification?"
     },
     "inProgress": "Verification in progress…",
     "inReviewHint": "A team member is reviewing your documents. We'll email you when it's done — you can safely leave this page.",
