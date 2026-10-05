@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { PartySocket } from "partysocket";
 import { notificationsService } from "@/services/notifications.service";
 import { notificationKeys } from "@/hooks/use-notifications";
+import { projectKeys } from "@/hooks/use-projects";
 
 /**
  * Live nudge for the bell.
@@ -13,6 +14,13 @@ import { notificationKeys } from "@/hooks/use-notifications";
  * cookie-authenticated API, so this adds latency-free refreshes without a
  * second data path. Polling (`useNotifications` staleTime) is untouched and is
  * the whole behaviour whenever this is off, unconfigured, or disconnected.
+ *
+ * A push also refreshes the user's projects. The SME dashboard draws the
+ * application tracker, the approval summary and the project's status from
+ * `useMyProjects` (cached for two minutes), and the push exists because that
+ * data just changed -- an admin decision is the case it was built for. Without
+ * this the bell would light up while the page beside it still said "under
+ * review" until the next reload.
  *
  * The connection is not React Query state: it is a live handle with a
  * lifecycle, owned by this effect.
@@ -23,6 +31,11 @@ export function useNotificationsRealtime(userId: string | undefined) {
 
   useEffect(() => {
     if (!host || !userId) return;
+
+    const refresh = () => {
+      queryClient.invalidateQueries({ queryKey: notificationKeys.all });
+      queryClient.invalidateQueries({ queryKey: projectKeys.all });
+    };
 
     const socket = new PartySocket({
       host,
@@ -46,16 +59,14 @@ export function useNotificationsRealtime(userId: string | undefined) {
       try {
         const msg = JSON.parse(String(event.data));
         if (msg?.type === "notifications.changed") {
-          queryClient.invalidateQueries({ queryKey: notificationKeys.all });
+          refresh();
         }
       } catch {
         // Not ours; ignore.
       }
     });
     // A reconnect may have missed a push while we were away.
-    socket.addEventListener("open", () => {
-      queryClient.invalidateQueries({ queryKey: notificationKeys.all });
-    });
+    socket.addEventListener("open", refresh);
 
     return () => socket.close();
   }, [host, userId, queryClient]);
