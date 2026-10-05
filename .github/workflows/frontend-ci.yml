@@ -5,14 +5,73 @@ on:
   push:
     branches:
       - production
+      - preview
 
 jobs:
-  build:
+  i18n-check:
+    name: i18n Check
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout 
-        uses: actions/checkout@v4 
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Check i18n sorting
+        run: bun run i18n:check
+
+  lint-styling:
+    name: Lint Styling Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Check code styling (Prettier)
+        run: bun run lint:style
+
+  lint:
+    name: Lint & Format Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Lint
+        run: bun run lint
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -24,3 +83,99 @@ jobs:
 
       - name: Build
         run: bun run build
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run Vitest
+        run: bun run test
+
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    # A browser download plus a production build; well clear of the default 6h
+    # but tight enough that a hung server fails instead of idling.
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      # Playwright's runner is a Node program. Bun installs the deps and runs
+      # the app and the stub API; Node runs the test runner, which is the only
+      # combination either tool supports.
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # Keyed on the resolved Playwright version so a bump re-downloads instead
+      # of restoring a browser the runner can no longer drive.
+      - name: Resolve Playwright version
+        id: pw
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browsers
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+
+      - name: Install Chromium
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      # System deps live outside the cached browser directory, so they are
+      # installed even on a cache hit.
+      - name: Install browser system dependencies
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      # Built here rather than inside playwright.config.ts so a build failure
+      # is reported as a build failure, not as a webServer timeout.
+      - name: Build app for E2E
+        env:
+          API_URL: http://127.0.0.1:8100
+          NEXT_PUBLIC_APP_URL: http://127.0.0.1:3100
+          # The app's own Turnstile escape hatch. Safe here and only here: this
+          # build is a throwaway artifact that is never deployed.
+          NEXT_PUBLIC_DISABLE_TURNSTILE: "true"
+          NEXT_DIST_DIR: .next-e2e
+        run: bun run build
+
+      - name: Run Playwright tests
+        env:
+          # Skip the rebuild in the webServer command — the step above did it.
+          E2E_SKIP_BUILD: "1"
+          NEXT_DIST_DIR: .next-e2e
+        run: npx playwright test
+
+      - name: Upload report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

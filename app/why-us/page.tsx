@@ -1,46 +1,51 @@
 import type { Metadata } from "next";
+
+import { getSeoStrings, localeAlternates, OG_LOCALE } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import WhyUsClient from "./why-us-client";
 
-export const metadata: Metadata = {
-  title: "Why Us | FundLok - Vision, Recognitions & Achievements",
-  description:
-    "Discover FundLok's vision and award-winning track record. Recognized by the Australian Government (Sustainability in Action 2024), incubated by SIHUB, and a Top 10 project at the International Blockchain Olympiad 2023. Learn about investor safety, flexible revenue-share terms for SMEs, and automated document processing.",
-  keywords: [
-    "FundLok vision",
-    "FundLok achievements",
-    "FundLok awards",
-    "FundLok recognitions",
-    "SME story",
-    "flexible capital solutions",
-    "investor safety",
-    "stable daily income",
-    "progressive repayment",
-    "revenue share lending",
-    "automated credit risk scoring",
-    "verified data financing",
-    "Sustainability in Action 2024",
-    "Australian Government",
-    "SIHUB 2025",
-    "Startup and Innovation Hub Ho Chi Minh City",
-    "International Blockchain Olympiad 2023",
-    "IBCOL 2023",
-    "LENDMI",
-  ],
-  openGraph: {
-    title: "Why Us | FundLok - Vision, Recognitions & Achievements",
-    description:
-      "Discover FundLok's vision and award-winning track record — recognized by the Australian Government, incubated by SIHUB, and a Top 10 project at the International Blockchain Olympiad 2023.",
-    type: "website",
-    siteName: "FundLok",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Why Us | FundLok - Vision, Recognitions & Achievements",
-    description:
-      "Discover FundLok's vision and award-winning track record — recognized by the Australian Government, incubated by SIHUB, and a Top 10 project at the International Blockchain Olympiad 2023.",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { locale, seo } = await getSeoStrings();
+  const title = seo.whyUsTitle;
+  const description = seo.whyUsDescription;
+
+  return {
+    title,
+    description,
+    keywords: [
+      "FundLok vision",
+      "FundLok achievements",
+      "FundLok awards",
+      "FundLok recognitions",
+      "SME story",
+      "flexible capital solutions",
+      "investor transparency",
+      "daily repayment",
+      "progressive repayment",
+      "revenue-based financing",
+      "reference business score",
+      "verified data financing",
+      "Sustainability in Action 2024",
+      "Australian Government",
+      "SIHUB 2025",
+      "Startup and Innovation Hub Ho Chi Minh City",
+      "International Blockchain Olympiad 2023",
+      "IBCOL 2023",
+      "LENDMI",
+    ],
+    alternates: localeAlternates("/why-us", locale),
+    openGraph: {
+      title,
+      description,
+      url: localeAlternates("/why-us", locale).canonical,
+      siteName: "FundLok",
+      type: "website",
+      locale: OG_LOCALE[locale],
+    },
+    twitter: { card: "summary", title, description },
+    robots: { index: true, follow: true },
+  };
+}
 
 // Structured data for FundLok's recognitions. Uses ItemList (each award as a
 // CreativeWork) plus an Organization node whose `award` list links back to the
@@ -63,7 +68,7 @@ const achievements = [
     name: "Top 10 Potential Project Global",
     awarder: "International Blockchain Olympiad 2023 (IBCOL)",
     description:
-      "Representing Vietnam (under the project name LENDMI), won a top-10 global spot for pioneering blockchain-based credit scoring and secure liquidity pooling for emerging markets.",
+      "Representing Vietnam (under the project name LENDMI), won a top-10 global spot for blockchain-based reference business scores and secure liquidity pooling for emerging markets.",
   },
 ];
 

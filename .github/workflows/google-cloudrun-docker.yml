@@ -27,7 +27,7 @@
 #
 # 3. Change the values in the "env" block to match your values.
 
-name: 'Deploy to Cloud Run from Source'
+name: "Deploy to Cloud Run from Source"
 
 on:
   push:
@@ -35,48 +35,48 @@ on:
       - main
 
 env:
-  PROJECT_ID: 'fundlok' # TODO: update to your Google Cloud project ID
-  REGION: 'asia-southeast1' # TODO: update to your region
-  SERVICE: 'api' # TODO: update to your service name
+  PROJECT_ID: "fundlok" # TODO: update to your Google Cloud project ID
+  REGION: "asia-southeast1" # TODO: update to your region
+  SERVICE: "api" # TODO: update to your service name
 
 jobs:
   deploy:
-    runs-on: 'ubuntu-latest'
+    runs-on: "ubuntu-latest"
 
     permissions:
-      contents: 'read'
-      id-token: 'write'
+      contents: "read"
+      id-token: "write"
 
     steps:
-      - name: 'Checkout'
-        uses: 'actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332' # actions/checkout@v4
+      - name: "Checkout"
+        uses: "actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332" # actions/checkout@v4
 
       # Configure Workload Identity Federation and generate an access token.
       #
       # See https://github.com/google-github-actions/auth for more options,
       # including authenticating via a JSON credentials file.
-      - id: 'auth'
-        name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@f112390a2df9932162083945e46d439060d66ec2' # google-github-actions/auth@v2
+      - id: "auth"
+        name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@f112390a2df9932162083945e46d439060d66ec2" # google-github-actions/auth@v2
         with:
-          workload_identity_provider: 'projects/1086381007504/locations/global/workloadIdentityPools/fundlok/providers/github' # TODO: replace with your workload identity provider
-          service_account: 'github-deploy@fundlok.iam.gserviceaccount.com'
+          workload_identity_provider: "projects/1086381007504/locations/global/workloadIdentityPools/fundlok/providers/github" # TODO: replace with your workload identity provider
+          service_account: "github-deploy@fundlok.iam.gserviceaccount.com"
 
-      - name: 'Deploy to Cloud Run'
-        uses: 'google-github-actions/deploy-cloudrun@v2' # google-github-actions/deploy-cloudrun@v2
+      - name: "Deploy to Cloud Run"
+        uses: "google-github-actions/deploy-cloudrun@v2" # google-github-actions/deploy-cloudrun@v2
         with:
-          service: '${{ env.SERVICE }}'
-          region: '${{ env.REGION }}'
-          project_id: '${{ env.PROJECT_ID }}'
+          service: "${{ env.SERVICE }}"
+          region: "${{ env.REGION }}"
+          project_id: "${{ env.PROJECT_ID }}"
           # NOTE: If using a different source folder, update the image name below:
-          source: './'
-          cloudsql_instances: 'fundlok:asia-southeast1:fundlok'
-          flags: '--add-cloudsql-instances fundlok:asia-southeast1:fundlok'
+          source: "./"
+          cloudsql_instances: "fundlok:asia-southeast1:fundlok"
+          flags: "--add-cloudsql-instances fundlok:asia-southeast1:fundlok"
           env_vars: |
             DATABASE_URL=${{ secrets.FUNLOK_DB }}
             SECRET_KEY=${{ secrets.SECRET_KEY }}
 
       # If required, use the Cloud Run URL output in later steps
-      - name: 'Show output'
+      - name: "Show output"
         run: |-
           echo ${{ steps.deploy.outputs.url }}

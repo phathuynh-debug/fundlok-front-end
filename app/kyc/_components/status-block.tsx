@@ -1,4 +1,4 @@
-// Shared status layout for the verification screens (Didit + GVerify).
+// Shared status layout for the GVerify verification screens.
 export function StatusBlock({
   icon,
   title,

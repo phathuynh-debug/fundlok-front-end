@@ -1,15 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useGoogleLogin } from "@react-oauth/google";
 import {
-	authenticationService,
-	isAdminRole,
-	type LoginPayload,
-	type OAuthLoginPayload,
-	type OAuthTokenResponse,
-	type User,
+  authenticationService,
+  isAdminRole,
+  isTotpChallenge,
+  type LoginPayload,
+  type LoginResult,
+  type OAuthLoginPayload,
+  type OAuthLoginResult,
+  type User,
 } from "@/services/authentication.service";
 import { usersService } from "@/services/users.service";
 import { authKeys } from "@/hooks/use-authentication";
@@ -21,83 +24,144 @@ import type { ApiError } from "@/lib/types";
 // useCurrentUser (header, sidebar, …) renders correct info on first paint.
 // Without this the seeded partial is treated as fresh (staleTime) and the UI
 // only corrects itself after a hard refresh wipes the in-memory cache.
-async function hydrateCurrentUser(queryClient: ReturnType<typeof useQueryClient>) {
-	try {
-		return await queryClient.fetchQuery({
-			queryKey: authKeys.currentUser(),
-			queryFn: () => usersService.getCurrentUser(),
-			staleTime: 0,
-		});
-	} catch {
-		// Keep whatever is already cached; useCurrentUser refetches on mount.
-		return queryClient.getQueryData<User>(authKeys.currentUser());
-	}
+async function hydrateCurrentUser(
+  queryClient: ReturnType<typeof useQueryClient>,
+) {
+  try {
+    return await queryClient.fetchQuery({
+      queryKey: authKeys.currentUser(),
+      queryFn: () => usersService.getCurrentUser(),
+      staleTime: 0,
+    });
+  } catch {
+    // Keep whatever is already cached; useCurrentUser refetches on mount.
+    return queryClient.getQueryData<User>(authKeys.currentUser());
+  }
 }
 
 // Admins (and system admins) land in the admin area. Users who don't have a
 // role yet must pick one first. Everyone else goes to the dashboard, where
 // middleware further routes SMEs without projects to the application form.
-function landingRouteFor(user?: User | null) {
-	if (isAdminRole(user?.role)) {
-		return "/admin";
-	}
-	if (!user?.role) {
-		return "/select-role";
-	}
-	return "/dashboard";
+export function landingRouteFor(user?: User | null) {
+  if (isAdminRole(user?.role)) {
+    return "/admin";
+  }
+  if (!user?.role) {
+    return "/select-role";
+  }
+  return "/dashboard";
 }
 
 export function useLogin() {
-	const queryClient = useQueryClient();
-	const router = useRouter();
+  const queryClient = useQueryClient();
+  const router = useRouter();
 
-	const emailPasswordLogin = useMutation<User, ApiError, LoginPayload>({
-		mutationFn: (payload) => authenticationService.login(payload),
-		onSuccess: async (user) => {
-			// Seed for an instant paint, then reconcile against /users/me.
-			queryClient.setQueryData(authKeys.currentUser(), user);
-			const current = await hydrateCurrentUser(queryClient);
-			router.push(landingRouteFor(current ?? user));
-		},
-	});
+  // Local, not server state: a pending second factor is a step in this form,
+  // has no query key and never outlives the page. The remembered `remember_me`
+  // rides along because step two needs it and the challenge token is no place
+  // for a UI preference.
+  const [challenge, setChallenge] = useState<{
+    token: string;
+    remember: boolean;
+  } | null>(null);
 
-	const googleLogin = useMutation<
-		OAuthTokenResponse,
-		ApiError,
-		OAuthLoginPayload
-	>({
-		mutationFn: (payload) => authenticationService.oauthLogin(payload),
-		onSuccess: async () => {
-			const current = await hydrateCurrentUser(queryClient);
-			router.push(landingRouteFor(current));
-		},
-	});
+  const finishSignIn = async (user: User) => {
+    // Seed for an instant paint, then reconcile against /users/me.
+    queryClient.setQueryData(authKeys.currentUser(), user);
+    const current = await hydrateCurrentUser(queryClient);
+    router.push(landingRouteFor(current ?? user));
+  };
 
-	const handleGoogleLogin = useGoogleLogin({
-		onSuccess: async (tokenResponse) => {
-			// The token shape varies by flow (implicit vs auth-code), so probe the
-			// known fields without assuming one.
-			const resp = tokenResponse as unknown as Record<string, string | undefined>;
-			const idToken =
-				resp?.credential ?? resp?.id_token ?? resp?.access_token;
+  const emailPasswordLogin = useMutation<LoginResult, ApiError, LoginPayload>({
+    mutationFn: (payload) => authenticationService.login(payload),
+    onSuccess: async (result, payload) => {
+      // 2FA accounts get a challenge, not a session — nothing is cached and no
+      // navigation happens until the code is verified.
+      if (isTotpChallenge(result)) {
+        setChallenge({
+          token: result.challenge_token,
+          remember: payload.remember_me ?? false,
+        });
+        return;
+      }
+      await finishSignIn(result);
+    },
+  });
 
-			if (!idToken) {
-				return;
-			}
+  const totpLogin = useMutation<User, ApiError, string>({
+    mutationFn: (code) => {
+      if (!challenge) {
+        // Unreachable through the UI (the step only renders with a challenge),
+        // but throwing beats sending `undefined` as a credential.
+        throw new Error("No two-factor challenge in progress");
+      }
+      return authenticationService.completeTotpLogin({
+        challenge_token: challenge.token,
+        code,
+        remember_me: challenge.remember,
+      });
+    },
+    onSuccess: finishSignIn,
+  });
 
-			googleLogin.mutate({ provider: "google", id_token: idToken });
-		},
-		onError: () => {
-			// Let the UI surface the error state through the Google button.
-		},
-	});
+  const googleLogin = useMutation<
+    OAuthLoginResult,
+    ApiError,
+    OAuthLoginPayload
+  >({
+    mutationFn: (payload) => authenticationService.oauthLogin(payload),
+    onSuccess: async (result) => {
+      // A 2FA account gets the same code step as the password form. remember is
+      // true because a social sign-in always issues persistent cookies (the
+      // backend's choice — there is no "keep me signed in" box on that path).
+      if (isTotpChallenge(result)) {
+        setChallenge({ token: result.challenge_token, remember: true });
+        return;
+      }
+      const current = await hydrateCurrentUser(queryClient);
+      router.push(landingRouteFor(current));
+    },
+  });
 
-	return {
-		login: emailPasswordLogin.mutate,
-		loginAsync: emailPasswordLogin.mutateAsync,
-		googleLogin: handleGoogleLogin,
-		googleLoginAsync: googleLogin.mutateAsync,
-		isPending: emailPasswordLogin.isPending,
-		isGooglePending: googleLogin.isPending,
-	};
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      // The token shape varies by flow (implicit vs auth-code), so probe the
+      // known fields without assuming one.
+      const resp = tokenResponse as unknown as Record<
+        string,
+        string | undefined
+      >;
+      const idToken = resp?.credential ?? resp?.id_token ?? resp?.access_token;
+
+      if (!idToken) {
+        return;
+      }
+
+      googleLogin.mutate({ provider: "google", id_token: idToken });
+    },
+    onError: () => {
+      // Let the UI surface the error state through the Google button.
+    },
+  });
+
+  return {
+    login: emailPasswordLogin.mutate,
+    loginAsync: emailPasswordLogin.mutateAsync,
+    googleLogin: handleGoogleLogin,
+    googleLoginAsync: googleLogin.mutateAsync,
+    isPending: emailPasswordLogin.isPending,
+    isGooglePending: googleLogin.isPending,
+
+    // --- second factor ---
+    totpRequired: challenge !== null,
+    submitTotpCode: totpLogin.mutate,
+    isVerifyingCode: totpLogin.isPending,
+    totpError: totpLogin.error,
+    // Back to the password step. Clearing the challenge is the point: an
+    // abandoned code prompt must not leave a usable token in memory.
+    cancelTotp: () => {
+      setChallenge(null);
+      totpLogin.reset();
+    },
+  };
 }

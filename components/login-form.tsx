@@ -4,23 +4,45 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useTurnstile } from "@/hooks/use-turnstile";
+import { TwoFactorStep } from "@/components/two-factor-step";
+import { isGoogleSignInConfigured } from "@/lib/google-oauth";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useLogin } from "@/app/login/use-login";
 import { Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
+import { PasskeySignInButton } from "@/components/passkey-sign-in-button";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  // Unticked by default: a shared machine should forget the session on
+  // close unless the user explicitly asks otherwise.
+  const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const { turnstileToken, turnstileContainerRef } = useTurnstile();
+  const {
+    turnstileToken,
+    turnstileContainerRef,
+    reset: resetTurnstile,
+  } = useTurnstile();
 
   const { toast } = useToast();
-  const { login, googleLogin, isPending, isGooglePending } = useLogin();
-  const { t } = useTranslations();
+  const {
+    login,
+    googleLogin,
+    isPending,
+    isGooglePending,
+    totpRequired,
+    submitTotpCode,
+    isVerifyingCode,
+    totpError,
+    cancelTotp,
+  } = useLogin();
+  const { t, locale, localize } = useTranslations();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,13 +51,18 @@ export function LoginForm() {
       toast({
         variant: "destructive",
         title: t("auth.login.failedTitle"),
-        description: "Please complete the security check.",
+        description: t("auth.securityCheckRequired"),
       });
       return;
     }
 
     login(
-      { email, password, turnstile_token: turnstileToken },
+      {
+        email,
+        password,
+        turnstile_token: turnstileToken,
+        remember_me: rememberMe,
+      },
       {
         onSuccess: () => {
           toast({
@@ -44,57 +71,93 @@ export function LoginForm() {
           });
         },
         onError: (error) => {
+          // A Turnstile token is single-use: the backend already redeemed it
+          // on this attempt. Without a reset, retrying resubmits the spent
+          // token and Cloudflare rejects it with `timeout-or-duplicate` (400),
+          // masking the real error the user was trying to correct.
+          resetTurnstile();
           toast({
             variant: "destructive",
             title: t("auth.login.failedTitle"),
-            description: error?.message || t("auth.login.failedDescription"),
+            description: apiErrorMessage(
+              error,
+              locale,
+              t("auth.login.failedDescription"),
+            ),
           });
         },
       },
     );
   };
 
+  // A pending second factor replaces the form entirely — see TwoFactorStep for
+  // why it is not rendered alongside it.
+  if (totpRequired) {
+    return (
+      <TwoFactorStep
+        onSubmit={submitTotpCode}
+        onCancel={() => {
+          cancelTotp();
+          // The Turnstile token was spent on the first attempt; without a reset
+          // the retry would resubmit a used token and Cloudflare rejects it.
+          resetTurnstile();
+        }}
+        isVerifying={isVerifyingCode}
+        error={totpError}
+      />
+    );
+  }
+
   return (
     <div className="space-y-4">
-      <Button
-        type="button"
-        onClick={() => googleLogin()}
-        disabled={isGooglePending}
-        className="w-full h-11 bg-white text-black flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-colors"
-      >
-        <svg
-          className="mr-3 h-4 w-4"
-          viewBox="0 0 533.5 544.3"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden
-        >
-          <path
-            fill="#4285F4"
-            d="M533.5 278.4c0-18.5-1.5-37.3-4.7-55.3H272v104.8h147.5c-6.3 34.1-25.1 62.9-53.6 82.2v68.2h86.6c50.7-46.7 80-115.4 80-199.9z"
-          />
-          <path
-            fill="#34A853"
-            d="M272 544.3c72.6 0 133.6-23.9 178.2-64.8l-86.6-68.2c-24.1 16.2-55 25.8-91.6 25.8-70 0-129.3-47.2-150.5-110.5H32.3v69.5C76.9 489.5 167.6 544.3 272 544.3z"
-          />
-          <path
-            fill="#FBBC05"
-            d="M121.5 325c-10.7-32-10.7-66.2 0-98.2V157.3H32.3c-43 85.4-43 187.2 0 272.6l89.2-69.9z"
-          />
-          <path
-            fill="#EA4335"
-            d="M272 109.7c38.8 0 73.6 13.4 101 39l75.7-75.7C405.8 28.2 349.6 0 272 0 167.6 0 76.9 54.8 32.3 137.8l89.2 69.5c21.2-63.3 80.5-110.5 150.5-110.5z"
-          />
-        </svg>
-        <span>{t("auth.login.signInWithGoogle")}</span>
-      </Button>
+      {/* Hidden when the build has no NEXT_PUBLIC_GOOGLE_CLIENT_ID. A button
+          that cannot work is worse than no button, and the provider behind it
+          is running on a placeholder id in that case — see lib/google-oauth.ts. */}
+      {isGoogleSignInConfigured && (
+        <>
+          <Button
+            type="button"
+            onClick={() => googleLogin()}
+            disabled={isGooglePending}
+            className="w-full h-11 bg-white text-black flex items-center justify-center hover:bg-slate-900 hover:text-white transition-colors"
+          >
+            <svg
+              className="mr-3 h-4 w-4"
+              viewBox="0 0 533.5 544.3"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden
+            >
+              <path
+                fill="#4285F4"
+                d="M533.5 278.4c0-18.5-1.5-37.3-4.7-55.3H272v104.8h147.5c-6.3 34.1-25.1 62.9-53.6 82.2v68.2h86.6c50.7-46.7 80-115.4 80-199.9z"
+              />
+              <path
+                fill="#34A853"
+                d="M272 544.3c72.6 0 133.6-23.9 178.2-64.8l-86.6-68.2c-24.1 16.2-55 25.8-91.6 25.8-70 0-129.3-47.2-150.5-110.5H32.3v69.5C76.9 489.5 167.6 544.3 272 544.3z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M121.5 325c-10.7-32-10.7-66.2 0-98.2V157.3H32.3c-43 85.4-43 187.2 0 272.6l89.2-69.9z"
+              />
+              <path
+                fill="#EA4335"
+                d="M272 109.7c38.8 0 73.6 13.4 101 39l75.7-75.7C405.8 28.2 349.6 0 272 0 167.6 0 76.9 54.8 32.3 137.8l89.2 69.5c21.2-63.3 80.5-110.5 150.5-110.5z"
+              />
+            </svg>
+            <span>{t("auth.login.signInWithGoogle")}</span>
+          </Button>
 
-      <div className="flex items-center gap-3">
-        <span className="flex-1 h-px bg-border" />
-        <span className="text-sm text-muted-foreground">
-          {t("auth.login.or")}
-        </span>
-        <span className="flex-1 h-px bg-border" />
-      </div>
+          <div className="flex items-center gap-3">
+            <span className="flex-1 h-px bg-border" />
+            <span className="text-sm text-muted-foreground">
+              {t("auth.login.or")}
+            </span>
+            <span className="flex-1 h-px bg-border" />
+          </div>
+        </>
+      )}
+
+      <PasskeySignInButton />
 
       <form onSubmit={handleLogin} className="space-y-4">
         <div className="space-y-2">
@@ -141,7 +204,18 @@ export function LoginForm() {
                 <Eye className="h-4 w-4" />
               )}
             </button>
-            <div className="flex justify-end">
+            <div className="flex items-center justify-between gap-3 pt-2.5">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <Checkbox
+                  id="rememberMe"
+                  checked={rememberMe}
+                  onCheckedChange={(checked) => setRememberMe(checked === true)}
+                  disabled={isPending || isGooglePending}
+                />
+                <span className="text-xs text-muted-foreground">
+                  {t("auth.login.rememberMe")}
+                </span>
+              </label>
               <Link
                 href="/forgot-password"
                 className="text-xs text-muted-foreground hover:text-foreground hover:underline transition-colors"
@@ -162,6 +236,7 @@ export function LoginForm() {
         <Button
           type="submit"
           className="w-full h-11"
+          aria-label={t("auth.login.submit")}
           disabled={isPending || !turnstileToken || isGooglePending}
         >
           {isPending ? (
@@ -173,6 +248,17 @@ export function LoginForm() {
             t("auth.login.submit")
           )}
         </Button>
+
+        <p className="text-xs text-center text-muted-foreground pt-1">
+          {t("auth.login.termsNotice").split("{termsLink}")[0]}
+          <Link
+            href={localize("/terms")}
+            className="underline underline-offset-2 hover:text-foreground transition-colors font-medium"
+          >
+            {t("auth.footer.termsLink")}
+          </Link>
+          {t("auth.login.termsNotice").split("{termsLink}")[1]}
+        </p>
       </form>
     </div>
   );

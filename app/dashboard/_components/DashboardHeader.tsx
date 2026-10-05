@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useLogout, useRequireAuth } from "@/hooks/use-authentication";
 import {
   LogOut,
-  Home,
   Loader2,
   Menu,
   X,
@@ -14,35 +13,65 @@ import {
   PieChart,
   ShieldCheck,
   Settings,
+  Headphones,
+  Phone,
+  Mail,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { TourReplayButton } from "@/components/tour-replay-button";
+import { WelcomeReplayButton } from "@/components/welcome-replay-button";
 import { useTranslations } from "@/lib/i18n";
-import Logo from "@/components/logo";
 import { cn, getInitials } from "@/lib/utils";
+import { CONTROL_IDLE } from "@/lib/ui-tokens";
 
 const navItems = [
-  { labelKey: "dashboard.sidebar.overview", href: "/dashboard", icon: LayoutDashboard },
-  { labelKey: "dashboard.sidebar.investmentProjects", href: "/dashboard/projects", icon: Briefcase },
-  { labelKey: "dashboard.sidebar.transactions", href: "/dashboard/transactions", icon: History },
-  { labelKey: "dashboard.sidebar.analytics", href: "/dashboard/analytics", icon: PieChart },
-  { labelKey: "dashboard.sidebar.security", href: "/dashboard/security", icon: ShieldCheck },
-  { labelKey: "dashboard.sidebar.settings", href: "/dashboard/settings", icon: Settings },
+  {
+    labelKey: "dashboard.sidebar.overview",
+    href: "/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    labelKey: "dashboard.sidebar.investmentProjects",
+    href: "/dashboard/projects",
+    icon: Briefcase,
+  },
+  {
+    labelKey: "dashboard.sidebar.transactions",
+    href: "/dashboard/transactions",
+    icon: History,
+  },
+  {
+    labelKey: "dashboard.sidebar.analytics",
+    href: "/dashboard/analytics",
+    icon: PieChart,
+  },
+  {
+    labelKey: "dashboard.sidebar.security",
+    href: "/dashboard/security",
+    icon: ShieldCheck,
+  },
+  {
+    labelKey: "dashboard.sidebar.settings",
+    href: "/dashboard/settings",
+    icon: Settings,
+  },
 ];
 
 export function DashboardHeader() {
   const { user, isLoading } = useRequireAuth();
   const { mutate: logout } = useLogout();
-  const router = useRouter();
   const pathname = usePathname();
   const { t } = useTranslations();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isSME = user?.role === "SME";
+  // The welcome cutscreen exists for the two customer roles only.
+  const hasWelcome = isSME || user?.role === "INVESTOR";
 
   const filteredNavItems = navItems.filter((item) => {
     if (isSME && item.href === "/dashboard/projects") return false;
@@ -72,15 +101,9 @@ export function DashboardHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="flex h-14 md:h-16 items-center justify-between px-4 md:px-8">
-        {/* Left: Logo + role badge */}
+        {/* Left: Role badge */}
         <div className="flex items-center gap-2 min-w-0">
-          <div className="flex items-center gap-2 font-bold text-lg md:text-xl tracking-tight shrink-0">
-            <Logo
-              alt={t("common.brandName")}
-              containerClassName="relative w-28 h-8 md:w-40 md:h-10 overflow-hidden"
-            />
-          </div>
-          <span className="hidden sm:inline-flex text-xs font-semibold text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full border border-border/50 whitespace-nowrap">
+          <span className="inline-flex text-xs font-semibold text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full border border-border/50 whitespace-nowrap">
             {portalLabel}
           </span>
         </div>
@@ -96,19 +119,11 @@ export function DashboardHeader() {
           <div className="flex items-center gap-1.5">
             <LocaleSwitcher />
             <ThemeToggle />
+            {hasWelcome && <WelcomeReplayButton />}
+            <TourReplayButton />
           </div>
 
           <div className="h-5 w-px bg-border/60" />
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className="gap-1.5 text-sm"
-            onClick={() => router.push("/dashboard")}
-          >
-            <Home className="h-4 w-4" />
-            {t("dashboard.header.home")}
-          </Button>
 
           <Button
             variant="outline"
@@ -125,12 +140,13 @@ export function DashboardHeader() {
         <div className="flex md:hidden items-center gap-1.5">
           <LocaleSwitcher />
           <ThemeToggle />
+          {hasWelcome && <WelcomeReplayButton />}
           <Button
             variant="ghost"
             size="icon"
             className="h-9 w-9"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
-            aria-label="Toggle menu"
+            aria-label={t("common.toggleMenu")}
           >
             {mobileMenuOpen ? (
               <X className="h-5 w-5" />
@@ -145,14 +161,19 @@ export function DashboardHeader() {
       <div
         className={cn(
           "md:hidden overflow-hidden border-t border-border/50 bg-background/98 backdrop-blur-lg transition-all duration-300 ease-in-out",
-          mobileMenuOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0 border-t-0"
+          mobileMenuOpen
+            ? "max-h-[500px] opacity-100"
+            : "max-h-0 opacity-0 border-t-0",
         )}
       >
         <div className="px-4 py-3 space-y-1">
           {/* User info */}
           <div className="flex items-center gap-2.5 py-2 px-1">
             <Avatar className="h-8 w-8 shrink-0">
-              <AvatarImage src={user?.avatar_url ?? undefined} alt={user?.full_name ?? ""} />
+              <AvatarImage
+                src={user?.avatar_url ?? undefined}
+                alt={user?.full_name ?? ""}
+              />
               <AvatarFallback className="bg-primary/10 text-[11px] font-semibold text-primary">
                 {getInitials(user?.full_name)}
               </AvatarFallback>
@@ -180,22 +201,52 @@ export function DashboardHeader() {
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
                     "flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
-                    isActive
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    isActive ? "bg-primary/10 text-primary" : CONTROL_IDLE,
                   )}
                 >
-                  <item.icon className={cn(
-                    "h-[18px] w-[18px] shrink-0",
-                    isActive ? "text-primary" : "text-muted-foreground"
-                  )} />
+                  <item.icon
+                    className={cn(
+                      "h-[18px] w-[18px] shrink-0",
+                      isActive ? "text-primary" : "text-muted-foreground",
+                    )}
+                  />
                   {t(item.labelKey)}
                 </Link>
               );
             })}
           </nav>
 
-          <div className="border-t border-border/40 my-1" />
+          <div className="border-t border-border/40 my-2" />
+
+          {/* Quick Help & Support for Mobile */}
+          <div className="rounded-xl border border-border/80 bg-muted/40 p-3 space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="flex h-6 w-6 items-center justify-center rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0">
+                <Headphones className="h-3.5 w-3.5" />
+              </span>
+              <span className="text-xs font-semibold text-foreground">
+                {t("dashboard.sidebar.needHelp")}
+              </span>
+            </div>
+            <div className="grid grid-cols-1 gap-1 text-xs">
+              <a
+                href="tel:0943711382"
+                className="flex items-center gap-2 rounded-md px-2 py-1 font-medium text-foreground hover:bg-card transition-colors"
+              >
+                <Phone className="h-3 w-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span className="tabular-nums font-semibold">
+                  094 371 13 82
+                </span>
+              </a>
+              <a
+                href="mailto:support@fundlok.com"
+                className="flex items-center gap-2 rounded-md px-2 py-1 font-medium text-foreground hover:bg-card transition-colors"
+              >
+                <Mail className="h-3 w-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span className="truncate">support@fundlok.com</span>
+              </a>
+            </div>
+          </div>
 
           {/* Logout */}
           <Button

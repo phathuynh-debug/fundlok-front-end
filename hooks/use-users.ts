@@ -1,13 +1,15 @@
-'use client';
+"use client";
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   usersService,
+  type SetPasswordRequest,
+  type SetPasswordResponse,
   type UpdateProfileRequest,
-} from '@/services/users.service';
-import { authKeys } from '@/hooks/use-authentication';
-import type { User } from '@/services/authentication.service';
-import type { ApiError } from '@/lib/types';
+} from "@/services/users.service";
+import { authKeys } from "@/hooks/use-authentication";
+import type { User } from "@/services/authentication.service";
+import type { ApiError } from "@/lib/types";
 
 export interface UpdateAvatarVariables {
   file: File;
@@ -38,6 +40,44 @@ export function useUpdateProfile() {
     mutationFn: (payload) => usersService.updateProfile(payload),
     onSuccess: (user) => {
       queryClient.setQueryData(authKeys.currentUser(), user);
+    },
+  });
+}
+
+// POST /users/me/password. The response is an ack rather than a user, so
+// there's nothing to seed — but the account has just gained a password, so
+// invalidate currentUser to pick up has_password and swap the profile card
+// over to the forgot-password route.
+/**
+ * Records that this account has seen the first-run walkthrough.
+ *
+ * The response is the refreshed user, so the cached currentUser is seeded
+ * directly rather than invalidated — an invalidate would refetch /users/me and
+ * briefly flip the tour back open while the request is in flight.
+ *
+ * Failure is deliberately not surfaced: a dismissed tour that fails to persist
+ * is a minor annoyance next time, not something worth a toast over the page
+ * someone just asked to get out of their way. The local mirror in
+ * use-product-tour.ts keeps it closed for this browser regardless.
+ */
+export function useCompleteOnboardingTour() {
+  const queryClient = useQueryClient();
+
+  return useMutation<User, ApiError, void>({
+    mutationFn: () => usersService.completeOnboardingTour(),
+    onSuccess: (user) => {
+      queryClient.setQueryData(authKeys.currentUser(), user);
+    },
+  });
+}
+
+export function useSetPassword() {
+  const queryClient = useQueryClient();
+
+  return useMutation<SetPasswordResponse, ApiError, SetPasswordRequest>({
+    mutationFn: (payload) => usersService.setPassword(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: authKeys.currentUser() });
     },
   });
 }

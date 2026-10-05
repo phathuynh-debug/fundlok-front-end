@@ -56,16 +56,16 @@ jobs:
           # 2. Check if the PR already exists
           EXISTING_PR=$(gh pr list --head "$BRANCH_NAME" --base "$BASE_BRANCH" --json number --jq '.[0].number')
 
+          # 3. Create or reset the trigger branch off the current tip of BASE_BRANCH
+          git checkout -B "$BRANCH_NAME"
+          date +%s > .vercel-trigger
+          git add .vercel-trigger
+          git commit -m "chore: ensure Vercel deployment author"
+
+          # 4. Push the branch (force push to ensure it matches current tip + trigger commit)
+          git push origin "$BRANCH_NAME" --force
+
           if [ -z "$EXISTING_PR" ]; then
-            # 3. Create the trigger branch off the current tip of production
-            git checkout -b "$BRANCH_NAME"
-            date +%s > .vercel-trigger
-            git add .vercel-trigger
-            git commit -m "chore: ensure Vercel deployment author"
-
-            # 4. Push the branch (force push to ensure it matches current tip + trigger commit)
-            git push origin "$BRANCH_NAME" --force
-
             # 5. Create the pull request
             gh pr create \
               --title "chore: trigger Vercel deployment" \
@@ -75,7 +75,7 @@ jobs:
 
             echo "Pull Request created successfully."
           else
-            echo "A Pull Request for $BRANCH_NAME already exists (PR #$EXISTING_PR). Skipping creation."
+            echo "A Pull Request for $BRANCH_NAME already exists (PR #$EXISTING_PR). Branch updated to latest tip."
           fi
 
           echo "::error::Failing the workflow because the latest commit author must be $EXPECTED_EMAIL"

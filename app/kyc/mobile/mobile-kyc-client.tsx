@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
 import {
   ShieldCheck,
   Loader2,
@@ -10,27 +10,31 @@ import {
   XCircle,
   AlertTriangle,
   RotateCcw,
-} from 'lucide-react';
+  Clock,
+} from "lucide-react";
 
-import { Button } from '@/components/ui/button';
-import { LocaleSwitcher } from '@/components/locale-switcher';
-import { useTranslations } from '@/lib/i18n';
-import { StatusBlock } from '../_components/status-block';
-import { ImageCaptureField } from '../_components/gverify/ImageCaptureField';
-import { CAPTURE_SLOTS, useGVerifyKyc } from '../_components/gverify/useGVerifyKyc';
-import type { GVerifyVerifyResponse } from '@/services/gverify.service';
-import type { ApiError } from '@/lib/types';
+import { Button } from "@/components/ui/button";
+import { LocaleSwitcher } from "@/components/locale-switcher";
+import { useTranslations } from "@/lib/i18n";
+import { StatusBlock } from "../_components/status-block";
+import { CaptureTabs } from "../_components/gverify/CaptureTabs";
+import { useGVerifyKyc } from "../_components/gverify/useGVerifyKyc";
+import type { GVerifyVerifyResponse } from "@/services/gverify.service";
+import type { ApiError } from "@/lib/types";
+import { apiErrorMessage, backendText } from "@/lib/api-error-message";
 
 // Phone side of the QR handoff: opened by scanning the desktop QR, carries a
 // short-lived token in the query string (?token=…) instead of a login cookie.
-// The camera opens directly on each tile (rear for the ID, front for the
-// selfie); the desktop discovers the verdict through its polling status query.
+// The in-app camera opens on each tile (rear camera for the ID, front for the
+// selfie); there is no way to pick a photo from the phone. The desktop
+// discovers the verdict through its polling status query.
 export function MobileKycClient() {
-  const { t } = useTranslations();
-  const token = useSearchParams().get('token') ?? '';
-  const { images, setFile, reset, allReady, submit, submitting } = useGVerifyKyc({
-    handoffToken: token,
-  });
+  const { t, locale } = useTranslations();
+  const token = useSearchParams().get("token") ?? "";
+  const { images, setFile, reset, allReady, submit, submitting } =
+    useGVerifyKyc({
+      handoffToken: token,
+    });
 
   // The phone session has no query cache to lean on — track the outcome of
   // this submission locally.
@@ -46,8 +50,8 @@ export function MobileKycClient() {
       // 401 = the 10-minute token expired (or was tampered with).
       setFailure(
         apiError?.status === 401
-          ? t('kyc.gv.mobileExpired')
-          : apiError?.message || t('kyc.gv.failedHint'),
+          ? t("kyc.gv.mobileExpired")
+          : apiErrorMessage(apiError, locale, t("kyc.gv.failedHint")),
       );
     }
   };
@@ -63,7 +67,7 @@ export function MobileKycClient() {
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, ease: 'easeOut' }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
         className="w-full max-w-md space-y-6 rounded-2xl border border-border bg-card p-6 text-center text-card-foreground shadow-lg"
       >
         <div className="flex items-center justify-end">
@@ -74,35 +78,46 @@ export function MobileKycClient() {
         {!token ? (
           <StatusBlock
             icon={<AlertTriangle className="h-12 w-12 text-amber-500" />}
-            title={t('kyc.gv.mobileNoTokenTitle')}
-            hint={t('kyc.gv.mobileNoTokenHint')}
+            title={t("kyc.gv.mobileNoTokenTitle")}
+            hint={t("kyc.gv.mobileNoTokenHint")}
           />
         ) : /* --- Approved: done on this device, continue on desktop --- */ verdict?.is_approved ? (
           <StatusBlock
             icon={<CheckCircle2 className="h-12 w-12 text-emerald-500" />}
-            title={t('kyc.approvedTitle')}
-            hint={t('kyc.gv.mobileApprovedHint')}
+            title={t("kyc.approvedTitle")}
+            hint={t("kyc.gv.mobileApprovedHint")}
+          />
+        ) : /* --- Parked for ops review: nothing to retake --- */ verdict?.status ===
+          "MANUAL_REVIEW" ? (
+          <StatusBlock
+            icon={<Clock className="h-12 w-12 text-amber-500" />}
+            title={t("kyc.inReviewTitle")}
+            hint={t("kyc.gv.inReviewHint")}
           />
         ) : /* --- Rejected: show reason, retake --- */ verdict ? (
           <StatusBlock
             icon={<XCircle className="h-12 w-12 text-destructive" />}
-            title={t('kyc.declinedTitle')}
-            hint={verdict.rejection_reason || t('kyc.declinedHint')}
+            title={t("kyc.declinedTitle")}
+            hint={backendText(
+              verdict.rejection_reason,
+              locale,
+              t("kyc.declinedHint"),
+            )}
           >
             <Button className="h-11 w-full" onClick={retake}>
               <RotateCcw className="mr-2 h-4 w-4" />
-              {t('kyc.retryBtn')}
+              {t("kyc.retryBtn")}
             </Button>
           </StatusBlock>
         ) : /* --- Provider failure / expired token --- */ failure ? (
           <StatusBlock
             icon={<AlertTriangle className="h-12 w-12 text-amber-500" />}
-            title={t('kyc.gv.failedTitle')}
+            title={t("kyc.gv.failedTitle")}
             hint={failure}
           >
             <Button className="h-11 w-full" onClick={retake}>
               <RotateCcw className="mr-2 h-4 w-4" />
-              {t('kyc.retryBtn')}
+              {t("kyc.retryBtn")}
             </Button>
           </StatusBlock>
         ) : (
@@ -113,26 +128,23 @@ export function MobileKycClient() {
                 <ShieldCheck className="h-7 w-7" />
               </div>
               <div className="space-y-1">
-                <h1 className="text-xl font-bold tracking-tight">{t('kyc.title')}</h1>
-                <p className="text-sm text-muted-foreground">{t('kyc.gv.mobileSubtitle')}</p>
+                <h1 className="text-xl font-bold tracking-tight">
+                  {t("kyc.title")}
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  {t("kyc.gv.mobileSubtitle")}
+                </p>
               </div>
             </div>
 
-            <div className="space-y-3">
-              {CAPTURE_SLOTS.map((slot) => (
-                <ImageCaptureField
-                  key={slot}
-                  slot={slot}
-                  image={images[slot]}
-                  disabled={submitting}
-                  onSelect={setFile}
-                  cameraCapture
-                />
-              ))}
-            </div>
+            <CaptureTabs
+              images={images}
+              disabled={submitting}
+              onSelect={setFile}
+            />
 
             <p className="text-xs leading-relaxed text-muted-foreground">
-              {t('kyc.gv.consent')}
+              {t("kyc.gv.consent")}
             </p>
 
             <Button
@@ -144,10 +156,10 @@ export function MobileKycClient() {
               {submitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t('kyc.gv.submitting')}
+                  {t("kyc.gv.submitting")}
                 </>
               ) : (
-                t('kyc.gv.submitBtn')
+                t("kyc.gv.submitBtn")
               )}
             </Button>
           </>

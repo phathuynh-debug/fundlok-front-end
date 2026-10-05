@@ -1,0 +1,10 @@
+.next
+node_modules
+dist
+build
+bun.lock
+package-lock.json
+tsconfig.tsbuildinfo
+.vercel-trigger
+.claude
+.agents

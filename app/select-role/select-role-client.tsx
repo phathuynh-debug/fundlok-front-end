@@ -4,14 +4,26 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
-import { Building2, TrendingUp, Loader2, ArrowRight } from "lucide-react";
+import {
+  Building2,
+  TrendingUp,
+  Loader2,
+  ArrowRight,
+  LogOut,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { useToast } from "@/hooks/use-toast";
-import { authKeys, useCurrentUser, useSelectRole } from "@/hooks/use-authentication";
+import {
+  authKeys,
+  useCurrentUser,
+  useLogout,
+  useSelectRole,
+} from "@/hooks/use-authentication";
 import { useTranslations } from "@/lib/i18n";
 import type { SelectableRole } from "@/services/authentication.service";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 // Stagger children so the heading and cards cascade in instead of popping.
 const containerVariants = {
@@ -34,19 +46,21 @@ const itemVariants = {
 export function SelectRoleClient() {
   const router = useRouter();
   const { toast } = useToast();
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const queryClient = useQueryClient();
   const { data: user } = useCurrentUser();
   const { mutate: selectRole } = useSelectRole();
+  const { mutate: logout, isPending: isLoggingOut } = useLogout();
   // The chosen role; once set we swap the cards for the onboarding loader.
   const [selectedRole, setSelectedRole] = useState<SelectableRole | null>(null);
 
   // Already has a role (picked earlier, another tab, stale session)? There's
-  // nothing to choose — head straight to /kyc and let the middleware route
-  // onward (verification, or the landing page if already approved).
+  // nothing to choose — head to the dashboard and let the middleware route
+  // onward. Verification is no longer forced here; it's demanded on-demand only
+  // when the user invests (KYC) or applies for funding (KYB).
   const alreadyHasRole = !!user?.role && !selectedRole;
   useEffect(() => {
-    if (alreadyHasRole) router.replace("/kyc");
+    if (alreadyHasRole) router.replace("/dashboard");
   }, [alreadyHasRole, router]);
 
   const handleSelect = (role: SelectableRole) => {
@@ -57,17 +71,19 @@ export function SelectRoleClient() {
           title: t("auth.selectRole.successTitle"),
           description: t("auth.selectRole.successDescription"),
         });
-        // Identity verification is the next onboarding step (middleware also
-        // enforces this); SME/Investor branching happens after KYC approval.
-        router.push("/kyc");
+        // Straight into the app — no forced verification. KYC/KYB is requested
+        // later, only when the user takes an action that requires it.
+        router.push("/dashboard");
       },
       onError: (error) => {
         // 409 = the account already has a role (e.g. picked in another tab, or
         // the page was reached with a stale session). Nothing to retry — sync
         // the cached user and continue; the middleware routes from there.
         if (error?.status === 409) {
-          void queryClient.invalidateQueries({ queryKey: authKeys.currentUser() });
-          router.push("/kyc");
+          void queryClient.invalidateQueries({
+            queryKey: authKeys.currentUser(),
+          });
+          router.push("/dashboard");
           return;
         }
         // Drop back to the cards so the user can retry.
@@ -75,7 +91,11 @@ export function SelectRoleClient() {
         toast({
           variant: "destructive",
           title: t("auth.selectRole.failedTitle"),
-          description: error?.message || t("auth.selectRole.failedDescription"),
+          description: apiErrorMessage(
+            error,
+            locale,
+            t("auth.selectRole.failedDescription"),
+          ),
         });
       },
     });
@@ -105,7 +125,10 @@ export function SelectRoleClient() {
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-muted/50 p-6">
       {/* Decorative background — keeps the page from feeling empty. Purely
           visual, so it's hidden from assistive tech and ignores pointer events. */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 overflow-hidden"
+      >
         {/* Faint dot grid */}
         <div
           className="absolute inset-0 opacity-[0.4]"
@@ -158,7 +181,11 @@ export function SelectRoleClient() {
                 <motion.span
                   className="absolute inset-0 rounded-full bg-primary/10"
                   animate={{ scale: [1, 1.25, 1], opacity: [0.6, 0.2, 0.6] }}
-                  transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{
+                    duration: 1.8,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
                 />
                 <Loader2 className="h-12 w-12 animate-spin text-primary" />
               </motion.div>
@@ -182,11 +209,31 @@ export function SelectRoleClient() {
               exit={{ opacity: 0, y: -16, transition: { duration: 0.2 } }}
               className="space-y-12"
             >
-              <motion.div variants={itemVariants} className="flex justify-end">
+              <motion.div
+                variants={itemVariants}
+                className="flex items-center justify-end gap-3"
+              >
                 <LocaleSwitcher />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => logout()}
+                  disabled={isLoggingOut}
+                  className="gap-1.5 text-sm rounded-full border-border/80 hover:bg-muted/80 shadow-xs cursor-pointer"
+                >
+                  {isLoggingOut ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <LogOut className="h-4 w-4" />
+                  )}
+                  <span>{t("common.logout")}</span>
+                </Button>
               </motion.div>
 
-              <motion.div variants={itemVariants} className="space-y-4 text-center">
+              <motion.div
+                variants={itemVariants}
+                className="space-y-4 text-center"
+              >
                 <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
                   {t("auth.selectRole.title")}
                 </h1>
@@ -207,13 +254,19 @@ export function SelectRoleClient() {
                   >
                     <motion.div
                       whileHover={{ rotate: -6, scale: 1.08 }}
-                      transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 15,
+                      }}
                       className="flex h-20 w-20 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground"
                     >
                       <Icon className="h-9 w-9" />
                     </motion.div>
 
-                    <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
+                    <h2 className="text-2xl font-bold tracking-tight">
+                      {title}
+                    </h2>
                     <p className="flex-1 text-base leading-relaxed text-muted-foreground">
                       {description}
                     </p>

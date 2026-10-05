@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fundlok-notifications",
+  "main": "index.ts",
+  "compatibility_date": "2025-10-01",
+  // The binding is called "Main" so rooms are served at /parties/main/<id>,
+  // the path the backend publishes to and the browser's PartySocket defaults to.
+  "durable_objects": {
+    "bindings": [{ "name": "Main", "class_name": "Main" }],
+  },
+  // SQLite-backed: Cloudflare no longer allows new key-value-backed Durable
+  // Objects, which is what the old PartyKit CLI tried to create.
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Main"] }],
+}

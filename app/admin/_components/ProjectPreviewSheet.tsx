@@ -1,0 +1,836 @@
+"use client";
+
+import { useState } from "react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Clock,
+  FileText,
+  Loader2,
+  Play,
+  ShieldCheck,
+  XCircle,
+} from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import { DocumentViewerDialog } from "./DocumentViewerDialog";
+import { useToast } from "@/hooks/use-toast";
+import {
+  useAdminProjectDetail,
+  useDecideApplication,
+  useResolveKybVerification,
+} from "@/hooks/use-admin";
+import { useApproveScoreRun, useStartScoreRun } from "@/hooks/use-underwriting";
+import { useTranslations } from "@/lib/i18n";
+import { formatCurrency } from "@/lib/format-currency";
+import { formatDate } from "@/lib/format-date";
+import { enumLabel } from "@/lib/enum-labels";
+import { industryLabel } from "@/lib/industry-label";
+import type {
+  AdminApplicationDocument,
+  AdminScoreRun,
+  AdminDecision,
+  AdminLoanApplication,
+} from "@/services/admin.service";
+import { apiErrorMessage } from "@/lib/api-error-message";
+
+// The admin project preview.
+//
+// A business goes live (ACTIVE) and a request can become a contract only when
+// BOTH halves of the two-approval gate are in: the operator's decision on the
+// request, and the grading engine's score run approved (locked). Either can
+// come second, and whichever does puts the business live. The business
+// verification (GVerify KYB) sits beside them as a precondition: it is what
+// stands in for the registration document the operator's approval requires.
+//
+// This panel shows each piece next to the thing it belongs to, says which half
+// is still missing, and lets the operator supply the halves that are theirs to
+// give. It once offered only the first, so an approved request never reached
+// Active: nothing here could approve the score.
+//
+// A Sheet rather than a Dialog: the content is a list that can run long, and a
+// side panel keeps the table it was opened from in view.
+
+interface ProjectPreviewSheetProps {
+  projectId: string | null;
+  onOpenChange: (open: boolean) => void;
+}
+
+export function ProjectPreviewSheet({
+  projectId,
+  onOpenChange,
+}: ProjectPreviewSheetProps) {
+  const { t, locale } = useTranslations();
+  const { toast } = useToast();
+  const { data, isLoading } = useAdminProjectDetail(projectId);
+  const { mutateAsync: resolveKyb, isPending: resolvingKyb } =
+    useResolveKybVerification(projectId);
+  const { mutateAsync: decide, isPending: deciding } =
+    useDecideApplication(projectId);
+
+  // Which document the viewer dialog is showing; null = closed.
+  const [viewerDocument, setViewerDocument] =
+    useState<AdminApplicationDocument | null>(null);
+  // One note box per decision target, keyed by record id — a rejection reason
+  // typed against one application must not follow the operator to the next.
+  const [notes, setNotes] = useState<Record<string, string>>({});
+  const noteFor = (id: string) => notes[id] ?? "";
+  const setNote = (id: string, value: string) =>
+    setNotes((prev) => ({ ...prev, [id]: value }));
+
+  // Which application is being scored; null = none. Tracked by id rather than
+  // a bare boolean so one request's spinner cannot appear on another's row.
+  const [scoringId, setScoringId] = useState<string | null>(null);
+  const { mutateAsync: startScoreRun } = useStartScoreRun(projectId);
+  // Which run is being approved; null = none. By id for the same reason.
+  const [approvingScoreId, setApprovingScoreId] = useState<string | null>(null);
+  const { mutateAsync: approveScoreRun } = useApproveScoreRun(projectId);
+
+  const handleScore = async (applicationId: string) => {
+    setScoringId(applicationId);
+    try {
+      const run = await startScoreRun({ application_id: applicationId });
+      // INSUFFICIENT_DATA and AI_PENDING are answers, not failures — the
+      // engine declining for want of inputs is information the operator needs,
+      // so it is reported neutrally rather than as an error.
+      const inconclusive =
+        run.decision === "INSUFFICIENT_DATA" || run.decision === "AI_PENDING";
+      toast({
+        title: inconclusive
+          ? t("admin.preview.scoreInconclusive")
+          : t("admin.preview.scoreComplete"),
+        description: inconclusive ? String(run.decision) : undefined,
+      });
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: t("admin.preview.scoreFailed"),
+        description: apiErrorMessage(err, locale, t("common.tryAgain")),
+      });
+    } finally {
+      setScoringId(null);
+    }
+  };
+
+  const fail = (err: unknown) =>
+    toast({
+      variant: "destructive",
+      title: t("admin.preview.decisionFailed"),
+      description: apiErrorMessage(err, locale, t("common.tryAgain")),
+    });
+
+  const handleApproveScore = async (runId: string) => {
+    setApprovingScoreId(runId);
+    try {
+      await approveScoreRun(runId);
+      toast({ title: t("admin.preview.scoreApproved") });
+    } catch (err) {
+      fail(err);
+    } finally {
+      setApprovingScoreId(null);
+    }
+  };
+
+  const handleKyb = async (id: string, decision: AdminDecision) => {
+    try {
+      await resolveKyb({ id, body: { decision, note: noteFor(id) || null } });
+      toast({ title: t("admin.preview.kybResolved") });
+    } catch (err) {
+      fail(err);
+    }
+  };
+
+  const handleApplication = async (id: string, decision: AdminDecision) => {
+    try {
+      await decide({ id, body: { decision, note: noteFor(id) || null } });
+      toast({ title: t("admin.preview.applicationDecided") });
+    } catch (err) {
+      fail(err);
+    }
+  };
+
+  return (
+    <Sheet open={projectId !== null} onOpenChange={onOpenChange}>
+      <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
+        <SheetHeader>
+          <SheetTitle>
+            {data?.legal_name ?? t("admin.preview.title")}
+          </SheetTitle>
+          <SheetDescription>{t("admin.preview.subtitle")}</SheetDescription>
+        </SheetHeader>
+
+        {isLoading || !data ? (
+          <div className="flex h-40 items-center justify-center">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          </div>
+        ) : (
+          <div className="space-y-6 px-4 pb-8">
+            {/* --- The company, as it was registered --- */}
+            <section className="space-y-3">
+              <h3 className="text-sm font-semibold">
+                {t("admin.preview.companyHeading")}
+              </h3>
+              <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                <Row label={t("admin.table.status")}>
+                  <Badge variant="secondary">
+                    {enumLabel(t, "projectStatus", data.status)}
+                  </Badge>
+                </Row>
+                <Row label={t("admin.table.industry")}>
+                  {industryLabel(data.industry, t) || "—"}
+                </Row>
+                <Row label={t("projectApplication.fields.taxId")}>
+                  {data.tax_id || "—"}
+                </Row>
+                <Row label={t("projectApplication.fields.incorporationDate")}>
+                  {data.incorporation_date
+                    ? formatDate(data.incorporation_date, locale)
+                    : "—"}
+                </Row>
+              </dl>
+            </section>
+
+            <Separator />
+
+            {/* --- The business verification (KYB) --- */}
+            <section className="space-y-3">
+              <h3 className="text-sm font-semibold">
+                {t("admin.preview.engineHeading")}
+              </h3>
+              {!data.kyb ? (
+                <p className="text-sm text-muted-foreground">
+                  {t("admin.preview.noKyb")}
+                </p>
+              ) : (
+                <div className="space-y-3 rounded-xl border border-border bg-muted/30 p-4">
+                  <div className="flex items-center gap-2">
+                    <StatusIcon status={data.kyb.status} />
+                    <span className="text-sm font-medium">
+                      {enumLabel(t, "verificationStatus", data.kyb.status)}
+                    </span>
+                  </div>
+                  {data.kyb.rejection_reason && (
+                    <p className="text-xs leading-relaxed text-muted-foreground">
+                      {data.kyb.rejection_reason}
+                    </p>
+                  )}
+                  {data.kyb.status === "MANUAL_REVIEW" && (
+                    <DecisionControls
+                      note={noteFor(data.kyb.id)}
+                      onNoteChange={(value) => setNote(data.kyb!.id, value)}
+                      disabled={resolvingKyb}
+                      onApprove={() => handleKyb(data.kyb!.id, "APPROVED")}
+                      onReject={() => handleKyb(data.kyb!.id, "REJECTED")}
+                      approveLabel={t("admin.preview.approve")}
+                      rejectLabel={t("admin.preview.reject")}
+                      notePlaceholder={t("admin.preview.notePlaceholder")}
+                    />
+                  )}
+                </div>
+              )}
+            </section>
+
+            <Separator />
+
+            {/* --- The operator and the engine, per funding request --- */}
+            <section className="space-y-3">
+              <h3 className="text-sm font-semibold">
+                {t("admin.preview.applicationsHeading")}
+              </h3>
+              {data.applications.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  {t("admin.preview.noApplications")}
+                </p>
+              ) : (
+                <ul className="space-y-3">
+                  {data.applications.map((application) => (
+                    <li
+                      key={application.id}
+                      className="space-y-3 rounded-xl border border-border bg-muted/30 p-4"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-sm font-semibold text-foreground">
+                            {formatCurrency(
+                              application.requested_amount,
+                              locale,
+                            )}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {application.purpose || "—"}
+                          </p>
+                        </div>
+                        <ApprovalBadge
+                          value={application.admin_approval}
+                          t={t}
+                        />
+                      </div>
+
+                      <p className="text-xs text-muted-foreground">
+                        {t("admin.table.created")}:{" "}
+                        {formatDate(application.created_at, locale)}
+                      </p>
+
+                      {/* The engine's answer, before the operator gives
+                          theirs — the whole point of previewing. */}
+                      <ScoreRunSummary
+                        run={application.score_run}
+                        t={t}
+                        canRun={
+                          application.status === "SUBMITTED" ||
+                          (application.status === "UNDER_REVIEW" &&
+                            application.admin_approval === "PENDING")
+                        }
+                        running={scoringId === application.id}
+                        onRun={() => handleScore(application.id)}
+                        approving={
+                          application.score_run !== null &&
+                          approvingScoreId === application.score_run.id
+                        }
+                        onApprove={() =>
+                          application.score_run &&
+                          handleApproveScore(application.score_run.id)
+                        }
+                      />
+
+                      <GateHint application={application} t={t} />
+
+                      <DocumentList
+                        documents={application.documents}
+                        missingDocuments={application.missing_documents}
+                        registrationFromKyb={!!data.kyb?.is_approved}
+                        t={t}
+                        onOpen={setViewerDocument}
+                      />
+
+                      {application.decision_note && (
+                        <p className="text-xs leading-relaxed text-muted-foreground">
+                          {application.decision_note}
+                        </p>
+                      )}
+
+                      {application.admin_approval === "PENDING" && (
+                        <DecisionControls
+                          note={noteFor(application.id)}
+                          onNoteChange={(value) =>
+                            setNote(application.id, value)
+                          }
+                          disabled={deciding}
+                          // The API answers 409 until every required
+                          // document is on file; say so before the click.
+                          approveBlockedReason={
+                            (application.missing_documents?.length ?? 0) > 0
+                              ? t("admin.preview.approveNeedsDocuments")
+                              : null
+                          }
+                          onApprove={() =>
+                            handleApplication(application.id, "APPROVED")
+                          }
+                          onReject={() =>
+                            handleApplication(application.id, "REJECTED")
+                          }
+                          approveLabel={t("admin.preview.approve")}
+                          rejectLabel={t("admin.preview.reject")}
+                          notePlaceholder={t("admin.preview.notePlaceholder")}
+                        />
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          </div>
+        )}
+      </SheetContent>
+
+      <DocumentViewerDialog
+        document={viewerDocument}
+        onOpenChange={(open) => {
+          if (!open) setViewerDocument(null);
+        }}
+      />
+    </Sheet>
+  );
+}
+
+// The four uploads the SME wizard collects. Rendered from the backend's own
+// document_type so a new type shows up as its raw key rather than vanishing —
+// silently dropping a document an operator is meant to review would be worse
+// than an unpolished label.
+// The grading engine's result for one funding request.
+//
+// Shows BOTH the run lifecycle and the decision: a LOCKED run that decided
+// REVIEW is not an approval, and collapsing them would read as one. The grade
+// is a 0-100 internal assessment — a reference input to the operator's
+// decision, never a rating, so it is labelled as a score and never graded to a
+// letter.
+function ScoreRunSummary({
+  run,
+  t,
+  canRun,
+  running,
+  onRun,
+  approving,
+  onApprove,
+}: {
+  run: AdminScoreRun | null;
+  t: (key: string) => string;
+  canRun: boolean;
+  running: boolean;
+  onRun: () => void;
+  approving: boolean;
+  onApprove: () => void;
+}) {
+  const runButton = (
+    <Button
+      type="button"
+      size="sm"
+      variant="outline"
+      className="w-full"
+      disabled={!canRun || running}
+      onClick={onRun}
+    >
+      {running ? (
+        <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+      ) : (
+        <Play className="mr-2 h-3.5 w-3.5" />
+      )}
+      {run ? t("admin.preview.rescore") : t("admin.preview.runScoring")}
+    </Button>
+  );
+
+  if (!run) {
+    // No run means no opinion. Rendering a zero would invent one.
+    return (
+      <div className="space-y-2">
+        <p className="text-xs text-muted-foreground">
+          {canRun
+            ? t("admin.preview.noScoreRun")
+            : t("admin.preview.scoreNeedsSubmitted")}
+        </p>
+        {canRun && runButton}
+      </div>
+    );
+  }
+  // REJECT is a verdict; INSUFFICIENT_DATA and AI_PENDING are the engine
+  // saying it has no verdict. All three are red because all three mean there
+  // is no score behind the Approve button sitting directly below — and a grey
+  // badge next to two em-dashes reads, at a glance, like a score that simply
+  // has not loaded yet.
+  const noVerdict = hasNoVerdict(run);
+  const blocked = isBlockedRun(run);
+
+  return (
+    <div
+      className={cn(
+        "space-y-2 rounded-lg border bg-background/60 p-3",
+        blocked ? "border-destructive/50" : "border-border",
+      )}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs font-semibold text-foreground">
+          {t("admin.preview.scoreHeading")}
+        </span>
+        <div className="flex items-center gap-1.5">
+          <Badge variant="secondary">
+            {enumLabel(t, "scoreRunStatus", run.status)}
+          </Badge>
+          {run.decision && (
+            <Badge variant={blocked ? "destructive" : "secondary"}>
+              {enumLabel(t, "scoreDecision", run.decision)}
+            </Badge>
+          )}
+        </div>
+      </div>
+      <dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+        <dt className="text-muted-foreground">
+          {t("admin.preview.scoreGrade")}
+        </dt>
+        <dd className="tabular-nums text-foreground">
+          {run.final_grade === null ? "—" : run.final_grade.toFixed(2)}
+        </dd>
+        <dt className="text-muted-foreground">
+          {t("admin.preview.scoreRate")}
+        </dt>
+        <dd className="tabular-nums text-foreground">
+          {run.interest_rate_pct === null
+            ? "—"
+            : `${run.interest_rate_pct.toFixed(2)}%`}
+        </dd>
+      </dl>
+      {/* The two em-dashes above are the whole story otherwise. Say what is
+          absent and what approving anyway would mean, because the Approve
+          button is the next thing on the panel. */}
+      {noVerdict && (
+        <p className="text-[11px] leading-relaxed text-destructive">
+          {run.decision === "AI_PENDING"
+            ? t("admin.preview.scoreAiPendingHint")
+            : t("admin.preview.scoreInsufficientHint")}
+        </p>
+      )}
+      {/* Which inputs, by name — "missing financial inputs" alone left the
+          operator re-running a score that could not change. */}
+      {run.decision === "INSUFFICIENT_DATA" &&
+        (run.missing_inputs?.length ?? 0) > 0 && (
+          <div className="space-y-1">
+            <p className="text-[11px] font-semibold text-destructive">
+              {t("admin.preview.missingInputs")}
+            </p>
+            <ul className="list-disc space-y-0.5 pl-4 text-[11px] text-destructive">
+              {run.missing_inputs!.map((key) => {
+                const label = t(`admin.preview.missingInput.${key}`);
+                return (
+                  <li key={key}>
+                    {label === `admin.preview.missingInput.${key}`
+                      ? key
+                      : label}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
+      {/* Provenance: which engine and parameter set produced this, so a quote
+          stays traceable after either is bumped. */}
+      {(run.engine_version || run.params_version) && (
+        <p className="font-mono text-[11px] text-muted-foreground">
+          {run.engine_version} · {run.params_version}
+        </p>
+      )}
+      {/* The engine's half of the gate. Only a finished run with a real
+          verdict can be approved: approving one the engine refused, or could
+          not grade, would put a business live on no score at all. */}
+      {run.status === "READY" && !blocked && (
+        <div className="space-y-1.5 border-t border-border pt-3">
+          <Button
+            type="button"
+            size="sm"
+            className="w-full"
+            disabled={approving}
+            onClick={onApprove}
+          >
+            {approving ? (
+              <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <ShieldCheck className="mr-2 h-3.5 w-3.5" />
+            )}
+            {t("admin.preview.approveScore")}
+          </Button>
+          <p className="text-[11px] leading-relaxed text-muted-foreground">
+            {t("admin.preview.approveScoreHint")}
+          </p>
+        </div>
+      )}
+      {run.status !== "LOCKED" && canRun && runButton}
+    </div>
+  );
+}
+
+/** The engine declined to grade: it has no verdict to give. */
+function hasNoVerdict(run: AdminScoreRun): boolean {
+  return run.decision === "INSUFFICIENT_DATA" || run.decision === "AI_PENDING";
+}
+
+/** No verdict, or a refusal: either way there is no score to stand behind. */
+function isBlockedRun(run: AdminScoreRun): boolean {
+  return hasNoVerdict(run) || run.decision === "REJECT";
+}
+
+// Which half of the gate is still missing, in words. Shown only when exactly one
+// half is in: that is the moment someone asks why the business is still Draft.
+// With neither in, the subtitle says what is needed; with both, the status at
+// the top of the panel already reads Active.
+function GateHint({
+  application,
+  t,
+}: {
+  application: AdminLoanApplication;
+  t: (key: string) => string;
+}) {
+  const run = application.score_run;
+  const approved = application.admin_approval === "APPROVED";
+  const scoreLocked = run?.status === "LOCKED";
+
+  let key: string | null = null;
+  if (approved && !scoreLocked) {
+    if (!run) key = "admin.preview.awaitingScoreRun";
+    else if (isBlockedRun(run)) key = "admin.preview.awaitingScoreBlocked";
+    else key = "admin.preview.awaitingScoreApproval";
+  } else if (
+    !approved &&
+    scoreLocked &&
+    application.admin_approval === "PENDING"
+  ) {
+    key = "admin.preview.awaitingRequestApproval";
+  }
+  if (!key) return null;
+
+  return (
+    <p
+      role="status"
+      data-testid="gate-hint"
+      className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs leading-relaxed text-amber-800 dark:text-amber-200"
+    >
+      {t(key)}
+    </p>
+  );
+}
+
+// What the SME wizard requires, in wizard order. Kept beside the checklist
+// that renders it; the wizard's own list is STEP_DOCUMENTS in
+// useLoanApplication.ts.
+const REQUIRED_DOCUMENT_TYPES = [
+  "legal_charter",
+  "business_registration",
+  "e_invoice_data",
+  "tax_filings",
+  "cic_report",
+] as const;
+
+function DocumentList({
+  documents,
+  missingDocuments,
+  registrationFromKyb,
+  t,
+  onOpen,
+}: {
+  documents: AdminApplicationDocument[];
+  /** The API's own list — authoritative; computed here only when absent. */
+  missingDocuments?: string[];
+  registrationFromKyb: boolean;
+  t: (key: string) => string;
+  onOpen: (document: AdminApplicationDocument) => void;
+}) {
+  const labelFor = (type: string) => {
+    const label = t(`admin.preview.documentTypes.${type}`);
+    return label.startsWith("admin.preview.") ? type : label;
+  };
+  const byType = new Map(documents.map((d) => [d.document_type, d]));
+  const extras = documents.filter(
+    (d) =>
+      !(REQUIRED_DOCUMENT_TYPES as readonly string[]).includes(d.document_type),
+  );
+  // A PENDING upload counts as missing: there is no object behind it.
+  const missing =
+    missingDocuments ??
+    REQUIRED_DOCUMENT_TYPES.filter(
+      (type) =>
+        byType.get(type)?.status !== "UPLOADED" &&
+        !(type === "business_registration" && registrationFromKyb),
+    );
+
+  const uploadedRow = (document: AdminApplicationDocument) => {
+    // Only a confirmed upload can be opened — there is no object behind a
+    // PENDING row, so it stays inert rather than offering a dead link.
+    const openable = document.status === "UPLOADED";
+    return (
+      <li key={document.id}>
+        <button
+          type="button"
+          disabled={!openable}
+          onClick={() => onOpen(document)}
+          className={cn(
+            "flex w-full items-center gap-2 rounded-md px-1 py-1 text-left text-xs text-muted-foreground",
+            openable
+              ? "cursor-pointer hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              : "cursor-default",
+          )}
+        >
+          <FileText className="h-3.5 w-3.5 shrink-0" aria-hidden />
+          <span className="font-medium text-foreground">
+            {labelFor(document.document_type)}
+          </span>
+          <span className="truncate">{document.original_filename}</span>
+          {/* PENDING means the presign was issued but the object never
+              landed — worth flagging, not hiding. */}
+          {!openable && (
+            <Badge variant="secondary" className="ml-auto shrink-0">
+              {enumLabel(t, "documentStatus", document.status)}
+            </Badge>
+          )}
+        </button>
+      </li>
+    );
+  };
+
+  return (
+    <div className="space-y-2">
+      <ul className="space-y-1.5">
+        {REQUIRED_DOCUMENT_TYPES.map((type) => {
+          const document = byType.get(type);
+          if (document) return uploadedRow(document);
+          if (type === "business_registration" && registrationFromKyb) {
+            return (
+              <li
+                key={type}
+                className="flex items-center gap-2 px-1 py-1 text-xs text-muted-foreground"
+              >
+                <ShieldCheck className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                <span className="font-medium text-foreground">
+                  {labelFor(type)}
+                </span>
+                <span className="truncate">
+                  {t("admin.preview.documentFromKyb")}
+                </span>
+              </li>
+            );
+          }
+          return (
+            <li
+              key={type}
+              data-missing-document={type}
+              className="flex items-center gap-2 px-1 py-1 text-xs text-destructive"
+            >
+              <AlertTriangle className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              <span className="font-medium">{labelFor(type)}</span>
+              <Badge variant="destructive" className="ml-auto shrink-0">
+                {t("admin.preview.documentMissing")}
+              </Badge>
+            </li>
+          );
+        })}
+        {extras.map(uploadedRow)}
+      </ul>
+      {/* The Approve button is the next thing on the panel. */}
+      {missing.length > 0 && (
+        <p className="text-[11px] leading-relaxed text-destructive">
+          {t("admin.preview.documentsMissingHint").replace(
+            "{count}",
+            String(missing.length),
+          )}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function Row({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <>
+      <dt className="text-muted-foreground">{label}</dt>
+      <dd className="text-foreground">{children}</dd>
+    </>
+  );
+}
+
+function StatusIcon({ status }: { status: string }) {
+  if (status === "APPROVED") {
+    return <CheckCircle2 className="h-4 w-4 text-emerald-600" />;
+  }
+  if (status === "REJECTED") {
+    return <XCircle className="h-4 w-4 text-destructive" />;
+  }
+  if (status === "MANUAL_REVIEW") {
+    return <Clock className="h-4 w-4 text-amber-600" />;
+  }
+  return <AlertTriangle className="h-4 w-4 text-muted-foreground" />;
+}
+
+function ApprovalBadge({
+  value,
+  t,
+}: {
+  value: AdminLoanApplication["admin_approval"];
+  t: (key: string) => string;
+}) {
+  const label = enumLabel(t, "approval", value);
+  if (value === "APPROVED") {
+    return (
+      <Badge className="gap-1">
+        <ShieldCheck className="h-3 w-3" />
+        {label}
+      </Badge>
+    );
+  }
+  return (
+    <Badge variant={value === "REJECTED" ? "destructive" : "secondary"}>
+      {label}
+    </Badge>
+  );
+}
+
+interface DecisionControlsProps {
+  note: string;
+  onNoteChange: (value: string) => void;
+  disabled: boolean;
+  /** When set, Approve is unavailable and this says why. Reject stays open. */
+  approveBlockedReason?: string | null;
+  onApprove: () => void;
+  onReject: () => void;
+  approveLabel: string;
+  rejectLabel: string;
+  notePlaceholder: string;
+}
+
+function DecisionControls({
+  note,
+  onNoteChange,
+  disabled,
+  approveBlockedReason = null,
+  onApprove,
+  onReject,
+  approveLabel,
+  rejectLabel,
+  notePlaceholder,
+}: DecisionControlsProps) {
+  return (
+    <div className="space-y-2">
+      <Textarea
+        rows={2}
+        value={note}
+        placeholder={notePlaceholder}
+        disabled={disabled}
+        onChange={(event) => onNoteChange(event.target.value)}
+      />
+      <div className="flex gap-2">
+        <Button
+          type="button"
+          size="sm"
+          className="flex-1"
+          disabled={disabled || !!approveBlockedReason}
+          onClick={onApprove}
+        >
+          {disabled ? (
+            <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <CheckCircle2 className="mr-2 h-3.5 w-3.5" />
+          )}
+          {approveLabel}
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          className="flex-1"
+          disabled={disabled}
+          onClick={onReject}
+        >
+          <XCircle className="mr-2 h-3.5 w-3.5" />
+          {rejectLabel}
+        </Button>
+      </div>
+      {approveBlockedReason && (
+        <p className="text-[11px] leading-relaxed text-destructive">
+          {approveBlockedReason}
+        </p>
+      )}
+    </div>
+  );
+}

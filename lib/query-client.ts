@@ -1,4 +1,4 @@
-import { QueryClient } from '@tanstack/react-query';
+import { QueryClient } from "@tanstack/react-query";
 
 // Singleton used by the server-side (RSC) and shared with the provider
 export function makeQueryClient() {
@@ -24,7 +24,7 @@ export function makeQueryClient() {
 let browserQueryClient: QueryClient | undefined;
 
 export function getQueryClient(): QueryClient {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     // Server: always create a new client so requests are not shared
     return makeQueryClient();
   }

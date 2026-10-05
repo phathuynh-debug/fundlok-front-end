@@ -1,4 +1,5 @@
 <!-- BEGIN:nextjs-agent-rules -->
+
 # This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
@@ -34,9 +35,43 @@ The load-bearing rules, in one breath (the skill has the detail and the why):
 - **Verify before done:** `npx tsc --noEmit` and `npx eslint <changed files>`
   must both be clean.
 
+# Follow the handbook
+
+Before writing or editing **any user-facing copy** — an i18n string, label,
+tooltip, badge, chart caption, FAQ answer, marketing page, error message — or
+any screen that presents a **rate, score, return, risk level, fee, repayment
+schedule or fund custody**, consult the **`fundlok-domain`** skill
+(`.claude/skills/fundlok-domain/SKILL.md`). It encodes the FundLok Handbook v3:
+what the product actually is and what the UI is permitted to say about it.
+
+The rules that get people in trouble:
+
+- **Never promise a return.** Targets, ranges and scenarios only — never a bare
+  point figure, never "guaranteed", "risk-free" or "protected capital".
+- **Never use rating language** ("chấm điểm", "credit score") — in **either**
+  `en.json` **or** `vi.json`. Say "điểm doanh nghiệp và lãi suất tham khảo".
+- **Never name a custodial bank** — "custodial bank partners", plural and
+  unnamed — and never say "FundLok never holds funds"; say we hold _instruction
+  rights within bank-enforced conditions_.
+- **Never imply we are a bank or a licensed lender**, and never discuss our
+  regulatory framework externally.
+- **Investor listings must show** the score, the verified revenue behind it, how
+  fresh that data is, the fees, concentration risks, the data gaps, the
+  **backstop date**, and that the investor bears the loss.
+- **Early repayment is "no prepayment penalty", never a discount** — settling
+  early clears the total, it does not reduce it.
+- **When the term stretches, the total goes up.** If revenue drops, the term
+  can stretch out and the daily repayment gets smaller; interest on the extra
+  time raises the total. Never say the total "never rises" or "is unchanged".
+- **Terms are 1 to 6 months.** Six is the maximum.
+
+`fundlok-frontend` governs **how** the code is written; `fundlok-domain` governs
+**what it may say**. Both apply.
+
 ## Workflow skills available
 
-Beyond `fundlok-frontend` (repo conventions), `.claude/skills/` also holds a set
+Beyond `fundlok-frontend` (repo conventions) and `fundlok-domain` (handbook
+rules), `.claude/skills/` also holds a set
 of general **engineering-workflow** skills vendored from
 [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) — process
 guidance for the whole lifecycle. Reach for the relevant one when the task fits;
@@ -45,11 +80,12 @@ notably:
 - Building/changing UI → `frontend-ui-engineering`
 - Implementing logic or fixing a bug → `test-driven-development`,
   `incremental-implementation`
-- Before merging → `code-review-and-quality`, `code-simplification`,
-  `security-and-hardening`
+- Before merging / checking CI → `ci-check-and-fix`, `code-review-and-quality`,
+  `code-simplification`, `security-and-hardening`
 - Debugging → `debugging-and-error-recovery`
 - Planning a larger change → `spec-driven-development`,
   `planning-and-task-breakdown`
 
-`fundlok-frontend` always wins on **how this repo is built**; these cover **how
-to work**. See `.claude/skills/VENDORED.md` for the full list and provenance.
+`fundlok-frontend` always wins on **how this repo is built**, `fundlok-domain`
+on **what we are allowed to say**; these cover **how to work**. See
+`.claude/skills/VENDORED.md` for the full list and provenance.

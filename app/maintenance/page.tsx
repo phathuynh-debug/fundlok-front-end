@@ -1,25 +1,25 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { useMaintenance } from "@/hooks/use-admin"
-import { useTranslations } from "@/lib/i18n"
-import { Loader2, Wrench } from "lucide-react"
-import Logo from "@/components/logo"
-import { LocaleSwitcher } from "@/components/locale-switcher"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useMaintenance } from "@/hooks/use-admin";
+import { useTranslations } from "@/lib/i18n";
+import { Loader2, Wrench } from "lucide-react";
+import Logo from "@/components/logo";
+import { LocaleSwitcher } from "@/components/locale-switcher";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function MaintenancePage() {
-  const router = useRouter()
-  const { t } = useTranslations()
-  const { data, isLoading, isError } = useMaintenance()
+  const router = useRouter();
+  const { t } = useTranslations();
+  const { data, isLoading, isError } = useMaintenance();
 
   // If maintenance has been lifted, don't strand the user here.
   useEffect(() => {
     if (!isLoading && (isError || data?.enabled === false)) {
-      router.replace("/")
+      router.replace("/");
     }
-  }, [isLoading, isError, data?.enabled, router])
+  }, [isLoading, isError, data?.enabled, router]);
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center bg-background px-6 text-center">
@@ -31,7 +31,10 @@ export default function MaintenancePage() {
 
       <div className="flex w-full max-w-md flex-col items-center gap-6">
         <div className="w-32">
-          <Logo alt={t("common.brandName")} containerClassName="relative w-32 h-10 overflow-hidden" />
+          <Logo
+            alt={t("common.brandName")}
+            containerClassName="relative w-32 h-10 overflow-hidden"
+          />
         </div>
 
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
@@ -52,5 +55,5 @@ export default function MaintenancePage() {
         )}
       </div>
     </div>
-  )
+  );
 }

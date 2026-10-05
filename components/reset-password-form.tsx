@@ -7,9 +7,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Lock, Loader2, Eye, EyeOff, CheckCircle2, AlertCircle } from "lucide-react";
+import {
+  Lock,
+  Loader2,
+  Eye,
+  EyeOff,
+  CheckCircle2,
+  AlertCircle,
+} from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
 import { useResetPassword } from "@/app/reset-password/use-reset-password";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 export function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -22,7 +30,7 @@ export function ResetPasswordForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { toast } = useToast();
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const { resetPassword, isPending, isSuccess } = useResetPassword();
 
   const handleResetPassword = (e: React.FormEvent) => {
@@ -41,7 +49,7 @@ export function ResetPasswordForm() {
       toast({
         variant: "destructive",
         title: t("auth.resetPassword.failedTitle"),
-        description: "Password must be at least 8 characters long.",
+        description: t("auth.resetPassword.passwordTooShort"),
       });
       return;
     }
@@ -76,10 +84,14 @@ export function ResetPasswordForm() {
           toast({
             variant: "destructive",
             title: t("auth.resetPassword.failedTitle"),
-            description: error?.message || t("auth.resetPassword.failedDescription"),
+            description: apiErrorMessage(
+              error,
+              locale,
+              t("auth.resetPassword.failedDescription"),
+            ),
           });
         },
-      }
+      },
     );
   };
 
@@ -146,7 +158,9 @@ export function ResetPasswordForm() {
 
       <form onSubmit={handleResetPassword} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="password">{t("auth.resetPassword.passwordLabel")}</Label>
+          <Label htmlFor="password">
+            {t("auth.resetPassword.passwordLabel")}
+          </Label>
           <div className="relative">
             <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
@@ -164,13 +178,19 @@ export function ResetPasswordForm() {
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
             >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
             </button>
           </div>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="confirmPassword">{t("auth.resetPassword.confirmPasswordLabel")}</Label>
+          <Label htmlFor="confirmPassword">
+            {t("auth.resetPassword.confirmPasswordLabel")}
+          </Label>
           <div className="relative">
             <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
@@ -188,7 +208,11 @@ export function ResetPasswordForm() {
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
             >
-              {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {showConfirmPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
             </button>
           </div>
         </div>

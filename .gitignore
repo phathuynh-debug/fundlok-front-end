@@ -14,7 +14,13 @@
 /coverage
 
 # next.js
+# The glob covers the alternate dist dirs NEXT_DIST_DIR is pointed at (the E2E
+# suite uses .next-e2e). Leaving one untracked is not just clutter: Tailwind v4
+# auto-detects sources by scanning everything git does not ignore, and it will
+# happily extract garbage "utilities" out of compiled binary chunks, which then
+# fail to parse as CSS.
 /.next/
+/.next-*/
 /out/
 
 # production
@@ -39,3 +45,24 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+certificates
+
+# Playwright
+/e2e/.artifacts/
+/playwright-report/
+/blob-report/
+/test-results/
+
+# E2E build output
+/.next-e2e/
+
+# vbsec security scan reports and fix logs: they list unfixed vulnerabilities
+# by file and line, so they never go into git (or a deployment).
+vbsec-reports/
+.vbsec-tmp/
+
+# partykit (own mini-package; see party/package.json)
+/party/node_modules
+/party/.partykit
+/party/.wrangler

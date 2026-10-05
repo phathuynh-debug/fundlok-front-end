@@ -1,9 +1,23 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  motion,
+  useMotionValueEvent,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+  type MotionValue,
+} from "framer-motion";
+import {
+  Building2,
+  Banknote,
+  ChevronDown,
+  ArrowRight,
+  type LucideIcon,
+} from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
-import { ChevronRight, ChevronLeft, RotateCcw } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 // Content structures for both roles in both English and Vietnamese
 const contentData = {
@@ -11,219 +25,168 @@ const contentData = {
     sme: {
       steps: [
         {
-          num: 1,
-          title: "Apply & KYC",
-          caption: "A simple and secure way to get started",
-          stage: "Stage 1 of 4",
-          badge: "Easy onboarding",
+          title: "Apply & KYB",
+          detailTitle: "Apply & verify online",
+          badge: "Step 1 · Apply",
           tags: [
-            "Simple start",
-            "Secure onboarding",
-            "Guided flow",
-            "Digital verification",
+            "Fully online",
+            "Documents you already have",
+            "No hard collateral",
           ],
-          desc: "Getting started with FundLok should feel clear, simple, and secure. In this first step, you submit your application and complete verification through one guided process so your business can move forward quickly and with confidence.",
-          how: "You go through one digital application and verification journey, with clear requirements and fewer manual back-and-forth steps.",
-          why: "This helps you get into the funding process more smoothly while giving FundLok the information needed to review your business responsibly.",
-          tech: "Behind the scenes, digital onboarding, verification workflows, and automated requirement handling help make the process faster, more consistent, and easier to manage.",
-          journeyTitle: "Your application journey",
+          desc: "Apply online and verify your business in one guided flow. We work from documents you already have: your VAT declarations and e-invoices.",
+          how: "One form, one identity check. We tell you up front what we need.",
+          why: "No paperwork chase. Your application moves straight to review.",
+          tech: "Uploads are checked as they land, so a missing or edited file is flagged straight away.",
+          journeyTitle: "Your application",
           rows: [
-            ["You apply online", "Quick and guided"],
-            ["Verification begins", "Digitally"],
-            ["Requirements are organized", "Automatically"],
-            ["Your case moves forward", "Ready for assessment"],
+            ["You apply online", "Step by step"],
+            ["Your identity is verified", "Digitally"],
+            ["Documents are checked", "Automatically"],
+            ["Your file goes to review", "Ready to assess"],
           ],
-          emphasis:
-            "What we want to emphasize here is that getting started should feel simple for you — but still supported by secure digital workflows that keep the process efficient and reliable.",
+          emphasis: "Simple for you. Checked properly on our side.",
         },
         {
-          num: 2,
           title: "Assess",
-          detailTitle: "Business Assessment",
-          caption: "A smarter review powered by data and AI",
-          stage: "Stage 2 of 4",
-          badge: "Smart assessment",
+          detailTitle: "Business assessment",
+          badge: "Step 2 · Assess",
           tags: [
-            "Data-driven review",
-            "AI-supported analysis",
-            "Cash flow understanding",
-            "Business-specific assessment",
+            "Based on real cash flow",
+            "Data and AI",
+            "Business score 0–100",
           ],
-          desc: "Once your application is complete, FundLok reviews your business in a way that is designed to reflect how it actually operates. Instead of forcing every SME into the same rigid model, we use data, automation, and AI-supported analysis to better understand your business reality, funding needs, and repayment capacity.",
-          how: "Your business is assessed using a more structured and technology-enabled process that helps us understand performance patterns, operating context, and funding suitability more accurately.",
-          why: "This matters because better assessment leads to funding structures that are more realistic, more relevant, and better aligned with how your business grows.",
-          tech: "Behind the experience are automated financial workflows, data analysis tools, and AI-assisted review models that help tailor decisions more intelligently than a one-size-fits-all approach.",
+          desc: "We look at how your business actually earns, not a one-size-fits-all checklist. Verified revenue and cash flow set your business score and reference rate.",
+          how: "Your tax data is analysed with data tools and AI, then reviewed by our team.",
+          why: "A fair read of your business means terms you can actually keep up with.",
+          tech: "Automated analysis of your VAT and e-invoice data keeps the review fast and consistent.",
           journeyTitle: "Understanding your business",
           rows: [
-            ["Business data is analyzed", "With structure"],
-            ["Patterns are reviewed", "Using data tools"],
-            ["Context is considered", "More intelligently"],
-            ["A funding outcome is prepared", "For the next step"],
+            ["Revenue is verified", "From tax records"],
+            ["Cash flow is analysed", "With data and AI"],
+            ["Your score is set", "0–100"],
+            ["A reference rate follows", "From your score"],
           ],
-          emphasis:
-            "What we want to emphasize here is that your business is not being looked at in a generic way. Technology helps us evaluate your real operating situation more thoughtfully and more accurately.",
+          emphasis: "Your business is judged on its own numbers.",
         },
         {
-          num: 3,
           title: "Offer",
-          detailTitle: "Offer & Confirmation",
-          caption: "Clear terms supported by a structured workflow",
-          stage: "Stage 3 of 4",
-          badge: "Transparent offer",
-          tags: [
-            "Clear structure",
-            "Transparent terms",
-            "Digital confirmation",
-            "Confidence before proceeding",
-          ],
-          desc: "If your business is suitable for funding, we prepare an offer for you to review. This is where you can understand the structure, review the terms clearly, and decide whether the funding arrangement fits your business before moving ahead.",
-          how: "You receive a structured offer experience that makes it easier to review terms, understand the arrangement, and move forward with clarity.",
-          why: "This helps ensure that funding is not only available, but also presented in a way that lets you make an informed and confident decision.",
-          tech: "Behind this step are automated offer-generation, approval-routing, and confirmation workflows that help keep the process secure, consistent, and scalable.",
-          journeyTitle: "Your offer review",
+          detailTitle: "Offer & confirmation",
+          badge: "Step 3 · Offer",
+          tags: ["All-in rate", "All fees upfront", "No prepayment penalty"],
+          desc: "If your business is a fit, you get an offer with the rate, the daily amount and every fee spelled out. Take your time and sign only when it works for you.",
+          how: "Review the terms online and confirm digitally when you are ready.",
+          why: "All fees are disclosed before disbursement. Nothing is added after.",
+          tech: "Offers are generated and routed for approval automatically, so every one follows the same rules.",
+          journeyTitle: "Your offer",
           rows: [
-            ["Your offer is prepared", "Clearly and digitally"],
-            ["Terms are presented", "For review"],
-            ["You confirm suitability", "Before proceeding"],
-            ["The process advances", "Only after confirmation"],
+            ["Your offer arrives", "Online"],
+            ["Rate and fees are shown", "In full"],
+            ["You review the terms", "At your pace"],
+            ["You sign", "Only if it fits"],
           ],
-          emphasis:
-            "What we want to emphasize here is confidence. You should feel that the offer is not only clear to review, but also supported by a structured technology layer that makes the process more secure and dependable.",
+          emphasis: "No surprises. Every fee is on the table before you sign.",
         },
         {
-          num: 4,
           title: "Disburse & Repay",
-          detailTitle: "Disbursement & Repayment",
-          caption: "Flexible servicing with clear tracking",
-          stage: "Stage 4 of 4",
-          badge: "Repayment experience",
+          detailTitle: "Disbursement & repayment",
+          badge: "Step 4 · Repay",
           tags: [
-            "Funding delivered",
-            "Flexible servicing",
-            "Ongoing visibility",
-            "Clear repayment flow",
+            "Fixed daily repayment",
+            "Relief when revenue dips",
+            "Early repayment, no penalty",
           ],
-          desc: "Once funding is completed, capital is disbursed to your business and repayment begins. FundLok is designed to make this stage more practical and transparent by connecting repayment more closely to actual business activity and giving you clearer visibility along the way.",
-          how: "You experience a repayment process that is easier to follow, with notifications, tracking, and connected servicing designed to reduce friction over time.",
-          why: "This is where FundLok's model becomes most meaningful: funding supports growth, while repayment is structured in a way that better reflects real business conditions.",
-          tech: "Behind this experience are connected revenue data flows, automated reminders, repayment routing logic, and transaction tracking systems that help make money movement more visible and manageable.",
-          journeyTitle: "Your funding and repayment experience",
+          desc: "Once funded, the money reaches your business and repayment begins: a small, fixed amount each working day, matched to how your business takes in cash.",
+          how: "Track every payment on your dashboard, with reminders along the way.",
+          why: "If verified revenue dips, the term can be extended to lower your daily payment. Interest applies to the extra time.",
+          tech: "Connected revenue data and automated tracking keep your balance up to date.",
+          journeyTitle: "Funding and repayment",
           rows: [
             ["Funds are disbursed", "To your business"],
-            ["Repayment begins", "With defined structure"],
-            ["Tracking stays active", "Throughout the journey"],
-            ["Notifications support you", "Along the way"],
+            ["Daily repayment starts", "Fixed amount"],
+            ["Your balance updates", "Every day"],
+            ["Revenue dips?", "Term can extend"],
           ],
-          emphasis:
-            "What we want to emphasize here is practicality supported by technology. Funding should reach you efficiently, and repayment should feel clearer, smoother, and easier to navigate because the system is built to support it.",
+          emphasis: "Repayment that moves with your business, not against it.",
         },
       ],
     },
     investor: {
       steps: [
         {
-          num: 1,
           title: "Apply & KYC",
-          caption: "A secure and trusted starting point",
-          stage: "Stage 1 of 4",
-          badge: "Secure onboarding",
-          tags: [
-            "Trusted entry",
-            "Secure verification",
-            "Controlled access",
-            "Digital onboarding",
-          ],
-          desc: "Before participating on FundLok, you complete a secure onboarding and verification process. This gives you a clearer and more trusted starting point, while helping establish a disciplined environment for participation across the platform.",
-          how: "You go through a structured onboarding experience that is designed to be efficient for you while maintaining strong verification and access control.",
-          why: "This matters because a stronger onboarding process supports a more credible platform and a more trusted investment environment.",
-          tech: "Behind the scenes, digital KYC workflows, verification checks, and controlled access systems help create a cleaner foundation for routing funds securely.",
-          journeyTitle: "Your onboarding journey",
+          detailTitle: "Sign up & verify",
+          badge: "Step 1 · Join",
+          tags: ["Verified investors only", "Secure access", "Fully online"],
+          desc: "Sign up and verify your identity online. Every investor on FundLok is verified before they can invest.",
+          how: "A short guided sign-up, then an identity check.",
+          why: "A verified community keeps the marketplace credible for everyone.",
+          tech: "Digital KYC and access controls run in the background.",
+          journeyTitle: "Your sign-up",
           rows: [
-            ["You register", "Through a guided flow"],
-            ["Verification is completed", "Securely"],
-            ["Access is reviewed", "Before activation"],
-            ["You enter the platform", "With confidence"],
+            ["You register", "Online"],
+            ["Your identity is verified", "Securely"],
+            ["Access is approved", "Before you invest"],
+            ["You are in", "Ready to browse"],
           ],
-          emphasis:
-            "What we want to emphasize here is trust supported by technology. Your participation begins through a controlled digital process designed to make the platform feel more secure and dependable from the start.",
+          emphasis: "Trust starts at the door.",
         },
         {
-          num: 2,
           title: "Browse Listings",
-          caption: "Structured opportunities in one marketplace",
-          stage: "Stage 2 of 4",
-          badge: "Investment discovery",
-          tags: [
-            "Vetted listings",
-            "Structured details",
-            "Filter & search",
-            "Transparent data",
-          ],
-          desc: "Explore investment opportunities with detailed business information, risk assessment parameters, and financial offers. We organize listings transparently so you can build your portfolio based on clear parameters.",
-          how: "You browse a structured database of verified SME listings, sorted and filtered by risk grades, industries, and repayment structures.",
-          why: "This gives you full visibility into loan offerings, so you can perform your due diligence and allocate capital to projects matching your risk-return targets.",
-          tech: "Behind the marketplace are secure listing databases, automated risk grading indexes, and real-time updates that synchronize active funding opportunities.",
+          detailTitle: "Browse listings",
+          badge: "Step 2 · Browse",
+          tags: ["Vetted SMEs", "Business score 0–100", "Verified revenue"],
+          desc: "Every listing shows the business score, the verified revenue behind it, how fresh that data is, the fees and the backstop date.",
+          how: "Filter by business score, industry and term to find what fits you.",
+          why: "Everything you need for your own due diligence, in one place.",
+          tech: "Listings update in real time as funding comes in.",
           journeyTitle: "Finding opportunities",
           rows: [
-            ["Listings are presented", "With standard detail"],
-            ["Risk grades are shown", "Based on model metrics"],
-            ["Financials are available", "For diligence review"],
-            ["Portfolio selection is", "In your control"],
+            ["Listings are presented", "In a standard format"],
+            ["Business scores are shown", "0–100"],
+            ["Revenue data is shared", "With its date"],
+            ["You choose", "What to fund"],
           ],
-          emphasis:
-            "What we want to emphasize here is data transparency. Discovering projects should feel simple, backed by structured assessments that help you make balanced decisions.",
+          emphasis: "Clear data, your decision.",
         },
         {
-          num: 3,
           title: "Deposit",
-          caption: "Controlled fund handling with greater transparency",
-          stage: "Stage 3 of 4",
-          badge: "Secure allocation",
-          tags: [
-            "Secure escrow",
-            "Capital allocation",
-            "Automated tracking",
-            "Zero hidden fees",
-          ],
-          desc: "Transfer funds securely into your platform escrow account. You specify how much you want to invest in chosen projects, and the capital is routed safely to fund the selected loan contracts.",
-          how: "You deposit capital through secure channels. The platform coordinates allocation to matching SME loan pools under strict custody terms.",
-          why: "Your funds are held securely and only committed to active loans once the matching phase is completed, ensuring transparent custody.",
-          tech: "Behind the funding are escrow accounts, ledger tracking systems, and transaction verification protocols that keep your capital safe and accounted for.",
-          journeyTitle: "Your deposit flow",
+          detailTitle: "Deposit & invest",
+          badge: "Step 3 · Invest",
+          tags: ["Secure escrow", "You choose the amount", "All fees upfront"],
+          desc: "Deposit into your escrow account, then choose the projects and how much to put into each. Funds are only committed once a loan is fully matched.",
+          how: "Deposit through secure channels, then allocate in a few clicks.",
+          why: "All fees are disclosed before disbursement. Nothing is added after.",
+          tech: "A ledger tracks every movement of your money, step by step.",
+          journeyTitle: "Your deposit",
           rows: [
-            ["Deposit funds", "Securely to escrow"],
-            ["Select project allocations", "Precisely and digitally"],
-            ["Funds are pooled", "For disbursement"],
-            ["Ledger tracks capital", "At every step"],
+            ["You deposit", "Into escrow"],
+            ["You pick projects", "And amounts"],
+            ["Funds are committed", "Once fully matched"],
+            ["Every movement", "Is on the ledger"],
           ],
-          emphasis:
-            "What we want to emphasize here is control. You manage how and where your capital is deployed, with platform automation securing the custody and transit of your funds.",
+          emphasis: "You stay in control of where your money goes.",
         },
         {
-          num: 4,
           title: "Repayment",
-          caption: "Technology-enabled routing and tracking",
-          stage: "Stage 4 of 4",
-          badge: "Investor returns",
+          detailTitle: "Receive repayments",
+          badge: "Step 4 · Earn",
           tags: [
-            "Revenue sharing",
-            "Automated distribution",
-            "Real-time ledger",
-            "Direct updates",
+            "Daily repayments",
+            "Paid out automatically",
+            "Live dashboard",
           ],
-          desc: "Receive your share of repayments automatically as SMEs make their daily or weekly revenue-share payments. Monitor returns and track progress in real-time on your dashboard ledger.",
-          how: "The platform routes the incoming SME revenue-share payments directly to the participating investors' accounts on a prorated basis.",
-          why: "This turns investment into regular, liquid cash flow returns, directly reflecting the performance of the businesses you support.",
-          tech: "Behind this are automated revenue-split contracts, bank-account integration APIs, and prorated ledger distribution scripts that automate repayment payouts.",
-          journeyTitle: "Your repayment tracking",
+          desc: "SMEs repay a fixed amount every working day. Your share lands in your account automatically, in proportion to what you invested.",
+          how: "Repayments are split across investors pro rata and credited to your balance.",
+          why: "Steady daily cash flow from real businesses, not a lump sum at the end.",
+          tech: "Automated distribution and a real-time ledger keep your balance current.",
+          journeyTitle: "Your returns",
           rows: [
-            ["Payments are received", "From the SME loop"],
-            ["Platform distributes split", "Automatically to ledger"],
-            ["Balance is updated", "In real-time"],
-            ["Dashboard charts portfolio", "Ongoing return progress"],
+            ["The SME repays", "Every working day"],
+            ["Your share is calculated", "Pro rata"],
+            ["Your balance updates", "In real time"],
+            ["Your dashboard shows", "Progress to date"],
           ],
-          emphasis:
-            "What we want to emphasize here is passive tracking. Returns are calculated, split, and deposited to your balance automatically, so you can track growth with zero manual overhead.",
+          emphasis: "Your returns arrive daily, tracked to the dong.",
         },
       ],
     },
@@ -232,225 +195,274 @@ const contentData = {
     sme: {
       steps: [
         {
-          num: 1,
-          title: "Đăng ký & KYC",
-          detailTitle: "Đăng ký & Xác thực",
-          caption: "Quy trình đơn giản và an toàn để bắt đầu",
-          stage: "Giai đoạn 1/4",
-          badge: "Đăng ký dễ dàng",
+          title: "Đăng ký & KYB",
+          detailTitle: "Đăng ký & xác thực trực tuyến",
+          badge: "Bước 1 · Đăng ký",
           tags: [
-            "Khởi đầu đơn giản",
-            "Onboarding bảo mật",
-            "Luồng hướng dẫn",
-            "Xác thực kỹ thuật số",
+            "Hoàn toàn trực tuyến",
+            "Dùng giấy tờ sẵn có",
+            "Không cần tài sản thế chấp",
           ],
-          desc: "Bắt đầu với FundLok được thiết kế để mang lại cảm giác rõ ràng, đơn giản và an toàn. Trong bước đầu tiên này, bạn gửi hồ sơ đăng ký và hoàn thành xác thực thông qua một quy trình có hướng dẫn để doanh nghiệp có thể tiến hành nhanh chóng và tự tin.",
-          how: "Bạn trải qua một hành trình đăng ký và xác thực trực quan duy nhất, với các yêu cầu rõ ràng và hạn chế tối đa các bước thủ công rườm rà.",
-          why: "Điều này giúp bạn bước vào quy trình gọi vốn thuận lợi hơn, đồng thời cung cấp đầy đủ thông tin để FundLok thẩm định hồ sơ doanh nghiệp một cách có trách nhiệm.",
-          tech: "Đằng sau hệ thống là các luồng đăng ký kỹ thuật số, quy trình xác thực tự động và cơ chế xử lý tài liệu giúp đẩy nhanh tiến độ, đảm bảo tính nhất quán.",
-          journeyTitle: "Hành trình đăng ký của bạn",
+          desc: "Đăng ký trực tuyến và xác thực doanh nghiệp trong một quy trình có hướng dẫn. Chúng tôi dùng giấy tờ bạn đã có sẵn: tờ khai VAT và hóa đơn điện tử.",
+          how: "Một biểu mẫu, một bước xác minh danh tính. Chúng tôi nói rõ cần gì ngay từ đầu.",
+          why: "Không phải chạy theo giấy tờ. Hồ sơ của bạn chuyển thẳng sang thẩm định.",
+          tech: "Tài liệu được kiểm tra ngay khi tải lên, nên tệp thiếu hoặc bị chỉnh sửa sẽ được phát hiện ngay.",
+          journeyTitle: "Hồ sơ của bạn",
           rows: [
-            ["Bạn đăng ký trực tuyến", "Nhanh chóng và có hướng dẫn"],
-            ["Quá trình xác thực bắt đầu", "Hoàn toàn kỹ thuật số"],
-            ["Các hồ sơ được sắp xếp", "Tự động"],
-            ["Hồ sơ được chuyển tiếp", "Sẵn sàng để thẩm định"],
+            ["Bạn đăng ký trực tuyến", "Từng bước"],
+            ["Danh tính được xác minh", "Trực tuyến"],
+            ["Tài liệu được kiểm tra", "Tự động"],
+            ["Hồ sơ chuyển sang thẩm định", "Sẵn sàng đánh giá"],
           ],
-          emphasis:
-            "Chúng tôi muốn nhấn mạnh rằng việc bắt đầu sẽ cực kỳ đơn giản cho bạn — nhưng vẫn được bảo đảm bởi các luồng công việc kỹ thuật số an toàn để giữ cho quy trình luôn hiệu quả và đáng tin cậy.",
+          emphasis: "Đơn giản với bạn. Kiểm tra kỹ lưỡng ở phía chúng tôi.",
         },
         {
-          num: 2,
           title: "Thẩm định",
           detailTitle: "Thẩm định doanh nghiệp",
-          caption: "Đánh giá thông minh bằng dữ liệu và AI",
-          stage: "Giai đoạn 2/4",
-          badge: "Thẩm định thông minh",
+          badge: "Bước 2 · Thẩm định",
           tags: [
-            "Đánh giá qua dữ liệu",
-            "Phân tích hỗ trợ bởi AI",
-            "Hiểu rõ dòng tiền",
-            "Thẩm định theo doanh nghiệp",
+            "Dựa trên dòng tiền thực",
+            "Dữ liệu và AI",
+            "Điểm doanh nghiệp 0–100",
           ],
-          desc: "Sau khi hồ sơ hoàn tất, FundLok đánh giá doanh nghiệp của bạn theo phương thức phản ánh đúng cách thức vận hành thực tế. Thay vì ép buộc mọi SME vào một mô hình cứng nhắc, chúng tôi sử dụng dữ liệu và phân tích AI để hiểu rõ thực tế hoạt động, nhu cầu vốn và khả năng hoàn trả.",
-          how: "Doanh nghiệp của bạn được đánh giá bằng quy trình áp dụng công nghệ và cấu trúc chặt chẽ giúp phân tích chính xác xu hướng hiệu suất, bối cảnh hoạt động và độ phù hợp.",
-          why: "Điều này quan trọng vì thẩm định tốt hơn sẽ dẫn đến các cấu trúc vốn thực tế, phù hợp và liên kết chặt chẽ hơn với tốc độ tăng trưởng của doanh nghiệp.",
-          tech: "Đằng sau trải nghiệm là các luồng công việc tài chính tự động, công cụ phân tích dữ liệu và mô hình đánh giá có AI hỗ trợ giúp tùy chỉnh các quyết định thông minh hơn.",
-          journeyTitle: "Hiểu rõ doanh nghiệp của bạn",
+          desc: "Chúng tôi xem doanh nghiệp của bạn thực sự tạo ra tiền thế nào, không áp một khuôn mẫu chung. Doanh thu đã xác minh và dòng tiền quyết định điểm doanh nghiệp và lãi suất tham khảo.",
+          how: "Dữ liệu thuế của bạn được phân tích bằng công cụ dữ liệu và AI, sau đó đội ngũ của chúng tôi xem xét.",
+          why: "Đánh giá đúng doanh nghiệp nghĩa là điều khoản bạn thực sự theo kịp.",
+          tech: "Phân tích tự động dữ liệu VAT và hóa đơn điện tử giúp việc thẩm định nhanh và nhất quán.",
+          journeyTitle: "Hiểu doanh nghiệp của bạn",
           rows: [
-            ["Dữ liệu kinh doanh được phân tích", "Theo cấu trúc"],
-            ["Các mô hình được đánh giá", "Sử dụng công cụ dữ liệu"],
-            ["Bối cảnh được xem xét", "Một cách thông minh hơn"],
-            ["Kết quả gọi vốn được chuẩn bị", "Cho bước tiếp theo"],
+            ["Doanh thu được xác minh", "Từ hồ sơ thuế"],
+            ["Dòng tiền được phân tích", "Bằng dữ liệu và AI"],
+            ["Điểm doanh nghiệp được xác định", "Thang 0–100"],
+            ["Lãi suất tham khảo", "Theo điểm của bạn"],
           ],
           emphasis:
-            "Điều chúng tôi muốn nhấn mạnh ở đây là doanh nghiệp của bạn không bị đánh giá theo cách chung chung. Công nghệ giúp chúng tôi đánh giá tình hình hoạt động thực tế của bạn một cách thấu đáo và chính xác hơn.",
+            "Doanh nghiệp của bạn được đánh giá bằng chính số liệu của mình.",
         },
         {
-          num: 3,
           title: "Đề xuất",
-          detailTitle: "Đề xuất & Xác nhận",
-          caption: "Điều khoản rõ ràng với quy trình chuẩn hóa",
-          stage: "Giai đoạn 3/4",
-          badge: "Đề xuất minh bạch",
+          detailTitle: "Đề xuất & xác nhận",
+          badge: "Bước 3 · Đề xuất",
           tags: [
-            "Cấu trúc rõ ràng",
-            "Điều khoản minh bạch",
-            "Xác nhận kỹ thuật số",
-            "Tự tin trước khi tiến hành",
+            "Lãi suất trọn gói",
+            "Công khai mọi khoản phí",
+            "Không phạt trả trước hạn",
           ],
-          desc: "Nếu doanh nghiệp của bạn đủ điều kiện tài trợ, chúng tôi sẽ chuẩn bị một đề xuất vay để bạn xem xét. Đây là nơi bạn có thể nắm rõ cấu trúc, xem các điều khoản một cách minh bạch và quyết định xem thỏa thuận gọi vốn có phù hợp với doanh nghiệp hay không.",
-          how: "Bạn nhận được một trải nghiệm xem đề xuất được cấu trúc rõ ràng giúp dễ dàng đánh giá điều khoản, hiểu rõ thỏa thuận và tiến hành với sự tường minh.",
-          why: "Điều này đảm bảo rằng nguồn vốn không chỉ có sẵn mà còn được trình bày theo cách giúp bạn đưa ra quyết định sáng suốt và tự tin nhất.",
-          tech: "Đằng sau bước này là các quy trình tự động tạo đề xuất, phê duyệt luồng và xác nhận kỹ thuật số giúp giữ cho quy trình an toàn, nhất quán và có thể mở rộng.",
-          journeyTitle: "Xem xét đề xuất của bạn",
+          desc: "Nếu doanh nghiệp phù hợp, bạn nhận đề xuất ghi rõ lãi suất, khoản trả hằng ngày và mọi khoản phí. Cứ cân nhắc kỹ và chỉ ký khi thấy phù hợp.",
+          how: "Xem điều khoản trực tuyến và xác nhận bằng chữ ký số khi sẵn sàng.",
+          why: "Mọi khoản phí được công bố trước khi giải ngân. Không phát sinh thêm sau đó.",
+          tech: "Đề xuất được tạo và chuyển duyệt tự động, nên mọi đề xuất đều theo cùng một quy tắc.",
+          journeyTitle: "Đề xuất của bạn",
           rows: [
-            ["Đề xuất được chuẩn bị", "Rõ ràng và bằng kỹ thuật số"],
-            ["Các điều khoản được trình bày", "Để xem xét"],
-            ["Bạn xác nhận độ phù hợp", "Trước khi tiến hành"],
-            ["Quy trình được chuyển tiếp", "Chỉ sau khi xác nhận"],
+            ["Đề xuất được gửi", "Trực tuyến"],
+            ["Lãi suất và phí", "Hiển thị đầy đủ"],
+            ["Bạn xem điều khoản", "Theo tốc độ của bạn"],
+            ["Bạn ký", "Chỉ khi phù hợp"],
           ],
           emphasis:
-            "Điều chúng tôi muốn nhấn mạnh ở đây là sự tự tin. Bạn sẽ cảm nhận được đề xuất không chỉ rõ ràng để xem xét, mà còn được hỗ trợ bởi một lớp công nghệ giúp quy trình an toàn và đáng tin cậy hơn.",
+            "Không bất ngờ. Mọi khoản phí đều rõ ràng trước khi bạn ký.",
         },
         {
-          num: 4,
           title: "Giải ngân & Hoàn trả",
-          detailTitle: "Giải ngân & Hoàn trả",
-          caption: "Dịch vụ linh hoạt với giám sát rõ ràng",
-          stage: "Giai đoạn 4/4",
-          badge: "Trải nghiệm thanh toán",
+          detailTitle: "Giải ngân & hoàn trả",
+          badge: "Bước 4 · Hoàn trả",
           tags: [
-            "Vốn được chuyển giao",
-            "Dịch vụ linh hoạt",
-            "Giám sát liên tục",
-            "Luồng hoàn trả rõ ràng",
+            "Trả cố định hằng ngày",
+            "Giãn thời hạn khi doanh thu giảm",
+            "Trả sớm không bị phạt",
           ],
-          desc: "Sau khi gọi vốn hoàn tất, nguồn vốn sẽ được giải ngân cho doanh nghiệp của bạn và quá trình hoàn trả bắt đầu. FundLok được thiết kế để làm cho giai đoạn này thực tế và minh bạch hơn bằng cách kết nối việc hoàn trả chặt chẽ hơn với doanh thu thực tế.",
-          how: "Bạn trải nghiệm quy trình hoàn trả dễ dàng theo dõi, với các thông báo, cập nhật tiến độ và dịch vụ kết nối được thiết kế để giảm thiểu mọi trở ngại.",
-          why: "Đây là nơi mô hình của FundLok trở nên ý nghĩa nhất: vốn hỗ trợ tăng trưởng, trong khi hoàn trả được cấu trúc phù hợp với điều kiện kinh doanh thực tế.",
-          tech: "Đằng sau là các luồng dữ liệu doanh thu kết nối trực tiếp, hệ thống nhắc nhở tự động, logic định tuyến thanh toán và cơ chế theo dõi giao dịch giúp dòng tiền trở nên minh bạch.",
-          journeyTitle: "Trải nghiệm gọi vốn và hoàn trả của bạn",
+          desc: "Khi gọi vốn xong, tiền được chuyển đến doanh nghiệp và việc hoàn trả bắt đầu: một khoản nhỏ, cố định mỗi ngày làm việc, khớp với cách doanh nghiệp thu tiền.",
+          how: "Theo dõi từng khoản thanh toán trên bảng điều khiển, kèm nhắc nhở trong suốt quá trình.",
+          why: "Nếu doanh thu đã xác minh giảm, thời hạn có thể được kéo dài để giảm khoản trả hằng ngày. Lãi được tính cho phần thời gian kéo dài.",
+          tech: "Dữ liệu doanh thu được kết nối và theo dõi tự động giúp số dư luôn cập nhật.",
+          journeyTitle: "Giải ngân và hoàn trả",
           rows: [
-            ["Vốn được giải ngân", "Đến doanh nghiệp của bạn"],
-            ["Quá trình hoàn trả bắt đầu", "Với cấu trúc xác định"],
-            ["Theo dõi hoạt động liên tục", "Suốt hành trình"],
-            ["Các thông báo hỗ trợ bạn", "Trong suốt quá trình"],
+            ["Vốn được giải ngân", "Đến doanh nghiệp"],
+            ["Bắt đầu trả hằng ngày", "Khoản cố định"],
+            ["Số dư được cập nhật", "Mỗi ngày"],
+            ["Doanh thu giảm?", "Có thể giãn thời hạn"],
           ],
-          emphasis:
-            "Điều chúng tôi muốn nhấn mạnh ở đây là tính thực tế được hỗ trợ bởi công nghệ. Vốn tiếp cận bạn nhanh chóng, và hoàn trả nhẹ nhàng, mượt mà hơn vì hệ thống được xây dựng để tối ưu hóa điều đó.",
+          emphasis: "Hoàn trả thuận theo nhịp kinh doanh của bạn.",
         },
       ],
     },
     investor: {
       steps: [
         {
-          num: 1,
           title: "Đăng ký & KYC",
-          caption: "Điểm khởi đầu an toàn và đáng tin cậy",
-          stage: "Giai đoạn 1/4",
-          badge: "Onboarding an toàn",
+          detailTitle: "Đăng ký & xác thực",
+          badge: "Bước 1 · Tham gia",
           tags: [
-            "Lối vào tin cậy",
-            "Xác thực bảo mật",
-            "Kiểm soát truy cập",
-            "Onboarding kỹ thuật số",
+            "Chỉ nhà đầu tư đã xác thực",
+            "Truy cập bảo mật",
+            "Hoàn toàn trực tuyến",
           ],
-          desc: "Trước khi tham gia vào FundLok, bạn hoàn thành quy trình đăng ký và xác thực bảo mật. Điều này mang lại cho bạn điểm khởi đầu rõ ràng, đáng tin cậy hơn, đồng thời thiết lập môi trường kỷ luật cho mọi hoạt động trên nền tảng.",
-          how: "Bạn trải qua quy trình đăng ký được cấu trúc hợp lý để tối ưu hóa thời gian của bạn mà vẫn duy trì kiểm soát xác thực chặt chẽ.",
-          why: "Điều này quan trọng vì quy trình đăng ký chặt chẽ giúp xây dựng nền tảng uy tín và môi trường đầu tư đáng tin cậy hơn cho tất cả thành viên.",
-          tech: "Hệ thống sử dụng các luồng KYC kỹ thuật số, cơ chế kiểm tra xác thực và hệ thống kiểm soát truy cập để tạo nền tảng sạch cho việc chuyển tiền và theo dõi sau này.",
-          journeyTitle: "Hành trình đăng ký của bạn",
+          desc: "Đăng ký và xác minh danh tính trực tuyến. Mọi nhà đầu tư trên FundLok đều được xác thực trước khi đầu tư.",
+          how: "Đăng ký nhanh có hướng dẫn, sau đó xác minh danh tính.",
+          why: "Cộng đồng đã xác thực giúp sàn đáng tin cậy với tất cả mọi người.",
+          tech: "KYC kỹ thuật số và kiểm soát truy cập vận hành phía sau.",
+          journeyTitle: "Đăng ký của bạn",
           rows: [
-            ["Bạn đăng ký tài khoản", "Qua luồng hướng dẫn trực quan"],
-            ["Xác thực được hoàn thành", "Bảo mật và an toàn"],
-            ["Quyền truy cập được duyệt", "Trước khi kích hoạt"],
-            ["Bạn truy cập nền tảng", "Với sự tự tin cao nhất"],
+            ["Bạn đăng ký", "Trực tuyến"],
+            ["Danh tính được xác minh", "An toàn"],
+            ["Quyền truy cập được duyệt", "Trước khi đầu tư"],
+            ["Hoàn tất", "Sẵn sàng khám phá"],
           ],
-          emphasis:
-            "Chúng tôi muốn nhấn mạnh ở đây là niềm tin được củng cố bởi công nghệ. Sự tham gia của bạn bắt đầu qua quy trình kỹ thuật số được kiểm soát chặt chẽ thiết kế để nền tảng an toàn ngay từ đầu.",
+          emphasis: "Niềm tin bắt đầu từ bước đầu tiên.",
         },
         {
-          num: 2,
-          title: "Duyệt danh sách",
-          caption: "Cơ hội đầu tư chuẩn hóa trong một thị trường",
-          stage: "Giai đoạn 2/4",
-          badge: "Khám phá đầu tư",
+          title: "Duyệt dự án",
+          detailTitle: "Duyệt dự án",
+          badge: "Bước 2 · Khám phá",
           tags: [
-            "Dự án đã thẩm định",
-            "Chi tiết chuẩn hóa",
-            "Bộ lọc & Tìm kiếm",
-            "Dữ liệu minh bạch",
+            "SME đã thẩm định",
+            "Điểm doanh nghiệp 0–100",
+            "Doanh thu đã xác minh",
           ],
-          desc: "Khám phá các cơ hội đầu tư với đầy đủ thông tin chi tiết về doanh nghiệp, thông số đánh giá rủi ro và các đề xuất tài chính. Chúng tôi sắp xếp các dự án minh bạch để bạn xây dựng danh mục theo các tiêu chí rõ ràng.",
-          how: "Bạn duyệt danh mục các doanh nghiệp SME đã xác thực, được sắp xếp và lọc theo xếp hạng rủi ro, ngành nghề và cơ cấu hoàn trả.",
-          why: "Điều này mang lại cho bạn sự minh bạch hoàn toàn đối với các khoản vay, giúp bạn dễ dàng thẩm định và phân bổ vốn vào các dự án phù hợp mục tiêu.",
-          tech: "Nền tảng vận hành các cơ sở dữ liệu dự án an toàn, chỉ số xếp hạng rủi ro tự động và hệ thống cập nhật đồng bộ các cơ hội gọi vốn đang hoạt động.",
-          journeyTitle: "Tìm kiếm cơ hội",
+          desc: "Mỗi dự án đều hiển thị điểm doanh nghiệp, doanh thu đã xác minh đằng sau điểm số, độ mới của dữ liệu, các khoản phí và hạn tất toán cuối cùng.",
+          how: "Lọc theo điểm doanh nghiệp, ngành và kỳ hạn để tìm dự án phù hợp.",
+          why: "Đủ thông tin để bạn tự thẩm định, tất cả ở một nơi.",
+          tech: "Danh sách dự án cập nhật theo thời gian thực khi vốn được huy động.",
+          journeyTitle: "Tìm cơ hội",
           rows: [
-            ["Các dự án được trình bày", "Với chi tiết chuẩn hóa"],
-            ["Xếp hạng rủi ro hiển thị rõ", "Dựa trên mô hình đánh giá"],
-            ["Số liệu tài chính có sẵn", "Để thẩm định dễ dàng"],
-            ["Lựa chọn danh mục đầu tư", "Nằm trong tầm kiểm soát của bạn"],
+            ["Dự án được trình bày", "Theo định dạng chuẩn"],
+            ["Điểm doanh nghiệp", "Thang 0–100"],
+            ["Dữ liệu doanh thu", "Kèm ngày cập nhật"],
+            ["Bạn quyết định", "Đầu tư vào đâu"],
           ],
-          emphasis:
-            "Chúng tôi muốn nhấn mạnh ở đây là sự minh bạch dữ liệu. Việc khám phá các dự án sẽ vô cùng đơn giản, được hỗ trợ bởi các báo cáo giúp bạn đưa ra quyết định cân bằng.",
+          emphasis: "Dữ liệu rõ ràng, quyết định của bạn.",
         },
         {
-          num: 3,
-          title: "Đầu tư",
-          caption: "Quản lý vốn an toàn với tính minh bạch cao",
-          stage: "Giai đoạn 3/4",
-          badge: "Phân bổ nguồn vốn",
+          title: "Nạp vốn",
+          detailTitle: "Nạp vốn & đầu tư",
+          badge: "Bước 3 · Đầu tư",
           tags: [
             "Tài khoản escrow an toàn",
-            "Phân bổ vốn",
-            "Theo dõi tự động",
-            "Không có phí ẩn",
+            "Bạn chọn số tiền",
+            "Công khai mọi khoản phí",
           ],
-          desc: "Chuyển tiền an toàn vào tài khoản phong tỏa (escrow) của bạn trên nền tảng. Bạn chỉ định số tiền muốn đầu tư vào dự án đã chọn, và nguồn vốn được định tuyến an toàn để tài trợ các hợp đồng vay.",
-          how: "Bạn nạp tiền qua các kênh thanh toán bảo mật. Nền tảng điều phối phân bổ vốn vào các nhóm vay SME tương ứng theo điều khoản ký gửi nghiêm ngặt.",
-          why: "Nguồn vốn của bạn được giữ an toàn và chỉ cam kết giải ngân vào các khoản vay sau khi hoàn thành khớp lệnh, đảm bảo tính minh bạch.",
-          tech: "Hệ thống sử dụng các tài khoản ký gửi phong tỏa, hệ thống ghi sổ tài khoản và giao thức xác thực giao dịch để bảo toàn nguồn vốn của bạn.",
-          journeyTitle: "Luồng đầu tư của bạn",
+          desc: "Nạp tiền vào tài khoản escrow, rồi chọn dự án và số tiền cho từng dự án. Tiền chỉ được cam kết khi khoản vay đã huy động đủ.",
+          how: "Nạp tiền qua kênh bảo mật, rồi phân bổ chỉ với vài thao tác.",
+          why: "Mọi khoản phí được công bố trước khi giải ngân. Không phát sinh thêm sau đó.",
+          tech: "Sổ cái ghi lại từng bước di chuyển của dòng tiền.",
+          journeyTitle: "Khoản nạp của bạn",
           rows: [
-            ["Ký gửi vốn", "An toàn vào tài khoản phong tỏa"],
-            ["Chọn phân bổ dự án", "Chính xác và bằng kỹ thuật số"],
-            ["Vốn được gom nhóm", "Để tiến hành giải ngân"],
-            ["Sổ cái theo dõi nguồn vốn", "Tại mỗi bước di chuyển"],
+            ["Bạn nạp tiền", "Vào tài khoản escrow"],
+            ["Bạn chọn dự án", "Và số tiền"],
+            ["Tiền được cam kết", "Khi huy động đủ"],
+            ["Mọi giao dịch", "Đều có trên sổ cái"],
           ],
-          emphasis:
-            "Chúng tôi muốn nhấn mạnh ở đây là quyền kiểm soát. Bạn chủ động quản lý cách thức và nơi phân bổ vốn, với hệ thống tự động bảo mật việc ký gửi và luân chuyển nguồn tiền của bạn.",
+          emphasis: "Bạn luôn kiểm soát tiền của mình đi đâu.",
         },
         {
-          num: 4,
           title: "Hoàn trả",
-          caption: "Định tuyến và theo dõi dựa trên công nghệ",
-          stage: "Giai đoạn 4/4",
-          badge: "Lợi nhuận nhà đầu tư",
+          detailTitle: "Nhận hoàn trả",
+          badge: "Bước 4 · Nhận lãi",
           tags: [
-            "Chia sẻ doanh thu",
-            "Phân phối tự động",
-            "Sổ cái thời gian thực",
-            "Cập nhật trực tiếp",
+            "Hoàn trả hằng ngày",
+            "Chi trả tự động",
+            "Bảng điều khiển trực tiếp",
           ],
-          desc: "Nhận phần chia sẻ hoàn trả tự động khi doanh nghiệp SME thực hiện các khoản thanh toán doanh thu hằng ngày hoặc hằng tuần. Giám sát lợi nhuận và tiến độ hoàn vốn trực tiếp trên sổ cái bảng điều khiển.",
-          how: "Nền tảng tự động định tuyến các khoản chia sẻ doanh thu từ SME trực tiếp về tài khoản của các nhà đầu tư tham gia theo tỷ lệ góp vốn.",
-          why: "Điều này biến khoản đầu tư thành dòng tiền thu hồi đều đặn, phản ánh trực tiếp hiệu quả hoạt động của doanh nghiệp bạn hỗ trợ.",
-          tech: "Hệ thống vận hành các hợp đồng chia sẻ doanh thu tự động, API tích hợp tài khoản ngân hàng và các lệnh phân phối sổ cái theo tỷ lệ để tự động hóa việc chi trả.",
-          journeyTitle: "Theo dõi hoàn trả của bạn",
+          desc: "Doanh nghiệp trả một khoản cố định mỗi ngày làm việc. Phần của bạn tự động về tài khoản, theo tỷ lệ số vốn bạn đầu tư.",
+          how: "Khoản hoàn trả được chia theo tỷ lệ cho các nhà đầu tư và ghi có vào số dư của bạn.",
+          why: "Dòng tiền đều đặn mỗi ngày từ doanh nghiệp thật, không phải chờ đến cuối kỳ.",
+          tech: "Phân phối tự động và sổ cái thời gian thực giúp số dư luôn cập nhật.",
+          journeyTitle: "Khoản nhận của bạn",
           rows: [
-            ["Các khoản thanh toán nhận về", "Từ vòng lặp doanh thu SME"],
-            ["Hệ thống phân phối tỷ lệ", "Tự động về tài khoản sổ cái"],
+            ["Doanh nghiệp trả nợ", "Mỗi ngày làm việc"],
+            ["Phần của bạn được tính", "Theo tỷ lệ góp vốn"],
             ["Số dư được cập nhật", "Theo thời gian thực"],
-            ["Bảng điều khiển vẽ biểu đồ", "Tiến độ lợi nhuận danh mục"],
+            ["Bảng điều khiển", "Hiển thị tiến độ"],
           ],
-          emphasis:
-            "Chúng tôi muốn nhấn mạnh ở đây là việc theo dõi thụ động. Lợi nhuận được tính toán, chia tỷ lệ và gửi về số dư của bạn tự động, giúp danh mục tăng trưởng không cần thao tác thủ công.",
+          emphasis: "Tiền về mỗi ngày, theo dõi đến từng đồng.",
         },
       ],
     },
   },
 };
+
+/**
+ * The audience gate: "SME or investor?", the question the section opens with.
+ *
+ * It is a tall scroll track (GATE_TRACK_VH) with one viewport-sized panel
+ * pinned inside it, and the track's scroll progress (0 → 1) drives three beats:
+ *
+ *   approach  the panel is still scrolling into view. The heading drops in and
+ *             the two cards slide in from opposite edges of the screen.
+ *   hold      the panel is pinned with both cards seated, so the reader has a
+ *             moment to choose.
+ *   release   the panel fades as the track ends and the sequence takes over.
+ *
+ * Not choosing is a choice: the sequence starts on the SME flow, so scrolling
+ * straight through the hold shows the Business process by default.
+ */
+const GATE_TRACK_VH = 185;
+
+/**
+ * One choice on the gate.
+ *
+ * `x` and `opacity` are the scroll-driven entrance and live on a wrapper that
+ * does nothing else. The button inside owns the hover and selected colours.
+ * They must not share an element: a CSS transition on the element framer-motion
+ * writes `transform` to turns every scroll frame into a 300ms ease, so that card
+ * trails behind its neighbour instead of tracking the scrollbar.
+ */
+function AudienceGateCard({
+  icon: Icon,
+  label,
+  blurb,
+  cta,
+  selected,
+  onChoose,
+  x,
+  opacity,
+}: {
+  icon: LucideIcon;
+  label: string;
+  blurb: string;
+  cta: string;
+  selected: boolean;
+  onChoose: () => void;
+  x: MotionValue<string>;
+  opacity: MotionValue<number>;
+}) {
+  return (
+    <motion.div style={{ x, opacity }} className="h-full">
+      <button
+        type="button"
+        onClick={onChoose}
+        aria-pressed={selected}
+        className={cn(
+          "group flex h-full w-full cursor-pointer flex-col items-start gap-2 rounded-2xl border p-4 text-left transition-[background-color,border-color,box-shadow] md:gap-3 md:p-8",
+          selected
+            ? "border-emerald-500 bg-emerald-500/10 shadow-lg shadow-emerald-500/10"
+            : "border-border bg-card hover:border-emerald-500/50 hover:shadow-md",
+        )}
+      >
+        <span
+          className={cn(
+            "flex h-10 w-10 items-center justify-center rounded-full transition-colors md:h-12 md:w-12",
+            selected
+              ? "bg-emerald-600 text-white"
+              : "bg-muted text-muted-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400",
+          )}
+        >
+          <Icon className="h-5 w-5 md:h-6 md:w-6" strokeWidth={1.75} />
+        </span>
+        <span className="font-sans text-xl font-extrabold tracking-tight text-foreground md:text-2xl">
+          {label}
+        </span>
+        <span className="font-sans text-sm leading-relaxed text-muted-foreground">
+          {blurb}
+        </span>
+        <span className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 md:mt-2">
+          {cta}
+          <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1" />
+        </span>
+      </button>
+    </motion.div>
+  );
+}
 
 export function InteractiveFlow() {
   const { locale } = useTranslations();
@@ -458,13 +470,13 @@ export function InteractiveFlow() {
   const text = contentData[currentLocale];
 
   const [role, setRole] = useState<"sme" | "investor">("sme");
+  const reduceMotion = useReducedMotion();
+  const celebrated = useRef(false);
   const [activeStep, setActiveStep] = useState(0);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const confettiCleanupRef = useRef<(() => void) | null>(null);
 
   const activeRoleData = role === "sme" ? text.sme : text.investor;
-  const stepCount = activeRoleData.steps.length;
-  const currentStepData = activeRoleData.steps[activeStep];
 
   const triggerConfetti = () => {
     const canvas = canvasRef.current;
@@ -930,323 +942,672 @@ export function InteractiveFlow() {
     return cleanup;
   };
 
-  // Confetti trigger on reaching the last step (index 3)
-  useEffect(() => {
-    if (activeStep === 3) {
-      const timer = setTimeout(() => triggerConfetti(), 80);
-      return () => {
-        clearTimeout(timer);
-        if (confettiCleanupRef.current) {
-          confettiCleanupRef.current();
-        }
-      };
-    }
-  }, [activeStep]);
-
-  // Cleanup confetti animation on unmount
+  // Cleanup on unmount. The burst fires when the reader reaches the final
+  // node, not on a timer, so it can be mid-flight when the section unmounts.
   useEffect(() => {
     return () => {
-      if (confettiCleanupRef.current) {
-        confettiCleanupRef.current();
-      }
+      confettiCleanupRef.current?.();
     };
   }, []);
 
-  const handleStepClick = (idx: number) => {
-    setActiveStep(idx);
-    if (idx === 3) {
-      setTimeout(() => triggerConfetti(), 80);
-    }
-  };
+  const steps = activeRoleData.steps;
+  const step = steps[Math.min(activeStep, steps.length - 1)];
 
-  const handleNext = () => {
-    if (activeStep < stepCount - 1) {
-      const nextStep = activeStep + 1;
-      setActiveStep(nextStep);
-      if (nextStep === 3) {
-        setTimeout(() => triggerConfetti(), 80);
-      }
-    }
-  };
+  /**
+   * Scroll-pinned sequence, after worldquant.com.
+   *
+   * The section is several viewports tall. Inside it a single panel is pinned,
+   * and scrolling advances the stage rather than moving the panel. That answers
+   * the thing tabs got wrong: the reader does not have to discover a control or
+   * decide what to click, they just keep scrolling and all four stages arrive
+   * in the order they actually happen.
+   *
+   * `useScroll` + `useTransform`, never a scroll listener (5.D). The progress
+   * bar is a motion value, so it repaints without re-rendering React; only the
+   * stage INDEX goes through state, and only when it actually changes, which is
+   * three times across the whole section rather than once per frame (3.B).
+   */
+  const sequenceRef = useRef<HTMLDivElement>(null);
+  // Pinned from the moment the wrapper's top reaches viewport top ("start start")
+  // until the container's bottom reaches the viewport bottom ("end end"), which is
+  // the exact point where sticky top-0 ceases to stick. This guarantees that all stages
+  // — including the final stage — receive their full scroll distance inside the block.
+  const { scrollYProgress } = useScroll({
+    target: sequenceRef,
+    offset: ["start start", "end end"],
+  });
+  const progressWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
-  const handlePrev = () => {
-    if (activeStep > 0) {
-      setActiveStep((prev) => prev - 1);
-    }
-  };
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    const idx = Math.min(steps.length - 1, Math.floor(v * steps.length));
+    setActiveStep((prev) => (prev === idx ? prev : idx));
 
-  const handleReset = () => {
-    setActiveStep(0);
-  };
+    // Celebrate when the reader finishes scrolling through the final stage
+    if (v >= 0.92 && !celebrated.current && !reduceMotion) {
+      celebrated.current = true;
+      triggerConfetti();
+    } else if (v < 0.75 && celebrated.current) {
+      celebrated.current = false;
+    }
+  });
 
   const handleRoleChange = (newRole: "sme" | "investor") => {
     setRole(newRole);
-    setActiveStep(0); // Reset to step 1
+    celebrated.current = false;
   };
 
-  return (
-    <div className="w-full flex flex-col items-center relative">
-      {/* Money Confetti Overlay Canvas */}
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 pointer-events-none z-50 w-full h-full"
-      />
+  const audiences = [
+    {
+      key: "sme" as const,
+      icon: Building2,
+      label: currentLocale === "vi" ? "Doanh nghiệp" : "SME",
+      short: currentLocale === "vi" ? "Cho doanh nghiệp" : "For SMEs",
+      blurb:
+        currentLocale === "vi"
+          ? "Tôi đang tìm nguồn vốn cho doanh nghiệp của mình."
+          : "I am looking for funding for my business.",
+      cta:
+        currentLocale === "vi"
+          ? "Xem quy trình Doanh nghiệp"
+          : "View Business flow",
+    },
+    {
+      key: "investor" as const,
+      icon: Banknote,
+      label: currentLocale === "vi" ? "Nhà đầu tư" : "Investor",
+      short: currentLocale === "vi" ? "Cho nhà đầu tư" : "For Investors",
+      blurb:
+        currentLocale === "vi"
+          ? "Tôi muốn cấp vốn cho các doanh nghiệp đã được thẩm định."
+          : "I want to fund businesses that have been assessed.",
+      cta:
+        currentLocale === "vi"
+          ? "Xem quy trình Nhà đầu tư"
+          : "View Investor flow",
+    },
+  ];
 
-      {/* Role Toggle Button Switch */}
-      <div className="flex bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1.5 rounded-full mb-12 relative z-20">
-        <button
-          onClick={() => handleRoleChange("sme")}
-          className={`px-6 py-2.5 rounded-full text-xs font-sans font-bold transition-all duration-300 ${
-            role === "sme"
-              ? "bg-emerald-600 text-white shadow-md"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          {currentLocale === "vi" ? "Cho doanh nghiệp" : "For SMEs"}
-        </button>
-        <button
-          onClick={() => handleRoleChange("investor")}
-          className={`px-6 py-2.5 rounded-full text-xs font-sans font-bold transition-all duration-300 ${
-            role === "investor"
-              ? "bg-emerald-600 text-white shadow-md"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          {currentLocale === "vi" ? "Cho nhà đầu tư" : "For Investors"}
-        </button>
-      </div>
+  const gateContainerRef = useRef<HTMLDivElement>(null);
 
-      {/* Top Rows: Step Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full mb-10 relative z-20">
-        {activeRoleData.steps.map((step, idx) => {
-          const isActive = idx === activeStep;
+  // Scroll progress across the whole gate track (approach + hold), 0 → 1.
+  const { scrollYProgress: gateTrackProgress } = useScroll({
+    target: gateContainerRef,
+    offset: ["start end", "end end"],
+  });
+
+  // The same number, copied through a plain function on purpose.
+  //
+  // framer-motion 12 hands a `useScroll({ target })` value that goes straight
+  // into `useTransform(v, [in], [out])` to the browser's native ViewTimeline
+  // instead of computing it in JS. For a target taller than the screen the
+  // native "entry" range ends when the target's TOP reaches the top of the
+  // screen, not when its bottom reaches the bottom, and its keyframes only
+  // cover the ranges given, so anything outside them falls back to the inline
+  // style. Opacity peaked early, faded back to 0 before the panel had pinned
+  // and the hold was an empty screen, while `x` (not accelerated) stayed on the
+  // JS progress. One value, one clock: everything below reads this copy.
+  const gateProgress = useTransform(gateTrackProgress, (v) => v);
+
+  // Landmarks, as fractions of the track: ~0.12 the panel's content is just
+  // below the fold, 0.54 (100/185) its top reaches the top of the screen and it
+  // pins, 1 the track ends and the sequence takes over.
+  //
+  // Approach: the heading drops in and the cards travel in from opposite screen
+  // edges, seated a moment before the panel locks. The travel is in vw, not px,
+  // so it starts off-screen at any width and needs no window read (which would
+  // make the server render differ from the client).
+  const headerY = useTransform(gateProgress, [0.1, 0.44], [-35, 0]);
+  const headerOpacity = useTransform(gateProgress, [0.1, 0.38], [0, 1]);
+  const leftCardX = useTransform(gateProgress, [0.12, 0.48], ["-45vw", "0vw"]);
+  const rightCardX = useTransform(gateProgress, [0.12, 0.48], ["45vw", "0vw"]);
+  const cardOpacity = useTransform(gateProgress, [0.12, 0.42], [0, 1]);
+
+  // Hold: the "keep scrolling" hint shows while the cards are seated.
+  const hintOpacity = useTransform(
+    gateProgress,
+    [0.5, 0.58, 0.82, 0.88],
+    [0, 1, 1, 0],
+  );
+
+  // Release: the whole panel eases away as the track ends.
+  const gateExitOpacity = useTransform(gateProgress, [0.86, 0.98], [1, 0]);
+  const gateExitScale = useTransform(gateProgress, [0.86, 0.98], [1, 0.96]);
+  const gateExitY = useTransform(gateProgress, [0.86, 0.98], [0, -18]);
+
+  // Cards that are still transparent (approach) or already fading (release)
+  // must not catch clicks meant for the page behind them.
+  const gateInteractive = useTransform(gateProgress, (v) =>
+    v > 0.4 && v < 0.93 ? "auto" : "none",
+  );
+
+  /**
+   * Picking an audience takes you to the sequence.
+   *
+   * The sequence starts on the SME flow, so there is nothing to "default" to
+   * when the reader scrolls past without choosing: that already IS the Business
+   * process. A choice, from here or from the rail, is simply kept.
+   */
+  const chooseAudience = (key: "sme" | "investor") => {
+    handleRoleChange(key);
+    sequenceRef.current?.scrollIntoView({
+      behavior: reduceMotion ? "auto" : "smooth",
+      block: "start",
+    });
+  };
+
+  const staticAudienceGate = (
+    <div className="mx-auto mb-14 max-w-3xl text-center lg:mb-20">
+      <h3 className="mb-3 font-sans text-3xl font-extrabold leading-[1.15] tracking-tighter text-foreground md:text-5xl">
+        {currentLocale === "vi"
+          ? "Bạn là doanh nghiệp hay nhà đầu tư?"
+          : "Are you an SME or an investor?"}
+      </h3>
+      <p className="mx-auto mb-8 max-w-[48ch] font-sans text-sm text-muted-foreground md:text-base">
+        {currentLocale === "vi"
+          ? "Chọn một bên để xem đúng quy trình dành cho bạn."
+          : "Pick one to see the process that applies to you."}
+      </p>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        {audiences.map((a) => {
+          const Icon = a.icon;
+          const isChosen = role === a.key;
           return (
             <button
-              key={idx}
-              onClick={() => handleStepClick(idx)}
-              className={`flex flex-col text-left p-5 rounded-2xl border transition-all duration-300 outline-none w-full ${
-                isActive
-                  ? "bg-white dark:bg-slate-900 border-emerald-500 dark:border-emerald-400 shadow-md scale-[1.02]"
-                  : "bg-white/40 dark:bg-slate-900/30 border-slate-200/60 dark:border-slate-800/80 text-muted-foreground/80 hover:border-slate-300 dark:hover:border-slate-700"
+              key={a.key}
+              onClick={() => chooseAudience(a.key)}
+              aria-pressed={isChosen}
+              className={`group flex flex-col items-start gap-3 rounded-2xl border p-6 text-left transition-colors md:p-8 ${
+                isChosen
+                  ? "border-emerald-500 bg-emerald-500/5"
+                  : "border-border bg-card hover:border-emerald-500/50"
               }`}
             >
-              {/* Step indicator circle */}
-              <div
-                className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-sans font-bold mb-3 transition-colors duration-300 ${
-                  isActive
+              <span
+                className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors ${
+                  isChosen
                     ? "bg-emerald-600 text-white"
-                    : "bg-slate-100 dark:bg-slate-800 text-muted-foreground"
+                    : "bg-muted text-muted-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400"
                 }`}
               >
-                {step.num}
-              </div>
-              <h4
-                className={`font-sans font-bold text-sm mb-1 transition-colors duration-300 ${
-                  isActive ? "text-foreground" : "text-muted-foreground"
-                }`}
-              >
-                {step.title}
-              </h4>
-              <p className="text-[10px] font-sans text-muted-foreground leading-normal line-clamp-2">
-                {step.caption}
-              </p>
+                <Icon className="h-6 w-6" strokeWidth={1.75} />
+              </span>
+              <span className="font-sans text-xl font-extrabold tracking-tight text-foreground md:text-2xl">
+                {a.label}
+              </span>
+              <span className="font-sans text-sm leading-relaxed text-muted-foreground">
+                {a.blurb}
+              </span>
             </button>
           );
         })}
       </div>
+    </div>
+  );
 
-      {/* Two Column details section */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full relative z-20">
-        {/* Left Column: Full Content Card */}
-        <div className="lg:col-span-7 bg-white/70 dark:bg-slate-900/70 border border-slate-200/60 dark:border-slate-800/80 rounded-3xl p-8 shadow-xl backdrop-blur-md flex flex-col justify-between min-h-[500px]">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeStep}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 10 }}
-              transition={{ duration: 0.25 }}
-              className="flex-1 flex flex-col justify-between"
-            >
-              <div>
-                {/* Badge tags header */}
-                <div className="flex items-center gap-3 mb-5">
-                  <span className="text-[10px] font-mono tracking-widest bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-3 py-1 rounded-full font-bold uppercase">
-                    {currentStepData.badge}
-                  </span>
-                  <span className="text-[10px] font-mono tracking-wider text-muted-foreground uppercase">
-                    {currentStepData.stage}
-                  </span>
-                </div>
+  /**
+   * One stage, presented the way worldquant.com presents a belief: the title
+   * IS the slide. Display type first, one lead paragraph, and the supporting
+   * detail demoted to a quiet grid underneath rather than competing with it.
+   *
+   * leading-[1.1], not leading-none. Vietnamese stacks diacritics above the
+   * cap height (ế, ữ, ộ) and a zero-leading display line clips them. The English
+   * copy would have looked fine and the production language would not.
+   */
+  function ScrollProgressItem({
+    progress,
+    range,
+    className = "",
+    children,
+  }: {
+    progress: MotionValue<number>;
+    range: [number, number];
+    className?: string;
+    children: React.ReactNode;
+  }) {
+    const opacity = useTransform(progress, range, [0, 1], { clamp: true });
+    const y = useTransform(progress, range, [14, 0], { clamp: true });
 
-                {/* Main H3 Title */}
-                <h3 className="font-sans text-3xl font-extrabold text-foreground mb-4 leading-tight tracking-tight">
-                  {(currentStepData as any).detailTitle ||
-                    currentStepData.title}
-                </h3>
+    return (
+      <motion.div style={{ opacity, y }} className={className}>
+        {children}
+      </motion.div>
+    );
+  }
 
-                {/* Description Paragraph */}
-                <p className="text-sm text-muted-foreground leading-relaxed font-sans mb-6">
-                  {currentStepData.desc}
-                </p>
+  function ScrollDrivenStageDetail({
+    s,
+    idx,
+    totalSteps,
+    currentLocale,
+    scrollYProgress,
+  }: {
+    s: (typeof contentData)["en"]["sme"]["steps"][number];
+    idx: number;
+    totalSteps: number;
+    currentLocale: string;
+    scrollYProgress: MotionValue<number>;
+  }) {
+    // Normalize scroll progress within this stage's span (idx / totalSteps -> (idx + 1) / totalSteps)
+    const stageProgress = useTransform(
+      scrollYProgress,
+      [idx / totalSteps, (idx + 1) / totalSteps],
+      [0, 1],
+      { clamp: true },
+    );
 
-                {/* Sub tags list */}
-                <div className="flex flex-wrap gap-2 mb-8">
-                  {currentStepData.tags.map((tag, tIdx) => (
-                    <span
-                      key={tIdx}
-                      className="text-[10px] font-sans font-semibold bg-emerald-50 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-900/30 px-3 py-1.5 rounded-full"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+    const cards = [
+      [currentLocale === "vi" ? "Cách hoạt động" : "How this works", s.how],
+      [
+        currentLocale === "vi" ? "Tại sao quan trọng" : "Why this matters",
+        s.why,
+      ],
+      [
+        currentLocale === "vi" ? "Công nghệ hỗ trợ" : "Technology behind it",
+        s.tech,
+      ],
+      [s.journeyTitle, s.emphasis],
+    ];
 
-                {/* Three small columns of info */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 border-t border-border/40 pt-6 mb-8">
-                  <div>
-                    <h5 className="text-[10px] font-sans font-bold tracking-wider text-emerald-700 dark:text-emerald-400 uppercase mb-2">
-                      {currentLocale === "vi"
-                        ? "Cách hoạt động"
-                        : "How this works"}
-                    </h5>
-                    <p className="text-[11px] text-muted-foreground font-sans leading-relaxed">
-                      {currentStepData.how}
-                    </p>
-                  </div>
-                  <div>
-                    <h5 className="text-[10px] font-sans font-bold tracking-wider text-emerald-700 dark:text-emerald-400 uppercase mb-2">
-                      {currentLocale === "vi"
-                        ? "Tại sao quan trọng"
-                        : "Why this matters"}
-                    </h5>
-                    <p className="text-[11px] text-muted-foreground font-sans leading-relaxed">
-                      {currentStepData.why}
-                    </p>
-                  </div>
-                  <div>
-                    <h5 className="text-[10px] font-sans font-bold tracking-wider text-emerald-700 dark:text-emerald-400 uppercase mb-2">
-                      {currentLocale === "vi"
-                        ? "Công nghệ hỗ trợ"
-                        : "Technology behind it"}
-                    </h5>
-                    <p className="text-[11px] text-muted-foreground font-sans leading-relaxed">
-                      {currentStepData.tech}
-                    </p>
-                  </div>
-                </div>
-              </div>
+    const cardRanges: [number, number][] = [
+      [0.02, 0.14],
+      [0.14, 0.26],
+      [0.26, 0.38],
+      [0.38, 0.5],
+    ];
 
-              {/* Navigation buttons */}
-              <div className="flex items-center gap-3 border-t border-border/30 pt-6">
-                <button
-                  disabled={activeStep === 0}
-                  onClick={handlePrev}
-                  className={`flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-sans font-bold tracking-wide uppercase transition-all duration-300 border ${
-                    activeStep === 0
-                      ? "bg-slate-100/50 dark:bg-slate-800/30 border-slate-200/40 dark:border-slate-800/50 text-muted-foreground/30 cursor-not-allowed"
-                      : "bg-[#eef1f4] dark:bg-slate-800/85 border-transparent text-zinc-700 dark:text-zinc-200 hover:bg-[#e4e8ec] dark:hover:bg-slate-800 active:scale-95"
-                  }`}
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  {currentLocale === "vi" ? "Quay lại" : "Previous"}
-                </button>
+    const rowRanges: [number, number][] = [
+      [0.58, 0.67],
+      [0.67, 0.76],
+      [0.76, 0.85],
+      [0.85, 0.94],
+    ];
 
-                {activeStep < stepCount - 1 ? (
-                  <button
-                    onClick={handleNext}
-                    className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-xs font-sans font-bold tracking-wide uppercase bg-emerald-600 hover:bg-emerald-700 text-white shadow-md hover:shadow-emerald-600/10 transition-all duration-300 active:scale-95 ml-auto"
-                  >
-                    {currentLocale === "vi" ? "Tiếp theo" : "Next"}
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleReset}
-                    className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-xs font-sans font-bold tracking-wide uppercase bg-emerald-600 hover:bg-emerald-700 text-white shadow-md hover:shadow-emerald-600/10 transition-all duration-300 active:scale-95 ml-auto"
-                  >
-                    <RotateCcw className="w-4 h-4" />
-                    {currentLocale === "vi" ? "Bắt đầu lại" : "Start again"}
-                  </button>
-                )}
-              </div>
-            </motion.div>
-          </AnimatePresence>
+    return (
+      <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+        <div>
+          <p className="mb-5 font-mono text-xs text-muted-foreground">
+            {String(idx + 1).padStart(2, "0")}
+          </p>
+
+          <h3 className="mb-6 max-w-[14ch] font-sans text-4xl font-extrabold leading-[1.1] tracking-tighter text-foreground md:text-6xl lg:text-7xl">
+            {(s as { detailTitle?: string }).detailTitle || s.title}
+          </h3>
+
+          <p className="mb-8 max-w-[52ch] font-sans text-base leading-relaxed text-muted-foreground md:text-lg">
+            {s.desc}
+          </p>
+
+          <div className="flex flex-wrap gap-2">
+            {s.tags.map((tag, tIdx) => (
+              <span
+                key={tIdx}
+                className="rounded-full border border-border px-3 py-1 font-sans text-xs text-muted-foreground"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
         </div>
 
-        {/* Right Column: Visual Journey Card */}
-        <div className="lg:col-span-5 bg-gradient-to-br from-emerald-50/40 to-teal-50/20 dark:from-slate-900/60 dark:to-slate-950/20 border border-slate-200/50 dark:border-slate-800/60 rounded-3xl p-6 md:p-8 shadow-xl backdrop-blur-md flex flex-col justify-between min-h-[500px]">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeStep}
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.25 }}
-              className="flex-1 flex flex-col justify-between"
-            >
-              <div>
-                {/* Header title & step dot markers */}
-                <div className="flex items-center justify-between mb-8">
-                  <h4 className="font-sans font-bold text-foreground text-sm tracking-wide">
-                    {currentStepData.journeyTitle}
-                  </h4>
-                  {/* Stepper dots indicator */}
-                  <div className="flex items-center gap-1.5">
-                    {Array.from({ length: stepCount }).map((_, dIdx) => (
-                      <span
-                        key={dIdx}
-                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                          dIdx === activeStep
-                            ? "bg-emerald-500 scale-125"
-                            : "bg-slate-200 dark:bg-slate-700"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </div>
+        {/* Supporting detail: items appear one by one as the reader scrolls within this stage */}
+        <div className="flex flex-col gap-8 lg:pt-16">
+          <div className="grid gap-6 sm:grid-cols-2">
+            {cards.map(([label, body], cIdx) => (
+              <ScrollProgressItem
+                key={label}
+                progress={stageProgress}
+                range={cardRanges[cIdx] ?? [0, 1]}
+                className="border-t border-border pt-4"
+              >
+                <h4 className="mb-2 font-sans text-xs font-semibold text-foreground">
+                  {label}
+                </h4>
+                <p className="font-sans text-xs leading-relaxed text-muted-foreground">
+                  {body}
+                </p>
+              </ScrollProgressItem>
+            ))}
+          </div>
 
-                {/* Inner White table card */}
-                <div className="bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 rounded-2xl p-5 shadow-md mb-6">
-                  {/* Category label */}
-                  <div className="flex justify-between items-center pb-4 border-b border-border/30 mb-4">
-                    <span className="text-[10px] font-sans font-bold tracking-widest text-emerald-700 dark:text-emerald-400 uppercase">
-                      {currentLocale === "vi"
-                        ? "BƯỚC THỰC HIỆN"
-                        : "WHAT HAPPENS HERE"}
-                    </span>
-                    <span className="text-[10px] font-mono bg-emerald-500/10 text-emerald-700 px-2 py-0.5 rounded uppercase font-bold text-[9px]">
-                      Tech + Trust
-                    </span>
-                  </div>
+          <dl className="border-t border-border pt-4">
+            <ScrollProgressItem progress={stageProgress} range={[0.5, 0.58]}>
+              <dt className="mb-3 font-sans text-xs font-semibold text-foreground">
+                {currentLocale === "vi"
+                  ? "Các bước thực hiện"
+                  : "What happens here"}
+              </dt>
+            </ScrollProgressItem>
+            {s.rows.map((row, rIdx) => (
+              <ScrollProgressItem
+                key={rIdx}
+                progress={stageProgress}
+                range={rowRanges[rIdx] ?? [0.58, 0.95]}
+                className="flex items-start justify-between gap-6 py-2"
+              >
+                <dd className="font-sans text-xs text-muted-foreground">
+                  {row[0]}
+                </dd>
+                <dd className="shrink-0 text-right font-sans text-xs font-bold text-foreground">
+                  {row[1]}
+                </dd>
+              </ScrollProgressItem>
+            ))}
+          </dl>
+        </div>
+      </div>
+    );
+  }
 
-                  {/* Flow list table rows */}
-                  <div className="flex flex-col gap-3.5">
-                    {currentStepData.rows.map((row, rIdx) => (
-                      <div
-                        key={rIdx}
-                        className="flex justify-between items-start gap-4 pb-3.5 border-b border-border/10 last:border-none last:pb-0"
-                      >
-                        <span className="text-xs text-muted-foreground font-sans">
-                          {row[0]}
-                        </span>
-                        <span className="text-xs font-sans font-bold text-foreground text-right shrink-0">
-                          {row[1]}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+  function StaticStageDetail({
+    s,
+    idx,
+    currentLocale,
+  }: {
+    s: (typeof contentData)["en"]["sme"]["steps"][number];
+    idx: number;
+    currentLocale: string;
+  }) {
+    return (
+      <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+        <div>
+          <p className="mb-5 font-mono text-xs text-muted-foreground">
+            {String(idx + 1).padStart(2, "0")}
+          </p>
 
-              {/* Bottom emphasis callout */}
-              <div className="bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl p-5">
-                <p className="text-xs text-emerald-800 dark:text-emerald-300 leading-relaxed font-sans font-medium">
-                  {currentStepData.emphasis}
+          <h3 className="mb-6 max-w-[14ch] font-sans text-4xl font-extrabold leading-[1.1] tracking-tighter text-foreground md:text-6xl lg:text-7xl">
+            {(s as { detailTitle?: string }).detailTitle || s.title}
+          </h3>
+
+          <p className="mb-8 max-w-[52ch] font-sans text-base leading-relaxed text-muted-foreground md:text-lg">
+            {s.desc}
+          </p>
+
+          <div className="flex flex-wrap gap-2">
+            {s.tags.map((tag, tIdx) => (
+              <span
+                key={tIdx}
+                className="rounded-full border border-border px-3 py-1 font-sans text-xs text-muted-foreground"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-8 lg:pt-16">
+          <div className="grid gap-6 sm:grid-cols-2">
+            {[
+              [
+                currentLocale === "vi" ? "Cách hoạt động" : "How this works",
+                s.how,
+              ],
+              [
+                currentLocale === "vi"
+                  ? "Tại sao quan trọng"
+                  : "Why this matters",
+                s.why,
+              ],
+              [
+                currentLocale === "vi"
+                  ? "Công nghệ hỗ trợ"
+                  : "Technology behind it",
+                s.tech,
+              ],
+              [s.journeyTitle, s.emphasis],
+            ].map(([label, body]) => (
+              <div key={label} className="border-t border-border pt-4">
+                <h4 className="mb-2 font-sans text-xs font-semibold text-foreground">
+                  {label}
+                </h4>
+                <p className="font-sans text-xs leading-relaxed text-muted-foreground">
+                  {body}
                 </p>
               </div>
+            ))}
+          </div>
+
+          <dl className="border-t border-border pt-4">
+            <dt className="mb-3 font-sans text-xs font-semibold text-foreground">
+              {currentLocale === "vi"
+                ? "Các bước thực hiện"
+                : "What happens here"}
+            </dt>
+            {s.rows.map((row, rIdx) => (
+              <div
+                key={rIdx}
+                className="flex items-start justify-between gap-6 py-2"
+              >
+                <dd className="font-sans text-xs text-muted-foreground">
+                  {row[0]}
+                </dd>
+                <dd className="shrink-0 text-right font-sans text-xs font-bold text-foreground">
+                  {row[1]}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </div>
+    );
+  }
+
+  const audienceRail = (
+    <div className="flex gap-1 rounded-2xl border border-border bg-card p-1.5">
+      {audiences.map((a) => (
+        <button
+          key={a.key}
+          onClick={() => handleRoleChange(a.key)}
+          aria-pressed={role === a.key}
+          className={`rounded-xl px-4 py-2 text-xs font-sans font-bold transition-colors ${
+            role === a.key
+              ? "bg-emerald-600 text-white"
+              : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+          }`}
+        >
+          {a.short}
+        </button>
+      ))}
+    </div>
+  );
+
+  // Reduced motion gets the whole story stacked, with no pin and no scrub.
+  // Same content, same order, nothing that moves under the reader (6.B).
+  if (reduceMotion) {
+    return (
+      <div className="w-full">
+        {staticAudienceGate}
+        <div className="space-y-14">
+          {steps.map((s, idx) => (
+            <div key={`${role}-${idx}`}>
+              <StaticStageDetail
+                s={s}
+                idx={idx}
+                currentLocale={currentLocale}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full">
+      <canvas
+        ref={canvasRef}
+        className="pointer-events-none absolute inset-0 z-50 h-full w-full"
+      />
+
+      {/* Too short to pin a whole screen of content (a phone on its side, a
+          window with devtools docked): show the plain, unpinned gate instead.
+          Pure CSS, so rotating never unmounts the element useScroll tracks.
+          639px is where the pinned content stops fitting on a phone. */}
+      <div className="hidden [@media(max-height:639px)]:block">
+        {staticAudienceGate}
+      </div>
+
+      {/* Audience gate: a scroll track with one viewport-tall panel pinned
+          inside it (see GATE_TRACK_VH). No overflow clip on the panel: the
+          cards travel in from the edges of the SCREEN, and the page wrapper
+          already clips horizontally. */}
+      <div
+        ref={gateContainerRef}
+        style={{ height: `${GATE_TRACK_VH}vh` }}
+        className="relative w-full [@media(max-height:639px)]:hidden"
+      >
+        <div className="sticky top-0 flex min-h-[100dvh] w-full flex-col items-center justify-center px-4 pb-8 pt-28 md:pt-24">
+          <motion.div
+            style={{
+              opacity: gateExitOpacity,
+              scale: gateExitScale,
+              y: gateExitY,
+              pointerEvents: gateInteractive,
+            }}
+            className="mx-auto w-full max-w-3xl text-center"
+          >
+            <motion.div style={{ y: headerY, opacity: headerOpacity }}>
+              <h3
+                id="audience-gate-title"
+                className="mb-3 font-sans text-2xl font-extrabold leading-[1.15] tracking-tighter text-foreground sm:text-3xl md:text-5xl"
+              >
+                {currentLocale === "vi"
+                  ? "Bạn là doanh nghiệp hay nhà đầu tư?"
+                  : "Are you an SME or an investor?"}
+              </h3>
+              {/* On a short screen the hint below says the same, and the room is needed. */}
+              <p className="mx-auto mb-5 max-w-[48ch] font-sans text-sm text-muted-foreground md:mb-8 md:text-base [@media(max-height:700px)]:hidden">
+                {currentLocale === "vi"
+                  ? "Chọn một bên để xem đúng quy trình dành cho bạn."
+                  : "Pick one to see the process that applies to you."}
+              </p>
             </motion.div>
-          </AnimatePresence>
+
+            <div
+              role="group"
+              aria-labelledby="audience-gate-title"
+              className="grid gap-3 sm:grid-cols-2 sm:gap-4"
+            >
+              {audiences.map((a, i) => (
+                <AudienceGateCard
+                  key={a.key}
+                  icon={a.icon}
+                  label={a.label}
+                  blurb={a.blurb}
+                  cta={a.cta}
+                  selected={role === a.key}
+                  onChoose={() => chooseAudience(a.key)}
+                  x={i === 0 ? leftCardX : rightCardX}
+                  opacity={cardOpacity}
+                />
+              ))}
+            </div>
+
+            {/* Hint for scrolling harder */}
+            <motion.div
+              style={{ opacity: hintOpacity }}
+              className="mt-5 flex flex-col items-center justify-center gap-2 md:mt-8"
+            >
+              <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/80 px-4 py-1.5 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur-sm">
+                <span>
+                  {currentLocale === "vi"
+                    ? "Chọn một bên hoặc cuộn tiếp để xem quy trình Doanh nghiệp mặc định"
+                    : "Choose an option or scroll to continue with Business process by default"}
+                </span>
+                <motion.span
+                  aria-hidden
+                  animate={{ y: [0, 3, 0] }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  className="inline-block text-emerald-600 dark:text-emerald-400"
+                >
+                  <ChevronDown className="h-4 w-4" />
+                </motion.span>
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Exactly one viewport of scroll per stage, plus the pinned viewport height. */}
+      <div
+        ref={sequenceRef}
+        style={{ height: `${steps.length * 100 + 100}vh` }}
+        className="relative"
+      >
+        <div className="sticky top-0 flex min-h-[100dvh] flex-col">
+          {/* Segmented indicator, after worldquant.com: one segment per stage,
+              filled as the reader passes it, with the progress line running
+              underneath. It is the wayfinding for the whole section, so it sits
+              at the very top of the pinned area and never moves. */}
+          <div className="border-b border-border pt-6">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+              <span className="font-sans text-xs font-semibold text-muted-foreground">
+                {currentLocale === "vi" ? "Quy trình" : "How it works"}
+              </span>
+              {audienceRail}
+            </div>
+
+            <ol className="grid grid-cols-2 md:grid-cols-4">
+              {steps.map((s, idx) => {
+                const isActive = idx === activeStep;
+                const isDone = idx < activeStep;
+                return (
+                  <li
+                    key={`${role}-seg-${idx}`}
+                    aria-current={isActive ? "step" : undefined}
+                    className={`border-l px-3 py-3 transition-colors first:border-l-0 ${
+                      isActive || isDone
+                        ? "border-emerald-500/40"
+                        : "border-border"
+                    }`}
+                  >
+                    <span
+                      className={`block font-sans text-[11px] font-bold leading-snug transition-colors md:text-xs ${
+                        isActive
+                          ? "text-emerald-600 dark:text-emerald-400"
+                          : isDone
+                            ? "text-foreground"
+                            : "text-muted-foreground"
+                      }`}
+                    >
+                      {s.title}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+
+            {/* The scrubbed line. Sits on the section's own bottom rule so the
+                bar reads as one object rather than a bar plus a stray track. */}
+            <div className="-mb-px h-0.5 w-full bg-transparent">
+              <motion.div
+                style={{ width: progressWidth }}
+                className="h-full bg-emerald-500"
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-1 flex-col justify-center py-12">
+            {/* The stage itself. Cross-fades as the scroll crosses each boundary. */}
+            <motion.div
+              key={`${role}-${activeStep}`}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <ScrollDrivenStageDetail
+                s={step}
+                idx={activeStep}
+                totalSteps={steps.length}
+                currentLocale={currentLocale}
+                scrollYProgress={scrollYProgress}
+              />
+            </motion.div>
+          </div>
         </div>
       </div>
     </div>

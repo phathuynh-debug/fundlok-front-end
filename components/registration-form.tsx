@@ -1,25 +1,18 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTurnstile } from "@/hooks/use-turnstile";
-
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useRegister } from "@/hooks/use-authentication";
-import {
-  User,
-  Mail,
-  Lock,
-  Phone,
-  Loader2,
-  Eye,
-  EyeOff,
-} from "lucide-react";
+import { User, Mail, Lock, Phone, Loader2, Eye, EyeOff } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 const normalizePhoneNumber = (value: string) =>
   value.trim().replace(/[\s().-]/g, "");
@@ -52,12 +45,16 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Cloudflare Turnstile Hook
-  const { turnstileToken, turnstileContainerRef } = useTurnstile();
+  const {
+    turnstileToken,
+    turnstileContainerRef,
+    reset: resetTurnstile,
+  } = useTurnstile();
 
   const router = useRouter();
   const { toast } = useToast();
   const { mutate: register, isPending } = useRegister();
-  const { t } = useTranslations();
+  const { t, locale, localize } = useTranslations();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,7 +81,7 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
       toast({
         variant: "destructive",
         title: t("auth.register.validationErrorTitle"),
-        description: "Please complete the security check.",
+        description: t("auth.securityCheckRequired"),
       });
       return;
     }
@@ -108,14 +105,21 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
           if (onSuccess) {
             setTimeout(() => onSuccess(email), 1200);
           } else {
-            setTimeout(() => router.push("/login"), 1200);
+            setTimeout(() => router.push(localize("/login")), 1200);
           }
         },
         onError: (error) => {
+          // See login-form.tsx: the token is spent, so a retry without a
+          // reset fails on `timeout-or-duplicate` instead of the real error.
+          resetTurnstile();
           toast({
             variant: "destructive",
             title: t("auth.register.failedTitle"),
-            description: error?.message || t("auth.register.failedDescription"),
+            description: apiErrorMessage(
+              error,
+              locale,
+              t("auth.register.failedDescription"),
+            ),
           });
         },
       },
@@ -255,6 +259,17 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
         {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         {isPending ? t("auth.register.submitting") : t("auth.register.submit")}
       </Button>
+
+      <p className="text-xs text-center text-muted-foreground pt-1">
+        {t("auth.register.termsNotice").split("{termsLink}")[0]}
+        <Link
+          href={localize("/terms")}
+          className="underline underline-offset-2 hover:text-foreground transition-colors font-medium"
+        >
+          {t("auth.footer.termsLink")}
+        </Link>
+        {t("auth.register.termsNotice").split("{termsLink}")[1]}
+      </p>
     </form>
   );
 }

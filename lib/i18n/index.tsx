@@ -1,113 +1,206 @@
-"use client"
+"use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react"
-import en from "./en.json"
-import vi from "./vi.json"
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  LOCALE_COOKIE,
+  localizedHref,
+  localizedPath,
+  parseLocalePath,
+} from "@/lib/locale-routing";
+import en from "./en.json";
+import vi from "./vi.json";
 
-export const LOCALE_COOKIE_NAME = "NEXT_LOCALE"
+export const LOCALE_COOKIE_NAME = LOCALE_COOKIE;
 
-export const supportedLocales = ["en", "vi"] as const
-export type Locale = (typeof supportedLocales)[number]
+export const supportedLocales = ["en", "vi"] as const;
 
-type MessageTree = typeof en
+/** One year, so a returning visitor keeps the language they chose. */
+function writeLocaleCookie(locale: string): void {
+  document.cookie = `${LOCALE_COOKIE_NAME}=${locale}; path=/; max-age=31536000; samesite=lax`;
+}
+export type Locale = (typeof supportedLocales)[number];
+
+type MessageTree = typeof en;
 
 const dictionaries: Record<Locale, MessageTree> = {
   en,
   vi,
-}
+};
 
-const DEFAULT_LOCALE: Locale = "en"
+/**
+ * Vietnamese, because Vietnam is the market. A visitor with no cookie gets
+ * Vietnamese; English is opt-in through the switcher, which writes the cookie.
+ *
+ * Note this is a cookie-only decision: `Accept-Language` is deliberately NOT
+ * consulted, so the default is predictable and the same HTML can be cached for
+ * every first-time visitor.
+ */
+const DEFAULT_LOCALE: Locale = "vi";
 
 function normalizeLocale(locale: string | null | undefined): Locale {
-  return locale === "vi" ? "vi" : DEFAULT_LOCALE
+  return locale === "en" ? "en" : DEFAULT_LOCALE;
 }
 
 function getPathValue(source: unknown, path: string): unknown {
   return path.split(".").reduce<unknown>((current, segment) => {
     if (current && typeof current === "object" && segment in current) {
-      return (current as Record<string, unknown>)[segment]
+      return (current as Record<string, unknown>)[segment];
     }
-    return undefined
-  }, source)
+    return undefined;
+  }, source);
 }
 
-function formatMessage(template: string, values?: Record<string, string | number>) {
+function formatMessage(
+  template: string,
+  values?: Record<string, string | number>,
+) {
   if (!values) {
-    return template
+    return template;
   }
 
   return template.replace(/\{(\w+)\}/g, (_, key: string) => {
-    const value = values[key]
-    return value === undefined || value === null ? `{${key}}` : String(value)
-  })
+    const value = values[key];
+    return value === undefined || value === null ? `{${key}}` : String(value);
+  });
 }
 
-function translate(dictionary: MessageTree, key: string, values?: Record<string, string | number>) {
-  const value = getPathValue(dictionary, key)
+function translate(
+  dictionary: MessageTree,
+  key: string,
+  values?: Record<string, string | number>,
+) {
+  const value = getPathValue(dictionary, key);
 
   if (typeof value === "string") {
-    return formatMessage(value, values)
+    return formatMessage(value, values);
   }
 
-  return key
+  return key;
 }
 
 type LocaleContextValue = {
-  locale: Locale
-  setLocale: (locale: Locale) => void
-  t: (key: string, values?: Record<string, string | number>) => string
-}
+  locale: Locale;
+  setLocale: (locale: Locale) => void;
+  t: (key: string, values?: Record<string, string | number>) => string;
+  /**
+   * An internal href in the current language: "/faq" becomes "/en/faq" on an
+   * English page. Links between public pages must go through this, or an
+   * English reader clicking "FAQ" lands on the Vietnamese URL, and on those
+   * pages the URL decides the language.
+   */
+  localize: (href: string) => string;
+};
 
-const LocaleContext = createContext<LocaleContextValue | null>(null)
+const LocaleContext = createContext<LocaleContextValue | null>(null);
 
 export function LocaleProvider({
   initialLocale,
   children,
 }: {
-  initialLocale: Locale
-  children: React.ReactNode
+  initialLocale: Locale;
+  children: React.ReactNode;
 }) {
-  const [locale, setLocaleState] = useState<Locale>(initialLocale)
+  // The language chosen for pages WITHOUT a per-language URL (dashboard,
+  // admin, ...): starts from the cookie the server read.
+  const [cookieLocale, setLocaleState] = useState<Locale>(initialLocale);
+  const router = useRouter();
+  const pathname = usePathname() ?? "/";
+  // On a public page the URL decides (see lib/locale-routing.ts). Derived here
+  // rather than taken from `initialLocale` because the root layout does not
+  // re-render on client navigation: going from /faq to /en/faq would
+  // otherwise keep the Vietnamese value the layout was first rendered with.
+  const route = parseLocalePath(pathname);
+  const locale: Locale = route.locale ?? cookieLocale;
 
   useEffect(() => {
-    document.documentElement.lang = locale
-    document.cookie = `${LOCALE_COOKIE_NAME}=${locale}; path=/; max-age=31536000; samesite=lax`
-  }, [locale])
+    document.documentElement.lang = locale;
+  }, [locale]);
 
-  const setLocale = (nextLocale: Locale) => {
-    setLocaleState(nextLocale)
-  }
+  const setLocale = useCallback(
+    (nextLocale: Locale) => {
+      // The cookie is written HERE, synchronously, rather than in an effect
+      // keyed on `locale`. Everything below depends on the order.
+      writeLocaleCookie(nextLocale);
+      setLocaleState(nextLocale);
+
+      // A public page has a URL per language: switching means going to the
+      // other one, keeping the query (?for=investor) and hash. The cookie is
+      // written first, so the proxy's preference redirect agrees with the move
+      // instead of bouncing it back.
+      //
+      // A FULL load, not router.push. /rate and /en/rate rewrite to the same
+      // page and differ only by a request header the client router cannot
+      // see, so a soft navigation re-rendered the client text in English
+      // while keeping the server-rendered <title>, canonical and <html lang>
+      // from the Vietnamese request. Verified in the browser: the tab read
+      // "Xem lãi suất…" on /en/rate. Switching language is rare; a reload is
+      // the price of every server-rendered part agreeing with the URL.
+      if (route.locale !== null) {
+        if (nextLocale !== route.locale) {
+          window.location.assign(
+            localizedPath(route.path, nextLocale) +
+              window.location.search +
+              window.location.hash,
+          );
+        }
+        return;
+      }
+
+      // Client components re-render from context on the line above. Server
+      // components do not — and the marketing pages build their copy on the
+      // server from this very cookie (see app/page.tsx). Without this refresh
+      // the header and the tabs switched language while the hero, the process
+      // section, the partner headings and the team bios stayed in the old one.
+      //
+      // The refresh re-requests the server tree, carrying the cookie just set;
+      // had that write stayed in an effect it would still be pending here and
+      // the server would answer in the previous language.
+      router.refresh();
+    },
+    [router, route.locale, route.path],
+  );
 
   const value = useMemo<LocaleContextValue>(
     () => ({
       locale,
       setLocale,
       t: (key, values) => translate(dictionaries[locale], key, values),
+      localize: (href) => localizedHref(href, locale),
     }),
-    [locale]
-  )
+    [locale, setLocale],
+  );
 
-  return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>
+  return (
+    <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>
+  );
 }
 
 export function useLocale() {
-  const context = useContext(LocaleContext)
+  const context = useContext(LocaleContext);
 
   if (!context) {
-    throw new Error("useLocale must be used within a LocaleProvider")
+    throw new Error("useLocale must be used within a LocaleProvider");
   }
 
-  return context
+  return context;
 }
 
 export function useTranslations() {
-  return useLocale()
+  return useLocale();
 }
 
 export function getLocaleFromCookie(cookieValue?: string | null): Locale {
-  return normalizeLocale(cookieValue)
+  return normalizeLocale(cookieValue);
 }
 
 export function getDictionary(locale: string | null | undefined) {
-  return dictionaries[normalizeLocale(locale)]
+  return dictionaries[normalizeLocale(locale)];
 }

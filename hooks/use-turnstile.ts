@@ -1,14 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 
+export const isTurnstileDisabled =
+  process.env.NEXT_PUBLIC_DISABLE_TURNSTILE === "true";
+
 export function useTurnstile() {
   const [turnstileToken, setTurnstileToken] = useState<string | null>(
-    process.env.NEXT_PUBLIC_DISABLE_TURNSTILE === "true" ? "mock-token" : null
+    isTurnstileDisabled ? "mock-token" : null,
   );
   const turnstileContainerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (process.env.NEXT_PUBLIC_DISABLE_TURNSTILE === "true") {
+    if (isTurnstileDisabled) {
       return;
     }
     const scriptId = "cloudflare-turnstile-script";
@@ -26,20 +29,23 @@ export function useTurnstile() {
 
     const initializeTurnstile = () => {
       if (window.turnstile && turnstileContainerRef.current) {
-        widgetIdRef.current = window.turnstile.render(turnstileContainerRef.current, {
-          sitekey:
-            process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY ||
-            "0x4AAAAAAADgp22IT7NjMKXhN",
-          callback: (token: string) => {
-            setTurnstileToken(token);
+        widgetIdRef.current = window.turnstile.render(
+          turnstileContainerRef.current,
+          {
+            sitekey:
+              process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY ||
+              "0x4AAAAAAADgp22IT7NjMKXhN",
+            callback: (token: string) => {
+              setTurnstileToken(token);
+            },
+            "expired-callback": () => {
+              setTurnstileToken(null);
+            },
+            "error-callback": () => {
+              setTurnstileToken(null);
+            },
           },
-          "expired-callback": () => {
-            setTurnstileToken(null);
-          },
-          "error-callback": () => {
-            setTurnstileToken(null);
-          },
-        });
+        );
       }
     };
 
@@ -49,15 +55,16 @@ export function useTurnstile() {
       script.onload = initializeTurnstile;
     }
 
+    const container = turnstileContainerRef.current;
     return () => {
-      if (window.turnstile && turnstileContainerRef.current) {
+      if (window.turnstile && container) {
         try {
           if (widgetIdRef.current) {
             window.turnstile.remove(widgetIdRef.current);
           } else {
             window.turnstile.remove();
           }
-        } catch (e) {
+        } catch {
           // ignore
         }
       }
@@ -65,7 +72,7 @@ export function useTurnstile() {
   }, []);
 
   const reset = () => {
-    if (process.env.NEXT_PUBLIC_DISABLE_TURNSTILE === "true") {
+    if (isTurnstileDisabled) {
       setTurnstileToken("mock-token");
       return;
     }
@@ -77,7 +84,7 @@ export function useTurnstile() {
           window.turnstile.reset();
         }
         setTurnstileToken(null);
-      } catch (e) {
+      } catch {
         // ignore
       }
     }
@@ -87,5 +94,6 @@ export function useTurnstile() {
     turnstileToken,
     turnstileContainerRef,
     reset,
+    isTurnstileDisabled,
   };
 }

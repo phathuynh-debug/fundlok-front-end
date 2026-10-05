@@ -1,20 +1,21 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useGVerifyKybVerify } from '@/hooks/use-gverify';
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useGVerifyKybVerify } from "@/hooks/use-gverify";
 import type {
   GVerifyKybDocumentType,
   GVerifyKybVerifyResponse,
-} from '@/services/gverify.service';
-import { compressImage, fileToBase64 } from './useGVerifyKyc';
+} from "@/services/gverify.service";
+import { compressImage, fileToBase64 } from "./useGVerifyKyc";
 
 // Mirror of the backend limits (app/gverify/kyb_service.py re-validates).
 const MAX_DOCUMENT_BYTES = 10 * 1024 * 1024;
-const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'application/pdf'];
-export const KYB_ACCEPT = ACCEPTED_TYPES.join(',');
+const ACCEPTED_TYPES = ["image/jpeg", "image/png", "application/pdf"];
+export const KYB_ACCEPT = ACCEPTED_TYPES.join(",");
 
 // i18n key suffix under kyc.kyb.* / kyc.gv.* — translated where rendered.
-export type KybDocumentError = 'invalidTypeDoc' | 'tooLarge' | 'processFailed' | null;
+export type KybDocumentError =
+  "invalidTypeDoc" | "tooLarge" | "processFailed" | null;
 
 export interface StagedDocument {
   file: File | null;
@@ -22,7 +23,20 @@ export interface StagedDocument {
   error: KybDocumentError;
 }
 
-const empty = (): StagedDocument => ({ file: null, previewUrl: null, error: null });
+const empty = (): StagedDocument => ({
+  file: null,
+  previewUrl: null,
+  error: null,
+});
+export interface KybDeclaredDetails {
+  taxCode: string;
+  licenseCode: string;
+}
+
+const emptyDetails = (): KybDeclaredDetails => ({
+  taxCode: "",
+  licenseCode: "",
+});
 
 // Local capture state for the GVerify KYB screen: one staged registration
 // certificate (photo or PDF) + the certificate variant, and the submit that
@@ -30,8 +44,19 @@ const empty = (): StagedDocument => ({ file: null, previewUrl: null, error: null
 // images; PDFs pass through untouched (only size-checked).
 export function useGVerifyKyb() {
   const [document, setDocument] = useState<StagedDocument>(empty());
-  const [documentType, setDocumentType] = useState<GVerifyKybDocumentType>('COMPANY');
+  const [documentType, setDocumentType] =
+    useState<GVerifyKybDocumentType>("COMPANY");
+  const [details, setDetails] = useState<KybDeclaredDetails>(emptyDetails);
   const { mutateAsync: verify, isPending: submitting } = useGVerifyKybVerify();
+
+  // Update one declared field by key, e.g. setDetail('taxCode', value).
+  const setDetail = useCallback(
+    <K extends keyof KybDeclaredDetails>(
+      field: K,
+      value: KybDeclaredDetails[K],
+    ) => setDetails((prev) => ({ ...prev, [field]: value })),
+    [],
+  );
 
   const urlsRef = useRef<Set<string>>(new Set());
   useEffect(() => {
@@ -62,12 +87,12 @@ export function useGVerifyKyb() {
       return;
     }
     if (!ACCEPTED_TYPES.includes(file.type)) {
-      stage({ file: null, previewUrl: null, error: 'invalidTypeDoc' });
+      stage({ file: null, previewUrl: null, error: "invalidTypeDoc" });
       return;
     }
-    if (file.type === 'application/pdf') {
+    if (file.type === "application/pdf") {
       if (file.size > MAX_DOCUMENT_BYTES) {
-        stage({ file: null, previewUrl: null, error: 'tooLarge' });
+        stage({ file: null, previewUrl: null, error: "tooLarge" });
         return;
       }
       stage({ file, previewUrl: null, error: null });
@@ -78,14 +103,16 @@ export function useGVerifyKyb() {
       .catch(() => file)
       .then((staged) => {
         if (staged.size > MAX_DOCUMENT_BYTES) {
-          stage({ file: null, previewUrl: null, error: 'tooLarge' });
+          stage({ file: null, previewUrl: null, error: "tooLarge" });
           return;
         }
         const previewUrl = URL.createObjectURL(staged);
         urlsRef.current.add(previewUrl);
         stage({ file: staged, previewUrl, error: null });
       })
-      .catch(() => stage({ file: null, previewUrl: null, error: 'processFailed' }));
+      .catch(() =>
+        stage({ file: null, previewUrl: null, error: "processFailed" }),
+      );
   }, []);
 
   const reset = useCallback(() => setFile(null), [setFile]);
@@ -104,8 +131,15 @@ export function useGVerifyKyb() {
 
   const submit = useCallback(async (): Promise<GVerifyKybVerifyResponse> => {
     const document_b64 = await fileToBase64(document.file as File);
-    return verify({ document_b64, document_type: documentType });
-  }, [document, documentType, verify]);
+    const trimmedTax = details.taxCode.trim();
+    const trimmedLicense = details.licenseCode.trim();
+    return verify({
+      document_b64,
+      document_type: documentType,
+      ...(trimmedTax ? { tax_code: trimmedTax } : {}),
+      ...(trimmedLicense ? { license_code: trimmedLicense } : {}),
+    });
+  }, [document, documentType, details, verify]);
 
   return {
     document,
@@ -113,6 +147,8 @@ export function useGVerifyKyb() {
     reset,
     documentType,
     selectDocumentType,
+    details,
+    setDetail,
     ready,
     submit,
     submitting,

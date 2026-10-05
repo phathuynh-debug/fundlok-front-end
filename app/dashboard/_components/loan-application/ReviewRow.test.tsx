@@ -9,6 +9,12 @@ import type { DocumentKey, DocumentUpload } from "./useLoanApplication";
 // ReviewRow reads everything from context, so we mock the context hook and feed
 // it a controlled value. This is how to unit-test the context-driven components
 // in this folder without standing up the whole provider + React Query.
+vi.mock(
+  "@/app/dashboard/_components/loan-application/LoanApplicationContext",
+  () => ({
+    useLoanApplicationContext: vi.fn(),
+  }),
+);
 vi.mock("./LoanApplicationContext", () => ({
   useLoanApplicationContext: vi.fn(),
 }));
@@ -66,11 +72,16 @@ describe("ReviewRow", () => {
   });
 
   it("prompts to add the document and jumps to its step when none is selected", async () => {
-    const { goToStep } = mockContext("cicReport", { status: "idle", file: null });
+    const { goToStep } = mockContext("cicReport", {
+      status: "idle",
+      file: null,
+    });
 
     render(<ReviewRow docKey="cicReport" label="CIC Credit Report" />);
 
-    expect(screen.getByText("dashboard.sme.notSelectedYet")).toBeInTheDocument();
+    expect(
+      screen.getByText("dashboard.sme.notSelectedYet"),
+    ).toBeInTheDocument();
     await userEvent.click(
       screen.getByRole("button", { name: /dashboard\.sme\.clickToUpload/ }),
     );

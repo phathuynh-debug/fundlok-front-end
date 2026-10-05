@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { ApiError } from '@/lib/types';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { ApiError } from "@/lib/types";
 import {
   projectsService,
   type CreateProjectPayload,
   type Project,
-} from '@/services/projects.service';
+} from "@/services/projects.service";
 
 export const projectKeys = {
-  all: ['projects'] as const,
-  mine: () => [...projectKeys.all, 'mine'] as const,
-  public: () => [...projectKeys.all, 'public'] as const,
+  all: ["projects"] as const,
+  mine: () => [...projectKeys.all, "mine"] as const,
+  public: () => [...projectKeys.all, "public"] as const,
 };
 
 export function useMyProjects(enabled = true) {

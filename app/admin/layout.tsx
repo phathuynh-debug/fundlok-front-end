@@ -1,17 +1,23 @@
-import type { Metadata } from 'next'
-import { AdminSidebar } from "./_components/AdminSidebar"
-import { LocaleSwitcher } from "@/components/locale-switcher"
-import { ThemeToggle } from "@/components/theme-toggle"
+import type { Metadata } from "next";
+import { AdminSidebar } from "./_components/AdminSidebar";
+import { LocaleSwitcher } from "@/components/locale-switcher";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { getServerTranslations } from "@/lib/i18n/server";
 
-export const metadata: Metadata = {
-  title: 'Admin',
-  description: 'Fundlok administration area.',
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerTranslations();
+  return {
+    // A plain string here would stop the root "%s | FundLok" template from
+    // reaching the pages below, so re-declare it for this section.
+    title: { default: t("seo.adminTitle"), template: "%s | FundLok" },
+    description: t("seo.adminDescription"),
+  };
 }
 
 export default function AdminLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <div className="flex h-screen overflow-hidden">
@@ -33,5 +39,5 @@ export default function AdminLayout({
         </div>
       </main>
     </div>
-  )
+  );
 }

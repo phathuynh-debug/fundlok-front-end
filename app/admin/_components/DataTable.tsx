@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Loader2 } from "lucide-react"
+import * as React from "react";
+import { Loader2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -9,29 +9,38 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
+import { cn } from "@/lib/utils";
+import { useTranslations } from "@/lib/i18n";
 
 // A single column definition: how to label the header and render each cell.
 export interface Column<T> {
   // Stable key for React and header identity.
-  key: string
-  header: string
+  key: string;
+  header: string;
   // Optional Tailwind classes for the header cell / body cells.
-  headClassName?: string
-  cellClassName?: string
+  headClassName?: string;
+  cellClassName?: string;
   // Turns a row into the cell content.
-  render: (row: T) => React.ReactNode
+  render: (row: T) => React.ReactNode;
 }
 
 interface DataTableProps<T> {
-  columns: Column<T>[]
-  rows: T[]
-  getRowKey: (row: T) => string
+  columns: Column<T>[];
+  rows: T[];
+  getRowKey: (row: T) => string;
   // First load — shows a centered spinner in place of rows.
-  isLoading?: boolean
+  isLoading?: boolean;
   // Background refetch (paging/filtering) — shows a subtle corner spinner.
-  isFetching?: boolean
-  emptyMessage?: string
+  isFetching?: boolean;
+  emptyMessage?: string;
+  // Makes rows activatable. Rows become real <button>-like targets: focusable,
+  // Enter/Space activated, with a pointer and hover fill. Left unset, rows stay
+  // inert and pick up none of that affordance, so a table with nothing to open
+  // never looks clickable.
+  onRowClick?: (row: T) => void;
+  // Accessible label for an activatable row, e.g. "Preview Acme Holdings".
+  getRowLabel?: (row: T) => string;
 }
 
 // Generic, presentational table. Pass the data plus a column config describing
@@ -42,9 +51,12 @@ export function DataTable<T>({
   getRowKey,
   isLoading,
   isFetching,
-  emptyMessage = "No results found.",
+  emptyMessage,
+  onRowClick,
+  getRowLabel,
 }: DataTableProps<T>) {
-  const colCount = columns.length
+  const { t } = useTranslations();
+  const colCount = columns.length;
 
   return (
     <div className="relative overflow-x-auto">
@@ -78,14 +90,37 @@ export function DataTable<T>({
                 colSpan={colCount}
                 className="h-32 text-center text-sm text-muted-foreground"
               >
-                {emptyMessage}
+                {emptyMessage ?? t("admin.table.noResults")}
               </TableCell>
             </TableRow>
           ) : (
             rows.map((row) => (
               // Fixed height keeps every row uniform regardless of cell
               // content — sized to comfortably fit the 32px (h-8) avatar.
-              <TableRow key={getRowKey(row)} className="h-16">
+              <TableRow
+                key={getRowKey(row)}
+                className={cn(
+                  "h-16",
+                  onRowClick &&
+                    "cursor-pointer transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
+                )}
+                // A <tr> has no native activation, so keyboard support is
+                // wired by hand rather than left to the mouse only.
+                role={onRowClick ? "button" : undefined}
+                tabIndex={onRowClick ? 0 : undefined}
+                aria-label={onRowClick ? getRowLabel?.(row) : undefined}
+                onClick={onRowClick ? () => onRowClick(row) : undefined}
+                onKeyDown={
+                  onRowClick
+                    ? (event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          onRowClick(row);
+                        }
+                      }
+                    : undefined
+                }
+              >
                 {columns.map((col) => (
                   <TableCell key={col.key} className={col.cellClassName}>
                     {col.render(row)}
@@ -97,5 +132,5 @@ export function DataTable<T>({
         </TableBody>
       </Table>
     </div>
-  )
+  );
 }

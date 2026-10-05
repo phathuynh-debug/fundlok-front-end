@@ -1,9 +1,13 @@
-import type { ReactNode } from 'react';
-import type { Metadata } from 'next';
+import type { ReactNode } from "react";
+import type { Metadata } from "next";
+import { getServerTranslations } from "@/lib/i18n/server";
 
-export const metadata: Metadata = {
-  title: 'Apply for Funding',
-  description: 'Submit a new funding application for your business. FundLok connects SMEs with private credit line investors.',
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerTranslations();
+  return {
+    title: t("seo.projectApplicationTitle"),
+    description: t("seo.projectApplicationDescription"),
+  };
 }
 
 export default function ProjectApplicationLayout({

@@ -19,6 +19,7 @@ import {
 const NAV_LINKS = [
   { href: "/", labelKey: "header.home" },
   { href: "/why-us", labelKey: "header.whyUs" },
+  { href: "/rate", labelKey: "header.rate" },
   { href: "/faq", labelKey: "header.faq" },
   { href: "/contact", labelKey: "header.contactUs" },
 ] as const;
@@ -26,7 +27,7 @@ const NAV_LINKS = [
 // Page-level navigation only. In-page section navigation on the landing page
 // is handled by the SectionLocator rail instead.
 export default function SiteHeader() {
-  const { t } = useTranslations();
+  const { t, localize } = useTranslations();
   const pathname = usePathname();
 
   const linkClass = (href: string) =>
@@ -36,7 +37,10 @@ export default function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-30 w-full bg-background/45 backdrop-blur-md border-b border-border/10 flex items-center justify-between px-6 py-4 md:px-12">
-      <Link href="/" className="flex items-center gap-2 group relative z-40">
+      <Link
+        href={localize("/")}
+        className="flex items-center gap-2 group relative z-40"
+      >
         <Logo />
       </Link>
 
@@ -44,8 +48,8 @@ export default function SiteHeader() {
         {NAV_LINKS.map(({ href, labelKey }) => (
           <Link
             key={href}
-            href={href}
-            className={`transition-colors duration-200 font-mono tracking-widest text-[11px] font-semibold uppercase ${linkClass(href)}`}
+            href={localize(href)}
+            className={`transition-colors duration-200 text-sm font-medium ${linkClass(href)}`}
           >
             {t(labelKey)}
           </Link>
@@ -57,8 +61,8 @@ export default function SiteHeader() {
         <LocaleSwitcher />
         <ThemeToggle />
         <Link
-          href="/login"
-          className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-6 py-2.5 text-xs font-mono tracking-widest font-bold uppercase transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"
+          href={localize("/login")}
+          className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-6 py-2.5 text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"
         >
           {t("header.enterApp")}
         </Link>
@@ -67,16 +71,16 @@ export default function SiteHeader() {
       {/* Mobile Navigation Drawer (Burger Menu) */}
       <div className="flex lg:hidden items-center gap-2 relative z-30">
         <Link
-          href="/login"
-          className="w-full text-center rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-6 py-3.5 text-xs font-mono tracking-widest font-bold uppercase transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"
+          href={localize("/login")}
+          className="w-full text-center rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-6 py-3.5 text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"
         >
           {t("header.enterApp")}
         </Link>
         <Sheet>
           <SheetTrigger asChild>
             <button
-              className="p-2.5 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 transition-colors cursor-pointer outline-hidden"
-              aria-label="Toggle Navigation Menu"
+              className="p-2.5 rounded-full hover:bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 transition-colors cursor-pointer outline-hidden"
+              aria-label={t("common.toggleMenu")}
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -86,7 +90,7 @@ export default function SiteHeader() {
             className="w-80 sm:w-96 flex flex-col p-6 z-50 bg-background/95 backdrop-blur-md"
           >
             <SheetHeader className="p-0 border-b border-border/10 pb-4 mb-4">
-              <SheetTitle className="text-left font-mono tracking-widest text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase">
+              <SheetTitle className="text-left text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
                 {t("header.navigationMenu")}
               </SheetTitle>
             </SheetHeader>
@@ -96,8 +100,8 @@ export default function SiteHeader() {
               {NAV_LINKS.map(({ href, labelKey }) => (
                 <SheetClose asChild key={href}>
                   <Link
-                    href={href}
-                    className={`text-left py-2 font-mono tracking-widest text-xs font-bold uppercase transition-colors ${linkClass(href)}`}
+                    href={localize(href)}
+                    className={`text-left py-2 text-sm font-semibold transition-colors ${linkClass(href)}`}
                   >
                     {t(labelKey)}
                   </Link>
@@ -116,8 +120,8 @@ export default function SiteHeader() {
 
               <SheetClose asChild>
                 <Link
-                  href="/login"
-                  className="w-full text-center rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-6 py-3.5 text-xs font-mono tracking-widest font-bold uppercase transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"
+                  href={localize("/login")}
+                  className="w-full text-center rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-6 py-3.5 text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"
                 >
                   {t("header.enterApp")}
                 </Link>

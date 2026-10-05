@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
+
+import {
+  getSeoStrings,
+  localeAlternates,
+  OG_LOCALE,
+  resolveSeoLocale,
+} from "@/lib/seo";
 import SiteHeader from "@/components/site-header";
 import { SectionLocator } from "@/components/section-locator";
 import SiteFooter from "@/components/site-footer";
@@ -20,9 +26,9 @@ const LinkedInIcon = (props: React.SVGProps<SVGSVGElement>) => (
 // Multilingual dictionary for static landing page assets
 const dict = {
   en: {
-    heroTitle: "Flexible Capital for MSMEs",
+    heroTitle: "Flexible capital for MSMEs in Vietnam",
     heroSubtitle:
-      "FundLok helps MSMEs access financing with repayment aligned to actual revenue, supported by data, AI, and transparent on-chain investor infrastructure.",
+      "Connecting SMEs with investors through flexible funding. Fixed daily repayments that adapt with term extensions if revenue dips.",
     navProduct: "PRODUCT",
     navProcess: "HOW IT WORKS",
     navContact: "CONTACT",
@@ -39,30 +45,31 @@ const dict = {
     daily: "Daily",
     fixedRate: "Fixed rate",
     variableRate: "Variable rate",
-    processTitle: "A clearer, technology-enabled funding journey",
+    processTitle: "A clearer, technology-enabled way to get funded",
     processSubtitle:
-      "FundLok is designed to make funding more flexible for SMEs and more transparent for investors — combining a customer-friendly experience with automation, data-driven assessment, secure fund handling, and clear repayment tracking.",
+      "FundLok makes funding more flexible for SMEs and more transparent for investors. Automation, data-driven assessment, secure fund handling and clear repayment tracking do the heavy lifting, so the experience stays simple.",
     ourSolution: "Our Solution",
     partnersEyebrow: "BACKED BY",
-    partnersTitle: "Our Partners & Programs",
+    partnersTitle: "Partners & programs",
     partnersSubtitle:
       "FundLok is supported by leading startup programs providing cloud infrastructure, mentorship, and ecosystem access.",
-    partnersStrategic: "Strategic Partner",
-    partnersInfra: "Cloud Infrastructure Partners",
+    partnersStrategic: "Strategic partner",
+    partnersInfra: "Cloud infrastructure partners",
     achievementsTitle: "FundLok's Achievements",
     achievementsSubtitle:
       "Recognized locally and globally for innovation, impact, and technology in FinTech and investment facilitation.",
-    teamTitle: "Meet Our Team",
+    teamTitle: "Meet the team",
     teamSubtitle:
       "The builders and visionaries behind FundLok's technology, financial structuring, and growth.",
     teamCfo: "Chief Financial Officer",
+    linkedInOf: "{name} on LinkedIn",
     teamCeo: "Founder & Chief Executive Officer",
     teamCto: "Chief Technological Officer",
   },
   vi: {
-    heroTitle: "Sàn vốn linh hoạt cho doanh nghiệp vừa và nhỏ",
+    heroTitle: "Sàn vốn linh hoạt cho SME tại Việt Nam",
     heroSubtitle:
-      "FundLok giúp các doanh nghiệp vừa và nhỏ tiếp cận vốn vay với việc trả nợ được điều chỉnh theo doanh thu thực tế, được hỗ trợ bởi dữ liệu, AI và hạ tầng nhà đầu tư minh bạch trên chuỗi.",
+      "Nền tảng kết nối doanh nghiệp SME với nhà đầu tư qua nguồn vốn linh hoạt, hoàn trả theo ngày làm việc và dãn hạn an toàn khi doanh thu giảm.",
     navProduct: "SẢN PHẨM",
     navProcess: "QUY TRÌNH",
     navContact: "LIÊN HỆ",
@@ -79,16 +86,16 @@ const dict = {
     daily: "Hàng ngày",
     fixedRate: "Lãi suất cố định",
     variableRate: "Lãi suất thả nổi",
-    processTitle: "Hành trình gọi vốn rõ ràng hơn, hỗ trợ bởi công nghệ",
+    processTitle: "Vay vốn minh bạch hơn nhờ công nghệ",
     processSubtitle:
-      "FundLok được thiết kế để giúp việc gọi vốn linh hoạt hơn cho doanh nghiệp SME và minh bạch hơn cho nhà đầu tư — kết hợp trải nghiệm thân thiện với khách hàng cùng quy trình tự động hóa, thẩm định bằng dữ liệu, quản lý quỹ an toàn và theo dõi hoàn trả rõ ràng.",
+      "FundLok giúp doanh nghiệp SME gọi vốn linh hoạt hơn và giúp nhà đầu tư theo dõi minh bạch hơn. Tự động hóa, thẩm định dựa trên dữ liệu, quản lý dòng vốn an toàn và theo dõi hoàn trả rõ ràng lo phần phức tạp, để trải nghiệm luôn đơn giản.",
     ourSolution: "Giải pháp của chúng tôi",
     partnersEyebrow: "ĐỒNG HÀNH CÙNG",
-    partnersTitle: "Đối tác & Chương trình",
+    partnersTitle: "Đối tác & chương trình",
     partnersSubtitle:
       "FundLok được đồng hành bởi các chương trình khởi nghiệp hàng đầu, cung cấp hạ tầng đám mây, cố vấn và kết nối hệ sinh thái.",
-    partnersStrategic: "Đối tác Chiến lược",
-    partnersInfra: "Đối tác Hạ tầng Đám mây",
+    partnersStrategic: "Đối tác chiến lược",
+    partnersInfra: "Đối tác hạ tầng đám mây",
     achievementsTitle: "Thành tựu của FundLok",
     achievementsSubtitle:
       "Được ghi nhận trong nước và quốc tế vì sự đổi mới sáng tạo, tầm ảnh hưởng và công nghệ trong lĩnh vực FinTech và thúc đẩy đầu tư.",
@@ -96,52 +103,61 @@ const dict = {
     teamSubtitle:
       "Những người xây dựng và kiến tạo đằng sau công nghệ, cấu trúc tài chính và sự tăng trưởng của FundLok.",
     teamCfo: "Giám đốc Tài chính (CFO)",
+    linkedInOf: "LinkedIn của {name}",
     teamCeo: "Nhà sáng lập & Giám đốc Điều hành (CEO)",
     teamCto: "Giám đốc Công nghệ (CTO)",
   },
 };
 
-export const metadata: Metadata = {
-  title: "FundLok | Flexible Capital Platform for SMEs",
-  description:
-    "FundLok connects investors with SMEs through a technology-led financing platform, using data and AI to support flexible funding aligned with real business needs.",
-  keywords: [
-    "FundLok",
-    "SME funding",
-    "private credit",
-    "flexible capital",
-    "on-chain credit",
-    "investor portal",
-    "flexible funding",
-    "AI credit scoring",
-    "Loc Vuong",
-    "Huy Pham",
-    "Edward Wong",
-    "FundLok CEO",
-    "FundLok CFO",
-    "FundLok CTO",
-    "FundLok founding team",
-    "FundLok founders",
-  ],
-  openGraph: {
-    title: "FundLok | Flexible Capital Platform for SMEs",
-    description:
-      "FundLok connects investors with SMEs through a technology-led financing platform, using data and AI to support flexible funding aligned with real business needs.",
-    type: "website",
-    siteName: "FundLok",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "FundLok | Flexible Capital Platform for SMEs",
-    description:
-      "FundLok connects investors with SMEs through a technology-led financing platform, using data and AI to support flexible funding aligned with real business needs.",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { locale, seo } = await getSeoStrings();
+
+  return {
+    alternates: localeAlternates("/", locale),
+    title: seo.homeTitle,
+    description: seo.homeDescription,
+    keywords: [
+      "FundLok",
+      "funding for SMEs in Vietnam",
+      "SME funding Vietnam",
+      "MSME funding Vietnam",
+      "business funding Vietnam",
+      "SME funding",
+      "private credit",
+      "flexible capital",
+      "on-chain credit",
+      "investor portal",
+      "flexible funding",
+      "Loc Vuong",
+      "Huy Pham",
+      "Edward Wong",
+      "FundLok CEO",
+      "FundLok CFO",
+      "FundLok CTO",
+      "FundLok founding team",
+      "FundLok founders",
+    ],
+    openGraph: {
+      url: localeAlternates("/", locale).canonical,
+      title: seo.homeTitle,
+      description: seo.homeOgDescription,
+      type: "website",
+      siteName: "FundLok",
+      locale: OG_LOCALE[locale],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: seo.homeTitle,
+      description: seo.homeOgDescription,
+    },
+  };
+}
 
 export default async function Page() {
-  const cookieStore = await cookies();
-  const cookieValue = cookieStore.get("NEXT_LOCALE")?.value;
-  const locale = cookieValue === "vi" ? "vi" : "en";
+  // This page builds its copy on the server, so it resolves the language
+  // itself rather than reading the client context: the URL (/ or /en), the
+  // same resolver the layout and metadata use.
+  const locale = await resolveSeoLocale();
   const currentLocale = locale;
   const strings = dict[currentLocale];
 
@@ -151,7 +167,9 @@ export default async function Page() {
       label: strings.partnersStrategic,
       logos: [
         {
-          src: "/images/partners/sihub.png",
+          src: "/images/partners/sihub.webp",
+          width: 500,
+          height: 500,
           alt: "Startup and Innovation Hub of Ho Chi Minh City (SIHUB)",
           href: "https://www.sihub.gov.vn/",
           invertOnDark: false,
@@ -162,13 +180,17 @@ export default async function Page() {
       label: strings.partnersInfra,
       logos: [
         {
-          src: "/images/partners/google-cloud-startups.png",
+          src: "/images/partners/google-cloud-startups.webp",
+          width: 500,
+          height: 126,
           alt: "Google Cloud for Startups",
           href: "https://cloud.google.com/startup",
           invertOnDark: false,
         },
         {
-          src: "/images/partners/cloudflare-startups.png",
+          src: "/images/partners/cloudflare-startups.webp",
+          width: 500,
+          height: 145,
           alt: "Cloudflare for Startups",
           href: "https://www.cloudflare.com/forstartups/",
           invertOnDark: true,
@@ -179,7 +201,7 @@ export default async function Page() {
 
   return (
     <>
-      <div className="relative min-h-screen w-full bg-background text-foreground overflow-x-hidden flex flex-col justify-between selection:bg-accent/20">
+      <div className="relative min-h-[100dvh] w-full bg-background text-foreground overflow-x-clip flex flex-col justify-between selection:bg-accent/20">
         <SiteHeader />
 
         {/* Right-edge scroll-spy rail showing the section currently in view */}
@@ -190,7 +212,7 @@ export default async function Page() {
           {/* Hero Section Container */}
           <section
             id="hero"
-            className="relative w-full min-h-[calc(100vh-76px)] flex flex-col items-center overflow-hidden scroll-mt-20"
+            className="relative w-full min-h-[calc(100dvh-76px)] flex flex-col items-center overflow-hidden scroll-mt-20"
           >
             {/* Client interactive GUI logic (waves + mockup + animated headers) */}
             <HeroInteractive strings={strings} />
@@ -205,7 +227,7 @@ export default async function Page() {
               <h2 className="font-sans text-3xl md:text-4xl font-extrabold text-foreground tracking-tight mb-4">
                 {strings.processTitle}
               </h2>
-              <p className="font-sans text-sm md:text-base text-muted-foreground/80 max-w-3xl mx-auto leading-relaxed">
+              <p className="font-sans text-sm md:text-base text-muted-foreground max-w-3xl mx-auto leading-relaxed">
                 {strings.processSubtitle}
               </p>
             </div>
@@ -219,13 +241,11 @@ export default async function Page() {
             className="w-full py-16 px-6 max-w-6xl mx-auto border-t border-border/10 relative z-20 scroll-mt-20"
           >
             <div className="text-center mb-10">
-              <h2 className="font-mono text-xs tracking-widest text-emerald-600 dark:text-emerald-400 font-bold uppercase mb-2">
-                {strings.partnersEyebrow}
-              </h2>
-              <h3 className="font-sans text-3xl font-extrabold text-foreground tracking-tight">
+              <p className="eyebrow mb-2">{strings.partnersEyebrow}</p>
+              <h2 className="font-sans text-3xl font-extrabold text-foreground tracking-tight">
                 {strings.partnersTitle}
-              </h3>
-              <p className="font-sans text-sm text-muted-foreground/80 max-w-2xl mx-auto mt-2">
+              </h2>
+              <p className="font-sans text-sm text-muted-foreground max-w-2xl mx-auto mt-2">
                 {strings.partnersSubtitle}
               </p>
             </div>
@@ -238,9 +258,7 @@ export default async function Page() {
                   key={tier.label}
                   className="w-full flex flex-col items-center gap-6"
                 >
-                  <h4 className="font-mono text-[11px] tracking-widest text-emerald-600 dark:text-emerald-400 font-bold uppercase">
-                    {tier.label}
-                  </h4>
+                  <p className="eyebrow">{tier.label}</p>
                   <div className="flex flex-wrap items-center justify-center gap-5 md:gap-6">
                     {tier.logos.map((logo) => (
                       <a
@@ -254,8 +272,16 @@ export default async function Page() {
                         <img
                           src={logo.src}
                           alt={logo.alt}
+                          // Intrinsic dimensions so the row reserves its space
+                          // before the logos load, instead of reflowing.
+                          width={logo.width}
+                          height={logo.height}
+                          loading="lazy"
+                          decoding="async"
                           className={`max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105 ${
-                            logo.invertOnDark ? "dark:brightness-0 dark:invert" : ""
+                            logo.invertOnDark
+                              ? "dark:brightness-0 dark:invert"
+                              : ""
                           }`}
                         />
                       </a>
@@ -272,42 +298,46 @@ export default async function Page() {
             className="w-full py-16 px-6 max-w-6xl mx-auto border-t border-border/10 relative z-20 scroll-mt-20"
           >
             <div className="text-center mb-12">
-              <h2 className="font-mono text-xs tracking-widest text-emerald-600 dark:text-emerald-400 font-bold uppercase mb-2">
-                {currentLocale === "vi" ? "ĐỘI NGŨ SÁNG LẬP" : "LEADERSHIP"}
-              </h2>
-              <h3 className="font-sans text-3xl md:text-4xl font-extrabold text-foreground tracking-tight mb-4">
+              <h2 className="font-sans text-4xl md:text-5xl font-extrabold leading-tight text-emerald-600 dark:text-emerald-400 tracking-tight mb-4">
                 {strings.teamTitle}
-              </h3>
-              <p className="font-sans text-sm md:text-base text-muted-foreground/80 max-w-3xl mx-auto leading-relaxed">
+              </h2>
+              <p className="font-sans text-sm md:text-base text-muted-foreground max-w-3xl mx-auto leading-relaxed">
                 {strings.teamSubtitle}
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Team Member 1: Huy Pham */}
-              <div className="flex flex-col bg-white/40 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-3xl p-5 shadow-lg backdrop-blur-md hover:scale-[1.01] transition-transform duration-300">
+              <div className="flex flex-col bg-card border border-border rounded-2xl p-5 transition-colors duration-200">
                 <div className="relative aspect-square w-full rounded-2xl overflow-hidden mb-5 bg-slate-100 dark:bg-slate-800">
                   <img
-                    src="/images/huy.png"
+                    src="/images/huy.webp"
+                    width={672}
+                    height={800}
+                    loading="lazy"
+                    decoding="async"
                     alt="Huy Pham"
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="flex items-center justify-between mb-1">
-                  <h4 className="font-sans font-bold text-lg text-foreground">
+                  <h3 className="font-sans font-bold text-lg text-foreground">
                     Huy Pham
-                  </h4>
+                  </h3>
                   <a
                     href="https://www.linkedin.com/in/huy-pham-5646bb49/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-muted-foreground hover:text-emerald-600 transition-colors"
-                    aria-label="Huy Pham's LinkedIn"
+                    aria-label={strings.linkedInOf.replace(
+                      "{name}",
+                      "Huy Pham",
+                    )}
                   >
                     <LinkedInIcon className="w-4 h-4" />
                   </a>
                 </div>
-                <p className="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400 mb-3 uppercase tracking-wider">
+                <p className="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-3 uppercase tracking-wider">
                   {strings.teamCfo}
                 </p>
                 <p className="text-xs text-muted-foreground leading-relaxed font-sans font-medium">
@@ -318,29 +348,36 @@ export default async function Page() {
               </div>
 
               {/* Team Member 2: Loc Vuong */}
-              <div className="flex flex-col bg-white/40 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-3xl p-5 shadow-lg backdrop-blur-md hover:scale-[1.01] transition-transform duration-300">
+              <div className="flex flex-col bg-card border border-border rounded-2xl p-5 transition-colors duration-200">
                 <div className="relative aspect-square w-full rounded-2xl overflow-hidden mb-5 bg-slate-100 dark:bg-slate-800">
                   <img
-                    src="/images/loc.png"
+                    src="/images/loc.webp"
+                    width={533}
+                    height={800}
+                    loading="lazy"
+                    decoding="async"
                     alt="Loc Vuong"
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="flex items-center justify-between mb-1">
-                  <h4 className="font-sans font-bold text-lg text-foreground">
+                  <h3 className="font-sans font-bold text-lg text-foreground">
                     Loc Vuong
-                  </h4>
+                  </h3>
                   <a
                     href="https://www.linkedin.com/in/lok-vuong/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-muted-foreground hover:text-emerald-600 transition-colors"
-                    aria-label="Loc Vuong's LinkedIn"
+                    aria-label={strings.linkedInOf.replace(
+                      "{name}",
+                      "Loc Vuong",
+                    )}
                   >
                     <LinkedInIcon className="w-4 h-4" />
                   </a>
                 </div>
-                <p className="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400 mb-3 uppercase tracking-wider">
+                <p className="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-3 uppercase tracking-wider">
                   {strings.teamCeo}
                 </p>
                 <p className="text-xs text-muted-foreground leading-relaxed font-sans font-medium">
@@ -351,29 +388,36 @@ export default async function Page() {
               </div>
 
               {/* Team Member 3: Edward Wong */}
-              <div className="flex flex-col bg-white/40 dark:bg-slate-900/30 border border-slate-200/60 dark:border-slate-800/80 rounded-3xl p-5 shadow-lg backdrop-blur-md hover:scale-[1.01] transition-transform duration-300">
+              <div className="flex flex-col bg-card border border-border rounded-2xl p-5 transition-colors duration-200">
                 <div className="relative aspect-square w-full rounded-2xl overflow-hidden mb-5 bg-slate-100 dark:bg-slate-800">
                   <img
-                    src="/images/edward.png"
+                    src="/images/edward.webp"
+                    width={800}
+                    height={800}
+                    loading="lazy"
+                    decoding="async"
                     alt="Edward Wong"
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="flex items-center justify-between mb-1">
-                  <h4 className="font-sans font-bold text-lg text-foreground">
+                  <h3 className="font-sans font-bold text-lg text-foreground">
                     Edward Wong
-                  </h4>
+                  </h3>
                   <a
                     href="https://www.linkedin.com/in/eywong8/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-muted-foreground hover:text-emerald-600 transition-colors"
-                    aria-label="Edward Wong's LinkedIn"
+                    aria-label={strings.linkedInOf.replace(
+                      "{name}",
+                      "Edward Wong",
+                    )}
                   >
                     <LinkedInIcon className="w-4 h-4" />
                   </a>
                 </div>
-                <p className="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400 mb-3 uppercase tracking-wider">
+                <p className="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-3 uppercase tracking-wider">
                   {strings.teamCto}
                 </p>
                 <p className="text-xs text-muted-foreground leading-relaxed font-sans font-medium">

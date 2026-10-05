@@ -40,31 +40,49 @@ app/**/_components/*     →  UI consumes the hooks (never calls services direct
 endpoints + `apiClient`. Don't call `apiClient` or `fetch` from a component.
 
 ### 1. Endpoints — `lib/endpoints.ts`
+
 Path constants grouped by domain. Functions for path params.
+
 ```ts
-export const PROJECT_ENDPOINTS = { list: "/projects", create: "/projects" } as const;
-export const FILES_ENDPOINTS = { commit: (id: string) => `/files/${id}/commit` } as const;
+export const PROJECT_ENDPOINTS = {
+  list: "/projects",
+  create: "/projects",
+} as const;
+export const FILES_ENDPOINTS = {
+  commit: (id: string) => `/files/${id}/commit`,
+} as const;
 ```
 
 ### 2. Services — `services/<domain>.service.ts`
+
 A pure data-access object plus the TypeScript interfaces for that domain. No
 React, no hooks. This is also where shared types live (`User`, `UserRole`, …).
+
 ```ts
-export interface RegisterPayload { full_name: string; email: string; /* … */ }
+export interface RegisterPayload {
+  full_name: string;
+  email: string; /* … */
+}
 
 export const authenticationService = {
-  login(payload: LoginPayload) { return apiClient.post<User>(AUTH_ENDPOINTS.login, payload); },
-  register(payload: RegisterPayload) { return apiClient.post<User>(AUTH_ENDPOINTS.register, payload); },
+  login(payload: LoginPayload) {
+    return apiClient.post<User>(AUTH_ENDPOINTS.login, payload);
+  },
+  register(payload: RegisterPayload) {
+    return apiClient.post<User>(AUTH_ENDPOINTS.register, payload);
+  },
 };
 ```
 
 ### 3. Hooks — `hooks/use-<domain>.ts`
+
 React Query wrappers. **Every domain exports a query-key factory** named
 `<domain>Keys` so caches invalidate consistently:
+
 ```ts
 export const projectKeys = {
-  all: ['projects'] as const,
-  mine: () => [...projectKeys.all, 'mine'] as const,
+  all: ["projects"] as const,
+  mine: () => [...projectKeys.all, "mine"] as const,
 };
 
 export function useMyProjects(enabled = true) {
@@ -85,6 +103,7 @@ export function useSelectRole() {
   });
 }
 ```
+
 - Mutations seed/invalidate the cache in `onSuccess` (e.g. `setQueryData`).
 - Error type is always `ApiError` from `@/lib/types`.
 - The global client config lives in `lib/query-client.ts` (staleTime 60s,
@@ -115,6 +134,7 @@ export function useSelectRole() {
   feature truly outgrows Context.
 
 ### Sharing local state without prop-drilling → Context provider
+
 When a feature splits into many sub-components that all need the same local
 state, create a Context provider instead of threading props. Reference
 implementation: `app/dashboard/_components/loan-application/`.
@@ -128,11 +148,14 @@ export function useLoanApplicationContext() {
   return v;
 }
 export function LoanApplicationProvider({ /* inputs */ children }) {
-  const state = useLoanApplication(/* … */);   // the hook with all logic
-  const value = { ...state, /* presentation: locale, theme, t, derived flags */ };
+  const state = useLoanApplication(/* … */); // the hook with all logic
+  const value = {
+    ...state /* presentation: locale, theme, t, derived flags */,
+  };
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 ```
+
 - The orchestrator component renders `<Provider><Wizard/></Provider>`; a
   component **cannot** consume a context it provides in the same render, so the
   consumer must be a child.
@@ -166,7 +189,9 @@ export function LoanApplicationProvider({ /* inputs */ children }) {
 - Keys are dot-paths: `t("dashboard.sme.reviewTitle")`.
 - Placeholders use `{name}` and are filled with `.replace()` at the call site:
   ```tsx
-  t("dashboard.sme.sendProgress").replace("{done}", String(done)).replace("{total}", String(total))
+  t("dashboard.sme.sendProgress")
+    .replace("{done}", String(done))
+    .replace("{total}", String(total));
   ```
 - Reuse existing keys where one fits; group new keys under the relevant
   namespace (`auth`, `dashboard.sme`, `common`, …). `locale === "vi"` inline
@@ -186,6 +211,48 @@ export function LoanApplicationProvider({ /* inputs */ children }) {
   mode and its foreground text vanishes. (This was a real bug on the role
   picker.) Emerald/amber accent tints (`bg-emerald-500/10`, `text-amber-600`)
   are fine for status semantics since they read on both themes.
+- **`bg-black text-white` is never the answer for an emphasis pill or a
+  selected chip** — `bg-primary text-primary-foreground` is already
+  near-black in light and near-white in dark. The eight hardcoded black pills
+  that used to exist all needed a hand-written `dark:` inversion to survive;
+  the token needs none.
+- **Dashboard controls hover to a neutral fill — import `CONTROL_HOVER` /
+  `CONTROL_IDLE` / `CONTROL_ICON_IDLE` from `@/lib/ui-tokens`.** Never retype
+  the classes and never invent a per-component hover
+  (`hover:text-zinc-950 dark:hover:text-white`, `hover:bg-card`, …); every such
+  one-off had to be cleaned up once already. `CONTROL_IDLE` is the idle half of
+  a control that also has a selected state (nav items, segmented pills, tabs);
+  `CONTROL_HOVER` is for controls with no selected state.
+  Why not the shadcn default: **`--accent` is the emerald brand color in light
+  mode** and a neutral gray in dark (see `app/globals.css`), so
+  `hover:bg-accent` paints a saturated green over a whole button. Fine for a
+  brand CTA, wrong for a quiet secondary control — so dashboard controls
+  override it. Outline/ghost `Button`s need the override explicitly, since the
+  cva variants ship `hover:bg-accent`.
+
+### Color & identity tiers
+
+Industry color is an *identity* signal, and how loudly a surface may wear it
+depends on how many peers sit next to it. `getIndustryChrome(industry, tier)`
+in `app/dashboard/_components/sme-dashboard-config.ts` returns only the classes
+legal at each tier — call it instead of reading `getIndustryTheme` directly, so
+the tier is declared at the call site rather than drifting.
+
+| Tier     | When | Gets |
+|---|---|---|
+| `hero`   | one entity owns the screen (SME dashboard hero) | tinted gradient surface, pattern, glow, tinted border |
+| `list`   | one row among many (project lists, search results) | neutral `bg-card` + colored icon, pill, and a 2px left rail |
+| `inline` | a table cell or a line of text | icon/text color only |
+
+Why: a list exists so rows can be **compared**, and comparison needs a constant
+background. Five differently tinted cards read as five different apps — that
+mistake was made and reverted on the investor projects list. The hero gets away
+with full immersion because it has no neighbor.
+
+**One meaning per color channel.** Industry hue = industry, and nothing else
+(don't accent an unrelated date with it). Status = `primary` / `muted` /
+`destructive` tokens. Emerald = brand actions. If a reader has to ask what a
+color means, it's carrying two jobs.
 
 ## Animation — framer-motion
 

@@ -1,21 +1,21 @@
-"use client"
+"use client";
 
-import Link from "next/link"
+import Link from "next/link";
 // Image handled by Logo component
-import { motion } from "framer-motion"
-import { Shield, Zap, Users, TrendingUp } from "lucide-react"
-import type { ReactNode } from "react"
-import { LocaleSwitcher } from "@/components/locale-switcher"
-import { ThemeToggle } from "@/components/theme-toggle"
-import { useTranslations } from "@/lib/i18n"
-import Logo from "@/components/logo"
+import { motion } from "framer-motion";
+import { Shield, Zap, Users, TrendingUp } from "lucide-react";
+import type { ReactNode } from "react";
+import { LocaleSwitcher } from "@/components/locale-switcher";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { useTranslations } from "@/lib/i18n";
+import Logo from "@/components/logo";
 
 interface AuthLayoutProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 export function AuthLayout({ children }: AuthLayoutProps) {
-  const { t } = useTranslations()
+  const { t, localize } = useTranslations();
 
   return (
     <motion.div
@@ -40,15 +40,23 @@ export function AuthLayout({ children }: AuthLayoutProps) {
 
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           <div>
-            <Link href="/" className="flex items-center gap-2">
-              <Logo alt={t("common.brandName")} containerClassName="relative w-40 h-10" />
+            <Link href={localize("/")} className="flex items-center gap-2">
+              <Logo
+                alt={t("common.brandName")}
+                containerClassName="relative w-40 h-10"
+              />
             </Link>
           </div>
 
           <div className="flex flex-col gap-8 max-w-lg">
-            <h1 className="text-4xl xl:text-5xl font-bold text-white leading-tight text-balance">
+            {/* Not an <h1>: this line is the same on every auth screen, so as
+                a heading it made /login and /forgot-password share one — which
+                tells a crawler the two pages are about the same thing. The
+                page's own heading carries the H1 instead; this is brand copy
+                and keeps its size through styling, not through its tag. */}
+            <p className="text-4xl xl:text-5xl font-bold text-white leading-tight text-balance">
               {t("auth.hero.headline")}
-            </h1>
+            </p>
             <p className="text-lg text-slate-300 leading-relaxed">
               {t("auth.hero.description")}
             </p>
@@ -73,7 +81,18 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           </div>
 
           <div className="flex items-center justify-between gap-4 text-sm text-slate-500">
-            <span>{t("auth.footer.copyright")}</span>
+            <div className="flex items-center gap-3">
+              <span>{t("auth.footer.copyright")}</span>
+              <span className="text-slate-600" aria-hidden>
+                •
+              </span>
+              <Link
+                href={localize("/terms")}
+                className="hover:text-slate-300 underline underline-offset-2 transition-colors"
+              >
+                {t("auth.footer.termsLink")}
+              </Link>
+            </div>
             <div className="flex items-center gap-3">
               <LocaleSwitcher tone="inverted" />
               <ThemeToggle />
@@ -86,7 +105,10 @@ export function AuthLayout({ children }: AuthLayoutProps) {
       <div className="flex-1 flex flex-col">
         {/* Mobile Header */}
         <header className="lg:hidden flex items-center justify-between p-6 border-b border-border bg-background/50 backdrop-blur-md">
-          <Link href="/" className="flex items-center gap-2 group relative z-40">
+          <Link
+            href={localize("/")}
+            className="flex items-center gap-2 group relative z-40"
+          >
             <Logo alt={t("common.brandName")} />
           </Link>
           <div className="flex items-center gap-3">
@@ -100,21 +122,32 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           <div className="w-full max-w-md">{children}</div>
         </div>
 
-        {/* Desktop Footer */}
-        <div className="hidden lg:flex items-center justify-center p-6 border-t border-border">
-          <p className="text-sm text-muted-foreground">
-            {t("auth.footer.helpPrefix")} {" "}
+        {/* Form Footer */}
+        <footer className="flex items-center justify-center p-6 border-t border-border">
+          <p className="text-sm text-muted-foreground flex items-center justify-center gap-3 flex-wrap">
+            <span>
+              {t("auth.footer.helpPrefix")}{" "}
+              <Link
+                href={localize("/contact")}
+                className="text-foreground font-medium underline underline-offset-2 hover:text-accent transition-colors"
+              >
+                {t("auth.footer.supportLink")}
+              </Link>
+            </span>
+            <span className="text-muted-foreground/60" aria-hidden>
+              •
+            </span>
             <Link
-              href="#"
+              href={localize("/terms")}
               className="text-foreground font-medium underline underline-offset-2 hover:text-accent transition-colors"
             >
-              {t("auth.footer.supportLink")}
+              {t("auth.footer.termsLink")}
             </Link>
           </p>
-        </div>
+        </footer>
       </div>
     </motion.div>
-  )
+  );
 }
 
 function Feature({
@@ -122,9 +155,9 @@ function Feature({
   title,
   subtitle,
 }: {
-  icon: ReactNode
-  title: string
-  subtitle: string
+  icon: ReactNode;
+  title: string;
+  subtitle: string;
 }) {
   return (
     <div className="flex items-center gap-4">
@@ -136,5 +169,5 @@ function Feature({
         <p className="text-sm text-slate-400">{subtitle}</p>
       </div>
     </div>
-  )
+  );
 }

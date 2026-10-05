@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   gverifyService,
   gverifyNotStarted,
@@ -13,15 +13,17 @@ import {
   type GVerifyStatusResponse,
   type GVerifyKybVerifyPayload,
   type GVerifyKybVerifyResponse,
+  type GVerifyKybCertificate,
   type GVerifyKybStatusResponse,
-} from '@/services/gverify.service';
-import type { ApiError } from '@/lib/types';
+} from "@/services/gverify.service";
+import type { ApiError } from "@/lib/types";
 
 // ---------- Query keys ----------
 export const gverifyKeys = {
-  all: ['gverify'] as const,
-  status: () => [...gverifyKeys.all, 'status'] as const,
-  kybStatus: () => [...gverifyKeys.all, 'kyb-status'] as const,
+  all: ["gverify"] as const,
+  status: () => [...gverifyKeys.all, "status"] as const,
+  kybCertificate: () => [...gverifyKeys.all, "kyb-certificate"] as const,
+  kybStatus: () => [...gverifyKeys.all, "kyb-status"] as const,
 };
 
 interface UseGVerifyStatusOptions {
@@ -34,7 +36,10 @@ interface UseGVerifyStatusOptions {
 // Latest GVerify KYC attempt for the logged-in investor. A 404 means they
 // never attempted, surfaced as a synthetic NOT_STARTED so the UI renders from
 // status.
-export function useGVerifyStatus({ enabled = true, poll = false }: UseGVerifyStatusOptions = {}) {
+export function useGVerifyStatus({
+  enabled = true,
+  poll = false,
+}: UseGVerifyStatusOptions = {}) {
   return useQuery<GVerifyStatusResponse, ApiError>({
     queryKey: gverifyKeys.status(),
     enabled,
@@ -64,7 +69,10 @@ export function useGVerifyVerify() {
   return useMutation<GVerifyVerifyResponse, ApiError, GVerifyVerifyPayload>({
     mutationFn: (payload) => gverifyService.verify(payload),
     onSuccess: (data) => {
-      queryClient.setQueryData(gverifyKeys.status(), verifyResponseToStatus(data));
+      queryClient.setQueryData(
+        gverifyKeys.status(),
+        verifyResponseToStatus(data),
+      );
     },
     onError: () => {
       void queryClient.invalidateQueries({ queryKey: gverifyKeys.status() });
@@ -105,10 +113,17 @@ export function useGVerifyKybStatus(enabled = true) {
 // status cache. A 502 leaves a FAILED attempt server-side → invalidate.
 export function useGVerifyKybVerify() {
   const queryClient = useQueryClient();
-  return useMutation<GVerifyKybVerifyResponse, ApiError, GVerifyKybVerifyPayload>({
+  return useMutation<
+    GVerifyKybVerifyResponse,
+    ApiError,
+    GVerifyKybVerifyPayload
+  >({
     mutationFn: (payload) => gverifyService.kybVerify(payload),
     onSuccess: (data) => {
-      queryClient.setQueryData(gverifyKeys.kybStatus(), kybVerifyResponseToStatus(data));
+      queryClient.setQueryData(
+        gverifyKeys.kybStatus(),
+        kybVerifyResponseToStatus(data),
+      );
     },
     onError: () => {
       void queryClient.invalidateQueries({ queryKey: gverifyKeys.kybStatus() });
@@ -126,6 +141,34 @@ interface TokenVerifyInput {
 // desktop discovers the verdict through its polling status query.
 export function useGVerifyVerifyWithToken() {
   return useMutation<GVerifyVerifyResponse, ApiError, TokenVerifyInput>({
-    mutationFn: ({ payload, token }) => gverifyService.verifyWithToken(payload, token),
+    mutationFn: ({ payload, token }) =>
+      gverifyService.verifyWithToken(payload, token),
+  });
+}
+
+/**
+ * The certificate the SME already gave us for KYB, as a short-lived URL.
+ *
+ * 404 means "nothing stored" — an ordinary outcome, since retention is
+ * best-effort — so it resolves to null rather than throwing. The caller then
+ * asks for an upload instead of rendering a broken preview.
+ *
+ * Not cached for long: the URL expires in 10 minutes, and serving a dead link
+ * from cache is worse than refetching.
+ */
+export function useKybCertificate(enabled = true) {
+  return useQuery<GVerifyKybCertificate | null, ApiError>({
+    queryKey: gverifyKeys.kybCertificate(),
+    enabled,
+    queryFn: async () => {
+      try {
+        return await gverifyService.kybGetCertificate();
+      } catch (err) {
+        if ((err as ApiError)?.status === 404) return null;
+        throw err;
+      }
+    },
+    staleTime: 5 * 60 * 1000,
+    retry: false,
   });
 }

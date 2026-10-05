@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState } from "react"
-import { Loader2, Upload } from "lucide-react"
+import { useEffect, useRef, useState } from "react";
+import { Loader2, Upload } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -9,23 +9,25 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useToast } from "@/hooks/use-toast"
-import { useUpdateAvatar } from "@/hooks/use-users"
-import { AVATAR_RULES } from "@/services/users.service"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useToast } from "@/hooks/use-toast";
+import { useUpdateAvatar } from "@/hooks/use-users";
+import { AVATAR_RULES } from "@/services/users.service";
+import { apiErrorMessage } from "@/lib/api-error-message";
+import { useTranslations } from "@/lib/i18n";
 
 interface AvatarUploadDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  currentAvatarUrl?: string | null
-  fullName?: string
-  initials: string
-  t: (key: string, vars?: Record<string, string | number>) => string
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  currentAvatarUrl?: string | null;
+  fullName?: string;
+  initials: string;
+  t: (key: string, vars?: Record<string, string | number>) => string;
 }
 
-const ACCEPT = AVATAR_RULES.contentTypes.join(",")
+const ACCEPT = AVATAR_RULES.contentTypes.join(",");
 
 export function AvatarUploadDialog({
   open,
@@ -35,44 +37,45 @@ export function AvatarUploadDialog({
   initials,
   t,
 }: AvatarUploadDialogProps) {
-  const { toast } = useToast()
-  const updateAvatar = useUpdateAvatar()
-  const inputRef = useRef<HTMLInputElement>(null)
+  const { toast } = useToast();
+  const { locale } = useTranslations();
+  const updateAvatar = useUpdateAvatar();
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const [file, setFile] = useState<File | null>(null)
-  const [objectUrl, setObjectUrl] = useState<string | null>(null)
-  const [progress, setProgress] = useState(0)
+  const [file, setFile] = useState<File | null>(null);
+  const [objectUrl, setObjectUrl] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
 
   // Revoke the object URL whenever it changes or the dialog unmounts.
   useEffect(() => {
     return () => {
-      if (objectUrl) URL.revokeObjectURL(objectUrl)
-    }
-  }, [objectUrl])
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [objectUrl]);
 
   const reset = () => {
-    setFile(null)
-    setObjectUrl(null)
-    setProgress(0)
-  }
+    setFile(null);
+    setObjectUrl(null);
+    setProgress(0);
+  };
 
   const handleOpenChange = (next: boolean) => {
-    if (!next) reset()
-    onOpenChange(next)
-  }
+    if (!next) reset();
+    onOpenChange(next);
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const picked = e.target.files?.[0]
-    e.target.value = "" // allow re-picking the same file
-    if (!picked) return
+    const picked = e.target.files?.[0];
+    e.target.value = ""; // allow re-picking the same file
+    if (!picked) return;
 
     if (!AVATAR_RULES.contentTypes.includes(picked.type as never)) {
       toast({
         variant: "destructive",
         title: t("dashboard.settings.profile.avatar.failedTitle"),
         description: t("dashboard.settings.profile.avatar.invalidType"),
-      })
-      return
+      });
+      return;
     }
     if (picked.size > AVATAR_RULES.maxSizeMb * 1024 * 1024) {
       toast({
@@ -81,49 +84,55 @@ export function AvatarUploadDialog({
         description: t("dashboard.settings.profile.avatar.tooLarge", {
           maxSize: AVATAR_RULES.maxSizeMb,
         }),
-      })
-      return
+      });
+      return;
     }
 
-    if (objectUrl) URL.revokeObjectURL(objectUrl)
-    setObjectUrl(URL.createObjectURL(picked))
-    setFile(picked)
-    setProgress(0)
-  }
+    if (objectUrl) URL.revokeObjectURL(objectUrl);
+    setObjectUrl(URL.createObjectURL(picked));
+    setFile(picked);
+    setProgress(0);
+  };
 
   const handleSave = () => {
-    if (!file) return
+    if (!file) return;
     updateAvatar.mutate(
       { file, onProgress: setProgress },
       {
         onSuccess: () => {
           toast({
             title: t("dashboard.settings.profile.avatar.updatedTitle"),
-            description: t("dashboard.settings.profile.avatar.updatedDescription"),
-          })
-          handleOpenChange(false)
+            description: t(
+              "dashboard.settings.profile.avatar.updatedDescription",
+            ),
+          });
+          handleOpenChange(false);
         },
         onError: (error) => {
           toast({
             variant: "destructive",
             title: t("dashboard.settings.profile.avatar.failedTitle"),
-            description:
-              error?.message ||
+            description: apiErrorMessage(
+              error,
+              locale,
               t("dashboard.settings.profile.avatar.failedDescription"),
-          })
+            ),
+          });
         },
-      }
-    )
-  }
+      },
+    );
+  };
 
-  const previewSrc = objectUrl ?? currentAvatarUrl ?? undefined
-  const isPending = updateAvatar.isPending
+  const previewSrc = objectUrl ?? currentAvatarUrl ?? undefined;
+  const isPending = updateAvatar.isPending;
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{t("dashboard.settings.profile.avatar.title")}</DialogTitle>
+          <DialogTitle>
+            {t("dashboard.settings.profile.avatar.title")}
+          </DialogTitle>
           <DialogDescription>
             {t("dashboard.settings.profile.avatar.description")}
           </DialogDescription>
@@ -146,7 +155,9 @@ export function AvatarUploadDialog({
                 />
               </div>
               <p className="text-center text-xs text-muted-foreground">
-                {t("dashboard.settings.profile.avatar.uploading", { percent: progress })}
+                {t("dashboard.settings.profile.avatar.uploading", {
+                  percent: progress,
+                })}
               </p>
             </div>
           )}
@@ -178,7 +189,12 @@ export function AvatarUploadDialog({
           >
             {t("dashboard.settings.profile.avatar.removeAvatar")}
           </Button>
-          <Button type="button" disabled={isPending || !file} onClick={handleSave} className="gap-2">
+          <Button
+            type="button"
+            disabled={isPending || !file}
+            onClick={handleSave}
+            className="gap-2"
+          >
             {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
             {!isPending && <Upload className="h-4 w-4" />}
             {isPending
@@ -188,5 +204,5 @@ export function AvatarUploadDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

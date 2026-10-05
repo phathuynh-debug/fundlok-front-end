@@ -17,6 +17,7 @@
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.945 0.01 85);
   --muted-foreground: oklch(0.45 0 0);
+  --eyebrow: oklch(59.6% 0.145 163.225); /* emerald-600 */
   --accent: oklch(0.65 0.15 165);
   --accent-foreground: oklch(1 0 0);
   --destructive: oklch(0.577 0.245 27.325);
@@ -30,6 +31,9 @@
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
   --radius: 0.625rem;
+  /* Logo colours: lime (the "Lok") and the swirl's blue. */
+  --brand: oklch(0.86 0.21 128);
+  --brand-blue: oklch(0.7 0.14 235);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -53,6 +57,7 @@
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
+  --eyebrow: oklch(76.5% 0.177 163.223); /* emerald-400 */
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.396 0.141 25.723);
@@ -75,9 +80,31 @@
   --sidebar-ring: oklch(0.439 0 0);
 }
 
+/* The brand stage: the first-run welcome cutscreen. Always very dark teal with
+   the logo's lime as the accent, whatever the user's theme — Handbook §7.3
+   puts the brand on dark grounds only. Declared after .dark so an element
+   carrying both classes takes these values, while dark: variants still apply. */
+.brand-stage {
+  --background: oklch(0.17 0.03 205);
+  --foreground: oklch(0.97 0.006 200);
+  --card: oklch(0.215 0.032 205);
+  --card-foreground: oklch(0.97 0.006 200);
+  --primary: oklch(0.86 0.21 128);
+  --primary-foreground: oklch(0.2 0.035 205);
+  --muted: oklch(0.26 0.03 205);
+  --muted-foreground: oklch(0.76 0.02 200);
+  --border: oklch(0.33 0.032 205);
+  --input: oklch(0.33 0.032 205);
+  --ring: oklch(0.86 0.21 128);
+  --eyebrow: oklch(0.86 0.21 128);
+}
+
 @theme inline {
-  --font-sans: 'Geist', 'Geist Fallback';
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --color-brand: var(--brand);
+  --color-brand-blue: var(--brand-blue);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -125,6 +152,36 @@
   }
 }
 
+/* --------------------------------------------------------------------------- */
+/* Shared typography roles. One element = one style, everywhere it appears.     */
+/* Uppercase letter-spacing is capped at 0.05em: wider tracking pulls           */
+/* Vietnamese tone marks away from their letters.                              */
+/* --------------------------------------------------------------------------- */
+
+/* Small section label above a heading. The colour is the public-page default;
+   add a text-* class where the surface needs another (e.g. the dark footer). */
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  line-height: var(--text-xs--line-height);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  /* Via a token rather than a dark: variant so a plain text-* class can still
+     override it in both themes (a variant would out-specify it in dark). */
+  color: var(--eyebrow);
+}
+
+/* Label above a figure in cards and KPIs. */
+@utility stat-label {
+  font-size: var(--text-xs);
+  line-height: var(--text-xs--line-height);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-muted-foreground);
+}
+
 /* Small thumb variant for range inputs */
 input.thumb-sm::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -133,8 +190,8 @@ input.thumb-sm::-webkit-slider-thumb {
   height: 10px;
   border-radius: 9999px;
   background: #10b981; /* emerald-500 */
-  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
-  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   margin-top: -3px; /* vertically center on a 4px (h-1) track */
 }
 input.thumb-sm::-moz-range-thumb {
@@ -142,16 +199,16 @@ input.thumb-sm::-moz-range-thumb {
   height: 10px;
   border-radius: 9999px;
   background: #10b981;
-  border: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 input.thumb-sm::-ms-thumb {
   width: 10px;
   height: 10px;
   border-radius: 9999px;
   background: #10b981;
-  border: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 /* Add left padding for the label column in the matrix tables to avoid overlap */
@@ -165,3 +222,93 @@ input.thumb-sm {
   appearance: none;
 }
 
+/* --------------------------------------------------------------------------- */
+/* Appearance preferences (see lib/appearance.ts)                              */
+/*                                                                             */
+/* Applied as attributes on <html> so the server can set them on the first     */
+/* byte. Each accent overrides only the CHROME tokens — `--primary` and the     */
+/* two tokens that must track it (`--ring` for focus, `--sidebar-primary` for   */
+/* the active nav item). The `emerald-*` utilities used for money and status    */
+/* are untouched on purpose: they mean "received" / "settled", not "brand".     */
+/*                                                                             */
+/* `--primary-foreground` is per-accent, not shared: amber at L=0.68 needs      */
+/* near-black text to stay readable where violet at L=0.55 needs near-white.    */
+/* Light and dark get separate lightness so contrast holds in both.            */
+/* --------------------------------------------------------------------------- */
+
+/* graphite is the default and matches :root, so it needs no override. */
+
+html[data-accent="emerald"] {
+  --primary: oklch(0.6 0.14 163);
+  --primary-foreground: oklch(0.985 0 0);
+  --ring: oklch(0.6 0.14 163);
+  --sidebar-primary: oklch(0.6 0.14 163);
+}
+html.dark[data-accent="emerald"] {
+  --primary: oklch(0.72 0.15 163);
+  --primary-foreground: oklch(0.205 0 0);
+  --ring: oklch(0.72 0.15 163);
+  --sidebar-primary: oklch(0.72 0.15 163);
+}
+
+html[data-accent="blue"] {
+  --primary: oklch(0.55 0.2 258);
+  --primary-foreground: oklch(0.985 0 0);
+  --ring: oklch(0.55 0.2 258);
+  --sidebar-primary: oklch(0.55 0.2 258);
+}
+html.dark[data-accent="blue"] {
+  --primary: oklch(0.7 0.17 258);
+  --primary-foreground: oklch(0.205 0 0);
+  --ring: oklch(0.7 0.17 258);
+  --sidebar-primary: oklch(0.7 0.17 258);
+}
+
+html[data-accent="violet"] {
+  --primary: oklch(0.55 0.24 292);
+  --primary-foreground: oklch(0.985 0 0);
+  --ring: oklch(0.55 0.24 292);
+  --sidebar-primary: oklch(0.55 0.24 292);
+}
+html.dark[data-accent="violet"] {
+  --primary: oklch(0.72 0.19 292);
+  --primary-foreground: oklch(0.205 0 0);
+  --ring: oklch(0.72 0.19 292);
+  --sidebar-primary: oklch(0.72 0.19 292);
+}
+
+html[data-accent="amber"] {
+  --primary: oklch(0.68 0.17 65);
+  /* Near-black text: white on amber this light fails contrast. */
+  --primary-foreground: oklch(0.205 0 0);
+  --ring: oklch(0.68 0.17 65);
+  --sidebar-primary: oklch(0.68 0.17 65);
+}
+html.dark[data-accent="amber"] {
+  --primary: oklch(0.8 0.16 75);
+  --primary-foreground: oklch(0.205 0 0);
+  --ring: oklch(0.8 0.16 75);
+  --sidebar-primary: oklch(0.8 0.16 75);
+}
+
+html[data-accent="rose"] {
+  --primary: oklch(0.58 0.22 15);
+  --primary-foreground: oklch(0.985 0 0);
+  --ring: oklch(0.58 0.22 15);
+  --sidebar-primary: oklch(0.58 0.22 15);
+}
+html.dark[data-accent="rose"] {
+  --primary: oklch(0.72 0.19 15);
+  --primary-foreground: oklch(0.205 0 0);
+  --ring: oklch(0.72 0.19 15);
+  --sidebar-primary: oklch(0.72 0.19 15);
+}
+
+/* Corner radius. Tailwind's --radius-sm…xl all derive from --radius, so this
+   one value restyles every card, button, input and dialog. */
+html[data-radius="sharp"] {
+  --radius: 0rem;
+}
+html[data-radius="rounded"] {
+  --radius: 1rem;
+}

@@ -1,7 +1,7 @@
-import { apiClient } from '@/lib/api-client';
-import { USER_ENDPOINTS } from '@/lib/endpoints';
-import { uploadsService } from '@/services/uploads.service';
-import type { SelectableRole, User } from './authentication.service';
+import { apiClient } from "@/lib/api-client";
+import { USER_ENDPOINTS } from "@/lib/endpoints";
+import { uploadsService } from "@/services/uploads.service";
+import type { SelectableRole, User } from "./authentication.service";
 
 // Mirrors backend AvatarPresignRequest / AvatarPresignResponse.
 export interface AvatarPresignRequest {
@@ -32,15 +32,48 @@ export interface RoleSelectRequest {
   role: SelectableRole;
 }
 
+// Mirrors backend SetPasswordRequest (POST /users/me/password) — sets a FIRST
+// password on an account created without one. There's no current_password:
+// changing an existing password goes through /forgot-password, where the
+// emailed token is the proof. The backend rejects any account that already
+// has one.
+export interface SetPasswordRequest {
+  new_password: string;
+}
+
+export interface SetPasswordResponse {
+  status: string;
+  message: string;
+}
+
+// Matches the backend's `new_password: str = Field(..., min_length=8)`, so the
+// dialog can say so before spending a round trip.
+export const PASSWORD_MIN_LENGTH = 8;
+
 // Same three-step flow as the loan document upload:
 // presign → direct PUT to R2 → confirm. The file never touches the API server.
 export const AVATAR_RULES = {
   // Browser-reported MIME types we accept; the R2 PUT reuses file.type verbatim.
-  contentTypes: ['image/jpeg', 'image/png', 'image/webp'] as const,
+  contentTypes: ["image/jpeg", "image/png", "image/webp"] as const,
   maxSizeMb: 5,
 };
 
 // Pure data-access layer for /users endpoints.
+export interface ChangePasswordRequest {
+  current_password: string;
+  new_password: string;
+}
+
+export interface ChangePasswordResponse {
+  status: string;
+  /** Other sessions ended by the change — the UI tells the user. */
+  sessions_revoked: number;
+}
+
+export interface SecurityPreferences {
+  signin_alerts_enabled: boolean;
+}
+
 export const usersService = {
   // GET /users/me — returns the currently authenticated user
   getCurrentUser() {
@@ -58,10 +91,45 @@ export const usersService = {
     return apiClient.patch<User>(USER_ENDPOINTS.selectRole, { role });
   },
 
+  // POST /users/me/onboarding-tour/complete. Returns the refreshed user, so
+  // the caller can seed the cache without a follow-up GET /users/me.
+  completeOnboardingTour() {
+    return apiClient.post<User>(USER_ENDPOINTS.completeOnboardingTour);
+  },
+
+  // POST /users/me/password. Returns an ack, not the user — the caller
+  // refreshes currentUser so has_password flips to true.
+  changePassword(payload: ChangePasswordRequest) {
+    return apiClient.post<ChangePasswordResponse>(
+      USER_ENDPOINTS.changePassword,
+      payload,
+    );
+  },
+
+  getSecurityPreferences() {
+    return apiClient.get<SecurityPreferences>(
+      USER_ENDPOINTS.securityPreferences,
+    );
+  },
+
+  updateSecurityPreferences(payload: SecurityPreferences) {
+    return apiClient.patch<SecurityPreferences>(
+      USER_ENDPOINTS.securityPreferences,
+      payload,
+    );
+  },
+
+  setPassword(payload: SetPasswordRequest) {
+    return apiClient.post<SetPasswordResponse>(
+      USER_ENDPOINTS.setPassword,
+      payload,
+    );
+  },
+
   presignAvatar(payload: AvatarPresignRequest) {
     return apiClient.post<AvatarPresignResponse>(
       USER_ENDPOINTS.avatarPresign,
-      payload
+      payload,
     );
   },
 
@@ -76,7 +144,7 @@ export const usersService = {
     onProgress?: (percent: number) => void;
   }): Promise<User> {
     const { file, onProgress } = params;
-    const contentType = file.type || 'application/octet-stream';
+    const contentType = file.type || "application/octet-stream";
 
     const presign = await this.presignAvatar({
       filename: file.name,
@@ -90,7 +158,7 @@ export const usersService = {
       presign.upload_url,
       file,
       contentType,
-      onProgress
+      onProgress,
     );
 
     return this.confirmAvatar({ file_key: presign.file_key });

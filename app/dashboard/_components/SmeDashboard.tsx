@@ -1,13 +1,19 @@
 "use client";
 
+import Link from "next/link";
+import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
-import { MapPin, CheckCircle2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { MapPin, CheckCircle2, Rocket, ArrowRight, Target } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Project } from "@/services/projects.service";
 import { useTranslations } from "@/lib/i18n";
+import { industryLabel } from "@/lib/industry-label";
 import { cn } from "@/lib/utils";
 import { getIndustryTheme } from "./sme-dashboard-config";
 import { formatDate, formatDateTime } from "@/lib/format-date";
+import { enumLabel } from "@/lib/enum-labels";
+import { useVerificationGate } from "@/hooks/use-verification-gate";
 import { LoanApplicationUpload } from "./loan-application/LoanApplicationUpload";
 import { LoanApplicationStatus } from "./loan-application/LoanApplicationStatus";
 
@@ -26,8 +32,51 @@ interface SmeDashboardProps {
 export function SmeDashboard({ projects }: SmeDashboardProps) {
   const project = projects[0];
   const { locale, t } = useTranslations();
+  const { needsVerification, openVerification } = useVerificationGate();
 
-  if (!project) return null;
+  // No project yet → invite the SME to apply. "Apply for funding" links to
+  // /project-application, which the proxy KYB-gates: an unverified SME is sent
+  // through /kyc first, then returned to the application form.
+  if (!project) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
+        className="flex-1 p-4 md:p-8 pt-6"
+      >
+        <Card className="mx-auto flex max-w-2xl flex-col items-center gap-6 rounded-2xl border border-dashed bg-card p-8 text-center md:p-12">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <Rocket className="h-8 w-8" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground">
+              {t("dashboard.sme.emptyTitle")}
+            </h2>
+            <p className="mx-auto max-w-md text-sm leading-relaxed text-muted-foreground">
+              {t("dashboard.sme.emptyDescription")}
+            </p>
+          </div>
+          <Button asChild size="lg" className="gap-2" data-tour="sme-apply">
+            <Link
+              href="/project-application"
+              onClick={(event) => {
+                // An SME without an approved KYB verifies in a new tab; this
+                // one continues to the application once it's approved.
+                if (needsVerification("/project-application")) {
+                  event.preventDefault();
+                  openVerification("/project-application");
+                }
+              }}
+            >
+              {t("dashboard.sme.emptyCta")}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
+        </Card>
+      </motion.div>
+    );
+  }
 
   const theme = getIndustryTheme(project.industry);
 
@@ -39,7 +88,12 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
   );
 
   return (
-    <div className="flex-1 space-y-6 md:space-y-8 p-4 md:p-8 pt-6 relative overflow-hidden">
+    <motion.div
+      initial={{ opacity: 0, y: -12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
+      className="flex-1 space-y-6 md:space-y-8 p-4 md:p-8 pt-6 relative overflow-hidden"
+    >
       {/* Dynamic Industry Ambient Background Decoration */}
       <div
         className={cn(
@@ -71,10 +125,10 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
 
         <div className="grid gap-6 p-6 md:p-8 lg:grid-cols-[1.4fr_0.6fr] items-stretch relative z-10">
           {/* Left Column: Project Profile Details */}
-          <div className="space-y-6 flex flex-col justify-between">
+          <div className="min-w-0 space-y-6 flex flex-col justify-between">
             {/* Header / Eyebrow */}
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs font-bold tracking-widest text-muted-foreground uppercase">
+              <div className="flex items-center gap-2 text-xs font-bold tracking-wider text-muted-foreground uppercase">
                 <span className="relative flex h-2.5 w-2.5">
                   <span
                     className={cn(
@@ -104,9 +158,14 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
                   variant={
                     project.status === "ACTIVE" ? "default" : "secondary"
                   }
-                  className="text-xs px-2.5 py-0.5 bg-black text-white rounded-full"
+                  className={cn(
+                    "text-xs px-2.5 py-0.5 rounded-full",
+                    project.status === "ACTIVE"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground",
+                  )}
                 >
-                  {project.status || t("dashboard.projectCard.status.draft")}
+                  {enumLabel(t, "projectStatus", project.status || "DRAFT")}
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed italic">
@@ -117,9 +176,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
             {/* Responsive Key Values Metrics Grid */}
             <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 pt-4 border-t border-border/40">
               <div className="space-y-1">
-                <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
-                  {t("dashboard.sme.industry")}
-                </p>
+                <p className="stat-label">{t("dashboard.sme.industry")}</p>
                 <p
                   className={cn(
                     "text-base font-bold flex items-center gap-1.5",
@@ -127,21 +184,19 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
                   )}
                 >
                   <theme.icon className="h-4 w-4 shrink-0" />
-                  {project.industry}
+                  {industryLabel(project.industry, t)}
                 </p>
               </div>
 
               <div className="space-y-1">
-                <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
-                  {t("dashboard.sme.taxId")}
-                </p>
+                <p className="stat-label">{t("dashboard.sme.taxId")}</p>
                 <p className="text-base font-bold text-foreground">
                   {project.tax_id}
                 </p>
               </div>
 
               <div className="space-y-1">
-                <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
+                <p className="stat-label">
                   {t("dashboard.sme.incorporationDate")}
                 </p>
                 <p className="text-base font-bold text-foreground">
@@ -152,11 +207,11 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
               </div>
 
               <div className="space-y-1">
-                <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
-                  {t("dashboard.sme.daysActive")}
-                </p>
+                <p className="stat-label">{t("dashboard.sme.daysActive")}</p>
                 <p className="text-base font-bold text-foreground">
-                  {Math.max(0, daysActive)} days
+                  {t("dashboard.sme.dayCount", {
+                    count: Math.max(0, daysActive),
+                  })}
                 </p>
               </div>
             </div>
@@ -203,15 +258,36 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
                   {t("dashboard.sme.systemRecordDetails")}
                 </h4>
                 <div className="space-y-1 text-xs text-muted-foreground">
-                  <p className="font-mono truncate">ID: {project.id}</p>
+                  <p className="font-mono break-all">ID: {project.id}</p>
                   <p>
-                    Created:{" "}
+                    {t("dashboard.sme.createdAt")}:{" "}
                     {project.created_at
                       ? formatDateTime(project.created_at, locale)
                       : t("common.na")}
                   </p>
                 </div>
               </div>
+            </div>
+
+            {/* Loan purpose. Prose, not a metric — it gets its own full-width
+                row rather than a cell in the four-column grid above, which is
+                sized for short values like a tax ID. */}
+            <div className="space-y-2 pt-4 border-t border-border/40 text-sm">
+              <h4 className="font-semibold text-foreground flex items-center gap-2">
+                <Target className={cn("h-4 w-4", theme.accentColor)} />
+                {t("dashboard.sme.loanPurpose")}
+              </h4>
+              <p
+                className={cn(
+                  "text-xs leading-relaxed",
+                  project.loan_application?.purpose
+                    ? "text-muted-foreground"
+                    : "text-muted-foreground/70 italic",
+                )}
+              >
+                {project.loan_application?.purpose?.trim() ||
+                  t("dashboard.sme.noLoanPurpose")}
+              </p>
             </div>
           </div>
 
@@ -244,7 +320,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
               </div>
               <div className="space-y-1">
                 <p className="font-bold text-foreground text-base">
-                  {project.industry}
+                  {industryLabel(project.industry, t)}
                 </p>
                 <p className="text-xs text-muted-foreground max-w-[180px] leading-relaxed">
                   {locale === "vi"
@@ -271,11 +347,12 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
         ) : (
           <LoanApplicationStatus
             loanApplication={project.loan_application}
+            companyName={project.legal_name}
             locale={locale}
             theme={theme}
             t={t}
           />
         ))}
-    </div>
+    </motion.div>
   );
 }

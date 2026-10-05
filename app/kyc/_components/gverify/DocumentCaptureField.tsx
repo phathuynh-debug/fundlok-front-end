@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { AlertCircle, FileText, Upload } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { useTranslations } from '@/lib/i18n';
-import { KYB_ACCEPT, type StagedDocument } from './useGVerifyKyb';
+import { AlertCircle, FileText, Upload } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useTranslations } from "@/lib/i18n";
+import { KYB_ACCEPT, type StagedDocument } from "./useGVerifyKyb";
 
 interface DocumentCaptureFieldProps {
   document: StagedDocument;
@@ -23,7 +23,7 @@ export function DocumentCaptureField({
   label,
 }: DocumentCaptureFieldProps) {
   const { t, locale } = useTranslations();
-  const inputId = 'gverify-kyb-document';
+  const inputId = "gverify-kyb-document";
 
   return (
     <div className="space-y-2 text-left">
@@ -36,12 +36,17 @@ export function DocumentCaptureField({
           if (!disabled) window.document.getElementById(inputId)?.click();
         }}
         className={cn(
-          'flex min-h-24 items-center justify-center gap-3 rounded-xl border border-dashed p-3 transition-all duration-200',
-          disabled && 'cursor-wait opacity-60',
-          !disabled && 'cursor-pointer',
-          doc.error && 'border-destructive/60 bg-destructive/5 hover:bg-destructive/10',
-          doc.file && !doc.error && 'border-emerald-500/50 bg-emerald-500/5 dark:bg-emerald-950/10',
-          !doc.file && !doc.error && 'border-border bg-muted/20 hover:border-primary/50 hover:bg-accent/40',
+          "flex min-h-24 items-center justify-center gap-3 rounded-xl border border-dashed p-3 transition-all duration-200",
+          disabled && "cursor-wait opacity-60",
+          !disabled && "cursor-pointer",
+          doc.error &&
+            "border-destructive/60 bg-destructive/5 hover:bg-destructive/10",
+          doc.file &&
+            !doc.error &&
+            "border-emerald-500/50 bg-emerald-500/5 dark:bg-emerald-950/10",
+          !doc.file &&
+            !doc.error &&
+            "border-border bg-muted/20 hover:border-primary/50 hover:bg-accent/40",
         )}
       >
         <input
@@ -50,7 +55,7 @@ export function DocumentCaptureField({
           className="hidden"
           accept={KYB_ACCEPT}
           onClick={(e) => {
-            (e.target as HTMLInputElement).value = '';
+            (e.target as HTMLInputElement).value = "";
           }}
           onChange={(e) => onSelect(e.target.files?.[0] ?? null)}
         />
@@ -68,7 +73,9 @@ export function DocumentCaptureField({
               <FileText className="h-8 w-8 shrink-0 text-primary" />
             )}
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-foreground">{doc.file.name}</p>
+              <p className="truncate text-sm font-medium text-foreground">
+                {doc.file.name}
+              </p>
               <p className="text-xs text-muted-foreground">
                 {(doc.file.size / (1024 * 1024)).toFixed(2)} MB
               </p>
@@ -84,21 +91,25 @@ export function DocumentCaptureField({
                 onSelect(null);
               }}
             >
-              {locale === 'vi' ? 'Xoá' : 'Remove'}
+              {locale === "vi" ? "Xoá" : "Remove"}
             </Button>
           </>
         ) : doc.error ? (
           <>
             <AlertCircle className="h-5 w-5 shrink-0 text-destructive" />
             <span className="text-sm text-destructive">
-              {t(doc.error === 'invalidTypeDoc' ? 'kyc.kyb.invalidTypeDoc' : `kyc.gv.${doc.error}`)}
+              {t(
+                doc.error === "invalidTypeDoc"
+                  ? "kyc.kyb.invalidTypeDoc"
+                  : `kyc.gv.${doc.error}`,
+              )}
             </span>
           </>
         ) : (
           <>
             <Upload className="h-5 w-5 shrink-0 text-muted-foreground" />
             <span className="text-sm font-medium text-muted-foreground">
-              {t('kyc.kyb.clickToAdd')}
+              {t("kyc.kyb.clickToAdd")}
             </span>
           </>
         )}

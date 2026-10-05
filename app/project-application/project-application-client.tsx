@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,10 +13,12 @@ import {
   Send,
   ArrowRight,
   ArrowLeft,
+  ShieldCheck,
 } from "lucide-react";
 import { useForm, type Path } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -30,19 +32,41 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { useCreateProject, useMyProjects } from "@/hooks/use-projects";
+import { useGVerifyKybStatus } from "@/hooks/use-gverify";
+import { splitKybAddress } from "@/lib/kyb-address";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { useTranslations } from "@/lib/i18n";
+import { digitsOnly, formatAmountInput } from "@/lib/format-currency";
+import { NumericInput } from "@/components/ui/numeric-input";
 import { cn } from "@/lib/utils";
 import {
   VN_PROVINCES,
   SUPPORTED_COUNTRIES,
   DEFAULT_COUNTRY,
 } from "@/lib/vn-provinces";
+import { INDUSTRY_OPTIONS } from "@/lib/constants/industries";
+import { industryLabel } from "@/lib/industry-label";
+import {
+  LOAN_DURATIONS_MONTHS,
+  LOAN_MAX_DURATION_MONTHS,
+  LOAN_MAX_VND,
+  LOAN_MIN_DURATION_MONTHS,
+  LOAN_MIN_VND,
+} from "@/lib/constants/loan-constraints";
+import {
+  companySizeForHeadcount,
+  MAX_EMPLOYEES,
+  MIN_EMPLOYEES,
+} from "@/lib/constants/company-size";
+import { apiErrorMessage } from "@/lib/api-error-message";
 
 type ProjectApplicationValues = {
   legal_name: string;
   tax_id: string;
   industry: string;
+  // Headcount, entered by the SME. `company_size` (micro/small/medium) is
+  // derived from it for the grading engine, which does not take a count.
+  employee_count: string;
   incorporation_date: string;
   address: {
     street: string;
@@ -53,12 +77,27 @@ type ProjectApplicationValues = {
   };
   loan: {
     requested_amount: string;
+    // Loan term in months. Held as a string because it comes from a radio
+    // group; coerced to a number in the submit payload.
+    duration_months: string;
     purpose?: string;
     repayment_preference: string;
   };
 };
 
 const TOTAL_STEPS = 5;
+
+// No Vietnamese enterprise predates this by any margin that matters, and it is
+// far enough back to never reject a real company. Its job is to catch a typo,
+// not to adjudicate history.
+const INCORPORATION_DATE_MIN = "1900-01-01";
+
+/** Today as YYYY-MM-DD in the viewer's own timezone, not UTC. */
+function todayIso(): string {
+  const now = new Date();
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 10);
+}
 
 export default function ProjectApplicationClient() {
   const router = useRouter();
@@ -81,9 +120,47 @@ export default function ProjectApplicationClient() {
       .string()
       .trim()
       .min(2, t("projectApplication.validation.industry")),
+    employee_count: z
+      .string()
+      .trim()
+      .refine((value) => {
+        const count = Number(value);
+        return (
+          Number.isInteger(count) &&
+          count >= MIN_EMPLOYEES &&
+          count <= MAX_EMPLOYEES
+        );
+      }, t("projectApplication.validation.employeeCount")),
+    // A native date input does NOT bound the year: typing extra digits yields
+    // "20003-05-12", which the browser accepts and the backend rejects with a
+    // parser message naming a field the applicant never saw. The `min`/`max`
+    // attributes on the input keep the picker honest; this keeps a typed or
+    // pasted value honest too.
     incorporation_date: z
       .string()
-      .min(1, t("projectApplication.validation.incorporationDate")),
+      .min(1, t("projectApplication.validation.incorporationDate"))
+      .refine(
+        (value) => /^\d{4}-\d{2}-\d{2}$/.test(value),
+        t("projectApplication.validation.incorporationDateFormat"),
+      )
+      .refine((value) => {
+        const parsed = new Date(`${value}T00:00:00Z`);
+        // Date accepts "2025-02-31" and rolls it forward, so round-trip it.
+        return (
+          !Number.isNaN(parsed.getTime()) &&
+          parsed.toISOString().slice(0, 10) === value
+        );
+      }, t("projectApplication.validation.incorporationDateFormat"))
+      .refine(
+        (value) => value >= INCORPORATION_DATE_MIN,
+        t("projectApplication.validation.incorporationDateTooEarly"),
+      )
+      .refine(
+        // A future incorporation date would make operating_months negative,
+        // which the grading engine has no sensible answer for.
+        (value) => value <= todayIso(),
+        t("projectApplication.validation.incorporationDateFuture"),
+      ),
     address: z.object({
       street: z
         .string()
@@ -101,13 +178,28 @@ export default function ProjectApplicationClient() {
         .min(2, t("projectApplication.validation.country")),
     }),
     loan: z.object({
+      // Engine bounds, not house style: loan_constraints in
+      // grading_params_v1.yaml refuses anything outside 20M-5bn before it
+      // scores, so catch it here rather than as a 500 at scoring time.
       requested_amount: z
         .string()
         .trim()
         .min(1, t("projectApplication.validation.requestedAmount"))
+        .refine((value) => {
+          const amount = Number(value);
+          return amount >= LOAN_MIN_VND && amount <= LOAN_MAX_VND;
+        }, t("projectApplication.validation.requestedAmountRange")),
+      // The grading engine accepts only these four terms, so anything else is
+      // rejected here rather than at scoring time.
+      duration_months: z
+        .string()
+        .trim()
         .refine(
-          (value) => Number(value) > 0,
-          t("projectApplication.validation.requestedAmount"),
+          (value) =>
+            (LOAN_DURATIONS_MONTHS as readonly number[]).includes(
+              Number(value),
+            ),
+          t("projectApplication.validation.durationMonths"),
         ),
       purpose: z.string().trim().optional(),
       repayment_preference: z
@@ -131,6 +223,7 @@ export default function ProjectApplicationClient() {
       legal_name: "",
       tax_id: "",
       industry: "",
+      employee_count: "",
       incorporation_date: "",
       address: {
         street: "",
@@ -141,77 +234,105 @@ export default function ProjectApplicationClient() {
       },
       loan: {
         requested_amount: "",
+        duration_months: "3",
         purpose: "",
-        repayment_preference: "",
+        // The only way a FundLok facility is repaid: a fixed amount each
+        // business day. Monthly/quarterly/lump-sum options do not exist.
+        repayment_preference: "DAILY",
       },
     },
   });
 
   useEffect(() => {
     register("industry");
+    register("loan.requested_amount");
+    register("loan.duration_months");
     register("loan.repayment_preference");
     register("address.city");
     register("address.country");
   }, [register]);
 
+  // KYB already read the legal name and tax code off the business registration
+  // certificate, so retyping them here only invites a mismatch with what was
+  // verified. Only an SME has a KYB record to read.
+  const { data: kyb } = useGVerifyKybStatus(user?.role === "SME");
+  const kybLegalName = kyb?.is_approved ? kyb.business_name : null;
+  const kybTaxId = kyb?.is_approved ? kyb.tax_code : null;
+  // The certificate carries the head-office address as one free-text line, so
+  // only the province is recoverable with confidence — see lib/kyb-address.ts.
+  // Ward/district land in the street line and the postal code is not on the
+  // certificate at all, so both stay the SME's to finish.
+  const kybAddress = splitKybAddress(
+    kyb?.is_approved ? kyb.company_address : null,
+  );
+  // One-shot: once seeded, a later refetch must not overwrite an edit.
+  const prefillAppliedRef = useRef(false);
+
+  useEffect(() => {
+    if (prefillAppliedRef.current) return;
+    if (!kybLegalName && !kybTaxId && !kybAddress.street && !kybAddress.city) {
+      return;
+    }
+
+    prefillAppliedRef.current = true;
+    // Never clobber something already typed — the SME may have started filling
+    // the form before the KYB status query resolved.
+    if (kybLegalName && !getValues("legal_name")) {
+      setValue("legal_name", kybLegalName, { shouldValidate: true });
+    }
+    if (kybTaxId && !getValues("tax_id")) {
+      setValue("tax_id", kybTaxId, { shouldValidate: true });
+    }
+    if (kybAddress.street && !getValues("address.street")) {
+      setValue("address.street", kybAddress.street, { shouldValidate: true });
+    }
+    if (kybAddress.city && !getValues("address.city")) {
+      setValue("address.city", kybAddress.city, { shouldValidate: true });
+    }
+  }, [
+    kybLegalName,
+    kybTaxId,
+    kybAddress.street,
+    kybAddress.city,
+    getValues,
+    setValue,
+  ]);
+
   const selectedIndustry = watch("industry");
+  const legalNameValue = watch("legal_name");
+  const taxIdValue = watch("tax_id");
+  const employeeCount = watch("employee_count");
+  const derivedCompanySize = companySizeForHeadcount(Number(employeeCount));
+  const requestedAmount = watch("loan.requested_amount");
+  const selectedDuration = watch("loan.duration_months");
   const selectedRepayment = watch("loan.repayment_preference");
+  const streetValue = watch("address.street");
   const selectedCity = watch("address.city");
   const selectedCountry = watch("address.country");
 
+  // Derived, not stored: each notice describes what is currently in its step's
+  // fields, so it retires itself once the SME has edited those values away from
+  // what KYB read off the certificate.
+  const prefilledFromKyb =
+    (!!kybLegalName && legalNameValue === kybLegalName) ||
+    (!!kybTaxId && taxIdValue === kybTaxId);
+  const prefilledAddressFromKyb =
+    (!!kybAddress.street && streetValue === kybAddress.street) ||
+    (!!kybAddress.city && selectedCity === kybAddress.city);
+
   const repaymentOptions = [
     {
-      value: "MONTHLY",
-      label: t("projectApplication.repaymentOptions.monthly"),
-    },
-    {
-      value: "QUARTERLY",
-      label: t("projectApplication.repaymentOptions.quarterly"),
-    },
-    {
-      value: "END_OF_TERM",
-      label: t("projectApplication.repaymentOptions.endOfTerm"),
+      value: "DAILY",
+      label: t("projectApplication.repaymentOptions.daily"),
     },
   ];
 
-  const industries = [
-    {
-      value: "Technology & Software",
-      label: t("projectApplication.industries.tech"),
-    },
-    {
-      value: "Retail & E-commerce",
-      label: t("projectApplication.industries.retail"),
-    },
-    {
-      value: "Healthcare & Medical",
-      label: t("projectApplication.industries.healthcare"),
-    },
-    {
-      value: "Manufacturing",
-      label: t("projectApplication.industries.manufacturing"),
-    },
-    {
-      value: "Food & Beverage / Hospitality",
-      label: t("projectApplication.industries.foodBev"),
-    },
-    {
-      value: "Logistics & Transportation",
-      label: t("projectApplication.industries.logistics"),
-    },
-    {
-      value: "Construction & Real Estate",
-      label: t("projectApplication.industries.construction"),
-    },
-    {
-      value: "Professional Services",
-      label: t("projectApplication.industries.professional"),
-    },
-    {
-      value: "Other",
-      label: t("projectApplication.industries.other"),
-    },
-  ];
+  // `value` is the grading engine's own industry string and is submitted
+  // verbatim — see lib/constants/industries.ts. Only the label is translated.
+  const industries = INDUSTRY_OPTIONS.map((option) => ({
+    value: option.value,
+    label: t(`projectApplication.industries.${option.labelKey}`),
+  }));
 
   useEffect(() => {
     if (isAuthLoading || !user) {
@@ -231,14 +352,14 @@ export default function ProjectApplicationClient() {
     }
 
     if (!isLoading && projects.length > 0) {
-      window.location.href = "/dashboard";
+      router.replace("/dashboard");
     }
   }, [isAuthLoading, isLoading, projects.length, router, user]);
 
   const handleNextStep = async () => {
     let fieldsToValidate: Path<ProjectApplicationValues>[] = [];
     if (currentStep === 1) {
-      fieldsToValidate = ["legal_name", "tax_id", "industry"];
+      fieldsToValidate = ["legal_name", "tax_id", "industry", "employee_count"];
     } else if (currentStep === 2) {
       fieldsToValidate = [
         "address.street",
@@ -250,8 +371,23 @@ export default function ProjectApplicationClient() {
     } else if (currentStep === 3) {
       fieldsToValidate = ["incorporation_date"];
     } else if (currentStep === 4) {
+      const rawAmount = getValues("loan.requested_amount");
+      if (rawAmount) {
+        const numeric = Number(rawAmount);
+        if (numeric > 0 && numeric < LOAN_MIN_VND) {
+          setValue("loan.requested_amount", String(LOAN_MIN_VND), {
+            shouldValidate: true,
+          });
+        } else if (numeric > LOAN_MAX_VND) {
+          setValue("loan.requested_amount", String(LOAN_MAX_VND), {
+            shouldValidate: true,
+          });
+        }
+      }
+
       fieldsToValidate = [
         "loan.requested_amount",
+        "loan.duration_months",
         "loan.purpose",
         "loan.repayment_preference",
       ];
@@ -268,11 +404,17 @@ export default function ProjectApplicationClient() {
   };
 
   const onSubmit = (values: ProjectApplicationValues) => {
-    const { loan, ...project } = values;
+    const { loan, employee_count, ...project } = values;
+    const headcount = Number(employee_count);
     const payload = {
       ...project,
+      employee_count: headcount,
+      // Derived rather than asked: the engine takes a band, not a count. The
+      // zod refine above guarantees the headcount falls inside one.
+      company_size: companySizeForHeadcount(headcount) ?? "micro",
       loan_application: {
         requested_amount: Number(loan.requested_amount),
+        duration_months: Number(loan.duration_months),
         purpose: loan.purpose?.trim() || null,
         repayment_preference: loan.repayment_preference,
       },
@@ -284,14 +426,17 @@ export default function ProjectApplicationClient() {
           title: t("projectApplication.toasts.submittedTitle"),
           description: t("projectApplication.toasts.submittedDescription"),
         });
-        window.location.href = "/dashboard";
+        router.push("/dashboard");
       },
       onError: (error) => {
         toast({
           variant: "destructive",
           title: t("projectApplication.toasts.failedTitle"),
-          description:
-            error?.message || t("projectApplication.toasts.failedDescription"),
+          description: apiErrorMessage(
+            error,
+            locale,
+            t("projectApplication.toasts.failedDescription"),
+          ),
         });
       },
     });
@@ -315,10 +460,10 @@ export default function ProjectApplicationClient() {
           <LocaleSwitcher />
         </div>
         <div className="space-y-3">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
+          <p className="eyebrow text-primary">
             {t("projectApplication.eyebrow")}
           </p>
-          <h1 className="text-4xl font-bold tracking-tight text-foreground lg:text-5xl">
+          <h1 className="text-4xl font-bold leading-tight tracking-tight text-foreground lg:text-5xl">
             {t("projectApplication.title")}
           </h1>
           <p className="max-w-xl text-base leading-7 text-muted-foreground">
@@ -432,6 +577,18 @@ export default function ProjectApplicationClient() {
             {/* Step 1: Business details */}
             {currentStep === 1 && (
               <div className="space-y-4 animate-in fade-in duration-200">
+                {prefilledFromKyb && (
+                  <p className="flex items-start gap-2 rounded-xl border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
+                    <ShieldCheck
+                      className="mt-px h-4 w-4 shrink-0 text-emerald-600"
+                      aria-hidden
+                    />
+                    <span>
+                      {t("projectApplication.hints.prefilledFromKyb")}
+                    </span>
+                  </p>
+                )}
+
                 <Field
                   label={t("projectApplication.fields.legalName")}
                   htmlFor="legalName"
@@ -486,12 +643,64 @@ export default function ProjectApplicationClient() {
                     </SelectContent>
                   </Select>
                 </Field>
+
+                <Field
+                  label={t("projectApplication.fields.employeeCount")}
+                  htmlFor="employeeCount"
+                  error={errors.employee_count?.message}
+                >
+                  {/* Not `type="number"`: that still accepts e/E/+/- and
+                      reports an empty value while the contents are invalid, so
+                      the form state disagrees with the screen. Headcount is a
+                      plain count — the bounds are the schema's job, the keyboard
+                      is this field's. Written through setValue for the same
+                      reason the amount field below is: `register`'s own onChange
+                      would receive the raw keystroke. */}
+                  <NumericInput
+                    id="employeeCount"
+                    placeholder={t(
+                      "projectApplication.placeholders.employeeCount",
+                    )}
+                    value={employeeCount ?? ""}
+                    onValueChange={(digits) =>
+                      setValue("employee_count", digits, {
+                        shouldValidate: true,
+                      })
+                    }
+                    disabled={isPending}
+                  />
+                  {derivedCompanySize ? (
+                    <p className="mt-2 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                      {t("projectApplication.hints.companySizeDerived", {
+                        size: t(
+                          `projectApplication.companySizes.${derivedCompanySize}`,
+                        ),
+                      })}
+                    </p>
+                  ) : (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {t("projectApplication.hints.employeeCount")}
+                    </p>
+                  )}
+                </Field>
               </div>
             )}
 
             {/* Step 2: Location */}
             {currentStep === 2 && (
               <div className="space-y-4 animate-in fade-in duration-200">
+                {prefilledAddressFromKyb && (
+                  <p className="flex items-start gap-2 rounded-xl border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
+                    <ShieldCheck
+                      className="mt-px h-4 w-4 shrink-0 text-emerald-600"
+                      aria-hidden
+                    />
+                    <span>
+                      {t("projectApplication.hints.prefilledAddressFromKyb")}
+                    </span>
+                  </p>
+                )}
+
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Field
                     label={t("projectApplication.fields.street")}
@@ -522,7 +731,9 @@ export default function ProjectApplicationClient() {
                     >
                       <SelectTrigger id="city" className="w-full">
                         <SelectValue
-                          placeholder={t("projectApplication.placeholders.city")}
+                          placeholder={t(
+                            "projectApplication.placeholders.city",
+                          )}
                         />
                       </SelectTrigger>
                       <SelectContent>
@@ -584,7 +795,9 @@ export default function ProjectApplicationClient() {
                   >
                     <SelectTrigger id="country" className="w-full">
                       <SelectValue
-                        placeholder={t("projectApplication.placeholders.country")}
+                        placeholder={t(
+                          "projectApplication.placeholders.country",
+                        )}
                       />
                     </SelectTrigger>
                     <SelectContent>
@@ -610,6 +823,10 @@ export default function ProjectApplicationClient() {
                   <Input
                     id="incorporationDate"
                     type="date"
+                    // Bounds the native picker AND the spinner, so a 5-digit
+                    // year cannot be produced in the first place.
+                    min={INCORPORATION_DATE_MIN}
+                    max={todayIso()}
                     {...register("incorporation_date")}
                     disabled={isPending}
                   />
@@ -625,17 +842,143 @@ export default function ProjectApplicationClient() {
                   htmlFor="requestedAmount"
                   error={errors.loan?.requested_amount?.message}
                 >
+                  {/* Text, not number: a number input rejects the grouping
+                      separators, so the field would show a bare 100000000.
+                      Form state keeps the raw digits; only the display is
+                      grouped. */}
                   <Input
                     id="requestedAmount"
-                    type="number"
-                    min="0"
-                    step="any"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="off"
                     placeholder={t(
                       "projectApplication.placeholders.requestedAmount",
                     )}
-                    {...register("loan.requested_amount")}
+                    value={formatAmountInput(requestedAmount ?? "", locale)}
+                    onChange={(event) => {
+                      const digits = digitsOnly(event.target.value);
+                      if (!digits) {
+                        setValue("loan.requested_amount", "", {
+                          shouldValidate: true,
+                        });
+                        return;
+                      }
+                      const numeric = Number(digits);
+                      if (numeric > LOAN_MAX_VND) {
+                        setValue(
+                          "loan.requested_amount",
+                          String(LOAN_MAX_VND),
+                          {
+                            shouldValidate: true,
+                          },
+                        );
+                      } else {
+                        setValue("loan.requested_amount", digits, {
+                          shouldValidate: true,
+                        });
+                      }
+                    }}
+                    onBlur={() => {
+                      const current = getValues("loan.requested_amount");
+                      if (!current) return;
+                      const numeric = Number(current);
+                      if (numeric > 0 && numeric < LOAN_MIN_VND) {
+                        setValue(
+                          "loan.requested_amount",
+                          String(LOAN_MIN_VND),
+                          {
+                            shouldValidate: true,
+                          },
+                        );
+                      } else if (numeric > LOAN_MAX_VND) {
+                        setValue(
+                          "loan.requested_amount",
+                          String(LOAN_MAX_VND),
+                          {
+                            shouldValidate: true,
+                          },
+                        );
+                      }
+                    }}
                     disabled={isPending}
                   />
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {t("projectApplication.hints.requestedAmountRange", {
+                      min: formatAmountInput(String(LOAN_MIN_VND), locale),
+                      max: formatAmountInput(String(LOAN_MAX_VND), locale),
+                    })}
+                  </p>
+                </Field>
+
+                <Field
+                  label={t("projectApplication.fields.durationMonths")}
+                  htmlFor="durationMonths"
+                  error={errors.loan?.duration_months?.message}
+                >
+                  <div className="space-y-4 pt-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground font-medium">
+                        {t("projectApplication.hints.durationMonthsRange", {
+                          min: LOAN_MIN_DURATION_MONTHS,
+                          max: LOAN_MAX_DURATION_MONTHS,
+                        })}
+                      </span>
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20 shadow-2xs">
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                        {t("projectApplication.durationOptions.months", {
+                          count: Number(selectedDuration || 3),
+                        })}
+                      </span>
+                    </div>
+
+                    <Slider
+                      id="durationMonths"
+                      aria-label={t("projectApplication.fields.durationMonths")}
+                      min={LOAN_MIN_DURATION_MONTHS}
+                      max={LOAN_MAX_DURATION_MONTHS}
+                      step={1}
+                      value={[Number(selectedDuration || 3)]}
+                      onValueChange={(val) => {
+                        setValue("loan.duration_months", String(val[0]), {
+                          shouldValidate: true,
+                        });
+                      }}
+                      disabled={isPending}
+                      className="py-2 cursor-pointer"
+                    />
+
+                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
+                      {LOAN_DURATIONS_MONTHS.map((months) => {
+                        const isSelected =
+                          Number(selectedDuration || 3) === months;
+                        return (
+                          <button
+                            key={months}
+                            type="button"
+                            disabled={isPending}
+                            onClick={() =>
+                              setValue("loan.duration_months", String(months), {
+                                shouldValidate: true,
+                              })
+                            }
+                            className={cn(
+                              "py-1.5 text-xs rounded-lg transition-all font-semibold cursor-pointer border text-center",
+                              isSelected
+                                ? "bg-primary text-primary-foreground border-primary shadow-xs"
+                                : "border-border/60 bg-muted/30 text-muted-foreground hover:bg-muted hover:text-foreground",
+                            )}
+                          >
+                            {t("projectApplication.durationOptions.months", {
+                              count: months,
+                            })}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {t("projectApplication.hints.durationMonths")}
+                  </p>
                 </Field>
 
                 <Field
@@ -643,30 +986,19 @@ export default function ProjectApplicationClient() {
                   htmlFor="repaymentPreference"
                   error={errors.loan?.repayment_preference?.message}
                 >
-                  <Select
-                    value={selectedRepayment}
-                    onValueChange={(value) =>
-                      setValue("loan.repayment_preference", value, {
-                        shouldValidate: true,
-                      })
-                    }
-                    disabled={isPending}
+                  {/* Not a choice: every facility repays a fixed amount each
+                      business day, so this is shown, not selected. */}
+                  <p
+                    id="repaymentPreference"
+                    className="rounded-md border border-input bg-muted/40 px-3 py-2 text-sm text-foreground"
                   >
-                    <SelectTrigger id="repaymentPreference" className="w-full">
-                      <SelectValue
-                        placeholder={t(
-                          "projectApplication.placeholders.repaymentPreference",
-                        )}
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {repaymentOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    {repaymentOptions.find(
+                      (option) => option.value === selectedRepayment,
+                    )?.label ?? t("projectApplication.repaymentOptions.daily")}
+                  </p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {t("projectApplication.hints.repaymentPreference")}
+                  </p>
                 </Field>
 
                 <Field
@@ -708,7 +1040,17 @@ export default function ProjectApplicationClient() {
 
                     <span>{t("projectApplication.fields.industry")}:</span>
                     <span className="text-foreground font-semibold">
-                      {getValues("industry")}
+                      {industryLabel(getValues("industry"), t)}
+                    </span>
+
+                    <span>{t("projectApplication.fields.employeeCount")}:</span>
+                    <span className="text-foreground font-semibold">
+                      {getValues("employee_count")}
+                      {derivedCompanySize
+                        ? ` · ${t(
+                            `projectApplication.companySizes.${derivedCompanySize}`,
+                          )}`
+                        : ""}
                     </span>
                   </div>
                 </div>
@@ -719,7 +1061,7 @@ export default function ProjectApplicationClient() {
                     <span>{t("projectApplication.info.locationTitle")}</span>
                   </h3>
                   <div className="grid grid-cols-[120px_1fr] gap-y-2 text-muted-foreground">
-                    <span>Address:</span>
+                    <span>{t("projectApplication.fields.address")}:</span>
                     <span className="text-foreground font-semibold leading-relaxed">
                       {getValues("address.street")}, {getValues("address.city")}
                       {getValues("address.state")
@@ -765,6 +1107,15 @@ export default function ProjectApplicationClient() {
                     </span>
 
                     <span>
+                      {t("projectApplication.fields.durationMonths")}:
+                    </span>
+                    <span className="text-foreground font-semibold">
+                      {t("projectApplication.durationOptions.months", {
+                        count: getValues("loan.duration_months"),
+                      })}
+                    </span>
+
+                    <span>
                       {t("projectApplication.fields.repaymentPreference")}:
                     </span>
                     <span className="text-foreground font-semibold">
@@ -801,7 +1152,7 @@ export default function ProjectApplicationClient() {
                   className="h-11 px-6 flex items-center gap-2"
                 >
                   <ArrowLeft className="h-4 w-4" />
-                  <span>Back</span>
+                  <span>{t("projectApplication.card.back")}</span>
                 </Button>
               )}
 
@@ -812,7 +1163,7 @@ export default function ProjectApplicationClient() {
                   onClick={handleNextStep}
                   className="h-11 px-6 ml-auto flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
                 >
-                  <span>Next</span>
+                  <span>{t("projectApplication.card.next")}</span>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               ) : (

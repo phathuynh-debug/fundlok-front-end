@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Mail, RefreshCw, LogOut, Loader2, XCircle, CheckCircle2 } from "lucide-react";
+import { Mail, RefreshCw, LogOut, Loader2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCurrentUser, useLogout } from "@/hooks/use-authentication";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authenticationService } from "@/services/authentication.service";
+import type { ApiError } from "@/lib/types";
 
 export function VerifyEmailClient() {
   const { data: user, refetch } = useCurrentUser();
@@ -16,12 +17,21 @@ export function VerifyEmailClient() {
   const { toast } = useToast();
   const { t } = useTranslations();
   const router = useRouter();
-  
+  // The token check must run once per token, not again when the language
+  // changes (a consumed token would then fail), so the effect reads the
+  // current translator through a ref instead of depending on `t`.
+  const tRef = useRef(t);
+  useEffect(() => {
+    tRef.current = t;
+  }, [t]);
+
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
   const [isVerifyingToken, setIsVerifyingToken] = useState(!!token);
-  const [verificationError, setVerificationError] = useState<string | null>(null);
+  const [verificationError, setVerificationError] = useState<string | null>(
+    null,
+  );
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isResending, setIsResending] = useState(false);
 
@@ -32,21 +42,34 @@ export function VerifyEmailClient() {
         setIsVerifyingToken(true);
         setVerificationError(null);
         try {
-          const res = await authenticationService.verifyEmail(token);
+          await authenticationService.verifyEmail(token);
           toast({
-            title: "Success",
-            description: res.message || "Email verified successfully!",
+            title: tRef.current("common.success"),
+            description: tRef.current("auth.verifyEmail.verifiedToast"),
           });
           // Refetch current user to update cache
-          await refetch();
-          router.push("/dashboard");
-        } catch (err: any) {
-          const errMsg = err?.response?.data?.detail || "Invalid or expired verification link.";
-          setVerificationError(errMsg);
+          const { data: verifiedUser } = await refetch();
+          // The link is usually opened from a mail client with no session, so
+          // /dashboard would only bounce back to /login. Send those users
+          // straight there; already-signed-in users continue to the app.
+          router.push(verifiedUser ? "/dashboard" : "/login");
+        } catch (err) {
+          // apiClient's interceptor flattens the axios error to
+          // { message, details, status }. The backend's message is English
+          // only, so a 4xx (bad, used or expired token) gets our own localized
+          // explanation; anything else (5xx, network) gets a localized
+          // "try again" rather than raw server text.
+          const status = (err as ApiError)?.status;
+          // Stored as a key so the message follows a later language switch.
+          const errKey =
+            status && status >= 400 && status < 500
+              ? "auth.verifyEmail.invalidLink"
+              : "auth.verifyEmail.verifyFailedGeneric";
+          setVerificationError(errKey);
           toast({
             variant: "destructive",
-            title: "Verification Failed",
-            description: errMsg,
+            title: tRef.current("auth.verifyEmail.failedTitle"),
+            description: tRef.current(errKey),
           });
         } finally {
           setIsVerifyingToken(false);
@@ -62,22 +85,22 @@ export function VerifyEmailClient() {
       const { data } = await refetch();
       if (data?.email_verified) {
         toast({
-          title: "Email verified!",
-          description: "Your email has been verified. Redirecting...",
+          title: t("auth.verifyEmail.verifiedTitle"),
+          description: t("auth.verifyEmail.verifiedRedirect"),
         });
         router.push("/dashboard");
       } else {
         toast({
           variant: "destructive",
-          title: "Verification pending",
-          description: "We couldn't confirm your verification. Please check your inbox and click the verification link first.",
+          title: t("auth.verifyEmail.pendingTitle"),
+          description: t("auth.verifyEmail.pendingDescription"),
         });
       }
     } catch {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "An error occurred while checking status. Please try again.",
+        title: t("common.error"),
+        description: t("auth.verifyEmail.checkStatusFailed"),
       });
     } finally {
       setIsRefreshing(false);
@@ -88,25 +111,25 @@ export function VerifyEmailClient() {
     if (!user?.email) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "User email address not found. Please log in again.",
+        title: t("common.error"),
+        description: t("auth.verifyEmail.emailNotFound"),
       });
       return;
     }
-    
+
     setIsResending(true);
     try {
-      const res = await authenticationService.resendVerification(user.email);
+      await authenticationService.resendVerification(user.email);
       toast({
         title: t("auth.verifyEmail.resendSuccess"),
-        description: res.message,
+        description: t("auth.verifyEmail.resendSuccessDescription"),
       });
-    } catch (err: any) {
-      const errMsg = err?.response?.data?.detail || t("auth.verifyEmail.resendFailed");
+    } catch {
+      // The backend's reason is English only; show our localized message.
       toast({
         variant: "destructive",
-        title: t("auth.verifyEmail.resendFailed"),
-        description: errMsg,
+        title: t("common.error"),
+        description: t("auth.verifyEmail.resendFailed"),
       });
     } finally {
       setIsResending(false);
@@ -118,8 +141,12 @@ export function VerifyEmailClient() {
       <div className="flex flex-col items-center justify-center space-y-6 text-center py-8">
         <Loader2 className="h-12 w-12 text-emerald-500 animate-spin" />
         <div className="space-y-2">
-          <h3 className="text-xl font-bold text-foreground">Verifying email...</h3>
-          <p className="text-sm text-muted-foreground">Please wait while we confirm your verification token.</p>
+          <h3 className="text-xl font-bold text-foreground">
+            {t("auth.verifyEmail.verifyingTitle")}
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            {t("auth.verifyEmail.verifyingDescription")}
+          </p>
         </div>
       </div>
     );
@@ -132,14 +159,19 @@ export function VerifyEmailClient() {
           <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 border border-red-500/20">
             <XCircle className="h-8 w-8" />
           </div>
-          <h2 className="text-2xl font-bold text-foreground">Verification Failed</h2>
+          <h2 className="text-2xl font-bold text-foreground">
+            {t("auth.verifyEmail.failedTitle")}
+          </h2>
           <p className="text-muted-foreground text-sm max-w-sm leading-relaxed">
-            {verificationError}
+            {t(verificationError)}
           </p>
         </div>
         <div className="space-y-3 pt-4">
-          <Button onClick={() => setVerificationError(null)} className="w-full h-11">
-            Back to verification options
+          <Button
+            onClick={() => setVerificationError(null)}
+            className="w-full h-11"
+          >
+            {t("auth.verifyEmail.backToOptions")}
           </Button>
           <Button
             onClick={() => logout()}
@@ -175,15 +207,17 @@ export function VerifyEmailClient() {
         <h2 className="text-2xl lg:text-3xl font-bold text-foreground">
           {t("auth.verifyEmail.title")}
         </h2>
-        
+
         <p className="text-muted-foreground text-sm lg:text-base max-w-sm leading-relaxed">
           {t("auth.verifyEmail.description")}
         </p>
 
         {user?.email && (
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-900 border border-border text-xs lg:text-sm text-slate-700 dark:text-slate-300">
-            <span className="font-semibold text-muted-foreground">{t("auth.verifyEmail.statusLabel")}:</span>
-            <span className="font-mono">{user.email}</span>
+          <div className="inline-flex max-w-full items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-900 border border-border text-xs lg:text-sm text-slate-700 dark:text-slate-300">
+            <span className="font-semibold text-muted-foreground">
+              {t("auth.verifyEmail.statusLabel")}:
+            </span>
+            <span className="min-w-0 break-all">{user.email}</span>
           </div>
         )}
       </div>
@@ -211,7 +245,7 @@ export function VerifyEmailClient() {
         {/* Resend verification button */}
         <Button
           onClick={handleResend}
-          disabled={isResending}
+          disabled={isResending || isRefreshing || !user?.email}
           variant="outline"
           className="w-full h-11"
         >
