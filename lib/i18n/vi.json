@@ -1715,7 +1715,11 @@
     "successDescription": "Bạn đã đầu tư {amount}.",
     "successTitle": "Đầu tư thành công",
     "title": "Xác nhận khoản đầu tư",
-    "verifiedBadge": "Đã xác minh danh tính"
+    "unavailableAction": "Quay lại thị trường",
+    "unavailableDescription": "Dự án này hiện chưa thể tiếp nhận đầu tư do hệ thống chưa tích hợp cổng thanh toán. Chúng tôi đang hoàn thiện kết nối kênh thanh toán với đối tác ngân hàng và sẽ thông báo đến bạn ngay khi sẵn sàng.",
+    "unavailableTitle": "Dự án hiện chưa khả dụng",
+    "verifiedBadge": "Đã xác minh danh tính",
+    "viewDetailsNotice": "Xem lại thông báo"
   },
   "investment": {
     "dueDiligence": {

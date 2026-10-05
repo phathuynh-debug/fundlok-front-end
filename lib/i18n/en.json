@@ -1715,7 +1715,11 @@
     "successDescription": "You have invested {amount}.",
     "successTitle": "Investment successful",
     "title": "Confirm your investment",
-    "verifiedBadge": "Identity verified"
+    "unavailableAction": "Back to marketplace",
+    "unavailableDescription": "This project is not currently available for investment because our payment gateway is not yet integrated. We are currently working on connecting bank payment channels and will notify you as soon as payment is supported.",
+    "unavailableTitle": "Project Not Currently Available",
+    "verifiedBadge": "Identity verified",
+    "viewDetailsNotice": "View notice again"
   },
   "investment": {
     "dueDiligence": {

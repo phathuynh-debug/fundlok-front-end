@@ -33,14 +33,18 @@ test.describe("/dashboard/invest", () => {
     ).toBeVisible();
   });
 
-  test("confirming reports success", async ({ page }) => {
+  test("confirming informs that project is not currently available", async ({
+    page,
+  }) => {
     await page.goto(`/dashboard/invest?amount=${amount}`);
 
     await page
       .getByRole("button", { name: t("investConfirm.confirmBtn") })
       .click();
 
-    await expect(page.getByText(t("investConfirm.doneHint"))).toBeVisible();
+    await expect(
+      page.getByText(t("investConfirm.unavailableTitle")).first(),
+    ).toBeVisible();
   });
 
   test("offers a way back to the marketplace", async ({ page }) => {
