@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   ShieldCheck,
@@ -11,6 +12,7 @@ import {
   AlertTriangle,
   RotateCcw,
   Clock,
+  Headphones,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -19,6 +21,8 @@ import { useTranslations } from "@/lib/i18n";
 import { StatusBlock } from "../_components/status-block";
 import { CaptureTabs } from "../_components/gverify/CaptureTabs";
 import { useGVerifyKyc } from "../_components/gverify/useGVerifyKyc";
+import { useVerificationFailures } from "../_components/use-verification-failures";
+import { VerificationHelpDialog } from "../_components/VerificationHelpDialog";
 import type { GVerifyVerifyResponse } from "@/services/gverify.service";
 import type { ApiError } from "@/lib/types";
 import { apiErrorMessage, backendText } from "@/lib/api-error-message";
@@ -35,17 +39,37 @@ export function MobileKycClient() {
     useGVerifyKyc({
       handoffToken: token,
     });
+  const {
+    failureCount,
+    isDialogOpen,
+    setIsDialogOpen,
+    recordFailure,
+    resetFailures,
+  } = useVerificationFailures("kyc");
 
   // The phone session has no query cache to lean on — track the outcome of
   // this submission locally.
   const [verdict, setVerdict] = useState<GVerifyVerifyResponse | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (verdict?.is_approved) {
+      resetFailures();
+    }
+  }, [verdict?.is_approved, resetFailures]);
+
   const handleSubmit = async () => {
     setFailure(null);
     try {
-      setVerdict(await submit());
+      const res = await submit();
+      setVerdict(res);
+      if (res.status === "REJECTED" || res.status === "FAILED") {
+        recordFailure();
+      } else if (res.status === "APPROVED") {
+        resetFailures();
+      }
     } catch (err) {
+      recordFailure();
       const apiError = err as ApiError;
       // 401 = the 10-minute token expired (or was tampered with).
       setFailure(
@@ -104,10 +128,24 @@ export function MobileKycClient() {
               t("kyc.declinedHint"),
             )}
           >
-            <Button className="h-11 w-full" onClick={retake}>
-              <RotateCcw className="mr-2 h-4 w-4" />
-              {t("kyc.retryBtn")}
-            </Button>
+            <div className="flex flex-col gap-2 w-full">
+              <Button className="h-11 w-full" onClick={retake}>
+                <RotateCcw className="mr-2 h-4 w-4" />
+                {t("kyc.retryBtn")}
+              </Button>
+              {failureCount >= 3 && (
+                <Button
+                  variant="outline"
+                  asChild
+                  className="h-11 w-full border-border bg-card hover:bg-accent text-foreground"
+                >
+                  <Link href="/contact?purpose=support">
+                    <Headphones className="mr-2 h-4 w-4" />
+                    {t("kyc.contactSupportBtn")}
+                  </Link>
+                </Button>
+              )}
+            </div>
           </StatusBlock>
         ) : /* --- Provider failure / expired token --- */ failure ? (
           <StatusBlock
@@ -115,10 +153,24 @@ export function MobileKycClient() {
             title={t("kyc.gv.failedTitle")}
             hint={failure}
           >
-            <Button className="h-11 w-full" onClick={retake}>
-              <RotateCcw className="mr-2 h-4 w-4" />
-              {t("kyc.retryBtn")}
-            </Button>
+            <div className="flex flex-col gap-2 w-full">
+              <Button className="h-11 w-full" onClick={retake}>
+                <RotateCcw className="mr-2 h-4 w-4" />
+                {t("kyc.retryBtn")}
+              </Button>
+              {failureCount >= 3 && (
+                <Button
+                  variant="outline"
+                  asChild
+                  className="h-11 w-full border-border bg-card hover:bg-accent text-foreground"
+                >
+                  <Link href="/contact?purpose=support">
+                    <Headphones className="mr-2 h-4 w-4" />
+                    {t("kyc.contactSupportBtn")}
+                  </Link>
+                </Button>
+              )}
+            </div>
           </StatusBlock>
         ) : (
           /* --- Capture --- */
@@ -164,6 +216,12 @@ export function MobileKycClient() {
             </Button>
           </>
         )}
+
+        <VerificationHelpDialog
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          flow="kyc"
+        />
       </motion.div>
     </div>
   );

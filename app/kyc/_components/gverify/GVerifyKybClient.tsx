@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -15,6 +15,7 @@ import {
   FileText,
   Clock,
   IdCard,
+  Headphones,
 } from "lucide-react";
 
 import Link from "next/link";
@@ -35,6 +36,8 @@ import { StatusBlock } from "../status-block";
 import { DocumentCaptureField } from "./DocumentCaptureField";
 import { KycCapturePanel } from "./KycCapturePanel";
 import { useGVerifyKyb } from "./useGVerifyKyb";
+import { useVerificationFailures } from "../use-verification-failures";
+import { VerificationHelpDialog } from "../VerificationHelpDialog";
 import type { ApiError } from "@/lib/types";
 import { apiErrorMessage, backendText } from "@/lib/api-error-message";
 
@@ -90,6 +93,13 @@ export function GVerifyKybClient() {
     submit,
     submitting,
   } = useGVerifyKyb();
+  const {
+    failureCount,
+    isDialogOpen,
+    setIsDialogOpen,
+    recordFailure,
+    resetFailures,
+  } = useVerificationFailures("kyb");
 
   // After a REJECTED/FAILED verdict the result screen shows first; "try again"
   // flips into capture mode for a fresh attempt.
@@ -102,6 +112,12 @@ export function GVerifyKybClient() {
   const landing = postVerificationTarget(searchParams.get("next"), user?.role);
   const isApproved = status?.is_approved === true;
 
+  useEffect(() => {
+    if (isApproved) {
+      resetFailures();
+    }
+  }, [isApproved, resetFailures]);
+
   // Approval changes what the SERVER will do with this session: proxy.ts routes
   // on /gverify/kyb/status, and it has already answered "not approved" for this
   // page load, so the next hop must be a full document load. In a verification
@@ -113,9 +129,12 @@ export function GVerifyKybClient() {
     try {
       const verdict = await submit();
       setRetaking(false);
-      if (verdict.status === "REJECTED") {
+      if (verdict.status === "REJECTED" || verdict.status === "FAILED") {
         reset();
         setStep(1);
+        recordFailure();
+      } else if (verdict.status === "APPROVED") {
+        resetFailures();
       }
     } catch (err) {
       const apiError = err as ApiError;
@@ -124,6 +143,7 @@ export function GVerifyKybClient() {
       // representative check is on) before spending any provider call.
       const needsIdentity = apiError?.code === "KYC_REQUIRED";
       setStep(needsIdentity && identityRequired ? 2 : 1);
+      recordFailure();
       toast({
         variant: "destructive",
         title: t("kyc.gv.errorTitle"),
@@ -218,16 +238,30 @@ export function GVerifyKybClient() {
                     )
             }
           >
-            <Button
-              className="h-11 w-full"
-              onClick={() => {
-                setRetaking(true);
-                setStep(1);
-              }}
-            >
-              <RotateCcw className="mr-2 h-4 w-4" />
-              {t("kyc.retryBtn")}
-            </Button>
+            <div className="flex flex-col gap-2 w-full">
+              <Button
+                className="h-11 w-full"
+                onClick={() => {
+                  setRetaking(true);
+                  setStep(1);
+                }}
+              >
+                <RotateCcw className="mr-2 h-4 w-4" />
+                {t("kyc.retryBtn")}
+              </Button>
+              {failureCount >= 3 && (
+                <Button
+                  variant="outline"
+                  asChild
+                  className="h-11 w-full border-border bg-card hover:bg-accent text-foreground"
+                >
+                  <Link href="/contact?purpose=support">
+                    <Headphones className="mr-2 h-4 w-4" />
+                    {t("kyc.contactSupportBtn")}
+                  </Link>
+                </Button>
+              )}
+            </div>
           </StatusBlock>
         ) : (
           /* --- Two-step wizard: document first, then review & submit --- */
@@ -457,6 +491,7 @@ export function GVerifyKybClient() {
                 </StatusBlock>
               ) : (
                 <KycCapturePanel
+                  flow="kyb"
                   onBack={() => setStep(1)}
                   heading={
                     <div className="space-y-1.5 text-left">
@@ -561,6 +596,12 @@ export function GVerifyKybClient() {
             )}
           </>
         )}
+
+        <VerificationHelpDialog
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          flow="kyb"
+        />
       </motion.div>
     </div>
   );

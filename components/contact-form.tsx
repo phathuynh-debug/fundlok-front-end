@@ -29,7 +29,23 @@ export function ContactForm() {
   const { t, locale } = useTranslations();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [purpose, setPurpose] = useState("");
+  const [purpose, setPurpose] = useState(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const urlPurpose = params.get("purpose");
+        if (
+          urlPurpose &&
+          CONTACT_PURPOSE_OPTIONS.some((opt) => opt.value === urlPurpose)
+        ) {
+          return urlPurpose;
+        }
+      } catch {
+        // ignore
+      }
+    }
+    return "";
+  });
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
 

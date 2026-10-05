@@ -1807,6 +1807,7 @@
     "approvedHint": "Mọi thứ đã sẵn sàng. Đang đưa bạn đến bảng điều khiển…",
     "approvedTitle": "Đã xác minh danh tính",
     "checking": "Đang kiểm tra xác minh của bạn…",
+    "contactSupportBtn": "Liên hệ hỗ trợ",
     "continueBtn": "Tiếp tục",
     "declinedHint": "Chúng tôi không thể xác minh danh tính của bạn. Bạn có thể thử lại.",
     "declinedTitle": "Xác minh thất bại",
@@ -1851,6 +1852,13 @@
       "tabFront": "CCCD mặt trước",
       "tabSelfie": "Chân dung",
       "tooLarge": "Ảnh vượt quá giới hạn 10MB"
+    },
+    "helpDialog": {
+      "closeBtn": "Thử lại sau",
+      "contactBtn": "Liên hệ hỗ trợ",
+      "kybDescription": "Hệ thống ghi nhận bạn đã gặp sự cố khi xác minh giấy tờ doanh nghiệp nhiều lần. Vui lòng liên hệ với đội ngũ hỗ trợ của chúng tôi để được trợ giúp trực tiếp.",
+      "kycDescription": "Hệ thống ghi nhận bạn đã xác minh không thành công 3 lần. Đội ngũ hỗ trợ của FundLok sẵn sàng hướng dẫn và giải quyết yêu cầu xác minh cho bạn.",
+      "title": "Cần hỗ trợ xác minh?"
     },
     "inProgress": "Đang xác minh…",
     "inReviewHint": "Đội ngũ của chúng tôi đang xem xét hồ sơ của bạn. Chúng tôi sẽ gửi email khi hoàn tất — bạn có thể rời khỏi trang này.",
