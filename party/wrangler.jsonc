@@ -11,4 +11,18 @@
   // SQLite-backed: Cloudflare no longer allows new key-value-backed Durable
   // Objects, which is what the old PartyKit CLI tried to create.
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Main"] }],
+
+  "env": {
+    // `wrangler deploy --env staging`: a SEPARATE worker with its own Durable
+    // Object namespace and its own secrets, so staging can never reach (or be
+    // reached from) production rooms. Bindings and migrations are not inherited
+    // by an environment, so they are repeated here.
+    "staging": {
+      "name": "fundlok-notifications-staging",
+      "durable_objects": {
+        "bindings": [{ "name": "Main", "class_name": "Main" }],
+      },
+      "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Main"] }],
+    },
+  },
 }

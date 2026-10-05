@@ -10,7 +10,16 @@
 // bell falls back to polling, so a problem here is logged loudly and the build
 // carries on.
 //
-// Needs these in Vercel's Production environment:
+// Which relay a build deploys:
+//   Vercel Production build                 -> worker "fundlok-notifications"
+//   Vercel Preview build of the `preview`   -> worker "fundlok-notifications-staging"
+//     branch (staging)                         (its own Durable Objects and secrets)
+//   anything else (PR previews, local)      -> skipped
+// The two workers share no state and no secrets, so staging can never reach
+// production rooms.
+//
+// Needs these in Vercel (Production for the first, Preview for the second; use
+// different hostnames and different secrets in each):
 //   NEXT_PUBLIC_PARTYKIT_HOST   the hostname the relay is served on, no scheme
 //                               (e.g. realtime.fundlok.com) -- also what the app
 //                               connects to, so there is one value, not two.
@@ -32,10 +41,17 @@ const partyDir = path.join(
 );
 const tag = "[partykit]";
 
-if (process.env.VERCEL_ENV !== "production") {
-  console.log(`${tag} skipped: not a Vercel production build`);
+const isProduction = process.env.VERCEL_ENV === "production";
+const isStaging =
+  process.env.VERCEL_ENV === "preview" &&
+  process.env.VERCEL_GIT_COMMIT_REF === "preview";
+if (!isProduction && !isStaging) {
+  console.log(
+    `${tag} skipped: only the production build and the "preview" branch deploy the relay`,
+  );
   process.exit(0);
 }
+const target = isProduction ? "production" : "staging";
 
 const required = [
   "NEXT_PUBLIC_PARTYKIT_HOST",
@@ -47,7 +63,7 @@ const required = [
 const missing = required.filter((name) => !process.env[name]);
 if (missing.length > 0) {
   console.warn(
-    `${tag} skipped: missing ${missing.join(", ")} in Vercel's Production env`,
+    `${tag} skipped (${target}): missing ${missing.join(", ")} in Vercel's ${isProduction ? "Production" : "Preview"} env`,
   );
   process.exit(0);
 }
@@ -78,6 +94,11 @@ try {
           "--",
           "wrangler",
           "deploy",
+          // An empty --env targets the top-level (production) config explicitly.
+          "--env",
+          isStaging ? "staging" : "",
+          // Test hook: compile and check without uploading anything.
+          ...(process.env.PARTYKIT_DEPLOY_DRY_RUN === "1" ? ["--dry-run"] : []),
           "--domain",
           process.env.NEXT_PUBLIC_PARTYKIT_HOST,
           "--secrets-file",
@@ -89,10 +110,12 @@ try {
 }
 
 if (deploy.status === 0) {
-  console.log(`${tag} deployed to ${process.env.NEXT_PUBLIC_PARTYKIT_HOST}`);
+  console.log(
+    `${tag} deployed ${target} relay to ${process.env.NEXT_PUBLIC_PARTYKIT_HOST}`,
+  );
 } else {
   console.warn(
-    `${tag} DEPLOY FAILED (see log above). The frontend build continues; the bell uses polling until this succeeds.`,
+    `${tag} DEPLOY FAILED for ${target} (see log above). The frontend build continues; the bell uses polling until this succeeds.`,
   );
 }
 process.exit(0);
