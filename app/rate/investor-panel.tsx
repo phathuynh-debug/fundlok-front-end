@@ -63,9 +63,8 @@ const CADENCES: InvestorCadence[] = [
 ];
 const COMMITMENTS: InvestorCommitment[] = [6, 12];
 
-// Mirrors INVESTOR_AMOUNT_MIN_VND / _MAX_VND in the backend's schemas.
-const AMOUNT_MIN = 1_000_000;
-const AMOUNT_MAX = 1_000_000_000_000;
+const AMOUNT_MIN = 20_000_000;
+const AMOUNT_MAX = 100_000_000;
 
 const GATE_KEY = "fundlok_investor_gate_ack";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -173,7 +172,7 @@ function InvestorCalculator({ getSessionId }: { getSessionId: () => string }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [amount, setAmount] = useState("1000000000");
+  const [amount, setAmount] = useState("50000000");
   const [commitment, setCommitment] = useState<InvestorCommitment>(12);
   const [tier, setTier] = useState<InvestorRiskTier>("balanced");
   const [cadence, setCadence] = useState<InvestorCadence>("monthly");

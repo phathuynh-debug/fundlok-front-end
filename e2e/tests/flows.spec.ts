@@ -271,9 +271,9 @@ test.describe("/project-application", () => {
       t("projectApplication.fields.requestedAmount"),
     );
 
-    // Typing too high auto-clamps to 1,000,000,000
+    // Typing too high auto-clamps to 100,000,000
     await amountInput.fill("200000000000000");
-    await expect(amountInput).toHaveValue(/1[.,]000[.,]000[.,]000/);
+    await expect(amountInput).toHaveValue(/100[.,]000[.,]000/);
 
     // Typing below minimum and blurring auto-scopes to 20,000,000
     await amountInput.fill("1000000");
@@ -291,7 +291,7 @@ test.describe("/project-application", () => {
 
     await page
       .getByLabel(t("projectApplication.fields.requestedAmount"))
-      .fill("500000000");
+      .fill("50000000");
 
     await page
       .getByRole("button", {

@@ -97,54 +97,54 @@ export interface SmeFacility {
 }
 
 export const MOCK_SME_FACILITY: SmeFacility = {
-  principal: 800_000_000,
-  // 800,000,000 at 14.32%/yr over six months, spread across the 126
-  // business days in the term: 6,803,810 x 126 = 857,280,060.
-  total_obligation: 857_280_060,
+  principal: 80_000_000,
+  // 80,000,000 at 14.32%/yr over six months, spread across the 126
+  // business days in the term: 680,381 x 126 = 85,728,006.
+  total_obligation: 85_728_006,
   interest_rate_pct: 14.32,
   term_months: 6,
   disbursed_at: "2026-04-01",
   // Five months in, one to go: 1 x 21 business days.
   days_remaining: 21,
-  target_daily: 6_803_810,
-  current_period_total: 142_880_010,
+  target_daily: 680_381,
+  current_period_total: 14_288_001,
   current_period_end_date: "2026-09-30",
   on_time_streak: 5,
   score: 70.98,
 };
 
-// Five months into a six-month term, 6,803,810 x 21 business days collected
+// Five months into a six-month term, 680,381 x 21 business days collected
 // each month. Revenue share drifts down as revenue grows against a fixed daily
 // amount — the shape an SME should expect.
 export const MOCK_REPAYMENT_MONTHS: RepaymentMonth[] = [
   {
     month: "2026-04",
-    repaid: 142_880_010,
-    repaid_cumulative: 142_880_010,
+    repaid: 14_288_001,
+    repaid_cumulative: 14_288_001,
     revenue_share: 0.31,
   },
   {
     month: "2026-05",
-    repaid: 142_880_010,
-    repaid_cumulative: 285_760_020,
+    repaid: 14_288_001,
+    repaid_cumulative: 28_576_002,
     revenue_share: 0.29,
   },
   {
     month: "2026-06",
-    repaid: 142_880_010,
-    repaid_cumulative: 428_640_030,
+    repaid: 14_288_001,
+    repaid_cumulative: 42_864_003,
     revenue_share: 0.27,
   },
   {
     month: "2026-07",
-    repaid: 142_880_010,
-    repaid_cumulative: 571_520_040,
+    repaid: 14_288_001,
+    repaid_cumulative: 57_152_004,
     revenue_share: 0.26,
   },
   {
     month: "2026-08",
-    repaid: 142_880_010,
-    repaid_cumulative: 714_400_050,
+    repaid: 14_288_001,
+    repaid_cumulative: 71_440_005,
     revenue_share: 0.24,
   },
 ];

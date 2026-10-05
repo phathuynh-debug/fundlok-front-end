@@ -1654,7 +1654,7 @@
       "title": "For investors"
     },
     "msme": {
-      "a1": "SMEs in Vietnam that pass verification and whose revenue can support a daily repayment. Funding typically ranges from 20,000,000 to 1,000,000,000 VND.",
+      "a1": "SMEs in Vietnam that pass verification and whose revenue can support a daily repayment. Funding typically ranges from 20,000,000 to 100,000,000 VND.",
       "a2": "Your business registration certificate, your VAT declarations and e-invoices (the signed electronic originals), your cost figures, and your CIC report.",
       "a3": "We read your tax records and financial figures, compare them with sector data, and a reviewer checks the result.",
       "a4": "Yes. You see the full offer, including the rate, the daily amount, the fees and the backstop date, before you confirm. Nothing is owed until you sign.",
@@ -2042,7 +2042,7 @@
       "legalName": "ABC Trading Co., Ltd.",
       "loanPurpose": "Working capital to fulfil new orders",
       "postalCode": "100000",
-      "requestedAmount": "500000000",
+      "requestedAmount": "50000000",
       "state": "Ba Dinh",
       "street": "123 Nguyen Hue",
       "taxId": "123456789"
@@ -2072,7 +2072,7 @@
       "postalCode": "Postal code is required",
       "repaymentPreference": "Repayment preference is required",
       "requestedAmount": "Enter a requested amount greater than 0",
-      "requestedAmountRange": "Enter an amount between 20,000,000 and 1,000,000,000 VND",
+      "requestedAmountRange": "Enter an amount between 20,000,000 and 100,000,000 VND",
       "street": "Street is required",
       "taxId": "Tax ID is required"
     }
@@ -2121,7 +2121,7 @@
       "email": "Enter a valid email address",
       "employeeRange": "Between 1 and 200 employees.",
       "fullName": "Enter your full name",
-      "loanRange": "Must be between 20,000,000 ₫ and 1,000,000,000 ₫.",
+      "loanRange": "Must be between 20,000,000 ₫ and 100,000,000 ₫.",
       "monthExceedsYear": "A single month cannot be more than the whole year's revenue.",
       "mustBePositive": "Must be greater than zero.",
       "operatingRange": "Enter the number of months, at least 1.",
@@ -2175,8 +2175,8 @@
       "email": "Email",
       "emailPlaceholder": "you@email.com",
       "error": {
-        "amountMax": "Enter no more than 1,000,000,000,000 VND",
-        "amountMin": "Enter at least 1,000,000 VND",
+        "amountMax": "Enter no more than 100,000,000 VND",
+        "amountMin": "Enter at least 20,000,000 VND",
         "consent": "Tick this box so we can contact you",
         "email": "Enter a valid email address",
         "name": "Enter your full name",
@@ -2221,7 +2221,7 @@
       "walkNetPerLoan": "What you keep, per loan"
     },
     "loanAmount": "How much you want",
-    "loanAmountHint": "Between 20,000,000 ₫ and 1,000,000,000 ₫.",
+    "loanAmountHint": "Between 20,000,000 ₫ and 100,000,000 ₫.",
     "monthlyPaymentLabel": "Estimated Monthly Repayment",
     "monthlyRateLabel": "Monthly Rate",
     "months": "months",

@@ -22,9 +22,9 @@ export const LOAN_DURATIONS_MONTHS = [1, 2, 3, 4, 5, 6] as const;
 
 export type LoanDurationMonths = (typeof LOAN_DURATIONS_MONTHS)[number];
 
-/** Principal bounds, VND. 20 million to 1 billion. */
+/** Principal bounds, VND. 20 million to 100 million. */
 export const LOAN_MIN_VND = 20_000_000;
-export const LOAN_MAX_VND = 1_000_000_000;
+export const LOAN_MAX_VND = 100_000_000;
 
 export function isAllowedLoanDuration(
   value: number,
