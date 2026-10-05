@@ -10,7 +10,7 @@ export interface RateCalculateRequest {
   cogs_l12m: number | string;
   fixed_costs_l12m: number | string;
   variable_costs_l12m: number | string;
-  requested_amount: number | string; // 20,000,000 to 1,000,000,000 VND
+  requested_amount: number | string; // 20,000,000 to 100,000,000 VND
   tenor_months: number; // 1 to 6
   seasonality?: {
     peak_month_revenue?: number | string | null;

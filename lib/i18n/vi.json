@@ -1654,7 +1654,7 @@
       "title": "Dành cho nhà đầu tư"
     },
     "msme": {
-      "a1": "Doanh nghiệp vừa và nhỏ tại Việt Nam đã qua xác minh và có doanh thu đủ để trả một khoản mỗi ngày. Mức vốn phổ biến từ 20.000.000 đến 1.000.000.000 VND.",
+      "a1": "Doanh nghiệp vừa và nhỏ tại Việt Nam đã qua xác minh và có doanh thu đủ để trả một khoản mỗi ngày. Mức vốn phổ biến từ 20.000.000 đến 100.000.000 VND.",
       "a2": "Giấy chứng nhận đăng ký kinh doanh, tờ khai thuế GTGT và hóa đơn điện tử (bản gốc điện tử có chữ ký), số liệu chi phí, và báo cáo CIC.",
       "a3": "Chúng tôi đọc chứng từ thuế và số liệu tài chính, đối chiếu với dữ liệu ngành, sau đó có người trực tiếp rà soát kết quả.",
       "a4": "Có. Bạn xem toàn bộ đề nghị tài trợ, gồm lãi suất, khoản trả mỗi ngày, các khoản phí và hạn tất toán cuối cùng, trước khi xác nhận. Bạn không nợ gì cho đến khi ký.",
@@ -2042,7 +2042,7 @@
       "legalName": "Công ty TNHH ABC",
       "loanPurpose": "Vốn lưu động cho các đơn hàng mới",
       "postalCode": "100000",
-      "requestedAmount": "500000000",
+      "requestedAmount": "50000000",
       "state": "Ba Đình",
       "street": "123 Nguyễn Huệ",
       "taxId": "123456789"
@@ -2072,7 +2072,7 @@
       "postalCode": "Vui lòng nhập mã bưu chính",
       "repaymentPreference": "Vui lòng chọn hình thức trả nợ",
       "requestedAmount": "Vui lòng nhập số tiền vay lớn hơn 0",
-      "requestedAmountRange": "Nhập số tiền từ 20.000.000 đến 1.000.000.000 VND",
+      "requestedAmountRange": "Nhập số tiền từ 20.000.000 đến 100.000.000 VND",
       "street": "Vui lòng nhập đường",
       "taxId": "Vui lòng nhập mã số thuế"
     }
@@ -2121,7 +2121,7 @@
       "email": "Vui lòng nhập email hợp lệ",
       "employeeRange": "Từ 1 đến 200 nhân sự.",
       "fullName": "Vui lòng nhập họ và tên",
-      "loanRange": "Phải từ 20.000.000 ₫ đến 1.000.000.000 ₫.",
+      "loanRange": "Phải từ 20.000.000 ₫ đến 100.000.000 ₫.",
       "monthExceedsYear": "Doanh thu một tháng không thể lớn hơn doanh thu cả năm.",
       "mustBePositive": "Phải lớn hơn 0.",
       "operatingRange": "Nhập số tháng, tối thiểu 1.",
@@ -2175,8 +2175,8 @@
       "email": "Email",
       "emailPlaceholder": "ban@email.com",
       "error": {
-        "amountMax": "Tối đa 1.000.000.000.000 VND",
-        "amountMin": "Tối thiểu 1.000.000 VND",
+        "amountMax": "Tối đa 100.000.000 VND",
+        "amountMin": "Tối thiểu 20.000.000 VND",
         "consent": "Vui lòng đánh dấu để chúng tôi có thể liên hệ với bạn",
         "email": "Vui lòng nhập email hợp lệ",
         "name": "Vui lòng nhập họ và tên",
@@ -2221,7 +2221,7 @@
       "walkNetPerLoan": "Phần bạn giữ lại, mỗi khoản vay"
     },
     "loanAmount": "Số tiền bạn cần",
-    "loanAmountHint": "Từ 20.000.000 ₫ đến 1.000.000.000 ₫.",
+    "loanAmountHint": "Từ 20.000.000 ₫ đến 100.000.000 ₫.",
     "monthlyPaymentLabel": "Ước tính trả góp hàng tháng",
     "monthlyRateLabel": "Lãi suất tháng",
     "months": "tháng",
