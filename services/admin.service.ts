@@ -290,6 +290,13 @@ export interface AdminUserStatusPayload {
   note?: string | null;
 }
 
+// No role and no password on purpose: the endpoint only ever creates ADMIN
+// accounts, and the invitee chooses their own password from the emailed link.
+export interface AdminInvitePayload {
+  email: string;
+  full_name: string;
+}
+
 export interface AdminDocumentUrl {
   url: string;
   /** Seconds the URL stays valid — 600. */
@@ -371,6 +378,12 @@ export const adminService = {
       ADMIN_ENDPOINTS.userStatus(userId),
       body,
     );
+  },
+
+  // SYSTEM_ADMIN only (403 otherwise). 409 when the email already has an
+  // account — an existing member is never silently promoted to admin.
+  inviteAdmin(body: AdminInvitePayload) {
+    return apiClient.post<AdminUserDetail>(ADMIN_ENDPOINTS.inviteAdmin, body);
   },
 
   // Admin only. Fetched on demand when a document is opened, never up front:

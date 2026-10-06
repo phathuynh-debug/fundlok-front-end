@@ -31,6 +31,25 @@ export function ResetPasswordForm() {
 
   const { toast } = useToast();
   const { t, locale } = useTranslations();
+  // Admin invitations land here too: app/admin/service.invite_admin emails an
+  // ordinary reset token with &invite=1. Same mechanism, but the account has
+  // no password yet, so "reset" would be the wrong word.
+  const isInvite = searchParams.get("invite") === "1";
+  const copy = isInvite
+    ? {
+        title: t("auth.resetPassword.inviteTitle"),
+        description: t("auth.resetPassword.inviteDescription"),
+        submit: t("auth.resetPassword.inviteSubmit"),
+        successTitle: t("auth.resetPassword.inviteSuccessTitle"),
+        successDescription: t("auth.resetPassword.inviteSuccessDescription"),
+      }
+    : {
+        title: t("auth.resetPassword.title"),
+        description: t("auth.resetPassword.description"),
+        submit: t("auth.resetPassword.submit"),
+        successTitle: t("auth.resetPassword.successTitle"),
+        successDescription: t("auth.resetPassword.successDescription"),
+      };
   const { resetPassword, isPending, isSuccess } = useResetPassword();
 
   const handleResetPassword = (e: React.FormEvent) => {
@@ -71,8 +90,8 @@ export function ResetPasswordForm() {
       {
         onSuccess: () => {
           toast({
-            title: t("auth.resetPassword.successTitle"),
-            description: t("auth.resetPassword.successDescription"),
+            title: copy.successTitle,
+            description: copy.successDescription,
           });
 
           // Redirect to login after 3 seconds
@@ -130,10 +149,10 @@ export function ResetPasswordForm() {
         </div>
         <div className="space-y-2">
           <h3 className="text-xl font-semibold text-foreground">
-            {t("auth.resetPassword.successTitle")}
+            {copy.successTitle}
           </h3>
           <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-            {t("auth.resetPassword.successDescription")}
+            {copy.successDescription}
           </p>
         </div>
         <div className="pt-2">
@@ -149,11 +168,9 @@ export function ResetPasswordForm() {
     <div className="space-y-6">
       <div className="space-y-2">
         <h2 className="text-2xl lg:text-3xl font-bold text-foreground">
-          {t("auth.resetPassword.title")}
+          {copy.title}
         </h2>
-        <p className="text-muted-foreground text-sm">
-          {t("auth.resetPassword.description")}
-        </p>
+        <p className="text-muted-foreground text-sm">{copy.description}</p>
       </div>
 
       <form onSubmit={handleResetPassword} className="space-y-4">
@@ -224,7 +241,7 @@ export function ResetPasswordForm() {
               {t("auth.resetPassword.submitting")}
             </>
           ) : (
-            t("auth.resetPassword.submit")
+            copy.submit
           )}
         </Button>
       </form>
