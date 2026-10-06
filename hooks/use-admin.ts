@@ -11,6 +11,7 @@ import {
   adminService,
   type AdminDecisionPayload,
   type AdminDocumentUrl,
+  type AdminInvitePayload,
   type AdminKybVerification,
   type AdminKycImageName,
   type AdminKycImageUrl,
@@ -164,6 +165,19 @@ export function useSetUserStatus() {
     mutationFn: ({ id, body }) => adminService.setUserStatus(id, body),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: adminKeys.all });
+    },
+  });
+}
+
+// Creates an ADMIN account and emails the invitee a set-password link
+// (SYSTEM_ADMIN only server-side). Invalidates the overview so the new account
+// appears in the users table and the role counts move.
+export function useInviteAdmin() {
+  const queryClient = useQueryClient();
+  return useMutation<AdminUserDetail, ApiError, AdminInvitePayload>({
+    mutationFn: (body) => adminService.inviteAdmin(body),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: adminKeys.overviewAll() });
     },
   });
 }
