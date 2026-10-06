@@ -133,9 +133,12 @@
       "approve": "Duyệt",
       "attemptHeading": "Lượt xác minh này",
       "cardDetailsHeading": "Thông tin trên CCCD",
+      "conflictAckLabel": "Tôi xác nhận rằng số giấy tờ này đã được xác minh trên {count} tài khoản khác và đồng ý phê duyệt ghi đè.",
       "conflictHeading": "Đã xác minh trên",
       "conflictMany": "Đã xác minh trên {count} tài khoản khác",
       "conflictOne": "Đã xác minh trên 1 tài khoản khác",
+      "conflictWarningDescription": "Số giấy tờ này đã được xác minh trên các tài khoản khác. Vui lòng kiểm tra, đánh dấu xác nhận và nhập lý do tối thiểu 20 ký tự.",
+      "conflictWarningTitle": "Trùng lặp giấy tờ yêu cầu xác nhận",
       "decisionHeading": "Quyết định của bạn",
       "detailLoadFailed": "Không thể tải chi tiết lượt xác minh danh tính. Vui lòng thử lại.",
       "detailsRequired": "Nhập số giấy tờ và họ tên trên thẻ để duyệt.",
@@ -173,6 +176,8 @@
       "notePlaceholder": "Vì sao bạn duyệt hoặc từ chối? Bắt buộc khi duyệt. Chỉ nhân viên xem được ghi chú này.",
       "notePlaceholderOptional": "Ghi chú cho đồng nghiệp (không bắt buộc). Chỉ nhân viên xem được ghi chú này.",
       "noteRequired": "Hãy thêm ghi chú để duyệt. Duyệt sẽ bỏ qua một cảnh báo gian lận, nên lý do cần được lưu lại.",
+      "overrideNotePlaceholder": "Giải thích lý do phê duyệt ghi đè số giấy tờ này (tối thiểu 20 ký tự). Chỉ nhân viên mới thấy ghi chú này.",
+      "overrideNoteRequired": "Cần nhập lý do tối thiểu 20 ký tự để phê duyệt ghi đè số giấy tờ trùng lặp ({count}/20).",
       "reject": "Từ chối",
       "rejectHint": "Nếu từ chối, nhà đầu tư sẽ thấy: “Chúng tôi không thể hoàn tất xác minh danh tính của bạn. Vui lòng liên hệ bộ phận hỗ trợ.” Họ có thể gửi lại.",
       "resolveFailed": "Không thể lưu quyết định",
@@ -2007,6 +2012,7 @@
       "typeLabel": "Loại giấy chứng nhận"
     },
     "manualModeNotice": "Hiện đội ngũ của chúng tôi đang kiểm tra hồ sơ xác minh thủ công, nên bạn sẽ không nhận được kết quả ngay. Hãy gửi giấy tờ như bình thường, chúng tôi sẽ cập nhật trang này sau khi duyệt xong.",
+    "modeChanged": "Chế độ xác minh đã được cập nhật. Vui lòng kiểm tra và gửi lại.",
     "newTab": {
       "description": "Vui lòng hoàn tất xác minh ở tab đó. Trang này sẽ tự tiếp tục khi bạn được duyệt.",
       "title": "Đã mở xác minh trong tab mới"

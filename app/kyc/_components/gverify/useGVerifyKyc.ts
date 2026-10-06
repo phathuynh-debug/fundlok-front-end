@@ -5,7 +5,10 @@ import {
   useGVerifyVerify,
   useGVerifyVerifyWithToken,
 } from "@/hooks/use-gverify";
-import type { GVerifyVerifyResponse } from "@/services/gverify.service";
+import type {
+  GVerifyVerifyResponse,
+  VerificationMode,
+} from "@/services/gverify.service";
 
 export type CaptureSlot = "front" | "back" | "portrait";
 
@@ -160,19 +163,27 @@ export function useGVerifyKyc({
 
   // Encode and submit. The caller handles the verdict (seeded into the status
   // cache by the mutation) and any ApiError.
-  const submit = useCallback(async (): Promise<GVerifyVerifyResponse> => {
-    const [front, back, portrait] = await Promise.all(
-      CAPTURE_SLOTS.map((slot) => fileToBase64(images[slot].file as File)),
-    );
-    const payload = {
-      id_front_b64: front,
-      id_back_b64: back,
-      portrait_b64: portrait,
-    };
-    return handoffToken
-      ? verifyToken({ payload, token: handoffToken })
-      : verifySession(payload);
-  }, [images, handoffToken, verifySession, verifyToken]);
+  const submit = useCallback(
+    async (options?: {
+      expected_mode?: VerificationMode;
+    }): Promise<GVerifyVerifyResponse> => {
+      const [front, back, portrait] = await Promise.all(
+        CAPTURE_SLOTS.map((slot) => fileToBase64(images[slot].file as File)),
+      );
+      const payload = {
+        id_front_b64: front,
+        id_back_b64: back,
+        portrait_b64: portrait,
+        ...(options?.expected_mode
+          ? { expected_mode: options.expected_mode }
+          : {}),
+      };
+      return handoffToken
+        ? verifyToken({ payload, token: handoffToken })
+        : verifySession(payload);
+    },
+    [images, handoffToken, verifySession, verifyToken],
+  );
 
   return { images, setFile, reset, allReady, submit, submitting };
 }

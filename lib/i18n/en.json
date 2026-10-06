@@ -133,9 +133,12 @@
       "approve": "Approve",
       "attemptHeading": "This attempt",
       "cardDetailsHeading": "Details from the ID card",
+      "conflictAckLabel": "I acknowledge that this ID is verified on {count} other account(s) and confirm this override.",
       "conflictHeading": "Already verified on",
       "conflictMany": "Also verified on {count} other accounts",
       "conflictOne": "Also verified on 1 other account",
+      "conflictWarningDescription": "This ID number is already verified on other accounts. Review them, check the acknowledgement, and enter an explanation of at least 20 characters.",
+      "conflictWarningTitle": "ID conflict requires acknowledgement",
       "decisionHeading": "Your decision",
       "detailLoadFailed": "Couldn't load identity check details. Please try again.",
       "detailsRequired": "Enter the ID number and full name from the card to approve.",
@@ -173,6 +176,8 @@
       "notePlaceholder": "Why are you approving or rejecting? Required to approve. Only staff can see this note.",
       "notePlaceholderOptional": "Note for colleagues (optional). Only staff can see this note.",
       "noteRequired": "Add a note to approve. Approving overrides a fraud check, so the reason has to be on record.",
+      "overrideNotePlaceholder": "Explain why this ID conflict is being overridden (minimum 20 characters). Only staff can see this note.",
+      "overrideNoteRequired": "An explanation of at least 20 characters is required to override an ID conflict ({count}/20).",
       "reject": "Reject",
       "rejectHint": "If you reject, the investor sees: “We could not complete your identity verification. Please contact support.” They can submit again.",
       "resolveFailed": "Couldn't save the decision",
@@ -2007,6 +2012,7 @@
       "typeLabel": "Certificate type"
     },
     "manualModeNotice": "Our team is checking verifications by hand at the moment, so you won't get an instant result. Submit your documents as usual and we'll update this page once they've been reviewed.",
+    "modeChanged": "The verification mode was updated. Please review and submit again.",
     "newTab": {
       "description": "Finish verifying there. This page continues on its own once you're approved.",
       "title": "Verification opened in a new tab"

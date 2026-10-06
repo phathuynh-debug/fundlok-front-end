@@ -17,7 +17,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
+import { useQueryClient } from "@tanstack/react-query";
 import {
+  gverifyKeys,
   useGVerifyHandoff,
   useGVerifyStatus,
   useVerificationMode,
@@ -54,6 +56,7 @@ export function KycCapturePanel({
 }) {
   const { toast } = useToast();
   const { t, locale } = useTranslations();
+  const queryClient = useQueryClient();
   const { data: verificationMode } = useVerificationMode();
   const { images, setFile, reset, allReady, submit, submitting } =
     useGVerifyKyc();
@@ -127,9 +130,11 @@ export function KycCapturePanel({
 
   const handlePhone = async () => {
     try {
-      const { token } = await createHandoff();
+      const res = await createHandoff();
+      const mode = res.mode || verificationMode?.mode;
+      const modeParam = mode ? `&mode=${encodeURIComponent(mode)}` : "";
       setPhone({
-        url: `${window.location.origin}/kyc/mobile?token=${encodeURIComponent(token)}`,
+        url: `${window.location.origin}/kyc/mobile?token=${encodeURIComponent(res.token)}${modeParam}`,
         baselineId: status?.verification_id ?? "",
       });
     } catch (err) {
@@ -139,7 +144,9 @@ export function KycCapturePanel({
 
   const handleSubmit = async () => {
     try {
-      const verdict = await submit();
+      const verdict = await submit({
+        expected_mode: verificationMode?.mode,
+      });
       setRetaking(false);
       if (verdict.status === "REJECTED" || verdict.status === "FAILED") {
         reset();
@@ -149,6 +156,24 @@ export function KycCapturePanel({
       }
     } catch (err) {
       setRetaking(false);
+      const apiErr = err as ApiError;
+      const code =
+        apiErr?.code ||
+        (apiErr?.details as { code?: string })?.code ||
+        (apiErr as unknown as { response?: { data?: { code?: string } } })
+          ?.response?.data?.code ||
+        (apiErr as unknown as { data?: { code?: string } })?.data?.code;
+      if (code === "VERIFICATION_MODE_CHANGED") {
+        void queryClient.invalidateQueries({
+          queryKey: gverifyKeys.verificationMode(),
+        });
+        toast({
+          variant: "destructive",
+          title: t("kyc.gv.errorTitle"),
+          description: t("kyc.modeChanged"),
+        });
+        return;
+      }
       recordFailure();
       fail(err);
     }

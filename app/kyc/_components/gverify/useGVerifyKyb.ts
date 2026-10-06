@@ -5,6 +5,7 @@ import { useGVerifyKybVerify } from "@/hooks/use-gverify";
 import type {
   GVerifyKybDocumentType,
   GVerifyKybVerifyResponse,
+  VerificationMode,
 } from "@/services/gverify.service";
 import { compressImage, fileToBase64 } from "./useGVerifyKyc";
 
@@ -129,17 +130,25 @@ export function useGVerifyKyb() {
 
   const ready = document.file !== null;
 
-  const submit = useCallback(async (): Promise<GVerifyKybVerifyResponse> => {
-    const document_b64 = await fileToBase64(document.file as File);
-    const trimmedTax = details.taxCode.trim();
-    const trimmedLicense = details.licenseCode.trim();
-    return verify({
-      document_b64,
-      document_type: documentType,
-      ...(trimmedTax ? { tax_code: trimmedTax } : {}),
-      ...(trimmedLicense ? { license_code: trimmedLicense } : {}),
-    });
-  }, [document, documentType, details, verify]);
+  const submit = useCallback(
+    async (options?: {
+      expected_mode?: VerificationMode;
+    }): Promise<GVerifyKybVerifyResponse> => {
+      const document_b64 = await fileToBase64(document.file as File);
+      const trimmedTax = details.taxCode.trim();
+      const trimmedLicense = details.licenseCode.trim();
+      return verify({
+        document_b64,
+        document_type: documentType,
+        ...(trimmedTax ? { tax_code: trimmedTax } : {}),
+        ...(trimmedLicense ? { license_code: trimmedLicense } : {}),
+        ...(options?.expected_mode
+          ? { expected_mode: options.expected_mode }
+          : {}),
+      });
+    },
+    [document, documentType, details, verify],
+  );
 
   return {
     document,

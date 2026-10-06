@@ -27,7 +27,9 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
 import { useCurrentUser } from "@/hooks/use-authentication";
+import { useQueryClient } from "@tanstack/react-query";
 import {
+  gverifyKeys,
   useGVerifyKybStatus,
   useGVerifyStatus,
   useVerificationMode,
@@ -79,6 +81,7 @@ export function GVerifyKybClient() {
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const { t, locale } = useTranslations();
+  const queryClient = useQueryClient();
   const { data: verificationMode } = useVerificationMode();
   const { data: user } = useCurrentUser();
   const { data: status } = useGVerifyKybStatus();
@@ -133,7 +136,9 @@ export function GVerifyKybClient() {
 
   const handleSubmit = async () => {
     try {
-      const verdict = await submit();
+      const verdict = await submit({
+        expected_mode: verificationMode?.mode,
+      });
       setRetaking(false);
       if (verdict.status === "REJECTED" || verdict.status === "FAILED") {
         reset();
@@ -145,9 +150,26 @@ export function GVerifyKybClient() {
     } catch (err) {
       const apiError = err as ApiError;
       setRetaking(false);
+      const code =
+        apiError?.code ||
+        (apiError?.details as { code?: string })?.code ||
+        (apiError as unknown as { response?: { data?: { code?: string } } })
+          ?.response?.data?.code ||
+        (apiError as unknown as { data?: { code?: string } })?.data?.code;
+      if (code === "VERIFICATION_MODE_CHANGED") {
+        void queryClient.invalidateQueries({
+          queryKey: gverifyKeys.verificationMode(),
+        });
+        toast({
+          variant: "destructive",
+          title: t("kyc.gv.errorTitle"),
+          description: t("kyc.modeChanged"),
+        });
+        return;
+      }
       // The backend refuses a KYB without an approved identity (when the
       // representative check is on) before spending any provider call.
-      const needsIdentity = apiError?.code === "KYC_REQUIRED";
+      const needsIdentity = code === "KYC_REQUIRED";
       setStep(needsIdentity && identityRequired ? 2 : 1);
       recordFailure();
       toast({

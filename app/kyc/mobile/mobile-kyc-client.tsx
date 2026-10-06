@@ -23,7 +23,12 @@ import { CaptureTabs } from "../_components/gverify/CaptureTabs";
 import { useGVerifyKyc } from "../_components/gverify/useGVerifyKyc";
 import { useVerificationFailures } from "../_components/use-verification-failures";
 import { VerificationHelpDialog } from "../_components/VerificationHelpDialog";
-import type { GVerifyVerifyResponse } from "@/services/gverify.service";
+import { ManualReviewNotice } from "../_components/ManualReviewNotice";
+import { useVerificationMode } from "@/hooks/use-gverify";
+import type {
+  GVerifyVerifyResponse,
+  VerificationMode,
+} from "@/services/gverify.service";
 import type { ApiError } from "@/lib/types";
 import { apiErrorMessage, backendText } from "@/lib/api-error-message";
 
@@ -34,7 +39,15 @@ import { apiErrorMessage, backendText } from "@/lib/api-error-message";
 // discovers the verdict through its polling status query.
 export function MobileKycClient() {
   const { t, locale } = useTranslations();
-  const token = useSearchParams().get("token") ?? "";
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token") ?? "";
+  const modeParam = searchParams.get("mode") as VerificationMode | null;
+  const { data: verificationMode } = useVerificationMode(!modeParam);
+  const effectiveMode: VerificationMode =
+    modeParam === "MANUAL" || modeParam === "AUTOMATIC"
+      ? modeParam
+      : (verificationMode?.mode ?? "AUTOMATIC");
+
   const { images, setFile, reset, allReady, submit, submitting } =
     useGVerifyKyc({
       handoffToken: token,
@@ -61,7 +74,9 @@ export function MobileKycClient() {
   const handleSubmit = async () => {
     setFailure(null);
     try {
-      const res = await submit();
+      const res = await submit({
+        expected_mode: effectiveMode,
+      });
       setVerdict(res);
       if (res.status === "REJECTED" || res.status === "FAILED") {
         recordFailure();
@@ -71,6 +86,16 @@ export function MobileKycClient() {
     } catch (err) {
       recordFailure();
       const apiError = err as ApiError;
+      const code =
+        apiError?.code ||
+        (apiError?.details as { code?: string })?.code ||
+        (apiError as unknown as { response?: { data?: { code?: string } } })
+          ?.response?.data?.code ||
+        (apiError as unknown as { data?: { code?: string } })?.data?.code;
+      if (code === "VERIFICATION_MODE_CHANGED") {
+        setFailure(t("kyc.modeChanged"));
+        return;
+      }
       // 401 = the 10-minute token expired (or was tampered with).
       setFailure(
         apiError?.status === 401
@@ -189,6 +214,8 @@ export function MobileKycClient() {
               </div>
             </div>
 
+            {effectiveMode === "MANUAL" && <ManualReviewNotice />}
+
             <CaptureTabs
               images={images}
               disabled={submitting}
@@ -196,7 +223,9 @@ export function MobileKycClient() {
             />
 
             <p className="text-xs leading-relaxed text-muted-foreground">
-              {t("kyc.gv.consent")}
+              {effectiveMode === "MANUAL"
+                ? t("kyc.gv.consentManual")
+                : t("kyc.gv.consent")}
             </p>
 
             <Button

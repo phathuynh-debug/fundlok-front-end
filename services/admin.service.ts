@@ -189,6 +189,12 @@ export interface AdminKycVerification {
    * them from the card (required to approve).
    */
   provider_checked: boolean;
+  /**
+   * False while the attempt has no ID number yet (manual mode, before reviewer
+   * types it): conflicts is empty because nothing was compared yet, not because
+   * the ID is clear.
+   */
+  conflicts_evaluated?: boolean;
 }
 
 /** Approving a manual-mode attempt needs the details read off the card. */
@@ -196,6 +202,7 @@ export interface AdminKycResolvePayload extends AdminDecisionPayload {
   person_number?: string | null;
   full_name?: string | null;
   date_of_birth?: string | null;
+  acknowledged_conflict_ids?: string[];
 }
 
 // How KYC/KYB submissions are decided: by the verification provider, or —

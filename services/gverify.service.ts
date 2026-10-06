@@ -10,10 +10,13 @@ import { GVERIFY_ENDPOINTS } from "@/lib/endpoints";
 export type GVerifyStatus =
   "PENDING" | "APPROVED" | "REJECTED" | "FAILED" | "MANUAL_REVIEW";
 
+export type VerificationMode = "AUTOMATIC" | "MANUAL";
+
 export interface GVerifyVerifyPayload {
   id_front_b64: string;
   id_back_b64: string;
   portrait_b64: string;
+  expected_mode?: VerificationMode;
 }
 
 // POST /gverify/kyc/verify — synchronous verdict (APPROVED | REJECTED).
@@ -27,6 +30,7 @@ export interface GVerifyVerifyResponse {
   date_of_birth: string | null;
   face_match_score: number | null;
   created_at: string | null;
+  mode?: VerificationMode;
 }
 
 // GET /gverify/kyc/status — the caller's latest attempt.
@@ -75,6 +79,7 @@ export function verifyResponseToStatus(
 export interface GVerifyHandoffResponse {
   token: string;
   expires_in_seconds: number;
+  mode?: VerificationMode;
 }
 
 // ---------- KYB (business verification, SME) ----------
@@ -87,6 +92,7 @@ export interface GVerifyKybVerifyPayload {
   document_type: GVerifyKybDocumentType;
   tax_code?: string;
   license_code?: string;
+  expected_mode?: VerificationMode;
 }
 
 export interface GVerifyKybRepresentative {
@@ -110,6 +116,7 @@ export interface GVerifyKybVerifyResponse {
   business_status: string | null;
   representatives: GVerifyKybRepresentative[];
   created_at: string | null;
+  mode?: VerificationMode;
 }
 
 // GET /gverify/kyb/status — the caller's latest attempt.
@@ -181,7 +188,7 @@ export interface GVerifyKybCertificate {
 // MANUAL means a person reviews each submission, so the verdict is not
 // instant and the screens say so before the user uploads anything.
 export interface VerificationModeStatus {
-  mode: "AUTOMATIC" | "MANUAL";
+  mode: VerificationMode;
 }
 
 export const gverifyService = {
