@@ -27,13 +27,20 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
 import { useCurrentUser } from "@/hooks/use-authentication";
-import { useGVerifyKybStatus, useGVerifyStatus } from "@/hooks/use-gverify";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  gverifyKeys,
+  useGVerifyKybStatus,
+  useGVerifyStatus,
+  useVerificationMode,
+} from "@/hooks/use-gverify";
 import { KYB_IDENTITY_STEP } from "@/lib/kyb-flow";
 import type { GVerifyKybDocumentType } from "@/services/gverify.service";
 import { postVerificationTarget } from "../../kyc-landing";
 import { useFinishVerification } from "../../use-finish-verification";
 import { StatusBlock } from "../status-block";
 import { DocumentCaptureField } from "./DocumentCaptureField";
+import { ManualReviewNotice } from "../ManualReviewNotice";
 import { KycCapturePanel } from "./KycCapturePanel";
 import { useGVerifyKyb } from "./useGVerifyKyb";
 import { useVerificationFailures } from "../use-verification-failures";
@@ -74,6 +81,8 @@ export function GVerifyKybClient() {
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const { t, locale } = useTranslations();
+  const queryClient = useQueryClient();
+  const { data: verificationMode } = useVerificationMode();
   const { data: user } = useCurrentUser();
   const { data: status } = useGVerifyKybStatus();
   const identityRequired = KYB_IDENTITY_STEP;
@@ -127,7 +136,9 @@ export function GVerifyKybClient() {
 
   const handleSubmit = async () => {
     try {
-      const verdict = await submit();
+      const verdict = await submit({
+        expected_mode: verificationMode?.mode,
+      });
       setRetaking(false);
       if (verdict.status === "REJECTED" || verdict.status === "FAILED") {
         reset();
@@ -139,9 +150,26 @@ export function GVerifyKybClient() {
     } catch (err) {
       const apiError = err as ApiError;
       setRetaking(false);
+      const code =
+        apiError?.code ||
+        (apiError?.details as { code?: string })?.code ||
+        (apiError as unknown as { response?: { data?: { code?: string } } })
+          ?.response?.data?.code ||
+        (apiError as unknown as { data?: { code?: string } })?.data?.code;
+      if (code === "VERIFICATION_MODE_CHANGED") {
+        void queryClient.invalidateQueries({
+          queryKey: gverifyKeys.verificationMode(),
+        });
+        toast({
+          variant: "destructive",
+          title: t("kyc.gv.errorTitle"),
+          description: t("kyc.modeChanged"),
+        });
+        return;
+      }
       // The backend refuses a KYB without an approved identity (when the
       // representative check is on) before spending any provider call.
-      const needsIdentity = apiError?.code === "KYC_REQUIRED";
+      const needsIdentity = code === "KYC_REQUIRED";
       setStep(needsIdentity && identityRequired ? 2 : 1);
       recordFailure();
       toast({
@@ -277,6 +305,8 @@ export function GVerifyKybClient() {
                 <p className="text-muted-foreground">{t("kyc.kyb.subtitle")}</p>
               </div>
             </div>
+
+            <ManualReviewNotice />
 
             {/* Step indicator — each step unlocks once the previous is done. */}
             <div
@@ -562,7 +592,9 @@ export function GVerifyKybClient() {
                 </div>
 
                 <p className="text-xs leading-relaxed text-muted-foreground">
-                  {t("kyc.kyb.consent")}
+                  {verificationMode?.mode === "MANUAL"
+                    ? t("kyc.kyb.consentManual")
+                    : t("kyc.kyb.consent")}
                 </p>
 
                 <div className="flex gap-2">

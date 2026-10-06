@@ -142,6 +142,16 @@ export const ADMIN_ENDPOINTS = {
     `/admin/kyc-verifications/${id}/images/${name}`,
   resolveKycVerification: (id: string) =>
     `/admin/kyc-verifications/${id}/resolve`,
+  // The business-verification queue: KYB attempts parked in MANUAL_REVIEW
+  // (every submission while verification mode is MANUAL), with a 10-minute
+  // read URL for the submitted certificate.
+  kybVerifications: "/admin/kyb-verifications",
+  kybVerification: (id: string) => `/admin/kyb-verifications/${id}`,
+  kybCertificate: (id: string) => `/admin/kyb-verifications/${id}/certificate`,
+  // KYC/KYB verification mode. Reading it with who/when is SYSTEM_ADMIN only,
+  // and so is changing it.
+  verificationModeAdmin: "/system/verification-mode/admin",
+  setVerificationMode: "/system/verification-mode",
   applicationDecision: (id: string) => `/admin/applications/${id}/decision`,
   // Account status. SUSPENDED is a real deny server-side, not a label.
   userStatus: (id: string) => `/admin/users/${id}/status`,
@@ -182,6 +192,9 @@ export const GVERIFY_ENDPOINTS = {
   // A 10-minute read URL for the certificate the SME already submitted for
   // KYB, so the loan application does not ask for the same file twice.
   kybCertificate: "/gverify/kyb/certificate",
+  // Any signed-in user: whether results come from the provider (AUTOMATIC)
+  // or from an admin (MANUAL), so the screens can say so up front.
+  verificationMode: "/system/verification-mode",
 } as const;
 
 // In-app notifications — the bell in the sidebar. Every route is scoped to the

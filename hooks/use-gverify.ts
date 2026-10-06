@@ -15,6 +15,7 @@ import {
   type GVerifyKybVerifyResponse,
   type GVerifyKybCertificate,
   type GVerifyKybStatusResponse,
+  type VerificationModeStatus,
 } from "@/services/gverify.service";
 import type { ApiError } from "@/lib/types";
 
@@ -24,6 +25,7 @@ export const gverifyKeys = {
   status: () => [...gverifyKeys.all, "status"] as const,
   kybCertificate: () => [...gverifyKeys.all, "kyb-certificate"] as const,
   kybStatus: () => [...gverifyKeys.all, "kyb-status"] as const,
+  verificationMode: () => [...gverifyKeys.all, "verification-mode"] as const,
 };
 
 interface UseGVerifyStatusOptions {
@@ -31,6 +33,20 @@ interface UseGVerifyStatusOptions {
   // Poll while waiting for another device (the phone handoff) to submit.
   // Same-device verifies don't need it — the mutation seeds this cache.
   poll?: boolean;
+}
+
+// Whether a person (MANUAL) or the provider (AUTOMATIC) decides KYC/KYB right
+// now. Short staleTime: a system admin can flip it at any moment. Failing to
+// read it is not worth an error on a KYC screen, so callers treat a missing
+// value as AUTOMATIC (the default) and simply show no notice.
+export function useVerificationMode(enabled = true) {
+  return useQuery<VerificationModeStatus, ApiError>({
+    queryKey: gverifyKeys.verificationMode(),
+    queryFn: () => gverifyService.getVerificationMode(),
+    staleTime: 30 * 1000,
+    retry: false,
+    enabled,
+  });
 }
 
 // Latest GVerify KYC attempt for the logged-in investor. A 404 means they

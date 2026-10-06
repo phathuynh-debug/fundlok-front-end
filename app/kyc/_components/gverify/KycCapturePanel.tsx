@@ -17,12 +17,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
-import { useGVerifyHandoff, useGVerifyStatus } from "@/hooks/use-gverify";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  gverifyKeys,
+  useGVerifyHandoff,
+  useGVerifyStatus,
+  useVerificationMode,
+} from "@/hooks/use-gverify";
 import { StatusBlock } from "../status-block";
 import { CaptureTabs } from "./CaptureTabs";
 import { useGVerifyKyc } from "./useGVerifyKyc";
 import { useVerificationFailures } from "../use-verification-failures";
 import { VerificationHelpDialog } from "../VerificationHelpDialog";
+import { ManualReviewNotice } from "../ManualReviewNotice";
 import type { ApiError } from "@/lib/types";
 import { apiErrorMessage, backendText } from "@/lib/api-error-message";
 
@@ -49,6 +56,8 @@ export function KycCapturePanel({
 }) {
   const { toast } = useToast();
   const { t, locale } = useTranslations();
+  const queryClient = useQueryClient();
+  const { data: verificationMode } = useVerificationMode();
   const { images, setFile, reset, allReady, submit, submitting } =
     useGVerifyKyc();
   const { mutateAsync: createHandoff, isPending: creatingHandoff } =
@@ -121,9 +130,11 @@ export function KycCapturePanel({
 
   const handlePhone = async () => {
     try {
-      const { token } = await createHandoff();
+      const res = await createHandoff();
+      const mode = res.mode || verificationMode?.mode;
+      const modeParam = mode ? `&mode=${encodeURIComponent(mode)}` : "";
       setPhone({
-        url: `${window.location.origin}/kyc/mobile?token=${encodeURIComponent(token)}`,
+        url: `${window.location.origin}/kyc/mobile?token=${encodeURIComponent(res.token)}${modeParam}`,
         baselineId: status?.verification_id ?? "",
       });
     } catch (err) {
@@ -133,7 +144,9 @@ export function KycCapturePanel({
 
   const handleSubmit = async () => {
     try {
-      const verdict = await submit();
+      const verdict = await submit({
+        expected_mode: verificationMode?.mode,
+      });
       setRetaking(false);
       if (verdict.status === "REJECTED" || verdict.status === "FAILED") {
         reset();
@@ -143,6 +156,24 @@ export function KycCapturePanel({
       }
     } catch (err) {
       setRetaking(false);
+      const apiErr = err as ApiError;
+      const code =
+        apiErr?.code ||
+        (apiErr?.details as { code?: string })?.code ||
+        (apiErr as unknown as { response?: { data?: { code?: string } } })
+          ?.response?.data?.code ||
+        (apiErr as unknown as { data?: { code?: string } })?.data?.code;
+      if (code === "VERIFICATION_MODE_CHANGED") {
+        void queryClient.invalidateQueries({
+          queryKey: gverifyKeys.verificationMode(),
+        });
+        toast({
+          variant: "destructive",
+          title: t("kyc.gv.errorTitle"),
+          description: t("kyc.modeChanged"),
+        });
+        return;
+      }
       recordFailure();
       fail(err);
     }
@@ -265,6 +296,10 @@ export function KycCapturePanel({
         </div>
       )}
 
+      {/* Embedded in the KYB wizard (custom heading), the wizard shows the
+          notice once at its top instead. */}
+      {!heading && <ManualReviewNotice />}
+
       {/* One tab per capture. Each photo is taken live with the in-app guided
           camera (framing overlay); there is no way to upload one. Where the
           camera cannot open (no webcam, blocked, or a plain-http origin) the
@@ -272,7 +307,11 @@ export function KycCapturePanel({
       <CaptureTabs images={images} disabled={submitting} onSelect={setFile} />
 
       <p className="text-xs leading-relaxed text-muted-foreground">
-        {t("kyc.gv.consent")}
+        {/* Manual mode never sends the photos to the provider, so the
+            consent line has to say who actually looks at them. */}
+        {verificationMode?.mode === "MANUAL"
+          ? t("kyc.gv.consentManual")
+          : t("kyc.gv.consent")}
       </p>
 
       <div className="flex gap-2">

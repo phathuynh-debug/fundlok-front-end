@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "@/lib/i18n";
+import { VerificationModeCard } from "./_components/VerificationModeCard";
 
 export default function AdminSystemPage() {
   const { user, isLoading } = useRequireAuth();
@@ -67,6 +68,8 @@ export default function AdminSystemPage() {
           </p>
         </div>
       </div>
+
+      <VerificationModeCard />
 
       {/* Maintenance mode */}
       <div className="rounded-lg border bg-card p-6">
