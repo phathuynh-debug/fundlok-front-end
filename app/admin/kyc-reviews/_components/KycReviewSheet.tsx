@@ -18,6 +18,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { KycImageTile } from "./KycImageTile";
@@ -44,9 +46,30 @@ import {
 // person? So it shows why the attempt was flagged, both accounts side by side,
 // and the images this attempt submitted, before the decision controls.
 //
-// Approving needs a note (the API refuses without one) because it overrides a
-// fraud signal. The note is for colleagues only: a rejected investor sees a
-// fixed message, never what was typed here.
+// Approving a provider-flagged attempt needs a note (the API refuses without
+// one) because it overrides a fraud signal. The note is for colleagues only: a
+// rejected investor sees a fixed message, never what was typed here.
+//
+// An attempt submitted in manual verification mode had no OCR or face match:
+// the reviewer compares the selfie with the card and types the ID number, name
+// and date of birth from the card. The ID number and name are required to
+// approve; the note is optional unless the server finds the number already
+// verified on another account.
+
+// CMND (9 digits) or CCCD (12), spaces allowed while typing.
+const PERSON_NUMBER_PATTERN = /^\d{9}(\d{3})?$/;
+
+interface CardDetails {
+  personNumber: string;
+  fullName: string;
+  dateOfBirth: string;
+}
+
+const EMPTY_DETAILS: CardDetails = {
+  personNumber: "",
+  fullName: "",
+  dateOfBirth: "",
+};
 
 interface KycReviewSheetProps {
   verificationId: string | null;
@@ -73,16 +96,59 @@ export function KycReviewSheet({
     }
   };
 
+  // Same keying as notes: typed details belong to one attempt.
+  const [detailsById, setDetailsById] = useState<Record<string, CardDetails>>(
+    {},
+  );
+  const details = verificationId
+    ? (detailsById[verificationId] ?? EMPTY_DETAILS)
+    : EMPTY_DETAILS;
+  const setDetail = (field: keyof CardDetails, value: string) => {
+    if (verificationId) {
+      setDetailsById((prev) => ({
+        ...prev,
+        [verificationId]: {
+          ...(prev[verificationId] ?? EMPTY_DETAILS),
+          [field]: value,
+        },
+      }));
+    }
+  };
+
   const isParked = data?.status === "MANUAL_REVIEW";
   const isSelf = !!data && !!me && data.user.id === me.id;
   const noteMissing = note.trim().length === 0;
+  const manualAttempt = !!data && !data.provider_checked;
+  const personNumber = details.personNumber.replace(/\s+/g, "");
+  const personNumberInvalid =
+    personNumber.length > 0 && !PERSON_NUMBER_PATTERN.test(personNumber);
+  const detailsMissing =
+    manualAttempt && (!personNumber || !details.fullName.trim());
+  // Known conflicts need a note; for a manual attempt the server re-checks
+  // the typed number and asks for one if it finds a conflict there.
+  const noteRequired =
+    !!data && (data.provider_checked || data.conflicts.length > 0);
+  const approveBlocked =
+    (noteRequired && noteMissing) ||
+    detailsMissing ||
+    (manualAttempt && personNumberInvalid);
 
   const handleDecision = async (decision: AdminDecision) => {
     if (!data) return;
     try {
       await resolve({
         id: data.id,
-        body: { decision, note: note.trim() || null },
+        body: {
+          decision,
+          note: note.trim() || null,
+          ...(manualAttempt && decision === "APPROVED"
+            ? {
+                person_number: personNumber || null,
+                full_name: details.fullName.trim() || null,
+                date_of_birth: details.dateOfBirth.trim() || null,
+              }
+            : {}),
+        },
       });
       setNote("");
       toast({ title: t("admin.kycReviews.resolved") });
@@ -144,7 +210,9 @@ export function KycReviewSheet({
                   <p>
                     {data.conflicts.length > 0
                       ? t("admin.kycReviews.whyDuplicate")
-                      : t("admin.kycReviews.whyNoConflict")}
+                      : manualAttempt
+                        ? t("admin.kycReviews.whyManual")
+                        : t("admin.kycReviews.whyNoConflict")}
                   </p>
                 </div>
               </section>
@@ -263,13 +331,81 @@ export function KycReviewSheet({
                 </p>
               ) : (
                 <div className="space-y-2">
+                  {manualAttempt && (
+                    <div className="space-y-3 rounded-xl border border-border bg-muted/30 p-3">
+                      <p className="text-xs font-medium text-foreground">
+                        {t("admin.kycReviews.cardDetailsHeading")}
+                      </p>
+                      <div className="space-y-1.5">
+                        <Label htmlFor={`kyc-person-number-${data.id}`}>
+                          {t("admin.kycReviews.inputIdNumber")}
+                        </Label>
+                        <Input
+                          id={`kyc-person-number-${data.id}`}
+                          inputMode="numeric"
+                          autoComplete="off"
+                          className="font-mono tabular-nums"
+                          value={details.personNumber}
+                          disabled={isPending}
+                          aria-invalid={personNumberInvalid}
+                          onChange={(event) =>
+                            setDetail("personNumber", event.target.value)
+                          }
+                        />
+                        {personNumberInvalid && (
+                          <p className="text-[11px] text-destructive">
+                            {t("admin.kycReviews.idNumberInvalid")}
+                          </p>
+                        )}
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label htmlFor={`kyc-full-name-${data.id}`}>
+                          {t("admin.kycReviews.inputFullName")}
+                        </Label>
+                        <Input
+                          id={`kyc-full-name-${data.id}`}
+                          autoComplete="off"
+                          maxLength={120}
+                          value={details.fullName}
+                          disabled={isPending}
+                          onChange={(event) =>
+                            setDetail("fullName", event.target.value)
+                          }
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label htmlFor={`kyc-dob-${data.id}`}>
+                          {t("admin.kycReviews.inputDateOfBirth")}
+                        </Label>
+                        <Input
+                          id={`kyc-dob-${data.id}`}
+                          autoComplete="off"
+                          maxLength={20}
+                          placeholder="DD/MM/YYYY"
+                          value={details.dateOfBirth}
+                          disabled={isPending}
+                          onChange={(event) =>
+                            setDetail("dateOfBirth", event.target.value)
+                          }
+                        />
+                      </div>
+                    </div>
+                  )}
                   <Textarea
                     id={`kyc-review-note-${data.id}`}
                     rows={3}
                     value={note}
                     disabled={isPending}
-                    placeholder={t("admin.kycReviews.notePlaceholder")}
-                    aria-label={t("admin.kycReviews.notePlaceholder")}
+                    placeholder={
+                      noteRequired
+                        ? t("admin.kycReviews.notePlaceholder")
+                        : t("admin.kycReviews.notePlaceholderOptional")
+                    }
+                    aria-label={
+                      noteRequired
+                        ? t("admin.kycReviews.notePlaceholder")
+                        : t("admin.kycReviews.notePlaceholderOptional")
+                    }
                     onChange={(event) => setNote(event.target.value)}
                   />
                   <div className="flex gap-2">
@@ -277,7 +413,7 @@ export function KycReviewSheet({
                       type="button"
                       size="sm"
                       className="flex-1"
-                      disabled={isPending || noteMissing}
+                      disabled={isPending || approveBlocked}
                       onClick={() => handleDecision("APPROVED")}
                     >
                       {isPending ? (
@@ -299,7 +435,12 @@ export function KycReviewSheet({
                       {t("admin.kycReviews.reject")}
                     </Button>
                   </div>
-                  {noteMissing && (
+                  {detailsMissing && (
+                    <p className="text-[11px] leading-relaxed text-muted-foreground">
+                      {t("admin.kycReviews.detailsRequired")}
+                    </p>
+                  )}
+                  {noteRequired && noteMissing && (
                     <p className="text-[11px] leading-relaxed text-muted-foreground">
                       {t("admin.kycReviews.noteRequired")}
                     </p>

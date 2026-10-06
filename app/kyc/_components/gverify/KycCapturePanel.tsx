@@ -17,12 +17,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
-import { useGVerifyHandoff, useGVerifyStatus } from "@/hooks/use-gverify";
+import {
+  useGVerifyHandoff,
+  useGVerifyStatus,
+  useVerificationMode,
+} from "@/hooks/use-gverify";
 import { StatusBlock } from "../status-block";
 import { CaptureTabs } from "./CaptureTabs";
 import { useGVerifyKyc } from "./useGVerifyKyc";
 import { useVerificationFailures } from "../use-verification-failures";
 import { VerificationHelpDialog } from "../VerificationHelpDialog";
+import { ManualReviewNotice } from "../ManualReviewNotice";
 import type { ApiError } from "@/lib/types";
 import { apiErrorMessage, backendText } from "@/lib/api-error-message";
 
@@ -49,6 +54,7 @@ export function KycCapturePanel({
 }) {
   const { toast } = useToast();
   const { t, locale } = useTranslations();
+  const { data: verificationMode } = useVerificationMode();
   const { images, setFile, reset, allReady, submit, submitting } =
     useGVerifyKyc();
   const { mutateAsync: createHandoff, isPending: creatingHandoff } =
@@ -265,6 +271,10 @@ export function KycCapturePanel({
         </div>
       )}
 
+      {/* Embedded in the KYB wizard (custom heading), the wizard shows the
+          notice once at its top instead. */}
+      {!heading && <ManualReviewNotice />}
+
       {/* One tab per capture. Each photo is taken live with the in-app guided
           camera (framing overlay); there is no way to upload one. Where the
           camera cannot open (no webcam, blocked, or a plain-http origin) the
@@ -272,7 +282,11 @@ export function KycCapturePanel({
       <CaptureTabs images={images} disabled={submitting} onSelect={setFile} />
 
       <p className="text-xs leading-relaxed text-muted-foreground">
-        {t("kyc.gv.consent")}
+        {/* Manual mode never sends the photos to the provider, so the
+            consent line has to say who actually looks at them. */}
+        {verificationMode?.mode === "MANUAL"
+          ? t("kyc.gv.consentManual")
+          : t("kyc.gv.consent")}
       </p>
 
       <div className="flex gap-2">

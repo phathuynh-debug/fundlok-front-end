@@ -69,7 +69,11 @@ export function KycReviewQueue() {
       header: t("admin.kycReviews.table.conflicts"),
       cellClassName: "text-xs",
       render: (row) =>
-        row.conflicts.length > 0 ? (
+        !row.provider_checked && row.conflicts.length === 0 ? (
+          <span className="text-muted-foreground">
+            {t("admin.kycReviews.manualMode")}
+          </span>
+        ) : row.conflicts.length > 0 ? (
           <span className="inline-flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
             <AlertTriangle className="h-3.5 w-3.5 shrink-0" aria-hidden />
             {conflictLabel(t, row.conflicts.length)}

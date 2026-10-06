@@ -183,6 +183,67 @@ export interface AdminKycVerification {
   user: AdminKycAccountRef;
   /** Recomputed on every read. Empty means nothing conflicts any more. */
   conflicts: AdminKycConflict[];
+  /**
+   * False when the attempt was submitted in manual verification mode: no OCR
+   * or face match ran, so the ID details are empty until the reviewer types
+   * them from the card (required to approve).
+   */
+  provider_checked: boolean;
+}
+
+/** Approving a manual-mode attempt needs the details read off the card. */
+export interface AdminKycResolvePayload extends AdminDecisionPayload {
+  person_number?: string | null;
+  full_name?: string | null;
+  date_of_birth?: string | null;
+}
+
+// How KYC/KYB submissions are decided: by the verification provider, or —
+// while it is unavailable — by an admin reviewing the stored documents.
+export type VerificationMode = "AUTOMATIC" | "MANUAL";
+
+export interface VerificationModeState {
+  mode: VerificationMode;
+  updated_at: string | null;
+  updated_by: string | null;
+}
+
+// One KYB attempt as the review queue shows it. kyc_* is the SME's own
+// approved identity check, for confirming that person is a legal
+// representative on the certificate.
+export interface AdminKybReview {
+  id: string;
+  status: AdminKycStatus | string;
+  is_approved: boolean;
+  /** What the SME sees. On a rejection it is the reviewer's note. */
+  rejection_reason: string | null;
+  document_type: string;
+  tax_code: string | null;
+  license_code: string | null;
+  business_name: string | null;
+  business_type: string | null;
+  company_address: string | null;
+  /** False for a manual-mode attempt: no OCR, no registry check. */
+  provider_checked: boolean;
+  created_at: string | null;
+  updated_at: string | null;
+  user: AdminKycAccountRef;
+  kyc_full_name: string | null;
+  kyc_person_number: string | null;
+  projects: string[];
+}
+
+/** Approving a manual-mode attempt needs the details from the certificate. */
+export interface AdminKybResolvePayload extends AdminDecisionPayload {
+  business_name?: string | null;
+  tax_code?: string | null;
+}
+
+export interface AdminKybCertificateUrl {
+  url: string;
+  /** Seconds the URL stays valid — 600. */
+  expires_in: number;
+  content_type: string;
 }
 
 export interface AdminKycImageUrl {
@@ -324,7 +385,7 @@ export const adminService = {
 
   // Admin only. Settles a KYB attempt the engine parked in MANUAL_REVIEW;
   // 409 if it was already decided by the provider.
-  resolveKybVerification(verificationId: string, body: AdminDecisionPayload) {
+  resolveKybVerification(verificationId: string, body: AdminKybResolvePayload) {
     return apiClient.post<AdminKybVerification>(
       ADMIN_ENDPOINTS.resolveKybVerification(verificationId),
       body,
@@ -355,10 +416,45 @@ export const adminService = {
 
   // Admin only. 400 when approving without a note (it overrides a fraud
   // signal), 403 on your own attempt, 409 if it is no longer parked.
-  resolveKycVerification(verificationId: string, body: AdminDecisionPayload) {
+  resolveKycVerification(verificationId: string, body: AdminKycResolvePayload) {
     return apiClient.post<AdminKycVerification>(
       ADMIN_ENDPOINTS.resolveKycVerification(verificationId),
       body,
+    );
+  },
+
+  // Admin only. Oldest first; defaults to the review queue.
+  getKybVerifications(status: AdminKycStatus = "MANUAL_REVIEW") {
+    return apiClient.get<AdminKybReview[]>(ADMIN_ENDPOINTS.kybVerifications, {
+      params: { status },
+    });
+  },
+
+  getKybVerification(verificationId: string) {
+    return apiClient.get<AdminKybReview>(
+      ADMIN_ENDPOINTS.kybVerification(verificationId),
+    );
+  },
+
+  // Fetched only while the review panel is open: the URL expires in 10 min.
+  getKybCertificateUrl(verificationId: string) {
+    return apiClient.get<AdminKybCertificateUrl>(
+      ADMIN_ENDPOINTS.kybCertificate(verificationId),
+    );
+  },
+
+  // SYSTEM_ADMIN only.
+  getVerificationModeAdmin() {
+    return apiClient.get<VerificationModeState>(
+      ADMIN_ENDPOINTS.verificationModeAdmin,
+    );
+  },
+
+  // SYSTEM_ADMIN only. MANUAL stops every call to the verification provider.
+  setVerificationMode(mode: VerificationMode) {
+    return apiClient.put<VerificationModeState>(
+      ADMIN_ENDPOINTS.setVerificationMode,
+      { mode },
     );
   },
 

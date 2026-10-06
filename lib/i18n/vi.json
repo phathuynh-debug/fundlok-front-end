@@ -77,15 +77,68 @@
       "successTitle": "Đã gửi lời mời",
       "title": "Thêm quản trị viên"
     },
+    "kybReviews": {
+      "alreadyDecided": "Lượt xác minh doanh nghiệp này đã được quyết định.",
+      "applicantHeading": "Người gửi",
+      "certificateDetailsHeading": "Thông tin trên giấy chứng nhận",
+      "certificateHeading": "Giấy chứng nhận đăng ký",
+      "certificateMissing": "Giấy chứng nhận không được lưu.",
+      "certificateOpen": "Mở giấy chứng nhận trong thẻ mới",
+      "checkManual": "Chế độ thủ công",
+      "checkProvider": "Nhà cung cấp gắn cờ",
+      "declaredBySme": "do doanh nghiệp tự khai",
+      "detailLoadFailed": "Không tải được lượt xác minh doanh nghiệp này. Vui lòng thử lại.",
+      "detailsRequired": "Nhập tên doanh nghiệp và mã số thuế trên giấy chứng nhận để duyệt.",
+      "documentTypes": {
+        "COMPANY": "Công ty",
+        "COMPANY_BRANCH": "Chi nhánh công ty",
+        "HOUSEHOLD": "Hộ kinh doanh"
+      },
+      "empty": "Không có lượt xác minh doanh nghiệp nào đang chờ duyệt.",
+      "emptyOther": "Không có lượt xác minh doanh nghiệp nào ở trạng thái này.",
+      "fields": {
+        "address": "Địa chỉ",
+        "businessName": "Tên doanh nghiệp",
+        "businessType": "Loại hình doanh nghiệp",
+        "documentType": "Loại giấy chứng nhận",
+        "licenseCode": "Số giấy phép",
+        "projects": "Doanh nghiệp trên FundLok",
+        "taxCode": "Mã số thuế"
+      },
+      "inputBusinessName": "Tên doanh nghiệp như in trên giấy",
+      "inputTaxCode": "Mã số thuế (MST)",
+      "notePlaceholder": "Ghi chú (không bắt buộc). Nếu từ chối, doanh nghiệp sẽ thấy ghi chú này là lý do.",
+      "ownerKycHeading": "Danh tính đã xác minh của người gửi",
+      "ownerKycHint": "Kiểm tra người này có tên là người đại diện theo pháp luật trên giấy chứng nhận.",
+      "ownerKycNone": "Tài khoản này chưa có lượt xác minh danh tính được duyệt. Hãy kiểm tra người đại diện theo pháp luật trước khi duyệt.",
+      "rejectHint": "Nếu từ chối, doanh nghiệp sẽ thấy ghi chú của bạn là lý do (hoặc một thông báo chung nếu để trống) và có thể gửi lại.",
+      "rowLabel": "Duyệt xác minh doanh nghiệp của {name}",
+      "selfBlocked": "Bạn không thể tự duyệt lượt xác minh doanh nghiệp của mình.",
+      "sheetSubtitle": "Đối chiếu giấy chứng nhận đăng ký với thông tin bên dưới.",
+      "sheetTitle": "Xác minh doanh nghiệp",
+      "table": {
+        "applicant": "Doanh nghiệp",
+        "check": "Lý do cần duyệt",
+        "documentType": "Giấy chứng nhận",
+        "status": "Trạng thái",
+        "submitted": "Ngày gửi",
+        "taxCode": "Mã số thuế"
+      },
+      "taxCodeInvalid": "Mã số thuế phải gồm 10 chữ số, có thể kèm -NNN cho chi nhánh.",
+      "whyManual": "Lượt này được gửi khi đang ở chế độ duyệt thủ công nên hệ thống không đọc giấy chứng nhận hay đối chiếu cơ sở dữ liệu đăng ký. Hãy đọc giấy chứng nhận và xác nhận tên doanh nghiệp và mã số thuế đúng như in trên đó.",
+      "whyProvider": "Nhà cung cấp đã đọc giấy chứng nhận này nhưng không tự quyết được, ví dụ do độ tin cậy khi đọc thấp hoặc thông tin không khớp với cơ sở dữ liệu đăng ký. Hãy kiểm tra giấy chứng nhận trước khi quyết định."
+    },
     "kycReviews": {
       "alreadyDecided": "Lượt xác minh này đã được quyết định.",
       "approve": "Duyệt",
       "attemptHeading": "Lượt xác minh này",
+      "cardDetailsHeading": "Thông tin trên CCCD",
       "conflictHeading": "Đã xác minh trên",
       "conflictMany": "Đã xác minh trên {count} tài khoản khác",
       "conflictOne": "Đã xác minh trên 1 tài khoản khác",
       "decisionHeading": "Quyết định của bạn",
       "detailLoadFailed": "Không thể tải chi tiết lượt xác minh danh tính. Vui lòng thử lại.",
+      "detailsRequired": "Nhập số giấy tờ và họ tên trên thẻ để duyệt.",
       "empty": "Không có lượt xác minh nào đang chờ xét duyệt.",
       "emptyOther": "Không có lượt xác minh nào ở trạng thái này.",
       "faceMatchValue": "Tương đồng {score}%",
@@ -100,6 +153,7 @@
         "submitted": "Ngày gửi",
         "verified": "Ngày xác minh"
       },
+      "idNumberInvalid": "Số giấy tờ phải gồm 9 hoặc 12 chữ số.",
       "imageMissing": "Không được lưu",
       "imageOpen": "Mở {name} kích thước đầy đủ",
       "images": {
@@ -108,8 +162,16 @@
         "portrait": "Ảnh chân dung"
       },
       "imagesHeading": "Ảnh đã gửi",
+      "inputDateOfBirth": "Ngày sinh (không bắt buộc)",
+      "inputFullName": "Họ và tên trên thẻ",
+      "inputIdNumber": "Số CCCD hoặc CMND",
+      "kindKyb": "Doanh nghiệp (KYB)",
+      "kindKyc": "Danh tính (KYC)",
+      "manualBanner": "Chế độ duyệt thủ công đang bật. Hệ thống không dùng nhà cung cấp xác minh, nên mọi lượt gửi KYC và KYB mới đều chờ quyết định tại đây.",
+      "manualMode": "Chế độ thủ công",
       "noConflict": "Hiện không còn trùng",
       "notePlaceholder": "Vì sao bạn duyệt hoặc từ chối? Bắt buộc khi duyệt. Chỉ nhân viên xem được ghi chú này.",
+      "notePlaceholderOptional": "Ghi chú cho đồng nghiệp (không bắt buộc). Chỉ nhân viên xem được ghi chú này.",
       "noteRequired": "Hãy thêm ghi chú để duyệt. Duyệt sẽ bỏ qua một cảnh báo gian lận, nên lý do cần được lưu lại.",
       "reject": "Từ chối",
       "rejectHint": "Nếu từ chối, nhà đầu tư sẽ thấy: “Chúng tôi không thể hoàn tất xác minh danh tính của bạn. Vui lòng liên hệ bộ phận hỗ trợ.” Họ có thể gửi lại.",
@@ -117,13 +179,13 @@
       "resolved": "Đã lưu quyết định",
       "rowLabel": "Xét duyệt lượt xác minh của {name}",
       "selfBlocked": "Bạn không thể tự xét duyệt lượt xác minh của chính mình.",
-      "sheetSubtitle": "So sánh CCCD và ảnh chân dung đã gửi với tài khoản đang giữ số CCCD này.",
+      "sheetSubtitle": "Kiểm tra CCCD và ảnh chân dung đã gửi trước khi quyết định.",
       "sheetTitle": "Xác minh danh tính",
-      "subtitle": "Các lượt xác minh danh tính nhà đầu tư mà hệ thống không thể tự duyệt.",
+      "subtitle": "Các lượt xác minh danh tính (KYC) và doanh nghiệp (KYB) đang chờ người duyệt: những lượt nhà cung cấp không tự quyết được, và mọi lượt gửi khi đang ở chế độ duyệt thủ công.",
       "table": {
         "conflicts": "Lý do gắn cờ",
         "idNumber": "Số CCCD",
-        "investor": "Nhà đầu tư",
+        "investor": "Người gửi",
         "nameOnCard": "Tên trên thẻ",
         "status": "Trạng thái",
         "submitted": "Ngày gửi"
@@ -133,9 +195,10 @@
         "MANUAL_REVIEW": "Chờ xét duyệt",
         "REJECTED": "Đã từ chối"
       },
-      "title": "Xét duyệt KYC",
+      "title": "Xét duyệt KYC / KYB",
       "whyDuplicate": "Số CCCD này đã được xác minh trên một tài khoản FundLok khác. Ảnh cắt từ CCCD của người khác vẫn có thể qua bước so khớp khuôn mặt, vì vậy hãy kiểm tra hai tài khoản có cùng một người trước khi duyệt.",
       "whyHeading": "Vì sao cần xét duyệt",
+      "whyManual": "Lượt này được gửi khi đang ở chế độ duyệt thủ công nên không có kiểm tra tự động nào. Hãy so sánh ảnh chân dung với ảnh trên CCCD, rồi nhập thông tin đúng như in trên thẻ.",
       "whyNoConflict": "Tài khoản từng giữ số CCCD này không còn được duyệt, nên hiện không còn trùng. Hãy quyết định dựa trên các bằng chứng bên dưới."
     },
     "loading": "Đang tải trang quản trị…",
@@ -280,7 +343,7 @@
     "sidebar": {
       "auditLogs": "Nhật ký kiểm toán",
       "badge": "Quản trị",
-      "kycReviews": "Xét duyệt KYC",
+      "kycReviews": "Xét duyệt KYC / KYB",
       "logout": "Đăng xuất",
       "overview": "Tổng quan",
       "projects": "Dự án",
@@ -308,7 +371,26 @@
         "title": "Chế độ bảo trì"
       },
       "subtitle": "Các điều khiển cấp hệ thống cho nền tảng.",
-      "title": "Cài đặt hệ thống"
+      "title": "Cài đặt hệ thống",
+      "verification": {
+        "automaticBody": "Nhà cung cấp xác minh kiểm tra từng lượt gửi và trả kết quả ngay.",
+        "automaticTitle": "Tự động",
+        "confirmAction": "Chuyển sang thủ công",
+        "confirmBody": "Các lượt gửi KYC và KYB mới sẽ bỏ qua nhà cung cấp xác minh và chờ quản trị viên duyệt. Không có kiểm tra danh tính hay doanh nghiệp tự động nào cho đến khi bạn chuyển lại.",
+        "confirmTitle": "Chuyển sang duyệt thủ công?",
+        "description": "Chọn ai quyết định các lượt xác minh KYC (danh tính) và KYB (doanh nghiệp). Chuyển sang duyệt thủ công khi nhà cung cấp xác minh không hoạt động.",
+        "error": "Không thể thay đổi cài đặt xác minh",
+        "lastChanged": "Thay đổi lần cuối {date}",
+        "loadFailed": "Không tải được cài đặt xác minh. Vui lòng thử lại.",
+        "manualActive": "Chế độ duyệt thủ công đang bật: không có kiểm tra tự động nào cho đến khi bạn chuyển lại, nên hãy bảo đảm có người xử lý hàng chờ.",
+        "manualBody": "Hệ thống không liên hệ nhà cung cấp. Giấy tờ được lưu lại và mọi lượt gửi chờ trong mục Xét duyệt KYC / KYB để quản trị viên duyệt hoặc từ chối.",
+        "manualTitle": "Duyệt thủ công",
+        "neverChanged": "Chưa từng thay đổi: mặc định là tự động.",
+        "openQueue": "Mở Xét duyệt KYC / KYB",
+        "savedAutomatic": "Đã bật xác minh tự động",
+        "savedManual": "Đã bật duyệt thủ công",
+        "title": "Xác minh danh tính và doanh nghiệp"
+      }
     },
     "table": {
       "allRoles": "Tất cả vai trò",
@@ -1851,6 +1933,7 @@
       "captureBtn": "Chụp ảnh",
       "clickToAdd": "Nhấn để chụp ảnh",
       "consent": "Ảnh của bạn được gửi an toàn tới đối tác xác minh để đọc thông tin giấy tờ và đối chiếu khuôn mặt, và được lưu trữ an toàn theo yêu cầu tuân thủ về xác minh danh tính.",
+      "consentManual": "Ảnh của bạn được lưu trữ an toàn và được đội ngũ của chúng tôi kiểm tra để xác minh danh tính, và được lưu trữ an toàn theo yêu cầu tuân thủ về xác minh danh tính.",
       "errorTitle": "Không thể hoàn tất xác minh",
       "failedHint": "Đối tác xác minh gặp sự cố khi xử lý yêu cầu của bạn. Vui lòng thử lại sau ít phút.",
       "failedTitle": "Đã xảy ra sự cố",
@@ -1898,6 +1981,7 @@
       "backBtn": "Quay lại",
       "clickToAdd": "Nhấn để thêm ảnh hoặc PDF",
       "consent": "Giấy chứng nhận của bạn được gửi an toàn tới đối tác xác minh để đọc thông tin và đối chiếu với cơ quan thuế, và được lưu trữ an toàn theo yêu cầu tuân thủ về xác minh doanh nghiệp.",
+      "consentManual": "Giấy chứng nhận của bạn được lưu trữ an toàn và được đội ngũ của chúng tôi kiểm tra để xác minh doanh nghiệp, và được lưu trữ an toàn theo yêu cầu tuân thủ về xác minh doanh nghiệp.",
       "declinedTitle": "Xác minh doanh nghiệp thất bại",
       "docLabelBranch": "Giấy chứng nhận đăng ký hoạt động chi nhánh",
       "docLabelCompany": "Giấy chứng nhận đăng ký doanh nghiệp",
@@ -1922,6 +2006,7 @@
       "typeCompany": "Doanh nghiệp",
       "typeLabel": "Loại giấy chứng nhận"
     },
+    "manualModeNotice": "Hiện đội ngũ của chúng tôi đang kiểm tra hồ sơ xác minh thủ công, nên bạn sẽ không nhận được kết quả ngay. Hãy gửi giấy tờ như bình thường, chúng tôi sẽ cập nhật trang này sau khi duyệt xong.",
     "newTab": {
       "description": "Vui lòng hoàn tất xác minh ở tab đó. Trang này sẽ tự tiếp tục khi bạn được duyệt.",
       "title": "Đã mở xác minh trong tab mới"

@@ -177,7 +177,20 @@ export interface GVerifyKybCertificate {
   verification_id: string;
 }
 
+// Which mode decides KYC/KYB right now (see the admin system settings).
+// MANUAL means a person reviews each submission, so the verdict is not
+// instant and the screens say so before the user uploads anything.
+export interface VerificationModeStatus {
+  mode: "AUTOMATIC" | "MANUAL";
+}
+
 export const gverifyService = {
+  getVerificationMode() {
+    return apiClient.get<VerificationModeStatus>(
+      GVERIFY_ENDPOINTS.verificationMode,
+    );
+  },
+
   kybGetCertificate() {
     return apiClient.get<GVerifyKybCertificate>(
       GVERIFY_ENDPOINTS.kybCertificate,

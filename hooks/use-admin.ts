@@ -7,15 +7,20 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import type { ApiError } from "@/lib/types";
+import { gverifyKeys } from "@/hooks/use-gverify";
 import {
   adminService,
   type AdminDecisionPayload,
   type AdminDocumentUrl,
   type AdminInvitePayload,
+  type AdminKybCertificateUrl,
+  type AdminKybResolvePayload,
+  type AdminKybReview,
   type AdminKybVerification,
   type AdminKycImageName,
   type AdminKycImageUrl,
   type AdminKycStatus,
+  type AdminKycResolvePayload,
   type AdminKycVerification,
   type AdminLoanApplication,
   type AdminOverview,
@@ -27,6 +32,8 @@ import {
   type AuditLogParams,
   type MaintenanceState,
   type MaintenanceUpdate,
+  type VerificationMode,
+  type VerificationModeState,
 } from "@/services/admin.service";
 
 export const adminKeys = {
@@ -47,6 +54,14 @@ export const adminKeys = {
     [...adminKeys.kycAll(), "list", status] as const,
   kycVerification: (id: string) =>
     [...adminKeys.kycAll(), "detail", id] as const,
+  kybAll: () => [...adminKeys.all, "kyb"] as const,
+  kybQueue: (status: AdminKycStatus) =>
+    [...adminKeys.kybAll(), "list", status] as const,
+  kybVerification: (id: string) =>
+    [...adminKeys.kybAll(), "detail", id] as const,
+  kybCertificate: (id: string) =>
+    [...adminKeys.kybAll(), "certificate", id] as const,
+  verificationMode: () => [...adminKeys.all, "verification-mode"] as const,
   kycImage: (id: string, name: AdminKycImageName) =>
     [...adminKeys.kycAll(), "image", id, name] as const,
 };
@@ -115,6 +130,16 @@ export function useAdminProjectDetail(projectId: string | null) {
 interface DecisionInput {
   id: string;
   body: AdminDecisionPayload;
+}
+
+interface KybResolveInput {
+  id: string;
+  body: AdminKybResolvePayload;
+}
+
+interface KycResolveInput {
+  id: string;
+  body: AdminKycResolvePayload;
 }
 
 // Settles a parked KYB attempt. Invalidates rather than seeding the cache: the
@@ -239,10 +264,83 @@ export function useAdminKycImageUrl(id: string, name: AdminKycImageName) {
 // conflict shown on other attempts.
 export function useResolveKycVerification() {
   const queryClient = useQueryClient();
-  return useMutation<AdminKycVerification, ApiError, DecisionInput>({
+  return useMutation<AdminKycVerification, ApiError, KycResolveInput>({
     mutationFn: ({ id, body }) => adminService.resolveKycVerification(id, body),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: adminKeys.kycAll() });
+    },
+  });
+}
+
+// ---------- KYB review queue ----------
+
+export function useAdminKybVerifications(status: AdminKycStatus) {
+  return useQuery<AdminKybReview[], ApiError>({
+    queryKey: adminKeys.kybQueue(status),
+    queryFn: () => adminService.getKybVerifications(status),
+    staleTime: 30 * 1000,
+    retry: false,
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useAdminKybVerification(id: string | null) {
+  return useQuery<AdminKybReview, ApiError>({
+    queryKey: adminKeys.kybVerification(id ?? ""),
+    queryFn: () => adminService.getKybVerification(id as string),
+    enabled: id !== null,
+    staleTime: 0,
+    retry: false,
+  });
+}
+
+// staleTime 0 because the URL expires in 10 minutes.
+export function useAdminKybCertificateUrl(id: string | null) {
+  return useQuery<AdminKybCertificateUrl, ApiError>({
+    queryKey: adminKeys.kybCertificate(id ?? ""),
+    queryFn: () => adminService.getKybCertificateUrl(id as string),
+    enabled: id !== null,
+    staleTime: 0,
+    retry: false,
+  });
+}
+
+// Settles a parked KYB attempt from the review queue. Invalidates every KYB
+// query plus the project previews and overview, where the same verdict is the
+// "registration verified" half of an application's gate.
+export function useResolveKybReview() {
+  const queryClient = useQueryClient();
+  return useMutation<AdminKybVerification, ApiError, KybResolveInput>({
+    mutationFn: ({ id, body }) => adminService.resolveKybVerification(id, body),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: adminKeys.all });
+    },
+  });
+}
+
+// ---------- Verification mode (SYSTEM_ADMIN) ----------
+
+export function useVerificationModeAdmin(enabled = true) {
+  return useQuery<VerificationModeState, ApiError>({
+    queryKey: adminKeys.verificationMode(),
+    queryFn: () => adminService.getVerificationModeAdmin(),
+    staleTime: 0,
+    retry: false,
+    enabled,
+  });
+}
+
+// Seeds the admin copy and invalidates the user-facing one, so this browser's
+// KYC/KYB screens and the review-page banner pick up the change at once.
+export function useSetVerificationMode() {
+  const queryClient = useQueryClient();
+  return useMutation<VerificationModeState, ApiError, VerificationMode>({
+    mutationFn: (mode) => adminService.setVerificationMode(mode),
+    onSuccess: (state) => {
+      queryClient.setQueryData(adminKeys.verificationMode(), state);
+      void queryClient.invalidateQueries({
+        queryKey: gverifyKeys.verificationMode(),
+      });
     },
   });
 }
