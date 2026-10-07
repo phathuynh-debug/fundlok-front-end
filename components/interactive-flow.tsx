@@ -13,7 +13,9 @@ import {
   Building2,
   Banknote,
   ChevronDown,
+  ChevronLeft,
   ArrowRight,
+  Sparkles,
   type LucideIcon,
 } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
@@ -978,7 +980,45 @@ export function InteractiveFlow() {
   });
   const progressWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
+  const mobileSectionRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const diffX = touchStartX.current - e.changedTouches[0].clientX;
+    const diffY = touchStartY.current - e.changedTouches[0].clientY;
+
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
+      if (diffX > 0 && activeStep < steps.length - 1) {
+        handleMobileStepChange(activeStep + 1);
+      } else if (diffX < 0 && activeStep > 0) {
+        handleMobileStepChange(activeStep - 1);
+      }
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
+
+  const handleMobileStepChange = (newIdx: number) => {
+    const target = Math.max(0, Math.min(steps.length - 1, newIdx));
+    setActiveStep(target);
+    if (target === steps.length - 1 && !celebrated.current && !reduceMotion) {
+      celebrated.current = true;
+      triggerConfetti();
+    }
+  };
+
   useMotionValueEvent(scrollYProgress, "change", (v) => {
+    // Desktop scrollytelling drives activeStep on screens >= 1024px
+    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+      return;
+    }
     const idx = Math.min(steps.length - 1, Math.floor(v * steps.length));
     setActiveStep((prev) => (prev === idx ? prev : idx));
 
@@ -993,6 +1033,7 @@ export function InteractiveFlow() {
 
   const handleRoleChange = (newRole: "sme" | "investor") => {
     setRole(newRole);
+    setActiveStep(0);
     celebrated.current = false;
   };
 
@@ -1089,7 +1130,11 @@ export function InteractiveFlow() {
    */
   const chooseAudience = (key: "sme" | "investor") => {
     handleRoleChange(key);
-    sequenceRef.current?.scrollIntoView({
+    const target =
+      typeof window !== "undefined" && window.innerWidth >= 1024
+        ? sequenceRef.current
+        : mobileSectionRef.current;
+    target?.scrollIntoView({
       behavior: reduceMotion ? "auto" : "smooth",
       block: "start",
     });
@@ -1210,10 +1255,10 @@ export function InteractiveFlow() {
     ];
 
     const cardRanges: [number, number][] = [
-      [0.02, 0.14],
-      [0.14, 0.26],
-      [0.26, 0.38],
-      [0.38, 0.5],
+      [0.02, 0.12],
+      [0.02, 0.12],
+      [0.04, 0.14],
+      [0.04, 0.14],
     ];
 
     const rowRanges: [number, number][] = [
@@ -1224,17 +1269,17 @@ export function InteractiveFlow() {
     ];
 
     return (
-      <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+      <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
         <div>
-          <p className="mb-5 font-mono text-xs text-muted-foreground">
+          <p className="mb-2 font-mono text-xs text-muted-foreground sm:mb-5">
             {String(idx + 1).padStart(2, "0")}
           </p>
 
-          <h3 className="mb-6 max-w-[14ch] font-sans text-4xl font-extrabold leading-[1.1] tracking-tighter text-foreground md:text-6xl lg:text-7xl">
+          <h3 className="mb-3 max-w-[14ch] font-sans text-2xl font-extrabold leading-[1.15] tracking-tighter text-foreground sm:text-4xl md:text-6xl lg:text-7xl sm:mb-6">
             {(s as { detailTitle?: string }).detailTitle || s.title}
           </h3>
 
-          <p className="mb-8 max-w-[52ch] font-sans text-base leading-relaxed text-muted-foreground md:text-lg">
+          <p className="mb-4 max-w-[52ch] font-sans text-sm leading-relaxed text-muted-foreground sm:text-base md:text-lg sm:mb-8">
             {s.desc}
           </p>
 
@@ -1250,9 +1295,9 @@ export function InteractiveFlow() {
           </div>
         </div>
 
-        {/* Supporting detail: items appear one by one as the reader scrolls within this stage */}
-        <div className="flex flex-col gap-8 lg:pt-16">
-          <div className="grid gap-6 sm:grid-cols-2">
+        {/* Supporting detail: items presented in a 2x2 grid on mobile */}
+        <div className="flex flex-col gap-6 lg:pt-16">
+          <div className="grid grid-cols-2 gap-3 sm:gap-6">
             {cards.map(([label, body], cIdx) => (
               <ScrollProgressItem
                 key={label}
@@ -1309,17 +1354,17 @@ export function InteractiveFlow() {
     currentLocale: string;
   }) {
     return (
-      <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+      <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
         <div>
-          <p className="mb-5 font-mono text-xs text-muted-foreground">
+          <p className="mb-2 font-mono text-xs text-muted-foreground sm:mb-5">
             {String(idx + 1).padStart(2, "0")}
           </p>
 
-          <h3 className="mb-6 max-w-[14ch] font-sans text-4xl font-extrabold leading-[1.1] tracking-tighter text-foreground md:text-6xl lg:text-7xl">
+          <h3 className="mb-3 max-w-[14ch] font-sans text-2xl font-extrabold leading-[1.15] tracking-tighter text-foreground sm:text-4xl md:text-6xl lg:text-7xl sm:mb-6">
             {(s as { detailTitle?: string }).detailTitle || s.title}
           </h3>
 
-          <p className="mb-8 max-w-[52ch] font-sans text-base leading-relaxed text-muted-foreground md:text-lg">
+          <p className="mb-4 max-w-[52ch] font-sans text-sm leading-relaxed text-muted-foreground sm:text-base md:text-lg sm:mb-8">
             {s.desc}
           </p>
 
@@ -1335,8 +1380,8 @@ export function InteractiveFlow() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-8 lg:pt-16">
-          <div className="grid gap-6 sm:grid-cols-2">
+        <div className="flex flex-col gap-6 lg:pt-16">
+          <div className="grid grid-cols-2 gap-3 sm:gap-6">
             {[
               [
                 currentLocale === "vi" ? "Cách hoạt động" : "How this works",
@@ -1393,13 +1438,13 @@ export function InteractiveFlow() {
   }
 
   const audienceRail = (
-    <div className="flex gap-1 rounded-2xl border border-border bg-card p-1.5">
+    <div className="flex gap-1 rounded-2xl border border-border bg-card p-1 sm:p-1.5">
       {audiences.map((a) => (
         <button
           key={a.key}
           onClick={() => handleRoleChange(a.key)}
           aria-pressed={role === a.key}
-          className={`rounded-xl px-4 py-2 text-xs font-sans font-bold transition-colors ${
+          className={`rounded-xl px-2.5 py-1.5 text-[11px] font-sans font-bold transition-colors sm:px-4 sm:py-2 sm:text-xs ${
             role === a.key
               ? "bg-emerald-600 text-white"
               : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
@@ -1532,11 +1577,11 @@ export function InteractiveFlow() {
         </div>
       </div>
 
-      {/* Exactly one viewport of scroll per stage, plus the pinned viewport height. */}
+      {/* Exactly one viewport of scroll per stage, plus the pinned viewport height (Desktop). */}
       <div
         ref={sequenceRef}
         style={{ height: `${steps.length * 100 + 100}vh` }}
-        className="relative"
+        className="relative hidden lg:block"
       >
         <div className="sticky top-0 flex min-h-[100dvh] flex-col">
           {/* Segmented indicator, after worldquant.com: one segment per stage,
@@ -1607,6 +1652,252 @@ export function InteractiveFlow() {
                 scrollYProgress={scrollYProgress}
               />
             </motion.div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Flow (Phones & Tablets < 1024px):
+          Full natural document height so all information is 100% visible,
+          with sticky segmented controls, swipe support, and prev/next buttons. */}
+      <div ref={mobileSectionRef} className="block lg:hidden w-full pt-4">
+        {/* Sticky wayfinding bar */}
+        <div className="sticky top-16 z-20 -mx-4 px-4 py-3 bg-background/95 backdrop-blur-md border-b border-border shadow-sm sm:-mx-6 sm:px-6">
+          <div className="mb-2.5 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="font-sans text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                {currentLocale === "vi" ? "Quy trình" : "How it works"}
+              </span>
+              <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 font-mono text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+                {String(activeStep + 1).padStart(2, "0")}/
+                {String(steps.length).padStart(2, "0")}
+              </span>
+            </div>
+            {audienceRail}
+          </div>
+
+          {/* 4 Tabs in 2x2 grid */}
+          <div className="grid grid-cols-2 gap-1.5">
+            {steps.map((s, idx) => {
+              const isActive = idx === activeStep;
+              const isDone = idx < activeStep;
+              return (
+                <button
+                  key={`${role}-mob-seg-${idx}`}
+                  type="button"
+                  onClick={() => handleMobileStepChange(idx)}
+                  aria-pressed={isActive}
+                  className={`flex items-center justify-between rounded-xl border px-3 py-2.5 text-left transition-all ${
+                    isActive
+                      ? "border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shadow-sm"
+                      : isDone
+                        ? "border-border/80 bg-card/60 text-foreground hover:bg-muted/50"
+                        : "border-border/40 bg-card/30 text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <span className="truncate font-sans text-xs font-bold leading-tight">
+                    {s.title}
+                  </span>
+                  <span
+                    className={`ml-1.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[10px] font-mono font-bold ${
+                      isActive
+                        ? "bg-emerald-600 text-white"
+                        : isDone
+                          ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                          : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {idx + 1}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Progress bar */}
+          <div className="mt-2.5 h-1 w-full overflow-hidden rounded-full bg-border/40">
+            <div
+              style={{ width: `${((activeStep + 1) / steps.length) * 100}%` }}
+              className="h-full bg-emerald-500 transition-all duration-300"
+            />
+          </div>
+        </div>
+
+        {/* Step Content: fully rendered with no height clamping, natural document flow */}
+        <div
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          className="py-6 space-y-6"
+        >
+          {/* Step header */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                {String(activeStep + 1).padStart(2, "0")}
+              </span>
+              <span className="rounded-full border border-border bg-card px-2.5 py-0.5 font-sans text-xs font-medium text-muted-foreground">
+                {step.badge}
+              </span>
+            </div>
+
+            <h3 className="font-sans text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground leading-tight">
+              {(step as { detailTitle?: string }).detailTitle || step.title}
+            </h3>
+
+            <p className="font-sans text-sm sm:text-base leading-relaxed text-muted-foreground">
+              {step.desc}
+            </p>
+
+            <div className="flex flex-wrap gap-2 pt-1">
+              {step.tags.map((tag, tIdx) => (
+                <span
+                  key={tIdx}
+                  className="rounded-full border border-border bg-card/60 px-3 py-1 font-sans text-xs text-muted-foreground"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* 4 Cards (How, Why, Tech, Journey/Emphasis) */}
+          <div className="space-y-3 pt-2">
+            <h4 className="font-sans text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              {currentLocale === "vi" ? "Chi tiết giai đoạn" : "Stage details"}
+            </h4>
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
+              {[
+                {
+                  label:
+                    currentLocale === "vi"
+                      ? "Cách hoạt động"
+                      : "How this works",
+                  body: step.how,
+                },
+                {
+                  label:
+                    currentLocale === "vi"
+                      ? "Tại sao quan trọng"
+                      : "Why this matters",
+                  body: step.why,
+                },
+                {
+                  label:
+                    currentLocale === "vi"
+                      ? "Công nghệ hỗ trợ"
+                      : "Technology behind it",
+                  body: step.tech,
+                },
+                {
+                  label: step.journeyTitle,
+                  body: step.emphasis,
+                },
+              ].map((card, cIdx) => (
+                <div
+                  key={cIdx}
+                  className="rounded-xl border border-border bg-card/70 p-3 sm:p-4 shadow-sm flex flex-col justify-start"
+                >
+                  <p className="mb-1 font-sans text-xs font-bold text-foreground">
+                    {card.label}
+                  </p>
+                  <p className="font-sans text-[11px] sm:text-xs leading-relaxed text-muted-foreground">
+                    {card.body}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* What happens here (Các bước thực hiện) */}
+          <div className="space-y-3 pt-2">
+            <h4 className="font-sans text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              {currentLocale === "vi"
+                ? "Các bước thực hiện"
+                : "What happens here"}
+            </h4>
+            <dl className="rounded-xl border border-border bg-card/60 p-4 divide-y divide-border/60 shadow-sm">
+              {step.rows.map((row, rIdx) => (
+                <div
+                  key={rIdx}
+                  className="flex items-start justify-between gap-4 py-2.5 first:pt-0 last:pb-0"
+                >
+                  <dt className="font-sans text-xs text-muted-foreground">
+                    {row[0]}
+                  </dt>
+                  <dd className="shrink-0 text-right font-sans text-xs font-bold text-foreground">
+                    {row[1]}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          {/* Stepper controls at bottom */}
+          <div className="pt-4 border-t border-border flex flex-col gap-4">
+            <div className="flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => handleMobileStepChange(activeStep - 1)}
+                disabled={activeStep === 0}
+                className={`flex items-center gap-1.5 rounded-xl border px-3.5 py-2.5 text-xs font-semibold transition-colors ${
+                  activeStep === 0
+                    ? "pointer-events-none opacity-40 border-border text-muted-foreground"
+                    : "border-border bg-card hover:bg-muted text-foreground"
+                }`}
+              >
+                <ChevronLeft className="h-4 w-4" />
+                <span>
+                  {currentLocale === "vi" ? "Bước trước" : "Previous"}
+                </span>
+              </button>
+
+              {/* Step indicator dots */}
+              <div className="flex items-center gap-1.5">
+                {steps.map((_, dotIdx) => (
+                  <button
+                    key={dotIdx}
+                    type="button"
+                    onClick={() => handleMobileStepChange(dotIdx)}
+                    aria-label={`Go to step ${dotIdx + 1}`}
+                    className={`h-2 rounded-full transition-all ${
+                      dotIdx === activeStep
+                        ? "w-6 bg-emerald-500"
+                        : "w-2 bg-border hover:bg-muted-foreground"
+                    }`}
+                  />
+                ))}
+              </div>
+
+              {activeStep < steps.length - 1 ? (
+                <button
+                  type="button"
+                  onClick={() => handleMobileStepChange(activeStep + 1)}
+                  className="flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-emerald-500 transition-colors"
+                >
+                  <span>{currentLocale === "vi" ? "Tiếp theo" : "Next"}</span>
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    celebrated.current = true;
+                    triggerConfetti();
+                  }}
+                  className="flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-emerald-500 transition-colors"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  <span>
+                    {currentLocale === "vi" ? "Hoàn tất" : "All done"}
+                  </span>
+                </button>
+              )}
+            </div>
+
+            <p className="text-center font-sans text-[11px] text-muted-foreground">
+              {currentLocale === "vi"
+                ? "Vuốt sang trái / phải để chuyển bước nhanh"
+                : "Swipe left / right to quickly change steps"}
+            </p>
           </div>
         </div>
       </div>
