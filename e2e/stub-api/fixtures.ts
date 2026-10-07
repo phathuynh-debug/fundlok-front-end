@@ -17,6 +17,7 @@ export type StubUserKey =
   | "unapprovedInvestor"
   | "unapprovedInvestorTab"
   | "unapprovedInvestorCamera"
+  | "unapprovedInvestorMobile"
   | "unapprovedSme"
   | "unapprovedSmeIdentity"
   | "smeDraftApplication"
@@ -181,6 +182,15 @@ export const STUB_USERS: Record<StubUserKey, StubUser> = {
     ...base,
     id: "00000000-0000-0000-0000-0000000000b4",
     email: "unapproved-investor-camera@e2e.test",
+    role: "INVESTOR",
+    is_approved: false,
+  },
+  // Dedicated account for direct mobile KYC capture test in kyc-capture.spec.ts,
+  // preventing race condition with unapprovedInvestorCamera phone handoff test.
+  unapprovedInvestorMobile: {
+    ...base,
+    id: "00000000-0000-0000-0000-0000000000b5",
+    email: "unapproved-investor-mobile@e2e.test",
     role: "INVESTOR",
     is_approved: false,
   },

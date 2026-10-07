@@ -21,12 +21,25 @@ function redactUrl<T extends { url: string }>(event: T): T {
   return { ...event, url: url.toString() };
 }
 
+// Analytics and Speed Insights scripts are served by Vercel's edge network.
+// In local environments and CI/E2E test runs, requesting these paths returns 404s.
+// Only enable when running on Vercel and not in E2E testing mode.
+const isVercelEnvironment =
+  process.env.NEXT_PUBLIC_DISABLE_TURNSTILE !== "true" &&
+  Boolean(process.env.NEXT_PUBLIC_VERCEL_ENV || process.env.VERCEL);
+
 // Client components because beforeSend is a function, which the server
 // root layout cannot pass across the boundary.
 export function VercelAnalytics() {
+  if (!isVercelEnvironment) {
+    return null;
+  }
   return <Analytics beforeSend={redactUrl} />;
 }
 
 export function VercelSpeedInsights() {
+  if (!isVercelEnvironment) {
+    return null;
+  }
   return <SpeedInsights beforeSend={redactUrl} />;
 }

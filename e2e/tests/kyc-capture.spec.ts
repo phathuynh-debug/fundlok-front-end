@@ -107,7 +107,7 @@ test.describe("the identity photos on a mobile device visiting /kyc directly", (
     page,
     context,
   }) => {
-    await signInAs(context, "unapprovedInvestorCamera");
+    await signInAs(context, "unapprovedInvestorMobile");
     await page.goto("/kyc");
 
     await takeIdentityPhotos(page);
