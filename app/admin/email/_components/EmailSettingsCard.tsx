@@ -41,7 +41,7 @@ import {
   EMAIL_PATTERN,
   LINE_BREAK,
   emailErrorText,
-  isNoResponse,
+  isUnknownOutcome,
 } from "./email-errors";
 
 // Step 1 of Admin > Email: the signed-in admin's own Gmail account, which
@@ -183,7 +183,7 @@ function SettingsForm({
       toast({
         variant: "destructive",
         title: t("admin.email.errors.title"),
-        description: isNoResponse(err)
+        description: isUnknownOutcome(err)
           ? t("admin.email.errors.unknownOutcome")
           : emailErrorText(err, t, locale),
       });

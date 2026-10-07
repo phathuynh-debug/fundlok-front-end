@@ -26,19 +26,20 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
-import type {
-  EmailContentPayload,
-  EmailPreview,
-  EmailTemplate,
+import {
+  MAX_RECIPIENTS,
+  type EmailContentPayload,
+  type EmailPreview,
+  type EmailTemplate,
 } from "@/services/admin-email.service";
 import { EmailPreviewDialog } from "./EmailPreviewDialog";
+import { RecipientsField } from "./RecipientsField";
 import {
   EMAIL_PATTERN,
   LINE_BREAK,
   asciiDomain,
   emailErrorText,
-  isNoResponse,
-  parseList,
+  isUnknownOutcome,
 } from "./email-errors";
 
 // Step 2 of Admin > Email: recipients, a template, plain-text content. The
@@ -53,7 +54,6 @@ const TEMPLATES: EmailTemplate[] = [
   "announcement",
   "action_required",
 ];
-const MAX_RECIPIENTS = 20;
 
 interface FieldErrors {
   to?: string;
@@ -73,7 +73,7 @@ export function ComposeEmailCard() {
     usePreviewEmail();
   const { mutateAsync: send, isPending: sending } = useSendEmail();
 
-  const [to, setTo] = useState("");
+  const [recipients, setRecipients] = useState<string[]>([]);
   const [template, setTemplate] = useState<EmailTemplate>("general");
   const [subject, setSubject] = useState("");
   const [heading, setHeading] = useState("");
@@ -86,7 +86,6 @@ export function ComposeEmailCard() {
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const ready = !!settings?.configured && settings.enabled;
-  const recipients = parseList(to);
 
   // Content checks shared by Preview and Send; Send also checks recipients.
   const contentErrors = (): FieldErrors => {
@@ -115,7 +114,10 @@ export function ComposeEmailCard() {
   const recipientError = (): string | undefined => {
     if (recipients.length === 0) return t("admin.email.compose.toRequired");
     if (recipients.length > MAX_RECIPIENTS) {
-      return t("admin.email.compose.toTooMany");
+      return t("admin.email.compose.toTooMany").replace(
+        "{max}",
+        String(MAX_RECIPIENTS),
+      );
     }
     const invalid = recipients.filter(
       (address) => !EMAIL_PATTERN.test(address),
@@ -183,22 +185,32 @@ export function ComposeEmailCard() {
     setConfirmOpen(false);
     try {
       const sent = await send({ ...content(), to: recipients });
-      toast(
-        sent.error_code === "SOME_RECIPIENTS_REFUSED"
-          ? {
-              variant: "destructive",
-              title: t("admin.email.compose.sentPartial"),
-              description: t("admin.email.errors.SOME_RECIPIENTS_REFUSED"),
-            }
-          : {
-              title: t("admin.email.compose.sent"),
-              description: t("admin.email.compose.sentDescription").replace(
-                "{count}",
-                String(sent.recipients.length),
-              ),
-            },
-      );
-      setTo("");
+      const undelivered = sent.undelivered ?? [];
+      if (undelivered.length > 0) {
+        // Some copies did not go: keep the email as written and leave just
+        // those people in the To list, so a second Send reaches them.
+        toast({
+          variant: "destructive",
+          title: t("admin.email.compose.sentPartial"),
+          description: t("admin.email.compose.sentPartialHint")
+            .replace(
+              "{sent}",
+              String(sent.recipients.length - undelivered.length),
+            )
+            .replace("{missed}", String(undelivered.length)),
+        });
+        setRecipients(undelivered);
+        setErrors({});
+        return;
+      }
+      toast({
+        title: t("admin.email.compose.sent"),
+        description: t("admin.email.compose.sentDescription").replace(
+          "{count}",
+          String(sent.recipients.length),
+        ),
+      });
+      setRecipients([]);
       setSubject("");
       setHeading("");
       setBody("");
@@ -206,9 +218,10 @@ export function ComposeEmailCard() {
       setButtonUrl("");
       setErrors({});
     } catch (err) {
-      // No answer is not a failure: the email may have gone. Keep the form
-      // and point at the log rather than inviting a duplicate send.
-      if (isNoResponse(err)) {
+      // No answer (or a gateway giving up) is not a failure: the email may
+      // have gone. Keep the form and point at the log rather than inviting a
+      // duplicate send.
+      if (isUnknownOutcome(err)) {
         toast({
           variant: "destructive",
           title: t("admin.email.errors.title"),
@@ -245,41 +258,20 @@ export function ComposeEmailCard() {
         noValidate
         className="mt-6 flex flex-col gap-5"
       >
-        <div className="space-y-2">
-          <Label htmlFor="compose-to">{t("admin.email.compose.toLabel")}</Label>
-          <Textarea
-            id="compose-to"
-            rows={2}
-            autoComplete="off"
-            spellCheck={false}
-            placeholder={t("admin.email.compose.toPlaceholder")}
-            value={to}
-            aria-invalid={!!errors.to}
-            aria-describedby="compose-to-help"
-            onChange={(event) => setTo(event.target.value)}
+        <div className="space-y-1">
+          <RecipientsField
+            recipients={recipients}
+            onChange={setRecipients}
+            error={errors.to}
           />
-          {errors.to && <p className="text-xs text-destructive">{errors.to}</p>}
-          <p id="compose-to-help" className="text-xs text-muted-foreground">
-            {t("admin.email.compose.toHelp")}
-            {allowedDomains.length > 0 && (
-              <>
-                {" "}
-                {t("admin.email.compose.allowedDomains").replace(
-                  "{list}",
-                  allowedDomains.join(", "),
-                )}
-              </>
-            )}
-            {recipients.length > 0 && (
-              <>
-                {" · "}
-                {t("admin.email.compose.toCount").replace(
-                  "{count}",
-                  String(recipients.length),
-                )}
-              </>
-            )}
-          </p>
+          {allowedDomains.length > 0 && (
+            <p className="text-xs text-muted-foreground">
+              {t("admin.email.compose.allowedDomains").replace(
+                "{list}",
+                allowedDomains.join(", "),
+              )}
+            </p>
+          )}
         </div>
 
         <div className="space-y-2">

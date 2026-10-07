@@ -43,6 +43,7 @@
         "sent": "Email sent",
         "sentDescription": "Recipients: {count}",
         "sentPartial": "Email sent, but not to everyone",
+        "sentPartialHint": "Sent: {sent}. Not delivered: {missed}. They are still in the To list, so you can send again.",
         "subjectLabel": "Subject",
         "subjectRequired": "Enter a subject.",
         "templateLabel": "Template",
@@ -55,14 +56,11 @@
           "generalHint": "A plain message."
         },
         "title": "2. Write and send",
-        "toCount": "Recipients: {count}",
-        "toHelp": "Up to 20 addresses, separated by commas. Every recipient sees the full list.",
         "toInvalid": "Check these addresses: {list}",
         "toLabel": "To",
         "toOutsideDomains": "Outside the allowed domains: {list}",
-        "toPlaceholder": "name@fundlok.com, other@fundlok.com",
         "toRequired": "Add at least one recipient.",
-        "toTooMany": "At most 20 recipients per email."
+        "toTooMany": "At most {max} recipients per email."
       },
       "errors": {
         "APP_PASSWORD_REQUIRED": "Enter the app password for this Gmail address.",
@@ -70,23 +68,47 @@
         "EMAIL_DISABLED": "Sending is paused. Turn it on in the settings above.",
         "EMAIL_ENCRYPTION_UNAVAILABLE": "The server cannot store the app password yet because its encryption key is not configured. Ask the developer to set it.",
         "EMAIL_NOT_CONFIGURED": "Connect your Gmail account first.",
-        "EMAIL_RATE_LIMITED": "You have reached the limit of 20 emails an hour. Try again later.",
+        "EMAIL_RATE_LIMITED": "You have reached the hourly limit of 200 recipients. Try again later or send to fewer people.",
         "GMAIL_AUTH_FAILED": "Google rejected the Gmail address or app password. Check both and save again.",
         "GMAIL_RECIPIENT_REFUSED": "Gmail refused the recipient address.",
         "GMAIL_UNAVAILABLE": "Could not reach Gmail. Try again in a few minutes.",
         "RECIPIENT_DOMAIN_NOT_ALLOWED": "Some recipients are outside the allowed domains.",
-        "SOME_RECIPIENTS_REFUSED": "Gmail did not accept every recipient, so some addresses did not receive it.",
+        "SOME_RECIPIENTS_REFUSED": "Some recipients did not get it: Gmail refused them, or sending stopped part-way.",
         "invalid": "Some fields are not valid. Check them and try again.",
         "saveTitle": "Settings not saved",
         "singleLine": "Keep this to a single line, without tabs or line breaks.",
         "title": "Email could not be sent",
         "unknownOutcome": "The server did not answer in time, so the email may or may not have gone. Check Recently sent before sending again."
       },
+      "picker": {
+        "add": "Use selected ({count})",
+        "clear": "Clear shown",
+        "description": "Active users with a verified email. Search by name or email.",
+        "empty": "No users match.",
+        "fundlokOnly": "FundLok emails only",
+        "loadFailed": "Could not load users.",
+        "noName": "(no name)",
+        "search": "Search by name or email",
+        "selectAll": "Select all shown",
+        "selectedCount": "Selected: {count}",
+        "title": "Choose recipients"
+      },
       "policy": {
         "description": "Every admin's email can only go to these domains. Only system admins can change this.",
         "loadFailed": "Could not load the allowed domains.",
         "saved": "Allowed domains saved",
         "title": "Allowed recipient domains (all admins)"
+      },
+      "recipients": {
+        "addFundlok": "Add all FundLok emails",
+        "count": "Recipients: {count} / {max}",
+        "fundlokAdded": "FundLok addresses added: {count}",
+        "fundlokNone": "There are no FundLok addresses to add.",
+        "inputPlaceholder": "Type an email and press Enter, or choose from users",
+        "pickUsers": "Choose from users",
+        "privateCopies": "Each recipient gets their own copy and cannot see the other addresses.",
+        "remove": "Remove {email}",
+        "truncated": "One email can go to at most {max} recipients; the rest were not added."
       },
       "sent": {
         "andMore": "+{count} more",
@@ -105,6 +127,7 @@
         "title": "Your recent emails",
         "titleAll": "Recent emails from all admins",
         "to": "To",
+        "undelivered": "Not delivered: {list}",
         "when": "Sent"
       },
       "settings": {
