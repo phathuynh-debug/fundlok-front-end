@@ -20,7 +20,10 @@ import { QueryProvider } from "@/providers/query-provider";
 import { LocaleProvider } from "@/lib/i18n";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { SITE_URL } from "@/lib/site";
-import { VercelAnalytics } from "@/components/vercel-analytics";
+import {
+  VercelAnalytics,
+  VercelSpeedInsights,
+} from "@/components/vercel-analytics";
 const geistSans = Geist({
   subsets: ["latin", "vietnamese"],
   variable: "--font-geist-sans",
@@ -174,6 +177,7 @@ export default async function RootLayout({
         {/* Global notification system */}
         <Toaster />
         <VercelAnalytics />
+        <VercelSpeedInsights />
       </body>
     </html>
   );

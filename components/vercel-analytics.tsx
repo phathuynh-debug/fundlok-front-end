@@ -1,15 +1,16 @@
 "use client";
 
-import { Analytics, type BeforeSendEvent } from "@vercel/analytics/next";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
-// Vercel Web Analytics records the full URL of every page view, and some of
-// ours carry a bearer secret in the query string: the phone KYC handoff
+// Vercel Web Analytics and Speed Insights record the full URL of every page view,
+// and some of ours carry a bearer secret in the query string: the phone KYC handoff
 // (/kyc/mobile?token=) and email verification (/verify-email?token=). Anyone
 // with access to the analytics dashboard would see them. So the query string
 // is cut down to UTM tags before the event leaves the browser — an allowlist,
 // so a secret added to some URL later is dropped without anyone remembering
 // to add it here.
-function redactUrl(event: BeforeSendEvent): BeforeSendEvent {
+function redactUrl<T extends { url: string }>(event: T): T {
   const url = new URL(event.url);
   const kept = new URLSearchParams();
   url.searchParams.forEach((value, key) => {
@@ -20,8 +21,12 @@ function redactUrl(event: BeforeSendEvent): BeforeSendEvent {
   return { ...event, url: url.toString() };
 }
 
-// A client component because beforeSend is a function, which the server
+// Client components because beforeSend is a function, which the server
 // root layout cannot pass across the boundary.
 export function VercelAnalytics() {
   return <Analytics beforeSend={redactUrl} />;
+}
+
+export function VercelSpeedInsights() {
+  return <SpeedInsights beforeSend={redactUrl} />;
 }

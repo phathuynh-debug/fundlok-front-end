@@ -13,6 +13,7 @@ import {
   ScanFace,
   LogOut,
   Loader2,
+  Mail,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -51,6 +52,11 @@ const navItems: NavItem[] = [
     labelKey: "admin.sidebar.auditLogs",
     href: "/admin/audit-logs",
     icon: ScrollText,
+  },
+  {
+    labelKey: "admin.sidebar.email",
+    href: "/admin/email",
+    icon: Mail,
   },
   {
     labelKey: "admin.sidebar.systemSettings",

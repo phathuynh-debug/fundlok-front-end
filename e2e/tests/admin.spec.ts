@@ -650,19 +650,34 @@ test.describe("KYC review", () => {
     await expect(panel).toContainText(t("admin.kycReviews.imageMissing"));
   });
 
-  test("approving is disabled until there is a note", async ({ page }) => {
+  test("approving is disabled until acknowledged with a note of at least 20 chars", async ({
+    page,
+  }) => {
     const panel = await openReview(page, STUB_KYC_REVIEW_LISTED.user);
     const approve = panel.getByRole("button", {
       name: t("admin.kycReviews.approve"),
     });
 
     await expect(approve).toBeDisabled();
-    await expect(panel).toContainText(t("admin.kycReviews.noteRequired"));
+    await expect(panel).toContainText(
+      t("admin.kycReviews.overrideNoteRequired", { count: 0 }),
+    );
 
     await panel.getByRole("textbox").fill("   ");
     await expect(approve).toBeDisabled();
 
     await panel.getByRole("textbox").fill("Called the owner");
+    await expect(approve).toBeDisabled();
+    await expect(panel).toContainText(
+      t("admin.kycReviews.overrideNoteRequired", { count: 16 }),
+    );
+
+    await panel
+      .getByRole("textbox")
+      .fill("Same person: lost access to the old account, confirmed by phone");
+    await expect(approve).toBeDisabled();
+
+    await panel.getByRole("checkbox").check();
     await expect(approve).toBeEnabled();
   });
 
@@ -672,6 +687,7 @@ test.describe("KYC review", () => {
     const user = STUB_KYC_REVIEW_TO_APPROVE.user;
     const panel = await openReview(page, user);
 
+    await panel.getByRole("checkbox").check();
     await panel
       .getByRole("textbox")
       .fill("Same person: lost access to the old account, confirmed by phone");

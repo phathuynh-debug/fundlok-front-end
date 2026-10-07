@@ -572,6 +572,7 @@ function parkedKycAttempt(
     date_of_birth: "12/05/1988",
     face_match_score: 0.91,
     created_at: createdAt,
+    provider_checked: true,
     user: {
       id: `${id}-user`,
       email,
@@ -616,6 +617,7 @@ export const STUB_KYC_OWNER_APPROVED = {
   date_of_birth: "12/05/1988",
   face_match_score: 0.96,
   created_at: "2026-04-02T09:20:00+07:00",
+  provider_checked: true,
   user: KYC_OWNER,
   conflicts: [],
 };
