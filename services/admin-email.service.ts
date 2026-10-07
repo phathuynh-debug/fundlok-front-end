@@ -68,9 +68,25 @@ export interface InternalEmail {
   subject: string;
   status: InternalEmailStatus;
   error_code: string | null;
+  // Recipients whose copy did not go out; everyone else got theirs. Optional
+  // so a frontend deployed ahead of the backend migration still renders.
+  undelivered?: string[];
   created_at: string;
   sent_at: string | null;
 }
+
+// A user the composer can add to the To list.
+export interface EmailRecipient {
+  id: string;
+  full_name: string | null;
+  email: string;
+  role: string | null;
+  // On a FundLok domain (backend FUNDLOK_EMAIL_DOMAINS).
+  is_fundlok: boolean;
+}
+
+// Per email. Each recipient gets their own copy, so nobody sees the others.
+export const MAX_RECIPIENTS = 50;
 
 // A send waits for Gmail: connect, login and DATA can each take up to the
 // backend's 20 s SMTP timeout. The client's default 20 s would give up first
@@ -122,6 +138,16 @@ export const adminEmailService = {
   send(payload: SendEmailPayload) {
     return apiClient.post<InternalEmail>(ADMIN_EMAIL_ENDPOINTS.send, payload, {
       timeout: SEND_TIMEOUT_MS,
+    });
+  },
+
+  listRecipients(params: { q?: string; fundlokOnly?: boolean } = {}) {
+    return apiClient.get<EmailRecipient[]>(ADMIN_EMAIL_ENDPOINTS.recipients, {
+      params: {
+        q: params.q?.trim() || undefined,
+        fundlok_only: params.fundlokOnly || undefined,
+        limit: 500,
+      },
     });
   },
 

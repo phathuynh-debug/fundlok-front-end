@@ -35,10 +35,12 @@ export function emailErrorText(
   return apiErrorMessage(err, locale, t("common.tryAgain"));
 }
 
-/** No response at all: a timeout or a dropped connection. For a send this
- * means the outcome is unknown, not that it failed. */
-export function isNoResponse(err: unknown): boolean {
-  return (err as ApiError | null)?.status === undefined;
+/** For a send: no answer, or a 5xx without our X-Error-Code (a proxy or
+ * gateway in front of the API gave up, not the API). Either way the email may
+ * still have gone, so the console must not invite a resend. */
+export function isUnknownOutcome(err: unknown): boolean {
+  const { status, code } = (err as ApiError | null) ?? {};
+  return status === undefined || (status >= 500 && !code);
 }
 
 /** Copy for a send-log row's error_code, or null when there is none to show. */

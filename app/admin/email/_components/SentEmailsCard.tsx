@@ -119,8 +119,15 @@ function StatusCell({ email }: { email: InternalEmail }) {
   const { t } = useTranslations();
   const label = t(`admin.email.sent.statuses.${email.status}`);
   // A FAILED row says why; a SENT row can carry a code too (some recipients
-  // refused).
+  // refused), and then names who did not get it.
   const detail = emailErrorCodeText(email.error_code, t);
+  const missed =
+    email.status === "SENT" && (email.undelivered ?? []).length > 0
+      ? t("admin.email.sent.undelivered").replace(
+          "{list}",
+          (email.undelivered ?? []).join(", "),
+        )
+      : null;
 
   return (
     <div className="flex flex-col gap-1">
@@ -144,6 +151,11 @@ function StatusCell({ email }: { email: InternalEmail }) {
       {detail && (
         <span className="block max-w-[14rem] whitespace-normal text-xs text-muted-foreground">
           {detail}
+        </span>
+      )}
+      {missed && (
+        <span className="block max-w-[14rem] whitespace-normal break-all text-xs text-muted-foreground">
+          {missed}
         </span>
       )}
     </div>

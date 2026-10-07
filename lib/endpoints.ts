@@ -178,6 +178,9 @@ export const ADMIN_EMAIL_ENDPOINTS = {
   send: "/admin/email/send",
   // Your own sends; a SYSTEM_ADMIN gets every admin's.
   messages: "/admin/email/messages",
+  // Users to pick for the To list (active, verified). ?q= searches name and
+  // email; ?fundlok_only=true keeps FundLok's own addresses.
+  recipients: "/admin/email/recipients",
 } as const;
 
 // Underwriting. Admin-only server-side (require_roles(Role.ADMIN) — note that

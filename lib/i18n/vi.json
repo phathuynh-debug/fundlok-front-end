@@ -43,6 +43,7 @@
         "sent": "Đã gửi email",
         "sentDescription": "Đã gửi tới {count} người nhận.",
         "sentPartial": "Đã gửi email, nhưng không tới tất cả người nhận",
+        "sentPartialHint": "Đã gửi: {sent}. Chưa gửi được: {missed}. Các địa chỉ này vẫn ở ô Người nhận để bạn gửi lại.",
         "subjectLabel": "Chủ đề",
         "subjectRequired": "Nhập chủ đề.",
         "templateLabel": "Mẫu email",
@@ -55,14 +56,11 @@
           "generalHint": "Một tin nhắn đơn giản."
         },
         "title": "2. Soạn và gửi",
-        "toCount": "{count} người nhận",
-        "toHelp": "Tối đa 20 địa chỉ, phân cách bằng dấu phẩy. Mọi người nhận đều thấy toàn bộ danh sách.",
         "toInvalid": "Kiểm tra lại các địa chỉ: {list}",
         "toLabel": "Người nhận",
         "toOutsideDomains": "Ngoài các tên miền được phép: {list}",
-        "toPlaceholder": "name@fundlok.com, other@fundlok.com",
         "toRequired": "Thêm ít nhất một người nhận.",
-        "toTooMany": "Tối đa 20 người nhận cho mỗi email."
+        "toTooMany": "Tối đa {max} người nhận cho mỗi email."
       },
       "errors": {
         "APP_PASSWORD_REQUIRED": "Nhập mật khẩu ứng dụng cho địa chỉ Gmail này.",
@@ -70,23 +68,47 @@
         "EMAIL_DISABLED": "Đang tạm dừng gửi. Hãy bật gửi email trong phần cài đặt phía trên.",
         "EMAIL_ENCRYPTION_UNAVAILABLE": "Máy chủ chưa thể lưu mật khẩu ứng dụng vì chưa cấu hình khoá mã hoá. Hãy nhờ đội kỹ thuật thiết lập.",
         "EMAIL_NOT_CONFIGURED": "Hãy kết nối tài khoản Gmail của bạn trước.",
-        "EMAIL_RATE_LIMITED": "Bạn đã đạt giới hạn 20 email mỗi giờ. Vui lòng thử lại sau.",
+        "EMAIL_RATE_LIMITED": "Bạn đã đạt giới hạn 200 người nhận mỗi giờ. Vui lòng thử lại sau hoặc gửi cho ít người hơn.",
         "GMAIL_AUTH_FAILED": "Google đã từ chối địa chỉ Gmail hoặc mật khẩu ứng dụng. Hãy kiểm tra cả hai rồi lưu lại.",
         "GMAIL_RECIPIENT_REFUSED": "Gmail đã từ chối địa chỉ người nhận.",
         "GMAIL_UNAVAILABLE": "Không kết nối được Gmail. Vui lòng thử lại sau vài phút.",
         "RECIPIENT_DOMAIN_NOT_ALLOWED": "Một số người nhận nằm ngoài các tên miền được phép.",
-        "SOME_RECIPIENTS_REFUSED": "Gmail không chấp nhận một số người nhận, nên vài địa chỉ không nhận được email.",
+        "SOME_RECIPIENTS_REFUSED": "Một số người nhận chưa nhận được: Gmail từ chối hoặc việc gửi bị dừng giữa chừng.",
         "invalid": "Một số trường chưa hợp lệ. Hãy kiểm tra rồi thử lại.",
         "saveTitle": "Chưa lưu được cài đặt",
         "singleLine": "Chỉ nhập trên một dòng, không có tab hoặc xuống dòng.",
         "title": "Không gửi được email",
         "unknownOutcome": "Máy chủ không phản hồi kịp nên chưa rõ email đã được gửi hay chưa. Hãy kiểm tra mục Đã gửi gần đây trước khi gửi lại."
       },
+      "picker": {
+        "add": "Dùng danh sách đã chọn ({count})",
+        "clear": "Bỏ chọn mục đang hiển thị",
+        "description": "Người dùng đang hoạt động, đã xác minh email. Tìm theo tên hoặc email.",
+        "empty": "Không có người dùng phù hợp.",
+        "fundlokOnly": "Chỉ email FundLok",
+        "loadFailed": "Không tải được danh sách người dùng.",
+        "noName": "(chưa có tên)",
+        "search": "Tìm theo tên hoặc email",
+        "selectAll": "Chọn tất cả đang hiển thị",
+        "selectedCount": "Đã chọn: {count}",
+        "title": "Chọn người nhận"
+      },
       "policy": {
         "description": "Email của mọi quản trị viên chỉ được gửi tới các tên miền này. Chỉ quản trị viên hệ thống mới thay đổi được.",
         "loadFailed": "Không tải được danh sách tên miền được phép.",
         "saved": "Đã lưu tên miền được phép",
         "title": "Tên miền người nhận được phép (mọi quản trị viên)"
+      },
+      "recipients": {
+        "addFundlok": "Thêm tất cả email FundLok",
+        "count": "Người nhận: {count} / {max}",
+        "fundlokAdded": "Đã thêm địa chỉ FundLok: {count}",
+        "fundlokNone": "Không có địa chỉ FundLok nào để thêm.",
+        "inputPlaceholder": "Nhập email rồi nhấn Enter, hoặc chọn từ danh sách người dùng",
+        "pickUsers": "Chọn từ danh sách người dùng",
+        "privateCopies": "Mỗi người nhận một bản riêng và không thấy địa chỉ của người khác.",
+        "remove": "Bỏ {email}",
+        "truncated": "Mỗi email chỉ gửi được tối đa {max} người nhận; phần còn lại chưa được thêm."
       },
       "sent": {
         "andMore": "+{count} người khác",
@@ -105,6 +127,7 @@
         "title": "Email bạn đã gửi gần đây",
         "titleAll": "Email đã gửi gần đây của mọi quản trị viên",
         "to": "Người nhận",
+        "undelivered": "Chưa gửi được: {list}",
         "when": "Thời gian"
       },
       "settings": {

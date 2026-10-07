@@ -8,6 +8,7 @@ import {
   type EmailContentPayload,
   type EmailPolicy,
   type EmailPreview,
+  type EmailRecipient,
   type EmailSettings,
   type EmailSettingsPayload,
   type EmailTestResult,
@@ -27,6 +28,9 @@ export const adminEmailKeys = {
   messages: (userId: string) =>
     [...adminEmailKeys.forUser(userId), "messages"] as const,
   policy: () => [...adminEmailKeys.all, "policy"] as const,
+  // The user directory is the same for every admin.
+  recipients: (q: string, fundlokOnly: boolean) =>
+    [...adminEmailKeys.all, "recipients", q, fundlokOnly] as const,
 };
 
 /** The signed-in admin's id; the per-admin queries wait for it. */
@@ -137,4 +141,30 @@ export function useSentEmails(enabled = true) {
     retry: false,
     enabled: enabled && !!userId,
   });
+}
+
+export function useEmailRecipients(
+  q: string,
+  fundlokOnly: boolean,
+  enabled = true,
+) {
+  return useQuery<EmailRecipient[], ApiError>({
+    queryKey: adminEmailKeys.recipients(q.trim(), fundlokOnly),
+    queryFn: () => adminEmailService.listRecipients({ q, fundlokOnly }),
+    staleTime: 60 * 1000,
+    retry: false,
+    enabled,
+  });
+}
+
+/** For a one-off action (the "add all FundLok emails" button): loads the
+ * FundLok addresses, from the cache when fresh. */
+export function useLoadFundlokRecipients() {
+  const queryClient = useQueryClient();
+  return () =>
+    queryClient.fetchQuery<EmailRecipient[], ApiError>({
+      queryKey: adminEmailKeys.recipients("", true),
+      queryFn: () => adminEmailService.listRecipients({ fundlokOnly: true }),
+      staleTime: 60 * 1000,
+    });
 }
