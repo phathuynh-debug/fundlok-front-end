@@ -746,3 +746,35 @@ test("non-admins cannot open the KYC review queue", async ({
   await page.goto("/admin/kyc-reviews");
   await expect(page).not.toHaveURL(/\/admin\/kyc-reviews/);
 });
+
+test.describe("as an admin on mobile viewport", () => {
+  test.use({ viewport: { width: 375, height: 667 }, isMobile: true });
+
+  test.beforeEach(async ({ context }) => {
+    await signInAs(context, "admin");
+  });
+
+  test("the navigation bar is visible and opens the menu drawer to navigate between admin pages", async ({
+    page,
+  }) => {
+    await page.goto("/admin");
+
+    // The mobile navigation toggle is visible
+    const menuBtn = page.getByRole("button", { name: t("common.toggleMenu") });
+    await expect(menuBtn).toBeVisible();
+
+    // Opening the menu drawer shows the admin navigation links
+    await menuBtn.click();
+    const emailLink = page.getByRole("link", {
+      name: t("admin.sidebar.email"),
+    });
+    await expect(emailLink).toBeVisible();
+
+    // Clicking a link navigates to that admin page
+    await emailLink.click();
+    await expect(page).toHaveURL(/\/admin\/email$/);
+
+    // On the new page, the mobile navigation bar is still present
+    await expect(menuBtn).toBeVisible();
+  });
+});

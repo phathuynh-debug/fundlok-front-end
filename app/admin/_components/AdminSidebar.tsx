@@ -30,7 +30,7 @@ interface NavItem {
   systemAdminOnly?: boolean;
 }
 
-const navItems: NavItem[] = [
+export const adminNavItems: NavItem[] = [
   { labelKey: "admin.sidebar.overview", href: "/admin", icon: LayoutDashboard },
   { labelKey: "admin.sidebar.users", href: "/admin/users", icon: Users },
   {
@@ -73,7 +73,7 @@ export function AdminSidebar() {
   const { t } = useTranslations();
 
   const isSystemAdmin = user?.role === "SYSTEM_ADMIN";
-  const visibleNavItems = navItems.filter(
+  const visibleNavItems = adminNavItems.filter(
     (item) => !item.systemAdminOnly || isSystemAdmin,
   );
 
