@@ -162,6 +162,24 @@ export const ADMIN_ENDPOINTS = {
   documentUrl: (id: string) => `/admin/documents/${id}/url`,
 } as const;
 
+// Admin > Email. Every admin connects their own Gmail account (the app
+// password is write-only, never returned) and sends from it; /settings is
+// always the signed-in admin's own. The org-wide policy is readable by any
+// admin and changeable by SYSTEM_ADMIN only.
+// Spec: backend docs/specs/admin/internal-email.md.
+export const ADMIN_EMAIL_ENDPOINTS = {
+  settings: "/admin/email/settings",
+  // Allowed recipient domains for every admin. PUT is SYSTEM_ADMIN only.
+  policy: "/admin/email/policy",
+  // Sends the test template to the signed-in admin's own address.
+  testEmail: "/admin/email/settings/test",
+  // Renders exactly what would be sent; sends nothing.
+  preview: "/admin/email/preview",
+  send: "/admin/email/send",
+  // Your own sends; a SYSTEM_ADMIN gets every admin's.
+  messages: "/admin/email/messages",
+} as const;
+
 // Underwriting. Admin-only server-side (require_roles(Role.ADMIN) — note that
 // is ADMIN specifically, not SYSTEM_ADMIN). A score run is a dated, audited
 // artefact: it writes an append-only score_run_inputs row for exact replay and
