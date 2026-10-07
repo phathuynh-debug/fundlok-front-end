@@ -83,7 +83,10 @@ export const adminEmailService = {
   },
 
   saveSettings(payload: EmailSettingsPayload) {
-    return apiClient.put<EmailSettings>(ADMIN_EMAIL_ENDPOINTS.settings, payload);
+    return apiClient.put<EmailSettings>(
+      ADMIN_EMAIL_ENDPOINTS.settings,
+      payload,
+    );
   },
 
   // Disconnects the account and deletes the stored password.
@@ -103,9 +106,13 @@ export const adminEmailService = {
   },
 
   sendTestEmail() {
-    return apiClient.post<EmailTestResult>(ADMIN_EMAIL_ENDPOINTS.testEmail, undefined, {
-      timeout: SEND_TIMEOUT_MS,
-    });
+    return apiClient.post<EmailTestResult>(
+      ADMIN_EMAIL_ENDPOINTS.testEmail,
+      undefined,
+      {
+        timeout: SEND_TIMEOUT_MS,
+      },
+    );
   },
 
   preview(payload: EmailContentPayload) {

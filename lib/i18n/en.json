@@ -20,6 +20,7 @@
     },
     "email": {
       "compose": {
+        "allowedDomains": "Allowed domains: {list}.",
         "bodyLabel": "Message",
         "bodyPlaceholder": "Write your message. Line breaks are kept.",
         "bodyRequired": "Write a message.",
@@ -61,8 +62,7 @@
         "toOutsideDomains": "Outside the allowed domains: {list}",
         "toPlaceholder": "name@fundlok.com, other@fundlok.com",
         "toRequired": "Add at least one recipient.",
-        "toTooMany": "At most 20 recipients per email.",
-        "allowedDomains": "Allowed domains: {list}."
+        "toTooMany": "At most 20 recipients per email."
       },
       "errors": {
         "APP_PASSWORD_REQUIRED": "Enter the app password for this Gmail address.",
@@ -82,9 +82,16 @@
         "title": "Email could not be sent",
         "unknownOutcome": "The server did not answer in time, so the email may or may not have gone. Check Recently sent before sending again."
       },
+      "policy": {
+        "description": "Every admin's email can only go to these domains. Only system admins can change this.",
+        "loadFailed": "Could not load the allowed domains.",
+        "saved": "Allowed domains saved",
+        "title": "Allowed recipient domains (all admins)"
+      },
       "sent": {
         "andMore": "+{count} more",
         "empty": "No emails sent yet.",
+        "fromLine": "From {address}",
         "loadFailed": "Could not load sent emails.",
         "status": "Status",
         "statuses": {
@@ -96,10 +103,9 @@
         "template": "Template",
         "test": "Test email",
         "title": "Your recent emails",
-        "to": "To",
-        "when": "Sent",
         "titleAll": "Recent emails from all admins",
-        "fromLine": "From {address}"
+        "to": "To",
+        "when": "Sent"
       },
       "settings": {
         "addressInvalid": "Enter a valid email address.",
@@ -141,13 +147,7 @@
         "title": "1. Connect your Gmail account"
       },
       "subtitle": "Send email from your own Gmail account.",
-      "title": "Email",
-      "policy": {
-        "title": "Allowed recipient domains (all admins)",
-        "description": "Every admin's email can only go to these domains. Only system admins can change this.",
-        "saved": "Allowed domains saved",
-        "loadFailed": "Could not load the allowed domains."
-      }
+      "title": "Email"
     },
     "investorLeads": {
       "acknowledged": "Acknowledged illustration",

@@ -85,7 +85,9 @@ export function SentEmailsCard() {
                     )}
                   </TableCell>
                   <TableCell className="max-w-[14rem]">
-                    <span className="block truncate">{email.recipients[0]}</span>
+                    <span className="block truncate">
+                      {email.recipients[0]}
+                    </span>
                     {email.recipients.length > 1 && (
                       <span className="text-xs text-muted-foreground">
                         {t("admin.email.sent.andMore").replace(

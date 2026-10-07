@@ -20,6 +20,7 @@
     },
     "email": {
       "compose": {
+        "allowedDomains": "Tên miền được phép: {list}.",
         "bodyLabel": "Nội dung",
         "bodyPlaceholder": "Viết nội dung. Các dòng xuống hàng được giữ nguyên.",
         "bodyRequired": "Viết nội dung.",
@@ -61,8 +62,7 @@
         "toOutsideDomains": "Ngoài các tên miền được phép: {list}",
         "toPlaceholder": "name@fundlok.com, other@fundlok.com",
         "toRequired": "Thêm ít nhất một người nhận.",
-        "toTooMany": "Tối đa 20 người nhận cho mỗi email.",
-        "allowedDomains": "Tên miền được phép: {list}."
+        "toTooMany": "Tối đa 20 người nhận cho mỗi email."
       },
       "errors": {
         "APP_PASSWORD_REQUIRED": "Nhập mật khẩu ứng dụng cho địa chỉ Gmail này.",
@@ -82,9 +82,16 @@
         "title": "Không gửi được email",
         "unknownOutcome": "Máy chủ không phản hồi kịp nên chưa rõ email đã được gửi hay chưa. Hãy kiểm tra mục Đã gửi gần đây trước khi gửi lại."
       },
+      "policy": {
+        "description": "Email của mọi quản trị viên chỉ được gửi tới các tên miền này. Chỉ quản trị viên hệ thống mới thay đổi được.",
+        "loadFailed": "Không tải được danh sách tên miền được phép.",
+        "saved": "Đã lưu tên miền được phép",
+        "title": "Tên miền người nhận được phép (mọi quản trị viên)"
+      },
       "sent": {
         "andMore": "+{count} người khác",
         "empty": "Chưa gửi email nào.",
+        "fromLine": "Từ {address}",
         "loadFailed": "Không tải được danh sách email đã gửi.",
         "status": "Trạng thái",
         "statuses": {
@@ -96,10 +103,9 @@
         "template": "Mẫu",
         "test": "Email thử",
         "title": "Email bạn đã gửi gần đây",
-        "to": "Người nhận",
-        "when": "Thời gian",
         "titleAll": "Email đã gửi gần đây của mọi quản trị viên",
-        "fromLine": "Từ {address}"
+        "to": "Người nhận",
+        "when": "Thời gian"
       },
       "settings": {
         "addressInvalid": "Nhập địa chỉ email hợp lệ.",
@@ -141,13 +147,7 @@
         "title": "1. Kết nối tài khoản Gmail của bạn"
       },
       "subtitle": "Gửi email từ chính tài khoản Gmail của bạn.",
-      "title": "Email",
-      "policy": {
-        "title": "Tên miền người nhận được phép (mọi quản trị viên)",
-        "description": "Email của mọi quản trị viên chỉ được gửi tới các tên miền này. Chỉ quản trị viên hệ thống mới thay đổi được.",
-        "saved": "Đã lưu tên miền được phép",
-        "loadFailed": "Không tải được danh sách tên miền được phép."
-      }
+      "title": "Email"
     },
     "investorLeads": {
       "acknowledged": "Đã xác nhận minh họa",

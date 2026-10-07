@@ -62,7 +62,10 @@ function PolicyForm({ domains: saved }: { domains: string[] }) {
     const bad = invalidDomains(list);
     if (bad.length > 0) {
       setError(
-        t("admin.email.settings.domainsInvalid").replace("{list}", bad.join(", ")),
+        t("admin.email.settings.domainsInvalid").replace(
+          "{list}",
+          bad.join(", "),
+        ),
       );
       return;
     }
@@ -101,7 +104,9 @@ function PolicyForm({ domains: saved }: { domains: string[] }) {
       </div>
       <div>
         <Button type="submit" disabled={isPending}>
-          {isPending && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
+          {isPending && (
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+          )}
           {isPending
             ? t("admin.email.settings.saving")
             : t("admin.email.settings.save")}
