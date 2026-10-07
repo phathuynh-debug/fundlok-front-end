@@ -366,6 +366,7 @@ const kybApproved = new Set<string>();
  * do it as step 2 of KYB; investors' fixtures already carry is_approved.
  */
 const kycApproved = new Set<string>();
+const handoffTokens = new Map<string, string>();
 const STUB_KYC_PERSON_NUMBER = "079203001234";
 
 function totpState(key: string) {
@@ -762,6 +763,33 @@ const server = createServer(async (req, res) => {
     });
   }
 
+  // Phone handoff verification is reachable without a session cookie: the phone
+  // uses the short-lived bearer token from the QR code instead.
+  if (path === "/gverify/kyc/handoff/verify" && method === "POST") {
+    const auth = req.headers["authorization"] ?? "";
+    const token = String(auth).replace(/^Bearer\s+/i, "");
+    const userKey =
+      handoffTokens.get(token) ||
+      (token.startsWith("e2e-token-")
+        ? token.replace("e2e-token-", "")
+        : "unapprovedInvestorTab");
+    kycApproved.add(userKey);
+    return json(res, 201, {
+      verification_id: "00000000-0000-0000-0000-0000000000c1",
+      status: "APPROVED",
+      is_approved: true,
+      rejection_reason: null,
+      person_number: STUB_KYC_PERSON_NUMBER,
+      full_name:
+        (userKey in STUB_USERS &&
+          STUB_USERS[userKey as StubUserKey]?.full_name) ||
+        "Nguyễn Văn Chủ",
+      date_of_birth: "01/01/1990",
+      face_match_score: 0.93,
+      created_at: new Date().toISOString(),
+    });
+  }
+
   // The rate calculator and the investor tab are public on the real backend,
   // so they are answered BEFORE the session guard below. Behind it, an
   // anonymous /rate visitor got a 401 here that production never returns.
@@ -1131,6 +1159,16 @@ const server = createServer(async (req, res) => {
       date_of_birth: "01/01/1990",
       face_match_score: 0.93,
       created_at: new Date().toISOString(),
+    });
+  }
+
+  if (path === "/gverify/kyc/handoff" && method === "POST") {
+    const token = `e2e-token-${key}`;
+    handoffTokens.set(token, key);
+    return json(res, 201, {
+      token,
+      expires_in_seconds: 600,
+      mode: "AUTOMATIC",
     });
   }
 

@@ -65,16 +65,26 @@ test("Invest opens KYC in a new tab, which closes and returns the user to the ac
   const next = new URL(verification.url()).searchParams.get("next");
   expect(next).toBe(`/dashboard/invest?amount=131&projectId=${project.id}`);
 
-  // Taken with the (fake) camera: the app accepts no uploaded photo.
-  await takeIdentityPhotos(verification);
-  const closed = verification.waitForEvent("close");
-  await verification
+  // On desktop, KYC exclusively shows the QR code to verify via phone.
+  const qrCode = verification.getByTestId("kyc-qr-code");
+  await expect(qrCode).toBeVisible();
+  const phoneUrl = await qrCode.getAttribute("data-qr-value");
+  expect(phoneUrl).toBeTruthy();
+
+  // Open the handoff URL (as if scanning the QR code on a mobile device).
+  const phonePage = await context.newPage();
+  await phonePage.goto(phoneUrl!);
+  await takeIdentityPhotos(phonePage);
+  await phonePage
     .getByRole("button", { name: t("kyc.gv.submitBtn"), exact: true })
     .click();
-  await expect(verification.getByText(t("kyc.approvedTitle"))).toBeVisible();
+  await expect(phonePage.getByText(t("kyc.approvedTitle"))).toBeVisible();
 
-  // It closes itself...
+  // The desktop tab polls, notices approval, shows confirmation, and closes itself.
+  const closed = verification.waitForEvent("close");
+  await expect(verification.getByText(t("kyc.approvedTitle"))).toBeVisible();
   await closed;
+
   // ...and the original tab moves on to the investment it was starting.
   await expect(page).toHaveURL(
     new RegExp(`/dashboard/invest\\?amount=131&projectId=${project.id}`),
