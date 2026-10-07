@@ -26,6 +26,7 @@ export const gverifyKeys = {
   kybCertificate: () => [...gverifyKeys.all, "kyb-certificate"] as const,
   kybStatus: () => [...gverifyKeys.all, "kyb-status"] as const,
   verificationMode: () => [...gverifyKeys.all, "verification-mode"] as const,
+  handoff: () => [...gverifyKeys.all, "handoff"] as const,
 };
 
 interface UseGVerifyStatusOptions {
@@ -101,6 +102,16 @@ export function useGVerifyVerify() {
 export function useGVerifyHandoff() {
   return useMutation<GVerifyHandoffResponse, ApiError, void>({
     mutationFn: () => gverifyService.createHandoff(),
+  });
+}
+
+export function useGVerifyHandoffToken(enabled = true) {
+  return useQuery<GVerifyHandoffResponse, ApiError>({
+    queryKey: gverifyKeys.handoff(),
+    queryFn: () => gverifyService.createHandoff(),
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+    enabled,
   });
 }
 

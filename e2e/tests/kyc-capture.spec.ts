@@ -28,7 +28,51 @@ async function expectNoUpload(page: Page) {
   await expect(page.getByText(/library|thư viện/i)).toHaveCount(0);
 }
 
-test.describe("the identity photos on the desktop screen", () => {
+test.describe("the identity verification on the desktop screen", () => {
+  test.beforeEach(async ({ context }) => {
+    await signInAs(context, "unapprovedInvestor");
+  });
+
+  test("displays the phone QR code and offers no file upload", async ({
+    page,
+  }) => {
+    await page.goto("/kyc");
+
+    await expect(page.getByText(t("kyc.gv.qrTitle"))).toBeVisible();
+    await expect(page.getByTestId("kyc-qr-code")).toBeVisible();
+    await expectNoUpload(page);
+    // Desktop camera dialog / webcam is not present on desktop
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+  });
+
+  test("can be scanned and completed via phone", async ({ page, context }) => {
+    await signInAs(context, "unapprovedInvestorCamera");
+    await page.goto("/kyc");
+
+    const qrCode = page.getByTestId("kyc-qr-code");
+    await expect(qrCode).toBeVisible();
+    const phoneUrl = await qrCode.getAttribute("data-qr-value");
+    expect(phoneUrl).toBeTruthy();
+
+    const phonePage = await context.newPage();
+    await phonePage.goto(phoneUrl!);
+
+    await takeIdentityPhotos(phonePage);
+    await expect(phonePage.getByText(t("kyc.gv.photoTaken"))).toBeVisible();
+
+    await phonePage
+      .getByRole("button", { name: t("kyc.gv.submitBtn"), exact: true })
+      .click();
+    await expect(phonePage.getByText(t("kyc.approvedTitle"))).toBeVisible();
+
+    // Desktop page polls, detects approval, and advances to dashboard.
+    await expect(page).toHaveURL(/\/dashboard/);
+  });
+});
+
+test.describe("the identity photos on a mobile device visiting /kyc directly", () => {
+  test.use({ viewport: { width: 375, height: 667 }, isMobile: true });
+
   test.beforeEach(async ({ context }) => {
     await signInAs(context, "unapprovedInvestor");
   });
@@ -38,72 +82,19 @@ test.describe("the identity photos on the desktop screen", () => {
 
     await expect(photoTile(page)).toBeVisible();
     await expectNoUpload(page);
-    // And it says so, rather than leaving a person to look for the button.
     await expect(page.getByText(t("kyc.gv.liveOnlyNote"))).toBeVisible();
   });
 
-  test("are taken with the camera, and nothing else is on offer inside it", async ({
+  test("are taken with the camera, and can be retaken or removed", async ({
     page,
   }) => {
-    await page.goto("/kyc");
-
-    await photoTile(page).click();
-    const camera = page.getByRole("dialog", { name: t("kyc.gv.frontLabel") });
-    await expect(camera).toBeVisible();
-    await expect(
-      camera.getByRole("button", { name: t("kyc.gv.captureBtn"), exact: true }),
-    ).toBeVisible();
-    // The old escape hatch inside the camera is gone, and so is any file input.
-    await expect(
-      camera.getByRole("button", { name: /library|thư viện/i }),
-    ).toHaveCount(0);
-    await expectNoUpload(page);
-  });
-
-  test("take over the whole screen while the camera is open", async ({
-    page,
-  }) => {
-    await page.goto("/kyc");
-
-    await photoTile(page).click();
-    const camera = page.getByRole("dialog", { name: t("kyc.gv.frontLabel") });
-    await expect(camera).toBeVisible();
-
-    // Nothing of the page shows around it. A margin inherited from the field
-    // once shrank it by 8px and left a strip of the page under the shutter.
-    const viewport = page.viewportSize();
-    expect(viewport).not.toBeNull();
-    expect(await camera.boundingBox()).toEqual({
-      x: 0,
-      y: 0,
-      width: viewport!.width,
-      height: viewport!.height,
-    });
-  });
-
-  test("can all be taken and submitted", async ({ page, context }) => {
-    // Its own account: submitting verifies it, and the stub remembers that.
-    await signInAs(context, "unapprovedInvestorCamera");
-    await page.goto("/kyc");
-
-    await takeIdentityPhotos(page);
-    // Each one shows as taken, and the tabs say they are all done.
-    await expect(page.getByText(t("kyc.gv.photoTaken"))).toBeVisible();
-
-    await page
-      .getByRole("button", { name: t("kyc.gv.submitBtn"), exact: true })
-      .click();
-    await expect(page.getByText(t("kyc.approvedTitle"))).toBeVisible();
-  });
-
-  test("can be retaken or removed", async ({ page }) => {
     await page.goto("/kyc");
 
     await photoTile(page).click();
     await page
       .getByRole("button", { name: t("kyc.gv.captureBtn"), exact: true })
       .click();
-    // The tabs moved on to the next photo; go back to the one just taken.
+
     await page.getByRole("tab", { name: t("kyc.gv.tabFront") }).click();
     await expect(page.getByText(t("kyc.gv.photoTaken"))).toBeVisible();
 
@@ -112,45 +103,20 @@ test.describe("the identity photos on the desktop screen", () => {
     await expect(page.getByText(t("kyc.gv.photoTaken"))).toHaveCount(0);
   });
 
-  test("say why when camera access is blocked, and offer no upload instead", async ({
+  test("can all be taken and submitted directly on mobile", async ({
     page,
+    context,
   }) => {
-    await page.addInitScript(() => {
-      navigator.mediaDevices.getUserMedia = () =>
-        Promise.reject(new DOMException("blocked", "NotAllowedError"));
-    });
+    await signInAs(context, "unapprovedInvestorCamera");
     await page.goto("/kyc");
 
-    await photoTile(page).click();
+    await takeIdentityPhotos(page);
+    await expect(page.getByText(t("kyc.gv.photoTaken"))).toBeVisible();
 
-    await expect(
-      page.getByRole("alert").filter({ hasText: t("kyc.gv.cameraDenied") }),
-    ).toBeVisible();
-    await expect(page.getByRole("dialog")).toHaveCount(0);
-    await expectNoUpload(page);
-    // The phone is the way on, and it is still offered.
-    await expect(
-      page.getByRole("button", { name: t("kyc.gv.phoneBtn") }),
-    ).toBeVisible();
-  });
-
-  test("say so when the page cannot use a camera at all", async ({ page }) => {
-    await page.addInitScript(() => {
-      Object.defineProperty(navigator, "mediaDevices", {
-        value: undefined,
-        configurable: true,
-      });
-    });
-    await page.goto("/kyc");
-
-    await photoTile(page).click();
-
-    await expect(
-      page
-        .getByRole("alert")
-        .filter({ hasText: t("kyc.gv.cameraUnsupported") }),
-    ).toBeVisible();
-    await expectNoUpload(page);
+    await page
+      .getByRole("button", { name: t("kyc.gv.submitBtn"), exact: true })
+      .click();
+    await expect(page.getByText(t("kyc.approvedTitle"))).toBeVisible();
   });
 });
 

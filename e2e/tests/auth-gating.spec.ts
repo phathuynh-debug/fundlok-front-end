@@ -240,11 +240,23 @@ async function completeIdentityStep(page: import("@playwright/test").Page) {
   await expect(
     page.getByRole("heading", { name: t("kyc.kyb.identityTitle") }),
   ).toBeVisible();
-  // Taken with the (fake) camera: the app accepts no uploaded photo.
-  await takeIdentityPhotos(page);
-  await page
+
+  // On desktop, the identity step displays the QR code to verify on phone.
+  const qrCode = page.getByTestId("kyc-qr-code");
+  await expect(qrCode).toBeVisible();
+  const phoneUrl = await qrCode.getAttribute("data-qr-value");
+  expect(phoneUrl).toBeTruthy();
+
+  const phonePage = await page.context().newPage();
+  await phonePage.goto(phoneUrl!);
+  await takeIdentityPhotos(phonePage);
+  await phonePage
     .getByRole("button", { name: t("kyc.gv.submitBtn"), exact: true })
     .click();
+  await expect(phonePage.getByText(t("kyc.approvedTitle"))).toBeVisible();
+  await phonePage.close();
+
+  // Desktop polls and updates to identity verified.
   await expect(
     page.getByText(t("kyc.kyb.identityVerifiedTitle")),
   ).toBeVisible();
