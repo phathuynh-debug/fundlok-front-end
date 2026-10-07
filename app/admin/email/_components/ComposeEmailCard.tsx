@@ -48,7 +48,11 @@ import {
 // The <form> submit is a no-op: Enter in a field must not send an email. Only
 // the confirm dialog's button does.
 
-const TEMPLATES: EmailTemplate[] = ["general", "announcement", "action_required"];
+const TEMPLATES: EmailTemplate[] = [
+  "general",
+  "announcement",
+  "action_required",
+];
 const MAX_RECIPIENTS = 20;
 
 interface FieldErrors {
@@ -65,7 +69,8 @@ export function ComposeEmailCard() {
   const { data: settings } = useEmailSettings();
   const { data: policy } = useEmailPolicy();
   const allowedDomains = policy?.allowed_domains ?? [];
-  const { mutateAsync: renderPreview, isPending: previewing } = usePreviewEmail();
+  const { mutateAsync: renderPreview, isPending: previewing } =
+    usePreviewEmail();
   const { mutateAsync: send, isPending: sending } = useSendEmail();
 
   const [to, setTo] = useState("");
@@ -112,9 +117,14 @@ export function ComposeEmailCard() {
     if (recipients.length > MAX_RECIPIENTS) {
       return t("admin.email.compose.toTooMany");
     }
-    const invalid = recipients.filter((address) => !EMAIL_PATTERN.test(address));
+    const invalid = recipients.filter(
+      (address) => !EMAIL_PATTERN.test(address),
+    );
     if (invalid.length > 0) {
-      return t("admin.email.compose.toInvalid").replace("{list}", invalid.join(", "));
+      return t("admin.email.compose.toInvalid").replace(
+        "{list}",
+        invalid.join(", "),
+      );
     }
     // The server enforces this too; checking here names the addresses. The
     // allowlist is punycode, so compare the recipient's domain in that form.
@@ -344,7 +354,9 @@ export function ComposeEmailCard() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="compose-body">{t("admin.email.compose.bodyLabel")}</Label>
+          <Label htmlFor="compose-body">
+            {t("admin.email.compose.bodyLabel")}
+          </Label>
           <Textarea
             id="compose-body"
             rows={8}

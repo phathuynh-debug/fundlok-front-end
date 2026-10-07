@@ -22,8 +22,10 @@ import {
 export const adminEmailKeys = {
   all: ["admin-email"] as const,
   forUser: (userId: string) => [...adminEmailKeys.all, "user", userId] as const,
-  settings: (userId: string) => [...adminEmailKeys.forUser(userId), "settings"] as const,
-  messages: (userId: string) => [...adminEmailKeys.forUser(userId), "messages"] as const,
+  settings: (userId: string) =>
+    [...adminEmailKeys.forUser(userId), "settings"] as const,
+  messages: (userId: string) =>
+    [...adminEmailKeys.forUser(userId), "messages"] as const,
   policy: () => [...adminEmailKeys.all, "policy"] as const,
 };
 
@@ -49,7 +51,8 @@ export function useSaveEmailSettings() {
   return useMutation<EmailSettings, ApiError, EmailSettingsPayload>({
     mutationFn: (payload) => adminEmailService.saveSettings(payload),
     onSuccess: (settings) => {
-      if (userId) queryClient.setQueryData(adminEmailKeys.settings(userId), settings);
+      if (userId)
+        queryClient.setQueryData(adminEmailKeys.settings(userId), settings);
     },
   });
 }
@@ -60,7 +63,8 @@ export function useClearEmailSettings() {
   return useMutation<EmailSettings, ApiError, void>({
     mutationFn: () => adminEmailService.clearSettings(),
     onSuccess: (settings) => {
-      if (userId) queryClient.setQueryData(adminEmailKeys.settings(userId), settings);
+      if (userId)
+        queryClient.setQueryData(adminEmailKeys.settings(userId), settings);
     },
   });
 }
@@ -94,7 +98,9 @@ export function useSendTestEmail() {
     mutationFn: () => adminEmailService.sendTestEmail(),
     onSettled: () => {
       if (userId) {
-        void queryClient.invalidateQueries({ queryKey: adminEmailKeys.forUser(userId) });
+        void queryClient.invalidateQueries({
+          queryKey: adminEmailKeys.forUser(userId),
+        });
       }
     },
   });
@@ -114,7 +120,9 @@ export function useSendEmail() {
     mutationFn: (payload) => adminEmailService.send(payload),
     onSettled: () => {
       if (userId) {
-        void queryClient.invalidateQueries({ queryKey: adminEmailKeys.messages(userId) });
+        void queryClient.invalidateQueries({
+          queryKey: adminEmailKeys.messages(userId),
+        });
       }
     },
   });

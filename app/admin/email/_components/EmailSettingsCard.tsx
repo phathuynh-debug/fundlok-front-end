@@ -122,7 +122,9 @@ function SettingsForm({
   const { mutateAsync: clear, isPending: clearing } = useClearEmailSettings();
   const { mutateAsync: sendTest, isPending: testing } = useSendTestEmail();
 
-  const [address, setAddress] = useState(settings.gmail_address ?? defaultAddress);
+  const [address, setAddress] = useState(
+    settings.gmail_address ?? defaultAddress,
+  );
   const [password, setPassword] = useState("");
   const [fromName, setFromName] = useState(settings.from_name ?? defaultName);
   const [enabled, setEnabled] = useState(settings.enabled);
@@ -234,7 +236,9 @@ function SettingsForm({
               placeholder={t("admin.email.settings.addressPlaceholder")}
               value={address}
               aria-invalid={!!errors.address}
-              aria-describedby={errors.address ? "email-address-error" : undefined}
+              aria-describedby={
+                errors.address ? "email-address-error" : undefined
+              }
               onChange={(event) => setAddress(event.target.value)}
             />
           </div>
