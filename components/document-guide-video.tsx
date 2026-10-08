@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PlayCircle } from "lucide-react";
+import { PlayCircle, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,8 +14,9 @@ import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { CONTROL_HOVER } from "@/lib/ui-tokens";
 
-const GUIDE_YOUTUBE_EMBED_URL =
-  "https://www.youtube-nocookie.com/embed/d9Z8JhJ-9ws?autoplay=1&rel=0";
+const YOUTUBE_VIDEO_ID = "d9Z8JhJ-9ws";
+const GUIDE_YOUTUBE_EMBED_URL = `https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&rel=0&modestbranding=1`;
+const GUIDE_YOUTUBE_WATCH_URL = `https://www.youtube.com/watch?v=${YOUTUBE_VIDEO_ID}`;
 
 /**
  * "Watch the guide video" — the walkthrough of preparing each upload document,
@@ -44,20 +45,42 @@ export function DocumentGuideVideo() {
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-4xl">
+        <DialogContent className="sm:max-w-4xl p-4 sm:p-6 overflow-hidden">
           <DialogHeader>
             <DialogTitle>{t("dashboard.documentGuide.videoTitle")}</DialogTitle>
             <DialogDescription>
               {t("dashboard.documentGuide.videoDescription")}
             </DialogDescription>
           </DialogHeader>
-          <iframe
-            src={GUIDE_YOUTUBE_EMBED_URL}
-            title={t("dashboard.documentGuide.videoTitle")}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-            className="aspect-video w-full rounded-lg border-0 bg-black"
-          />
+
+          <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-black">
+            <iframe
+              src={GUIDE_YOUTUBE_EMBED_URL}
+              title={t("dashboard.documentGuide.videoTitle")}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+              className="h-full w-full border-0"
+            />
+          </div>
+
+          <div className="flex justify-end pt-1">
+            <Button
+              variant="outline"
+              size="sm"
+              asChild
+              className="gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+            >
+              <a
+                href={GUIDE_YOUTUBE_WATCH_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                {t("dashboard.documentGuide.videoWatchOnYouTube")}
+              </a>
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </>

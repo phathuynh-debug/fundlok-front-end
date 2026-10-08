@@ -977,7 +977,8 @@
       "title": "About this form",
       "videoDescription": "A short video showing how to prepare and upload each document.",
       "videoOpen": "Watch the guide video",
-      "videoTitle": "Document guide video"
+      "videoTitle": "Document guide video",
+      "videoWatchOnYouTube": "Watch on YouTube"
     },
     "header": {
       "home": "Home",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePublicProjects } from "@/hooks/use-projects";
@@ -25,6 +25,8 @@ import { CONTROL_IDLE } from "@/lib/ui-tokens";
 import { cn } from "@/lib/utils";
 
 type TabType = "risk" | "diligence";
+
+const emptySubscribe = () => () => {};
 
 function ProjectDetailsSkeleton() {
   return (
@@ -69,6 +71,11 @@ export default function ProjectDetailsClient() {
   const searchParams = useSearchParams();
   const projectId = searchParams.get("id");
   const [activeTab, setActiveTab] = useState<TabType>("risk");
+  const isMounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
   const { t } = useTranslations();
 
   const { user, isLoading: isAuthLoading } = useRequireAuth();
@@ -82,7 +89,7 @@ export default function ProjectDetailsClient() {
   // from is the score they land on. See lib/sample-listing-figures.ts.
   const sampleScore = sampleListingScore(project?.id ?? projectId);
 
-  if (isAuthLoading || isProjectsLoading) {
+  if (!isMounted || isAuthLoading || isProjectsLoading) {
     return <ProjectDetailsSkeleton />;
   }
 
