@@ -155,6 +155,8 @@ export const ADMIN_ENDPOINTS = {
   applicationDecision: (id: string) => `/admin/applications/${id}/decision`,
   // Account status. SUSPENDED is a real deny server-side, not a label.
   userStatus: (id: string) => `/admin/users/${id}/status`,
+  // Full detail preview for one account (profile + projects + investments + security).
+  userDetail: (id: string) => `/admin/users/${id}`,
   // SYSTEM_ADMIN only. Creates an ADMIN account with no password and emails
   // the invitee a single-use link to choose one.
   inviteAdmin: "/admin/users/admins",

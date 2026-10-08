@@ -27,6 +27,7 @@ import {
   type AdminOverviewParams,
   type AdminProjectDetail,
   type AdminUserDetail,
+  type AdminUserFullDetail,
   type AdminUserStatusPayload,
   type AuditLog,
   type AuditLogParams,
@@ -49,6 +50,8 @@ export const adminKeys = {
     [...adminKeys.all, "document-url", documentId] as const,
   projectDetail: (projectId: string) =>
     [...adminKeys.all, "project", projectId] as const,
+  userDetail: (userId: string) =>
+    [...adminKeys.all, "user", userId] as const,
   kycAll: () => [...adminKeys.all, "kyc"] as const,
   kycQueue: (status: AdminKycStatus) =>
     [...adminKeys.kycAll(), "list", status] as const,
@@ -122,6 +125,18 @@ export function useAdminProjectDetail(projectId: string | null) {
     queryKey: adminKeys.projectDetail(projectId ?? ""),
     queryFn: () => adminService.getProjectDetail(projectId as string),
     enabled: projectId !== null,
+    staleTime: 0,
+    retry: false,
+  });
+}
+
+// One account, its owned projects, investor summary, and security posture.
+// Only fetched while the preview sheet is open.
+export function useAdminUserDetail(userId: string | null) {
+  return useQuery<AdminUserFullDetail, ApiError>({
+    queryKey: adminKeys.userDetail(userId ?? ""),
+    queryFn: () => adminService.getUserDetail(userId as string),
+    enabled: userId !== null,
     staleTime: 0,
     retry: false,
   });
