@@ -88,7 +88,7 @@ export function ProfileClient() {
     formState: { errors },
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema(t)),
-    defaultValues: { full_name: "", phone: "", bio: "" },
+    defaultValues: { full_name: "", phone: "", bio: "", email_signature: "" },
   });
 
   const isSaving = updateProfile.isPending;
@@ -99,6 +99,7 @@ export function ProfileClient() {
       full_name: user?.full_name ?? "",
       phone: user?.phone ?? "",
       bio: user?.bio ?? "",
+      email_signature: user?.email_signature ?? "",
     });
     setIsEditing(true);
   };
@@ -109,6 +110,7 @@ export function ProfileClient() {
         full_name: values.full_name,
         phone: values.phone || null,
         bio: values.bio || null,
+        email_signature: values.email_signature || null,
       },
       {
         onSuccess: () => {
@@ -363,6 +365,46 @@ export function ProfileClient() {
                         value={user?.bio ?? ""}
                         placeholder={t(
                           "dashboard.settings.profile.bioPlaceholder",
+                        )}
+                        className="resize-none bg-muted/40"
+                      />
+                    )}
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label
+                      htmlFor="emailSignature"
+                      className="text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+                    >
+                      {t("dashboard.settings.profile.emailSignature")}
+                    </Label>
+                    {isEditing ? (
+                      <>
+                        <Textarea
+                          id="emailSignature"
+                          rows={5}
+                          disabled={isSaving}
+                          aria-invalid={!!errors.email_signature}
+                          placeholder={t(
+                            "dashboard.settings.profile.emailSignaturePlaceholder",
+                          )}
+                          className="resize-none"
+                          {...register("email_signature")}
+                        />
+                        {errors.email_signature && (
+                          <p className="text-xs font-medium text-destructive">
+                            {errors.email_signature.message}
+                          </p>
+                        )}
+                      </>
+                    ) : (
+                      <Textarea
+                        id="emailSignature"
+                        readOnly
+                        rows={5}
+                        value={user?.email_signature ?? ""}
+                        placeholder={t(
+                          "dashboard.settings.profile.emailSignatureNotSet",
                         )}
                         className="resize-none bg-muted/40"
                       />

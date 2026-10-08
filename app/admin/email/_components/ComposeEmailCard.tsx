@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Eye, Loader2, Send } from "lucide-react";
+import { useState, useRef, useCallback } from "react";
+import { Eye, Loader2, Send, Bold, Italic, Link, List, ListOrdered } from "lucide-react";
 
 import {
   AlertDialog,
@@ -16,7 +16,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   useEmailPolicy,
   useEmailSettings,
@@ -80,12 +79,36 @@ export function ComposeEmailCard() {
   const [body, setBody] = useState("");
   const [buttonLabel, setButtonLabel] = useState("");
   const [buttonUrl, setButtonUrl] = useState("");
+  const [includeSignature, setIncludeSignature] = useState(true);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [preview, setPreview] = useState<EmailPreview | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const ready = !!settings?.configured && settings.enabled;
+
+  const bodyTextareaRef = useRef<HTMLDivElement>(null);
+
+  const execCommand = useCallback((command: string, value?: string) => {
+    const editor = bodyTextareaRef.current;
+    if (!editor) return;
+
+    editor.focus();
+    document.execCommand(command, false, value);
+    editor.normalize();
+
+    // Sync state after change
+    setBody(editor.innerText);
+  }, [setBody]);
+
+  const handleBold = () => execCommand("bold");
+  const handleItalic = () => execCommand("italic");
+  const handleLink = () => {
+    const url = prompt("Enter link URL:", "https://");
+    if (url) execCommand("createLink", url);
+  };
+  const handleBulletList = () => execCommand("insertUnorderedList");
+  const handleNumberedList = () => execCommand("insertOrderedList");
 
   // Content checks shared by Preview and Send; Send also checks recipients.
   const contentErrors = (): FieldErrors => {
@@ -152,6 +175,7 @@ export function ComposeEmailCard() {
     body,
     button_label: buttonLabel.trim() || null,
     button_url: buttonUrl.trim() || null,
+    include_signature: includeSignature,
   });
 
   const fail = (err: unknown) =>
@@ -349,18 +373,98 @@ export function ComposeEmailCard() {
           <Label htmlFor="compose-body">
             {t("admin.email.compose.bodyLabel")}
           </Label>
-          <Textarea
+
+          <div className="flex items-center gap-1 border border-b-0 rounded-t-md bg-muted/30 px-2 py-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0"
+              onClick={handleBold}
+              title="Bold"
+            >
+              <Bold className="h-4 w-4" />
+              <span className="sr-only">Bold</span>
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0"
+              onClick={handleItalic}
+              title="Italic"
+            >
+              <Italic className="h-4 w-4" />
+              <span className="sr-only">Italic</span>
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0"
+              onClick={handleLink}
+              title="Insert link"
+            >
+              <Link className="h-4 w-4" />
+              <span className="sr-only">Link</span>
+            </Button>
+            <div className="w-px h-5 bg-border mx-1" />
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0"
+              onClick={handleBulletList}
+              title="Bullet list"
+            >
+              <List className="h-4 w-4" />
+              <span className="sr-only">Bullet list</span>
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0"
+              onClick={handleNumberedList}
+              title="Numbered list"
+            >
+              <ListOrdered className="h-4 w-4" />
+              <span className="sr-only">Numbered list</span>
+            </Button>
+          </div>
+
+          <div
+            ref={bodyTextareaRef}
             id="compose-body"
-            rows={8}
-            maxLength={10000}
-            placeholder={t("admin.email.compose.bodyPlaceholder")}
-            value={body}
+            contentEditable
+            role="textbox"
+            aria-multiline
             aria-invalid={!!errors.body}
-            onChange={(event) => setBody(event.target.value)}
+            data-placeholder={t("admin.email.compose.bodyPlaceholder")}
+            onInput={(e) => setBody(e.currentTarget.innerText)}
+            onPaste={(e) => {
+              e.preventDefault();
+              const text = e.clipboardData?.getData("text/plain") || "";
+              document.execCommand("insertText", false, text);
+            }}
+            className="min-h-[128px] w-full rounded-b-md border border-t-0 bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 empty:before:content-[attr(data-placeholder)] empty:before:text-muted-foreground"
           />
           {errors.body && (
             <p className="text-xs text-destructive">{errors.body}</p>
           )}
+
+          <div className="flex items-center gap-2 mt-2">
+            <input
+              type="checkbox"
+              id="include-signature"
+              checked={includeSignature}
+              onChange={(e) => setIncludeSignature(e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+            />
+            <label htmlFor="include-signature" className="text-sm text-muted-foreground">
+              Include my email signature
+            </label>
+          </div>
         </div>
 
         <div className="grid gap-5 md:grid-cols-2">

@@ -15,6 +15,9 @@ export interface EmailSettings {
   has_app_password: boolean;
   last_verified_at: string | null;
   updated_at: string | null;
+  signature_name: string | null;
+  signature_title: string | null;
+  signature_phone: string | null;
 }
 
 export interface EmailSettingsPayload {
@@ -23,6 +26,9 @@ export interface EmailSettingsPayload {
   // null keeps the stored password.
   app_password: string | null;
   enabled: boolean;
+  signature_name?: string | null;
+  signature_title?: string | null;
+  signature_phone?: string | null;
 }
 
 // Rules every admin's sends follow. Empty allowed_domains means any domain.
@@ -41,6 +47,7 @@ export interface EmailContentPayload {
   body: string;
   button_label: string | null;
   button_url: string | null;
+  include_signature: boolean;
 }
 
 export interface SendEmailPayload extends EmailContentPayload {

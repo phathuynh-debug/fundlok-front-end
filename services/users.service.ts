@@ -25,6 +25,7 @@ export interface UpdateProfileRequest {
   full_name?: string;
   phone?: string | null;
   bio?: string | null;
+  email_signature?: string | null;
 }
 
 // Mirrors backend RoleSelectRequest (PATCH /users/me/role).

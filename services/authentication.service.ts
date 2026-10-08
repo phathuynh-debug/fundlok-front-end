@@ -43,6 +43,8 @@ export interface User {
    * replaying itself on every load.
    */
   onboarding_tour_completed_at?: string | null;
+  /** Markdown-formatted signature appended to outgoing emails. */
+  email_signature?: string | null;
 }
 
 /**

@@ -18,6 +18,13 @@ export function profileFormSchema(t: Translate) {
       .trim()
       .max(30, t("dashboard.settings.profile.phoneTooLong")),
     bio: z.string().trim().max(500, t("dashboard.settings.profile.bioTooLong")),
+    email_signature: z
+      .string()
+      .trim()
+      .max(
+        2000,
+        t("dashboard.settings.profile.emailSignatureTooLong"),
+      ),
   });
 }
 

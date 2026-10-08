@@ -89,6 +89,9 @@ export function EmailSettingsCard() {
             data.from_name,
             data.enabled,
             data.configured,
+            data.signature_name,
+            data.signature_title,
+            data.signature_phone,
           ])}
           settings={data}
           // Not connected yet: start from the admin's own account, since the
@@ -105,6 +108,9 @@ interface FieldErrors {
   address?: string;
   password?: string;
   fromName?: string;
+  signatureName?: string;
+  signatureTitle?: string;
+  signaturePhone?: string;
 }
 
 function SettingsForm({
@@ -128,6 +134,9 @@ function SettingsForm({
   const [password, setPassword] = useState("");
   const [fromName, setFromName] = useState(settings.from_name ?? defaultName);
   const [enabled, setEnabled] = useState(settings.enabled);
+  const [signatureName, setSignatureName] = useState(settings.signature_name ?? "");
+  const [signatureTitle, setSignatureTitle] = useState(settings.signature_title ?? "");
+  const [signaturePhone, setSignaturePhone] = useState(settings.signature_phone ?? "");
   const [errors, setErrors] = useState<FieldErrors>({});
   const [confirmClear, setConfirmClear] = useState(false);
 
@@ -148,6 +157,15 @@ function SettingsForm({
     } else if (LINE_BREAK.test(fromName.trim())) {
       next.fromName = t("admin.email.errors.singleLine");
     }
+    if (LINE_BREAK.test(signatureName.trim())) {
+      next.signatureName = t("admin.email.errors.singleLine");
+    }
+    if (LINE_BREAK.test(signatureTitle.trim())) {
+      next.signatureTitle = t("admin.email.errors.singleLine");
+    }
+    if (LINE_BREAK.test(signaturePhone.trim())) {
+      next.signaturePhone = t("admin.email.errors.singleLine");
+    }
     setErrors(next);
     if (Object.keys(next).length > 0) return;
 
@@ -157,6 +175,9 @@ function SettingsForm({
         from_name: fromName.trim(),
         app_password: compactPassword || null,
         enabled,
+        signature_name: signatureName.trim() || null,
+        signature_title: signatureTitle.trim() || null,
+        signature_phone: signaturePhone.trim() || null,
       });
       // Saved; the server will never send it back, so do not keep it here.
       setPassword("");
@@ -317,6 +338,63 @@ function SettingsForm({
           {errors.fromName && (
             <p className="text-xs text-destructive">{errors.fromName}</p>
           )}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label>{t("admin.email.settings.signatureHelp")}</Label>
+        <div className="grid gap-5 md:grid-cols-3">
+          <div className="space-y-2">
+            <Label htmlFor="email-signature-name">
+              {t("admin.email.settings.signatureNameLabel")}
+            </Label>
+            <Input
+              id="email-signature-name"
+              autoComplete="off"
+              maxLength={80}
+              placeholder={t("admin.email.settings.signatureNamePlaceholder")}
+              value={signatureName}
+              aria-invalid={!!errors.signatureName}
+              onChange={(event) => setSignatureName(event.target.value)}
+            />
+            {errors.signatureName && (
+              <p className="text-xs text-destructive">{errors.signatureName}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email-signature-title">
+              {t("admin.email.settings.signatureTitleLabel")}
+            </Label>
+            <Input
+              id="email-signature-title"
+              autoComplete="off"
+              maxLength={120}
+              placeholder={t("admin.email.settings.signatureTitlePlaceholder")}
+              value={signatureTitle}
+              aria-invalid={!!errors.signatureTitle}
+              onChange={(event) => setSignatureTitle(event.target.value)}
+            />
+            {errors.signatureTitle && (
+              <p className="text-xs text-destructive">{errors.signatureTitle}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email-signature-phone">
+              {t("admin.email.settings.signaturePhoneLabel")}
+            </Label>
+            <Input
+              id="email-signature-phone"
+              autoComplete="off"
+              maxLength={40}
+              placeholder={t("admin.email.settings.signaturePhonePlaceholder")}
+              value={signaturePhone}
+              aria-invalid={!!errors.signaturePhone}
+              onChange={(event) => setSignaturePhone(event.target.value)}
+            />
+            {errors.signaturePhone && (
+              <p className="text-xs text-destructive">{errors.signaturePhone}</p>
+            )}
+          </div>
         </div>
       </div>
 
