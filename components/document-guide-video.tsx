@@ -14,15 +14,15 @@ import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { CONTROL_HOVER } from "@/lib/ui-tokens";
 
-const GUIDE_VIDEO_SRC = "/videos/document-guide.mp4";
+const GUIDE_YOUTUBE_EMBED_URL =
+  "https://www.youtube-nocookie.com/embed/d9Z8JhJ-9ws?autoplay=1&rel=0";
 
 /**
  * "Watch the guide video" — the walkthrough of preparing each upload document,
  * beside the text guide (`DocumentGuide`).
  *
- * The <video> is mounted only while the dialog is open. A 35 MB file costs
- * nothing for the applicants who never press the button, and closing the
- * dialog unmounts the element, which stops playback and releases the download.
+ * The <iframe> is mounted only while the dialog is open. Closing the dialog
+ * unmounts the element, which stops playback and releases memory.
  */
 export function DocumentGuideVideo() {
   const { t } = useTranslations();
@@ -51,13 +51,12 @@ export function DocumentGuideVideo() {
               {t("dashboard.documentGuide.videoDescription")}
             </DialogDescription>
           </DialogHeader>
-          <video
-            src={GUIDE_VIDEO_SRC}
-            controls
-            autoPlay
-            playsInline
-            preload="metadata"
-            className="aspect-video w-full rounded-lg bg-black"
+          <iframe
+            src={GUIDE_YOUTUBE_EMBED_URL}
+            title={t("dashboard.documentGuide.videoTitle")}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            className="aspect-video w-full rounded-lg border-0 bg-black"
           />
         </DialogContent>
       </Dialog>

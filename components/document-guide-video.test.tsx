@@ -11,14 +11,13 @@ vi.mock("@/lib/i18n", () => ({
 describe("DocumentGuideVideo", () => {
   it("does not load the video until the dialog is opened", async () => {
     const { container } = render(<DocumentGuideVideo />);
-    expect(container.ownerDocument.querySelector("video")).toBeNull();
+    expect(container.ownerDocument.querySelector("iframe")).toBeNull();
 
     await userEvent.click(
       screen.getByRole("button", { name: "dashboard.documentGuide.videoOpen" }),
     );
-    const video = document.querySelector("video");
-    expect(video).not.toBeNull();
-    expect(video?.getAttribute("src")).toBe("/videos/document-guide.mp4");
-    expect(video?.hasAttribute("controls")).toBe(true);
+    const iframe = document.querySelector("iframe");
+    expect(iframe).not.toBeNull();
+    expect(iframe?.getAttribute("src")).toContain("d9Z8JhJ-9ws");
   });
 });
