@@ -4,13 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { motion, useReducedMotion } from "framer-motion";
-import {
-  AlertCircle,
-  Check,
-  Copy,
-  Loader2,
-  Sparkles,
-} from "lucide-react";
+import { AlertCircle, Check, Copy, Loader2, Sparkles } from "lucide-react";
 import SiteHeader from "@/components/site-header";
 import SiteFooter from "@/components/site-footer";
 import { BackgroundBlobs } from "@/components/background-blobs";
