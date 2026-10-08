@@ -108,7 +108,7 @@ export function ComposeEmailCard() {
       editor.normalize();
 
       // Sync state after change
-      setBody(editor.innerText);
+      setBody(editor.innerHTML);
     },
     [setBody],
   );
@@ -133,7 +133,10 @@ export function ComposeEmailCard() {
     if (LINE_BREAK.test(heading.trim())) {
       next.heading = t("admin.email.errors.singleLine");
     }
-    if (!body.trim()) next.body = t("admin.email.compose.bodyRequired");
+    const isBodyEmpty = bodyTextareaRef.current
+      ? bodyTextareaRef.current.innerText.trim().length === 0
+      : !body.replace(/<[^>]+>/g, "").trim();
+    if (isBodyEmpty) next.body = t("admin.email.compose.bodyRequired");
     const label = buttonLabel.trim();
     const url = buttonUrl.trim();
     if (LINE_BREAK.test(label)) {
@@ -250,6 +253,9 @@ export function ComposeEmailCard() {
       setSubject("");
       setHeading("");
       setBody("");
+      if (bodyTextareaRef.current) {
+        bodyTextareaRef.current.innerHTML = "";
+      }
       setButtonLabel("");
       setButtonUrl("");
       setErrors({});
@@ -453,7 +459,7 @@ export function ComposeEmailCard() {
             aria-multiline
             aria-invalid={!!errors.body}
             data-placeholder={t("admin.email.compose.bodyPlaceholder")}
-            onInput={(e) => setBody(e.currentTarget.innerText)}
+            onInput={(e) => setBody(e.currentTarget.innerHTML)}
             onPaste={(e) => {
               e.preventDefault();
               const text = e.clipboardData?.getData("text/plain") || "";

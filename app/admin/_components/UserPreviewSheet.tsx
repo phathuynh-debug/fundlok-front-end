@@ -61,7 +61,8 @@ const ADMIN_ROLES = ["ADMIN", "SYSTEM_ADMIN"];
 function statusVariant(status?: string | null) {
   const s = status?.toUpperCase();
   if (s === "ACTIVE" || s === "APPROVED") return "default" as const;
-  if (s === "SUSPENDED" || s === "INACTIVE" || s === "REJECTED") return "destructive" as const;
+  if (s === "SUSPENDED" || s === "INACTIVE" || s === "REJECTED")
+    return "destructive" as const;
   return "secondary" as const;
 }
 
@@ -77,7 +78,8 @@ export function UserPreviewSheet({
   const { t, locale } = useTranslations();
   const { toast } = useToast();
   const { data: me } = useCurrentUser();
-  const { mutateAsync: setStatus, isPending: isUpdatingStatus } = useSetUserStatus();
+  const { mutateAsync: setStatus, isPending: isUpdatingStatus } =
+    useSetUserStatus();
   const { data: detail, isLoading } = useAdminUserDetail(user?.id ?? null);
   const [note, setNote] = useState("");
 
@@ -116,7 +118,9 @@ export function UserPreviewSheet({
     <Sheet open={user !== null} onOpenChange={onOpenChange}>
       <SheetContent className="w-full overflow-y-auto sm:max-w-lg md:max-w-xl lg:max-w-2xl">
         <SheetHeader className="pb-2">
-          <SheetTitle className="text-xl">{t("admin.userPreview.title")}</SheetTitle>
+          <SheetTitle className="text-xl">
+            {t("admin.userPreview.title")}
+          </SheetTitle>
           <SheetDescription>{t("admin.userPreview.subtitle")}</SheetDescription>
         </SheetHeader>
 
@@ -127,7 +131,10 @@ export function UserPreviewSheet({
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex items-start gap-3.5">
                   <Avatar className="h-14 w-14 shrink-0 rounded-full border ring-1 ring-border">
-                    <AvatarImage src={user.avatar_url ?? undefined} alt={displayName} />
+                    <AvatarImage
+                      src={user.avatar_url ?? undefined}
+                      alt={displayName}
+                    />
                     <AvatarFallback className="bg-primary/10 text-lg font-semibold text-primary">
                       {avatarInitials}
                     </AvatarFallback>
@@ -145,7 +152,10 @@ export function UserPreviewSheet({
                           {roleLabel(t, currentRole)}
                         </Badge>
                       )}
-                      <Badge variant={statusVariant(currentStatus)} className="text-xs">
+                      <Badge
+                        variant={statusVariant(currentStatus)}
+                        className="text-xs"
+                      >
                         {enumLabel(t, "userStatus", currentStatus)}
                       </Badge>
                       {detail?.kyc_status && (
@@ -159,15 +169,26 @@ export function UserPreviewSheet({
                           }
                           className={cn(
                             "text-xs gap-1",
-                            detail.kyc_status === "APPROVED" && "bg-emerald-600 hover:bg-emerald-600",
+                            detail.kyc_status === "APPROVED" &&
+                              "bg-emerald-600 hover:bg-emerald-600",
                           )}
                         >
-                          {detail.kyc_status === "APPROVED" && <ShieldCheck className="h-3 w-3" />}
-                          {detail.kyc_status === "REJECTED" && <XCircle className="h-3 w-3" />}
-                          {(detail.kyc_status === "PENDING" || detail.kyc_status === "MANUAL_REVIEW") && (
+                          {detail.kyc_status === "APPROVED" && (
+                            <ShieldCheck className="h-3 w-3" />
+                          )}
+                          {detail.kyc_status === "REJECTED" && (
+                            <XCircle className="h-3 w-3" />
+                          )}
+                          {(detail.kyc_status === "PENDING" ||
+                            detail.kyc_status === "MANUAL_REVIEW") && (
                             <Clock className="h-3 w-3" />
                           )}
-                          KYC: {enumLabel(t, "verificationStatus", detail.kyc_status)}
+                          KYC:{" "}
+                          {enumLabel(
+                            t,
+                            "verificationStatus",
+                            detail.kyc_status,
+                          )}
                         </Badge>
                       )}
                     </div>
@@ -247,15 +268,20 @@ export function UserPreviewSheet({
                           {t("admin.userPreview.twoFactor")}
                         </span>
                         <Badge
-                          variant={detail.totp_enabled ? "default" : "secondary"}
+                          variant={
+                            detail.totp_enabled ? "default" : "secondary"
+                          }
                           className={cn(
                             "text-xs",
-                            detail.totp_enabled && "bg-emerald-600 hover:bg-emerald-600",
+                            detail.totp_enabled &&
+                              "bg-emerald-600 hover:bg-emerald-600",
                           )}
                         >
                           {detail.totp_enabled
                             ? detail.totp_confirmed_at
-                              ? t("admin.userPreview.twoFactorConfirmed").replace(
+                              ? t(
+                                  "admin.userPreview.twoFactorConfirmed",
+                                ).replace(
                                   "{date}",
                                   formatDate(detail.totp_confirmed_at, locale),
                                 )
@@ -332,15 +358,25 @@ export function UserPreviewSheet({
                           }
                           className={cn(
                             "text-xs gap-1",
-                            detail.kyc_status === "APPROVED" && "bg-emerald-600 hover:bg-emerald-600",
+                            detail.kyc_status === "APPROVED" &&
+                              "bg-emerald-600 hover:bg-emerald-600",
                           )}
                         >
-                          {detail.kyc_status === "APPROVED" && <ShieldCheck className="h-3 w-3" />}
-                          {detail.kyc_status === "REJECTED" && <XCircle className="h-3 w-3" />}
-                          {(detail.kyc_status === "PENDING" || detail.kyc_status === "MANUAL_REVIEW") && (
+                          {detail.kyc_status === "APPROVED" && (
+                            <ShieldCheck className="h-3 w-3" />
+                          )}
+                          {detail.kyc_status === "REJECTED" && (
+                            <XCircle className="h-3 w-3" />
+                          )}
+                          {(detail.kyc_status === "PENDING" ||
+                            detail.kyc_status === "MANUAL_REVIEW") && (
                             <Clock className="h-3 w-3" />
                           )}
-                          {enumLabel(t, "verificationStatus", detail.kyc_status)}
+                          {enumLabel(
+                            t,
+                            "verificationStatus",
+                            detail.kyc_status,
+                          )}
                         </Badge>
                       ) : (
                         <span className="text-xs text-muted-foreground">
@@ -378,12 +414,18 @@ export function UserPreviewSheet({
 
                   <dl className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-xs">
                     <div>
-                      <dt className="text-muted-foreground">{t("admin.userPreview.phone")}</dt>
-                      <dd className="font-medium text-foreground">{detail.phone || "—"}</dd>
+                      <dt className="text-muted-foreground">
+                        {t("admin.userPreview.phone")}
+                      </dt>
+                      <dd className="font-medium text-foreground">
+                        {detail.phone || "—"}
+                      </dd>
                     </div>
 
                     <div>
-                      <dt className="text-muted-foreground">{t("dashboard.settings.profile.emailAddress")}</dt>
+                      <dt className="text-muted-foreground">
+                        {t("dashboard.settings.profile.emailAddress")}
+                      </dt>
                       <dd className="font-medium text-foreground">
                         {detail.email_verified ? (
                           <span className="inline-flex items-center gap-1 text-emerald-600">
@@ -399,12 +441,17 @@ export function UserPreviewSheet({
                     </div>
 
                     <div className="col-span-2">
-                      <dt className="text-muted-foreground">{t("admin.userPreview.onboardingTour")}</dt>
+                      <dt className="text-muted-foreground">
+                        {t("admin.userPreview.onboardingTour")}
+                      </dt>
                       <dd className="font-medium text-foreground">
                         {detail.onboarding_tour_completed_at
                           ? t("admin.userPreview.onboardingCompleted").replace(
                               "{date}",
-                              formatDate(detail.onboarding_tour_completed_at, locale),
+                              formatDate(
+                                detail.onboarding_tour_completed_at,
+                                locale,
+                              ),
                             )
                           : t("admin.userPreview.onboardingNotCompleted")}
                       </dd>
@@ -412,7 +459,9 @@ export function UserPreviewSheet({
 
                     {detail.bio && (
                       <div className="col-span-2">
-                        <dt className="text-muted-foreground">{t("admin.userPreview.bio")}</dt>
+                        <dt className="text-muted-foreground">
+                          {t("admin.userPreview.bio")}
+                        </dt>
                         <dd className="rounded-md border bg-muted/20 p-2.5 text-foreground italic">
                           &ldquo;{detail.bio}&rdquo;
                         </dd>
@@ -421,7 +470,9 @@ export function UserPreviewSheet({
 
                     {/* Email signature preview */}
                     <div className="col-span-2 space-y-1">
-                      <dt className="text-muted-foreground">{t("admin.userPreview.emailSignature")}</dt>
+                      <dt className="text-muted-foreground">
+                        {t("admin.userPreview.emailSignature")}
+                      </dt>
                       <dd>
                         {detail.email_signature ? (
                           <div className="rounded-md border bg-muted/30 p-2.5 font-mono text-[11px] leading-relaxed text-foreground whitespace-pre-wrap">
@@ -444,7 +495,8 @@ export function UserPreviewSheet({
                     <div className="space-y-3">
                       <h4 className="flex items-center gap-2 text-sm font-semibold text-foreground">
                         <Briefcase className="h-4 w-4 text-primary" />
-                        {t("admin.userPreview.relatedProjects")} ({detail.projects.length})
+                        {t("admin.userPreview.relatedProjects")} (
+                        {detail.projects.length})
                       </h4>
 
                       {detail.projects.length === 0 ? (
@@ -465,10 +517,14 @@ export function UserPreviewSheet({
                                   </h5>
                                   <p className="text-xs text-muted-foreground">
                                     {proj.ownership_role}
-                                    {proj.industry && ` · ${industryLabel(proj.industry, t)}`}
+                                    {proj.industry &&
+                                      ` · ${industryLabel(proj.industry, t)}`}
                                   </p>
                                 </div>
-                                <Badge variant={statusVariant(proj.status)} className="text-xs">
+                                <Badge
+                                  variant={statusVariant(proj.status)}
+                                  className="text-xs"
+                                >
                                   {enumLabel(t, "projectStatus", proj.status)}
                                 </Badge>
                               </div>
@@ -488,7 +544,9 @@ export function UserPreviewSheet({
                                   </span>
                                   <span className="font-medium text-foreground">
                                     {proj.employee_count !== null
-                                      ? t("admin.userPreview.employeeCountFormat").replace(
+                                      ? t(
+                                          "admin.userPreview.employeeCountFormat",
+                                        ).replace(
                                           "{count}",
                                           String(proj.employee_count),
                                         )
@@ -509,7 +567,10 @@ export function UserPreviewSheet({
                                   </span>
                                   <span className="font-medium text-foreground">
                                     {proj.total_requested_amount > 0
-                                      ? formatCurrency(proj.total_requested_amount, locale)
+                                      ? formatCurrency(
+                                          proj.total_requested_amount,
+                                          locale,
+                                        )
                                       : "0 ₫"}
                                   </span>
                                 </div>
@@ -541,10 +602,16 @@ export function UserPreviewSheet({
                           </span>
                           <p className="text-xs font-semibold text-foreground">
                             {t("admin.userPreview.ordersSummary")
-                              .replace("{count}", String(detail.investments.orders_count))
+                              .replace(
+                                "{count}",
+                                String(detail.investments.orders_count),
+                              )
                               .replace(
                                 "{amount}",
-                                formatCurrency(detail.investments.orders_amount, locale),
+                                formatCurrency(
+                                  detail.investments.orders_amount,
+                                  locale,
+                                ),
                               )}
                           </p>
                         </div>
@@ -555,10 +622,16 @@ export function UserPreviewSheet({
                           </span>
                           <p className="text-xs font-semibold text-foreground">
                             {t("admin.userPreview.holdingsSummary")
-                              .replace("{count}", String(detail.investments.holdings_count))
+                              .replace(
+                                "{count}",
+                                String(detail.investments.holdings_count),
+                              )
                               .replace(
                                 "{amount}",
-                                formatCurrency(detail.investments.holdings_principal, locale),
+                                formatCurrency(
+                                  detail.investments.holdings_principal,
+                                  locale,
+                                ),
                               )}
                           </p>
                         </div>

@@ -50,8 +50,7 @@ export const adminKeys = {
     [...adminKeys.all, "document-url", documentId] as const,
   projectDetail: (projectId: string) =>
     [...adminKeys.all, "project", projectId] as const,
-  userDetail: (userId: string) =>
-    [...adminKeys.all, "user", userId] as const,
+  userDetail: (userId: string) => [...adminKeys.all, "user", userId] as const,
   kycAll: () => [...adminKeys.all, "kyc"] as const,
   kycQueue: (status: AdminKycStatus) =>
     [...adminKeys.kycAll(), "list", status] as const,

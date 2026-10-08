@@ -356,22 +356,22 @@ export interface AdminUserDetail {
 export interface AdminUserProjectRef {
   id: string;
   legal_name: string;
-  tax_id: string | null;            // Company tax code
+  tax_id: string | null; // Company tax code
   industry: string | null;
-  status: string;                   // e.g. "ACTIVE"
-  ownership_role: string;           // e.g. "OWNER"
-  employee_count: number | null;    // Headcount
-  applications_count: number;       // Total loan applications submitted
-  total_requested_amount: number;   // Total VND requested (integer)
+  status: string; // e.g. "ACTIVE"
+  ownership_role: string; // e.g. "OWNER"
+  employee_count: number | null; // Headcount
+  applications_count: number; // Total loan applications submitted
+  total_requested_amount: number; // Total VND requested (integer)
   created_at: string | null;
-  updated_at: string | null;        // Last company update
+  updated_at: string | null; // Last company update
 }
 
 export interface AdminUserInvestmentSummary {
   orders_count: number;
-  orders_amount: number;            // Integer VND
+  orders_amount: number; // Integer VND
   holdings_count: number;
-  holdings_principal: number;       // Integer VND
+  holdings_principal: number; // Integer VND
 }
 
 export interface AdminUserFullDetail {
@@ -387,21 +387,21 @@ export interface AdminUserFullDetail {
   // Profile Details
   phone: string | null;
   bio: string | null;
-  avatar_key: string | null;        // R2/S3 object key for avatar
-  email_signature: string | null;   // Custom email footer signature
+  avatar_key: string | null; // R2/S3 object key for avatar
+  email_signature: string | null; // Custom email footer signature
   onboarding_tour_completed_at: string | null;
   // Password & Security Posture
-  has_password: boolean;            // true if password set; false for Google OAuth / invitees
+  has_password: boolean; // true if password set; false for Google OAuth / invitees
   signin_alerts_enabled: boolean;
   totp_enabled: boolean;
   totp_confirmed_at: string | null; // When 2FA was confirmed
   unused_recovery_codes_count: number; // Number of unused backup codes remaining
-  passkeys_count: number;           // Registered WebAuthn / passkey count
-  active_sessions_count: number;    // Active non-expired refresh tokens
-  last_sign_in_at: string | null;   // Timestamp of most recent activity
+  passkeys_count: number; // Registered WebAuthn / passkey count
+  active_sessions_count: number; // Active non-expired refresh tokens
+  last_sign_in_at: string | null; // Timestamp of most recent activity
   // Verification & Banking Insight
   kyc_status: "APPROVED" | "REJECTED" | "MANUAL_REVIEW" | "PENDING" | null; // Latest eKYC result
-  linked_accounts_count: number;    // Number of active linked bank/e-wallet accounts
+  linked_accounts_count: number; // Number of active linked bank/e-wallet accounts
   // Associated Entities
   projects: AdminUserProjectRef[];
   investments: AdminUserInvestmentSummary;
@@ -539,7 +539,9 @@ export const adminService = {
 
   // Admin only — full account detail including security, projects, and investments.
   getUserDetail(userId: string) {
-    return apiClient.get<AdminUserFullDetail>(ADMIN_ENDPOINTS.userDetail(userId));
+    return apiClient.get<AdminUserFullDetail>(
+      ADMIN_ENDPOINTS.userDetail(userId),
+    );
   },
 
   // SYSTEM_ADMIN only (403 otherwise). 409 when the email already has an
