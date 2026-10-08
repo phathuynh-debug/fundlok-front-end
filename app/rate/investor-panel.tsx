@@ -120,7 +120,7 @@ export function InvestorPanel({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={false}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
       className="mx-auto max-w-xl space-y-5 rounded-2xl border border-border bg-card p-8 text-center shadow-xs"
@@ -318,7 +318,7 @@ function InvestorCalculator({ getSessionId }: { getSessionId: () => string }) {
     <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
       <motion.form
         onSubmit={onCalculate}
-        initial={{ opacity: 0, y: 24 }}
+        initial={false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="space-y-5 rounded-2xl border border-border bg-card p-6 shadow-xs"
@@ -504,8 +504,8 @@ function InvestorCalculator({ getSessionId }: { getSessionId: () => string }) {
             </div>
 
             {process.env.NEXT_PUBLIC_DISABLE_TURNSTILE !== "true" && (
-              <div className="flex justify-center">
-                <div ref={turnstileContainerRef} />
+              <div className="flex justify-center min-h-[65px] items-center">
+                <div ref={turnstileContainerRef} className="min-h-[65px]" />
               </div>
             )}
 
@@ -531,7 +531,7 @@ function InvestorCalculator({ getSessionId }: { getSessionId: () => string }) {
 
       {/* ---------------- Result ---------------- */}
       <motion.div
-        initial={{ opacity: 0, y: 24 }}
+        initial={false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.13, ease: "easeOut" }}
         className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-xs lg:sticky lg:top-24"

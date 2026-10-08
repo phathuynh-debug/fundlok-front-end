@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   AlertCircle,
   Check,
   Copy,
-  Info,
   Loader2,
   Sparkles,
 } from "lucide-react";
@@ -21,7 +21,6 @@ import { NumericInput } from "@/components/ui/numeric-input";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AmountInput, parseAmount } from "./amount-input";
-import { InvestorPanel } from "./investor-panel";
 import {
   ResultBurst,
   figureVariants,
@@ -244,6 +243,14 @@ function ResultSkeleton() {
   );
 }
 
+const InvestorPanel = dynamic(
+  () => import("./investor-panel").then((mod) => mod.InvestorPanel),
+  {
+    ssr: false,
+    loading: () => <ResultSkeleton />,
+  },
+);
+
 /** Clearance for the sticky site header, so a scrolled-to panel does not tuck
  *  its own heading underneath it. */
 function getClientSessionId(): string {
@@ -340,27 +347,48 @@ export default function RateClient({
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
 
-  const values: Values = {
-    industry,
-    operatingMonths,
-    employeeCount,
-    revenueLast,
-    revenuePrior,
-    cogs,
-    fixedCost,
-    variableCost,
-    loanAmount,
-    bestMonth,
-    worstMonth,
-    top1,
-    top3,
-    fullName,
-    companyName,
-    email,
-    phone,
-  };
+  const values: Values = useMemo(
+    () => ({
+      industry,
+      operatingMonths,
+      employeeCount,
+      revenueLast,
+      revenuePrior,
+      cogs,
+      fixedCost,
+      variableCost,
+      loanAmount,
+      bestMonth,
+      worstMonth,
+      top1,
+      top3,
+      fullName,
+      companyName,
+      email,
+      phone,
+    }),
+    [
+      industry,
+      operatingMonths,
+      employeeCount,
+      revenueLast,
+      revenuePrior,
+      cogs,
+      fixedCost,
+      variableCost,
+      loanAmount,
+      bestMonth,
+      worstMonth,
+      top1,
+      top3,
+      fullName,
+      companyName,
+      email,
+      phone,
+    ],
+  );
 
-  const errors = validate(values, t);
+  const errors = useMemo(() => validate(values, t), [values, t]);
   const consentError =
     (submitAttempted || touched.consent) && !consent
       ? t("ratePage.error.consent")
@@ -451,18 +479,6 @@ export default function RateClient({
     resetTurnstile();
   };
 
-  const numberFormat = locale === "vi" ? "vi-VN" : "en-US";
-  const pct = (value: number) =>
-    `${value.toLocaleString(numberFormat, {
-      minimumFractionDigits: 1,
-      maximumFractionDigits: 1,
-    })}%`;
-  // Whole numbers: the engine keeps full precision internally, but a 0-100
-  // score shown to two decimals reads far more exact than a bracketed
-  // estimate is.
-  const score = (value: number) =>
-    Math.round(value).toLocaleString(numberFormat);
-
   const data = estimate.data;
 
   const markTouched = (name: string) =>
@@ -540,7 +556,7 @@ export default function RateClient({
             become the containing block for the result card's `lg:sticky` and
             silently kill it. */}
         <motion.div
-          initial={{ opacity: 0, y: -16 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
           className="mb-10 space-y-3 text-center"
@@ -559,7 +575,7 @@ export default function RateClient({
             different questions, and a visitor on the wrong one reads a
             borrowing form as an investment page. */}
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.08, ease: "easeOut" }}
           className="mx-auto mb-10 max-w-md space-y-2"
@@ -636,7 +652,7 @@ export default function RateClient({
             {/* ---------------- Form ---------------- */}
             <motion.form
               onSubmit={onSubmit}
-              initial={{ opacity: 0, y: 24 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
               className="space-y-5 rounded-2xl border border-border bg-card p-6 shadow-xs"
@@ -983,8 +999,8 @@ export default function RateClient({
               </div>
 
               {process.env.NEXT_PUBLIC_DISABLE_TURNSTILE !== "true" && (
-                <div className="flex justify-center">
-                  <div ref={turnstileContainerRef} />
+                <div className="flex justify-center min-h-[65px] items-center">
+                  <div ref={turnstileContainerRef} className="min-h-[65px]" />
                 </div>
               )}
 
@@ -1005,7 +1021,7 @@ export default function RateClient({
             {/* ---------------- Result ---------------- */}
             <motion.div
               ref={resultRef}
-              initial={{ opacity: 0, y: 24 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.28, ease: "easeOut" }}
               className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-xs lg:sticky lg:top-24"
