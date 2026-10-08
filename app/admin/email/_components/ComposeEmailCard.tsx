@@ -1,7 +1,16 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { Eye, Loader2, Send, Bold, Italic, Link, List, ListOrdered } from "lucide-react";
+import {
+  Eye,
+  Loader2,
+  Send,
+  Bold,
+  Italic,
+  Link,
+  List,
+  ListOrdered,
+} from "lucide-react";
 
 import {
   AlertDialog,
@@ -89,17 +98,20 @@ export function ComposeEmailCard() {
 
   const bodyTextareaRef = useRef<HTMLDivElement>(null);
 
-  const execCommand = useCallback((command: string, value?: string) => {
-    const editor = bodyTextareaRef.current;
-    if (!editor) return;
+  const execCommand = useCallback(
+    (command: string, value?: string) => {
+      const editor = bodyTextareaRef.current;
+      if (!editor) return;
 
-    editor.focus();
-    document.execCommand(command, false, value);
-    editor.normalize();
+      editor.focus();
+      document.execCommand(command, false, value);
+      editor.normalize();
 
-    // Sync state after change
-    setBody(editor.innerText);
-  }, [setBody]);
+      // Sync state after change
+      setBody(editor.innerText);
+    },
+    [setBody],
+  );
 
   const handleBold = () => execCommand("bold");
   const handleItalic = () => execCommand("italic");
@@ -461,7 +473,10 @@ export function ComposeEmailCard() {
               onChange={(e) => setIncludeSignature(e.target.checked)}
               className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
             />
-            <label htmlFor="include-signature" className="text-sm text-muted-foreground">
+            <label
+              htmlFor="include-signature"
+              className="text-sm text-muted-foreground"
+            >
               Include my email signature
             </label>
           </div>

@@ -134,9 +134,15 @@ function SettingsForm({
   const [password, setPassword] = useState("");
   const [fromName, setFromName] = useState(settings.from_name ?? defaultName);
   const [enabled, setEnabled] = useState(settings.enabled);
-  const [signatureName, setSignatureName] = useState(settings.signature_name ?? "");
-  const [signatureTitle, setSignatureTitle] = useState(settings.signature_title ?? "");
-  const [signaturePhone, setSignaturePhone] = useState(settings.signature_phone ?? "");
+  const [signatureName, setSignatureName] = useState(
+    settings.signature_name ?? "",
+  );
+  const [signatureTitle, setSignatureTitle] = useState(
+    settings.signature_title ?? "",
+  );
+  const [signaturePhone, setSignaturePhone] = useState(
+    settings.signature_phone ?? "",
+  );
   const [errors, setErrors] = useState<FieldErrors>({});
   const [confirmClear, setConfirmClear] = useState(false);
 
@@ -375,7 +381,9 @@ function SettingsForm({
               onChange={(event) => setSignatureTitle(event.target.value)}
             />
             {errors.signatureTitle && (
-              <p className="text-xs text-destructive">{errors.signatureTitle}</p>
+              <p className="text-xs text-destructive">
+                {errors.signatureTitle}
+              </p>
             )}
           </div>
           <div className="space-y-2">
@@ -392,7 +400,9 @@ function SettingsForm({
               onChange={(event) => setSignaturePhone(event.target.value)}
             />
             {errors.signaturePhone && (
-              <p className="text-xs text-destructive">{errors.signaturePhone}</p>
+              <p className="text-xs text-destructive">
+                {errors.signaturePhone}
+              </p>
             )}
           </div>
         </div>

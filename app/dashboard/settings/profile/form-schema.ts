@@ -21,10 +21,7 @@ export function profileFormSchema(t: Translate) {
     email_signature: z
       .string()
       .trim()
-      .max(
-        2000,
-        t("dashboard.settings.profile.emailSignatureTooLong"),
-      ),
+      .max(2000, t("dashboard.settings.profile.emailSignatureTooLong")),
   });
 }
 
