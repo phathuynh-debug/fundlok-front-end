@@ -841,6 +841,8 @@
     "na": "Không có",
     "needHelp": "Cần hỗ trợ?",
     "noFileChosen": "Chưa chọn tệp",
+    "notAvailable": "Hiện chưa khả dụng",
+    "notAvailableDescription": "Tính năng này hiện chưa khả dụng cho tài khoản của bạn.",
     "pageNotFound": "Không tìm thấy trang",
     "pageSections": "Các phần của trang",
     "processing": "Đang xử lý...",

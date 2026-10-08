@@ -1,33 +1,34 @@
 "use client";
 
-import { useMemo, useState } from "react";
+// import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { BarChart3, FlaskConical, PieChart, TableIcon } from "lucide-react";
+import { BarChart3 } from "lucide-react";
+// import { FlaskConical, PieChart, TableIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { pageTransitionProps } from "@/lib/animations";
 import { useTranslations } from "@/lib/i18n";
 import { DashboardHeader } from "../_components/DashboardHeader";
-import { AnalyticsKpiCards } from "./_components/AnalyticsKpiCards";
-import { AnalyticsTableView } from "./_components/AnalyticsTableView";
-import { CapitalFlowChart } from "./_components/CapitalFlowChart";
-import { CapitalStatusChart } from "./_components/CapitalStatusChart";
-import { IndustryAllocationChart } from "./_components/IndustryAllocationChart";
-import { IndustrySplitChart } from "./_components/IndustrySplitChart";
-import { MonthlyReturnsChart } from "./_components/MonthlyReturnsChart";
-import { SmeAnalyticsView } from "./_components/sme/SmeAnalyticsView";
-import {
-  deriveKpis,
-  MOCK_ALLOCATION,
-  MOCK_CAPITAL_STATUS,
-  MOCK_MONTHLY,
-  sliceByRange,
-  totalAllocated,
-  type RangeKey,
-} from "./_components/mock-analytics";
-import { CONTROL_IDLE } from "@/lib/ui-tokens";
+// import { AnalyticsKpiCards } from "./_components/AnalyticsKpiCards";
+// import { AnalyticsTableView } from "./_components/AnalyticsTableView";
+// import { CapitalFlowChart } from "./_components/CapitalFlowChart";
+// import { CapitalStatusChart } from "./_components/CapitalStatusChart";
+// import { IndustryAllocationChart } from "./_components/IndustryAllocationChart";
+// import { IndustrySplitChart } from "./_components/IndustrySplitChart";
+// import { MonthlyReturnsChart } from "./_components/MonthlyReturnsChart";
+// import { SmeAnalyticsView } from "./_components/sme/SmeAnalyticsView";
+// import {
+//   deriveKpis,
+//   MOCK_ALLOCATION,
+//   MOCK_CAPITAL_STATUS,
+//   MOCK_MONTHLY,
+//   sliceByRange,
+//   totalAllocated,
+//   type RangeKey,
+// } from "./_components/mock-analytics";
+// import { CONTROL_IDLE } from "@/lib/ui-tokens";
 
-const RANGES: RangeKey[] = ["3M", "6M", "12M"];
+// const RANGES: RangeKey[] = ["3M", "6M", "12M"];
 
 function AnalyticsSkeleton() {
   return (
@@ -55,25 +56,25 @@ function AnalyticsSkeleton() {
   );
 }
 
-function ChartCard({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="bg-card text-card-foreground border border-border rounded-xl shadow-xs p-5 space-y-4">
-      <div className="space-y-1">
-        <h3 className="text-sm font-semibold">{title}</h3>
-        <p className="text-xs text-muted-foreground">{description}</p>
-      </div>
-      {children}
-    </section>
-  );
-}
+// function ChartCard({
+//   title,
+//   description,
+//   children,
+// }: {
+//   title: string;
+//   description: string;
+//   children: React.ReactNode;
+// }) {
+//   return (
+//     <section className="bg-card text-card-foreground border border-border rounded-xl shadow-xs p-5 space-y-4">
+//       <div className="space-y-1">
+//         <h3 className="text-sm font-semibold">{title}</h3>
+//         <p className="text-xs text-muted-foreground">{description}</p>
+//       </div>
+//       {children}
+//     </section>
+//   );
+// }
 
 export default function AnalyticsClient() {
   const { user, isLoading: isAuthLoading } = useRequireAuth();
@@ -85,12 +86,12 @@ export default function AnalyticsClient() {
   const isSme = user?.role === "SME";
 
   // Local UI state only -- nothing here round-trips to the server.
-  const [range, setRange] = useState<RangeKey>("12M");
-  const [view, setView] = useState<"charts" | "table">("charts");
+  // const [range, setRange] = useState<RangeKey>("12M");
+  // const [view, setView] = useState<"charts" | "table">("charts");
 
-  const points = useMemo(() => sliceByRange(MOCK_MONTHLY, range), [range]);
-  const kpis = useMemo(() => deriveKpis(points), [points]);
-  const allocationTotal = useMemo(() => totalAllocated(MOCK_ALLOCATION), []);
+  // const points = useMemo(() => sliceByRange(MOCK_MONTHLY, range), [range]);
+  // const kpis = useMemo(() => deriveKpis(points), [points]);
+  // const allocationTotal = useMemo(() => totalAllocated(MOCK_ALLOCATION), []);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -120,8 +121,7 @@ export default function AnalyticsClient() {
           </div>
         </div>
 
-        {/* Sample-data notice, same as the transactions screen: these are not
-            real balances. */}
+        {/* Sample-data notice (commented out):
         <div className="flex items-start gap-2.5 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3">
           <FlaskConical className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
           <p className="text-xs text-amber-700 dark:text-amber-300">
@@ -132,15 +132,30 @@ export default function AnalyticsClient() {
             )}
           </p>
         </div>
+        */}
 
         {isAuthLoading ? (
           <AnalyticsSkeleton />
-        ) : isSme ? (
+        ) : (
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/40 py-20 px-4 text-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground mb-4">
+              <BarChart3 className="h-6 w-6" />
+            </div>
+            <h3 className="text-lg font-semibold text-foreground">
+              {t("common.notAvailable")}
+            </h3>
+            <p className="text-sm text-muted-foreground mt-1 max-w-sm">
+              {t("common.notAvailableDescription")}
+            </p>
+          </div>
+        )}
+
+        {/* 
+        MOCK DATA (Commented out):
+        {isSme ? (
           <SmeAnalyticsView />
         ) : (
           <>
-            {/* One filter row above everything it scopes -- the range applies to
-                the KPIs and every chart at once, never per-card. */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div
                 className="p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-800/40 w-fit flex items-center gap-1"
@@ -224,8 +239,6 @@ export default function AnalyticsClient() {
                     />
                   </ChartCard>
 
-                  {/* Same data as the bars above, different question: those
-                      compare magnitudes, this shows concentration. */}
                   <ChartCard
                     title={t("dashboard.analytics.charts.splitTitle")}
                     description={t("dashboard.analytics.charts.splitDesc")}
@@ -267,6 +280,7 @@ export default function AnalyticsClient() {
             )}
           </>
         )}
+        */}
       </motion.div>
     </div>
   );

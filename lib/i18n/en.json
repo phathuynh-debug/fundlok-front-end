@@ -841,6 +841,8 @@
     "na": "N/A",
     "needHelp": "Need help?",
     "noFileChosen": "No file chosen",
+    "notAvailable": "Not available",
+    "notAvailableDescription": "This feature is currently not available for your account.",
     "pageNotFound": "Page not found",
     "pageSections": "Page sections",
     "processing": "Processing...",
