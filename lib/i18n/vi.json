@@ -506,6 +506,10 @@
       "title": "Khách hàng tiềm năng mới",
       "viewAll": "Xem tất cả"
     },
+    "security": {
+      "subtitle": "Quản lý các lớp bảo vệ cho tài khoản quản trị của bạn: mật khẩu, xác thực hai lớp, passkey, cảnh báo đăng nhập và phiên đăng nhập đang hoạt động.",
+      "title": "Bảo mật"
+    },
     "sidebar": {
       "auditLogs": "Nhật ký kiểm toán",
       "badge": "Quản trị",
@@ -515,6 +519,7 @@
       "overview": "Tổng quan",
       "projects": "Dự án",
       "rates": "Yêu cầu định phí",
+      "security": "Bảo mật",
       "systemSettings": "Cài đặt hệ thống",
       "users": "Người dùng"
     },
@@ -1158,7 +1163,6 @@
         "unknownDevice": "Thiết bị không xác định",
         "unknownLocation": "Vị trí không xác định"
       },
-      "mockNotice": "Dữ liệu mẫu. Màn hình này chưa kết nối với tài khoản của bạn, nên các số liệu dưới đây không phải số liệu thật. Các công tắc ở đây chỉ thay đổi trên trang này.",
       "passkeys": {
         "add": "Thêm passkey",
         "addFailedTitle": "Không thể thêm passkey",
@@ -1210,15 +1214,13 @@
           "loginAlerts": "Gửi email cho bạn mỗi khi có đăng nhập từ thiết bị lạ.",
           "passkey": "Đăng nhập bằng Face ID, Touch ID hoặc khóa bảo mật thay vì nhập mật khẩu.",
           "password": "Dùng cùng với lớp xác thực thứ hai mỗi lần đăng nhập.",
-          "totp": "Mã sáu số từ ứng dụng xác thực, bắt buộc ở mỗi lần đăng nhập.",
-          "withdrawalLock": "Đổi tài khoản ngân hàng nhận tiền sẽ tạm giữ 24 giờ trước khi chi trả bất kỳ khoản nào."
+          "totp": "Mã sáu số từ ứng dụng xác thực, bắt buộc ở mỗi lần đăng nhập."
         },
         "items": {
           "loginAlerts": "Cảnh báo đăng nhập",
           "passkey": "Passkey",
           "password": "Mật khẩu",
-          "totp": "Xác thực hai lớp",
-          "withdrawalLock": "Khóa tài khoản nhận tiền"
+          "totp": "Xác thực hai lớp"
         },
         "saveFailedTitle": "Không thể lưu thay đổi",
         "state": {

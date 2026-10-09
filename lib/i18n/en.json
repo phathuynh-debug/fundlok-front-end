@@ -506,6 +506,10 @@
       "title": "Recent leads",
       "viewAll": "View all"
     },
+    "security": {
+      "subtitle": "Manage the protections on your own admin account: password, two-factor authentication, passkeys, sign-in alerts and active sessions.",
+      "title": "Security"
+    },
     "sidebar": {
       "auditLogs": "Audit logs",
       "badge": "Admin",
@@ -515,6 +519,7 @@
       "overview": "Overview",
       "projects": "Projects",
       "rates": "Rate Inquiries",
+      "security": "Security",
       "systemSettings": "System settings",
       "users": "Users"
     },
@@ -1158,7 +1163,6 @@
         "unknownDevice": "Unknown device",
         "unknownLocation": "Unknown location"
       },
-      "mockNotice": "Sample data. This screen isn't connected to your account yet, so none of these figures are real. Toggles here change this page only.",
       "passkeys": {
         "add": "Add passkey",
         "addFailedTitle": "Could not add that passkey",
@@ -1210,15 +1214,13 @@
           "loginAlerts": "We email you when someone signs in from a device you have not used before.",
           "passkey": "Sign in with Face ID, Touch ID, or a security key instead of typing a password.",
           "password": "Used together with your second factor at every sign-in.",
-          "totp": "A six-digit code from your authenticator app, required on every sign-in.",
-          "withdrawalLock": "Changing your payout bank account starts a 24-hour hold before any distribution is sent."
+          "totp": "A six-digit code from your authenticator app, required on every sign-in."
         },
         "items": {
           "loginAlerts": "Sign-in alerts",
           "passkey": "Passkey",
           "password": "Password",
-          "totp": "Two-factor authentication",
-          "withdrawalLock": "Payout account lock"
+          "totp": "Two-factor authentication"
         },
         "saveFailedTitle": "Could not save that change",
         "state": {

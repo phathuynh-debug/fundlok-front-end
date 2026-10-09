@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Banknote,
   BellRing,
   Fingerprint,
   KeyRound,
@@ -14,12 +13,11 @@ import { Card } from "@/components/ui/card";
 import { formatDate } from "@/lib/format-date";
 import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
-import type { ProtectionItem, ProtectionState } from "./mock-security";
+import type { ProtectionItem, ProtectionState } from "./protections";
 
 const ICONS: Record<string, LucideIcon> = {
   password: KeyRound,
   totp: ShieldCheck,
-  withdrawalLock: Banknote,
   passkey: Fingerprint,
   loginAlerts: BellRing,
 };

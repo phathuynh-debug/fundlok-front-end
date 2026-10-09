@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { springItemVariants, staggerContainerVariants } from "@/lib/animations";
 import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
-import { scoreBand, type PostureBand } from "./mock-security";
+import { scoreBand, type PostureBand } from "./protections";
 
 const BAND_STYLES: Record<PostureBand, { text: string; bar: string }> = {
   strong: {

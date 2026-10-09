@@ -5,11 +5,10 @@ import { signInAs } from "../support/auth";
 import { t } from "../support/i18n";
 import { toast } from "../support/ui";
 
-// /dashboard/security is mostly real, and the remaining split matters. Sessions
-// and activity come from the API (refresh_tokens and audit_logs); password,
-// sign-in alerts and two-factor auth are all real controls. Only passkeys and
-// the payout-account lock still have no backend, and the tests below pin that
-// boundary so a row can never claim a protection the account does not have.
+// /dashboard/security is real: sessions and activity come from the API
+// (refresh_tokens and audit_logs); password, sign-in alerts, two-factor auth
+// and passkeys are all real controls. The tests below pin that boundary so a
+// row can never claim a protection the account does not have.
 
 test.beforeEach(async ({ context, page }) => {
   await signInAs(context, "investor");
@@ -24,13 +23,7 @@ test("shows the security posture and protection list", async ({ page }) => {
     }),
   ).toBeVisible();
 
-  for (const key of [
-    "password",
-    "totp",
-    "withdrawalLock",
-    "passkey",
-    "loginAlerts",
-  ]) {
+  for (const key of ["password", "totp", "passkey", "loginAlerts"]) {
     await expect(
       page.getByText(t(`dashboard.security.protections.items.${key}`), {
         exact: true,

@@ -14,6 +14,7 @@ import {
   LogOut,
   Loader2,
   Mail,
+  KeyRound,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -57,6 +58,11 @@ export const adminNavItems: NavItem[] = [
     labelKey: "admin.sidebar.email",
     href: "/admin/email",
     icon: Mail,
+  },
+  {
+    labelKey: "admin.sidebar.security",
+    href: "/admin/security",
+    icon: KeyRound,
   },
   {
     labelKey: "admin.sidebar.systemSettings",

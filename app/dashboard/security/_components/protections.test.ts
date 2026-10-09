@@ -5,7 +5,7 @@ import {
   scoreBand,
   buildProtections,
   type ProtectionItem,
-} from "./mock-security";
+} from "./protections";
 
 // deriveScore/scoreBand are the only logic on the security screen — they are
 // pure so they survive the move to a real API, which is exactly why they are
@@ -54,36 +54,34 @@ describe("deriveScore", () => {
   });
 
   it("scores only the protections that are actually on", () => {
-    // With alerts off, `password` (25) and the payout lock (20) are the only
-    // "on" rows: 2FA and passkeys are off, not enabled, so they must not
-    // count toward the score. Claiming otherwise was the bug.
+    // With alerts off, `password` (25 of the 80 total) is the only "on" row:
+    // 2FA and passkeys are off, not enabled, so they must not count toward
+    // the score. Claiming otherwise was the bug.
     const withoutAlerts = deriveScore(buildProtections(false));
-    expect(withoutAlerts).toBe(45);
+    expect(withoutAlerts).toBe(31);
     expect(scoreBand(withoutAlerts)).toBe("weak");
 
-    // Turning sign-in alerts on adds its 10 points.
-    expect(deriveScore(buildProtections(true))).toBe(55);
+    // Turning sign-in alerts on adds its 10 points: 35/80.
+    expect(deriveScore(buildProtections(true))).toBe(44);
   });
 
   it("counts two-factor auth once it is actually enabled", () => {
     // 2FA carries the largest weight (30) because it is the strongest control
     // on the list. It used to be permanently uncountable — the row was
     // hardcoded "unavailable" while there was no backend.
-    expect(deriveScore(buildProtections(false, true))).toBe(75);
+    expect(deriveScore(buildProtections(false, true))).toBe(69);
     expect(scoreBand(deriveScore(buildProtections(false, true)))).toBe("fair");
 
-    // password 25 + payout lock 20 + alerts 10 + 2FA 30 = 85, with no passkey
-    // registered.
-    expect(deriveScore(buildProtections(true, true))).toBe(85);
+    // password 25 + alerts 10 + 2FA 30 = 65 of 80, with no passkey registered.
+    expect(deriveScore(buildProtections(true, true))).toBe(81);
     expect(scoreBand(deriveScore(buildProtections(true, true)))).toBe("strong");
   });
 
   it("counts passkeys once one is actually registered", () => {
     // The row was hardcoded "unavailable" while there was no WebAuthn
-    // backend. Now it reflects webauthn_credentials, so the last 15 points
-    // are reachable and a fully protected account can actually score 100 —
-    // which the score claimed was possible all along.
-    expect(deriveScore(buildProtections(false, false, 1))).toBe(60);
+    // backend. Now it reflects webauthn_credentials, so a fully protected
+    // account scores 100 — which the score claimed was possible all along.
+    expect(deriveScore(buildProtections(false, false, 1))).toBe(50);
     expect(deriveScore(buildProtections(true, true, 1))).toBe(100);
     expect(scoreBand(deriveScore(buildProtections(true, true, 1)))).toBe(
       "strong",
@@ -99,6 +97,15 @@ describe("deriveScore", () => {
     );
     expect(passkey?.state).toBe("off");
     expect(passkey?.toggleable).toBe(true);
+  });
+
+  it("no longer includes the payout-account lock", () => {
+    // The payout lock had no backend and was a hardcoded fake "on" row that
+    // the score counted. It was removed as out of scope — nothing may
+    // resurrect it silently.
+    expect(
+      buildProtections(true, true, 1).map((item) => item.key),
+    ).not.toContain("withdrawalLock");
   });
 });
 
