@@ -163,6 +163,9 @@ export async function proxy(request: NextRequest) {
       rawPathname.slice("/api".length) + request.nextUrl.search,
       API_ORIGIN,
     );
+    if (target.origin !== new URL(API_ORIGIN).origin) {
+      return new NextResponse("Invalid rewrite destination", { status: 400 });
+    }
     return NextResponse.rewrite(target, {
       request: { headers: applyBackendSecret(new Headers(request.headers)) },
     });
