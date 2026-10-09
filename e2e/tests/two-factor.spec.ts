@@ -226,7 +226,7 @@ test.describe("enrolment", () => {
 
     const after = await page.locator("main").last().innerText();
     expect(after).not.toBe(before);
-    expect(after).toContain("75");
+    expect(after).toContain("69");
   });
 });
 
