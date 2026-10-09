@@ -369,9 +369,11 @@
     },
     "loading": "Đang tải trang quản trị…",
     "pagination": {
+      "emails": "email",
       "next": "Sau",
       "of": "trên",
       "page": "Trang",
+      "perPage": "Mỗi trang",
       "prev": "Trước",
       "projects": "dự án",
       "users": "người dùng"

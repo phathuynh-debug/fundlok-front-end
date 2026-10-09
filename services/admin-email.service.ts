@@ -158,9 +158,11 @@ export const adminEmailService = {
     });
   },
 
-  listMessages(limit = 20) {
+  listMessages(params?: { limit?: number; offset?: number } | number) {
+    const limit = typeof params === "number" ? params : (params?.limit ?? 100);
+    const offset = typeof params === "object" ? params?.offset : undefined;
     return apiClient.get<InternalEmail[]>(ADMIN_EMAIL_ENDPOINTS.messages, {
-      params: { limit },
+      params: { limit, offset },
     });
   },
 };

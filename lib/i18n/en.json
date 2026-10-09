@@ -369,9 +369,11 @@
     },
     "loading": "Loading admin…",
     "pagination": {
+      "emails": "emails",
       "next": "Next",
       "of": "of",
       "page": "Page",
+      "perPage": "Per page",
       "prev": "Prev",
       "projects": "projects",
       "users": "users"

@@ -132,11 +132,11 @@ export function useSendEmail() {
   });
 }
 
-export function useSentEmails(enabled = true) {
+export function useSentEmails(limit = 100, enabled = true) {
   const userId = useAdminId();
   return useQuery<InternalEmail[], ApiError>({
-    queryKey: adminEmailKeys.messages(userId ?? ""),
-    queryFn: () => adminEmailService.listMessages(20),
+    queryKey: [...adminEmailKeys.messages(userId ?? ""), limit],
+    queryFn: () => adminEmailService.listMessages(limit),
     staleTime: 30 * 1000,
     retry: false,
     enabled: enabled && !!userId,
