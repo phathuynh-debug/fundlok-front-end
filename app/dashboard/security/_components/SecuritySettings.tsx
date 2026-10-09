@@ -69,10 +69,28 @@ export function SecuritySettings({
   // Sessions and activity are real server state: /auth/sessions is backed by
   // refresh_tokens and /auth/security-events by audit_logs, so they belong in
   // React Query, keyed by authKeys.
+  const INITIAL_ACTIVITY_LIMIT = 7;
+  const [activityLimit, setActivityLimit] = useState(INITIAL_ACTIVITY_LIMIT);
   const { data: sessions = [], isLoading: isSessionsLoading } =
     useSessions(!isAuthLoading);
-  const { data: activity = [], isLoading: isActivityLoading } =
-    useSecurityEvents(!isAuthLoading);
+  const {
+    data: activity = [],
+    isLoading: isActivityLoading,
+    isFetching: isActivityFetching,
+  } = useSecurityEvents(!isAuthLoading, activityLimit);
+
+  const hasMoreActivity =
+    activity.length >= activityLimit && activityLimit < 100;
+  const isLoadingMoreActivity = isActivityFetching && !isActivityLoading;
+
+  const handleFetchMoreActivity = () => {
+    setActivityLimit((prev) => Math.min(prev + INITIAL_ACTIVITY_LIMIT, 100));
+  };
+
+  const handleCollapseActivity = () => {
+    setActivityLimit(INITIAL_ACTIVITY_LIMIT);
+  };
+
   const {
     mutate: revokeSession,
     isPending: isRevoking,
@@ -234,7 +252,14 @@ export function SecuritySettings({
               revokingId={isRevoking ? revokingId : null}
               isRevokingAll={isRevokingAll}
             />
-            <ActivityFeed events={activity} />
+            <ActivityFeed
+              events={activity}
+              hasMore={hasMoreActivity}
+              isLoadingMore={isLoadingMoreActivity}
+              onFetchMore={handleFetchMoreActivity}
+              onCollapse={handleCollapseActivity}
+              initialCount={INITIAL_ACTIVITY_LIMIT}
+            />
           </div>
         </div>
       )}

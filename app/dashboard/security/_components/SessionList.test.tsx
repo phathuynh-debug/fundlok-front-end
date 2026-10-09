@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { SessionList } from "./SessionList";
@@ -85,5 +85,51 @@ describe("SessionList", () => {
       screen.getByText("dashboard.security.sessions.onlyThisDevice"),
     ).toBeInTheDocument();
     expect(onRevokeAll).not.toHaveBeenCalled();
+  });
+
+  it("limits sessions to 7 initially and extends when clicking show more", async () => {
+    const manySessions: DeviceSession[] = Array.from(
+      { length: 10 },
+      (_, i) => ({
+        session_id: `sess-${i}`,
+        device: `Device ${i}`,
+        browser: "Chrome",
+        ip_address: "127.0.0.1",
+        created_at: "2026-08-18T08:42:00Z",
+        last_used_at: "2026-08-18T08:42:00Z",
+        current: i === 0,
+      }),
+    );
+
+    setup(manySessions);
+
+    // Only 7 items should be visible initially
+    expect(screen.getByText("Device 0 · Chrome")).toBeInTheDocument();
+    expect(screen.getByText("Device 6 · Chrome")).toBeInTheDocument();
+    expect(screen.queryByText("Device 7 · Chrome")).not.toBeInTheDocument();
+
+    const showMoreBtn = screen.getByRole("button", {
+      name: "dashboard.security.sessions.showMore",
+    });
+    expect(showMoreBtn).toBeInTheDocument();
+
+    // Click show more
+    await userEvent.click(showMoreBtn);
+
+    // All 10 items should now be visible
+    expect(screen.getByText("Device 7 · Chrome")).toBeInTheDocument();
+    expect(screen.getByText("Device 9 · Chrome")).toBeInTheDocument();
+
+    // Collapse button should now be visible
+    const showLessBtn = screen.getByRole("button", {
+      name: "dashboard.security.sessions.showLess",
+    });
+    expect(showLessBtn).toBeInTheDocument();
+
+    // Click collapse
+    await userEvent.click(showLessBtn);
+    await waitFor(() => {
+      expect(screen.queryByText("Device 7 · Chrome")).not.toBeInTheDocument();
+    });
   });
 });

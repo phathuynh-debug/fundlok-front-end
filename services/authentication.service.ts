@@ -266,8 +266,10 @@ export const authenticationService = {
     return apiClient.post<RevokeResult>(AUTH_ENDPOINTS.revokeOtherSessions);
   },
 
-  listSecurityEvents() {
-    return apiClient.get<SecurityEvent[]>(AUTH_ENDPOINTS.securityEvents);
+  listSecurityEvents(limit?: number) {
+    return apiClient.get<SecurityEvent[]>(AUTH_ENDPOINTS.securityEvents, {
+      params: typeof limit === "number" ? { limit } : undefined,
+    });
   },
 
   register(payload: RegisterPayload) {

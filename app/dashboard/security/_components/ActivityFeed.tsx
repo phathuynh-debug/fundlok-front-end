@@ -1,6 +1,15 @@
 "use client";
 
-import { AlertTriangle, Info, ShieldAlert } from "lucide-react";
+import { useState } from "react";
+import {
+  AlertTriangle,
+  ChevronDown,
+  ChevronUp,
+  Info,
+  Loader2,
+  ShieldAlert,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { formatDateTime } from "@/lib/format-date";
 import { useTranslations } from "@/lib/i18n";
@@ -115,8 +124,54 @@ function actionLabel(
   return t(key, context);
 }
 
-export function ActivityFeed({ events }: { events: SecurityEvent[] }) {
+const DEFAULT_INITIAL_ACTIVITIES = 7;
+
+export function ActivityFeed({
+  events,
+  hasMore = false,
+  isLoadingMore = false,
+  onFetchMore,
+  onCollapse,
+  initialCount = DEFAULT_INITIAL_ACTIVITIES,
+}: {
+  events: SecurityEvent[];
+  hasMore?: boolean;
+  isLoadingMore?: boolean;
+  onFetchMore?: () => void;
+  onCollapse?: () => void;
+  initialCount?: number;
+}) {
   const { locale, t } = useTranslations();
+  const [visibleCount, setVisibleCount] = useState(initialCount);
+
+  // If onFetchMore is supplied, parent manages fetched events size.
+  // Otherwise, fall back to slicing the local events array.
+  const isServerManaged = Boolean(onFetchMore);
+  const visibleEvents = isServerManaged
+    ? events
+    : events.slice(0, visibleCount);
+  const activeHasMore = isServerManaged
+    ? hasMore
+    : events.length > visibleCount;
+  const activeCanCollapse = isServerManaged
+    ? events.length > initialCount && Boolean(onCollapse)
+    : visibleCount > initialCount && events.length > initialCount;
+
+  const handleFetchMore = () => {
+    if (onFetchMore) {
+      onFetchMore();
+    } else {
+      setVisibleCount((prev) => prev + initialCount);
+    }
+  };
+
+  const handleCollapse = () => {
+    if (onCollapse) {
+      onCollapse();
+    } else {
+      setVisibleCount(initialCount);
+    }
+  };
 
   return (
     <Card className="p-5 md:p-6 gap-0">
@@ -129,59 +184,112 @@ export function ActivityFeed({ events }: { events: SecurityEvent[] }) {
         </p>
       </div>
 
-      <ol className="border-t border-border pt-4">
-        {events.map((event, index) => {
-          const severity = SEVERITY[event.severity];
-          const Icon = severity.icon;
-          const isLast = index === events.length - 1;
+      {visibleEvents.length === 0 ? (
+        <div className="border-t border-border pt-6 pb-2 text-center">
+          <p className="text-sm text-muted-foreground">
+            {t("dashboard.security.activity.empty")}
+          </p>
+        </div>
+      ) : (
+        <ol className="border-t border-border pt-4">
+          {visibleEvents.map((event, index) => {
+            const severity = SEVERITY[event.severity];
+            const Icon = severity.icon;
+            const isLast = index === visibleEvents.length - 1;
 
-          return (
-            <li key={event.id} className="relative flex gap-3 pb-5 last:pb-0">
-              {/* Timeline spine */}
-              {!isLast && (
-                <span
-                  aria-hidden
-                  className="absolute left-[15px] top-8 bottom-0 w-px bg-border"
-                />
-              )}
-
-              <span
-                className={cn(
-                  "relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-card",
-                  severity.text,
-                )}
-              >
-                <Icon className="h-4 w-4" />
-              </span>
-
-              <div className="min-w-0 pt-1">
-                <p className="text-sm text-foreground">
-                  {/* Action codes come from the audit log. An action with no
-                      translation falls back to the code itself rather than
-                      rendering a raw i18n key at the user. */}
-                  {actionLabel(event, t)}
-                </p>
-                <p className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
+            return (
+              <li key={event.id} className="relative flex gap-3 pb-5 last:pb-0">
+                {/* Timeline spine */}
+                {!isLast && (
                   <span
-                    className={cn("h-1.5 w-1.5 rounded-full", severity.dot)}
+                    aria-hidden
+                    className="absolute left-[15px] top-8 bottom-0 w-px bg-border"
                   />
-                  <span>
-                    {t(
-                      `dashboard.security.activity.severity.${event.severity}`,
-                    )}
-                  </span>
-                  <span aria-hidden>·</span>
-                  <span>
-                    {event.created_at
-                      ? formatDateTime(event.created_at, locale)
-                      : ""}
-                  </span>
-                </p>
-              </div>
-            </li>
-          );
-        })}
-      </ol>
+                )}
+
+                <span
+                  className={cn(
+                    "relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-card",
+                    severity.text,
+                  )}
+                >
+                  <Icon className="h-4 w-4" />
+                </span>
+
+                <div className="min-w-0 pt-1">
+                  <p className="text-sm text-foreground">
+                    {/* Action codes come from the audit log. An action with no
+                        translation falls back to the code itself rather than
+                        rendering a raw i18n key at the user. */}
+                    {actionLabel(event, t)}
+                  </p>
+                  <p className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
+                    <span
+                      className={cn("h-1.5 w-1.5 rounded-full", severity.dot)}
+                    />
+                    <span>
+                      {t(
+                        `dashboard.security.activity.severity.${event.severity}`,
+                      )}
+                    </span>
+                    <span aria-hidden>·</span>
+                    <span>
+                      {event.created_at
+                        ? formatDateTime(event.created_at, locale)
+                        : ""}
+                    </span>
+                  </p>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      )}
+
+      {(activeHasMore || activeCanCollapse) && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-4 border-t border-border mt-3">
+          <span className="text-xs text-muted-foreground">
+            {t("dashboard.security.activity.showingCount", {
+              shown: visibleEvents.length,
+            })}
+          </span>
+          <div className="flex items-center gap-2">
+            {activeHasMore && (
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={isLoadingMore}
+                onClick={handleFetchMore}
+                className="text-xs font-medium hover:bg-muted"
+              >
+                {isLoadingMore ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+                    {t("dashboard.security.activity.loadingMore")}
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-3.5 w-3.5 mr-1.5" />
+                    {t("dashboard.security.activity.showMore")}
+                  </>
+                )}
+              </Button>
+            )}
+            {activeCanCollapse && (
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={isLoadingMore}
+                onClick={handleCollapse}
+                className="text-xs font-medium hover:bg-muted"
+              >
+                <ChevronUp className="h-3.5 w-3.5 mr-1.5" />
+                {t("dashboard.security.activity.showLess")}
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
     </Card>
   );
 }

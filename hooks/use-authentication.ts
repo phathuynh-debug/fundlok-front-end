@@ -35,7 +35,10 @@ export const authKeys = {
   currentUser: () => [...authKeys.all, "me"] as const,
   sessions: () => [...authKeys.all, "sessions"] as const,
   securityPreferences: () => [...authKeys.all, "security-preferences"] as const,
-  securityEvents: () => [...authKeys.all, "security-events"] as const,
+  securityEvents: (limit?: number) =>
+    typeof limit === "number"
+      ? ([...authKeys.all, "security-events", limit] as const)
+      : ([...authKeys.all, "security-events"] as const),
   twoFactor: () => [...authKeys.all, "two-factor"] as const,
   passkeys: () => [...authKeys.all, "passkeys"] as const,
 };
@@ -155,10 +158,10 @@ export function useSessions(enabled = true) {
   });
 }
 
-export function useSecurityEvents(enabled = true) {
+export function useSecurityEvents(enabled = true, limit?: number) {
   return useQuery<SecurityEvent[], ApiError>({
-    queryKey: authKeys.securityEvents(),
-    queryFn: () => authenticationService.listSecurityEvents(),
+    queryKey: authKeys.securityEvents(limit),
+    queryFn: () => authenticationService.listSecurityEvents(limit),
     staleTime: 60 * 1000,
     retry: false,
     enabled,

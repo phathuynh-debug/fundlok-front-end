@@ -1153,6 +1153,7 @@
     "security": {
       "activity": {
         "bankAccountFallback": "a bank account",
+        "empty": "No recent security activity.",
         "events": {
           "failedAttempt": "A failed sign-in attempt.",
           "failedAttempts": "{count} failed sign-in attempts from {location}.",
@@ -1169,11 +1170,15 @@
           "twoFactorDisabled": "Two-factor authentication turned off.",
           "twoFactorEnabled": "Two-factor authentication turned on."
         },
+        "loadingMore": "Loading more…",
         "severity": {
           "critical": "Needs attention",
           "info": "Routine",
           "warning": "Worth a look"
         },
+        "showLess": "Show less",
+        "showMore": "Extend more",
+        "showingCount": "Showing {shown} activities",
         "subtitle": "Sign-ins and changes to anything that affects your money.",
         "title": "Recent activity",
         "unknownDevice": "Unknown device",
@@ -1261,6 +1266,9 @@
         "revokedAllTitle": "Signed out everywhere else",
         "revokedDescription": "That device will need to sign in again.",
         "revokedTitle": "Device signed out",
+        "showLess": "Show less",
+        "showMore": "Extend more (+{count})",
+        "showingCount": "Showing {shown} of {total} devices",
         "subtitle": "Everywhere your account is currently open.",
         "thisDevice": "This device",
         "title": "Signed-in devices",

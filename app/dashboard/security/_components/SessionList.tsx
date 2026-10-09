@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Laptop, MapPin } from "lucide-react";
+import { ChevronDown, ChevronUp, Laptop, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -9,12 +10,15 @@ import { formatDateTime } from "@/lib/format-date";
 import { useTranslations } from "@/lib/i18n";
 import type { DeviceSession } from "@/services/authentication.service";
 
+const DEFAULT_INITIAL_SESSIONS = 7;
+
 export function SessionList({
   sessions,
   onRevoke,
   onRevokeAll,
   revokingId,
   isRevokingAll,
+  initialCount = DEFAULT_INITIAL_SESSIONS,
 }: {
   sessions: DeviceSession[];
   onRevoke: (sessionId: string) => void;
@@ -22,9 +26,16 @@ export function SessionList({
   /** Session currently being signed out, so only that row shows a spinner. */
   revokingId?: string | null;
   isRevokingAll?: boolean;
+  initialCount?: number;
 }) {
   const { locale, t } = useTranslations();
+  const [visibleCount, setVisibleCount] = useState(initialCount);
   const revocable = sessions.filter((session) => !session.current).length;
+
+  const visibleSessions = sessions.slice(0, visibleCount);
+  const hasMore = sessions.length > visibleCount;
+  const canCollapse =
+    visibleCount > initialCount && sessions.length > initialCount;
 
   return (
     <Card className="p-5 md:p-6 gap-0">
@@ -50,7 +61,7 @@ export function SessionList({
 
       <ul className="divide-y divide-border border-t border-border">
         <AnimatePresence initial={false}>
-          {sessions.map((session) => (
+          {visibleSessions.map((session) => (
             <motion.li
               key={session.session_id}
               layout
@@ -118,7 +129,44 @@ export function SessionList({
         </AnimatePresence>
       </ul>
 
-      {revocable === 0 && (
+      {(hasMore || canCollapse) && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-4 border-t border-border mt-1">
+          <span className="text-xs text-muted-foreground">
+            {t("dashboard.security.sessions.showingCount", {
+              shown: visibleSessions.length,
+              total: sessions.length,
+            })}
+          </span>
+          <div className="flex items-center gap-2">
+            {hasMore && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setVisibleCount((prev) => prev + initialCount)}
+                className="text-xs font-medium hover:bg-muted"
+              >
+                <ChevronDown className="h-3.5 w-3.5 mr-1.5" />
+                {t("dashboard.security.sessions.showMore", {
+                  count: sessions.length - visibleCount,
+                })}
+              </Button>
+            )}
+            {canCollapse && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setVisibleCount(initialCount)}
+                className="text-xs font-medium hover:bg-muted"
+              >
+                <ChevronUp className="h-3.5 w-3.5 mr-1.5" />
+                {t("dashboard.security.sessions.showLess")}
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {revocable === 0 && !hasMore && !canCollapse && (
         <p className="pt-4 text-sm text-muted-foreground">
           {t("dashboard.security.sessions.onlyThisDevice")}
         </p>

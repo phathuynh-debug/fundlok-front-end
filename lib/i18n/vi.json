@@ -1153,6 +1153,7 @@
     "security": {
       "activity": {
         "bankAccountFallback": "một tài khoản ngân hàng",
+        "empty": "Chưa có hoạt động bảo mật nào gần đây.",
         "events": {
           "failedAttempt": "Một lần đăng nhập thất bại.",
           "failedAttempts": "{count} lần đăng nhập thất bại từ {location}.",
@@ -1169,11 +1170,15 @@
           "twoFactorDisabled": "Đã tắt xác thực hai lớp.",
           "twoFactorEnabled": "Đã bật xác thực hai lớp."
         },
+        "loadingMore": "Đang tải thêm…",
         "severity": {
           "critical": "Cần xử lý",
           "info": "Bình thường",
           "warning": "Nên xem lại"
         },
+        "showLess": "Thu gọn",
+        "showMore": "Xem thêm",
+        "showingCount": "Hiển thị {shown} hoạt động",
         "subtitle": "Các lần đăng nhập và thay đổi liên quan đến dòng tiền của bạn.",
         "title": "Hoạt động gần đây",
         "unknownDevice": "Thiết bị không xác định",
@@ -1261,6 +1266,9 @@
         "revokedAllTitle": "Đã đăng xuất ở mọi nơi khác",
         "revokedDescription": "Thiết bị đó sẽ cần đăng nhập lại.",
         "revokedTitle": "Đã đăng xuất thiết bị",
+        "showLess": "Thu gọn",
+        "showMore": "Xem thêm (+{count})",
+        "showingCount": "Hiển thị {shown}/{total} thiết bị",
         "subtitle": "Mọi nơi tài khoản của bạn đang mở.",
         "thisDevice": "Thiết bị này",
         "title": "Thiết bị đã đăng nhập",
