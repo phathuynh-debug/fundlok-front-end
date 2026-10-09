@@ -926,6 +926,9 @@
         },
         "totalDeployed": "Tổng đã giải ngân"
       },
+      "emptyAction": "Khám phá dự án",
+      "emptyDescription": "Thực hiện khoản đầu tư đầu tiên để xem phân tích hiệu quả danh mục.",
+      "emptyTitle": "Chưa có dữ liệu phân tích",
       "kpi": {
         "deltaIn": "{amount} trong {range} gần nhất",
         "deployed": "Vốn đã giải ngân",
@@ -948,6 +951,9 @@
         "returns": "Lợi nhuận nhận được",
         "totalReturned": "Tổng tiền nhận về"
       },
+      "smeEmptyAction": "Nộp hồ sơ vay",
+      "smeEmptyDescription": "Nộp hồ sơ vay vốn để xem phân tích tài chính và thông tin khoản vay.",
+      "smeEmptyTitle": "Chưa có dữ liệu phân tích",
       "subtitle": "Vốn của bạn đã được giải ngân ra sao và mang lại kết quả gì.",
       "table": {
         "industry": "Ngành",
@@ -1775,6 +1781,9 @@
         "description": "Không tìm thấy giao dịch nào khớp với từ khóa hoặc bộ lọc của bạn. Hãy xóa bớt bộ lọc để xem toàn bộ lịch sử.",
         "title": "Không có giao dịch phù hợp"
       },
+      "emptyAction": "Khám phá dự án",
+      "emptyDescription": "Thực hiện khoản đầu tư đầu tiên để xem phân tích và lịch sử giao dịch.",
+      "emptyTitle": "Chưa có giao dịch nào",
       "filterByType": "Lọc theo loại",
       "methods": {
         "bankTransfer": "Chuyển khoản ngân hàng",
@@ -1787,6 +1796,9 @@
       "mockNotice": "Dữ liệu mẫu. Màn hình này chưa kết nối với tài khoản của bạn, nên các số liệu dưới đây không phải số liệu thật.",
       "searchPlaceholder": "Tìm theo dự án, mã tham chiếu hoặc phương thức",
       "showing": "Hiển thị {shown} trong tổng số {total} giao dịch",
+      "smeEmptyAction": "Nộp hồ sơ vay",
+      "smeEmptyDescription": "Nộp hồ sơ vay vốn để theo dõi các khoản giải ngân và thanh toán.",
+      "smeEmptyTitle": "Chưa có giao dịch khoản vay nào",
       "smeMockNotice": "Dữ liệu mẫu. Màn hình này chưa kết nối với tài khoản của bạn, nên các số liệu dưới đây không phải số liệu thật.",
       "smeSubtitle": "Toàn bộ dòng tiền của khoản vay: số bạn đã nhận, số đã trả và phí FundLok đã thu.",
       "smeSummary": {

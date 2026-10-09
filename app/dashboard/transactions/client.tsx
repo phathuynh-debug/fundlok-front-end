@@ -2,10 +2,12 @@
 
 // import { useMemo, useState } from "react";
 // import { AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { History } from "lucide-react";
 // import { FlaskConical, Search, SlidersHorizontal } from "lucide-react";
 // import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 // import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRequireAuth } from "@/hooks/use-authentication";
@@ -184,11 +186,32 @@ export default function TransactionsClient() {
               <History className="h-6 w-6" />
             </div>
             <h3 className="text-lg font-semibold text-foreground">
-              {t("common.notAvailable")}
+              {t(
+                isSme
+                  ? "dashboard.transactions.smeEmptyTitle"
+                  : "dashboard.transactions.emptyTitle",
+              )}
             </h3>
             <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-              {t("common.notAvailableDescription")}
+              {t(
+                isSme
+                  ? "dashboard.transactions.smeEmptyDescription"
+                  : "dashboard.transactions.emptyDescription",
+              )}
             </p>
+            <Button asChild className="mt-6 px-6">
+              <Link
+                href={
+                  isSme ? "/dashboard/loan-application" : "/dashboard/projects"
+                }
+              >
+                {t(
+                  isSme
+                    ? "dashboard.transactions.smeEmptyAction"
+                    : "dashboard.transactions.emptyAction",
+                )}
+              </Link>
+            </Button>
           </div>
         )}
 

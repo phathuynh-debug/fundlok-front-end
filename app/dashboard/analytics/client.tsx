@@ -1,9 +1,11 @@
 "use client";
 
 // import { useMemo, useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { BarChart3 } from "lucide-react";
 // import { FlaskConical, PieChart, TableIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { pageTransitionProps } from "@/lib/animations";
@@ -142,11 +144,32 @@ export default function AnalyticsClient() {
               <BarChart3 className="h-6 w-6" />
             </div>
             <h3 className="text-lg font-semibold text-foreground">
-              {t("common.notAvailable")}
+              {t(
+                isSme
+                  ? "dashboard.analytics.smeEmptyTitle"
+                  : "dashboard.analytics.emptyTitle",
+              )}
             </h3>
             <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-              {t("common.notAvailableDescription")}
+              {t(
+                isSme
+                  ? "dashboard.analytics.smeEmptyDescription"
+                  : "dashboard.analytics.emptyDescription",
+              )}
             </p>
+            <Button asChild className="mt-6 px-6">
+              <Link
+                href={
+                  isSme ? "/dashboard/loan-application" : "/dashboard/projects"
+                }
+              >
+                {t(
+                  isSme
+                    ? "dashboard.analytics.smeEmptyAction"
+                    : "dashboard.analytics.emptyAction",
+                )}
+              </Link>
+            </Button>
           </div>
         )}
 

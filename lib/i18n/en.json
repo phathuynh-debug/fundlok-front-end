@@ -926,6 +926,9 @@
         },
         "totalDeployed": "Total deployed"
       },
+      "emptyAction": "Browse projects",
+      "emptyDescription": "Make your first investment to view portfolio analytics and performance.",
+      "emptyTitle": "No analytics yet",
       "kpi": {
         "deltaIn": "{amount} in the last {range}",
         "deployed": "Capital deployed",
@@ -948,6 +951,9 @@
         "returns": "Returns received",
         "totalReturned": "Total returned"
       },
+      "smeEmptyAction": "Apply for funding",
+      "smeEmptyDescription": "Apply for business funding to view financial analytics and loan insights.",
+      "smeEmptyTitle": "No analytics yet",
       "subtitle": "How your capital has been deployed and what it has returned.",
       "table": {
         "industry": "Industry",
@@ -1775,6 +1781,9 @@
         "description": "We couldn't find any transactions matching your search or filters. Try clearing them to see the full history.",
         "title": "No transactions match"
       },
+      "emptyAction": "Browse projects",
+      "emptyDescription": "Make your first investment to view analytics and transaction history.",
+      "emptyTitle": "No transactions yet",
       "filterByType": "Filter by type",
       "methods": {
         "bankTransfer": "Bank transfer",
@@ -1787,6 +1796,9 @@
       "mockNotice": "Sample data. This screen isn't connected to your account yet, so none of these figures are real.",
       "searchPlaceholder": "Search by project, reference or method",
       "showing": "Showing {shown} of {total} transactions",
+      "smeEmptyAction": "Apply for funding",
+      "smeEmptyDescription": "Apply for business funding to track disbursements and repayments.",
+      "smeEmptyTitle": "No loan transactions yet",
       "smeMockNotice": "Sample data. This screen isn't connected to your account yet, so none of these figures are real.",
       "smeSubtitle": "Every movement on your loan: what you received, what you have repaid, and the fees FundLok charged.",
       "smeSummary": {
