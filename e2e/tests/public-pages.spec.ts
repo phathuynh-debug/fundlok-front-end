@@ -3,9 +3,10 @@ import { test, expect } from "@playwright/test";
 import { t } from "../support/i18n";
 import { settle } from "../support/ui";
 
-// The pages a visitor sees before signing in. These are deliberately OUTSIDE
-// the proxy matcher (so maintenance never blocks them), which means nothing
-// else in the suite touches them.
+// The pages a visitor sees before signing in. The proxy runs on them only for
+// the language header and the CSP nonce and returns before any maintenance
+// lookup (so maintenance never blocks them); nothing else in the suite touches
+// them.
 
 const PUBLIC_ROUTES = [
   { path: "/", name: "landing" },

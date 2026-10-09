@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 
 import { getSeoStrings, OG_LOCALE, resolveSeoLocale } from "@/lib/seo";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { NONCE_HEADER } from "@/lib/csp";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
@@ -100,6 +101,9 @@ export default async function RootLayout({
   );
   const accent = parseAccentCookie(cookieStore.get(ACCENT_COOKIE_NAME)?.value);
   const radius = parseRadiusCookie(cookieStore.get(RADIUS_COOKIE_NAME)?.value);
+  // Set by proxy.ts. Next nonces its own scripts; next-themes renders an
+  // inline one (the no-flash theme switch) that the CSP blocks without it.
+  const nonce = (await headers()).get(NONCE_HEADER) ?? undefined;
 
   const localBusinessSchema = {
     "@context": "https://schema.org",
@@ -162,6 +166,7 @@ export default async function RootLayout({
                 attribute="class"
                 defaultTheme="system"
                 enableSystem
+                nonce={nonce}
               >
                 <AppearanceProvider
                   initialReduceMotion={reduceMotion}

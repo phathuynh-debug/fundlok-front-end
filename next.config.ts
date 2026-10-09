@@ -24,6 +24,8 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // Content-Security-Policy is NOT here: it carries a per-request nonce,
+        // so proxy.ts sets it. See lib/csp.ts.
         source: "/:path*",
         headers: [
           { key: "X-Frame-Options", value: "DENY" },

@@ -9,6 +9,7 @@ import {
   type ParsedLocalePath,
 } from "@/lib/locale-routing";
 import { safeNextPath } from "@/lib/safe-next-path";
+import { NONCE_HEADER, contentSecurityPolicy, createNonce } from "@/lib/csp";
 
 // Same default as next.config.ts and middleware.service.ts. Kept in step with
 // both: they all describe one hop, Next → FastAPI.
@@ -100,8 +101,9 @@ function requiredVerificationForPath(
   return null;
 }
 
-// Paths whose auth/role rules are handled below. The matcher only runs
-// middleware on these app routes plus the maintenance-relevant ones.
+// Paths whose auth/role rules are handled below. The matcher runs the proxy on
+// every page, but anything outside this set (bar /maintenance) only gets the
+// language header and the CSP nonce.
 function isHandledRoute(pathname: string) {
   return (
     pathname === "/" ||
@@ -116,26 +118,42 @@ function isHandledRoute(pathname: string) {
   );
 }
 
-// Continue with the page, carrying the language the URL asked for.
+// Continue with the page, carrying the language the URL asked for and this
+// request's Content-Security-Policy.
 //
 // For /en/... the request is REWRITTEN to the unprefixed page (there is one
 // page component per route; the prefix is not a separate route tree) and the
 // header tells the server to render English. For an unprefixed localized page
 // the header says "vi". The header is always overwritten here, never passed
 // through, so a client cannot pick a localized page's language by sending it.
-function continueWithLocale(
+//
+// The policy goes on the request as well as the response: Next reads the nonce
+// out of the request's copy and stamps it on every script it renders. Every
+// page the proxy lets through leaves via this function, so none can render
+// without its nonce. See lib/csp.ts.
+function continueToPage(
   request: NextRequest,
   route: ParsedLocalePath,
 ): NextResponse {
   const headers = new Headers(request.headers);
   headers.delete(LOCALE_HEADER);
   if (route.locale) headers.set(LOCALE_HEADER, route.locale);
+
+  const nonce = createNonce();
+  const csp = contentSecurityPolicy(nonce);
+  headers.set(NONCE_HEADER, nonce);
+  headers.set("Content-Security-Policy", csp);
+
+  let response: NextResponse;
   if (route.prefixed) {
     const url = request.nextUrl.clone();
     url.pathname = route.path;
-    return NextResponse.rewrite(url, { request: { headers } });
+    response = NextResponse.rewrite(url, { request: { headers } });
+  } else {
+    response = NextResponse.next({ request: { headers } });
   }
-  return NextResponse.next({ request: { headers } });
+  response.headers.set("Content-Security-Policy", csp);
+  return response;
 }
 
 export async function proxy(request: NextRequest) {
@@ -208,12 +226,13 @@ export async function proxy(request: NextRequest) {
   }
 
   const pathname = route.path;
-  const pass = () => continueWithLocale(request, route);
+  const pass = () => continueToPage(request, route);
 
-  // The marketing pages (why-us, rate, faq, contact, terms) have no auth or
-  // role rules. Returning here keeps them off the session lookup below: they
-  // are in the matcher only so the language header gets set.
-  if (route.locale !== null && !isHandledRoute(pathname)) {
+  // Pages with no auth, role or maintenance rule — the marketing pages (why-us,
+  // rate, faq, contact, terms), /forgot-password, /reset-password, the 404 —
+  // are in the matcher only for the language header and the CSP nonce.
+  // Returning here keeps them off the session lookup below.
+  if (!isHandledRoute(pathname) && pathname !== MAINTENANCE_ROUTE) {
     return pass();
   }
 
@@ -297,10 +316,10 @@ export async function proxy(request: NextRequest) {
   // System admins are never blocked.
   //
   // Scope is deliberate and load-bearing: the flag is only READ on that route
-  // and /maintenance itself. The public marketing pages (/why-us, /faq,
-  // /contact, …) are matched only for the language header and return at
-  // "Language prefix" above, and `/` is matched but never reaches this branch
-  // — so browsing the site costs zero maintenance lookups.
+  // and /maintenance itself. Pages without auth rules (/why-us, /faq,
+  // /contact, …) return before the session lookup above, and `/` is matched
+  // but never reaches this branch — so browsing the site costs zero
+  // maintenance lookups.
   // The lookup itself is cached in middleware.service.ts; see the note there
   // for why prefetches can't simply be skipped instead.
   const isMaintenancePage = pathname === MAINTENANCE_ROUTE;
@@ -482,36 +501,17 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Run on app routes, the maintenance-relevant ones, and the public pages
-  // (for the language header only). The marketing pages return before any
-  // session or maintenance lookup, so maintenance never blocks them.
   matcher: [
-    // English URLs, and the Vietnamese public pages not already listed below:
-    // on these the URL decides the language, so the proxy must see them to set
-    // the header. They return before any session lookup (see "Language prefix").
-    "/en",
-    "/en/:path*",
-    "/why-us",
-    "/rate",
-    "/faq",
-    "/contact",
-    "/terms",
-    // Every backend call the browser makes. Listed first because without it the
-    // /api branch above never runs and the secret is never attached — the
-    // failure would be silent, since next.config.ts still proxies the traffic.
+    // Every backend call the browser makes. Without it the /api branch above
+    // never runs and the secret is never attached — the failure would be
+    // silent, since next.config.ts still proxies the traffic.
     "/api/:path*",
-    "/",
-    "/login",
-    "/dashboard/:path*",
-    "/project-application",
-    "/project-application/:path*",
-    "/admin",
-    "/admin/:path*",
-    "/select-role",
-    "/kyc",
-    "/kyc/:path*",
-    "/suspended",
-    "/verify-email",
-    "/maintenance",
+    // Every page, because every page needs its own CSP nonce (a page the proxy
+    // skipped would get no Content-Security-Policy at all). Pages without auth
+    // rules return before any session or maintenance lookup, so matching them
+    // costs no backend call. Excludes Next's build assets, Vercel's analytics
+    // endpoints and any path with a file extension — public/ files,
+    // robots.txt, sitemap.xml, llms.txt — none of which is a page.
+    "/((?!_next/|_vercel/|.*\\.).*)",
   ],
 };
