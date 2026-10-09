@@ -15,9 +15,8 @@ const eslintConfig = defineConfig([
   globalIgnores([
     // Default ignores of eslint-config-next:
     ".next/**",
-    // The E2E suite builds to its own dist dir (next.config.ts) so it never
-    // clobbers a running dev server; that output is not source either.
-    ".next-e2e/**",
+    // Any alternate Next.js dist dirs (e.g., .next-e2e, .next-perf)
+    ".next-*/**",
     // Playwright traces, videos and reports.
     "e2e/.artifacts/**",
     "playwright-report/**",
@@ -28,6 +27,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     ".claude/**",
     ".agents/**",
+    "vbsec-reports/**",
+    ".vbsec-tmp/**",
     // Separate package with its own tsconfig-less Workers runtime.
     "party/**",
     "node_modules/**",

@@ -1,4 +1,5 @@
 .next
+.next-*
 node_modules
 dist
 build
@@ -8,3 +9,9 @@ tsconfig.tsbuildinfo
 .vercel-trigger
 .claude
 .agents
+vbsec-reports
+.vbsec-tmp
+e2e/.artifacts
+playwright-report
+blob-report
+test-results
