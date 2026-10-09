@@ -93,17 +93,37 @@ export default function WhyUsClient() {
   const { t, locale, localize } = useTranslations();
   const currentLocale = locale === "vi" ? "vi" : "en";
 
-  // Animation variants for smooth scroll/reveal
+  // Animation variants for smooth scroll/reveal. The container only staggers
+  // its children; each child carries its own entrance.
   const containerVariants: Variants = {
-    hidden: { opacity: 0 },
+    hidden: {},
     visible: {
-      opacity: 1,
       transition: {
         staggerChildren: 0.15,
       },
     },
   };
 
+  // Above the fold (the title and the vision section) entrances are TRANSFORM
+  // ONLY — no `opacity`. An `initial` opacity is serialised into the SSR HTML
+  // as `style="opacity:0"`, so that copy, the LCP element on desktop, stayed
+  // invisible until ~350KB of JS had downloaded and hydrated: 4.5–7s in the
+  // field. Translated text still counts as painted. Same fix as
+  // components/hero-interactive.tsx. Keep it that way.
+  const aboveFoldItemVariants: Variants = {
+    hidden: { y: 30 },
+    visible: {
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 15,
+      },
+    },
+  };
+
+  // Below the fold, so a fade costs no paint: it is off-screen until scrolled
+  // to, by which time the page has hydrated.
   const itemVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
@@ -130,8 +150,8 @@ export default function WhyUsClient() {
       <main className="max-w-6xl mx-auto px-6 py-16 md:py-24 relative z-10">
         {/* Page Title Hero */}
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ y: -20 }}
+          animate={{ y: 0 }}
           transition={{ duration: 0.6 }}
           className="text-center mb-16 md:mb-24"
         >
@@ -156,7 +176,7 @@ export default function WhyUsClient() {
           className="mb-24 md:mb-32 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center"
         >
           <motion.div
-            variants={itemVariants}
+            variants={aboveFoldItemVariants}
             className="lg:col-span-7 space-y-6"
           >
             <p className="eyebrow">{t("specialPage.vision.header")}</p>
@@ -170,7 +190,7 @@ export default function WhyUsClient() {
           </motion.div>
 
           <motion.div
-            variants={itemVariants}
+            variants={aboveFoldItemVariants}
             className="lg:col-span-5 bg-gradient-to-br from-emerald-500/10 via-zinc-500/5 to-transparent dark:from-emerald-500/5 dark:via-zinc-900/40 dark:to-transparent border border-border/10 p-8 rounded-2xl relative overflow-hidden backdrop-blur-sm group hover:border-emerald-500/20 transition-all duration-300"
           >
             <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl -z-10 group-hover:bg-emerald-500/20 transition-all duration-300" />
