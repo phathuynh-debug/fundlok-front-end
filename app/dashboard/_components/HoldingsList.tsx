@@ -86,7 +86,7 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
           <motion.li key={holding.id} variants={springItemVariants}>
             <div
               className={cn(
-                "group/card relative flex flex-col gap-4 overflow-hidden rounded-xl border p-4 pl-5 shadow-xs transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 hover:border-emerald-500/40 md:p-5 md:pl-6",
+                "group/card relative flex flex-col gap-4 overflow-hidden rounded-xl border p-4 pl-5 shadow-xs transition-colors duration-200 hover:border-foreground/20 hover:bg-muted/10 md:p-5 md:pl-6",
                 chrome.surface,
               )}
             >
@@ -125,13 +125,33 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                  {/* Ranking Badge */}
-                  {isTopThree ? (
+                  {/* Distinctive Ranking Badge */}
+                  {rank === 1 ? (
                     <Badge
                       variant="outline"
-                      className="bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 text-[11px] font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1"
+                      className="bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30 text-[11px] font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1"
                     >
-                      <Medal className="h-3 w-3 text-zinc-500 shrink-0" />
+                      <Medal className="h-3 w-3 text-amber-500 shrink-0" />
+                      <span>
+                        {t("dashboard.investor.holdingRank", { rank })}
+                      </span>
+                    </Badge>
+                  ) : rank === 2 ? (
+                    <Badge
+                      variant="outline"
+                      className="bg-slate-400/10 text-slate-700 dark:text-slate-300 border-slate-400/30 text-[11px] font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1"
+                    >
+                      <Medal className="h-3 w-3 text-slate-400 shrink-0" />
+                      <span>
+                        {t("dashboard.investor.holdingRank", { rank })}
+                      </span>
+                    </Badge>
+                  ) : rank === 3 ? (
+                    <Badge
+                      variant="outline"
+                      className="bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/30 text-[11px] font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1"
+                    >
+                      <Medal className="h-3 w-3 text-orange-500 shrink-0" />
                       <span>
                         {t("dashboard.investor.holdingRank", { rank })}
                       </span>

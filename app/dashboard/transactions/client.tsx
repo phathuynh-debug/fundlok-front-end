@@ -11,7 +11,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { pageTransitionProps } from "@/lib/animations";
 import { useTranslations } from "@/lib/i18n";
-import { DashboardHeader } from "../_components/DashboardHeader";
 import { TransactionSummaryCards } from "./_components/TransactionSummaryCards";
 import { TransactionsTable } from "./_components/TransactionsTable";
 import { SmeTransactionSummaryCards } from "./_components/sme/SmeTransactionSummaryCards";
@@ -128,193 +127,184 @@ export default function TransactionsClient() {
   );
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <DashboardHeader />
-
-      <motion.div
-        {...pageTransitionProps}
-        className="flex-1 space-y-6 md:space-y-8 p-4 md:p-8 pt-6"
-      >
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight">
-              {t(
-                isSme
-                  ? "dashboard.transactions.smeTitle"
-                  : "dashboard.transactions.title",
-              )}
-            </h2>
-            <p className="text-sm text-muted-foreground mt-2">
-              {t(
-                isSme
-                  ? "dashboard.transactions.smeSubtitle"
-                  : "dashboard.transactions.subtitle",
-              )}
-            </p>
-          </div>
-
-          {transactions.length > 0 && (
-            <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-600 px-3 py-1.5 rounded-full text-xs font-semibold w-fit border border-emerald-500/20">
-              <History className="h-4 w-4" />
-              <span>
-                {t("dashboard.transactions.count", {
-                  count: transactions.length,
-                })}
-              </span>
-            </div>
-          )}
+    <motion.div {...pageTransitionProps} className="space-y-6 md:space-y-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">
+            {t(
+              isSme
+                ? "dashboard.transactions.smeTitle"
+                : "dashboard.transactions.title",
+            )}
+          </h2>
+          <p className="text-sm text-muted-foreground mt-2">
+            {t(
+              isSme
+                ? "dashboard.transactions.smeSubtitle"
+                : "dashboard.transactions.subtitle",
+            )}
+          </p>
         </div>
 
-        {/* Sample-data notice */}
         {transactions.length > 0 && (
-          <div className="flex items-start gap-2.5 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3">
-            <FlaskConical className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-            <p className="text-xs text-amber-700 dark:text-amber-300">
-              {t(
-                isSme
-                  ? "dashboard.transactions.smeMockNotice"
-                  : "dashboard.transactions.mockNotice",
-              )}
-            </p>
+          <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-600 px-3 py-1.5 rounded-full text-xs font-semibold w-fit border border-emerald-500/20">
+            <History className="h-4 w-4" />
+            <span>
+              {t("dashboard.transactions.count", {
+                count: transactions.length,
+              })}
+            </span>
           </div>
         )}
+      </div>
 
-        {isAuthLoading ? (
-          <TransactionsSkeleton />
-        ) : transactions.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/40 py-20 px-4 text-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground mb-4">
-              <History className="h-6 w-6" />
-            </div>
-            <h3 className="text-lg font-semibold text-foreground">
-              {t(
-                isSme
-                  ? "dashboard.transactions.smeEmptyTitle"
-                  : "dashboard.transactions.emptyTitle",
-              )}
-            </h3>
-            <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-              {t(
-                isSme
-                  ? "dashboard.transactions.smeEmptyDescription"
-                  : "dashboard.transactions.emptyDescription",
-              )}
-            </p>
-            <Button asChild className="mt-6 px-6">
-              <Link
-                href={isSme ? "/project-application" : "/dashboard/projects"}
-              >
-                {t(
-                  isSme
-                    ? "dashboard.transactions.smeEmptyAction"
-                    : "dashboard.transactions.emptyAction",
-                )}
-              </Link>
-            </Button>
-          </div>
-        ) : (
-          <>
-            {isSme ? (
-              <SmeTransactionSummaryCards summary={smeSummary} />
-            ) : (
-              <TransactionSummaryCards summary={summary} />
+      {/* Sample-data notice */}
+      {transactions.length > 0 && (
+        <div className="flex items-start gap-2.5 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3">
+          <FlaskConical className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+          <p className="text-xs text-amber-700 dark:text-amber-300">
+            {t(
+              isSme
+                ? "dashboard.transactions.smeMockNotice"
+                : "dashboard.transactions.mockNotice",
             )}
+          </p>
+        </div>
+      )}
 
-            <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-              <div className="relative w-full md:max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder={t("dashboard.transactions.searchPlaceholder")}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
+      {isAuthLoading ? (
+        <TransactionsSkeleton />
+      ) : transactions.length === 0 ? (
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/40 py-20 px-4 text-center">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground mb-4">
+            <History className="h-6 w-6" />
+          </div>
+          <h3 className="text-lg font-semibold text-foreground">
+            {t(
+              isSme
+                ? "dashboard.transactions.smeEmptyTitle"
+                : "dashboard.transactions.emptyTitle",
+            )}
+          </h3>
+          <p className="text-sm text-muted-foreground mt-1 max-w-sm">
+            {t(
+              isSme
+                ? "dashboard.transactions.smeEmptyDescription"
+                : "dashboard.transactions.emptyDescription",
+            )}
+          </p>
+          <Button asChild className="mt-6 px-6">
+            <Link href={isSme ? "/project-application" : "/dashboard/projects"}>
+              {t(
+                isSme
+                  ? "dashboard.transactions.smeEmptyAction"
+                  : "dashboard.transactions.emptyAction",
+              )}
+            </Link>
+          </Button>
+        </div>
+      ) : (
+        <>
+          {isSme ? (
+            <SmeTransactionSummaryCards summary={smeSummary} />
+          ) : (
+            <TransactionSummaryCards summary={summary} />
+          )}
 
-              <div className="p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-800/40 w-fit flex items-center gap-1">
-                {(["ALL", ...STATUS_FILTERS] as const).map((status) => (
-                  <button
-                    key={status}
-                    type="button"
-                    onClick={() => setSelectedStatus(status)}
-                    className={`px-3 py-2 rounded-lg text-xs font-semibold uppercase transition-all duration-200 cursor-pointer ${
-                      selectedStatus === status
-                        ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
-                        : `${CONTROL_IDLE} bg-transparent border border-transparent`
-                    }`}
-                  >
-                    {status === "ALL"
-                      ? t("common.all")
-                      : t(STATUS_LABEL_KEYS[status])}
-                  </button>
-                ))}
-              </div>
+          <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+            <div className="relative w-full md:max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder={t("dashboard.transactions.searchPlaceholder")}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
             </div>
 
-            <div className="flex flex-wrap gap-2 items-center">
-              <span className="text-sm font-medium text-muted-foreground flex items-center gap-1.5 mr-1">
-                <SlidersHorizontal className="h-3.5 w-3.5" />
-                {t("dashboard.transactions.filterByType")}
-              </span>
-              {(["ALL", ...typeFilters] as const).map((type) => (
-                <Badge
-                  key={type}
-                  variant={selectedType === type ? "default" : "outline"}
-                  className={`cursor-pointer rounded-full transition-all ${
-                    selectedType === type
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                      : CONTROL_HOVER
+            <div className="p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-800/40 w-fit flex items-center gap-1">
+              {(["ALL", ...STATUS_FILTERS] as const).map((status) => (
+                <button
+                  key={status}
+                  type="button"
+                  onClick={() => setSelectedStatus(status)}
+                  className={`px-3 py-2 rounded-lg text-xs font-semibold uppercase transition-all duration-200 cursor-pointer ${
+                    selectedStatus === status
+                      ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
+                      : `${CONTROL_IDLE} bg-transparent border border-transparent`
                   }`}
-                  onClick={() => setSelectedType(type)}
                 >
-                  {type === "ALL"
+                  {status === "ALL"
                     ? t("common.all")
-                    : t(transactionTypeLabelKey(type))}
-                </Badge>
+                    : t(STATUS_LABEL_KEYS[status])}
+                </button>
               ))}
             </div>
+          </div>
 
-            <div className="text-xs font-semibold text-muted-foreground tracking-wide">
-              {t("dashboard.transactions.showing", {
-                shown: filteredTransactions.length,
-                total: transactions.length,
-              })}
-            </div>
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-sm font-medium text-muted-foreground flex items-center gap-1.5 mr-1">
+              <SlidersHorizontal className="h-3.5 w-3.5" />
+              {t("dashboard.transactions.filterByType")}
+            </span>
+            {(["ALL", ...typeFilters] as const).map((type) => (
+              <Badge
+                key={type}
+                variant={selectedType === type ? "default" : "outline"}
+                className={`cursor-pointer rounded-full transition-all ${
+                  selectedType === type
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : CONTROL_HOVER
+                }`}
+                onClick={() => setSelectedType(type)}
+              >
+                {type === "ALL"
+                  ? t("common.all")
+                  : t(transactionTypeLabelKey(type))}
+              </Badge>
+            ))}
+          </div>
 
-            <AnimatePresence mode="wait">
-              {filteredTransactions.length > 0 ? (
-                <motion.div
-                  key="table"
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <TransactionsTable transactions={filteredTransactions} />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="empty"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.25 }}
-                  className="text-center py-16 bg-muted/30 rounded-lg border border-dashed flex flex-col items-center justify-center p-6"
-                >
-                  <History className="h-10 w-10 text-muted-foreground/60 mb-4" />
-                  <h3 className="text-lg font-semibold text-foreground mb-2">
-                    {t("dashboard.transactions.empty.title")}
-                  </h3>
-                  <p className="text-muted-foreground max-w-md">
-                    {t("dashboard.transactions.empty.description")}
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </>
-        )}
-      </motion.div>
-    </div>
+          <div className="text-xs font-semibold text-muted-foreground tracking-wide">
+            {t("dashboard.transactions.showing", {
+              shown: filteredTransactions.length,
+              total: transactions.length,
+            })}
+          </div>
+
+          <AnimatePresence mode="wait">
+            {filteredTransactions.length > 0 ? (
+              <motion.div
+                key="table"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <TransactionsTable transactions={filteredTransactions} />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="text-center py-16 bg-muted/30 rounded-lg border border-dashed flex flex-col items-center justify-center p-6"
+              >
+                <History className="h-10 w-10 text-muted-foreground/60 mb-4" />
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  {t("dashboard.transactions.empty.title")}
+                </h3>
+                <p className="text-muted-foreground max-w-md">
+                  {t("dashboard.transactions.empty.description")}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>
+      )}
+    </motion.div>
   );
 }

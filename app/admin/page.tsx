@@ -6,7 +6,16 @@ import { useRouter } from "next/navigation";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { useAdminOverview } from "@/hooks/use-admin";
 import { isAdminRole } from "@/services/authentication.service";
-import { Loader2, Users, Briefcase, ShieldCheck } from "lucide-react";
+import {
+  Loader2,
+  Users,
+  Briefcase,
+  ShieldCheck,
+  ScanFace,
+  Calculator,
+  ScrollText,
+  KeyRound,
+} from "lucide-react";
 import { AdminPageLoader } from "./_components/AdminDirectory";
 import { RecentLeads } from "./_components/RecentLeads";
 import { useTranslations } from "@/lib/i18n";
@@ -68,13 +77,21 @@ export default function AdminPage() {
               {t("admin.stats.users")}
             </span>
           </div>
-          <p className="mt-2 text-2xl font-bold text-foreground">
-            {isOverviewLoading ? (
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-            ) : (
-              (stats?.total_users ?? "—")
+          <div className="mt-2 flex items-baseline justify-between gap-2">
+            <p className="text-2xl font-bold text-foreground">
+              {isOverviewLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              ) : (
+                (stats?.total_users ?? "—")
+              )}
+            </p>
+            {stats?.users_by_role && (
+              <span className="text-xs text-muted-foreground truncate">
+                {stats.users_by_role.INVESTOR ?? 0} {t("enums.role.INVESTOR")} ·{" "}
+                {stats.users_by_role.SME ?? 0} {t("enums.role.SME")}
+              </span>
             )}
-          </p>
+          </div>
         </Link>
 
         <Link
@@ -90,13 +107,21 @@ export default function AdminPage() {
               {t("admin.stats.projects")}
             </span>
           </div>
-          <p className="mt-2 text-2xl font-bold text-foreground">
-            {isOverviewLoading ? (
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-            ) : (
-              (stats?.total_projects ?? "—")
+          <div className="mt-2 flex items-baseline justify-between gap-2">
+            <p className="text-2xl font-bold text-foreground">
+              {isOverviewLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              ) : (
+                (stats?.total_projects ?? "—")
+              )}
+            </p>
+            {stats?.projects_by_status?.ACTIVE !== undefined && (
+              <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                {stats.projects_by_status.ACTIVE}{" "}
+                {t("enums.projectStatus.ACTIVE")}
+              </span>
             )}
-          </p>
+          </div>
         </Link>
 
         <div className="rounded-lg border bg-card p-5">
@@ -104,10 +129,104 @@ export default function AdminPage() {
             <ShieldCheck className="h-4 w-4" />
             <span className="text-sm font-medium">{t("admin.stats.role")}</span>
           </div>
-          <p className="mt-2 text-2xl font-bold text-foreground">
-            {roleLabel(t, user.role)}
-          </p>
+          <div className="mt-2 flex items-baseline justify-between gap-2">
+            <p className="text-2xl font-bold text-foreground">
+              {roleLabel(t, user.role)}
+            </p>
+            <span className="text-xs font-mono text-muted-foreground">
+              {user.role}
+            </span>
+          </div>
         </div>
+      </div>
+
+      {/* Quick Action Navigation Hub */}
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <Link
+          href="/admin/kyc-reviews"
+          className={cn(
+            "flex items-center gap-3 rounded-lg border bg-card p-4 transition-colors",
+            CONTROL_HOVER,
+          )}
+        >
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0">
+            <ScanFace className="h-5 w-5" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-foreground truncate">
+              {t("admin.sidebar.kycReviews")}
+            </p>
+            <p className="text-xs text-muted-foreground truncate">
+              {locale === "vi"
+                ? "Xét duyệt danh tính"
+                : "Identity verification"}
+            </p>
+          </div>
+        </Link>
+
+        <Link
+          href="/admin/rates"
+          className={cn(
+            "flex items-center gap-3 rounded-lg border bg-card p-4 transition-colors",
+            CONTROL_HOVER,
+          )}
+        >
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 shrink-0">
+            <Calculator className="h-5 w-5" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-foreground truncate">
+              {t("admin.sidebar.rates")}
+            </p>
+            <p className="text-xs text-muted-foreground truncate">
+              {locale === "vi"
+                ? "Lãi suất & định phí"
+                : "Rate inquiries & model"}
+            </p>
+          </div>
+        </Link>
+
+        <Link
+          href="/admin/audit-logs"
+          className={cn(
+            "flex items-center gap-3 rounded-lg border bg-card p-4 transition-colors",
+            CONTROL_HOVER,
+          )}
+        >
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 shrink-0">
+            <ScrollText className="h-5 w-5" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-foreground truncate">
+              {t("admin.sidebar.auditLogs")}
+            </p>
+            <p className="text-xs text-muted-foreground truncate">
+              {locale === "vi" ? "Lịch sử hoạt động" : "System activity trace"}
+            </p>
+          </div>
+        </Link>
+
+        <Link
+          href="/admin/security"
+          className={cn(
+            "flex items-center gap-3 rounded-lg border bg-card p-4 transition-colors",
+            CONTROL_HOVER,
+          )}
+        >
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 shrink-0">
+            <KeyRound className="h-5 w-5" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-foreground truncate">
+              {t("admin.sidebar.security")}
+            </p>
+            <p className="text-xs text-muted-foreground truncate">
+              {locale === "vi"
+                ? "Bảo mật & phiên đăng nhập"
+                : "Sessions & security"}
+            </p>
+          </div>
+        </Link>
       </div>
 
       {/* Who asked for a rate on the public /rate page, with how to reach

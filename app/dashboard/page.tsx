@@ -4,7 +4,6 @@ import { useRequireAuth } from "@/hooks/use-authentication";
 import { useMyProjects } from "@/hooks/use-projects";
 import { SmeDashboard } from "./_components/SmeDashboard";
 import { InvestorDashboard } from "./_components/InvestorDashboard";
-import { DashboardHeader } from "./_components/DashboardHeader";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
 
@@ -20,7 +19,7 @@ export default function DashboardPage() {
 
   if (isLoading || isMyProjectsLoading) {
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-background">
+      <div className="h-64 w-full flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-2">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <span className="text-sm font-medium text-muted-foreground">
@@ -31,16 +30,9 @@ export default function DashboardPage() {
     );
   }
 
-  return (
-    <div className="flex flex-col min-h-screen">
-      <DashboardHeader />
-
-      {/* Render Role-Specific Dashboard */}
-      {user?.role === "SME" ? (
-        <SmeDashboard projects={myProjects} />
-      ) : (
-        <InvestorDashboard />
-      )}
-    </div>
+  return user?.role === "SME" ? (
+    <SmeDashboard projects={myProjects} />
+  ) : (
+    <InvestorDashboard />
   );
 }

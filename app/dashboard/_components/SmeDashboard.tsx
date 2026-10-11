@@ -1,10 +1,19 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, CheckCircle2, Rocket, ArrowRight, Target } from "lucide-react";
+import {
+  MapPin,
+  CheckCircle2,
+  Rocket,
+  ArrowRight,
+  Target,
+  Copy,
+  Check,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Project } from "@/services/projects.service";
 import { useTranslations } from "@/lib/i18n";
@@ -33,6 +42,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
   const project = projects[0];
   const { locale, t } = useTranslations();
   const { needsVerification, openVerification } = useVerificationGate();
+  const [copied, setCopied] = useState(false);
 
   // No project yet → invite the SME to apply. "Apply for funding" links to
   // /project-application, which the proxy KYB-gates: an unverified SME is sent
@@ -92,66 +102,35 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
       initial={{ y: -12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
-      className="flex-1 space-y-6 md:space-y-8 p-4 md:p-8 pt-6 relative overflow-hidden"
+      className="flex-1 space-y-6 md:space-y-8 p-4 md:p-8 pt-6 relative"
     >
-      {/* Dynamic Industry Ambient Background Decoration */}
-      <div
-        className={cn(
-          "absolute -top-24 -left-24 w-72 h-72 rounded-full pointer-events-none -z-10 opacity-30 blur-3xl transition-all duration-700",
-          theme.glowColor,
-        )}
-      />
-
       {/* Unified Responsive Hero Card */}
       <Card
         className={cn(
-          "overflow-hidden border bg-gradient-to-br shadow-xl backdrop-blur-sm relative",
+          "overflow-hidden border bg-card shadow-sm relative transition-all duration-300",
           theme.borderColor,
         )}
       >
-        {/* Glow & SVG Background Pattern Overlay */}
-        <div
-          className={cn(
-            "absolute -top-32 -left-32 w-96 h-96 rounded-full pointer-events-none opacity-20 blur-3xl",
-            theme.glowColor,
-          )}
-        />
-        <div
-          className={cn(
-            "absolute inset-0 opacity-[0.05] pointer-events-none",
-            theme.patternClass,
-          )}
-        />
-
-        <div className="grid gap-6 p-6 md:p-8 lg:grid-cols-[1.4fr_0.6fr] items-stretch relative z-10">
+        <div className="grid gap-6 p-6 md:p-8 lg:grid-cols-[1.35fr_0.65fr] items-stretch relative z-10">
           {/* Left Column: Project Profile Details */}
           <div className="min-w-0 space-y-6 flex flex-col justify-between">
             {/* Header / Eyebrow */}
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs font-bold tracking-wider text-muted-foreground uppercase">
-                <span className="relative flex h-2.5 w-2.5">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/60 px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
                   <span
-                    className={cn(
-                      "animate-ping absolute inline-flex h-full w-full rounded-full opacity-75",
-                      theme.pulseColor,
-                    )}
-                  ></span>
-                  <span
-                    className={cn(
-                      "relative inline-flex rounded-full h-2.5 w-2.5",
-                      theme.pulseColor,
-                    )}
-                  ></span>
-                </span>
-                <span>
-                  {locale === "vi"
-                    ? "Tổng quan dự án SME"
-                    : "SME Project Profile"}
+                    className={cn("h-1.5 w-1.5 rounded-full", theme.pulseColor)}
+                  />
+                  <span>
+                    {locale === "vi"
+                      ? "Tổng quan dự án SME"
+                      : "SME Project Profile"}
+                  </span>
                 </span>
               </div>
 
               <div className="flex flex-wrap items-center gap-3">
-                <h2 className="text-3xl font-extrabold tracking-tight text-foreground">
+                <h2 className="text-3xl font-bold tracking-tight text-foreground">
                   {project.legal_name}
                 </h2>
                 <Badge
@@ -159,7 +138,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
                     project.status === "ACTIVE" ? "default" : "secondary"
                   }
                   className={cn(
-                    "text-xs px-2.5 py-0.5 rounded-full",
+                    "text-xs px-2.5 py-0.5 rounded-full font-semibold",
                     project.status === "ACTIVE"
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted text-muted-foreground",
@@ -173,13 +152,13 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
               </p>
             </div>
 
-            {/* Responsive Key Values Metrics Grid */}
-            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 pt-4 border-t border-border/40">
-              <div className="space-y-1">
+            {/* Structured Key Values Metrics Grid */}
+            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-4 pt-2">
+              <div className="rounded-xl border border-border/60 bg-muted/30 p-3 space-y-1">
                 <p className="stat-label">{t("dashboard.sme.industry")}</p>
                 <p
                   className={cn(
-                    "text-base font-bold flex items-center gap-1.5",
+                    "text-sm font-semibold flex items-center gap-1.5",
                     theme.accentColor,
                   )}
                 >
@@ -188,27 +167,27 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
                 </p>
               </div>
 
-              <div className="space-y-1">
+              <div className="rounded-xl border border-border/60 bg-muted/30 p-3 space-y-1">
                 <p className="stat-label">{t("dashboard.sme.taxId")}</p>
-                <p className="text-base font-bold text-foreground">
+                <p className="text-sm font-semibold font-mono text-foreground">
                   {project.tax_id}
                 </p>
               </div>
 
-              <div className="space-y-1">
+              <div className="rounded-xl border border-border/60 bg-muted/30 p-3 space-y-1">
                 <p className="stat-label">
                   {t("dashboard.sme.incorporationDate")}
                 </p>
-                <p className="text-base font-bold text-foreground">
+                <p className="text-sm font-semibold text-foreground">
                   {project.incorporation_date
                     ? formatDate(project.incorporation_date, locale)
                     : t("common.na")}
                 </p>
               </div>
 
-              <div className="space-y-1">
+              <div className="rounded-xl border border-border/60 bg-muted/30 p-3 space-y-1">
                 <p className="stat-label">{t("dashboard.sme.daysActive")}</p>
-                <p className="text-base font-bold text-foreground">
+                <p className="text-sm font-semibold text-foreground">
                   {t("dashboard.sme.dayCount", {
                     count: Math.max(0, daysActive),
                   })}
@@ -219,8 +198,8 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
             {/* Address & Record Info in an elegant layout */}
             <div className="grid gap-4 md:grid-cols-2 pt-4 border-t border-border/40 text-sm">
               <div className="space-y-2">
-                <h4 className="font-semibold text-foreground flex items-center gap-2">
-                  <MapPin className={cn("h-4 w-4", theme.accentColor)} />
+                <h4 className="font-semibold text-foreground flex items-center gap-2 text-xs">
+                  <MapPin className={cn("h-3.5 w-3.5", theme.accentColor)} />
                   {t("dashboard.sme.registeredAddress")}
                 </h4>
                 {project.address ? (
@@ -253,12 +232,19 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
               </div>
 
               <div className="space-y-2">
-                <h4 className="font-semibold text-foreground flex items-center gap-2">
-                  <CheckCircle2 className={cn("h-4 w-4", theme.accentColor)} />
+                <h4 className="font-semibold text-foreground flex items-center gap-2 text-xs">
+                  <CheckCircle2
+                    className={cn("h-3.5 w-3.5", theme.accentColor)}
+                  />
                   {t("dashboard.sme.systemRecordDetails")}
                 </h4>
                 <div className="space-y-1 text-xs text-muted-foreground">
-                  <p className="font-mono break-all">ID: {project.id}</p>
+                  <div className="flex items-center gap-1.5 font-mono">
+                    <span className="text-[11px] text-muted-foreground">
+                      ID:
+                    </span>
+                    <span className="truncate max-w-[200px]">{project.id}</span>
+                  </div>
                   <p>
                     {t("dashboard.sme.createdAt")}:{" "}
                     {project.created_at
@@ -269,12 +255,10 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
               </div>
             </div>
 
-            {/* Loan purpose. Prose, not a metric — it gets its own full-width
-                row rather than a cell in the four-column grid above, which is
-                sized for short values like a tax ID. */}
-            <div className="space-y-2 pt-4 border-t border-border/40 text-sm">
-              <h4 className="font-semibold text-foreground flex items-center gap-2">
-                <Target className={cn("h-4 w-4", theme.accentColor)} />
+            {/* Loan purpose */}
+            <div className="rounded-xl border border-border/50 bg-muted/20 p-3.5 space-y-1 text-sm">
+              <h4 className="font-semibold text-foreground flex items-center gap-2 text-xs">
+                <Target className={cn("h-3.5 w-3.5", theme.accentColor)} />
                 {t("dashboard.sme.loanPurpose")}
               </h4>
               <p
@@ -291,43 +275,98 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
             </div>
           </div>
 
-          {/* Right Column: Dynamic Industry Graphic Card */}
-          <div className="hidden lg:flex relative h-full min-h-[220px] w-full rounded-2xl overflow-hidden border border-border/40 bg-gradient-to-tr transition-all duration-500 hover:scale-[1.01] shadow-inner items-center justify-center">
-            {/* Themed background & glow */}
-            <div
-              className={cn(
-                "absolute inset-0 bg-gradient-to-br opacity-20",
-                theme.gradient,
-              )}
-            />
-            <div
-              className={cn(
-                "absolute -bottom-10 -right-10 w-40 h-40 rounded-full blur-2xl opacity-40",
-                theme.glowColor,
-              )}
-            />
-            <div className="absolute inset-0 bg-[radial-gradient(#8080800d_1px,transparent_1px)] [bg-size:12px_12px]" />
+          {/* Right Column: Project Quick Snapshot Card */}
+          <div className="hidden lg:flex flex-col justify-between h-full rounded-2xl border border-border/60 bg-muted/20 p-5 shadow-xs">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5">
+                  <div
+                    className={cn(
+                      "p-2.5 rounded-xl bg-background shadow-xs ring-1 ring-border/50",
+                      theme.accentColor,
+                    )}
+                  >
+                    <theme.icon className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-foreground">
+                      {industryLabel(project.industry, t)}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground">
+                      {locale === "vi"
+                        ? "Ngành nghề kinh doanh"
+                        : "Business Sector"}
+                    </p>
+                  </div>
+                </div>
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "text-[11px] font-semibold",
+                    project.status === "ACTIVE"
+                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                      : "border-border bg-muted/60 text-muted-foreground",
+                  )}
+                >
+                  {enumLabel(t, "projectStatus", project.status || "DRAFT")}
+                </Badge>
+              </div>
 
-            {/* Themed Large Icon */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center space-y-4">
-              <div
-                className={cn(
-                  "p-4 rounded-full bg-background/80 shadow-md ring-1 ring-border/50",
-                  theme.animationClass,
-                )}
+              {/* Quick ID Copy */}
+              <div className="rounded-xl border border-border/50 bg-background/80 p-3 space-y-1.5 shadow-2xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-medium text-muted-foreground">
+                    {locale === "vi"
+                      ? "Mã định danh dự án"
+                      : "Project Reference ID"}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(project.id);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    }}
+                    className="flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline cursor-pointer"
+                    title={locale === "vi" ? "Sao chép mã" : "Copy ID"}
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
+                        <span className="text-emerald-600 dark:text-emerald-400">
+                          {locale === "vi" ? "Đã chép" : "Copied"}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-3 w-3" />
+                        <span>{locale === "vi" ? "Sao chép" : "Copy"}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+                <p className="font-mono text-xs text-foreground truncate select-all">
+                  {project.id}
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-border/40">
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="w-full gap-1.5 text-xs font-semibold"
               >
-                <theme.icon className={cn("h-12 w-12", theme.accentColor)} />
-              </div>
-              <div className="space-y-1">
-                <p className="font-bold text-foreground text-base">
-                  {industryLabel(project.industry, t)}
-                </p>
-                <p className="text-xs text-muted-foreground max-w-[180px] leading-relaxed">
-                  {locale === "vi"
-                    ? "Danh mục ngành nghề đã xác thực"
-                    : "Verified Industry Sector"}
-                </p>
-              </div>
+                <Link href={`/dashboard/project-details?id=${project.id}`}>
+                  <span>
+                    {locale === "vi"
+                      ? "Xem chi tiết dự án"
+                      : "View Project Details"}
+                  </span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </Button>
             </div>
           </div>
         </div>

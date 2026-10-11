@@ -108,48 +108,54 @@ export function InvestorDashboard() {
 
       <SampleDataNotice message={t("dashboard.investor.mockNotice")} />
 
-      {/* KPI Metrics Grid with Staggered Entrance Animation.
-          Four across only from xl: at 125% browser zoom a four-column grid
-          leaves ~170px per card, and a VND figure needs 160px+ and cannot wrap
-          (Intl puts a non-breaking space before the ₫). */}
+      {/* KPI Metrics Grid with Balanced Financial Hierarchy */}
       <motion.div
         variants={staggerContainerVariants}
         initial="hidden"
         animate="show"
-        // Three across, not four or five: a VND figure cannot wrap, and each
-        // extra column narrows every card enough to clip it. Vietnamese is the
-        // default locale and formats wider than English
-        // ("2.706.268.750 ₫" vs "₫2,706,268,750"), which is what pushed this
-        // from four to three. Remaining tiles wrap to a second row.
-        className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
+        className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6"
       >
-        {kpis.map((kpi) => (
-          <motion.div key={kpi.key} variants={springItemVariants}>
-            <Card className="h-full hover:shadow-md transition-shadow duration-200">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  {kpi.label}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="min-w-0 space-y-1">
-                <div className="flex min-w-0 items-center gap-2">
-                  <kpi.icon
-                    className={`h-6 w-6 shrink-0 ${kpi.iconClassName}`}
-                  />
-                  <TruncatedFigure
-                    value={kpi.value}
-                    className="text-2xl font-bold"
-                  />
-                </div>
-                {kpi.caption && (
-                  <p className="text-[11px] leading-snug text-muted-foreground">
-                    {kpi.caption}
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
+        {kpis.map((kpi, index) => {
+          // Layout hierarchy:
+          // Row 1: Core Financials (Total Invested, Total Returns, Weighted ROI) - 2 cols each = 6 cols
+          // Row 2: Portfolio Health (Active Investments, Capital Written Down) - 3 cols each = 6 cols
+          const spanClass =
+            index < 3
+              ? "sm:col-span-1 xl:col-span-2"
+              : "sm:col-span-1 xl:col-span-3";
+
+          return (
+            <motion.div
+              key={kpi.key}
+              variants={springItemVariants}
+              className={spanClass}
+            >
+              <Card className="h-full border bg-card transition-colors duration-200 hover:border-foreground/20 shadow-xs">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    {kpi.label}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="min-w-0 space-y-1">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <kpi.icon
+                      className={`h-6 w-6 shrink-0 ${kpi.iconClassName}`}
+                    />
+                    <TruncatedFigure
+                      value={kpi.value}
+                      className="text-2xl font-bold"
+                    />
+                  </div>
+                  {kpi.caption && (
+                    <p className="text-[11px] leading-snug text-muted-foreground">
+                      {kpi.caption}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
+          );
+        })}
       </motion.div>
 
       {/* Holdings, or the real empty state when there are none. The empty

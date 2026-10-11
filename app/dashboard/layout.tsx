@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Sidebar } from "@/components/sidebar";
+import { DashboardHeader } from "./_components/DashboardHeader";
 import { getServerTranslations } from "@/lib/i18n/server";
 import { ProductTour, ProductTourProvider } from "@/components/product-tour";
 
@@ -29,6 +30,7 @@ export default function DashboardLayout({
 
         {/* Main Content Area */}
         <main className="flex-1 relative overflow-y-auto bg-background focus:outline-none">
+          <DashboardHeader />
           <div className="py-6">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
               {children}

@@ -6,7 +6,6 @@ import { useRequireAuth } from "@/hooks/use-authentication";
 import { usePublicProjects } from "@/hooks/use-projects";
 import type { Project } from "@/services/projects.service";
 import { ProjectCard } from "../_components/ProjectCard";
-import { DashboardHeader } from "../_components/DashboardHeader";
 import { SampleDataNotice } from "../_components/SampleDataNotice";
 import {
   Search,
@@ -457,215 +456,204 @@ export default function ProjectsClient() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <DashboardHeader />
-
-      <motion.div
-        {...pageTransitionProps}
-        className="flex-1 space-y-6 md:space-y-8 p-4 md:p-8 pt-6"
-      >
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight">
+    <motion.div {...pageTransitionProps} className="space-y-6 md:space-y-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">
+            {marketType === "primary"
+              ? t("dashboard.projects.title")
+              : t("dashboard.projects.secondaryTitle")}
+          </h2>
+          <p className="text-sm text-muted-foreground mt-2">
+            {marketType === "primary"
+              ? t("dashboard.projects.subtitle")
+              : t("dashboard.projects.secondarySubtitle")}
+          </p>
+        </div>
+        {showListings && (
+          <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-600 px-3 py-1.5 rounded-full text-xs font-semibold w-fit border border-emerald-500/20">
+            <Briefcase className="h-4 w-4" />
+            <span>
               {marketType === "primary"
-                ? t("dashboard.projects.title")
-                : t("dashboard.projects.secondaryTitle")}
-            </h2>
-            <p className="text-sm text-muted-foreground mt-2">
-              {marketType === "primary"
-                ? t("dashboard.projects.subtitle")
-                : t("dashboard.projects.secondarySubtitle")}
-            </p>
+                ? t("dashboard.projects.opportunitiesAvailable", {
+                    count: publicProjects.length,
+                  })
+                : t("dashboard.projects.showingListings", {
+                    shown: filteredItems.length,
+                    total: mockSecondaryMarket.length,
+                  })}
+            </span>
           </div>
-          {showListings && (
-            <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-600 px-3 py-1.5 rounded-full text-xs font-semibold w-fit border border-emerald-500/20">
-              <Briefcase className="h-4 w-4" />
-              <span>
-                {marketType === "primary"
-                  ? t("dashboard.projects.opportunitiesAvailable", {
-                      count: publicProjects.length,
-                    })
-                  : t("dashboard.projects.showingListings", {
-                      shown: filteredItems.length,
-                      total: mockSecondaryMarket.length,
-                    })}
+        )}
+      </div>
+
+      {/* Market Toggle Pill Selector */}
+      <div className="p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-800/40 w-fit flex items-center gap-1">
+        <button
+          onClick={() => handleMarketToggle("primary")}
+          className={`px-4 py-2.5 rounded-lg text-xs font-semibold uppercase transition-all duration-200 flex items-center gap-2 cursor-pointer ${
+            marketType === "primary"
+              ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
+              : `${CONTROL_IDLE} bg-transparent border border-transparent`
+          }`}
+        >
+          <Building2 className="w-3.5 h-3.5" />
+          <span>{t("dashboard.projects.primaryMarket")}</span>
+        </button>
+        <button
+          onClick={() => handleMarketToggle("secondary")}
+          className={`px-4 py-2.5 rounded-lg text-xs font-semibold uppercase transition-all duration-200 flex items-center gap-2 cursor-pointer ${
+            marketType === "secondary"
+              ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
+              : `${CONTROL_IDLE} bg-transparent border border-transparent`
+          }`}
+        >
+          <ShoppingCart className="w-3.5 h-3.5" />
+          <span>{t("dashboard.projects.secondaryMarket")}</span>
+        </button>
+      </div>
+
+      {showListings ? (
+        <>
+          {/* Search & Filters */}
+          <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between pb-2">
+            <div className="relative w-full md:max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder={t("dashboard.projects.searchPlaceholder")}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <div className="flex flex-wrap gap-2 items-center">
+              <span className="text-sm font-medium text-muted-foreground flex items-center gap-1.5 mr-1">
+                <SlidersHorizontal className="h-3.5 w-3.5" />
+                {t("dashboard.projects.filterLabel")}
               </span>
+              {industries.map((industry) => (
+                <Badge
+                  key={industry}
+                  variant={activeIndustry === industry ? "default" : "outline"}
+                  className={`cursor-pointer rounded-full transition-all ${
+                    activeIndustry === industry
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                      : CONTROL_HOVER
+                  }`}
+                  onClick={() => setSelectedIndustry(industry)}
+                >
+                  {industry === t("common.all")
+                    ? industry
+                    : industryLabel(industry, t)}
+                </Badge>
+              ))}
             </div>
-          )}
-        </div>
+          </div>
 
-        {/* Market Toggle Pill Selector */}
-        <div className="p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-800/40 w-fit flex items-center gap-1">
-          <button
-            onClick={() => handleMarketToggle("primary")}
-            className={`px-4 py-2.5 rounded-lg text-xs font-semibold uppercase transition-all duration-200 flex items-center gap-2 cursor-pointer ${
-              marketType === "primary"
-                ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
-                : `${CONTROL_IDLE} bg-transparent border border-transparent`
-            }`}
-          >
-            <Building2 className="w-3.5 h-3.5" />
-            <span>{t("dashboard.projects.primaryMarket")}</span>
-          </button>
-          <button
-            onClick={() => handleMarketToggle("secondary")}
-            className={`px-4 py-2.5 rounded-lg text-xs font-semibold uppercase transition-all duration-200 flex items-center gap-2 cursor-pointer ${
-              marketType === "secondary"
-                ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
-                : `${CONTROL_IDLE} bg-transparent border border-transparent`
-            }`}
-          >
-            <ShoppingCart className="w-3.5 h-3.5" />
-            <span>{t("dashboard.projects.secondaryMarket")}</span>
-          </button>
-        </div>
-
-        {showListings ? (
-          <>
-            {/* Search & Filters */}
-            <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between pb-2">
-              <div className="relative w-full md:max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder={t("dashboard.projects.searchPlaceholder")}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              <div className="flex flex-wrap gap-2 items-center">
-                <span className="text-sm font-medium text-muted-foreground flex items-center gap-1.5 mr-1">
-                  <SlidersHorizontal className="h-3.5 w-3.5" />
-                  {t("dashboard.projects.filterLabel")}
-                </span>
-                {industries.map((industry) => (
-                  <Badge
-                    key={industry}
-                    variant={
-                      activeIndustry === industry ? "default" : "outline"
-                    }
-                    className={`cursor-pointer rounded-full transition-all ${
-                      activeIndustry === industry
-                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                        : CONTROL_HOVER
-                    }`}
-                    onClick={() => setSelectedIndustry(industry)}
-                  >
-                    {industry === t("common.all")
-                      ? industry
-                      : industryLabel(industry, t)}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-
-            {/* The card mixes real application data with presentation figures
+          {/* The card mixes real application data with presentation figures
             derived from the project id — funding progress, investor count,
             days remaining and the business score. An investor reading
             "Score 73/100" as a real assessment is exactly the misreading the
             handbook's disclosure rules exist to prevent (§3), so the page
             says which half is which. */}
-            <SampleDataNotice
-              message={t("dashboard.projectCard.sampleNotice")}
-            />
+          <SampleDataNotice message={t("dashboard.projectCard.sampleNotice")} />
 
-            {/* Count display label below search/filters */}
-            <div className="text-xs font-semibold text-muted-foreground tracking-wide">
+          {/* Count display label below search/filters */}
+          <div className="text-xs font-semibold text-muted-foreground tracking-wide">
+            {isInitialLoading ? (
+              <Skeleton className="h-4 w-40 rounded-sm" />
+            ) : (
+              t("dashboard.projects.showingListings", {
+                shown: filteredItems.length,
+                total: activeDataSource.length,
+              })
+            )}
+          </div>
+
+          {/* Market Listing Section with Loading & Open Up Animation */}
+          <div className="space-y-6">
+            <AnimatePresence mode="wait">
               {isInitialLoading ? (
-                <Skeleton className="h-4 w-40 rounded-sm" />
-              ) : (
-                t("dashboard.projects.showingListings", {
-                  shown: filteredItems.length,
-                  total: activeDataSource.length,
-                })
-              )}
-            </div>
-
-            {/* Market Listing Section with Loading & Open Up Animation */}
-            <div className="space-y-6">
-              <AnimatePresence mode="wait">
-                {isInitialLoading ? (
-                  <motion.div
-                    key="skeleton"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <ProjectsSkeletonList />
-                  </motion.div>
-                ) : filteredItems.length > 0 ? (
-                  <motion.div
-                    key={`${marketType}-${activeIndustry}-${searchTerm}`}
-                    variants={staggerContainerVariants}
-                    initial="hidden"
-                    animate="show"
-                    className="grid gap-6"
-                  >
-                    {marketType === "primary"
-                      ? (filteredItems as Project[]).map((project) => (
+                <motion.div
+                  key="skeleton"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <ProjectsSkeletonList />
+                </motion.div>
+              ) : filteredItems.length > 0 ? (
+                <motion.div
+                  key={`${marketType}-${activeIndustry}-${searchTerm}`}
+                  variants={staggerContainerVariants}
+                  initial="hidden"
+                  animate="show"
+                  className="grid gap-6"
+                >
+                  {marketType === "primary"
+                    ? (filteredItems as Project[]).map((project) => (
+                        <motion.div
+                          key={project.id}
+                          variants={springItemVariants}
+                        >
+                          <ProjectCard project={project} role="INVESTOR" />
+                        </motion.div>
+                      ))
+                    : (filteredItems as SecondaryMarketListing[]).map(
+                        (listing) => (
                           <motion.div
-                            key={project.id}
+                            key={listing.id}
                             variants={springItemVariants}
                           >
-                            <ProjectCard project={project} role="INVESTOR" />
+                            <SecondaryMarketCard listing={listing} />
                           </motion.div>
-                        ))
-                      : (filteredItems as SecondaryMarketListing[]).map(
-                          (listing) => (
-                            <motion.div
-                              key={listing.id}
-                              variants={springItemVariants}
-                            >
-                              <SecondaryMarketCard listing={listing} />
-                            </motion.div>
-                          ),
-                        )}
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="empty"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.25 }}
-                    className="text-center py-16 bg-muted/30 rounded-lg border border-dashed flex flex-col items-center justify-center p-6"
-                  >
-                    <Briefcase className="h-10 w-10 text-muted-foreground/60 mb-4" />
-                    <h3 className="text-lg font-semibold text-foreground mb-2">
-                      {marketType === "primary"
-                        ? t("dashboard.projects.noProjectsTitle")
-                        : t("dashboard.projects.secondaryEmptyTitle")}
-                    </h3>
-                    <p className="text-muted-foreground max-w-md">
-                      {marketType === "primary"
-                        ? t("dashboard.projects.noProjectsDescription")
-                        : t("dashboard.projects.secondaryEmptyDescription")}
-                    </p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </>
-        ) : (
-          <motion.div
-            key="secondary-coming-soon"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.25 }}
-            className="text-center py-16 bg-muted/30 rounded-lg border border-dashed flex flex-col items-center justify-center p-6"
-          >
-            <Clock className="h-10 w-10 text-muted-foreground/60 mb-4" />
-            <h3 className="text-lg font-semibold text-foreground mb-2">
-              {t("dashboard.projects.comingSoonTitle")}
-            </h3>
-            <p className="text-muted-foreground max-w-md">
-              {t("dashboard.projects.comingSoonDescription")}
-            </p>
-          </motion.div>
-        )}
-      </motion.div>
-    </div>
+                        ),
+                      )}
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="empty"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="text-center py-16 bg-muted/30 rounded-lg border border-dashed flex flex-col items-center justify-center p-6"
+                >
+                  <Briefcase className="h-10 w-10 text-muted-foreground/60 mb-4" />
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                    {marketType === "primary"
+                      ? t("dashboard.projects.noProjectsTitle")
+                      : t("dashboard.projects.secondaryEmptyTitle")}
+                  </h3>
+                  <p className="text-muted-foreground max-w-md">
+                    {marketType === "primary"
+                      ? t("dashboard.projects.noProjectsDescription")
+                      : t("dashboard.projects.secondaryEmptyDescription")}
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </>
+      ) : (
+        <motion.div
+          key="secondary-coming-soon"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.25 }}
+          className="text-center py-16 bg-muted/30 rounded-lg border border-dashed flex flex-col items-center justify-center p-6"
+        >
+          <Clock className="h-10 w-10 text-muted-foreground/60 mb-4" />
+          <h3 className="text-lg font-semibold text-foreground mb-2">
+            {t("dashboard.projects.comingSoonTitle")}
+          </h3>
+          <p className="text-muted-foreground max-w-md">
+            {t("dashboard.projects.comingSoonDescription")}
+          </p>
+        </motion.div>
+      )}
+    </motion.div>
   );
 }
