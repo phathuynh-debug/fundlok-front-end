@@ -15,7 +15,10 @@ import { RiskAssessmentTab } from "./_components/RiskAssessmentTab";
 import { DueDiligenceTab } from "./_components/DueDiligenceTab";
 import { useTranslations } from "@/lib/i18n";
 import { industryLabel } from "@/lib/industry-label";
-import { sampleListingScore } from "@/lib/sample-listing-figures";
+import {
+  sampleListingScore,
+  sampleListingDealTerms,
+} from "@/lib/sample-listing-figures";
 import {
   pageTransitionProps,
   fadeInUpProps,
@@ -84,7 +87,12 @@ export default function ProjectDetailsClient() {
   const { data: projects = [], isLoading: isProjectsLoading } =
     usePublicProjects(!isAuthLoading && user?.role === "INVESTOR");
 
-  const project = projects.find((p) => p.id === projectId);
+  const projectIndex = projects.findIndex((p) => p.id === projectId);
+  const project = projectIndex >= 0 ? projects[projectIndex] : undefined;
+  const dealTerms = sampleListingDealTerms(
+    project,
+    projectIndex >= 0 ? projectIndex : 0,
+  );
   // Same source as the marketplace card, so the score a user clicked through
   // from is the score they land on. See lib/sample-listing-figures.ts.
   const sampleScore = sampleListingScore(project?.id ?? projectId);
@@ -99,19 +107,14 @@ export default function ProjectDetailsClient() {
   const displayIndustry =
     industryLabel(project?.industry, t) ||
     t("dashboard.projectDetails.fallbackIndustry");
+  const description =
+    project?.loan_application?.purpose ||
+    t("dashboard.projectDetails.description");
 
-  // The loan application rides along on the project payload. Absent for a
-  // project with no application yet, in which case the KPI shows its mock.
-  const requestedAmount = project?.loan_application?.requested_amount;
-  const loanAmountVnd =
-    requestedAmount === undefined || requestedAmount === null
-      ? undefined
-      : Number(requestedAmount);
-  // Rate and term ride along too, so the daily obligation is computed from the
-  // same figures as the marketplace card rather than the KPI's mock defaults.
-  const interestRatePct =
-    project?.loan_application?.interest_rate_pct ?? undefined;
-  const paybackMonths = project?.loan_application?.duration_months ?? undefined;
+  const loanAmountVnd = dealTerms.askingAmount;
+  const interestRatePct = dealTerms.interestRatePct;
+  const paybackMonths = dealTerms.durationMonths;
+  const revenueShareRate = dealTerms.revenueShareRate;
 
   return (
     <motion.div
@@ -159,7 +162,7 @@ export default function ProjectDetailsClient() {
           </div>
         </div>
         <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl">
-          {t("dashboard.projectDetails.description")}
+          {description}
         </p>
       </motion.div>
 
@@ -169,6 +172,7 @@ export default function ProjectDetailsClient() {
           loanAmountVnd={loanAmountVnd}
           interestRatePct={interestRatePct}
           paybackMonths={paybackMonths}
+          revenueShareRate={revenueShareRate}
         />
       </motion.div>
 

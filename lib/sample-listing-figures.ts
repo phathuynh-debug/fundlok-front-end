@@ -38,3 +38,63 @@ export function listingHash(seed: string | null | undefined): number {
 export function sampleListingScore(seed: string | null | undefined): number {
   return (listingHash(seed) % 41) + 52; // 52 - 92
 }
+
+export interface DealTerms {
+  askingAmount: number;
+  durationMonths: number;
+  interestRatePct: number;
+  revenueShareRate: string;
+}
+
+/**
+ * Deterministic benchmark deal terms when underwriting fields
+ * (duration_months, interest_rate_pct) are pending from backend.
+ * Uses the exact same seed formula so card and details views never disagree.
+ */
+export function sampleListingDealTerms(
+  project?: {
+    id?: string | null;
+    legal_name?: string | null;
+    loan_application?: {
+      requested_amount?: string | number | null;
+      duration_months?: number | null;
+      interest_rate_pct?: number | null;
+      purpose?: string | null;
+    } | null;
+  } | null,
+  index: number = 0,
+): DealTerms {
+  const seed = project
+    ? `${project.id || "deal"}-${project.legal_name || "deal"}-${index}`
+    : `deal-${index}`;
+  const hash = listingHash(seed);
+
+  const rawAmount = project?.loan_application?.requested_amount;
+  const askingAmount =
+    rawAmount !== undefined && rawAmount !== null
+      ? Number(rawAmount)
+      : 500_000_000;
+
+  // Benchmark durations: 12, 9, 6, 12, 18 months
+  const benchmarkDurations = [12, 9, 6, 12, 18];
+  const durationMonths =
+    project?.loan_application?.duration_months ??
+    benchmarkDurations[hash % benchmarkDurations.length];
+
+  // Benchmark rates: 14.2, 13.5, 15.2, 12.8, 14.8, 13.9%
+  const benchmarkRates = [14.2, 13.5, 15.2, 12.8, 14.8, 13.9];
+  const interestRatePct =
+    project?.loan_application?.interest_rate_pct ??
+    benchmarkRates[hash % benchmarkRates.length];
+
+  // Benchmark revenue share rates
+  const benchmarkRevShares = ["8.0%", "8.5%", "7.5%", "9.0%", "8.2%"];
+  const revenueShareRate = benchmarkRevShares[hash % benchmarkRevShares.length];
+
+  return {
+    askingAmount,
+    durationMonths,
+    interestRatePct,
+    revenueShareRate,
+  };
+}

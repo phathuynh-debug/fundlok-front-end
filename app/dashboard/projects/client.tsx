@@ -24,6 +24,7 @@ import { useTranslations } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format-currency";
 import { dailyRepaymentAmount } from "@/lib/facility-terms";
 import { industryLabel } from "@/lib/industry-label";
+import { sampleListingDealTerms } from "@/lib/sample-listing-figures";
 
 interface SecondaryMarketListing {
   id: string;
@@ -387,30 +388,15 @@ export default function ProjectsClient() {
   // underwriting/grading fields (duration_months, interest_rate_pct) are pending from backend
   const enrichedPublicProjects = publicProjects.map((project, idx) => {
     if (!project.loan_application) return project;
-    const seed = `${project.id}-${project.legal_name}-${idx}`;
-    const hash = Math.abs(
-      seed
-        .split("")
-        .reduce((acc, c) => ((acc << 5) - acc + c.charCodeAt(0)) | 0, 0),
-    );
-
-    // Realistic SME loan durations: 6, 9, 12, or 18 months
-    const benchmarkDurations = [12, 9, 6, 12, 18];
-    const derivedDuration =
-      benchmarkDurations[hash % benchmarkDurations.length];
-
-    // Realistic market returns: 12.8% - 15.2% p.a.
-    const benchmarkRates = [14.2, 13.5, 15.2, 12.8, 14.8, 13.9];
-    const derivedRate = benchmarkRates[hash % benchmarkRates.length];
+    const terms = sampleListingDealTerms(project, idx);
 
     return {
       ...project,
       loan_application: {
         ...project.loan_application,
-        duration_months:
-          project.loan_application.duration_months ?? derivedDuration,
-        interest_rate_pct:
-          project.loan_application.interest_rate_pct ?? derivedRate,
+        requested_amount: String(terms.askingAmount),
+        duration_months: terms.durationMonths,
+        interest_rate_pct: terms.interestRatePct,
       },
     };
   });

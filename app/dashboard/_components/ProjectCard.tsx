@@ -109,7 +109,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
       <div
         aria-hidden
         className={cn(
-          "pointer-events-none absolute inset-y-0 left-0 w-1",
+          "pointer-events-none absolute inset-y-0 left-0 w-1 opacity-75 rounded-r-full",
           chrome.rail,
         )}
       />
@@ -125,9 +125,9 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
               {role === "INVESTOR" && (
                 <Badge
                   variant="outline"
-                  className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30 text-[10px] font-semibold uppercase tracking-wider rounded-md px-2 py-0.5 flex items-center gap-1"
+                  className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30 text-xs font-medium rounded-full px-2.5 py-0.5 flex items-center gap-1"
                 >
-                  <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                   <span>{t("dashboard.projectCard.verifiedSme")}</span>
                 </Badge>
               )}
@@ -140,8 +140,8 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
             {role === "INVESTOR" && (
               <>
                 {isHot && (
-                  <Badge className="bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30 text-[10px] uppercase font-semibold tracking-wider rounded-full px-2.5 py-0.5 flex items-center gap-1">
-                    <Flame className="w-3 h-3 text-amber-500 shrink-0" />
+                  <Badge className="bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30 text-xs font-medium rounded-full px-2.5 py-0.5 flex items-center gap-1">
+                    <Flame className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                     <span>{t("dashboard.projectCard.hotDeal")}</span>
                   </Badge>
                 )}
@@ -152,7 +152,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                     conclusion from it. */}
                 <Badge
                   variant="outline"
-                  className="bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-zinc-300 dark:border-zinc-700 text-[10px] uppercase font-semibold tracking-wider rounded-full px-2.5 py-0.5"
+                  className="bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-zinc-300 dark:border-zinc-700 text-xs font-semibold rounded-full px-2.5 py-0.5"
                 >
                   {t("dashboard.projectCard.score", { score: sampleScore })}
                 </Badge>
@@ -383,7 +383,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
         {/* Trust Highlights Tags (Investor View) */}
         {role === "INVESTOR" && (
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800/80 px-2.5 py-1 rounded-md border border-zinc-200/70 dark:border-zinc-700/60">
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800/80 px-2.5 py-1 rounded-md border border-zinc-200/70 dark:border-zinc-700/60">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
               {/* Was "Asset-Backed" — untrue and unsayable: we finance
                   without hard collateral, and the tag implied a security
@@ -391,15 +391,11 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                   verified revenue. */}
               {t("dashboard.projectCard.verifiedRevenue")}
             </span>
-            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800/80 px-2.5 py-1 rounded-md border border-zinc-200/70 dark:border-zinc-700/60">
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800/80 px-2.5 py-1 rounded-md border border-zinc-200/70 dark:border-zinc-700/60">
               <TrendingUp className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
               {/* Repayment is a fixed amount every business day, not a
                   monthly amortising schedule (Handbook §5.4). */}
               {t("dashboard.projectCard.dailyRepayment")}
-            </span>
-            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800/80 px-2.5 py-1 rounded-md border border-zinc-200/70 dark:border-zinc-700/60">
-              <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-              {t("dashboard.projectCard.verifiedSme")}
             </span>
           </div>
         )}
@@ -414,14 +410,12 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
             asChild
             variant="outline"
             className={cn(
-              "group/details w-full flex-1 justify-between py-2.5 rounded-xl transition-all duration-200 hover:border-primary/50 hover:bg-muted/70",
+              "group/details w-full flex-1 justify-between py-2.5 rounded-xl transition-all duration-200 hover:border-primary/50 hover:bg-muted/70 bg-muted/20 font-semibold cursor-pointer",
               CONTROL_IDLE,
             )}
           >
             <Link href={`/dashboard/project-details?id=${project.id}`}>
-              <span className="font-semibold">
-                {t("dashboard.projectCard.viewDetails")}
-              </span>
+              <span>{t("dashboard.projectCard.viewDetails")}</span>
               <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover/details:translate-x-1" />
             </Link>
           </Button>

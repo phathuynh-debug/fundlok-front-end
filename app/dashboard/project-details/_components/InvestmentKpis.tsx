@@ -80,6 +80,19 @@ export function InvestmentKpis({
                 ? formatCurrency(displayAmount, locale)
                 : t("common.na")}
             </div>
+            <p className="text-xs text-muted-foreground mt-1 truncate">
+              {t("dashboard.projectCard.minTicket", {
+                amount: formatCurrency(
+                  Math.max(
+                    2_000_000,
+                    Math.round(
+                      ((displayAmount ?? 500_000_000) * 0.01) / 1_000_000,
+                    ) * 1_000_000,
+                  ),
+                  locale,
+                ),
+              })}
+            </p>
           </div>
         </Card>
       </motion.div>
@@ -93,10 +106,15 @@ export function InvestmentKpis({
               {t("investment.kpis.expectedRoi")}
             </span>
           </div>
-          <div className="text-3xl font-bold tracking-tight text-emerald-600 mt-2">
-            {displayRate !== undefined
-              ? `${displayRate.toFixed(1)}%`
-              : t("common.na")}
+          <div className="min-w-0 mt-2">
+            <div className="truncate whitespace-nowrap text-2xl md:text-xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400">
+              {displayRate !== undefined
+                ? `${displayRate.toFixed(1)}%`
+                : t("common.na")}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1 truncate">
+              {t("dashboard.projectCard.notGuaranteed")}
+            </p>
           </div>
         </Card>
       </motion.div>
@@ -110,10 +128,15 @@ export function InvestmentKpis({
               {t("investment.kpis.estPaybackPeriod")}
             </span>
           </div>
-          <div className="text-3xl font-bold tracking-tight text-foreground mt-2">
-            {displayMonths !== undefined
-              ? t("investment.kpis.months", { count: displayMonths })
-              : t("common.na")}
+          <div className="min-w-0 mt-2">
+            <div className="truncate whitespace-nowrap text-2xl md:text-xl font-bold tracking-tight text-foreground">
+              {displayMonths !== undefined
+                ? t("investment.kpis.months", { count: displayMonths })
+                : t("common.na")}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1 truncate">
+              {t("dashboard.projectCard.dailyRepayment")}
+            </p>
           </div>
         </Card>
       </motion.div>
@@ -127,32 +150,15 @@ export function InvestmentKpis({
               {t("investment.kpis.revenueShareRate")}
             </span>
           </div>
-          <div>
-            <div className="text-3xl font-bold tracking-tight text-foreground mt-1">
+          <div className="min-w-0 mt-2">
+            <div className="truncate whitespace-nowrap text-2xl md:text-xl font-bold tracking-tight text-foreground">
               {displayRevShare ?? t("common.na")}
             </div>
-            {displayRevShare && (
-              <span className="text-xs text-muted-foreground block mt-1">
-                {t("investment.kpis.ofDailyRevenue")}
-              </span>
-            )}
-          </div>
-          {/* The % is the share of revenue; this is the fixed amount it comes
-              to each business day. */}
-          <div className="mt-3 min-w-0 border-t border-border pt-3">
-            <span className="text-xs font-medium text-muted-foreground block">
-              {t("investment.kpis.dailyObligation")}
-            </span>
-            <div className="truncate whitespace-nowrap text-base font-bold text-foreground">
+            <p className="text-xs text-muted-foreground mt-1 truncate">
               {dailyObligationVnd !== null
-                ? formatCurrency(dailyObligationVnd, locale)
-                : t("common.na")}
-            </div>
-            {dailyObligationVnd !== null && (
-              <span className="text-xs text-muted-foreground block">
-                {t("investment.kpis.perBusinessDay")}
-              </span>
-            )}
+                ? `${t("investment.kpis.dailyObligation")}: ${formatCurrency(dailyObligationVnd, locale)}`
+                : t("investment.kpis.ofDailyRevenue")}
+            </p>
           </div>
         </Card>
       </motion.div>
