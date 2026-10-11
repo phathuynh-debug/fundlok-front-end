@@ -15,13 +15,13 @@ import { useTranslations } from "@/lib/i18n";
  * is here to order the reading, not to perform. The two info cards stagger
  * against each other; nothing loops, nothing parallaxes. */
 const cardsContainer: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08 } },
 };
 
 const cardItem: Variants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  hidden: { y: 16 },
+  visible: { y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
 export default function ContactClient() {
@@ -38,7 +38,7 @@ export default function ContactClient() {
         <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr]">
           <section className="space-y-6">
             <motion.div
-              initial={reduceMotion ? false : { opacity: 0, y: -16 }}
+              initial={reduceMotion ? false : { y: -16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, ease: "easeOut" }}
               className="space-y-3"
@@ -85,7 +85,7 @@ export default function ContactClient() {
           </section>
 
           <motion.section
-            initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+            initial={reduceMotion ? false : { y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.28, ease: "easeOut" }}
             className="rounded-2xl border border-border bg-card p-6 md:p-8"

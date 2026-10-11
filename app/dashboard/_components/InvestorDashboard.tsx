@@ -156,7 +156,7 @@ export function InvestorDashboard() {
           branch is kept live: it is what a genuinely new investor sees once
           this reads from the API. */}
       <motion.div
-        initial={{ opacity: 0, y: 20, scale: 0.98 }}
+        initial={{ y: 20, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.35, delay: 0.2 }}
         className="space-y-4"

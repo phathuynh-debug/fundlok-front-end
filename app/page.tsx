@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import dynamic from "next/dynamic";
+
 import {
   getSeoStrings,
   localeAlternates,
@@ -10,7 +12,16 @@ import SiteHeader from "@/components/site-header";
 import { SectionLocator } from "@/components/section-locator";
 import SiteFooter from "@/components/site-footer";
 import { HeroInteractive } from "@/components/hero-interactive";
-import { InteractiveFlow } from "@/components/interactive-flow";
+
+const InteractiveFlow = dynamic(
+  () =>
+    import("@/components/interactive-flow").then((mod) => mod.InteractiveFlow),
+  {
+    loading: () => (
+      <div className="h-96 w-full animate-pulse rounded-2xl bg-muted/20" />
+    ),
+  },
+);
 
 const LinkedInIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg

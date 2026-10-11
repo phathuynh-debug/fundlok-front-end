@@ -27,7 +27,7 @@ export function SuspendedClient() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/50 p-6">
       <motion.div
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
         className="w-full max-w-lg space-y-6 rounded-2xl border border-border bg-card p-8 text-center text-card-foreground shadow-lg"

@@ -56,7 +56,7 @@ export function VerifyEmailNotice({
     <div className="flex flex-col gap-8">
       <div className="flex flex-col items-center text-center space-y-4">
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
+          initial={{ scale: 0.8 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{
             type: "spring",

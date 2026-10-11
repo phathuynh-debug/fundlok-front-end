@@ -67,7 +67,7 @@ export default function FaqClient() {
       <main className="relative z-10 flex-1 w-full">
         {/* Page hero */}
         <motion.div
-          initial={{ opacity: 0, y: -16 }}
+          initial={{ y: -16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
           className="text-center pt-16 pb-8 px-6"
@@ -83,7 +83,7 @@ export default function FaqClient() {
 
         {/* Category pill bar */}
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
           className="flex flex-wrap items-center justify-center gap-3 px-6 mb-14"

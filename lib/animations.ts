@@ -1,20 +1,24 @@
 import type { Variants } from "framer-motion";
 
 /**
- * Standard page-level open-up entrance animation props
+ * Standard page-level open-up entrance animation props.
+ * Transform only — no `opacity: 0` initial state. An `initial: { opacity: 0 }`
+ * serialises into SSR HTML as `style="opacity:0"`, making the entire page
+ * content invisible until client JS hydrates (hurting LCP & FCP).
  */
 export const pageTransitionProps = {
-  initial: { opacity: 0, y: -12 },
-  animate: { opacity: 1, y: 0 },
+  initial: { y: -12 },
+  animate: { y: 0 },
   transition: { duration: 0.35, ease: "easeOut" },
 } as const;
 
 /**
- * Fade-in slide-up transition props for header / text elements
+ * Slide-up transition props for header / text elements.
+ * Transform only to prevent LCP degradation on headings.
  */
 export const fadeInUpProps = {
-  initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0 },
+  initial: { y: 12 },
+  animate: { y: 0 },
   transition: { duration: 0.3, ease: "easeOut" },
 } as const;
 
@@ -22,9 +26,8 @@ export const fadeInUpProps = {
  * Staggered container variants for lists, grids, and card collections
  */
 export const staggerContainerVariants: Variants = {
-  hidden: { opacity: 0 },
+  hidden: {},
   show: {
-    opacity: 1,
     transition: {
       staggerChildren: 0.08,
       delayChildren: 0.05,

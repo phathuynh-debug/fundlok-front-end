@@ -40,7 +40,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
   if (!project) {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 15 }}
+        initial={{ y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: "easeOut" }}
         className="flex-1 p-4 md:p-8 pt-6"
@@ -89,7 +89,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: -12 }}
+      initial={{ y: -12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
       className="flex-1 space-y-6 md:space-y-8 p-4 md:p-8 pt-6 relative overflow-hidden"

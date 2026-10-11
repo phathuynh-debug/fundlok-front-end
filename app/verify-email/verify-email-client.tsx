@@ -191,7 +191,7 @@ export function VerifyEmailClient() {
       <div className="flex flex-col items-center text-center space-y-4">
         {/* Animated mail icon */}
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
+          initial={{ scale: 0.8 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{
             type: "spring",
