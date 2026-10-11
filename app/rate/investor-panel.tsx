@@ -26,7 +26,11 @@ import type {
   InvestorEstimate,
   InvestorRiskTier,
 } from "@/services/rates.service";
-import { AmountInput, parseAmount } from "./amount-input";
+import {
+  AmountInput,
+  COMMON_AMOUNT_PRESETS,
+  parseAmount,
+} from "./amount-input";
 import {
   ResultBurst,
   figureVariants,
@@ -411,6 +415,7 @@ function InvestorCalculator({ getSessionId }: { getSessionId: () => string }) {
             locale={locale}
             invalid={Boolean(show("amount"))}
             onBlur={() => markTouched("amount")}
+            presets={COMMON_AMOUNT_PRESETS(locale)}
           />
           {fieldError(show("amount"))}
         </div>

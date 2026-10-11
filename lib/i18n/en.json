@@ -2519,6 +2519,7 @@
       "UNSCOREABLE": "We cannot estimate a rate from these figures."
     },
     "errorGeneric": "We could not work out a rate from these figures. Check the amounts and try again.",
+    "fillSample": "Fill sample figures",
     "fixedCost": "Fixed costs, last 12 months",
     "fixedCostHint": "Rent, salaries, insurance: what you pay whether you sell or not.",
     "formHint": "Your figures stay in your browser until you press Calculate. When you do, the figures and your contact details are saved so FundLok can follow up with you.",

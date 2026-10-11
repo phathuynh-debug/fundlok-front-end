@@ -2519,6 +2519,7 @@
       "UNSCOREABLE": "Chúng tôi chưa thể ước tính lãi suất từ các số liệu này."
     },
     "errorGeneric": "Chúng tôi chưa tính được lãi suất từ các số liệu này. Hãy kiểm tra lại và thử lần nữa.",
+    "fillSample": "Điền số liệu mẫu",
     "fixedCost": "Chi phí cố định, 12 tháng gần nhất",
     "fixedCostHint": "Tiền thuê, lương, bảo hiểm: các khoản phải trả dù có bán được hay không.",
     "formHint": "Số liệu chỉ nằm trên trình duyệt của bạn cho đến khi bấm Tính. Khi bấm Tính, số liệu và thông tin liên hệ được lưu để FundLok liên hệ tư vấn cho bạn.",

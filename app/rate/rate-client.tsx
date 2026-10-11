@@ -14,7 +14,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { NumericInput } from "@/components/ui/numeric-input";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { AmountInput, parseAmount } from "./amount-input";
+import {
+  AmountInput,
+  AmountPreset,
+  COMMON_AMOUNT_PRESETS,
+  parseAmount,
+} from "./amount-input";
 import {
   ResultBurst,
   figureVariants,
@@ -478,6 +483,19 @@ export default function RateClient({
   const markTouched = (name: string) =>
     setTouched((prev) => (prev[name] ? prev : { ...prev, [name]: true }));
 
+  const handleFillSampleData = () => {
+    setOperatingMonths("36");
+    setEmployeeCount("25");
+    setRevenueLast("4000000000");
+    setRevenuePrior("3200000000");
+    setCogs("2400000000");
+    setFixedCost("600000000");
+    setVariableCost("300000000");
+    setLoanAmount("80000000");
+    setDuration(6);
+    if (!industry) setIndustry("Retail Trade");
+  };
+
   const field = (
     name: string,
     label: string,
@@ -489,6 +507,7 @@ export default function RateClient({
       optional?: boolean;
       /** Money: group thousands as the visitor types. */
       amount?: boolean;
+      presets?: AmountPreset[];
     } = {},
   ) => {
     const error = showError(name);
@@ -508,15 +527,47 @@ export default function RateClient({
             placeholder={opts.placeholder}
             invalid={Boolean(error)}
             onBlur={() => markTouched(name)}
+            presets={opts.presets}
           />
         ) : (
-          <NumericInput
-            value={value}
-            placeholder={opts.placeholder}
-            aria-invalid={Boolean(error)}
-            onBlur={() => markTouched(name)}
-            onValueChange={onChange}
-          />
+          <div className="space-y-2">
+            <NumericInput
+              value={value}
+              placeholder={opts.placeholder}
+              aria-invalid={Boolean(error)}
+              onBlur={() => markTouched(name)}
+              onValueChange={onChange}
+            />
+            {opts.presets && opts.presets.length > 0 && (
+              <div
+                className="flex flex-wrap items-center gap-1.5 pt-0.5"
+                role="group"
+                aria-label="Preset options"
+              >
+                {opts.presets.map((preset) => {
+                  const isSelected = value === String(preset.value);
+                  return (
+                    <button
+                      key={preset.value}
+                      type="button"
+                      onClick={() => {
+                        onChange(String(preset.value));
+                        markTouched(name);
+                      }}
+                      className={cn(
+                        "rounded-md border px-2.5 py-1 text-xs font-medium transition-all active:scale-[0.97] cursor-pointer",
+                        isSelected
+                          ? "border-primary bg-primary/15 text-primary font-semibold ring-1 ring-primary/30"
+                          : "border-border/80 bg-background/60 text-muted-foreground hover:bg-muted hover:text-foreground hover:border-border",
+                      )}
+                    >
+                      {preset.label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         )}
         {/* The message sits under the field that caused it, not in a summary
           elsewhere on the page — at 3,000,000,000 vs 300,000,000 the whole
@@ -796,6 +847,25 @@ export default function RateClient({
                 )}
               </div>
 
+              <div className="flex items-center justify-between pt-2">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  {locale === "vi" ? "Số liệu kinh doanh" : "Business figures"}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleFillSampleData}
+                  className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline cursor-pointer"
+                >
+                  <Sparkles className="h-3.5 w-3.5 text-primary" />
+                  <span>
+                    {t("ratePage.fillSample") ||
+                      (locale === "vi"
+                        ? "Điền số liệu mẫu"
+                        : "Use sample figures")}
+                  </span>
+                </button>
+              </div>
+
               <div className="grid gap-4 sm:grid-cols-2">
                 {field(
                   "operatingMonths",
@@ -805,6 +875,12 @@ export default function RateClient({
                   {
                     hint: t("ratePage.operatingMonthsHint"),
                     placeholder: "36",
+                    presets: [
+                      { label: locale === "vi" ? "12 th" : "12 mo", value: 12 },
+                      { label: locale === "vi" ? "24 th" : "24 mo", value: 24 },
+                      { label: locale === "vi" ? "36 th" : "36 mo", value: 36 },
+                      { label: locale === "vi" ? "48 th" : "48 mo", value: 48 },
+                    ],
                   },
                 )}
                 {field(
@@ -812,7 +888,16 @@ export default function RateClient({
                   t("ratePage.employeeCount"),
                   employeeCount,
                   setEmployeeCount,
-                  { hint: t("ratePage.employeeCountHint"), placeholder: "25" },
+                  {
+                    hint: t("ratePage.employeeCountHint"),
+                    placeholder: "25",
+                    presets: [
+                      { label: "5", value: 5 },
+                      { label: "10", value: 10 },
+                      { label: "25", value: 25 },
+                      { label: "50", value: 50 },
+                    ],
+                  },
                 )}
               </div>
 
@@ -883,6 +968,7 @@ export default function RateClient({
                   amount: true,
                   hint: t("ratePage.loanAmountHint"),
                   placeholder: "800000000",
+                  presets: COMMON_AMOUNT_PRESETS(locale),
                 },
               )}
 
