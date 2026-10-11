@@ -24,15 +24,21 @@ import {
 import { TruncatedFigure } from "@/components/truncated-figure";
 import { HoldingsList } from "./HoldingsList";
 import { SampleDataNotice } from "./SampleDataNotice";
-import { MOCK_HOLDINGS, summarizePortfolio } from "./mock-investor-dashboard";
+import {
+  // MOCK_HOLDINGS commented out — an investor sees the clean empty state until
+  // live portfolio data exists, prompting them to invest first.
+  // MOCK_HOLDINGS,
+  summarizePortfolio,
+  type Holding,
+} from "./mock-investor-dashboard";
 
 export function InvestorDashboard() {
   const { locale, t } = useTranslations();
 
-  // Sample data until a portfolio API exists — see mock-investor-dashboard.ts.
-  // Shaped as "fetch then summarize" so swapping MOCK_HOLDINGS for a hook is a
-  // one-line change and the summary logic survives untouched.
-  const holdings = MOCK_HOLDINGS;
+  // MOCK_HOLDINGS commented out — an investor sees the clean empty state until
+  // live portfolio data exists, prompting them to invest first.
+  // const holdings = MOCK_HOLDINGS;
+  const holdings = useMemo<Holding[]>(() => [], []);
   const summary = useMemo(() => summarizePortfolio(holdings), [holdings]);
 
   // `caption` carries the qualifier a figure cannot be shown without — a
@@ -106,84 +112,91 @@ export function InvestorDashboard() {
         </p>
       </motion.div>
 
-      <SampleDataNotice message={t("dashboard.investor.mockNotice")} />
+      {/* Sample-data notice — only shown while there is sample data to explain */}
+      {holdings.length > 0 && (
+        <SampleDataNotice message={t("dashboard.investor.mockNotice")} />
+      )}
 
-      {/* KPI Metrics Grid with Balanced Financial Hierarchy */}
-      <motion.div
-        variants={staggerContainerVariants}
-        initial="hidden"
-        animate="show"
-        className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6"
-      >
-        {kpis.map((kpi, index) => {
-          // Layout hierarchy:
-          // Row 1: Core Financials (Total Invested, Total Returns, Weighted ROI) - 2 cols each = 6 cols
-          // Row 2: Portfolio Health (Active Investments, Capital Written Down) - 3 cols each = 6 cols
-          const spanClass =
-            index < 3
-              ? "sm:col-span-1 xl:col-span-2"
-              : "sm:col-span-1 xl:col-span-3";
-
-          return (
-            <motion.div
-              key={kpi.key}
-              variants={springItemVariants}
-              className={spanClass}
-            >
-              <Card className="h-full border bg-card transition-colors duration-200 hover:border-foreground/20 shadow-xs">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    {kpi.label}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="min-w-0 space-y-1">
-                  <div className="flex min-w-0 items-center gap-2">
-                    <kpi.icon
-                      className={`h-6 w-6 shrink-0 ${kpi.iconClassName}`}
-                    />
-                    <TruncatedFigure
-                      value={kpi.value}
-                      className="text-2xl font-bold"
-                    />
-                  </div>
-                  {kpi.caption && (
-                    <p className="text-[11px] leading-snug text-muted-foreground">
-                      {kpi.caption}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            </motion.div>
-          );
-        })}
-      </motion.div>
-
-      {/* Holdings, or the real empty state when there are none. The empty
-          branch is kept live: it is what a genuinely new investor sees once
-          this reads from the API. */}
-      <motion.div
-        initial={{ y: 20, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.35, delay: 0.2 }}
-        className="space-y-4"
-      >
-        {holdings.length === 0 ? (
-          <div className="text-center py-16 bg-muted/30 rounded-lg border border-dashed flex flex-col items-center justify-center p-6">
-            <TrendingUp className="h-10 w-10 text-muted-foreground/60 mb-4" />
-            <h3 className="text-lg font-semibold text-foreground mb-2">
-              {t("dashboard.investor.noInvestmentsTitle")}
-            </h3>
-            <p className="text-muted-foreground mb-6 max-w-md">
-              {t("dashboard.investor.noInvestmentsDescription")}
-            </p>
-            <Button asChild className="px-6">
-              <Link href="/dashboard/projects">
-                {t("dashboard.investor.browseProjects")}
-              </Link>
-            </Button>
+      {holdings.length === 0 ? (
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/40 py-20 px-4 text-center"
+        >
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground mb-4">
+            <TrendingUp className="h-6 w-6" />
           </div>
-        ) : (
-          <>
+          <h3 className="text-lg font-semibold text-foreground">
+            {t("dashboard.investor.noInvestmentsTitle")}
+          </h3>
+          <p className="text-sm text-muted-foreground mt-1 max-w-md">
+            {t("dashboard.investor.noInvestmentsDescription")}
+          </p>
+          <Button asChild className="mt-6 px-6">
+            <Link href="/dashboard/projects">
+              {t("dashboard.investor.browseProjects")}
+            </Link>
+          </Button>
+        </motion.div>
+      ) : (
+        <>
+          {/* KPI Metrics Grid with Balanced Financial Hierarchy */}
+          <motion.div
+            variants={staggerContainerVariants}
+            initial="hidden"
+            animate="show"
+            className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6"
+          >
+            {kpis.map((kpi, index) => {
+              // Layout hierarchy:
+              // Row 1: Core Financials (Total Invested, Total Returns, Weighted ROI) - 2 cols each = 6 cols
+              // Row 2: Portfolio Health (Active Investments, Capital Written Down) - 3 cols each = 6 cols
+              const spanClass =
+                index < 3
+                  ? "sm:col-span-1 xl:col-span-2"
+                  : "sm:col-span-1 xl:col-span-3";
+
+              return (
+                <motion.div
+                  key={kpi.key}
+                  variants={springItemVariants}
+                  className={spanClass}
+                >
+                  <Card className="h-full border bg-card transition-colors duration-200 hover:border-foreground/20 shadow-xs">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium text-muted-foreground">
+                        {kpi.label}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="min-w-0 space-y-1">
+                      <div className="flex min-w-0 items-center gap-2">
+                        <kpi.icon
+                          className={`h-6 w-6 shrink-0 ${kpi.iconClassName}`}
+                        />
+                        <TruncatedFigure
+                          value={kpi.value}
+                          className="text-2xl font-bold"
+                        />
+                      </div>
+                      {kpi.caption && (
+                        <p className="text-[11px] leading-snug text-muted-foreground">
+                          {kpi.caption}
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </motion.div>
+
+          <motion.div
+            initial={{ y: 20, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.35, delay: 0.2 }}
+            className="space-y-4"
+          >
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h3 className="text-lg font-semibold text-foreground">
                 {t("dashboard.investor.holdingsTitle", {
@@ -197,9 +210,9 @@ export function InvestorDashboard() {
               </Button>
             </div>
             <HoldingsList holdings={holdings} />
-          </>
-        )}
-      </motion.div>
+          </motion.div>
+        </>
+      )}
     </motion.div>
   );
 }

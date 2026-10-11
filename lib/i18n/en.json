@@ -1045,7 +1045,7 @@
       "holdingsTitle": "Your positions ({count})",
       "investorBearsLoss": "The investor bears this loss.",
       "mockNotice": "The system isn't connected to live accounts yet. The portfolio below is sample data.",
-      "noInvestmentsDescription": "You haven't invested in a business yet. Browse the open listings to find your first one.",
+      "noInvestmentsDescription": "You haven't invested in a business yet. Please browse open listings and invest to view your portfolio analytics.",
       "noInvestmentsTitle": "No investments yet",
       "subtitle": "What you've invested, what's come back, and what's due next.",
       "title": "Investment portfolio",
