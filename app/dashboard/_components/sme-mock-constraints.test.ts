@@ -24,7 +24,11 @@ import {
 // or term, this fails rather than shipping.
 
 /** Every SME-facing mock loan, as {label, principal VND, term months}. */
-const SME_MOCK_LOANS: { label: string; principal: number; term_months: number }[] = [
+const SME_MOCK_LOANS: {
+  label: string;
+  principal: number;
+  term_months: number;
+}[] = [
   // {
   //   label: "MOCK_SME_FACILITY (SME analytics)",
   //   principal: MOCK_SME_FACILITY.principal,
