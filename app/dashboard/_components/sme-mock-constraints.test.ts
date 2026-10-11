@@ -6,8 +6,11 @@ import {
   LOAN_MIN_VND,
   isAllowedLoanDuration,
 } from "@/lib/constants/loan-constraints";
-import { MOCK_SME_FACILITY } from "../analytics/_components/sme/mock-sme-analytics";
-import { ALLOWED_TERM_MONTHS } from "@/lib/facility-terms";
+// import { MOCK_SME_FACILITY } from "../analytics/_components/sme/mock-sme-analytics";
+// import { ALLOWED_TERM_MONTHS } from "@/lib/facility-terms";
+// — both commented out with the mock data; re-add the facility to
+// SME_MOCK_LOANS below (and the handbook describe block at the bottom) when the
+// mock comes back.
 
 // The SME demo surfaces are driven entirely by hardcoded mocks, and those mocks
 // drifted outside the shapes the grading engine will actually accept — a loan
@@ -21,12 +24,12 @@ import { ALLOWED_TERM_MONTHS } from "@/lib/facility-terms";
 // or term, this fails rather than shipping.
 
 /** Every SME-facing mock loan, as {label, principal VND, term months}. */
-const SME_MOCK_LOANS = [
-  {
-    label: "MOCK_SME_FACILITY (SME analytics)",
-    principal: MOCK_SME_FACILITY.principal,
-    term_months: MOCK_SME_FACILITY.term_months,
-  },
+const SME_MOCK_LOANS: { label: string; principal: number; term_months: number }[] = [
+  // {
+  //   label: "MOCK_SME_FACILITY (SME analytics)",
+  //   principal: MOCK_SME_FACILITY.principal,
+  //   term_months: MOCK_SME_FACILITY.term_months,
+  // },
 ];
 
 describe("SME mock loans obey the grading engine's constraints", () => {
@@ -65,6 +68,11 @@ describe("SME mock loans obey the grading engine's constraints", () => {
 // Settled by the product owner: a term is 1 to 6 months, which is exactly what
 // the engine accepts. ALLOWED_TERM_MONTHS now re-exports LOAN_DURATIONS_MONTHS,
 // so the product rule and the engine cannot disagree again.
+//
+// The block below only pinned the mock loan, so it is commented out with the
+// mock data — an it.each over an empty list fails as "no test found in suite".
+// Restore it together with the SME_MOCK_LOANS entry above.
+/*
 describe("SME mock terms also satisfy the handbook, not just the engine", () => {
   it.each(SME_MOCK_LOANS)(
     "$label declares a term of 1 to 6 months",
@@ -73,3 +81,4 @@ describe("SME mock terms also satisfy the handbook, not just the engine", () => 
     },
   );
 });
+*/

@@ -959,9 +959,9 @@
         "returns": "Lợi nhuận nhận được",
         "totalReturned": "Tổng tiền nhận về"
       },
-      "smeEmptyAction": "Nộp hồ sơ vay",
-      "smeEmptyDescription": "Nộp hồ sơ vay vốn để xem phân tích tài chính và thông tin khoản vay.",
-      "smeEmptyTitle": "Chưa có dữ liệu phân tích",
+      "smeEmptyAction": "Đăng dự án",
+      "smeEmptyDescription": "Phân tích khoản vay của bạn sẽ xuất hiện tại đây sau khi dự án được đăng.",
+      "smeEmptyTitle": "Đăng dự án để xem phân tích",
       "subtitle": "Vốn của bạn đã được giải ngân ra sao và mang lại kết quả gì.",
       "table": {
         "industry": "Ngành",
@@ -1812,9 +1812,9 @@
       "mockNotice": "Dữ liệu mẫu. Màn hình này chưa kết nối với tài khoản của bạn, nên các số liệu dưới đây không phải số liệu thật.",
       "searchPlaceholder": "Tìm theo dự án, mã tham chiếu hoặc phương thức",
       "showing": "Hiển thị {shown} trong tổng số {total} giao dịch",
-      "smeEmptyAction": "Nộp hồ sơ vay",
-      "smeEmptyDescription": "Nộp hồ sơ vay vốn để theo dõi các khoản giải ngân và thanh toán.",
-      "smeEmptyTitle": "Chưa có giao dịch khoản vay nào",
+      "smeEmptyAction": "Đăng dự án",
+      "smeEmptyDescription": "Các khoản giải ngân, thanh toán và phí sẽ xuất hiện tại đây sau khi dự án được đăng.",
+      "smeEmptyTitle": "Đăng dự án để xem hoạt động khoản vay",
       "smeMockNotice": "Dữ liệu mẫu. Màn hình này chưa kết nối với tài khoản của bạn, nên các số liệu dưới đây không phải số liệu thật.",
       "smeSubtitle": "Toàn bộ dòng tiền của khoản vay: số bạn đã nhận, số đã trả và phí FundLok đã thu.",
       "smeSummary": {

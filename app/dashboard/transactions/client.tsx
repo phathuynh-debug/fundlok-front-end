@@ -16,7 +16,8 @@ import { TransactionSummaryCards } from "./_components/TransactionSummaryCards";
 import { TransactionsTable } from "./_components/TransactionsTable";
 import { SmeTransactionSummaryCards } from "./_components/sme/SmeTransactionSummaryCards";
 import {
-  MOCK_SME_TRANSACTIONS,
+  // MOCK_SME_TRANSACTIONS — commented out with the mock data; the SME ledger
+  // shows its empty state until a real ledger endpoint exists.
   SME_TYPE_FILTERS,
   summarizeSme,
 } from "./_components/sme/mock-sme-transactions";
@@ -84,7 +85,9 @@ export default function TransactionsClient() {
   // distributions describe an investor, so the SME gets its own dataset,
   // summary tiles and filter chips rather than the investor screen relabelled.
   const isSme = user?.role === "SME";
-  const transactions = isSme ? MOCK_SME_TRANSACTIONS : MOCK_TRANSACTIONS;
+  // MOCK_SME_TRANSACTIONS commented out with the mock data — an SME now sees
+  // the empty state below instead of invented ledger rows.
+  const transactions = useMemo(() => (isSme ? [] : MOCK_TRANSACTIONS), [isSme]);
   const typeFilters = isSme ? SME_TYPE_FILTERS : TYPE_FILTERS;
 
   // All local UI state: none of this round-trips to the server, so it stays in
@@ -200,9 +203,7 @@ export default function TransactionsClient() {
             </p>
             <Button asChild className="mt-6 px-6">
               <Link
-                href={
-                  isSme ? "/dashboard/loan-application" : "/dashboard/projects"
-                }
+                href={isSme ? "/project-application" : "/dashboard/projects"}
               >
                 {t(
                   isSme

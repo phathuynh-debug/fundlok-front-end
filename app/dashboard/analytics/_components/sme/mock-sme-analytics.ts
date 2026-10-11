@@ -96,6 +96,11 @@ export interface SmeFacility {
   score: number;
 }
 
+// Mock data switched off — SmeAnalyticsView was derived entirely from these
+// three constants, and analytics/client.tsx now sends SMEs to the shared empty
+// state instead of rendering it. Un-comment them (and SmeAnalyticsView) when a
+// real repayment schedule / score endpoint replaces them.
+/*
 export const MOCK_SME_FACILITY: SmeFacility = {
   principal: 80_000_000,
   // 80,000,000 at 14.32%/yr over six months, spread across the 126
@@ -157,6 +162,7 @@ export const MOCK_SCORE_FACTORS: ScoreFactor[] = [
   { key: "sector", score: 75.46, weight: 0.25 },
   { key: "behavioral", score: 32.42, weight: 0.1 },
 ];
+*/
 
 /** The affordability ceiling the engine's gate 8 enforces. */
 export const REVENUE_SHARE_CEILING = 0.3;

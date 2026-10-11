@@ -4,10 +4,12 @@ import {
   MOCK_TRANSACTIONS,
   summarize,
 } from "../../app/dashboard/transactions/_components/mock-transactions";
-import {
-  MOCK_SME_TRANSACTIONS,
-  summarizeSme,
-} from "../../app/dashboard/transactions/_components/sme/mock-sme-transactions";
+// import {
+//   MOCK_SME_TRANSACTIONS,
+//   summarizeSme,
+// } from "../../app/dashboard/transactions/_components/sme/mock-sme-transactions";
+// — commented out with the mock data; the SME ledger shows its empty state,
+// so the data-dependent SME assertions below are commented out with it.
 import { formatCurrency } from "../../lib/format-currency";
 import { signInAs } from "../support/auth";
 import { normalizeSpaces, t } from "../support/i18n";
@@ -123,7 +125,7 @@ test.describe("investor ledger", () => {
 });
 
 test.describe("SME ledger", () => {
-  const summary = summarizeSme(MOCK_SME_TRANSACTIONS);
+  // const summary = summarizeSme(MOCK_SME_TRANSACTIONS);
 
   test.beforeEach(async ({ context, page }) => {
     await signInAs(context, "sme");
@@ -144,37 +146,40 @@ test.describe("SME ledger", () => {
     ).toHaveCount(0);
   });
 
-  test("summarises disbursement, repayments and fees", async ({ page }) => {
-    for (const label of [
-      "dashboard.transactions.smeSummary.disbursed",
-      "dashboard.transactions.smeSummary.repaid",
-      "dashboard.transactions.smeSummary.fees",
-    ]) {
-      await expect(page.getByText(t(label), { exact: true })).toBeVisible();
-    }
+  // Data-dependent assertions, commented out with the mock data. Restore them
+  // (with the summary line above) when a real ledger endpoint replaces the mock.
 
-    // The disbursement figure appears twice by design — once in the summary
-    // card and once as the ledger row it came from. The card's copy is enough.
-    await expect(
-      page
-        .getByText(normalizeSpaces(formatCurrency(summary.disbursed, "vi")), {
-          exact: false,
-        })
-        .first(),
-    ).toBeVisible();
-  });
-
-  test("distinguishes an early repayment from a scheduled one", async ({
-    page,
-  }) => {
-    await expect(
-      page.getByText(t("dashboard.transactions.types.earlyRepayment")).first(),
-    ).toBeVisible();
-  });
-
-  test("lists every SME transaction", async ({ page }) => {
-    await expect(page.getByRole("row")).toHaveCount(
-      MOCK_SME_TRANSACTIONS.length + 1,
-    );
-  });
+  // test("summarises disbursement, repayments and fees", async ({ page }) => {
+  //   for (const label of [
+  //     "dashboard.transactions.smeSummary.disbursed",
+  //     "dashboard.transactions.smeSummary.repaid",
+  //     "dashboard.transactions.smeSummary.fees",
+  //   ]) {
+  //     await expect(page.getByText(t(label), { exact: true })).toBeVisible();
+  //   }
+  //
+  //   // The disbursement figure appears twice by design — once in the summary
+  //   // card and once as the ledger row it came from. The card's copy is enough.
+  //   await expect(
+  //     page
+  //       .getByText(normalizeSpaces(formatCurrency(summary.disbursed, "vi")), {
+  //         exact: false,
+  //       })
+  //       .first(),
+  //   ).toBeVisible();
+  // });
+  //
+  // test("distinguishes an early repayment from a scheduled one", async ({
+  //   page,
+  // }) => {
+  //   await expect(
+  //     page.getByText(t("dashboard.transactions.types.earlyRepayment")).first(),
+  //   ).toBeVisible();
+  // });
+  //
+  // test("lists every SME transaction", async ({ page }) => {
+  //   await expect(page.getByRole("row")).toHaveCount(
+  //     MOCK_SME_TRANSACTIONS.length + 1,
+  //   );
+  // });
 });

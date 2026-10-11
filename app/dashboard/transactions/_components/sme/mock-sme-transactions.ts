@@ -36,6 +36,10 @@ export const SME_TYPE_FILTERS: TransactionType[] = [
   "FEE",
 ];
 
+// Mock data switched off — the ledger screen falls through to its empty state
+// until a real ledger endpoint replaces it. Restoring is mechanical: un-comment
+// the block below and point transactions/client.tsx back at MOCK_SME_TRANSACTIONS.
+/*
 const PROJECT = "Công ty TNHH ABC Retail";
 const INSTALMENT = 98_436_421;
 
@@ -150,6 +154,7 @@ export const MOCK_SME_TRANSACTIONS: Transaction[] = [
     method_ref: "••••4417",
   },
 ];
+*/
 
 export interface SmeTransactionSummary {
   /** Disbursed to the SME, VND. */

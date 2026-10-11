@@ -17,7 +17,8 @@ import { CapitalStatusChart } from "./_components/CapitalStatusChart";
 import { IndustryAllocationChart } from "./_components/IndustryAllocationChart";
 import { IndustrySplitChart } from "./_components/IndustrySplitChart";
 import { MonthlyReturnsChart } from "./_components/MonthlyReturnsChart";
-import { SmeAnalyticsView } from "./_components/sme/SmeAnalyticsView";
+// import { SmeAnalyticsView } from "./_components/sme/SmeAnalyticsView";
+// — commented out with the SME mock data; SMEs get the empty state instead.
 import {
   deriveKpis,
   MOCK_ALLOCATION,
@@ -90,7 +91,13 @@ export default function AnalyticsClient() {
   const [range, setRange] = useState<RangeKey>("12M");
   const [view, setView] = useState<"charts" | "table">("charts");
 
-  const points = useMemo(() => sliceByRange(MOCK_MONTHLY, range), [range]);
+  // SME mock data commented out — until the repayment schedule / score
+  // endpoints exist there is nothing real to chart, so an SME falls through to
+  // the empty state below instead of the mock-driven SmeAnalyticsView.
+  const points = useMemo(
+    () => (isSme ? [] : sliceByRange(MOCK_MONTHLY, range)),
+    [isSme, range],
+  );
   const kpis = useMemo(() => deriveKpis(points), [points]);
   const allocationTotal = useMemo(() => totalAllocated(MOCK_ALLOCATION), []);
 
@@ -122,17 +129,20 @@ export default function AnalyticsClient() {
           </div>
         </div>
 
-        {/* Sample-data notice */}
-        <div className="flex items-start gap-2.5 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3">
-          <FlaskConical className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-          <p className="text-xs text-amber-700 dark:text-amber-300">
-            {t(
-              isSme
-                ? "dashboard.smeAnalytics.mockNotice"
-                : "dashboard.analytics.mockNotice",
-            )}
-          </p>
-        </div>
+        {/* Sample-data notice — only shown while there is something on screen
+            to label; the SME mock data it described is commented out. */}
+        {points.length > 0 && (
+          <div className="flex items-start gap-2.5 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3">
+            <FlaskConical className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+            <p className="text-xs text-amber-700 dark:text-amber-300">
+              {t(
+                isSme
+                  ? "dashboard.smeAnalytics.mockNotice"
+                  : "dashboard.analytics.mockNotice",
+              )}
+            </p>
+          </div>
+        )}
 
         {isAuthLoading ? (
           <AnalyticsSkeleton />
@@ -169,9 +179,9 @@ export default function AnalyticsClient() {
               </Link>
             </Button>
           </div>
-        ) : isSme ? (
-          <SmeAnalyticsView />
         ) : (
+          /* The SME mock view is commented out with the mock data:
+             isSme ? <SmeAnalyticsView /> : */
           <>
             {/* One filter row above everything it scopes -- the range applies to
                 the KPIs and every chart at once, never per-card. */}

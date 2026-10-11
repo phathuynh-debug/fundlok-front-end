@@ -1,5 +1,18 @@
 "use client";
 
+// Mock data commented out. This view was derived entirely from
+// MOCK_SME_FACILITY / MOCK_REPAYMENT_MONTHS / MOCK_SCORE_FACTORS in
+// mock-sme-analytics.ts, and those constants are switched off, so the view
+// renders nothing. analytics/client.tsx now sends SMEs to the shared empty
+// state instead. When a real repayment schedule / score endpoint lands, move
+// this component onto the hook and un-comment both the constants and the
+// implementation kept below — the swap is mechanical.
+export function SmeAnalyticsView() {
+  return null;
+}
+
+/* Preserved implementation, restored with the real endpoints
+
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import {
@@ -49,7 +62,7 @@ function ChartCard({
 // FE-013. A borrower's screen, not the investor screen relabelled: one loan,
 // what is left on it, how much of daily revenue it eats, and what moves the
 // score. Nothing here is a portfolio.
-export function SmeAnalyticsView() {
+export function SmeAnalyticsViewOld() {
   const { locale, t } = useTranslations();
 
   const summary = useMemo(
@@ -121,8 +134,8 @@ export function SmeAnalyticsView() {
 
   return (
     <div className="space-y-6">
-      {/* Repayment progress bar — the single most important number for a
-          borrower, so it leads and is not buried in a chart. */}
+      // Repayment progress bar — the single most important number for a
+      // borrower, so it leads and is not buried in a chart.
       <Card className="p-5 gap-3">
         <div className="flex flex-wrap items-end justify-between gap-2">
           <div>
@@ -160,7 +173,7 @@ export function SmeAnalyticsView() {
         </div>
       </Card>
 
-      {/* KPI tiles */}
+      // KPI tiles
       <motion.div
         variants={staggerContainerVariants}
         initial="hidden"
@@ -188,9 +201,9 @@ export function SmeAnalyticsView() {
         ))}
       </motion.div>
 
-      {/* Affordability warning. Gate 8 is a soft gate in the engine, so this is
-          a caution, not a failure — but an SME paying more than 30% of revenue
-          should hear it plainly. */}
+      // Affordability warning. Gate 8 is a soft gate in the engine, so this is
+      // a caution, not a failure — but an SME paying more than 30% of revenue
+      // should hear it plainly.
       {overCeiling && (
         <div className="flex items-start gap-2.5 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3">
           <ShieldCheck className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
@@ -238,3 +251,4 @@ export function SmeAnalyticsView() {
     </div>
   );
 }
+*/

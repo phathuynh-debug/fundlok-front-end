@@ -959,9 +959,9 @@
         "returns": "Returns received",
         "totalReturned": "Total returned"
       },
-      "smeEmptyAction": "Apply for funding",
-      "smeEmptyDescription": "Apply for business funding to view financial analytics and loan insights.",
-      "smeEmptyTitle": "No analytics yet",
+      "smeEmptyAction": "Post your project",
+      "smeEmptyDescription": "Your facility analytics will appear here once your project is posted.",
+      "smeEmptyTitle": "Post your project to see analytics",
       "subtitle": "How your capital has been deployed and what it has returned.",
       "table": {
         "industry": "Industry",
@@ -1812,9 +1812,9 @@
       "mockNotice": "Sample data. This screen isn't connected to your account yet, so none of these figures are real.",
       "searchPlaceholder": "Search by project, reference or method",
       "showing": "Showing {shown} of {total} transactions",
-      "smeEmptyAction": "Apply for funding",
-      "smeEmptyDescription": "Apply for business funding to track disbursements and repayments.",
-      "smeEmptyTitle": "No loan transactions yet",
+      "smeEmptyAction": "Post your project",
+      "smeEmptyDescription": "Your disbursements, repayments and fees will appear here once your project is posted.",
+      "smeEmptyTitle": "Post your project to see your loan activity",
       "smeMockNotice": "Sample data. This screen isn't connected to your account yet, so none of these figures are real.",
       "smeSubtitle": "Every movement on your loan: what you received, what you have repaid, and the fees FundLok charged.",
       "smeSummary": {
