@@ -66,7 +66,7 @@ test.describe("SME analytics", () => {
     await page.goto("/dashboard/analytics");
   });
 
-  test("shows the loan analytics screen", async ({ page }) => {
+  test("shows the loan analytics screen with empty state", async ({ page }) => {
     await expect(
       page.getByRole("heading", {
         name: t("dashboard.smeAnalytics.title"),
@@ -74,7 +74,7 @@ test.describe("SME analytics", () => {
       }),
     ).toBeVisible();
     await expect(
-      page.getByText(t("dashboard.smeAnalytics.mockNotice")),
+      page.getByText(t("dashboard.analytics.smeEmptyTitle")),
     ).toBeVisible();
   });
 
@@ -86,11 +86,5 @@ test.describe("SME analytics", () => {
         exact: true,
       }),
     ).toHaveCount(0);
-  });
-
-  test("renders its charts", async ({ page }) => {
-    await expect(page.locator("svg.recharts-surface").first()).toBeVisible({
-      timeout: 15_000,
-    });
   });
 });

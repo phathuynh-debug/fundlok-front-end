@@ -669,6 +669,31 @@ export default function ProjectApplicationClient() {
                     }
                     disabled={isPending}
                   />
+                  {/* Quick headcount presets */}
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1.5">
+                    {[5, 10, 25, 50, 100].map((count) => {
+                      const isSelected = employeeCount === String(count);
+                      return (
+                        <button
+                          key={count}
+                          type="button"
+                          onClick={() =>
+                            setValue("employee_count", String(count), {
+                              shouldValidate: true,
+                            })
+                          }
+                          className={cn(
+                            "px-2.5 py-1 text-xs rounded-lg font-medium border transition-colors cursor-pointer",
+                            isSelected
+                              ? "bg-primary text-primary-foreground border-primary shadow-xs"
+                              : "border-border/60 bg-muted/30 text-muted-foreground hover:bg-muted hover:text-foreground",
+                          )}
+                        >
+                          {count}
+                        </button>
+                      );
+                    })}
+                  </div>
                   {derivedCompanySize ? (
                     <p className="mt-2 text-xs font-medium text-emerald-600 dark:text-emerald-400">
                       {t("projectApplication.hints.companySizeDerived", {
@@ -902,6 +927,56 @@ export default function ProjectApplicationClient() {
                     }}
                     disabled={isPending}
                   />
+                  {/* Quick loan requested amount presets */}
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1.5">
+                    {[
+                      {
+                        label: locale === "vi" ? "20 triệu" : "20M",
+                        val: 20_000_000,
+                      },
+                      {
+                        label: locale === "vi" ? "30 triệu" : "30M",
+                        val: 30_000_000,
+                      },
+                      {
+                        label: locale === "vi" ? "50 triệu" : "50M",
+                        val: 50_000_000,
+                      },
+                      {
+                        label: locale === "vi" ? "75 triệu" : "75M",
+                        val: 75_000_000,
+                      },
+                      {
+                        label: locale === "vi" ? "100 triệu" : "100M",
+                        val: 100_000_000,
+                      },
+                    ].map((preset) => {
+                      const isSelected = requestedAmount === String(preset.val);
+                      return (
+                        <button
+                          key={preset.val}
+                          type="button"
+                          onClick={() =>
+                            setValue(
+                              "loan.requested_amount",
+                              String(preset.val),
+                              {
+                                shouldValidate: true,
+                              },
+                            )
+                          }
+                          className={cn(
+                            "px-2.5 py-1 text-xs rounded-lg font-medium border transition-colors cursor-pointer",
+                            isSelected
+                              ? "bg-primary text-primary-foreground border-primary shadow-xs"
+                              : "border-border/60 bg-muted/30 text-muted-foreground hover:bg-muted hover:text-foreground",
+                          )}
+                        >
+                          {preset.label}
+                        </button>
+                      );
+                    })}
+                  </div>
                   <p className="mt-2 text-xs text-muted-foreground">
                     {t("projectApplication.hints.requestedAmountRange", {
                       min: formatAmountInput(String(LOAN_MIN_VND), locale),
@@ -1024,10 +1099,10 @@ export default function ProjectApplicationClient() {
               <div className="space-y-4 animate-in fade-in duration-200 text-sm">
                 <div className="rounded-2xl border border-border/60 bg-muted/20 p-5 space-y-3">
                   <h3 className="font-bold text-foreground flex items-center gap-2 pb-2 border-b border-border/50">
-                    <Building2 className="h-4 w-4 text-emerald-600 animate-pulse" />
+                    <Building2 className="h-4 w-4 text-emerald-600" />
                     <span>{t("projectApplication.info.businessTitle")}</span>
                   </h3>
-                  <div className="grid grid-cols-[120px_1fr] gap-y-2 text-muted-foreground">
+                  <div className="grid grid-cols-1 sm:grid-cols-[140px_1fr] gap-y-2 text-muted-foreground">
                     <span>{t("projectApplication.fields.legalName")}:</span>
                     <span className="text-foreground font-semibold">
                       {getValues("legal_name")}
@@ -1057,10 +1132,10 @@ export default function ProjectApplicationClient() {
 
                 <div className="rounded-2xl border border-border/60 bg-muted/20 p-5 space-y-3">
                   <h3 className="font-bold text-foreground flex items-center gap-2 pb-2 border-b border-border/50">
-                    <MapPin className="h-4 w-4 text-emerald-600 animate-pulse" />
+                    <MapPin className="h-4 w-4 text-emerald-600" />
                     <span>{t("projectApplication.info.locationTitle")}</span>
                   </h3>
-                  <div className="grid grid-cols-[120px_1fr] gap-y-2 text-muted-foreground">
+                  <div className="grid grid-cols-1 sm:grid-cols-[140px_1fr] gap-y-2 text-muted-foreground">
                     <span>{t("projectApplication.fields.address")}:</span>
                     <span className="text-foreground font-semibold leading-relaxed">
                       {getValues("address.street")}, {getValues("address.city")}
@@ -1075,10 +1150,10 @@ export default function ProjectApplicationClient() {
 
                 <div className="rounded-2xl border border-border/60 bg-muted/20 p-5 space-y-3">
                   <h3 className="font-bold text-foreground flex items-center gap-2 pb-2 border-b border-border/50">
-                    <CalendarDays className="h-4 w-4 text-emerald-600 animate-pulse" />
+                    <CalendarDays className="h-4 w-4 text-emerald-600" />
                     <span>{t("projectApplication.info.companyAgeTitle")}</span>
                   </h3>
-                  <div className="grid grid-cols-[120px_1fr] gap-y-2 text-muted-foreground">
+                  <div className="grid grid-cols-1 sm:grid-cols-[140px_1fr] gap-y-2 text-muted-foreground">
                     <span>
                       {t("projectApplication.fields.incorporationDate")}:
                     </span>
@@ -1090,10 +1165,10 @@ export default function ProjectApplicationClient() {
 
                 <div className="rounded-2xl border border-border/60 bg-muted/20 p-5 space-y-3">
                   <h3 className="font-bold text-foreground flex items-center gap-2 pb-2 border-b border-border/50">
-                    <Banknote className="h-4 w-4 text-emerald-600 animate-pulse" />
+                    <Banknote className="h-4 w-4 text-emerald-600" />
                     <span>{t("projectApplication.info.loanTitle")}</span>
                   </h3>
-                  <div className="grid grid-cols-[120px_1fr] gap-y-2 text-muted-foreground">
+                  <div className="grid grid-cols-1 sm:grid-cols-[140px_1fr] gap-y-2 text-muted-foreground">
                     <span>
                       {t("projectApplication.fields.requestedAmount")}:
                     </span>

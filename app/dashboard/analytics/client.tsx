@@ -67,12 +67,14 @@ function ChartCard({
   children: React.ReactNode;
 }) {
   return (
-    <section className="bg-card text-card-foreground border border-border rounded-xl shadow-xs p-5 space-y-4">
-      <div className="space-y-1">
-        <h3 className="text-sm font-semibold">{title}</h3>
-        <p className="text-xs text-muted-foreground">{description}</p>
+    <section className="bg-card text-card-foreground border border-border/80 rounded-2xl shadow-xs overflow-hidden">
+      <div className="px-5 py-4 border-b border-border/50 bg-muted/10 space-y-0.5">
+        <h3 className="text-sm font-semibold tracking-tight">{title}</h3>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          {description}
+        </p>
       </div>
-      {children}
+      <div className="p-5">{children}</div>
     </section>
   );
 }
@@ -159,11 +161,7 @@ export default function AnalyticsClient() {
             )}
           </p>
           <Button asChild className="mt-6 px-6">
-            <Link
-              href={
-                isSme ? "/dashboard/loan-application" : "/dashboard/projects"
-              }
-            >
+            <Link href={isSme ? "/project-application" : "/dashboard/projects"}>
               {t(
                 isSme
                   ? "dashboard.analytics.smeEmptyAction"
@@ -186,10 +184,10 @@ export default function AnalyticsClient() {
                   type="button"
                   onClick={() => setRange(option)}
                   aria-pressed={range === option}
-                  className={`px-3 py-2 rounded-lg text-xs font-semibold uppercase transition-all duration-200 cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-lg text-xs transition-all duration-200 cursor-pointer ${
                     range === option
-                      ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
-                      : `${CONTROL_IDLE} bg-transparent border border-transparent`
+                      ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10 font-semibold"
+                      : `${CONTROL_IDLE} bg-transparent border border-transparent font-medium`
                   }`}
                 >
                   {option}
@@ -217,10 +215,10 @@ export default function AnalyticsClient() {
                   type="button"
                   onClick={() => setView(key)}
                   aria-pressed={view === key}
-                  className={`px-3 py-2 rounded-lg text-xs font-semibold uppercase transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 rounded-lg text-xs transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
                     view === key
-                      ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
-                      : `${CONTROL_IDLE} bg-transparent border border-transparent`
+                      ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10 font-semibold"
+                      : `${CONTROL_IDLE} bg-transparent border border-transparent font-medium`
                   }`}
                 >
                   <Icon className="h-3.5 w-3.5" />

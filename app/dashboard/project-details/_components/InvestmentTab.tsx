@@ -9,6 +9,7 @@ import { Banknote } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format-currency";
 import { useVerificationGate } from "@/hooks/use-verification-gate";
+import { cn } from "@/lib/utils";
 
 export function InvestmentTab() {
   const router = useRouter();
@@ -149,6 +150,47 @@ export function InvestmentTab() {
                 required
               />
             </div>
+
+            {/* Quick investment amount presets */}
+            <div className="flex flex-wrap items-center gap-1.5 pt-1">
+              {[
+                {
+                  label: locale === "vi" ? "10 triệu" : "10M",
+                  val: 10_000_000,
+                },
+                {
+                  label: locale === "vi" ? "25 triệu" : "25M",
+                  val: 25_000_000,
+                },
+                {
+                  label: locale === "vi" ? "50 triệu" : "50M",
+                  val: 50_000_000,
+                },
+                {
+                  label: locale === "vi" ? "100 triệu" : "100M",
+                  val: 100_000_000,
+                },
+                { label: locale === "vi" ? "Tối đa" : "Max", val: maxAmount },
+              ].map((preset) => {
+                const isSelected = amount === String(preset.val);
+                return (
+                  <button
+                    key={preset.val}
+                    type="button"
+                    onClick={() => setAmount(String(preset.val))}
+                    className={cn(
+                      "px-2.5 py-1 text-xs rounded-lg font-semibold border transition-colors cursor-pointer",
+                      isSelected
+                        ? "bg-primary text-primary-foreground border-primary shadow-xs"
+                        : "border-border/60 bg-muted/30 text-muted-foreground hover:bg-muted hover:text-foreground",
+                    )}
+                  >
+                    {preset.label}
+                  </button>
+                );
+              })}
+            </div>
+
             <p className="text-xs text-muted-foreground tracking-wide">
               {t("investment.tab.maximum")}
             </p>
