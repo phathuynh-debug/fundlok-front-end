@@ -17,6 +17,41 @@ test.beforeEach(async ({ context, page }) => {
   await page.goto("/dashboard/settings/appearance");
 });
 
+/**
+ * Hue angle (0-360°) of a computed CSS colour. Chromium reports Tailwind's
+ * oklch palette as oklch(), lab() or rgb() depending on version and context,
+ * so all three are read. Anything else returns NaN, which fails the caller's
+ * range assertion instead of letting it pass without checking anything.
+ */
+function hueOf(color: string): number {
+  const oklch = color.match(/oklch\(\s*[\d.]+%?\s+[\d.]+\s+([\d.]+)/);
+  if (oklch) return Number(oklch[1]);
+
+  const lab = color.match(/lab\(\s*[\d.]+%?\s+(-?[\d.]+)\s+(-?[\d.]+)/);
+  if (lab) {
+    const degrees =
+      (Math.atan2(Number(lab[2]), Number(lab[1])) * 180) / Math.PI;
+    return (degrees + 360) % 360;
+  }
+
+  const rgb = color.match(/rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)/);
+  if (rgb) {
+    const [r, g, b] = rgb.slice(1, 4).map((v) => Number(v) / 255);
+    const max = Math.max(r, g, b);
+    const delta = max - Math.min(r, g, b);
+    if (delta === 0) return NaN; // grey has no hue
+    const sector =
+      max === r
+        ? ((g - b) / delta) % 6
+        : max === g
+          ? (b - r) / delta + 2
+          : (r - g) / delta + 4;
+    return (sector * 60 + 360) % 360;
+  }
+
+  return NaN;
+}
+
 test("renders all three preference groups", async ({ page }) => {
   await expect(
     page.getByRole("heading", {
@@ -224,27 +259,34 @@ test.describe("accent colour", () => {
   });
 
   test("leaves status colours alone", async ({ page }) => {
-    // Money received must stay green whatever the accent is — recolouring it
-    // would make the product lie. Guards the deliberate decision not to remap
-    // the emerald utilities.
+    // Status green (money received, a verified business) must stay green
+    // whatever the accent is — recolouring it would make the product lie.
+    // Guards the deliberate decision not to remap the emerald utilities.
+    //
+    // This used to read the transactions page's "Money in" figure; that page
+    // shows its empty state while its mock data is commented out, so the same
+    // emerald utilities are read from the "Verified SME" badge on a project
+    // card instead. Switch back once the transactions page has real data.
     await swatch(
       page,
       t("dashboard.settings.appearance.accent.colors.rose"),
     ).click();
     await expect(page.locator("html")).toHaveAttribute("data-accent", "rose");
 
-    await page.goto("/dashboard/transactions");
+    await page.goto("/dashboard/projects");
     await settle(page);
 
-    const moneyInColor = await page
-      .getByText(t("dashboard.transactions.summary.moneyIn"), { exact: true })
-      .locator("xpath=following-sibling::*[1]")
+    const statusGreen = await page
+      .getByText(t("dashboard.projectCard.verifiedSme"), { exact: true })
+      .first()
       .evaluate((el) => getComputedStyle(el).color);
 
-    // oklch green sits around hue 150-165; a rose accent would drag it to ~15.
-    expect(moneyInColor).toBeTruthy();
-    const hue = Number(moneyInColor.match(/oklch\([^)]*?\s([\d.]+)\)/)?.[1]);
-    if (!Number.isNaN(hue)) expect(hue).toBeGreaterThan(100);
+    // Emerald sits around hue 150-165; a rose accent would drag it to ~0-20 or
+    // ~340-360. The old check only parsed oklch(), but Chromium reports this
+    // colour as lab(), so it skipped itself and never checked anything.
+    const hue = hueOf(statusGreen);
+    expect(hue, `computed colour was ${statusGreen}`).toBeGreaterThan(100);
+    expect(hue, `computed colour was ${statusGreen}`).toBeLessThan(200);
   });
 
   test("survives a reload, server-rendered", async ({ page }) => {

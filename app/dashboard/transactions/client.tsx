@@ -22,12 +22,18 @@ import {
 } from "./_components/sme/mock-sme-transactions";
 import { transactionTypeLabelKey } from "./_components/TransactionTypeCell";
 import {
-  MOCK_TRANSACTIONS,
+  // MOCK_TRANSACTIONS — commented out with the mock data; the investor ledger
+  // shows its empty state until a real transactions endpoint exists.
   summarize,
+  type Transaction,
   type TransactionStatus,
   type TransactionType,
 } from "./_components/mock-transactions";
 import { CONTROL_HOVER, CONTROL_IDLE } from "@/lib/ui-tokens";
+
+// Stands in for the transactions API until it exists. Module-level so its
+// identity is stable across renders (the useMemos below depend on it).
+const NO_TRANSACTIONS: Transaction[] = [];
 
 const TYPE_FILTERS: TransactionType[] = [
   "INVESTMENT",
@@ -84,9 +90,11 @@ export default function TransactionsClient() {
   // distributions describe an investor, so the SME gets its own dataset,
   // summary tiles and filter chips rather than the investor screen relabelled.
   const isSme = user?.role === "SME";
-  // MOCK_SME_TRANSACTIONS commented out with the mock data — an SME now sees
-  // the empty state below instead of invented ledger rows.
-  const transactions = useMemo(() => (isSme ? [] : MOCK_TRANSACTIONS), [isSme]);
+  // MOCK_TRANSACTIONS and MOCK_SME_TRANSACTIONS are both commented out with the
+  // mock data — investors and SMEs see the empty state below instead of
+  // invented ledger rows until a real transactions endpoint exists.
+  // const transactions = useMemo(() => (isSme ? MOCK_SME_TRANSACTIONS : MOCK_TRANSACTIONS), [isSme]);
+  const transactions = NO_TRANSACTIONS;
   const typeFilters = isSme ? SME_TYPE_FILTERS : TYPE_FILTERS;
 
   // All local UI state: none of this round-trips to the server, so it stays in

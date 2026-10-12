@@ -20,16 +20,24 @@ import { MonthlyReturnsChart } from "./_components/MonthlyReturnsChart";
 // — commented out with the SME mock data; SMEs get the empty state instead.
 import {
   deriveKpis,
-  MOCK_ALLOCATION,
-  MOCK_CAPITAL_STATUS,
-  MOCK_MONTHLY,
-  sliceByRange,
+  // MOCK_ALLOCATION, MOCK_CAPITAL_STATUS, MOCK_MONTHLY and sliceByRange —
+  // commented out with the mock data; investors see the empty state below
+  // until a portfolio-analytics endpoint exists.
   totalAllocated,
+  type CapitalStatusAllocation,
+  type IndustryAllocation,
+  type MonthlyPoint,
   type RangeKey,
 } from "./_components/mock-analytics";
 import { CONTROL_IDLE } from "@/lib/ui-tokens";
 
 const RANGES: RangeKey[] = ["3M", "6M", "12M"];
+
+// Stand in for the analytics API until it exists. Module-level so their
+// identity is stable across renders (the useMemos below depend on them).
+const NO_POINTS: MonthlyPoint[] = [];
+const NO_ALLOCATION: IndustryAllocation[] = [];
+const NO_CAPITAL_STATUS: CapitalStatusAllocation[] = [];
 
 function AnalyticsSkeleton() {
   return (
@@ -92,15 +100,17 @@ export default function AnalyticsClient() {
   const [range, setRange] = useState<RangeKey>("12M");
   const [view, setView] = useState<"charts" | "table">("charts");
 
-  // SME mock data commented out — until the repayment schedule / score
-  // endpoints exist there is nothing real to chart, so an SME falls through to
-  // the empty state below instead of the mock-driven SmeAnalyticsView.
-  const points = useMemo(
-    () => (isSme ? [] : sliceByRange(MOCK_MONTHLY, range)),
-    [isSme, range],
-  );
+  // Investor and SME mock data are both commented out — until the portfolio
+  // analytics (investor) and repayment schedule / score (SME) endpoints exist
+  // there is nothing real to chart, so everyone falls through to the empty
+  // state below instead of the mock-driven charts or SmeAnalyticsView.
+  // const points = useMemo(
+  //   () => (isSme ? [] : sliceByRange(MOCK_MONTHLY, range)),
+  //   [isSme, range],
+  // );
+  const points = NO_POINTS;
   const kpis = useMemo(() => deriveKpis(points), [points]);
-  const allocationTotal = useMemo(() => totalAllocated(MOCK_ALLOCATION), []);
+  const allocationTotal = useMemo(() => totalAllocated(NO_ALLOCATION), []);
 
   return (
     <motion.div {...pageTransitionProps} className="space-y-6 md:space-y-8">
@@ -200,12 +210,12 @@ export default function AnalyticsClient() {
                 [
                   {
                     key: "charts",
-                    label: t("dashboard.analytics.views.charts"),
+                    label: t("dashboard.analytics.view.charts"),
                     icon: PieChart,
                   },
                   {
                     key: "table",
-                    label: t("dashboard.analytics.views.table"),
+                    label: t("dashboard.analytics.view.table"),
                     icon: TableIcon,
                   },
                 ] as const
@@ -254,7 +264,7 @@ export default function AnalyticsClient() {
                   description={t("dashboard.analytics.charts.allocationDesc")}
                 >
                   <IndustryAllocationChart
-                    allocation={MOCK_ALLOCATION}
+                    allocation={NO_ALLOCATION}
                     total={allocationTotal}
                   />
                 </ChartCard>
@@ -264,7 +274,7 @@ export default function AnalyticsClient() {
                   description={t("dashboard.analytics.charts.splitDesc")}
                 >
                   <IndustrySplitChart
-                    allocation={MOCK_ALLOCATION}
+                    allocation={NO_ALLOCATION}
                     total={allocationTotal}
                   />
                 </ChartCard>
@@ -274,7 +284,7 @@ export default function AnalyticsClient() {
                   description={t("dashboard.analytics.charts.statusDesc")}
                 >
                   <CapitalStatusChart
-                    statusAllocation={MOCK_CAPITAL_STATUS}
+                    statusAllocation={NO_CAPITAL_STATUS}
                     total={allocationTotal}
                   />
                 </ChartCard>
@@ -283,8 +293,8 @@ export default function AnalyticsClient() {
           ) : (
             <AnalyticsTableView
               points={points}
-              allocation={MOCK_ALLOCATION}
-              capitalStatus={MOCK_CAPITAL_STATUS}
+              allocation={NO_ALLOCATION}
+              capitalStatus={NO_CAPITAL_STATUS}
               total={allocationTotal}
             />
           )}

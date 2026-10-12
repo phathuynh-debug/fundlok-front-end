@@ -15,40 +15,66 @@ test.describe("investor analytics", () => {
     await page.goto("/dashboard/analytics");
   });
 
-  test("shows the portfolio charts", async ({ page }) => {
+  test("shows the analytics screen with empty state, not sample data", async ({
+    page,
+  }) => {
     await expect(
       page.getByRole("heading", {
         name: t("dashboard.analytics.title"),
         exact: true,
       }),
     ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: t("dashboard.analytics.emptyTitle") }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: t("dashboard.analytics.emptyAction") }),
+    ).toHaveAttribute("href", "/dashboard/projects");
 
-    for (const key of [
-      "dashboard.analytics.charts.capitalFlowTitle",
-      "dashboard.analytics.charts.monthlyReturnsTitle",
-      "dashboard.analytics.charts.allocationTitle",
-    ]) {
-      await expect(page.getByText(t(key), { exact: true })).toBeVisible();
-    }
-  });
-
-  test("renders the industry allocation chart, not just its heading", async ({
-    page,
-  }) => {
-    // A Recharts pie that fails to mount leaves the card heading in place and
-    // an empty box beneath it, so the heading alone proves nothing.
-    const slices = page.locator(
-      "svg .recharts-pie-sector, svg path.recharts-sector",
-    );
-    await expect(slices.first()).toBeVisible({ timeout: 15_000 });
-  });
-
-  test("KPI tiles are present", async ({ page }) => {
-    await expect(page.locator("svg.recharts-surface").first()).toBeVisible();
+    // Nothing invented is on screen: no sample notice, no charts.
     await expect(
       page.getByText(t("dashboard.analytics.mockNotice")),
-    ).toBeVisible();
+    ).toHaveCount(0);
+    await expect(page.locator("svg.recharts-surface")).toHaveCount(0);
   });
+
+  // Data-dependent assertions, commented out with the mock data. Restore them
+  // when a real portfolio-analytics endpoint replaces the mock.
+
+  // test("shows the portfolio charts", async ({ page }) => {
+  //   await expect(
+  //     page.getByRole("heading", {
+  //       name: t("dashboard.analytics.title"),
+  //       exact: true,
+  //     }),
+  //   ).toBeVisible();
+  //
+  //   for (const key of [
+  //     "dashboard.analytics.charts.capitalFlowTitle",
+  //     "dashboard.analytics.charts.monthlyReturnsTitle",
+  //     "dashboard.analytics.charts.allocationTitle",
+  //   ]) {
+  //     await expect(page.getByText(t(key), { exact: true })).toBeVisible();
+  //   }
+  // });
+  //
+  // test("renders the industry allocation chart, not just its heading", async ({
+  //   page,
+  // }) => {
+  //   // A Recharts pie that fails to mount leaves the card heading in place and
+  //   // an empty box beneath it, so the heading alone proves nothing.
+  //   const slices = page.locator(
+  //     "svg .recharts-pie-sector, svg path.recharts-sector",
+  //   );
+  //   await expect(slices.first()).toBeVisible({ timeout: 15_000 });
+  // });
+  //
+  // test("KPI tiles are present", async ({ page }) => {
+  //   await expect(page.locator("svg.recharts-surface").first()).toBeVisible();
+  //   await expect(
+  //     page.getByText(t("dashboard.analytics.mockNotice")),
+  //   ).toBeVisible();
+  // });
 
   test("does not show the SME loan view", async ({ page }) => {
     await expect(
