@@ -29,7 +29,9 @@ test.describe("Vietnamese", () => {
       }),
     ).toBeVisible();
     await expect(
-      page.getByText(t("dashboard.investor.totalInvested", undefined, "vi")),
+      page.getByRole("heading", {
+        name: t("dashboard.investor.noInvestmentsTitle", undefined, "vi"),
+      }),
     ).toBeVisible();
   });
 
@@ -38,12 +40,10 @@ test.describe("Vietnamese", () => {
   }) => {
     // vi-VN puts the symbol after the amount; en-US puts it in front. Getting
     // this backwards is the kind of thing only a rendered page reveals.
-    await page.goto("/dashboard");
+    await page.goto("/dashboard/projects");
 
-    const kpi = page
-      .getByText(t("dashboard.investor.totalInvested", undefined, "vi"))
-      .locator("xpath=ancestor::*[self::div][1]/..");
-    await expect(kpi).toContainText("₫");
+    const money = page.getByText(/[\d.,]+\s*₫/).first();
+    await expect(money).toBeVisible();
   });
 
   test("leaks no raw i18n keys onto the page", async ({ page }) => {

@@ -595,7 +595,7 @@ test.describe("KYC review", () => {
   test("the sidebar links to the review queue", async ({ page }) => {
     await page.goto("/admin");
     await page
-      .getByRole("link", { name: t("admin.sidebar.kycReviews") })
+      .getByRole("link", { name: t("admin.sidebar.kycReviews"), exact: true })
       .click();
     await expect(page).toHaveURL(/\/admin\/kyc-reviews$/);
     await expect(
