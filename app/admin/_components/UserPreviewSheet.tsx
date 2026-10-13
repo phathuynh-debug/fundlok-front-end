@@ -117,7 +117,7 @@ export function UserPreviewSheet({
   return (
     <Sheet open={user !== null} onOpenChange={onOpenChange}>
       <SheetContent className="w-full overflow-y-auto sm:max-w-lg md:max-w-xl lg:max-w-2xl">
-        <SheetHeader className="pb-2">
+        <SheetHeader className="px-4 pb-2 sm:px-6">
           <SheetTitle className="text-xl">
             {t("admin.userPreview.title")}
           </SheetTitle>
@@ -125,7 +125,7 @@ export function UserPreviewSheet({
         </SheetHeader>
 
         {user && (
-          <div className="space-y-6 pb-12 pt-2">
+          <div className="space-y-6 px-4 pb-12 pt-2 sm:px-6">
             {/* 1. Header Profile & Identity Card */}
             <div className="rounded-xl border bg-card p-4 sm:p-5">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
