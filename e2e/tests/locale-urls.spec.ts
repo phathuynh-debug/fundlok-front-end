@@ -56,9 +56,7 @@ test("the switcher moves to the other language's URL, keeping the query", async 
   await expect(page).toHaveURL(/\/en\/rate\?for=investor$/);
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   // Server-rendered parts follow too, not only the client text.
-  await expect(page).toHaveTitle(
-    t("seo.rateTitle", undefined, "en") + " | FundLok",
-  );
+  await expect(page).toHaveTitle(t("seo.rateTitle", undefined, "en"));
 });
 
 test("an explicit earlier choice sends the visitor to their language", async ({
