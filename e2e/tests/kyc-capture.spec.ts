@@ -65,8 +65,11 @@ test.describe("the identity verification on the desktop screen", () => {
       .click();
     await expect(phonePage.getByText(t("kyc.approvedTitle"))).toBeVisible();
 
-    // Desktop page polls, detects approval, and advances to dashboard.
-    await expect(page).toHaveURL(/\/dashboard/);
+    // Desktop page polls, detects approval, and advances to dashboard. That is
+    // up to a 3s poll (hooks/use-gverify.ts), the 1.2s confirmation
+    // (use-finish-verification.ts) and a full page load — under parallel load,
+    // more than the default 5s allows.
+    await expect(page).toHaveURL(/\/dashboard/, { timeout: 10_000 });
   });
 });
 

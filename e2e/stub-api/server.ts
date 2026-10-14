@@ -359,6 +359,8 @@ let setupUnavailable = false;
  * point of the post-verification redirect is what happens the moment it flips.
  * A fixture flag alone can only express "already approved" or "never", never
  * the change itself. Only ever set by POST /gverify/kyb/verify.
+ *
+ * Keyed by `verificationScope`, not the bare account: see there.
  */
 const kybApproved = new Set<string>();
 /**
@@ -366,8 +368,25 @@ const kybApproved = new Set<string>();
  * do it as step 2 of KYB; investors' fixtures already carry is_approved.
  */
 const kycApproved = new Set<string>();
-const handoffTokens = new Map<string, string>();
+/** Phone handoff tokens, to the account and scope that asked for the QR code. */
+const handoffTokens = new Map<string, { key: string; scope: string }>();
 const STUB_KYC_PERSON_NUMBER = "079203001234";
+
+/**
+ * Where an account's KYC/KYB approval is recorded: within the test's own
+ * `stub_scope` (support/auth.ts sets one for every signed-in test), falling
+ * back to the account alone when there is none.
+ *
+ * Approval is one-way, and one stub process serves every parallel worker. Keyed
+ * by account alone, the first test to finish verification left that account
+ * approved for every later test — a following spec, or the same test under
+ * --repeat-each — and proxy.ts then correctly sent it from /kyc to the
+ * dashboard. With the scope, a test only ever sees approvals it earned itself.
+ */
+function verificationScope(req: IncomingMessage, key: string): string {
+  const scope = readCookie(req, "stub_scope");
+  return scope ? `${scope}.${key}` : key;
+}
 
 function totpState(key: string) {
   if (!twoFactor.has(key)) {
@@ -391,13 +410,6 @@ function readCookie(req: IncomingMessage, name: string): string | null {
   return null;
 }
 
-/**
- * Registered passkeys per stub account.
- *
- * Reset between specs by `resetStubState`, because unlike the rest of this
- * server it is mutable — a spec that removes a passkey must not change what
- * the next one sees.
- */
 /**
  * Must be a registrable suffix of the host the page is served from, or the
  * browser refuses the ceremony before it reaches the authenticator.
@@ -429,10 +441,10 @@ function toBase64Url(value: string): string {
 const stubPasskeys = new Map<string, Record<string, unknown>[]>();
 
 /**
- * Passkeys are the only mutable state in this server, so they are the only
- * thing that can leak between specs sharing a worker. Each test sets its own
- * `stub_scope` cookie and gets its own bucket; without one the account key is
- * used, so behaviour is unchanged for every other spec.
+ * Registered passkeys, bucketed by the test's `stub_scope` cookie so a spec
+ * that removes a passkey cannot change what the next one sees. Every signed-in
+ * test has a scope (support/auth.ts; passkeys.spec.ts sets its own); without
+ * one the account key is used.
  */
 function passkeyScope(req: IncomingMessage, key: string): string {
   return readCookie(req, "stub_scope") ?? key;
@@ -787,12 +799,15 @@ const server = createServer(async (req, res) => {
   if (path === "/gverify/kyc/handoff/verify" && method === "POST") {
     const auth = req.headers["authorization"] ?? "";
     const token = String(auth).replace(/^Bearer\s+/i, "");
+    // A minted token approves whoever showed the QR code, in their scope — not
+    // the phone's: a real phone has none of the desktop's cookies.
+    const minted = handoffTokens.get(token);
     const userKey =
-      handoffTokens.get(token) ||
+      minted?.key ||
       (token.startsWith("e2e-token-")
         ? token.replace("e2e-token-", "")
         : "unapprovedInvestorTab");
-    kycApproved.add(userKey);
+    kycApproved.add(minted?.scope ?? verificationScope(req, userKey));
     return json(res, 201, {
       verification_id: "00000000-0000-0000-0000-0000000000c1",
       status: "APPROVED",
@@ -1167,7 +1182,7 @@ const server = createServer(async (req, res) => {
   // A personal identity check (ID card + selfie). Synchronous like the real
   // provider; the stub approves and records it for /gverify/kyc/status.
   if (path === "/gverify/kyc/verify" && method === "POST") {
-    kycApproved.add(key);
+    kycApproved.add(verificationScope(req, key));
     return json(res, 201, {
       verification_id: "00000000-0000-0000-0000-0000000000c1",
       status: "APPROVED",
@@ -1182,8 +1197,11 @@ const server = createServer(async (req, res) => {
   }
 
   if (path === "/gverify/kyc/handoff" && method === "POST") {
-    const token = `e2e-token-${key}`;
-    handoffTokens.set(token, key);
+    // One token per scope: tests showing the same account's QR code in
+    // parallel must not overwrite each other's entry.
+    const scope = verificationScope(req, key);
+    const token = `e2e-token-${scope}`;
+    handoffTokens.set(token, { key, scope });
     return json(res, 201, {
       token,
       expires_in_seconds: 600,
@@ -1192,7 +1210,7 @@ const server = createServer(async (req, res) => {
   }
 
   if (path === "/gverify/kyb/verify" && method === "POST") {
-    kybApproved.add(key);
+    kybApproved.add(verificationScope(req, key));
     return json(res, 201, {
       verification_id: `00000000-0000-0000-0000-00000000kyb1`.slice(0, 36),
       status: "APPROVED",
@@ -1209,10 +1227,11 @@ const server = createServer(async (req, res) => {
   }
 
   if (path === "/gverify/kyc/status" || path === "/gverify/kyb/status") {
+    const scope = verificationScope(req, key);
     const approved =
       user.is_approved ||
-      (path === "/gverify/kyb/status" && kybApproved.has(key)) ||
-      (path === "/gverify/kyc/status" && kycApproved.has(key));
+      (path === "/gverify/kyb/status" && kybApproved.has(scope)) ||
+      (path === "/gverify/kyc/status" && kycApproved.has(scope));
     // KYB additionally carries what the certificate OCR read, which the SME
     // project application prefills from. Null (not absent) when the fixture
     // has no certificate data — that is the real endpoint's shape too.

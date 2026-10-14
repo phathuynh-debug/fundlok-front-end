@@ -1,7 +1,21 @@
-import type { BrowserContext, Page } from "@playwright/test";
+import { test, type BrowserContext, type Page } from "@playwright/test";
 
 import type { StubUserKey } from "../stub-api/fixtures";
 import { settle } from "./ui";
+
+/**
+ * This run of this test's own slice of the stub's mutable state.
+ *
+ * The stub records KYC/KYB approvals under it (verificationScope in
+ * e2e/stub-api/server.ts), so a test that finishes verification cannot leave
+ * the account approved for the next test that signs in as it. Unique per run:
+ * Playwright's testId already differs for each --repeat-each copy, and the
+ * retry number starts a retry clean rather than on the failed attempt's state.
+ */
+function stubScope(): string {
+  const { testId, retry } = test.info();
+  return `${testId}-${retry}`;
+}
 
 /**
  * Mark the first-run walkthrough as already seen.
@@ -71,6 +85,13 @@ export async function signInAs(
       domain,
       path: "/",
       httpOnly: true,
+      sameSite: "Lax",
+    },
+    {
+      name: "stub_scope",
+      value: stubScope(),
+      domain,
+      path: "/",
       sameSite: "Lax",
     },
   ]);

@@ -32,8 +32,10 @@ export default defineConfig({
   testDir: "./e2e/tests",
   // Explicit so Playwright can never pick up a Vitest *.test.ts file.
   testMatch: "**/*.spec.ts",
-  // Every spec seeds its own cookie and the stub holds no mutable state, so
-  // files are safe to run in parallel.
+  // Every spec seeds its own cookie, so files are safe to run in parallel. One
+  // stub serves every worker, though, and it does hold state: anything a test
+  // changes there must be scoped to that test (the `stub_scope` cookie that
+  // support/auth.ts sets) or put back by it.
   fullyParallel: true,
   // A test that only passes on a retry is a flaky test; failing the run on a
   // stray `test.only` keeps that from reaching main.
