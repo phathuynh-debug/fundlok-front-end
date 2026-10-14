@@ -137,7 +137,7 @@ test.describe("switching language on the marketing site", () => {
     const english = await bodyText();
     expect(english).toContain("Flexible capital for MSMEs");
 
-    await page.getByRole("button", { name: "Vietnamese" }).click();
+    await page.getByRole("link", { name: "Vietnamese" }).click();
     await expect(
       page.getByRole("heading", { level: 1, name: /Sàn vốn linh hoạt/ }),
     ).toBeVisible();
@@ -160,14 +160,14 @@ test.describe("switching language on the marketing site", () => {
   test("switches back again", async ({ page, context }) => {
     await useLocale(context, "en");
     await page.goto("/");
-    await page.getByRole("button", { name: "Vietnamese" }).click();
+    await page.getByRole("link", { name: "Vietnamese" }).click();
     await expect(
       page.getByRole("heading", { level: 1, name: /Sàn vốn linh hoạt/ }),
     ).toBeVisible();
 
     // The switcher labels are themselves translated, so the way back is
     // "Tiếng Anh" rather than "English".
-    await page.getByRole("button", { name: "Tiếng Anh" }).click();
+    await page.getByRole("link", { name: "Tiếng Anh" }).click();
     await expect(
       page.getByRole("heading", {
         level: 1,

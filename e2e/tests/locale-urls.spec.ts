@@ -39,6 +39,34 @@ test("each language version names the other with hreflang", async ({
   );
 });
 
+// Crawlers read the server HTML and follow <a href>; they do not run the click
+// handler or press buttons. While the switcher was a button, no Vietnamese
+// page linked to any English one, and Google — which knows the site through
+// the Vietnamese pages — left /en/* largely undiscovered. Read with
+// page.request, not page.goto: the raw response is exactly what a crawler
+// gets, before any JavaScript runs.
+for (const [from, to, lang] of [
+  ["/rate", "/en/rate", "en"],
+  ["/", "/en", "en"],
+  ["/en/rate", "/rate", "vi"],
+] as const) {
+  test(`server HTML of ${from} links to ${to} for crawlers`, async ({
+    page,
+  }) => {
+    const html = await (await page.request.get(from)).text();
+    const anchors = html.match(/<a\s[^>]*>/g) ?? [];
+    const crossLink = anchors.find(
+      (a) =>
+        a.includes(`href="${to}"`) &&
+        new RegExp(`hreflang="${lang}"`, "i").test(a),
+    );
+    expect(
+      crossLink,
+      `no <a href="${to}" hreflang="${lang}"> in ${from}`,
+    ).toBeTruthy();
+  });
+}
+
 test("links on an English page stay in English", async ({ page }) => {
   await page.goto("/en/faq");
   await expect(
@@ -52,7 +80,7 @@ test("the switcher moves to the other language's URL, keeping the query", async 
   page,
 }) => {
   await page.goto("/rate?for=investor");
-  await page.getByRole("button", { name: t("localeSwitcher.english") }).click();
+  await page.getByRole("link", { name: t("localeSwitcher.english") }).click();
   await expect(page).toHaveURL(/\/en\/rate\?for=investor$/);
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   // Server-rendered parts follow too, not only the client text.
