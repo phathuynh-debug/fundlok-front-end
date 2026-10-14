@@ -7,6 +7,8 @@ const mockSubmit = vi.fn();
 
 vi.mock("next/navigation", () => ({
   useSearchParams: () => mockSearchParams,
+  // Read by the LocaleSwitcher in the page header.
+  usePathname: () => "/kyc/mobile",
 }));
 
 vi.mock("@/lib/i18n", () => ({
