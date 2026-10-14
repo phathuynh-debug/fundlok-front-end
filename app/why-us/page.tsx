@@ -10,7 +10,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const description = seo.whyUsDescription;
 
   return {
-    title,
+    // absolute: whyUsTitle already carries the brand; the root template would
+    // otherwise append a second "| FundLok".
+    title: { absolute: title },
     description,
     keywords: [
       "FundLok vision",

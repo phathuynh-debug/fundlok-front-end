@@ -30,7 +30,9 @@ const PAGES: Record<(typeof LOCALIZED_PATHS)[number], PageMeta> = {
   "/rate": { changeFrequency: "weekly", priority: 0.9 },
   "/faq": { changeFrequency: "weekly", priority: 0.7 },
   "/contact": { changeFrequency: "monthly", priority: 0.7 },
-  "/terms": { changeFrequency: "monthly", priority: 0.6 },
+  // Legal boilerplate: crawlable, but far below the pages that match what an
+  // SME actually searches for.
+  "/terms": { changeFrequency: "monthly", priority: 0.3 },
   // Sign-up lives on this page too, at ?mode=register. The query variant is
   // deliberately not listed separately — it is the same document.
   "/login": { changeFrequency: "monthly", priority: 0.5 },

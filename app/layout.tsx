@@ -62,9 +62,13 @@ export async function generateMetadata(): Promise<Metadata> {
       description: siteDescription,
     },
     icons: {
-      icon: "/logo/image.png",
-      shortcut: "/logo/image.png",
-      apple: "/logo/image.png",
+      // 1:1 square brand mark, served by the app/icon.png, app/apple-icon.png
+      // and app/favicon.ico file conventions. The previous value pointed at
+      // /logo/image.png, which does not exist — Google then fell back to the
+      // horizontal wordmark it found on the page and rendered it cropped.
+      icon: "/icon.png",
+      shortcut: "/icon.png",
+      apple: "/apple-icon.png",
     },
   };
 }
@@ -112,7 +116,9 @@ export default async function RootLayout({
     name: "FundLok",
     alternateName: "Công ty Cổ phần FundLok",
     url: SITE_URL,
-    logo: `${SITE_URL}/logo/image.png`,
+    // The square mark (Google requires a 1:1 logo), not the wordmark.
+    logo: `${SITE_URL}/icon.png`,
+    image: `${SITE_URL}/images/icon-square-512.png`,
     description:
       "FundLok arranges funding for SMEs in Vietnam. Investors provide the capital and the credit agreement is between the investor and the business; FundLok is not a bank and does not lend its own money.",
     // Geography is the half of "funding for SMEs in Vietnam" the site never

@@ -125,7 +125,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     alternates: localeAlternates("/", locale),
-    title: seo.homeTitle,
+    // absolute: homeTitle already carries the brand ("FundLok | …"); the root
+    // template would otherwise append a second "| FundLok".
+    title: { absolute: seo.homeTitle },
     description: seo.homeDescription,
     keywords: [
       "FundLok",

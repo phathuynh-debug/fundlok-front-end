@@ -6,13 +6,13 @@ import { localeAlternates, OG_LOCALE } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { locale, t } = await getServerTranslations();
-  // The root layout's template already appends "| FundLok", so the title
-  // carries no brand suffix of its own.
+  // termsTitle carries the full rendered title including the brand suffix, so
+  // `absolute` keeps the root template from appending a second "| FundLok".
   const title = t("seo.termsTitle");
   const description = t("seo.termsDescription");
 
   return {
-    title,
+    title: { absolute: title },
     description,
     keywords: [
       "FundLok terms",

@@ -15,6 +15,12 @@ import { NumericInput } from "@/components/ui/numeric-input";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
   AmountInput,
   AmountPreset,
   COMMON_AMOUNT_PRESETS,
@@ -1396,6 +1402,41 @@ export default function RateClient({
             </motion.div>
           </div>
         </div>
+
+        {/* FAQ for both audiences — common SME questions around the rate and
+            funding, rendered from the same strings the FAQPage JSON-LD on this
+            page carries (see app/rate/page.tsx). */}
+        <motion.section
+          aria-labelledby="rate-faq-heading"
+          className="mx-auto mt-16 w-full max-w-3xl scroll-mt-28"
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.55, ease: "easeOut" }}
+        >
+          <h2
+            id="rate-faq-heading"
+            className="mb-2 text-2xl font-extrabold tracking-tight text-foreground md:text-3xl"
+          >
+            {t("seo.rateFaqTitle")}
+          </h2>
+          <Accordion type="single" collapsible className="w-full">
+            {[1, 2, 3].map((n) => (
+              <AccordionItem
+                key={n}
+                value={`rate-faq-${n}`}
+                className="border-foreground/15"
+              >
+                <AccordionTrigger className="text-left text-sm font-semibold md:text-base">
+                  {t(`seo.rateFaqQ${n}`)}
+                </AccordionTrigger>
+                <AccordionContent className="text-sm leading-relaxed text-muted-foreground">
+                  {t(`seo.rateFaqA${n}`)}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </motion.section>
       </main>
 
       <SiteFooter />
