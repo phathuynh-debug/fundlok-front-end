@@ -517,7 +517,7 @@ function json(
   res: ServerResponse,
   status: number,
   body: unknown,
-  headers: Record<string, string> = {},
+  headers: Record<string, string | string[]> = {},
 ) {
   const payload = JSON.stringify(body);
   res.writeHead(status, {
@@ -729,10 +729,29 @@ const server = createServer(async (req, res) => {
   }
 
   if (path === "/auth/refresh" && method === "POST") {
-    if (!session) return detail(res, 401, "Not authenticated");
-    return json(res, 200, session.user, {
-      "set-cookie": sessionCookie(session.key, 60 * 60),
-    });
+    // Like the real backend: authenticated by the refresh_token cookie ALONE.
+    // By the time anything refreshes, the access token has usually expired or
+    // been dropped by the browser — that is the case proxy.ts restores. The
+    // stub's refresh token is the account key, like its access token.
+    const key = readCookie(req, "refresh_token") as StubUserKey | null;
+    if (!key || !(key in STUB_USERS)) {
+      return detail(res, 401, "Invalid or expired refresh token");
+    }
+    // The remember marker is what keeps a remembered session persistent
+    // across rotation (app/auth/router.py); without it, session cookies.
+    const persistent = readCookie(req, "remember_session") === "1";
+    const lifetime = persistent ? "; Max-Age=" + 60 * 60 * 24 * 14 : "";
+    return json(
+      res,
+      200,
+      { access_token: key, refresh_token: key, token_type: "bearer" },
+      {
+        "set-cookie": [
+          `${COOKIE_NAME}=${key}; Path=/; HttpOnly; SameSite=Lax${lifetime}`,
+          `refresh_token=${key}; Path=/; HttpOnly; SameSite=Lax${lifetime}`,
+        ],
+      },
+    );
   }
 
   // Passkey sign-in is deliberately reachable without a session: the caller

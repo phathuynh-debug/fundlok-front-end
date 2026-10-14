@@ -1163,6 +1163,7 @@
           "passwordChanged": "Password changed.",
           "passwordSet": "Password set.",
           "payoutAccountAdded": "Payout account changed to {bank}.",
+          "sessionReuseDetected": "A device was signed out because an old sign-in token was used again. If you did not expect this, change your password.",
           "sessionRevoked": "A device was signed out.",
           "sessionsRevokedOthers": "Signed out of all other devices.",
           "signIn": "Signed in from {device} in {location}.",

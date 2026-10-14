@@ -419,6 +419,84 @@ test.describe("an expired session", () => {
   });
 });
 
+// --- A session that outlived its access token --------------------------------
+// The access token lasts 30 minutes, the refresh token 14 days. The proxy used
+// to look only at the first, so "remember me" signed users out at the
+// 30-minute mark on their next page load. It now rotates the refresh token
+// server-side and carries on. Cookies are seeded directly because the case is
+// "came back later", which a login form cannot reach.
+
+test.describe("a session that outlived its access token", () => {
+  function seed(cookies: Record<string, string>) {
+    return Object.entries(cookies).map(([name, value]) => ({
+      name,
+      value,
+      domain: "127.0.0.1",
+      path: "/",
+      httpOnly: true,
+      sameSite: "Lax" as const,
+    }));
+  }
+
+  test("is restored when the browser has already dropped the access cookie", async ({
+    page,
+    context,
+  }) => {
+    // A remembered login an hour later: the access cookie's Max-Age matched
+    // its token and has lapsed; the refresh cookie and marker remain.
+    await context.addCookies(
+      seed({
+        stub_onboarded: "1",
+        refresh_token: "investor",
+        remember_session: "1",
+      }),
+    );
+    await page.goto("/dashboard");
+
+    await expect(page).toHaveURL(/\/dashboard$/);
+    const access = (await context.cookies()).find(
+      (c) => c.name === "access_token",
+    );
+    expect(access?.value).toBe("investor");
+    // Still remembered: the re-issued cookie persists past a browser restart.
+    expect(access!.expires).toBeGreaterThan(0);
+  });
+
+  test("is restored when the access cookie is still sent but its token has expired", async ({
+    page,
+    context,
+  }) => {
+    // A session-scoped login left open: the browser still sends the access
+    // cookie, but the backend rejects the token inside it.
+    await context.addCookies(
+      seed({
+        stub_onboarded: "1",
+        access_token: "expiredSession",
+        refresh_token: "investor",
+      }),
+    );
+    await page.goto("/dashboard/transactions");
+
+    await expect(page).toHaveURL(/\/dashboard\/transactions$/);
+    const access = (await context.cookies()).find(
+      (c) => c.name === "access_token",
+    );
+    expect(access?.value).toBe("investor");
+    // Not remembered, so it stays a session cookie after the refresh.
+    expect(access!.expires).toBe(-1);
+  });
+
+  test("still ends at login when the refresh token is refused", async ({
+    page,
+    context,
+  }) => {
+    await context.addCookies(seed({ refresh_token: "revoked-elsewhere" }));
+    await page.goto("/dashboard");
+
+    await expect(page).toHaveURL(/\/login\?from=%2Fdashboard/);
+  });
+});
+
 test("the KYB review step stays locked until the SME's identity is verified", async ({
   page,
   context,

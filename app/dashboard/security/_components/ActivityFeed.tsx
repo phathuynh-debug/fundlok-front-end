@@ -45,6 +45,8 @@ const ACTION_KEYS: Record<string, string> = {
   LOGIN_FAILED: "dashboard.security.activity.events.failedAttempt",
   NEW_DEVICE: "dashboard.security.activity.events.newDevice",
   SESSION_REVOKED: "dashboard.security.activity.events.sessionRevoked",
+  SESSION_REUSE_DETECTED:
+    "dashboard.security.activity.events.sessionReuseDetected",
   SESSIONS_REVOKED_OTHERS:
     "dashboard.security.activity.events.sessionsRevokedOthers",
   REVOKE_ALL_SESSIONS:

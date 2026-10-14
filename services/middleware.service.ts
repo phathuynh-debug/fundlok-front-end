@@ -146,6 +146,49 @@ export const middlewareService = {
     }
   },
 
+  /**
+   * Trade the refresh cookie for a new token pair, server-side.
+   *
+   * Returns the backend's Set-Cookie lines verbatim, or null when it refused.
+   * Verbatim matters: the backend alone decides whether the new cookies are
+   * persistent (remember me) or session-scoped, from its `remember_session`
+   * marker, and re-deriving that here would let the two drift apart.
+   *
+   * The browser's User-Agent and X-Forwarded-For go along because the backend
+   * records them on the session row at every rotation — without them, a
+   * refresh made here would relabel the user's device on the security screen
+   * as this server, at this server's address. Forwarding XFF unchanged gives
+   * the backend the same hop chain as the /api rewrite, so its
+   * TRUSTED_PROXY_HOPS rule reads both paths the same way.
+   */
+  async refreshSession(request: NextRequest): Promise<string[] | null> {
+    const forwarded: Record<string, string> = {};
+    for (const name of ["user-agent", "x-forwarded-for"]) {
+      const value = request.headers.get(name);
+      if (value) forwarded[name] = value;
+    }
+
+    try {
+      const response = await fetch(new URL("/auth/refresh", API_BASE_URL), {
+        method: "POST",
+        headers: {
+          cookie: request.headers.get("cookie") ?? "",
+          ...forwarded,
+          ...backendSecretHeaders(),
+        },
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        return null;
+      }
+
+      return response.headers.getSetCookie();
+    } catch {
+      return null;
+    }
+  },
+
   // Reads whether the user's verification is approved — both roles via
   // GVerify now: investors /gverify/kyc/status, SMEs /gverify/kyb/status
   // (calling the wrong one 403s). 404 means they never started. Fails closed

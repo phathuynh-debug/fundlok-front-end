@@ -156,7 +156,37 @@ function continueToPage(
   return response;
 }
 
+// Carry a refreshed pair into the rest of THIS request, so the session lookup
+// below and the page render both see the new access token rather than the
+// expired one the browser sent. A Set-Cookie that deletes (Max-Age=0 — the
+// backend clears the remember marker that way) removes the cookie instead.
+function applyRefreshedCookies(request: NextRequest, setCookies: string[]) {
+  for (const line of setCookies) {
+    const [pair] = line.split(";");
+    const separator = pair.indexOf("=");
+    if (separator === -1) continue;
+    const name = pair.slice(0, separator).trim();
+    if (/;\s*max-age=0\s*(;|$)/i.test(line)) {
+      request.cookies.delete(name);
+    } else {
+      request.cookies.set(name, pair.slice(separator + 1).trim());
+    }
+  }
+}
+
 export async function proxy(request: NextRequest) {
+  // Set-Cookie lines from a session refresh made while routing this request.
+  // Appended here, once, because routeRequest has a dozen exits (every
+  // redirect and pass-through) and each must hand the browser its new pair —
+  // a redirect that dropped them would leave the browser holding a refresh
+  // token the backend has already rotated out.
+  const refreshed: string[] = [];
+  const response = await routeRequest(request, refreshed);
+  for (const line of refreshed) response.headers.append("Set-Cookie", line);
+  return response;
+}
+
+async function routeRequest(request: NextRequest, refreshed: string[]) {
   const rawPathname = request.nextUrl.pathname;
 
   // --- /api/* → FastAPI, stamped with the shared secret --------------------
@@ -243,11 +273,34 @@ export async function proxy(request: NextRequest) {
   if (pathname.startsWith("/kyc/mobile")) {
     return pass();
   }
-  const accessToken = request.cookies.get("access_token")?.value;
-  const isAuthenticated = !!accessToken;
-  const session = isAuthenticated
+  let accessToken = request.cookies.get("access_token")?.value;
+  let session = accessToken
     ? await middlewareService.getCurrentUser(request)
     : null;
+
+  // The access token lives 30 minutes; the refresh token 14 days. Reading only
+  // the first meant every session ended at the 30-minute mark on the next page
+  // load: a remembered login's access cookie expires with its token (so the
+  // browser stops sending it), and a session-scoped one is still sent but
+  // 401s. Either way the user was bounced to /login holding a perfectly good
+  // refresh token — "remember me does nothing". The client-side refresh in
+  // lib/api-client.ts never got a chance, because this redirect runs first.
+  //
+  // So: no usable access token but a refresh cookie → rotate here, once, and
+  // carry on as that user. SUSPENDED is not retried — the backend refuses to
+  // refresh a suspended account anyway.
+  if (session === null && request.cookies.has("refresh_token")) {
+    const setCookies = await middlewareService.refreshSession(request);
+    if (setCookies) {
+      applyRefreshedCookies(request, setCookies);
+      refreshed.push(...setCookies);
+      accessToken = request.cookies.get("access_token")?.value;
+      session = accessToken
+        ? await middlewareService.getCurrentUser(request)
+        : null;
+    }
+  }
+  const isAuthenticated = !!accessToken;
 
   // A suspended account holds a valid cookie but the backend refuses it. Sent
   // to /login it would loop: the password is right, sign-in is refused, and
@@ -295,10 +348,18 @@ export async function proxy(request: NextRequest) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("from", pathname);
       const response = NextResponse.redirect(loginUrl);
-      // Clear the stale pair so the next request is cleanly anonymous rather
-      // than repeating this round trip to the backend.
+      // Clear the stale access token so the next request skips /users/me.
+      //
+      // NOT the refresh token. Reaching here means the refresh above failed,
+      // and a live session can fail it without being dead: refreshSession
+      // returns null on a timeout or a backend hiccup too, and a response
+      // racing this one (another tab, the client-side refresh in
+      // lib/api-client.ts) may be carrying a newer pair to the browser that a
+      // delete here would land on top of. Either way, deleting the cookie
+      // would sign out someone who is still signed in. A genuinely dead
+      // refresh cookie costs one 401 per page load until the next sign-in
+      // overwrites it, and the backend's logout already clears it.
       response.cookies.delete("access_token");
-      response.cookies.delete("refresh_token");
       return response;
     }
   }

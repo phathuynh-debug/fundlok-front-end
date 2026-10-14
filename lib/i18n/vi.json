@@ -1163,6 +1163,7 @@
           "passwordChanged": "Đã đổi mật khẩu.",
           "passwordSet": "Đã đặt mật khẩu.",
           "payoutAccountAdded": "Tài khoản nhận tiền được đổi sang {bank}.",
+          "sessionReuseDetected": "Một thiết bị đã bị đăng xuất vì mã đăng nhập cũ bị dùng lại. Nếu bạn không thực hiện việc này, hãy đổi mật khẩu.",
           "sessionRevoked": "Một thiết bị đã bị đăng xuất.",
           "sessionsRevokedOthers": "Đã đăng xuất khỏi tất cả thiết bị khác.",
           "signIn": "Đăng nhập từ {device} tại {location}.",
