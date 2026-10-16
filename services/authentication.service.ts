@@ -293,10 +293,12 @@ export const authenticationService = {
     );
   },
 
-  resendVerification(email: string) {
+  // Public and it sends mail, so the backend requires a Turnstile token here,
+  // the same as register and forgot-password.
+  resendVerification(email: string, turnstileToken: string | null) {
     return apiClient.post<{ status: string; message: string }>(
       AUTH_ENDPOINTS.resendVerification,
-      { email },
+      { email, turnstile_token: turnstileToken },
     );
   },
 

@@ -6,6 +6,7 @@ import { Mail, RefreshCw, LogOut, Loader2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCurrentUser, useLogout } from "@/hooks/use-authentication";
 import { useToast } from "@/hooks/use-toast";
+import { useTurnstile } from "@/hooks/use-turnstile";
 import { useTranslations } from "@/lib/i18n";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authenticationService } from "@/services/authentication.service";
@@ -33,7 +34,6 @@ export function VerifyEmailClient() {
     null,
   );
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isResending, setIsResending] = useState(false);
 
   // Automatically verify when token is present in search parameters
   useEffect(() => {
@@ -104,35 +104,6 @@ export function VerifyEmailClient() {
       });
     } finally {
       setIsRefreshing(false);
-    }
-  };
-
-  const handleResend = async () => {
-    if (!user?.email) {
-      toast({
-        variant: "destructive",
-        title: t("common.error"),
-        description: t("auth.verifyEmail.emailNotFound"),
-      });
-      return;
-    }
-
-    setIsResending(true);
-    try {
-      await authenticationService.resendVerification(user.email);
-      toast({
-        title: t("auth.verifyEmail.resendSuccess"),
-        description: t("auth.verifyEmail.resendSuccessDescription"),
-      });
-    } catch {
-      // The backend's reason is English only; show our localized message.
-      toast({
-        variant: "destructive",
-        title: t("common.error"),
-        description: t("auth.verifyEmail.resendFailed"),
-      });
-    } finally {
-      setIsResending(false);
     }
   };
 
@@ -242,22 +213,7 @@ export function VerifyEmailClient() {
           )}
         </Button>
 
-        {/* Resend verification button */}
-        <Button
-          onClick={handleResend}
-          disabled={isResending || isRefreshing || !user?.email}
-          variant="outline"
-          className="w-full h-11"
-        >
-          {isResending ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {t("common.processing")}
-            </>
-          ) : (
-            t("auth.verifyEmail.resendBtn")
-          )}
-        </Button>
+        <ResendVerificationButton email={user?.email} disabled={isRefreshing} />
 
         {/* Sign out / Logout */}
         <Button
@@ -270,5 +226,97 @@ export function VerifyEmailClient() {
         </Button>
       </div>
     </div>
+  );
+}
+
+// Its own component so the Turnstile widget mounts with the button. The page
+// above first renders a "verifying link" state with no button, and
+// useTurnstile only renders its widget into a container present on mount.
+function ResendVerificationButton({
+  email,
+  disabled,
+}: {
+  email: string | undefined;
+  disabled: boolean;
+}) {
+  const { toast } = useToast();
+  const { t } = useTranslations();
+  const [isResending, setIsResending] = useState(false);
+  const {
+    turnstileToken,
+    turnstileContainerRef,
+    reset: resetTurnstile,
+    isTurnstileDisabled,
+  } = useTurnstile();
+
+  const handleResend = async () => {
+    if (!email) {
+      toast({
+        variant: "destructive",
+        title: t("common.error"),
+        description: t("auth.verifyEmail.emailNotFound"),
+      });
+      return;
+    }
+    if (!isTurnstileDisabled && !turnstileToken) {
+      toast({
+        variant: "destructive",
+        title: t("common.error"),
+        description: t("auth.securityCheckRequired"),
+      });
+      return;
+    }
+
+    setIsResending(true);
+    try {
+      await authenticationService.resendVerification(email, turnstileToken);
+      toast({
+        title: t("auth.verifyEmail.resendSuccess"),
+        description: t("auth.verifyEmail.resendSuccessDescription"),
+      });
+    } catch {
+      // The backend's reason is English only; show our localized message.
+      toast({
+        variant: "destructive",
+        title: t("common.error"),
+        description: t("auth.verifyEmail.resendFailed"),
+      });
+    } finally {
+      // A Turnstile token is single use, so the next resend needs a new one.
+      resetTurnstile();
+      setIsResending(false);
+    }
+  };
+
+  return (
+    <>
+      {/* Cloudflare Turnstile Spam Prevention */}
+      {!isTurnstileDisabled && (
+        <div className="flex justify-center py-2">
+          <div ref={turnstileContainerRef} />
+        </div>
+      )}
+
+      <Button
+        onClick={handleResend}
+        disabled={
+          isResending ||
+          disabled ||
+          !email ||
+          (!isTurnstileDisabled && !turnstileToken)
+        }
+        variant="outline"
+        className="w-full h-11"
+      >
+        {isResending ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            {t("common.processing")}
+          </>
+        ) : (
+          t("auth.verifyEmail.resendBtn")
+        )}
+      </Button>
+    </>
   );
 }

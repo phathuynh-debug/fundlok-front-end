@@ -6,6 +6,7 @@ import { Mail, Loader2, ArrowLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useTurnstile } from "@/hooks/use-turnstile";
 import { useTranslations } from "@/lib/i18n";
 import { authenticationService } from "@/services/authentication.service";
 import { apiErrorMessage } from "@/lib/api-error-message";
@@ -20,7 +21,8 @@ interface VerifyEmailNoticeProps {
 // Shown right after a successful registration. Registration doesn't start a
 // session, so this is a self-contained "check your inbox" panel — the actual
 // verification happens when the user clicks the link in their email, which
-// opens /verify-email?token=… . Resend only needs the email address.
+// opens /verify-email?token=… . Resend needs the email address and a
+// Turnstile token.
 export function VerifyEmailNotice({
   email,
   onBackToLogin,
@@ -28,11 +30,29 @@ export function VerifyEmailNotice({
   const { toast } = useToast();
   const { t, locale } = useTranslations();
   const [isResending, setIsResending] = useState(false);
+  const {
+    turnstileToken,
+    turnstileContainerRef,
+    reset: resetTurnstile,
+    isTurnstileDisabled,
+  } = useTurnstile();
 
   const handleResend = async () => {
+    if (!isTurnstileDisabled && !turnstileToken) {
+      toast({
+        variant: "destructive",
+        title: t("common.error"),
+        description: t("auth.securityCheckRequired"),
+      });
+      return;
+    }
+
     setIsResending(true);
     try {
-      const res = await authenticationService.resendVerification(email);
+      const res = await authenticationService.resendVerification(
+        email,
+        turnstileToken,
+      );
       toast({
         title: t("auth.verifyEmail.resendSuccess"),
         description: res.message,
@@ -48,6 +68,8 @@ export function VerifyEmailNotice({
         ),
       });
     } finally {
+      // A Turnstile token is single use, so the next resend needs a new one.
+      resetTurnstile();
       setIsResending(false);
     }
   };
@@ -88,9 +110,16 @@ export function VerifyEmailNotice({
       </div>
 
       <div className="space-y-3 pt-2">
+        {/* Cloudflare Turnstile Spam Prevention */}
+        {!isTurnstileDisabled && (
+          <div className="flex justify-center py-2">
+            <div ref={turnstileContainerRef} />
+          </div>
+        )}
+
         <Button
           onClick={handleResend}
-          disabled={isResending}
+          disabled={isResending || (!isTurnstileDisabled && !turnstileToken)}
           variant="outline"
           className="h-11 w-full"
         >
