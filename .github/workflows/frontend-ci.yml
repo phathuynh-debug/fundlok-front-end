@@ -256,7 +256,7 @@ jobs:
             # 5. Create the pull request
             gh pr create \
               --title "chore: trigger Vercel deployment" \
-              --body "Automated PR to ensure the latest commit on \`$BASE_BRANCH\` has the correct author (${EXPECTED_EMAIL}) so Vercel can deploy it. Make sure to merge this PR with rebase mode." \
+              --body "Automated PR to ensure the latest commit on \`$BASE_BRANCH\` has the correct author (${EXPECTED_EMAIL}) so Vercel can deploy it. Rebased automatically — only the trigger commit (with the correct author) lands on \`$BASE_BRANCH\`." \
               --base "$BASE_BRANCH" \
               --head "$BRANCH_NAME"
 
@@ -265,8 +265,16 @@ jobs:
             echo "A Pull Request for $BRANCH_NAME already exists (PR #$EXISTING_PR). Branch updated to latest tip."
           fi
 
-          echo "::error::Failing the workflow because the latest commit author must be $EXPECTED_EMAIL"
-          exit 1
+          # 6. Rebase-merge the trigger PR so ONLY the trigger commit (already
+          #    authored with $EXPECTED_EMAIL) lands on the base branch. A
+          #    regular merge commit would be authored by whoever merged,
+          #    re-triggering this job in a loop. This job only runs after all
+          #    CI checks passed (needs: [...]), and branch protection is off,
+          #    so the rebase merge is immediate and deterministic.
+          gh pr merge "$BRANCH_NAME" --rebase --delete-branch
+
+          echo "::notice::Trigger PR rebased and merged — the follow-up push re-runs CI and passes the author check."
+          exit 0
 
       - name: Cleanup outdated PR and branch
         if: steps.check-author.outputs.mismatch == 'false'
