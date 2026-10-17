@@ -61,7 +61,7 @@ export function HeroInteractive({ strings }: HeroInteractiveProps) {
       <GuillocheWaves activeIndex={0} />
 
       {/* Centered Content Wrapper (Restricted max-w-4xl width) */}
-      <div className="relative z-10 w-full max-w-4xl mx-auto flex-1 flex flex-col items-center justify-between pt-4 md:pt-6 pb-2 px-4">
+      <div className="relative z-10 w-full max-w-4xl mx-auto flex-1 flex flex-col items-center justify-between pt-2 md:pt-3 pb-2 px-4">
         {/* Animated text content wrapper.
             The title and subtitle animate on TRANSFORM ONLY — no `opacity` in
             `initial`. An `initial={{ opacity: 0 }}` is serialised into the SSR
@@ -75,13 +75,13 @@ export function HeroInteractive({ strings }: HeroInteractiveProps) {
           initial={{ y: -20 }}
           animate={{ y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-center px-4 flex flex-col items-center mb-3 md:mb-4 max-w-3xl mx-auto"
+          className="text-center px-4 flex flex-col items-center mb-2 md:mb-3 max-w-4xl mx-auto"
         >
           <motion.h1
             initial={{ y: -10 }}
             animate={{ y: 0 }}
             transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
-            className="font-sans text-3xl sm:text-4xl md:text-5xl font-extrabold text-foreground leading-[1.15] mb-2.5 tracking-tight max-w-2xl"
+            className="font-sans text-3xl sm:text-4xl md:text-[2.5rem] font-extrabold text-foreground leading-[1.15] mb-2.5 tracking-tight max-w-4xl"
           >
             {strings.heroTitle}
           </motion.h1>
@@ -89,7 +89,7 @@ export function HeroInteractive({ strings }: HeroInteractiveProps) {
             initial={{ y: 10 }}
             animate={{ y: 0 }}
             transition={{ duration: 0.8, delay: 0.35, ease: "easeOut" }}
-            className="font-sans text-xs md:text-sm text-muted-foreground leading-relaxed max-w-xl"
+            className="font-sans text-sm md:text-base text-muted-foreground leading-relaxed max-w-xl"
           >
             {strings.heroSubtitle}
           </motion.p>
@@ -122,7 +122,7 @@ export function HeroInteractive({ strings }: HeroInteractiveProps) {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.95 }}
           onClick={scrollToProcess}
-          className="relative z-20 mt-2 mb-2 text-muted-foreground hover:text-accent cursor-pointer flex flex-col items-center gap-1 text-xs md:text-sm tracking-wider font-bold uppercase transition-colors select-none outline-none border-none bg-transparent"
+          className="relative z-20 mt-2 mb-2 text-muted-foreground hover:text-accent cursor-pointer flex flex-col items-center gap-1 text-[10px] md:text-xs tracking-wider font-bold uppercase transition-colors select-none outline-none border-none bg-transparent"
         >
           <motion.div
             animate={{ y: [0, 6, 0] }}
@@ -131,10 +131,10 @@ export function HeroInteractive({ strings }: HeroInteractiveProps) {
               duration: 1.8,
               ease: "easeInOut",
             }}
-            className="flex flex-col items-center gap-1"
+            className="flex flex-col items-center gap-0.5"
           >
             <span>{strings.ourSolution}</span>
-            <ChevronDown className="w-5 h-5 md:w-6 md:h-6" />
+            <ChevronDown className="w-4 h-4 md:w-5 md:h-5" />
           </motion.div>
         </motion.button>
       </div>

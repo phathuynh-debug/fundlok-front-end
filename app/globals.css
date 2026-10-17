@@ -312,3 +312,42 @@ html[data-radius="sharp"] {
 html[data-radius="rounded"] {
   --radius: 1rem;
 }
+
+/* Hero MacBook mockup scaling.
+   The frame is laid out at its fixed 800px design width and scaled as a
+   WHOLE with `zoom`, so the terminal UI inside never reflows (tabs, table
+   labels and buttons wrap and break if the width itself shrinks). Height
+   tiers keep the one-viewport hero — header + title + mockup + disclaimer
+   + scroll indicator — above the fold on shorter laptop screens; on tall
+   viewports the mockup renders at full size. Budget: fixed chrome (header,
+   title, disclaimer, button, margins) ≈ 340-380px, frame height 533px × z.
+
+   The macbook.webp has transparent padding above the lid (the screen starts
+   at 10.7% of the frame height), so the negative top margin pulls the frame
+   up into that empty band. `zoom` scales the margin with the frame, so the
+   reclaimed space stays proportional at every tier. That reclaimed band is
+   what pays for the larger zoom values. */
+.hero-laptop-zoom {
+  zoom: 0.7;
+  margin-top: -40px;
+}
+@media (min-height: 750px) {
+  .hero-laptop-zoom {
+    zoom: 0.86;
+  }
+}
+@media (min-height: 820px) {
+  .hero-laptop-zoom {
+    zoom: 0.94;
+  }
+}
+@media (min-height: 880px) {
+  .hero-laptop-zoom {
+    zoom: 1;
+  }
+}
+@media (min-height: 940px) {
+  .hero-laptop-zoom {
+    zoom: 1.06;
+  }
+}

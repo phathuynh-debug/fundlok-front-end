@@ -209,7 +209,13 @@ export default function Mockup(props: MockupProps) {
 
   const laptopMockup = (
     <div className="w-full flex justify-center mb-6 z-20 select-none">
-      <div className="relative w-[800px] aspect-[2528/1684] shrink-0">
+      {/* The frame stays at its 800px design width so the internal terminal
+          UI never reflows (shrinking the width made the tabs and table text
+          wrap and break). Instead the WHOLE frame is scaled with `zoom` —
+          see .hero-laptop-zoom in globals.css — in height-based tiers, so
+          the one-viewport hero keeps the "our solution" scroll button above
+          the fold on shorter laptop screens. */}
+      <div className="hero-laptop-zoom relative w-[800px] aspect-[2528/1684] shrink-0">
         {/* MacBook Pro Model Image. Intrinsic dimensions are declared so the
               frame reserves its box before the bytes land; `fetchPriority` is
               high because on a wide viewport this is the largest thing above
