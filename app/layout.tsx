@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { getSeoStrings, OG_LOCALE, resolveSeoLocale } from "@/lib/seo";
+import { getSeoStrings, OG_LOCALE } from "@/lib/seo";
 import { cookies, headers } from "next/headers";
 import { NONCE_HEADER } from "@/lib/csp";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -97,7 +97,7 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   // The URL on a localized public page (/en/...), else the cookie. Same
   // resolver as the page and its metadata, so <html lang> matches the body.
-  const locale = await resolveSeoLocale();
+  const { locale, seo } = await getSeoStrings();
   // Read server-side so the first paint already respects the preference —
   // see the note in components/appearance-provider.tsx.
   const reduceMotion = parseReduceMotionCookie(
@@ -115,6 +115,9 @@ export default async function RootLayout({
     "@id": `${SITE_URL}#organization`,
     name: "FundLok",
     alternateName: "Công ty Cổ phần FundLok",
+    // The hero <h1> in this page's language, so the entity carries the phrase
+    // people search for alongside the brand name.
+    slogan: seo.slogan,
     url: SITE_URL,
     // The square mark (Google requires a 1:1 logo), not the wordmark.
     logo: `${SITE_URL}/icon.png`,

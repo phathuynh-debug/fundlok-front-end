@@ -149,6 +149,21 @@ export async function generateMetadata(): Promise<Metadata> {
       "FundLok CTO",
       "FundLok founding team",
       "FundLok founders",
+      // The hero <h1> phrase in both languages, and the shorter queries
+      // people type for it. Google ignores this tag, so each phrase also leads
+      // homeTitle and homeDescription in its own en.json / vi.json; this list
+      // is for the engines that still read it, on both language versions.
+      "Flexible capital for MSMEs in Vietnam",
+      "flexible capital for SMEs in Vietnam",
+      "flexible capital marketplace for SMEs",
+      "SME funding platform Vietnam",
+      "Sàn vốn linh hoạt cho SME tại Việt Nam",
+      "sàn vốn linh hoạt",
+      "sàn vốn linh hoạt cho SME",
+      "vốn linh hoạt cho SME",
+      "sàn huy động vốn SME",
+      "nền tảng huy động vốn",
+      "kết nối vốn doanh nghiệp SME",
     ],
     openGraph: {
       url: localeAlternates("/", locale).canonical,
