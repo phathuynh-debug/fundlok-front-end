@@ -158,6 +158,7 @@ export async function generateMetadata(): Promise<Metadata> {
       "flexible capital marketplace for SMEs",
       "SME funding platform Vietnam",
       "Sàn vốn linh hoạt cho SME tại Việt Nam",
+      "Vốn linh hoạt cho SME tại Việt Nam",
       "sàn vốn linh hoạt",
       "sàn vốn linh hoạt cho SME",
       "vốn linh hoạt cho SME",
