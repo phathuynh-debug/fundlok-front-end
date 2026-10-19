@@ -2657,6 +2657,14 @@
       "successTitle": "Đã đổi mật khẩu",
       "title": "Đổi mật khẩu"
     },
+    "secondFactorRequired": {
+      "addAnotherBody": "Phiên này được mở mà không dùng lớp xác thực thứ hai bạn đã có. Hãy đăng nhập lại bằng phương thức đó trước khi thêm phương thức khác.",
+      "setupBody": "Bạn mới chỉ đăng nhập bằng mật khẩu nên khu vực quản trị đang bị khóa. Hãy thiết lập ứng dụng xác thực hoặc passkey bên dưới, sau đó đăng xuất và đăng nhập lại bằng phương thức đó.",
+      "signInAgain": "Đăng xuất và đăng nhập lại",
+      "signInAgainBody": "Phiên này được mở mà không dùng lớp xác thực thứ hai nên khu vực quản trị đang bị khóa. Hãy đăng xuất, rồi đăng nhập lại bằng ứng dụng xác thực hoặc passkey.",
+      "title": "Tài khoản quản trị phải đăng nhập bằng xác thực hai lớp",
+      "toastBody": "Hãy đăng xuất và đăng nhập lại bằng phương thức này để mở khóa khu vực quản trị."
+    },
     "twoFactor": {
       "back": "Quay lại",
       "codeHint": "Mã thay đổi mỗi 30 giây.",

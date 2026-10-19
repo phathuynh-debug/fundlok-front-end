@@ -5,6 +5,11 @@ import axios, {
   type AxiosResponse,
 } from "axios";
 import { API_URL } from "./endpoints";
+import {
+  MFA_REQUIRED,
+  SECOND_FACTOR_SETUP_PATH,
+  shouldRedirectToSecondFactorSetup,
+} from "./second-factor";
 import { getStatusMessage } from "./status-codes";
 import type { ApiError } from "./types";
 
@@ -94,6 +99,29 @@ class ApiClient {
     return this.refreshInFlight;
   }
 
+  /**
+   * Set once the page is on its way to the second-factor setup page, so the
+   * burst of refusals from a page's parallel queries navigates only once.
+   */
+  private redirectingToSecondFactorSetup = false;
+
+  /**
+   * Send an admin whose session has no second factor to set one up. Returns
+   * whether the page is leaving, i.e. whether the caller should stop here.
+   */
+  private sendToSecondFactorSetup(): boolean {
+    if (typeof window === "undefined") return false;
+    if (this.redirectingToSecondFactorSetup) return true;
+    if (!shouldRedirectToSecondFactorSetup(window.location.pathname)) {
+      return false;
+    }
+    this.redirectingToSecondFactorSetup = true;
+    // replace, not assign: Back would return to a page that cannot load and
+    // bounce straight here again.
+    window.location.replace(SECOND_FACTOR_SETUP_PATH);
+    return true;
+  }
+
   private setupInterceptors() {
     this.axiosInstance.interceptors.response.use(
       (response: AxiosResponse) => response,
@@ -136,6 +164,24 @@ class ApiClient {
         // existing caller already reads. See ApiError.code.
         const rawCode = error.response?.headers?.["x-error-code"];
         const code = typeof rawCode === "string" ? rawCode : undefined;
+
+        // An admin whose session was opened without a second factor (see
+        // lib/second-factor.ts). The backend refuses almost every call, so
+        // the page that made this one cannot work: each query would show its
+        // own "could not load" and each mutation its own red toast. Send the
+        // admin to set one up instead.
+        //
+        // The promise never settles. The page is being replaced, and
+        // rejecting would flash every error state on the way out. On the
+        // setup page itself this rejects as usual, carrying the code, so the
+        // page can explain why its calls fail.
+        if (
+          status === 403 &&
+          code === MFA_REQUIRED &&
+          this.sendToSecondFactorSetup()
+        ) {
+          return new Promise<never>(() => {});
+        }
 
         return Promise.reject({ message, details, status, code });
       },

@@ -500,6 +500,29 @@ const SUSPENDED_KEYS = new Set<StubUserKey>(["suspended"]);
 const EXPIRED_KEYS = new Set<StubUserKey>(["expiredSession"]);
 
 /**
+ * Admin sessions opened without a second factor (audit finding SEC-01).
+ *
+ * The real get_current_user refuses them on every route but the few an admin
+ * needs to get one: reading their own profile, 2FA status and passkeys, and
+ * enrolling a FIRST factor. Enrolling does not upgrade the session, so once a
+ * factor exists everything else stays refused until they sign in again.
+ */
+const SECOND_FACTOR_MISSING_KEYS = new Set<StubUserKey>([
+  "adminNoSecondFactor",
+]);
+const SECOND_FACTOR_READS = new Set([
+  "GET /users/me",
+  "GET /auth/2fa",
+  "GET /auth/passkeys",
+]);
+const SECOND_FACTOR_ENROLMENT = new Set([
+  "POST /auth/2fa/setup",
+  "POST /auth/2fa/enable",
+  "POST /auth/passkeys/register/options",
+  "POST /auth/passkeys/register/verify",
+]);
+
+/**
  * The stub's signed VAT series, oldest first from 08/2024 (the reference
  * folder's first month). It lines up with the stub e-invoices, which run
  * 09/2025-08/2026:
@@ -910,6 +933,27 @@ const server = createServer(async (req, res) => {
     return detail(res, 401, "Not authenticated");
   }
   const { key, user } = session;
+
+  if (SECOND_FACTOR_MISSING_KEYS.has(key)) {
+    const route = `${method} ${path}`;
+    const hasSecondFactor =
+      totpState(key).enabled ||
+      (stubPasskeys.get(passkeyScope(req, key)) ?? []).length > 0;
+    const allowed =
+      SECOND_FACTOR_READS.has(route) ||
+      (SECOND_FACTOR_ENROLMENT.has(route) && !hasSecondFactor);
+    if (!allowed) {
+      return json(
+        res,
+        403,
+        {
+          detail:
+            "Admin accounts must sign in with a second factor. Set up an authenticator app or a passkey, then sign in again with it.",
+        },
+        { "x-error-code": "MFA_REQUIRED" },
+      );
+    }
+  }
 
   // --- Passkeys -----------------------------------------------------------
   // Registration and sign-in need a real authenticator, so those ceremonies

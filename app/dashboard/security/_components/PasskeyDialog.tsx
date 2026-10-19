@@ -22,6 +22,8 @@ import { formatDate } from "@/lib/format-date";
 import { useTranslations } from "@/lib/i18n";
 import { isPasskeyCancellation, isPasskeySupported } from "@/lib/passkeys";
 import { apiErrorMessage } from "@/lib/api-error-message";
+import { isSecondFactorRequired } from "@/lib/second-factor";
+import { useSignInAgainToast } from "./SecondFactorNotice";
 
 /**
  * Add and remove passkeys.
@@ -34,12 +36,19 @@ import { apiErrorMessage } from "@/lib/api-error-message";
 export function PasskeyDialog({
   open,
   onOpenChange,
+  secondFactorRequired = false,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /**
+   * An admin on a session opened without a second factor. Registering does
+   * not upgrade that session, so success says to sign in again instead.
+   */
+  secondFactorRequired?: boolean;
 }) {
   const { locale, t } = useTranslations();
   const { toast } = useToast();
+  const signInAgainToast = useSignInAgainToast();
   const [name, setName] = useState("");
 
   const { data: passkeys, isPending } = usePasskeys(open);
@@ -52,6 +61,10 @@ export function PasskeyDialog({
     register.mutate(name.trim() || undefined, {
       onSuccess: (created) => {
         setName("");
+        if (secondFactorRequired) {
+          signInAgainToast(t("dashboard.security.passkeys.addedTitle"));
+          return;
+        }
         toast({
           title: t("dashboard.security.passkeys.addedTitle"),
           description: t("dashboard.security.passkeys.addedBody", {
@@ -66,7 +79,11 @@ export function PasskeyDialog({
         toast({
           variant: "destructive",
           title: t("dashboard.security.passkeys.addFailedTitle"),
-          description: apiErrorMessage(error, locale, t("common.tryAgain")),
+          // An admin who already has a factor cannot add a passkey from a
+          // session that did not use it.
+          description: isSecondFactorRequired(error)
+            ? t("security.secondFactorRequired.addAnotherBody")
+            : apiErrorMessage(error, locale, t("common.tryAgain")),
         });
       },
     });

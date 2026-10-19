@@ -25,7 +25,8 @@ export type StubUserKey =
   | "smeApprovedApplication"
   | "twoFactor"
   | "suspended"
-  | "expiredSession";
+  | "expiredSession"
+  | "adminNoSecondFactor";
 
 export interface StubUser {
   id: string;
@@ -210,6 +211,17 @@ export const STUB_USERS: Record<StubUserKey, StubUser> = {
     id: "00000000-0000-0000-0000-0000000000b3",
     email: "expired@e2e.test",
     full_name: "Expired Session",
+    role: "ADMIN",
+  },
+  // An admin signed in with a password only. The backend refuses nearly every
+  // call from such a session (audit finding SEC-01), so the frontend must send
+  // them to set up a second factor. Its own identity because the spec enrols
+  // 2FA on it, and the stub keeps that per account.
+  adminNoSecondFactor: {
+    ...base,
+    id: "00000000-0000-0000-0000-0000000000b6",
+    email: "admin-no-second-factor@e2e.test",
+    full_name: "Password Only Admin",
     role: "ADMIN",
   },
   unapprovedSme: {

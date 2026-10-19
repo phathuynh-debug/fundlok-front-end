@@ -26,7 +26,9 @@ import { ChangePasswordDialog } from "./ChangePasswordDialog";
 import { TwoFactorDisableDialog } from "./TwoFactorDisableDialog";
 import { TwoFactorSetupDialog } from "./TwoFactorSetupDialog";
 import { PasskeyDialog } from "./PasskeyDialog";
+import { SecondFactorNotice } from "./SecondFactorNotice";
 import { apiErrorMessage } from "@/lib/api-error-message";
+import { isSecondFactorRequired } from "@/lib/second-factor";
 
 function SecuritySkeleton() {
   return (
@@ -71,8 +73,15 @@ export function SecuritySettings({
   // React Query, keyed by authKeys.
   const INITIAL_ACTIVITY_LIMIT = 7;
   const [activityLimit, setActivityLimit] = useState(INITIAL_ACTIVITY_LIMIT);
-  const { data: sessions = [], isLoading: isSessionsLoading } =
-    useSessions(!isAuthLoading);
+  const {
+    data: sessions = [],
+    isLoading: isSessionsLoading,
+    error: sessionsError,
+  } = useSessions(!isAuthLoading);
+  // An admin whose session was opened without a second factor. The backend
+  // refuses sessions, activity and preferences for them (see
+  // lib/second-factor.ts), and this is the page api-client sends them to.
+  const secondFactorRequired = isSecondFactorRequired(sessionsError);
   const {
     data: activity = [],
     isLoading: isActivityLoading,
@@ -113,7 +122,7 @@ export function SecuritySettings({
   const [totpDisableOpen, setTotpDisableOpen] = useState(false);
   const [passkeyDialogOpen, setPasskeyDialogOpen] = useState(false);
 
-  const { data: passkeys } = usePasskeys();
+  const { data: passkeys, isLoading: isPasskeysLoading } = usePasskeys();
 
   const protections = useMemo(
     () =>
@@ -127,6 +136,8 @@ export function SecuritySettings({
 
   const score = useMemo(() => deriveScore(protections), [protections]);
   const protectionsOn = protections.filter((p) => p.state === "on").length;
+  const hasSecondFactor =
+    (twoFactor?.enabled ?? false) || (passkeys?.length ?? 0) > 0;
 
   // The password row no longer carries a date: nothing stores when a password
   // last changed. The security history does show PASSWORD_CHANGED events, which
@@ -225,8 +236,23 @@ export function SecuritySettings({
       isSessionsLoading ||
       isActivityLoading ||
       isPrefsLoading ||
-      isTwoFactorLoading ? (
+      isTwoFactorLoading ||
+      isPasskeysLoading ? (
         <SecuritySkeleton />
+      ) : secondFactorRequired ? (
+        // Only the two rows that can get them a second factor. Everything else
+        // on this screen is refused until they sign in with one, and would
+        // render as empty lists and switches that fail.
+        <div className="space-y-6">
+          <SecondFactorNotice hasSecondFactor={hasSecondFactor} />
+          <ProtectionList
+            items={protections.filter(
+              (item) => item.key === "totp" || item.key === "passkey",
+            )}
+            onToggle={handleToggle}
+            onChangePassword={() => setPasswordDialogOpen(true)}
+          />
+        </div>
       ) : (
         <div className="space-y-6">
           <SecurityPostureCard
@@ -272,11 +298,13 @@ export function SecuritySettings({
       <PasskeyDialog
         open={passkeyDialogOpen}
         onOpenChange={setPasskeyDialogOpen}
+        secondFactorRequired={secondFactorRequired}
       />
 
       <TwoFactorSetupDialog
         open={totpSetupOpen}
         onOpenChange={setTotpSetupOpen}
+        secondFactorRequired={secondFactorRequired}
       />
 
       <TwoFactorDisableDialog

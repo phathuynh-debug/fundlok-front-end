@@ -32,6 +32,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { apiErrorMessage } from "@/lib/api-error-message";
+import { isSecondFactorRequired } from "@/lib/second-factor";
+import { useSignInAgainToast } from "./SecondFactorNotice";
 
 /**
  * Three-step enrolment: scan -> confirm a code -> save recovery codes.
@@ -47,12 +49,19 @@ type Step = "scan" | "confirm" | "recovery";
 export function TwoFactorSetupDialog({
   open,
   onOpenChange,
+  secondFactorRequired = false,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /**
+   * An admin on a session opened without a second factor. Enrolling does not
+   * upgrade that session, so success says to sign in again instead.
+   */
+  secondFactorRequired?: boolean;
 }) {
   const { t, locale } = useTranslations();
   const { toast } = useToast();
+  const signInAgainToast = useSignInAgainToast();
 
   const [step, setStep] = useState<Step>("scan");
   const [code, setCode] = useState("");
@@ -77,6 +86,11 @@ export function TwoFactorSetupDialog({
     startSetup();
     return () => resetSetup();
   }, [open, startSetup, resetSetup]);
+
+  // An admin who already has a passkey cannot add an app from a session that
+  // did not use it; the backend's English sentence says to set one up, which
+  // they have.
+  const setupBlocked = isSecondFactorRequired(setupError);
 
   const close = (next: boolean) => {
     if (!next) {
@@ -167,8 +181,10 @@ export function TwoFactorSetupDialog({
                   {t("security.twoFactor.setupFailedTitle")}
                 </p>
                 <p className="text-xs leading-relaxed text-muted-foreground">
-                  {setupError.message ||
-                    t("security.twoFactor.setupFailedDescription")}
+                  {setupBlocked
+                    ? t("security.secondFactorRequired.addAnotherBody")
+                    : setupError.message ||
+                      t("security.twoFactor.setupFailedDescription")}
                 </p>
               </div>
             </div>
@@ -177,10 +193,12 @@ export function TwoFactorSetupDialog({
               <Button variant="outline" onClick={() => close(false)}>
                 {t("common.cancel")}
               </Button>
-              <Button onClick={() => startSetup()} className="gap-1.5">
-                <RefreshCw className="h-3.5 w-3.5" />
-                {t("security.twoFactor.retry")}
-              </Button>
+              {!setupBlocked && (
+                <Button onClick={() => startSetup()} className="gap-1.5">
+                  <RefreshCw className="h-3.5 w-3.5" />
+                  {t("security.twoFactor.retry")}
+                </Button>
+              )}
             </DialogFooter>
           </div>
         )}
@@ -325,10 +343,14 @@ export function TwoFactorSetupDialog({
             <DialogFooter>
               <Button
                 onClick={() => {
-                  toast({
-                    title: t("security.twoFactor.enabledTitle"),
-                    description: t("security.twoFactor.enabledDescription"),
-                  });
+                  if (secondFactorRequired) {
+                    signInAgainToast(t("security.twoFactor.enabledTitle"));
+                  } else {
+                    toast({
+                      title: t("security.twoFactor.enabledTitle"),
+                      description: t("security.twoFactor.enabledDescription"),
+                    });
+                  }
                   close(false);
                 }}
                 className={cn("w-full sm:w-auto")}

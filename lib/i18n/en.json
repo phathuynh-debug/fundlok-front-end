@@ -2657,6 +2657,14 @@
       "successTitle": "Password changed",
       "title": "Change password"
     },
+    "secondFactorRequired": {
+      "addAnotherBody": "This session was opened without the second factor you already have. Sign in again with it before adding another.",
+      "setupBody": "You signed in with your password only, so the admin area is locked. Set up an authenticator app or a passkey below, then sign out and sign in again with it.",
+      "signInAgain": "Sign out and sign in again",
+      "signInAgainBody": "This session was opened without your second factor, so the admin area is locked. Sign out, then sign in again with your authenticator app or passkey.",
+      "title": "Admin accounts need two-factor sign-in",
+      "toastBody": "Sign out and sign in again with it to unlock the admin area."
+    },
     "twoFactor": {
       "back": "Back",
       "codeHint": "The code changes every 30 seconds.",
