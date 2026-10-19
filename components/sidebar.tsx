@@ -134,7 +134,7 @@ function NavLink({
 export function Sidebar() {
   const pathname = usePathname();
   const { data: user } = useCurrentUser();
-  const { t } = useTranslations();
+  const { t, localize } = useTranslations();
 
   const isSME = user?.role === "SME";
 
@@ -247,7 +247,7 @@ export function Sidebar() {
 
                   <div className="pt-1 border-t border-border/40">
                     <Link
-                      href="/contact"
+                      href={localize("/contact")}
                       className="flex items-center justify-between text-[11px] font-medium text-muted-foreground hover:text-foreground px-2 py-0.5 transition-colors"
                     >
                       <span>{t("dashboard.sidebar.help")}</span>

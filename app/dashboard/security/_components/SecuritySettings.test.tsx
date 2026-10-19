@@ -6,6 +6,7 @@ import { SecuritySettings } from "./SecuritySettings";
 // What the security endpoints answer for the account under test.
 const account = vi.hoisted(() => ({
   sessionsError: null as unknown,
+  secondFactorRequired: false,
   totpEnabled: false,
   passkeys: [] as { id: string; name: string }[],
 }));
@@ -21,6 +22,18 @@ const mutation = vi.hoisted(() => () => ({
 
 vi.mock("@/hooks/use-authentication", () => ({
   useRequireAuth: () => ({ user: { role: "ADMIN" }, isLoading: false }),
+  useSecurityOverview: () => ({
+    data: {
+      second_factor_required: account.secondFactorRequired,
+      two_factor: { enabled: account.totpEnabled },
+      passkeys: account.passkeys,
+      sessions: [],
+      security_events: [],
+      security_preferences: { signin_alerts_enabled: false },
+    },
+    isLoading: false,
+    isFetched: true,
+  }),
   useSessions: () => ({
     data: undefined,
     isLoading: false,

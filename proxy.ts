@@ -256,6 +256,10 @@ async function routeRequest(request: NextRequest, refreshed: string[]) {
   }
 
   const pathname = route.path;
+  const effectiveLocale =
+    route.locale ??
+    (preferred === "en" || preferred === "vi" ? preferred : "vi");
+  const localizedLoginPath = localizedPath("/login", effectiveLocale);
   const pass = () => continueToPage(request, route);
 
   // Pages with no auth, role or maintenance rule — the marketing pages (why-us,
@@ -313,7 +317,7 @@ async function routeRequest(request: NextRequest, refreshed: string[]) {
   // Nobody else has any business on that page.
   if (!isSuspendedSession && pathname === SUSPENDED_ROUTE) {
     return NextResponse.redirect(
-      new URL(isAuthenticated ? "/dashboard" : "/login", request.url),
+      new URL(isAuthenticated ? "/dashboard" : localizedLoginPath, request.url),
     );
   }
 
@@ -345,7 +349,7 @@ async function routeRequest(request: NextRequest, refreshed: string[]) {
       AUTH_ROUTES.some((route) => pathname === route) ||
       pathname === "/verify-email";
     if (!isPublicEntry) {
-      const loginUrl = new URL("/login", request.url);
+      const loginUrl = new URL(localizedLoginPath, request.url);
       loginUrl.searchParams.set("from", pathname);
       const response = NextResponse.redirect(loginUrl);
       // Clear the stale access token so the next request skips /users/me.
@@ -453,7 +457,7 @@ async function routeRequest(request: NextRequest, refreshed: string[]) {
     pathname === "/verify-email" &&
     !hasVerificationToken
   ) {
-    const loginUrl = new URL("/login", request.url);
+    const loginUrl = new URL(localizedLoginPath, request.url);
     loginUrl.searchParams.set("from", pathname);
     return NextResponse.redirect(loginUrl);
   }
@@ -524,7 +528,7 @@ async function routeRequest(request: NextRequest, refreshed: string[]) {
     !isAuthenticated &&
     PROTECTED_ROUTES.some((r) => pathname.startsWith(r))
   ) {
-    const loginUrl = new URL("/login", request.url);
+    const loginUrl = new URL(localizedLoginPath, request.url);
     loginUrl.searchParams.set("from", pathname);
     return NextResponse.redirect(loginUrl);
   }

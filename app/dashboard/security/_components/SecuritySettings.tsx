@@ -4,10 +4,12 @@ import { useMemo, useState } from "react";
 import { ShieldCheck } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  usePasskeys,
   useRequireAuth,
   useRevokeOtherSessions,
   useRevokeSession,
   useSecurityEvents,
+  useSecurityOverview,
   useSecurityPreferences,
   useSessions,
   useTwoFactorStatus,
@@ -21,7 +23,6 @@ import { ProtectionList } from "./ProtectionList";
 import { SecurityPostureCard } from "./SecurityPostureCard";
 import { SessionList } from "./SessionList";
 import { buildProtections, deriveScore } from "./protections";
-import { usePasskeys } from "@/hooks/use-authentication";
 import { ChangePasswordDialog } from "./ChangePasswordDialog";
 import { TwoFactorDisableDialog } from "./TwoFactorDisableDialog";
 import { TwoFactorSetupDialog } from "./TwoFactorSetupDialog";
@@ -71,22 +72,39 @@ export function SecuritySettings({
   // Sessions and activity are real server state: /auth/sessions is backed by
   // refresh_tokens and /auth/security-events by audit_logs, so they belong in
   // React Query, keyed by authKeys.
+  //
+  // On initial mount, useSecurityOverview fetches all five security slices in
+  // one BFF call (GET /api/bff/security-overview) and seeds their React Query
+  // caches so the individual hooks below read from cache with zero extra
+  // network requests.
   const INITIAL_ACTIVITY_LIMIT = 7;
   const [activityLimit, setActivityLimit] = useState(INITIAL_ACTIVITY_LIMIT);
+  const {
+    data: overview,
+    isLoading: isOverviewLoading,
+    isFetched: isOverviewFetched,
+  } = useSecurityOverview(!isAuthLoading, INITIAL_ACTIVITY_LIMIT);
+
+  const slicesEnabled = !isAuthLoading && isOverviewFetched;
+  const protectedSlicesEnabled =
+    slicesEnabled && !overview?.second_factor_required;
+
   const {
     data: sessions = [],
     isLoading: isSessionsLoading,
     error: sessionsError,
-  } = useSessions(!isAuthLoading);
+  } = useSessions(protectedSlicesEnabled);
   // An admin whose session was opened without a second factor. The backend
   // refuses sessions, activity and preferences for them (see
   // lib/second-factor.ts), and this is the page api-client sends them to.
-  const secondFactorRequired = isSecondFactorRequired(sessionsError);
+  const secondFactorRequired =
+    Boolean(overview?.second_factor_required) ||
+    isSecondFactorRequired(sessionsError);
   const {
     data: activity = [],
     isLoading: isActivityLoading,
     isFetching: isActivityFetching,
-  } = useSecurityEvents(!isAuthLoading, activityLimit);
+  } = useSecurityEvents(protectedSlicesEnabled, activityLimit);
 
   const hasMoreActivity =
     activity.length >= activityLimit && activityLimit < 100;
@@ -112,17 +130,18 @@ export function SecuritySettings({
   // 2FA and passkeys are both real now, so buildProtections marks them
   // unavailable rather than pretending they are on.
   const { data: preferences, isLoading: isPrefsLoading } =
-    useSecurityPreferences(!isAuthLoading);
+    useSecurityPreferences(protectedSlicesEnabled);
   const { mutate: updatePreferences, isPending: isSavingPreference } =
     useUpdateSecurityPreferences();
   const { data: twoFactor, isLoading: isTwoFactorLoading } =
-    useTwoFactorStatus(!isAuthLoading);
+    useTwoFactorStatus(slicesEnabled);
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
   const [totpSetupOpen, setTotpSetupOpen] = useState(false);
   const [totpDisableOpen, setTotpDisableOpen] = useState(false);
   const [passkeyDialogOpen, setPasskeyDialogOpen] = useState(false);
 
-  const { data: passkeys, isLoading: isPasskeysLoading } = usePasskeys();
+  const { data: passkeys, isLoading: isPasskeysLoading } =
+    usePasskeys(slicesEnabled);
 
   const protections = useMemo(
     () =>
@@ -233,6 +252,7 @@ export function SecuritySettings({
       </div>
 
       {isAuthLoading ||
+      isOverviewLoading ||
       isSessionsLoading ||
       isActivityLoading ||
       isPrefsLoading ||

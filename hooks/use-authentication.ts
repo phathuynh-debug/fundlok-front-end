@@ -33,6 +33,10 @@ import { createPasskey, getPasskeyAssertion } from "@/lib/passkeys";
 export const authKeys = {
   all: ["auth"] as const,
   currentUser: () => [...authKeys.all, "me"] as const,
+  securityOverview: (limit?: number) =>
+    typeof limit === "number"
+      ? ([...authKeys.all, "security-overview", limit] as const)
+      : ([...authKeys.all, "security-overview"] as const),
   sessions: () => [...authKeys.all, "sessions"] as const,
   securityPreferences: () => [...authKeys.all, "security-preferences"] as const,
   securityEvents: (limit?: number) =>
@@ -113,12 +117,13 @@ export function useLogout() {
  * The cookie is sent automatically by the browser — no token needed.
  * Returns undefined when not authenticated (401 → query disabled).
  */
-export function useCurrentUser() {
+export function useCurrentUser(enabled = true) {
   return useQuery<User, ApiError>({
     queryKey: authKeys.currentUser(),
     queryFn: () => usersService.getCurrentUser(),
     staleTime: 5 * 60 * 1000,
     retry: false,
+    enabled,
   });
 }
 
@@ -143,6 +148,47 @@ export function useRequireAuth(redirectTo = "/login") {
 }
 
 // ---------- Security screen ----------
+
+/**
+ * BFF bootstrap for /dashboard/security and /admin/security.
+ *
+ * Fetches two-factor status, passkeys, active sessions, security events, and
+ * sign-in alert preferences in a single HTTP request to
+ * GET /api/bff/security-overview, then seeds each individual React Query key
+ * so the granular hooks below read from cache with zero extra network calls on
+ * mount.
+ */
+export function useSecurityOverview(
+  enabled = true,
+  initialEventsLimit = 7,
+) {
+  const queryClient = useQueryClient();
+
+  return useQuery({
+    queryKey: authKeys.securityOverview(initialEventsLimit),
+    queryFn: async () => {
+      const overview =
+        await authenticationService.getSecurityOverview(initialEventsLimit);
+      queryClient.setQueryData(authKeys.twoFactor(), overview.two_factor);
+      queryClient.setQueryData(authKeys.passkeys(), overview.passkeys);
+      if (!overview.second_factor_required) {
+        queryClient.setQueryData(authKeys.sessions(), overview.sessions);
+        queryClient.setQueryData(
+          authKeys.securityEvents(initialEventsLimit),
+          overview.security_events,
+        );
+        queryClient.setQueryData(
+          authKeys.securityPreferences(),
+          overview.security_preferences,
+        );
+      }
+      return overview;
+    },
+    staleTime: 30 * 1000,
+    retry: false,
+    enabled,
+  });
+}
 
 /**
  * Devices currently signed in. Short staleTime: revoking on another tab (or
@@ -180,6 +226,7 @@ export function useRevokeSession() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authKeys.sessions() });
       queryClient.invalidateQueries({ queryKey: authKeys.securityEvents() });
+      queryClient.invalidateQueries({ queryKey: authKeys.securityOverview() });
     },
   });
 }
@@ -192,6 +239,7 @@ export function useRevokeOtherSessions() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authKeys.sessions() });
       queryClient.invalidateQueries({ queryKey: authKeys.securityEvents() });
+      queryClient.invalidateQueries({ queryKey: authKeys.securityOverview() });
     },
   });
 }
@@ -216,6 +264,7 @@ export function useUpdateSecurityPreferences() {
       queryClient.setQueryData(authKeys.securityPreferences(), prefs);
       // Toggling is audited, so the activity feed changes too.
       queryClient.invalidateQueries({ queryKey: authKeys.securityEvents() });
+      queryClient.invalidateQueries({ queryKey: authKeys.securityOverview() });
     },
   });
 }
@@ -232,6 +281,7 @@ export function useChangePassword() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authKeys.sessions() });
       queryClient.invalidateQueries({ queryKey: authKeys.securityEvents() });
+      queryClient.invalidateQueries({ queryKey: authKeys.securityOverview() });
     },
   });
 }
@@ -275,6 +325,7 @@ export function useEnableTwoFactor() {
     mutationFn: (code) => authenticationService.enableTwoFactor(code),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authKeys.twoFactor() });
+      queryClient.invalidateQueries({ queryKey: authKeys.securityOverview() });
     },
   });
 }
@@ -289,6 +340,7 @@ export function useDisableTwoFactor() {
       // reconciled from the server.
       queryClient.setQueryData(authKeys.twoFactor(), status);
       queryClient.invalidateQueries({ queryKey: authKeys.twoFactor() });
+      queryClient.invalidateQueries({ queryKey: authKeys.securityOverview() });
     },
   });
 }
@@ -329,6 +381,7 @@ export function useRegisterPasskey() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authKeys.passkeys() });
+      queryClient.invalidateQueries({ queryKey: authKeys.securityOverview() });
     },
   });
 }
@@ -340,6 +393,7 @@ export function useDeletePasskey() {
     mutationFn: (id) => authenticationService.deletePasskey(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authKeys.passkeys() });
+      queryClient.invalidateQueries({ queryKey: authKeys.securityOverview() });
     },
   });
 }

@@ -68,7 +68,7 @@ export function useGVerifyStatus({
         throw err;
       }
     },
-    staleTime: 0,
+    staleTime: poll ? 0 : 60 * 1000,
     retry: false,
     // While polling, never self-stop on a terminal status: the current
     // attempt may already be terminal (e.g. an earlier rejection) and the
@@ -131,7 +131,7 @@ export function useGVerifyKybStatus(enabled = true) {
         throw err;
       }
     },
-    staleTime: 0,
+    staleTime: 60 * 1000,
     retry: false,
   });
 }

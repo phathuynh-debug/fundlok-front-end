@@ -31,11 +31,19 @@ const aboutLinks = [
 ];
 
 const supportLinks = [
-  { labelKey: "footer.contactUs", href: "/contact" },
-  { labelKey: "footer.projectApplication", href: "/project-application" },
-  { labelKey: "footer.terms", href: "/terms" },
-  { labelKey: "footer.logIn", href: "/login" },
-  { labelKey: "footer.register", href: "/login?mode=register" },
+  { labelKey: "footer.contactUs", href: "/contact", prefetch: undefined },
+  {
+    labelKey: "footer.projectApplication",
+    href: "/project-application",
+    prefetch: false,
+  },
+  { labelKey: "footer.terms", href: "/terms", prefetch: undefined },
+  { labelKey: "footer.logIn", href: "/login", prefetch: false },
+  {
+    labelKey: "footer.register",
+    href: "/login?mode=register",
+    prefetch: false,
+  },
 ];
 
 const socialLinks = [
@@ -92,6 +100,7 @@ export default function SiteFooter() {
                 <li key={link.labelKey}>
                   <Link
                     href={localize(link.href)}
+                    prefetch={link.prefetch}
                     className="transition-colors hover:text-white"
                   >
                     {t(link.labelKey)}

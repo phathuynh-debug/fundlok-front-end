@@ -514,6 +514,7 @@ const SECOND_FACTOR_READS = new Set([
   "GET /users/me",
   "GET /auth/2fa",
   "GET /auth/passkeys",
+  "GET /auth/security-overview",
 ]);
 const SECOND_FACTOR_ENROLMENT = new Set([
   "POST /auth/2fa/setup",
@@ -1217,6 +1218,65 @@ const server = createServer(async (req, res) => {
       },
     ]);
   }
+
+  if (path === "/auth/security-overview" && method === "GET") {
+    const state = totpState(key);
+    const twoFactorPayload = {
+      enabled: state.enabled,
+      confirmed_at: state.enabled ? "2026-08-27T09:00:00+07:00" : null,
+      recovery_codes_remaining: state.recoveryRemaining,
+    };
+    const passkeysPayload = stubPasskeys.get(passkeyScope(req, key)) ?? [];
+    const secondFactorRequired = SECOND_FACTOR_MISSING_KEYS.has(key);
+
+    if (secondFactorRequired) {
+      return json(res, 200, {
+        two_factor: twoFactorPayload,
+        passkeys: passkeysPayload,
+        sessions: [],
+        security_events: [],
+        security_preferences: null,
+        second_factor_required: true,
+      });
+    }
+
+    return json(res, 200, {
+      two_factor: twoFactorPayload,
+      passkeys: passkeysPayload,
+      sessions: [
+        {
+          session_id: "session-current",
+          device: "Mac",
+          browser: "Chrome 141",
+          ip_address: "127.0.0.1",
+          created_at: "2026-08-20T09:00:00+07:00",
+          last_used_at: "2026-08-27T09:00:00+07:00",
+          current: true,
+        },
+        {
+          session_id: "session-other",
+          device: "iPhone",
+          browser: "Safari 18",
+          ip_address: "203.0.113.7",
+          created_at: "2026-08-25T19:30:00+07:00",
+          last_used_at: "2026-08-26T21:05:00+07:00",
+          current: false,
+        },
+      ],
+      security_events: [
+        {
+          id: "event-1",
+          action: "SIGN_IN",
+          severity: "info",
+          ip_address: "127.0.0.1",
+          created_at: "2026-08-27T09:00:00+07:00",
+        },
+      ],
+      security_preferences: { signin_alerts_enabled: false },
+      second_factor_required: false,
+    });
+  }
+
 
   // The proxy's on-demand verification gate. Both prefixes answer from the same
   // fixture flag; the proxy picks one by role.

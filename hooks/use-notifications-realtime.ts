@@ -65,8 +65,16 @@ export function useNotificationsRealtime(userId: string | undefined) {
         // Not ours; ignore.
       }
     });
-    // A reconnect may have missed a push while we were away.
-    socket.addEventListener("open", refresh);
+    // A reconnect may have missed a push while we were away. Skip the initial
+    // open so we do not immediately invalidate and re-fetch the notifications
+    // and projects queries that just mounted with the page.
+    let hasConnectedOnce = false;
+    socket.addEventListener("open", () => {
+      if (hasConnectedOnce) {
+        refresh();
+      }
+      hasConnectedOnce = true;
+    });
 
     return () => socket.close();
   }, [host, userId, queryClient]);

@@ -64,7 +64,7 @@ const navItems = [
   },
   {
     labelKey: "dashboard.sidebar.settings",
-    href: "/dashboard/settings",
+    href: "/dashboard/settings/profile",
     icon: Settings,
   },
 ];
@@ -208,7 +208,7 @@ export function DashboardHeader() {
                 {filteredNavItems.map((item) => {
                   const isActive =
                     pathname === item.href ||
-                    (item.href === "/dashboard/settings" &&
+                    (item.href === "/dashboard/settings/profile" &&
                       pathname.startsWith("/dashboard/settings"));
                   return (
                     <Link

@@ -8,7 +8,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { useTranslations } from "@/lib/i18n";
 
 export default function NotFound() {
-  const { t } = useTranslations();
+  const { t, localize } = useTranslations();
 
   return (
     <div className="min-h-screen flex">
@@ -19,7 +19,11 @@ export default function NotFound() {
 
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           <div>
-            <Link href="/" className="flex items-center gap-2">
+            <Link
+              href={localize("/")}
+              prefetch={false}
+              className="flex items-center gap-2"
+            >
               <div className="h-10 w-10 rounded-lg bg-accent flex items-center justify-center">
                 <span className="text-accent-foreground font-bold text-lg">
                   F
@@ -57,7 +61,11 @@ export default function NotFound() {
       <div className="flex-1 flex flex-col">
         {/* Mobile Header */}
         <header className="lg:hidden flex items-center justify-between p-6 border-b border-border">
-          <Link href="/" className="flex items-center gap-2">
+          <Link
+            href={localize("/")}
+            prefetch={false}
+            className="flex items-center gap-2"
+          >
             <div className="h-8 w-8 rounded-lg bg-accent flex items-center justify-center">
               <span className="text-accent-foreground font-bold">F</span>
             </div>
@@ -89,10 +97,12 @@ export default function NotFound() {
 
             <div className="flex flex-col sm:flex-row gap-3 w-full">
               <Button asChild className="flex-1 h-11">
-                <Link href="/">{t("notFound.goHome")}</Link>
+                <Link href={localize("/")} prefetch={false}>
+                  {t("notFound.goHome")}
+                </Link>
               </Button>
               <Button asChild variant="outline" className="flex-1 h-11">
-                <Link href="/dashboard">
+                <Link href="/dashboard" prefetch={false}>
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   {t("common.dashboard")}
                 </Link>

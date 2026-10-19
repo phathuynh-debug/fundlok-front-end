@@ -13,7 +13,12 @@ import { authenticationService } from "@/services/authentication.service";
 import type { ApiError } from "@/lib/types";
 
 export function VerifyEmailClient() {
-  const { data: user, refetch } = useCurrentUser();
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
+  // When opened from an emailed verification link (?token=...), skip the
+  // automatic mount /users/me lookup so an unauthenticated mail-client click
+  // does not fire a 401 + /auth/refresh 401 before the token is verified.
+  const { data: user, refetch } = useCurrentUser(!token);
   const { mutate: logout } = useLogout();
   const { toast } = useToast();
   const { t } = useTranslations();
@@ -25,9 +30,6 @@ export function VerifyEmailClient() {
   useEffect(() => {
     tRef.current = t;
   }, [t]);
-
-  const searchParams = useSearchParams();
-  const token = searchParams.get("token");
 
   const [isVerifyingToken, setIsVerifyingToken] = useState(!!token);
   const [verificationError, setVerificationError] = useState<string | null>(

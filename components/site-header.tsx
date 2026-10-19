@@ -62,6 +62,7 @@ export default function SiteHeader() {
         <ThemeToggle />
         <Link
           href={localize("/login")}
+          prefetch={false}
           className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-6 py-2.5 text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"
         >
           {t("header.enterApp")}
@@ -72,6 +73,7 @@ export default function SiteHeader() {
       <div className="flex lg:hidden items-center gap-2 relative z-30">
         <Link
           href={localize("/login")}
+          prefetch={false}
           className="w-full text-center rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-6 py-3.5 text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"
         >
           {t("header.enterApp")}
@@ -121,6 +123,7 @@ export default function SiteHeader() {
               <SheetClose asChild>
                 <Link
                   href={localize("/login")}
+                  prefetch={false}
                   className="w-full text-center rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-6 py-3.5 text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"
                 >
                   {t("header.enterApp")}

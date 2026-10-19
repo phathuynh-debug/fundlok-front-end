@@ -33,9 +33,9 @@ export interface GVerifyVerifyResponse {
   mode?: VerificationMode;
 }
 
-// GET /gverify/kyc/status — the caller's latest attempt.
+// GET /gverify/kyc/status — the caller's latest attempt, or NOT_STARTED.
 export interface GVerifyStatusResponse {
-  verification_id: string;
+  verification_id: string | null;
   status: GVerifyStatus | "NOT_STARTED";
   is_terminal: boolean;
   is_approved: boolean;
@@ -119,9 +119,9 @@ export interface GVerifyKybVerifyResponse {
   mode?: VerificationMode;
 }
 
-// GET /gverify/kyb/status — the caller's latest attempt.
+// GET /gverify/kyb/status — the caller's latest attempt, or NOT_STARTED.
 export interface GVerifyKybStatusResponse {
-  verification_id: string;
+  verification_id: string | null;
   status: GVerifyStatus | "NOT_STARTED";
   is_terminal: boolean;
   is_approved: boolean;

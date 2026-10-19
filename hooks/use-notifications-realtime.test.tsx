@@ -83,4 +83,17 @@ describe("useNotificationsRealtime", () => {
     unmount();
     expect(sockets[0].close).toHaveBeenCalled();
   });
+
+  it("skips invalidation on initial open but invalidates on reconnect open", () => {
+    vi.stubEnv("NEXT_PUBLIC_PARTYKIT_HOST", "x.partykit.dev");
+    const { wrapper, spy } = setup();
+    renderHook(() => useNotificationsRealtime("u1"), { wrapper });
+
+    sockets[0].listeners.open({});
+    expect(spy).not.toHaveBeenCalled();
+
+    sockets[0].listeners.open({});
+    expect(spy).toHaveBeenCalledWith({ queryKey: notificationKeys.all });
+    expect(spy).toHaveBeenCalledWith({ queryKey: projectKeys.all });
+  });
 });

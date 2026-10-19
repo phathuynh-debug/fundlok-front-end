@@ -62,13 +62,12 @@ export async function generateMetadata(): Promise<Metadata> {
       description: siteDescription,
     },
     icons: {
-      // 1:1 square brand mark, served by the app/icon.png, app/apple-icon.png
-      // and app/favicon.ico file conventions. The previous value pointed at
-      // /logo/image.png, which does not exist — Google then fell back to the
-      // horizontal wordmark it found on the page and rendered it cropped.
+      // 1:1 square brand mark, served by the app/icon.png and app/favicon.ico
+      // file conventions. The previous value pointed at /logo/image.png or
+      // /apple-icon.png, which do not exist.
       icon: "/icon.png",
       shortcut: "/icon.png",
-      apple: "/apple-icon.png",
+      apple: "/icon.png",
     },
   };
 }

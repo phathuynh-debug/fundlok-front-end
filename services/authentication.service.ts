@@ -178,6 +178,17 @@ export interface RevokeResult {
   revoked: number;
 }
 
+export interface SecurityOverview {
+  second_factor_required: boolean;
+  two_factor: TotpStatus;
+  passkeys: Passkey[];
+  sessions: DeviceSession[];
+  security_events: SecurityEvent[];
+  security_preferences: {
+    signin_alerts_enabled: boolean;
+  };
+}
+
 export const authenticationService = {
   // Backend sets httpOnly cookies and returns the User object.
   // During transition the backend may still return Token shape — we handle both.
@@ -249,6 +260,15 @@ export const authenticationService = {
 
   oauthLogin(payload: OAuthLoginPayload) {
     return apiClient.post<OAuthLoginResult>(AUTH_ENDPOINTS.oauthLogin, payload);
+  },
+
+  getSecurityOverview(eventsLimit?: number) {
+    return apiClient.get<SecurityOverview>(AUTH_ENDPOINTS.securityOverview, {
+      params:
+        typeof eventsLimit === "number"
+          ? { events_limit: eventsLimit }
+          : undefined,
+    });
   },
 
   // Returns the created User. No tokens — caller redirects to login.

@@ -58,6 +58,38 @@ async function fetchMaintenance(): Promise<MaintenanceFlag> {
 /** The backend rejected this session because the account is suspended. */
 export const SUSPENDED = "SUSPENDED" as const;
 
+type SessionLookupResult = CurrentUser | typeof SUSPENDED | null;
+
+// Concurrent proxy invocations for the same cookie (e.g. a dashboard or admin
+// page load plus its 6-8 sidebar <Link> RSC prefetches) share one in-flight
+// request instead of each starting its own round trip to /users/me or
+// /gverify/*/status.
+const currentUserInFlight = new Map<string, Promise<SessionLookupResult>>();
+const verificationInFlight = new Map<string, Promise<boolean>>();
+
+/**
+ * Checks whether a 3-part JWT's `exp` claim is already in the past.
+ *
+ * Returns false for non-JWT tokens (e.g. E2E stub tokens) or malformed strings
+ * so they still delegate to the backend. Skipping an already-expired JWT saves
+ * a guaranteed 401 round trip to /users/me before refreshSession runs.
+ */
+function isJwtExpired(token: string): boolean {
+  const parts = token.split(".");
+  if (parts.length !== 3) return false;
+  try {
+    const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const json = atob(base64);
+    const payload = JSON.parse(json) as { exp?: unknown };
+    if (typeof payload.exp === "number") {
+      return payload.exp * 1000 <= Date.now();
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
 export const middlewareService = {
   // Reads the platform maintenance flag from the public maintenance endpoint
   // (GET /system/maintenance — readable without auth so the gate can apply to
@@ -105,45 +137,57 @@ export const middlewareService = {
    * refused — a loop with no explanation. The proxy needs to tell the two
    * apart to send them somewhere that says what happened.
    */
-  async getCurrentUser(
-    request: NextRequest,
-  ): Promise<CurrentUser | typeof SUSPENDED | null> {
+  async getCurrentUser(request: NextRequest): Promise<SessionLookupResult> {
     const accessToken = request.cookies.get("access_token")?.value;
 
-    if (!accessToken) {
+    if (!accessToken || isJwtExpired(accessToken)) {
       return null;
     }
 
-    try {
-      const response = await fetch(new URL("/users/me", API_BASE_URL), {
-        headers: {
-          cookie: request.headers.get("cookie") ?? "",
-          ...backendSecretHeaders(),
-        },
-        cache: "no-store",
-      });
+    const cookieHeader = request.headers.get("cookie") ?? accessToken;
+    const inflightKey = `${accessToken}:${cookieHeader}`;
+    const existing = currentUserInFlight.get(inflightKey);
+    if (existing) {
+      return existing;
+    }
 
-      if (!response.ok) {
-        // 403 alone is not enough — an unverified email answers 403 too on
-        // some routes. Match the backend's own detail so only a suspension
-        // takes this branch, and fall back to "no session" otherwise.
-        if (response.status === 403) {
-          const detail = await response
-            .clone()
-            .json()
-            .then((body) => String(body?.detail ?? ""))
-            .catch(() => "");
-          if (detail.toLowerCase().includes("suspended")) {
-            return SUSPENDED;
+    const lookup = (async (): Promise<SessionLookupResult> => {
+      try {
+        const response = await fetch(new URL("/users/me", API_BASE_URL), {
+          headers: {
+            cookie: request.headers.get("cookie") ?? "",
+            ...backendSecretHeaders(),
+          },
+          cache: "no-store",
+        });
+
+        if (!response.ok) {
+          // 403 alone is not enough — an unverified email answers 403 too on
+          // some routes. Match the backend's own detail so only a suspension
+          // takes this branch, and fall back to "no session" otherwise.
+          if (response.status === 403) {
+            const detail = await response
+              .clone()
+              .json()
+              .then((body) => String(body?.detail ?? ""))
+              .catch(() => "");
+            if (detail.toLowerCase().includes("suspended")) {
+              return SUSPENDED;
+            }
           }
+          return null;
         }
+
+        return (await response.json()) as CurrentUser;
+      } catch {
         return null;
       }
+    })().finally(() => {
+      currentUserInFlight.delete(inflightKey);
+    });
 
-      return (await response.json()) as CurrentUser;
-    } catch {
-      return null;
-    }
+    currentUserInFlight.set(inflightKey, lookup);
+    return lookup;
   },
 
   /**
@@ -200,23 +244,37 @@ export const middlewareService = {
   ): Promise<boolean> {
     const statusPath =
       role === "SME" ? "/gverify/kyb/status" : "/gverify/kyc/status";
-    try {
-      const response = await fetch(new URL(statusPath, API_BASE_URL), {
-        headers: {
-          cookie: request.headers.get("cookie") ?? "",
-          ...backendSecretHeaders(),
-        },
-        cache: "no-store",
-      });
+    const cookieHeader = request.headers.get("cookie") ?? "";
+    const inflightKey = `${role ?? ""}:${cookieHeader}`;
+    const existing = verificationInFlight.get(inflightKey);
+    if (existing) {
+      return existing;
+    }
 
-      if (!response.ok) {
+    const lookup = (async (): Promise<boolean> => {
+      try {
+        const response = await fetch(new URL(statusPath, API_BASE_URL), {
+          headers: {
+            cookie: cookieHeader,
+            ...backendSecretHeaders(),
+          },
+          cache: "no-store",
+        });
+
+        if (!response.ok) {
+          return false;
+        }
+
+        const data = (await response.json()) as { is_approved?: boolean };
+        return data?.is_approved === true;
+      } catch {
         return false;
       }
+    })().finally(() => {
+      verificationInFlight.delete(inflightKey);
+    });
 
-      const data = (await response.json()) as { is_approved?: boolean };
-      return data?.is_approved === true;
-    } catch {
-      return false;
-    }
+    verificationInFlight.set(inflightKey, lookup);
+    return lookup;
   },
 };
