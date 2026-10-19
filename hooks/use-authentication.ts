@@ -154,7 +154,7 @@ export function useRequireAuth(redirectTo = "/login") {
  *
  * Fetches two-factor status, passkeys, active sessions, security events, and
  * sign-in alert preferences in a single HTTP request to
- * GET /api/bff/security-overview, then seeds each individual React Query key
+ * GET /auth/security-overview, then seeds each individual React Query key
  * so the granular hooks below read from cache with zero extra network calls on
  * mount.
  */
@@ -223,7 +223,10 @@ export function useRevokeSession() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authKeys.sessions() });
       queryClient.invalidateQueries({ queryKey: authKeys.securityEvents() });
-      queryClient.invalidateQueries({ queryKey: authKeys.securityOverview() });
+      queryClient.invalidateQueries({
+        queryKey: authKeys.securityOverview(),
+        refetchType: "none",
+      });
     },
   });
 }
@@ -236,7 +239,10 @@ export function useRevokeOtherSessions() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authKeys.sessions() });
       queryClient.invalidateQueries({ queryKey: authKeys.securityEvents() });
-      queryClient.invalidateQueries({ queryKey: authKeys.securityOverview() });
+      queryClient.invalidateQueries({
+        queryKey: authKeys.securityOverview(),
+        refetchType: "none",
+      });
     },
   });
 }
@@ -261,7 +267,6 @@ export function useUpdateSecurityPreferences() {
       queryClient.setQueryData(authKeys.securityPreferences(), prefs);
       // Toggling is audited, so the activity feed changes too.
       queryClient.invalidateQueries({ queryKey: authKeys.securityEvents() });
-      queryClient.invalidateQueries({ queryKey: authKeys.securityOverview() });
     },
   });
 }
@@ -278,7 +283,10 @@ export function useChangePassword() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authKeys.sessions() });
       queryClient.invalidateQueries({ queryKey: authKeys.securityEvents() });
-      queryClient.invalidateQueries({ queryKey: authKeys.securityOverview() });
+      queryClient.invalidateQueries({
+        queryKey: authKeys.securityOverview(),
+        refetchType: "none",
+      });
     },
   });
 }
@@ -322,7 +330,10 @@ export function useEnableTwoFactor() {
     mutationFn: (code) => authenticationService.enableTwoFactor(code),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authKeys.twoFactor() });
-      queryClient.invalidateQueries({ queryKey: authKeys.securityOverview() });
+      queryClient.invalidateQueries({
+        queryKey: authKeys.securityOverview(),
+        refetchType: "none",
+      });
     },
   });
 }
@@ -337,7 +348,10 @@ export function useDisableTwoFactor() {
       // reconciled from the server.
       queryClient.setQueryData(authKeys.twoFactor(), status);
       queryClient.invalidateQueries({ queryKey: authKeys.twoFactor() });
-      queryClient.invalidateQueries({ queryKey: authKeys.securityOverview() });
+      queryClient.invalidateQueries({
+        queryKey: authKeys.securityOverview(),
+        refetchType: "none",
+      });
     },
   });
 }
@@ -378,7 +392,10 @@ export function useRegisterPasskey() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authKeys.passkeys() });
-      queryClient.invalidateQueries({ queryKey: authKeys.securityOverview() });
+      queryClient.invalidateQueries({
+        queryKey: authKeys.securityOverview(),
+        refetchType: "none",
+      });
     },
   });
 }
@@ -390,7 +407,10 @@ export function useDeletePasskey() {
     mutationFn: (id) => authenticationService.deletePasskey(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authKeys.passkeys() });
-      queryClient.invalidateQueries({ queryKey: authKeys.securityOverview() });
+      queryClient.invalidateQueries({
+        queryKey: authKeys.securityOverview(),
+        refetchType: "none",
+      });
     },
   });
 }

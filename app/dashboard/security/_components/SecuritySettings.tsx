@@ -74,7 +74,7 @@ export function SecuritySettings({
   // React Query, keyed by authKeys.
   //
   // On initial mount, useSecurityOverview fetches all five security slices in
-  // one BFF call (GET /api/bff/security-overview) and seeds their React Query
+  // one call (GET /auth/security-overview) and seeds their React Query
   // caches so the individual hooks below read from cache with zero extra
   // network requests.
   const INITIAL_ACTIVITY_LIMIT = 7;
