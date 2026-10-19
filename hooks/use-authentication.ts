@@ -158,10 +158,7 @@ export function useRequireAuth(redirectTo = "/login") {
  * so the granular hooks below read from cache with zero extra network calls on
  * mount.
  */
-export function useSecurityOverview(
-  enabled = true,
-  initialEventsLimit = 7,
-) {
+export function useSecurityOverview(enabled = true, initialEventsLimit = 7) {
   const queryClient = useQueryClient();
 
   return useQuery({

@@ -1277,7 +1277,6 @@ const server = createServer(async (req, res) => {
     });
   }
 
-
   // The proxy's on-demand verification gate. Both prefixes answer from the same
   // fixture flag; the proxy picks one by role.
   // A KYB submission. The real provider returns the verdict synchronously, so
