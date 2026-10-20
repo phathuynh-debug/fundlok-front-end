@@ -13,6 +13,13 @@ repository (MIT licensed — see `agent-skills.LICENSE`).
 These are **generic engineering-workflow** skills (TDD, code review, shipping,
 security, etc.) — process guidance that applies to any project.
 
+## Vendored, then rewritten for FundLok
+
+- **`git-workflow-and-versioning/`**: rewritten 2026-10-20 around this
+  repo's `production`/`preview` Vercel deploy branches, CI gates (`bun run
+  ci`), branch/commit conventions and cross-repo spec links. Don't overwrite
+  it when re-syncing from upstream.
+
 ## Not vendored — ours
 
 - **`fundlok-frontend/`** — project-specific conventions and data flow for
