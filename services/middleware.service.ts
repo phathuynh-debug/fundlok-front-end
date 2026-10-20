@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { backendSecretHeaders } from "@/lib/backend-secret";
+import { clientIpHeaders } from "@/lib/client-ip";
 
 // Same fallback as the /api rewrite in next.config.ts — without it, every
 // server-side lookup here throws on new URL(..., undefined) and the proxy
@@ -36,12 +37,18 @@ let maintenanceCache: { value: MaintenanceFlag; expiresAt: number } | null =
 // starting its own — a burst of prefetches collapses to a single call.
 let maintenanceInFlight: Promise<MaintenanceFlag> | null = null;
 
-async function fetchMaintenance(): Promise<MaintenanceFlag> {
+async function fetchMaintenance(
+  request: NextRequest,
+): Promise<MaintenanceFlag> {
   try {
     const response = await fetch(new URL("/system/maintenance", API_BASE_URL), {
       // Server-to-server hop, so it needs the shared secret like every other
-      // Next → FastAPI call. These three bypass the /api rewrite entirely.
-      headers: { ...backendSecretHeaders() },
+      // Next → FastAPI call. These bypass the /api rewrite entirely, so each
+      // one also states the visitor's address itself (lib/client-ip.ts).
+      headers: {
+        ...clientIpHeaders(request.headers),
+        ...backendSecretHeaders(),
+      },
       cache: "no-store",
     });
 
@@ -99,7 +106,11 @@ export const middlewareService = {
   // Only the auth entry point (/login, which also serves sign-up at
   // ?mode=register) and /maintenance itself call this — public pages are never
   // gated, so they never trigger a lookup.
-  async getMaintenance(): Promise<MaintenanceFlag> {
+  //
+  // The flag is shared, but the call is not anonymous: it is counted against
+  // the visitor whose page load found the cache empty. Without an address it
+  // would be counted against Vercel's, shared by every visitor.
+  async getMaintenance(request: NextRequest): Promise<MaintenanceFlag> {
     const now = Date.now();
 
     if (maintenanceCache && maintenanceCache.expiresAt > now) {
@@ -109,7 +120,7 @@ export const middlewareService = {
       return maintenanceInFlight;
     }
 
-    maintenanceInFlight = fetchMaintenance()
+    maintenanceInFlight = fetchMaintenance(request)
       .then((value) => {
         // A failed lookup is cached too, for the same short window: when the
         // API is down, failing open on every single request would hammer it
@@ -156,6 +167,7 @@ export const middlewareService = {
         const response = await fetch(new URL("/users/me", API_BASE_URL), {
           headers: {
             cookie: request.headers.get("cookie") ?? "",
+            ...clientIpHeaders(request.headers),
             ...backendSecretHeaders(),
           },
           cache: "no-store",
@@ -198,12 +210,13 @@ export const middlewareService = {
    * persistent (remember me) or session-scoped, from its `remember_session`
    * marker, and re-deriving that here would let the two drift apart.
    *
-   * The browser's User-Agent and X-Forwarded-For go along because the backend
+   * The browser's User-Agent and address go along because the backend
    * records them on the session row at every rotation — without them, a
    * refresh made here would relabel the user's device on the security screen
-   * as this server, at this server's address. Forwarding XFF unchanged gives
-   * the backend the same hop chain as the /api rewrite, so its
-   * TRUSTED_PROXY_HOPS rule reads both paths the same way.
+   * as this server, at this server's address. The address is X-Client-IP, as
+   * on every other call; X-Forwarded-For is still forwarded unchanged for a
+   * backend without the secret, so its TRUSTED_PROXY_HOPS rule reads this
+   * path the same way as the /api rewrite.
    */
   async refreshSession(request: NextRequest): Promise<string[] | null> {
     const forwarded: Record<string, string> = {};
@@ -218,6 +231,7 @@ export const middlewareService = {
         headers: {
           cookie: request.headers.get("cookie") ?? "",
           ...forwarded,
+          ...clientIpHeaders(request.headers),
           ...backendSecretHeaders(),
         },
         cache: "no-store",
@@ -256,6 +270,7 @@ export const middlewareService = {
         const response = await fetch(new URL(statusPath, API_BASE_URL), {
           headers: {
             cookie: cookieHeader,
+            ...clientIpHeaders(request.headers),
             ...backendSecretHeaders(),
           },
           cache: "no-store",

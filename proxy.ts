@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { SUSPENDED, middlewareService } from "@/services/middleware.service";
 import { applyBackendSecret } from "@/lib/backend-secret";
+import { applyClientIp } from "@/lib/client-ip";
 import {
   LOCALE_COOKIE,
   LOCALE_HEADER,
@@ -196,7 +197,8 @@ async function routeRequest(request: NextRequest, refreshed: string[]) {
   // headers, and `rewrites()` takes `has`/`missing` conditions but nothing that
   // injects one. Doing the rewrite here is the only way to put
   // X-Backend-Secret on browser-originated API traffic without exposing the
-  // secret to the browser.
+  // secret to the browser — and X-Client-IP next to it, the visitor's address
+  // as the platform saw it (lib/client-ip.ts).
   //
   // MUST stay the first thing in this function: everything below calls the
   // backend to resolve the session, and letting an /api request fall through to
@@ -215,7 +217,11 @@ async function routeRequest(request: NextRequest, refreshed: string[]) {
       return new NextResponse("Invalid rewrite destination", { status: 400 });
     }
     return NextResponse.rewrite(target, {
-      request: { headers: applyBackendSecret(new Headers(request.headers)) },
+      request: {
+        headers: applyClientIp(
+          applyBackendSecret(new Headers(request.headers)),
+        ),
+      },
     });
   }
 
@@ -392,7 +398,7 @@ async function routeRequest(request: NextRequest, refreshed: string[]) {
     (r) => pathname === r || pathname.startsWith(`${r}/`),
   );
   if (isMaintenancePage || isBlockedDuringMaintenance) {
-    const maintenance = await middlewareService.getMaintenance();
+    const maintenance = await middlewareService.getMaintenance(request);
     const maintenanceOn = !!maintenance?.enabled;
 
     if (maintenanceOn && isBlockedDuringMaintenance && !isSystemAdmin) {
