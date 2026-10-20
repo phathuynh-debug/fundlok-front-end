@@ -96,7 +96,7 @@ test("registration rejects mismatched passwords client-side", async ({
   await page.getByLabel(t("auth.register.emailLabel")).fill("new@e2e.test");
   await page
     .getByLabel(t("auth.register.passwordLabel"), { exact: true })
-    .fill("a-good-password");
+    .fill("A-Good-Passw0rd!");
   await page
     .getByLabel(t("auth.register.confirmPasswordLabel"))
     .fill("a-different-password");
