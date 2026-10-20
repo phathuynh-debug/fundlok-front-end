@@ -1,9 +1,9 @@
 # Frontend CI/CD — single pipeline for tests AND deploys
 #
-#   PR to preview / production  -> i18n + lint + style + build + unit-tests + e2e
+#   PR to preview / production  -> i18n + lint + style + build + unit-tests + e2e + dependency audit
 #   push to preview / production -> all CI checks -> enforce Vercel deploy author
 #
-# Deploy trigger job is gated with `needs: [i18n-check, lint-styling, lint, build, unit-tests, e2e]`
+# Deploy trigger job is gated with `needs: [i18n-check, lint-styling, lint, build, unit-tests, e2e, dependency-audit]`
 # — deployment only triggers when all other CI pipelines pass.
 
 name: Frontend CI/CD
@@ -115,6 +115,36 @@ jobs:
       - name: Run Vitest
         run: bun run test
 
+  # Known vulnerabilities in bun.lock (compliance audit SEC-07), from the
+  # npm advisory database that `npm audit` uses.
+  dependency-audit:
+    name: Dependency Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      # What ships to users: no known advisory of moderate severity or above.
+      - name: Audit production dependencies
+        run: bun audit --prod --audit-level=moderate
+
+      # Everything, build and dev tooling included: high and above. One
+      # suppression, with the same bar as the backend's pip-audit:
+      #   GHSA-vfj7-8cjw-p6xm  braces <=3.0.3, stack exhaustion on deeply
+      #   nested glob patterns. No fixed release exists (3.0.3 is the
+      #   latest). It reaches only dev tooling (shadcn CLI and
+      #   eslint-config-next, via fast-glob > micromatch), which globs
+      #   patterns we write ourselves; nothing shipped depends on it.
+      #   Drop the --ignore once braces publishes a fix.
+      - name: Audit all dependencies
+        run: bun audit --audit-level=high --ignore=GHSA-vfj7-8cjw-p6xm
+
   e2e:
     name: E2E (Playwright)
     runs-on: ubuntu-latest
@@ -196,7 +226,8 @@ jobs:
     name: Enforce Vercel Deploy Author
     timeout-minutes: 20
     runs-on: ubuntu-latest
-    needs: [i18n-check, lint-styling, lint, build, unit-tests, e2e]
+    needs:
+      [i18n-check, lint-styling, lint, build, unit-tests, e2e, dependency-audit]
     if: github.event_name == 'push' && (github.ref == 'refs/heads/production' || github.ref == 'refs/heads/preview')
     permissions:
       contents: write
