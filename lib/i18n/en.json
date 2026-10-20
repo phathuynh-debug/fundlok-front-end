@@ -1908,15 +1908,20 @@
       "UPLOAD_INITIATED": "Upload started",
       "USER_STATUS_CHANGED": "Account status changed",
       "VERIFY": "Verification",
+      "VIEW": "Viewed",
       "WEBHOOK": "Webhook received"
     },
     "auditEntity": {
+      "ADMIN_OVERVIEW": "Admin overview",
+      "AUDIT_LOG": "Audit log",
       "AUTH": "Authentication",
       "BANK_RATE_CONFIG": "Bank rate settings",
       "CONTRACT": "Contract",
       "DOCUMENT": "Document",
       "GVERIFY_KYB_VERIFICATION": "Business verification",
       "GVERIFY_KYC_VERIFICATION": "Identity verification",
+      "INTERNAL_EMAIL": "Internal email",
+      "INVESTOR_LEAD": "Investor lead",
       "LEDGER": "Ledger",
       "LINKED_ACCOUNT": "Linked account",
       "LISTING": "Listing",
@@ -1924,6 +1929,7 @@
       "LOAN_APPLICATION_DOCUMENT": "Application document",
       "ORDER": "Order",
       "PROJECT": "Project",
+      "RATE_INQUIRY": "Rate inquiry",
       "SCORE_RUN": "Score run",
       "SESSION": "Session",
       "USER": "User"

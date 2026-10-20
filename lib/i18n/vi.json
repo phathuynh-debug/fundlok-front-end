@@ -1908,15 +1908,20 @@
       "UPLOAD_INITIATED": "Đã bắt đầu tải lên",
       "USER_STATUS_CHANGED": "Đã đổi trạng thái tài khoản",
       "VERIFY": "Xác minh",
+      "VIEW": "Đã xem",
       "WEBHOOK": "Đã nhận webhook"
     },
     "auditEntity": {
+      "ADMIN_OVERVIEW": "Tổng quan quản trị",
+      "AUDIT_LOG": "Nhật ký kiểm toán",
       "AUTH": "Xác thực",
       "BANK_RATE_CONFIG": "Cấu hình lãi suất tham khảo",
       "CONTRACT": "Hợp đồng",
       "DOCUMENT": "Tài liệu",
       "GVERIFY_KYB_VERIFICATION": "Xác minh doanh nghiệp",
       "GVERIFY_KYC_VERIFICATION": "Xác minh danh tính",
+      "INTERNAL_EMAIL": "Email nội bộ",
+      "INVESTOR_LEAD": "Nhà đầu tư quan tâm",
       "LEDGER": "Sổ cái",
       "LINKED_ACCOUNT": "Tài khoản liên kết",
       "LISTING": "Tin đăng gọi vốn",
@@ -1924,6 +1929,7 @@
       "LOAN_APPLICATION_DOCUMENT": "Tài liệu hồ sơ",
       "ORDER": "Lệnh đầu tư",
       "PROJECT": "Dự án",
+      "RATE_INQUIRY": "Lượt tra cứu lãi suất",
       "SCORE_RUN": "Lượt tính điểm",
       "SESSION": "Phiên đăng nhập",
       "USER": "Người dùng"
