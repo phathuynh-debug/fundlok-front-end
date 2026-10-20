@@ -18,6 +18,7 @@ import {
 import { useTranslations } from "@/lib/i18n";
 import { useResetPassword } from "@/app/reset-password/use-reset-password";
 import { apiErrorMessage } from "@/lib/api-error-message";
+import { isPasswordBreached, passwordProblem } from "@/lib/password-policy";
 
 export function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -64,11 +65,12 @@ export function ResetPasswordForm() {
       return;
     }
 
-    if (password.length < 8) {
+    const problem = passwordProblem(password, t);
+    if (problem) {
       toast({
         variant: "destructive",
         title: t("auth.resetPassword.failedTitle"),
-        description: t("auth.resetPassword.passwordTooShort"),
+        description: problem,
       });
       return;
     }
@@ -103,11 +105,13 @@ export function ResetPasswordForm() {
           toast({
             variant: "destructive",
             title: t("auth.resetPassword.failedTitle"),
-            description: apiErrorMessage(
-              error,
-              locale,
-              t("auth.resetPassword.failedDescription"),
-            ),
+            description: isPasswordBreached(error)
+              ? t("auth.passwordPolicy.breached")
+              : apiErrorMessage(
+                  error,
+                  locale,
+                  t("auth.resetPassword.failedDescription"),
+                ),
           });
         },
       },
@@ -202,6 +206,9 @@ export function ResetPasswordForm() {
               )}
             </button>
           </div>
+          <p className="text-xs text-muted-foreground">
+            {t("auth.passwordPolicy.hint")}
+          </p>
         </div>
 
         <div className="space-y-2">

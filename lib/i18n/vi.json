@@ -725,6 +725,19 @@
       "twoFactorVerify": "Xác thực và đăng nhập",
       "twoFactorVerifying": "Đang xác thực…"
     },
+    "passwordPolicy": {
+      "breached": "Mật khẩu này đã xuất hiện trong một vụ lộ lọt dữ liệu. Vui lòng chọn mật khẩu khác.",
+      "hint": "Ít nhất 8 ký tự, gồm chữ hoa, chữ thường, chữ số và ký tự đặc biệt.",
+      "missing": "Mật khẩu cần có: {rules}.",
+      "rules": {
+        "digit": "một chữ số",
+        "length": "ít nhất 8 ký tự",
+        "lowercase": "một chữ thường",
+        "symbol": "một ký tự đặc biệt",
+        "uppercase": "một chữ hoa"
+      },
+      "tooLong": "Mật khẩu quá dài."
+    },
     "register": {
       "confirmPasswordLabel": "Xác nhận mật khẩu",
       "emailLabel": "Địa chỉ email",
@@ -762,7 +775,6 @@
       "passwordLabel": "Mật khẩu mới",
       "passwordMismatch": "Mật khẩu không khớp.",
       "passwordPlaceholder": "••••••••",
-      "passwordTooShort": "Mật khẩu phải có ít nhất 8 ký tự.",
       "submit": "Đặt lại mật khẩu",
       "submitting": "Đang đặt lại...",
       "successDescription": "Mật khẩu của bạn đã được đặt lại. Bây giờ bạn có thể đăng nhập bằng mật khẩu mới.",
@@ -1386,7 +1398,6 @@
           "failedDescription": "Đã xảy ra lỗi. Vui lòng thử lại.",
           "failedTitle": "Không thể đặt mật khẩu",
           "hide": "Ẩn mật khẩu",
-          "hint": "Sử dụng ít nhất {min} ký tự.",
           "mismatch": "Hai mật khẩu không khớp.",
           "newLabel": "Mật khẩu mới",
           "show": "Hiện mật khẩu",
@@ -1394,8 +1405,7 @@
           "submitting": "Đang lưu…",
           "successDescription": "Bây giờ bạn có thể đăng nhập bằng email và mật khẩu.",
           "successTitle": "Đã đặt mật khẩu",
-          "title": "Đặt mật khẩu",
-          "tooShort": "Mật khẩu phải có ít nhất {min} ký tự."
+          "title": "Đặt mật khẩu"
         },
         "subtitle": "Quản lý thông tin cá nhân của bạn",
         "title": "Hồ sơ",
@@ -2650,11 +2660,9 @@
       "description": "Bạn cần nhập mật khẩu hiện tại. Các thiết bị khác sẽ bị đăng xuất.",
       "errorCurrent": "Nhập mật khẩu hiện tại của bạn",
       "errorGeneric": "Không thể đổi mật khẩu",
-      "errorLength": "Mật khẩu mới phải có tối thiểu {min} ký tự",
       "errorMismatch": "Hai mật khẩu mới không khớp",
       "errorWrongCurrent": "Mật khẩu hiện tại không đúng",
       "hide": "Ẩn mật khẩu",
-      "hint": "Tối thiểu {min} ký tự.",
       "newLabel": "Mật khẩu mới",
       "revokeNotice": "Đổi mật khẩu sẽ đăng xuất bạn trên mọi thiết bị khác.",
       "show": "Hiện mật khẩu",

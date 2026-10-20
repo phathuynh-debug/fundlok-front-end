@@ -15,8 +15,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useSetPassword } from "@/hooks/use-users";
-import { PASSWORD_MIN_LENGTH } from "@/services/users.service";
 import { apiErrorMessage } from "@/lib/api-error-message";
+import { isPasswordBreached, passwordProblem } from "@/lib/password-policy";
 import { useTranslations } from "@/lib/i18n";
 
 // Sets a FIRST password, for accounts created without one (OAuth sign-in).
@@ -63,13 +63,9 @@ export function SetPasswordDialog({
     e.preventDefault();
     setError(null);
 
-    if (newPassword.length < PASSWORD_MIN_LENGTH) {
-      setError(
-        t("dashboard.settings.profile.setPasswordDialog.tooShort").replace(
-          "{min}",
-          String(PASSWORD_MIN_LENGTH),
-        ),
-      );
+    const problem = passwordProblem(newPassword, t);
+    if (problem) {
+      setError(problem);
       return;
     }
     if (newPassword !== confirmPassword) {
@@ -94,11 +90,15 @@ export function SetPasswordDialog({
         onError: (err) => {
           // Show it inline next to the fields, not only as a toast that
           // disappears while the user is still looking at the form.
-          const message = apiErrorMessage(
-            err,
-            locale,
-            t("dashboard.settings.profile.setPasswordDialog.failedDescription"),
-          );
+          const message = isPasswordBreached(err)
+            ? t("auth.passwordPolicy.breached")
+            : apiErrorMessage(
+                err,
+                locale,
+                t(
+                  "dashboard.settings.profile.setPasswordDialog.failedDescription",
+                ),
+              );
           setError(message);
           toast({
             variant: "destructive",
@@ -158,10 +158,7 @@ export function SetPasswordDialog({
               </button>
             </div>
             <p className="text-xs text-muted-foreground">
-              {t("dashboard.settings.profile.setPasswordDialog.hint").replace(
-                "{min}",
-                String(PASSWORD_MIN_LENGTH),
-              )}
+              {t("auth.passwordPolicy.hint")}
             </p>
           </div>
 

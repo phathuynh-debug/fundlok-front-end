@@ -725,6 +725,19 @@
       "twoFactorVerify": "Verify and sign in",
       "twoFactorVerifying": "Verifying…"
     },
+    "passwordPolicy": {
+      "breached": "This password has appeared in a known data breach. Choose a different one.",
+      "hint": "At least 8 characters, with an uppercase letter, a lowercase letter, a digit and a symbol.",
+      "missing": "Password needs: {rules}.",
+      "rules": {
+        "digit": "a digit",
+        "length": "at least 8 characters",
+        "lowercase": "a lowercase letter",
+        "symbol": "a symbol",
+        "uppercase": "an uppercase letter"
+      },
+      "tooLong": "Password is too long."
+    },
     "register": {
       "confirmPasswordLabel": "Confirm password",
       "emailLabel": "Email address",
@@ -762,7 +775,6 @@
       "passwordLabel": "New password",
       "passwordMismatch": "Passwords do not match.",
       "passwordPlaceholder": "••••••••",
-      "passwordTooShort": "Password must be at least 8 characters long.",
       "submit": "Reset password",
       "submitting": "Resetting...",
       "successDescription": "Your password has been reset. You can now sign in with it.",
@@ -1386,7 +1398,6 @@
           "failedDescription": "Something went wrong. Please try again.",
           "failedTitle": "Couldn't set password",
           "hide": "Hide passwords",
-          "hint": "Use at least {min} characters.",
           "mismatch": "The two passwords don't match.",
           "newLabel": "New password",
           "show": "Show passwords",
@@ -1394,8 +1405,7 @@
           "submitting": "Saving…",
           "successDescription": "You can now sign in with your email and password.",
           "successTitle": "Password set",
-          "title": "Set a password",
-          "tooShort": "Password must be at least {min} characters."
+          "title": "Set a password"
         },
         "subtitle": "Manage your personal information",
         "title": "Profile",
@@ -2650,11 +2660,9 @@
       "description": "You will need your current password. Other devices are signed out.",
       "errorCurrent": "Enter your current password",
       "errorGeneric": "Could not change your password",
-      "errorLength": "New password must be at least {min} characters",
       "errorMismatch": "The two new passwords do not match",
       "errorWrongCurrent": "Current password is incorrect",
       "hide": "Hide passwords",
-      "hint": "At least {min} characters.",
       "newLabel": "New password",
       "revokeNotice": "Changing your password signs you out on every other device.",
       "show": "Show passwords",

@@ -17,8 +17,7 @@ import { useChangePassword } from "@/hooks/use-authentication";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
 import { apiErrorMessage } from "@/lib/api-error-message";
-
-const MIN_LENGTH = 8;
+import { isPasswordBreached, passwordProblem } from "@/lib/password-policy";
 
 export function ChangePasswordDialog({
   open,
@@ -49,8 +48,8 @@ export function ChangePasswordDialog({
   // check and we cannot.
   const validate = (): string | null => {
     if (!currentPassword) return t("security.changePassword.errorCurrent");
-    if (newPassword.length < MIN_LENGTH)
-      return t("security.changePassword.errorLength", { min: MIN_LENGTH });
+    const problem = passwordProblem(newPassword, t);
+    if (problem) return problem;
     if (newPassword !== confirmPassword)
       return t("security.changePassword.errorMismatch");
     return null;
@@ -81,16 +80,19 @@ export function ChangePasswordDialog({
         },
         onError: (apiError) =>
           setError(
-            // 400 is the backend refusing the current password: say so in the
-            // user's language rather than a generic failure, since it is the
-            // one error here the user can fix on the spot.
-            apiError?.status === 400
-              ? t("security.changePassword.errorWrongCurrent")
-              : apiErrorMessage(
-                  apiError,
-                  locale,
-                  t("security.changePassword.errorGeneric"),
-                ),
+            // A breached new password is also a 400, so it is told apart by
+            // its code first. Any other 400 is the backend refusing the
+            // current password: say so in the user's language rather than a
+            // generic failure, since it is an error the user can fix on the spot.
+            isPasswordBreached(apiError)
+              ? t("auth.passwordPolicy.breached")
+              : apiError?.status === 400
+                ? t("security.changePassword.errorWrongCurrent")
+                : apiErrorMessage(
+                    apiError,
+                    locale,
+                    t("security.changePassword.errorGeneric"),
+                  ),
           ),
       },
     );
@@ -161,7 +163,7 @@ export function ChangePasswordDialog({
               </button>
             </div>
             <p className="text-xs text-muted-foreground">
-              {t("security.changePassword.hint", { min: MIN_LENGTH })}
+              {t("auth.passwordPolicy.hint")}
             </p>
           </div>
 

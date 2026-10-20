@@ -201,7 +201,7 @@ test.describe("change password", () => {
       .fill(STUB_PASSWORD);
     await page
       .getByLabel(t("security.changePassword.newLabel"), { exact: true })
-      .fill("a-new-password");
+      .fill("A-New-Passw0rd!");
     await page
       .getByLabel(t("security.changePassword.confirmLabel"))
       .fill("something-else");
@@ -230,8 +230,14 @@ test.describe("change password", () => {
       .getByRole("button", { name: t("security.changePassword.submit") })
       .click();
 
+    // "short" has a lowercase letter and nothing else the rules ask for.
+    const missing = ["length", "uppercase", "digit", "symbol"]
+      .map((rule) => t(`auth.passwordPolicy.rules.${rule}`))
+      .join(", ");
     await expect(
-      page.getByText(t("security.changePassword.errorLength", { min: 8 })),
+      page.getByText(
+        t("auth.passwordPolicy.missing").replace("{rules}", missing),
+      ),
     ).toBeVisible();
   });
 
@@ -245,10 +251,10 @@ test.describe("change password", () => {
       .fill("not-my-password");
     await page
       .getByLabel(t("security.changePassword.newLabel"), { exact: true })
-      .fill("a-new-password");
+      .fill("A-New-Passw0rd!");
     await page
       .getByLabel(t("security.changePassword.confirmLabel"))
-      .fill("a-new-password");
+      .fill("A-New-Passw0rd!");
     await page
       .getByRole("button", { name: t("security.changePassword.submit") })
       .click();
@@ -270,10 +276,10 @@ test.describe("change password", () => {
       .fill(STUB_PASSWORD);
     await page
       .getByLabel(t("security.changePassword.newLabel"), { exact: true })
-      .fill("a-brand-new-password");
+      .fill("A-Brand-New-Passw0rd!");
     await page
       .getByLabel(t("security.changePassword.confirmLabel"))
-      .fill("a-brand-new-password");
+      .fill("A-Brand-New-Passw0rd!");
     await page
       .getByRole("button", { name: t("security.changePassword.submit") })
       .click();

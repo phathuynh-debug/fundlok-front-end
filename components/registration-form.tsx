@@ -13,6 +13,7 @@ import { useRegister } from "@/hooks/use-authentication";
 import { User, Mail, Lock, Phone, Loader2, Eye, EyeOff } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
 import { apiErrorMessage } from "@/lib/api-error-message";
+import { isPasswordBreached, passwordProblem } from "@/lib/password-policy";
 
 const normalizePhoneNumber = (value: string) =>
   value.trim().replace(/[\s().-]/g, "");
@@ -68,6 +69,16 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
       return;
     }
 
+    const problem = passwordProblem(password, t);
+    if (problem) {
+      toast({
+        variant: "destructive",
+        title: t("auth.register.validationErrorTitle"),
+        description: problem,
+      });
+      return;
+    }
+
     if (password !== confirmPassword) {
       toast({
         variant: "destructive",
@@ -115,11 +126,13 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
           toast({
             variant: "destructive",
             title: t("auth.register.failedTitle"),
-            description: apiErrorMessage(
-              error,
-              locale,
-              t("auth.register.failedDescription"),
-            ),
+            description: isPasswordBreached(error)
+              ? t("auth.passwordPolicy.breached")
+              : apiErrorMessage(
+                  error,
+                  locale,
+                  t("auth.register.failedDescription"),
+                ),
           });
         },
       },
@@ -206,6 +219,9 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
             )}
           </button>
         </div>
+        <p className="text-xs text-muted-foreground">
+          {t("auth.passwordPolicy.hint")}
+        </p>
       </div>
       <div className="space-y-2">
         <Label htmlFor="confirmPassword">

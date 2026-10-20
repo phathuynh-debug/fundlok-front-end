@@ -47,10 +47,6 @@ export interface SetPasswordResponse {
   message: string;
 }
 
-// Matches the backend's `new_password: str = Field(..., min_length=8)`, so the
-// dialog can say so before spending a round trip.
-export const PASSWORD_MIN_LENGTH = 8;
-
 // Same three-step flow as the loan document upload:
 // presign → direct PUT to R2 → confirm. The file never touches the API server.
 export const AVATAR_RULES = {
