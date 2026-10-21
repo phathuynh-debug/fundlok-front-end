@@ -15,8 +15,11 @@ import {
   localizedPath,
   parseLocalePath,
 } from "@/lib/locale-routing";
-import en from "./en.json";
-import vi from "./vi.json";
+// Type only. A value import of either dictionary here would put it in the
+// client bundle of every page: this module is imported by the root layout.
+// The root layout passes the active locale's dictionary in instead, and the
+// other one is only fetched if the visitor actually switches (see below).
+import type en from "./en.json";
 
 export const LOCALE_COOKIE_NAME = LOCALE_COOKIE;
 
@@ -28,12 +31,19 @@ function writeLocaleCookie(locale: string): void {
 }
 export type Locale = (typeof supportedLocales)[number];
 
-type MessageTree = typeof en;
+export type MessageTree = typeof en;
 
-const dictionaries: Record<Locale, MessageTree> = {
-  en,
-  vi,
-};
+/**
+ * The dictionary the server did not send, fetched as its own chunk. Only
+ * reached when the language in use changes without the root layout
+ * re-rendering — a client navigation between /faq and /en/faq, or the moment
+ * between a switch on the dashboard and its router.refresh() landing.
+ */
+function loadDictionary(locale: Locale): Promise<MessageTree> {
+  return locale === "en"
+    ? import("./en.json").then((module) => module.default)
+    : import("./vi.json").then((module) => module.default);
+}
 
 /**
  * Vietnamese, because Vietnam is the market. A visitor with no cookie gets
@@ -90,6 +100,8 @@ type LocaleContextValue = {
   locale: Locale;
   setLocale: (locale: Locale) => void;
   t: (key: string, values?: Record<string, string | number>) => string;
+  /** The whole dictionary for `locale`, for strings `t()` can't return (arrays). */
+  messages: MessageTree;
   /**
    * An internal href in the current language: "/faq" becomes "/en/faq" on an
    * English page. Links between public pages must go through this, or an
@@ -103,9 +115,12 @@ const LocaleContext = createContext<LocaleContextValue | null>(null);
 
 export function LocaleProvider({
   initialLocale,
+  messages,
   children,
 }: {
   initialLocale: Locale;
+  /** The dictionary for `initialLocale`, from the server. */
+  messages: MessageTree;
   children: React.ReactNode;
 }) {
   // The language chosen for pages WITHOUT a per-language URL (dashboard,
@@ -118,7 +133,38 @@ export function LocaleProvider({
   // re-render on client navigation: going from /faq to /en/faq would
   // otherwise keep the Vietnamese value the layout was first rendered with.
   const route = parseLocalePath(pathname);
-  const locale: Locale = route.locale ?? cookieLocale;
+  const requestedLocale: Locale = route.locale ?? cookieLocale;
+
+  // Dictionaries fetched on the client. The server's one is merged in on
+  // every render rather than copied into state once, because router.refresh()
+  // re-renders the root layout with a new `initialLocale` and `messages`.
+  const [fetched, setFetched] = useState<Partial<Record<Locale, MessageTree>>>(
+    {},
+  );
+  const dictionaries = useMemo<Partial<Record<Locale, MessageTree>>>(
+    () => ({ ...fetched, [initialLocale]: messages }),
+    [fetched, initialLocale, messages],
+  );
+  const missing = dictionaries[requestedLocale] === undefined;
+
+  useEffect(() => {
+    if (!missing) return;
+    let cancelled = false;
+    loadDictionary(requestedLocale).then((dictionary) => {
+      if (!cancelled) {
+        setFetched((prev) => ({ ...prev, [requestedLocale]: dictionary }));
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [missing, requestedLocale]);
+
+  // Until the requested dictionary arrives, stay in the language whose text we
+  // have, so `locale` (dates, number formats, <html lang>) never disagrees with
+  // the strings on screen.
+  const locale: Locale = missing ? initialLocale : requestedLocale;
+  const activeMessages = dictionaries[locale] ?? messages;
 
   useEffect(() => {
     document.documentElement.lang = locale;
@@ -172,10 +218,11 @@ export function LocaleProvider({
     () => ({
       locale,
       setLocale,
-      t: (key, values) => translate(dictionaries[locale], key, values),
+      t: (key, values) => translate(activeMessages, key, values),
+      messages: activeMessages,
       localize: (href) => localizedHref(href, locale),
     }),
-    [locale, setLocale],
+    [locale, setLocale, activeMessages],
   );
 
   return (
@@ -199,8 +246,4 @@ export function useTranslations() {
 
 export function getLocaleFromCookie(cookieValue?: string | null): Locale {
   return normalizeLocale(cookieValue);
-}
-
-export function getDictionary(locale: string | null | undefined) {
-  return dictionaries[normalizeLocale(locale)];
 }

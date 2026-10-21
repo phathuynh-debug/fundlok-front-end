@@ -19,6 +19,7 @@ import {
 } from "@/lib/appearance";
 import { QueryProvider } from "@/providers/query-provider";
 import { LocaleProvider } from "@/lib/i18n";
+import { getMessages } from "@/lib/i18n/server";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { SITE_URL } from "@/lib/site";
 import {
@@ -169,7 +170,10 @@ export default async function RootLayout({
             password sign-in down with it. See lib/google-oauth.ts. */}
         <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID_OR_PLACEHOLDER}>
           <QueryProvider>
-            <LocaleProvider initialLocale={locale}>
+            <LocaleProvider
+              initialLocale={locale}
+              messages={getMessages(locale)}
+            >
               <ThemeProvider
                 attribute="class"
                 defaultTheme="system"
