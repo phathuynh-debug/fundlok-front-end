@@ -2,6 +2,7 @@ import { test, expect, type BrowserContext, type Page } from "@playwright/test";
 
 import { signInAs } from "../support/auth";
 import { t } from "../support/i18n";
+import { confirmPassword } from "../support/ui";
 import { addVirtualAuthenticator } from "../support/webauthn";
 
 // Passkeys, driven by a real (virtual) authenticator rather than a mock of
@@ -64,6 +65,7 @@ test.describe("managing passkeys", () => {
     await dialog
       .getByLabel(t("dashboard.security.passkeys.nameLabel"))
       .fill("MacBook Touch ID");
+    await confirmPassword(dialog, { submit: false });
     await dialog
       .getByRole("button", { name: t("dashboard.security.passkeys.add") })
       .click();
@@ -95,6 +97,7 @@ test.describe("managing passkeys", () => {
       })
       .click();
     const dialog = page.getByRole("dialog");
+    await confirmPassword(dialog, { submit: false });
     await dialog
       .getByRole("button", { name: t("dashboard.security.passkeys.add") })
       .click();
@@ -143,6 +146,7 @@ test.describe("managing passkeys", () => {
     await dialog
       .getByLabel(t("dashboard.security.passkeys.nameLabel"))
       .fill("Old phone");
+    await confirmPassword(dialog, { submit: false });
     await dialog
       .getByRole("button", { name: t("dashboard.security.passkeys.add") })
       .click();
@@ -200,6 +204,7 @@ test.describe("signing in with a passkey", () => {
       })
       .click();
     const dialog = page.getByRole("dialog");
+    await confirmPassword(dialog, { submit: false });
     await dialog
       .getByRole("button", { name: t("dashboard.security.passkeys.add") })
       .click();

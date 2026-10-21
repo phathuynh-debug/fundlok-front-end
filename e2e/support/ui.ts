@@ -1,5 +1,8 @@
 import type { Locator, Page } from "@playwright/test";
 
+import { STUB_PASSWORD } from "../stub-api/fixtures";
+import { t } from "./i18n";
+
 /**
  * The visible toast matching `text`.
  *
@@ -27,4 +30,27 @@ export function toast(page: Page, text: string): Locator {
 export async function settle(page: Page): Promise<void> {
   await page.waitForLoadState("load");
   await page.evaluate(() => document.fonts.ready.then(() => undefined));
+}
+
+/**
+ * Answer the step-up prompt that adding a sign-in method now shows
+ * (lib/step-up.ts). The stub accepts any password; what this covers is that
+ * the field is there and the flow continues past it.
+ *
+ * `continue`: the authenticator dialog has a separate password step with its
+ * own button; the passkey dialog takes the password beside the name and sends
+ * it with Add.
+ */
+export async function confirmPassword(
+  dialog: Locator,
+  { submit }: { submit: boolean },
+): Promise<void> {
+  await dialog
+    .getByLabel(t("security.stepUp.passwordLabel"))
+    .fill(STUB_PASSWORD);
+  if (submit) {
+    await dialog
+      .getByRole("button", { name: t("security.stepUp.continue") })
+      .click();
+  }
 }

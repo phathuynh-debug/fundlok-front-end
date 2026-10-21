@@ -117,15 +117,25 @@ export function TwoFactorSetupDialog({
         setPassword("");
         setStep("scan");
       },
-      onError: (apiError) =>
-        setPasswordError(
-          stepUpMessage(apiError) ??
+      onError: (apiError) => {
+        const stepUp = stepUpMessage(apiError);
+        if (stepUp) {
+          setPasswordError(stepUp);
+        } else if (apiError?.status === 400) {
+          setPasswordError(
             apiErrorMessage(
               apiError,
               locale,
               t("security.stepUp.wrongPassword"),
             ),
-        ),
+          );
+        } else {
+          // Not about the password (setup unavailable, a 5xx): kept on this
+          // step it read as "That password is incorrect" in Vietnamese. The
+          // scan step's failure panel explains it and offers a retry.
+          setStep("scan");
+        }
+      },
     });
   };
 

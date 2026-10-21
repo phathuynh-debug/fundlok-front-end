@@ -2,7 +2,7 @@ import { test, expect, type Page } from "@playwright/test";
 
 import { signInAs } from "../support/auth";
 import { t } from "../support/i18n";
-import { settle } from "../support/ui";
+import { confirmPassword, settle } from "../support/ui";
 
 /**
  * An admin signed in with a password only (audit finding SEC-01).
@@ -86,6 +86,7 @@ test("enrolling an authenticator app asks them to sign in again", async ({
   const dialog = page.getByRole("dialog", {
     name: t("security.twoFactor.title"),
   });
+  await confirmPassword(dialog, { submit: true });
   await dialog
     .getByRole("button", { name: t("security.twoFactor.next") })
     .click();

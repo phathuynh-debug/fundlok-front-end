@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 import { STUB_PASSWORD, STUB_USERS } from "../stub-api/fixtures";
 import { signInAs } from "../support/auth";
 import { t } from "../support/i18n";
-import { settle, toast } from "../support/ui";
+import { confirmPassword, settle, toast } from "../support/ui";
 
 /**
  * Two-factor authentication, end to end.
@@ -66,6 +66,7 @@ const enrol = async (page: import("@playwright/test").Page) => {
     name: t("security.twoFactor.title"),
   });
   await expect(dialog).toBeVisible();
+  await confirmPassword(dialog, { submit: true });
   await dialog
     .getByRole("button", { name: t("security.twoFactor.next") })
     .click();
@@ -120,6 +121,7 @@ test.describe("enrolment", () => {
     const dialog = page.getByRole("dialog", {
       name: t("security.twoFactor.title"),
     });
+    await confirmPassword(dialog, { submit: true });
     // react-qr-code renders an <svg>; its presence is what proves the URI
     // arrived and was encoded, not just that the dialog opened.
     await expect(dialog.locator("svg").first()).toBeVisible();
@@ -139,6 +141,7 @@ test.describe("enrolment", () => {
     const dialog = page.getByRole("dialog", {
       name: t("security.twoFactor.title"),
     });
+    await confirmPassword(dialog, { submit: true });
     await dialog
       .getByRole("button", { name: t("security.twoFactor.next") })
       .click();
@@ -170,6 +173,7 @@ test.describe("enrolment", () => {
     const dialog = page.getByRole("dialog", {
       name: t("security.twoFactor.title"),
     });
+    await confirmPassword(dialog, { submit: true });
     await dialog
       .getByRole("button", { name: t("security.twoFactor.next") })
       .click();
@@ -454,6 +458,8 @@ test.describe("when the server cannot offer 2FA", () => {
     const dialog = page.getByRole("dialog", {
       name: t("security.twoFactor.title"),
     });
+    // The secret is only requested once the password is confirmed.
+    await confirmPassword(dialog, { submit: true });
     await expect(
       dialog.getByText(t("security.twoFactor.setupFailedTitle")),
     ).toBeVisible();
@@ -482,6 +488,8 @@ test.describe("when the server cannot offer 2FA", () => {
     const dialog = page.getByRole("dialog", {
       name: t("security.twoFactor.title"),
     });
+    // The secret is only requested once the password is confirmed.
+    await confirmPassword(dialog, { submit: true });
     await expect(
       dialog.getByText(t("security.twoFactor.setupFailedTitle")),
     ).toBeVisible();
@@ -492,6 +500,8 @@ test.describe("when the server cannot offer 2FA", () => {
     await dialog
       .getByRole("button", { name: t("security.twoFactor.retry") })
       .click();
+    // Retrying asks for the password again: it starts setup afresh.
+    await confirmPassword(dialog, { submit: true });
 
     // Back to the scan step, with a real secret.
     await expect(dialog.getByText("JBSWY3DPEHPK3PXP")).toBeVisible();

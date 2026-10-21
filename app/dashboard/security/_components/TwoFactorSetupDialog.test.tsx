@@ -7,9 +7,12 @@ import { TwoFactorSetupDialog } from "./TwoFactorSetupDialog";
 // Starting setup needs the account password (lib/step-up.ts): an authenticator
 // enrolled from a stolen session locks the owner out of an account without
 // 2FA. Accounts with no password skip the step and start on open.
-const { account, startSetup, setupState } = vi.hoisted(() => ({
+const { account, startSetup, resetSetup, setupState } = vi.hoisted(() => ({
   account: { has_password: true },
   startSetup: vi.fn(),
+  // Stable, as react-query's is: a new function per render re-runs the
+  // dialog's open effect, which puts it back on the password step.
+  resetSetup: vi.fn(),
   setupState: { error: null as unknown },
 }));
 
@@ -22,7 +25,7 @@ vi.mock("@/hooks/use-authentication", () => ({
     data: undefined,
     isPending: false,
     error: setupState.error,
-    reset: vi.fn(),
+    reset: resetSetup,
   }),
   useEnableTwoFactor: () => ({ mutate: vi.fn(), isPending: false }),
   useLogout: () => ({ isPending: false, mutate: vi.fn() }),
@@ -79,6 +82,32 @@ describe("TwoFactorSetupDialog step-up", () => {
     );
 
     expect(screen.getByText("Password is incorrect")).toBeInTheDocument();
+  });
+
+  it("shows a failure that is not about the password as a setup failure", async () => {
+    const unavailable = { message: "Unavailable", status: 503 };
+    startSetup.mockImplementation(
+      (_password: string, options: { onError: (e: unknown) => void }) => {
+        setupState.error = unavailable;
+        options.onError(unavailable);
+      },
+    );
+    render(<TwoFactorSetupDialog open onOpenChange={vi.fn()} />);
+
+    await userEvent.type(
+      screen.getByLabelText("security.stepUp.passwordLabel"),
+      "correct horse",
+    );
+    await userEvent.click(
+      screen.getByRole("button", { name: "security.stepUp.continue" }),
+    );
+
+    expect(
+      screen.getByText("security.twoFactor.setupFailedTitle"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("security.stepUp.wrongPassword"),
+    ).not.toBeInTheDocument();
   });
 
   it("starts at once for an account without a password", () => {
