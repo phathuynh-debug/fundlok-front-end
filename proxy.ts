@@ -42,6 +42,8 @@ const SELECT_ROLE_ROUTE = "/select-role";
 // On-demand identity/business verification screen. No longer a blanket entry
 // gate — reached only when a user hits a verification-gated action route.
 const KYC_ROUTE = "/kyc";
+// Phone side of the KYC QR handoff; ungated (see the bypass below).
+const KYC_MOBILE_ROUTE = "/kyc/mobile";
 // Frontend system-settings page (distinct from the backend /system API prefix).
 const SYSTEM_SETTINGS_ROUTE = "/admin/system";
 const MAINTENANCE_ROUTE = "/maintenance";
@@ -296,7 +298,14 @@ async function routeRequest(request: NextRequest, refreshed: string[]) {
   // device, so there is no session cookie here — auth is the short-lived
   // handoff token in the query string, validated by the backend on submit.
   // Must bypass every session-based gate (login redirect, KYC gate, …).
-  if (pathname.startsWith("/kyc/mobile")) {
+  //
+  // The exact route or below it only. A bare prefix also matched siblings
+  // such as /kyc/mobile-review, which would have skipped every gate the day
+  // one was added.
+  if (
+    pathname === KYC_MOBILE_ROUTE ||
+    pathname.startsWith(`${KYC_MOBILE_ROUTE}/`)
+  ) {
     return pass();
   }
   let accessToken = request.cookies.get("access_token")?.value;

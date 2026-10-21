@@ -141,3 +141,22 @@ describe("the session user header", () => {
     expect(decodeSessionUser("not base64 json")).toBeNull();
   });
 });
+
+describe("the KYC handoff bypass", () => {
+  const signedOut = (path: string) =>
+    proxy(new NextRequest(`https://www.fundlok.com${path}?token=t`));
+
+  it("lets the handoff page through without a session", async () => {
+    for (const path of ["/kyc/mobile", "/kyc/mobile/"]) {
+      const response = await signedOut(path);
+      expect(response.headers.get("location")).toBeNull();
+    }
+  });
+
+  it("does not extend to routes that merely share the prefix", async () => {
+    for (const path of ["/kyc/mobile-review", "/kyc/mobileX"]) {
+      const response = await signedOut(path);
+      expect(response.headers.get("location")).toContain("/login");
+    }
+  });
+});
