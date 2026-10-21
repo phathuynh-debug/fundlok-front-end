@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthLayout } from "@/components/auth-layout";
 import { AuthFormSwitcher } from "@/components/auth-form-switcher";
+import { GOOGLE_CLIENT_ID_OR_PLACEHOLDER } from "@/lib/google-oauth";
 import { getServerTranslations } from "@/lib/i18n/server";
 import { languageAlternates, localizedPath } from "@/lib/locale-routing";
 import { localeAlternates } from "@/lib/seo";
@@ -56,7 +58,16 @@ export default async function LoginPage({
 
   return (
     <AuthLayout>
-      <AuthFormSwitcher initialMode={isRegister(mode) ? "register" : "login"} />
+      {/* Only this page signs in with Google, so only this page pays for the
+          provider's sign-in script. Never an empty client id:
+          @react-oauth/google throws on init with one, and Next turns that
+          hydration error into a full-page crash — taking password sign-in
+          down with it. See lib/google-oauth.ts. */}
+      <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID_OR_PLACEHOLDER}>
+        <AuthFormSwitcher
+          initialMode={isRegister(mode) ? "register" : "login"}
+        />
+      </GoogleOAuthProvider>
     </AuthLayout>
   );
 }
