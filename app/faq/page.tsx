@@ -26,7 +26,7 @@ function qaPairsFor(locale: SeoLocale) {
   const faq = dictionaries[locale].faqPage;
   return FAQ_CATEGORIES.flatMap((key) => {
     const category = faq[key];
-    return faqQuestionNumbers(key).map((n) => ({
+    return faqQuestionNumbers(faq, key).map((n) => ({
       question: category[`q${n}` as keyof typeof category] as string,
       answer: category[`a${n}` as keyof typeof category] as string,
     }));

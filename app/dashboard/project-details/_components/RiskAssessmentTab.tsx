@@ -1,13 +1,12 @@
 import { Card } from "@/components/ui/card";
 import { CheckCircle2, AlertTriangle } from "lucide-react";
-import { getDictionary, useTranslations } from "@/lib/i18n";
+import { useTranslations } from "@/lib/i18n";
 import { InvestmentTab } from "./InvestmentTab";
 
 export function RiskAssessmentTab({ score }: { score: number }) {
-  const { locale, t } = useTranslations();
-  const dictionary = getDictionary(locale);
-  const strengths = dictionary.investment.risk.strengthItems;
-  const risks = dictionary.investment.risk.riskItems;
+  const { messages, t } = useTranslations();
+  const strengths = messages.investment.risk.strengthItems;
+  const risks = messages.investment.risk.riskItems;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-200">

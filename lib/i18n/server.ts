@@ -41,6 +41,15 @@ export function createServerTranslator(locale: SeoLocale): ServerTranslate {
   };
 }
 
+/**
+ * The dictionary the root layout hands to `LocaleProvider`. Only this locale's
+ * strings reach the browser; `lib/i18n/index.tsx` must never import the JSON
+ * itself, or every page ships both languages again.
+ */
+export function getMessages(locale: SeoLocale) {
+  return dictionaries[locale];
+}
+
 export async function getServerTranslations() {
   const locale = await resolveSeoLocale();
   return { locale, t: createServerTranslator(locale) };

@@ -27,7 +27,7 @@ type CategoryKey = FaqCategory;
 const sectionId = (key: CategoryKey) => `faq-${key}`;
 
 export default function FaqClient() {
-  const { t, localize } = useTranslations();
+  const { t, localize, messages } = useTranslations();
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("general");
 
   // Highlight the pill of the category currently in view while scrolling.
@@ -122,7 +122,7 @@ export default function FaqClient() {
               </h2>
 
               <Accordion type="single" collapsible className="w-full">
-                {faqQuestionNumbers(key).map((n) => (
+                {faqQuestionNumbers(messages.faqPage, key).map((n) => (
                   <AccordionItem
                     key={n}
                     value={`${key}-${n}`}
