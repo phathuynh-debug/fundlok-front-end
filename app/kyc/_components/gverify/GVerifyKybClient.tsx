@@ -139,6 +139,8 @@ export function GVerifyKybClient() {
       const verdict = await submit({
         expected_mode: verificationMode?.mode,
       });
+      // A tap while a submit is already running; that one handles the verdict.
+      if (!verdict) return;
       setRetaking(false);
       if (verdict.status === "REJECTED" || verdict.status === "FAILED") {
         reset();

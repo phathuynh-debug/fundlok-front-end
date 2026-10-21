@@ -77,6 +77,8 @@ export function MobileKycClient() {
       const res = await submit({
         expected_mode: effectiveMode,
       });
+      // A tap while a submit is already running; that one handles the verdict.
+      if (!res) return;
       setVerdict(res);
       if (res.status === "REJECTED" || res.status === "FAILED") {
         recordFailure();

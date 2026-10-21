@@ -97,7 +97,13 @@ export function useGVerifyKyc({
     useGVerifyVerify();
   const { mutateAsync: verifyToken, isPending: tokenPending } =
     useGVerifyVerifyWithToken();
-  const submitting = sessionPending || tokenPending;
+  // The mutation only reports pending once the request is sent, and submit
+  // first base64-encodes three images of up to 10 MB each. Without a guard
+  // that is set synchronously on the first tap, a double-tap in that window
+  // sent two verifications: two paid GVerify calls and two attempts.
+  const inFlightRef = useRef(false);
+  const [inFlight, setInFlight] = useState(false);
+  const submitting = inFlight || sessionPending || tokenPending;
 
   // Track every object URL we minted so unmount can revoke stragglers.
   const urlsRef = useRef<Set<string>>(new Set());
@@ -162,25 +168,35 @@ export function useGVerifyKyc({
   const allReady = CAPTURE_SLOTS.every((slot) => images[slot].file !== null);
 
   // Encode and submit. The caller handles the verdict (seeded into the status
-  // cache by the mutation) and any ApiError.
+  // cache by the mutation) and any ApiError. Resolves to null, doing nothing,
+  // when a submit is already running, so a second tap is ignored rather than
+  // reported (and counted) as a second attempt.
   const submit = useCallback(
     async (options?: {
       expected_mode?: VerificationMode;
-    }): Promise<GVerifyVerifyResponse> => {
-      const [front, back, portrait] = await Promise.all(
-        CAPTURE_SLOTS.map((slot) => fileToBase64(images[slot].file as File)),
-      );
-      const payload = {
-        id_front_b64: front,
-        id_back_b64: back,
-        portrait_b64: portrait,
-        ...(options?.expected_mode
-          ? { expected_mode: options.expected_mode }
-          : {}),
-      };
-      return handoffToken
-        ? verifyToken({ payload, token: handoffToken })
-        : verifySession(payload);
+    }): Promise<GVerifyVerifyResponse | null> => {
+      if (inFlightRef.current) return null;
+      inFlightRef.current = true;
+      setInFlight(true);
+      try {
+        const [front, back, portrait] = await Promise.all(
+          CAPTURE_SLOTS.map((slot) => fileToBase64(images[slot].file as File)),
+        );
+        const payload = {
+          id_front_b64: front,
+          id_back_b64: back,
+          portrait_b64: portrait,
+          ...(options?.expected_mode
+            ? { expected_mode: options.expected_mode }
+            : {}),
+        };
+        return await (handoffToken
+          ? verifyToken({ payload, token: handoffToken })
+          : verifySession(payload));
+      } finally {
+        inFlightRef.current = false;
+        setInFlight(false);
+      }
     },
     [images, handoffToken, verifySession, verifyToken],
   );

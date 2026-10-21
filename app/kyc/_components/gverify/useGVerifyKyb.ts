@@ -48,7 +48,13 @@ export function useGVerifyKyb() {
   const [documentType, setDocumentType] =
     useState<GVerifyKybDocumentType>("COMPANY");
   const [details, setDetails] = useState<KybDeclaredDetails>(emptyDetails);
-  const { mutateAsync: verify, isPending: submitting } = useGVerifyKybVerify();
+  const { mutateAsync: verify, isPending } = useGVerifyKybVerify();
+  // Set synchronously on the first click: the certificate (up to 10 MB) is
+  // base64-encoded before the mutation reports pending, and a double-click in
+  // that window used to start two KYB provider calls. See useGVerifyKyc.
+  const inFlightRef = useRef(false);
+  const [inFlight, setInFlight] = useState(false);
+  const submitting = inFlight || isPending;
 
   // Update one declared field by key, e.g. setDetail('taxCode', value).
   const setDetail = useCallback(
@@ -133,19 +139,28 @@ export function useGVerifyKyb() {
   const submit = useCallback(
     async (options?: {
       expected_mode?: VerificationMode;
-    }): Promise<GVerifyKybVerifyResponse> => {
-      const document_b64 = await fileToBase64(document.file as File);
-      const trimmedTax = details.taxCode.trim();
-      const trimmedLicense = details.licenseCode.trim();
-      return verify({
-        document_b64,
-        document_type: documentType,
-        ...(trimmedTax ? { tax_code: trimmedTax } : {}),
-        ...(trimmedLicense ? { license_code: trimmedLicense } : {}),
-        ...(options?.expected_mode
-          ? { expected_mode: options.expected_mode }
-          : {}),
-      });
+    }): Promise<GVerifyKybVerifyResponse | null> => {
+      // Null means a submit is already running; the caller does nothing.
+      if (inFlightRef.current) return null;
+      inFlightRef.current = true;
+      setInFlight(true);
+      try {
+        const document_b64 = await fileToBase64(document.file as File);
+        const trimmedTax = details.taxCode.trim();
+        const trimmedLicense = details.licenseCode.trim();
+        return await verify({
+          document_b64,
+          document_type: documentType,
+          ...(trimmedTax ? { tax_code: trimmedTax } : {}),
+          ...(trimmedLicense ? { license_code: trimmedLicense } : {}),
+          ...(options?.expected_mode
+            ? { expected_mode: options.expected_mode }
+            : {}),
+        });
+      } finally {
+        inFlightRef.current = false;
+        setInFlight(false);
+      }
     },
     [document, documentType, details, verify],
   );
