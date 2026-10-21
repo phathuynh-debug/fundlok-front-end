@@ -376,7 +376,7 @@ export function TermsClient() {
       <SiteHeader />
       <BackgroundBlobs variant="compact" />
 
-      <main className="relative z-10 mx-auto w-full max-w-6xl px-6 py-12 md:py-16">
+      <div className="relative z-10 mx-auto w-full max-w-6xl px-6 py-12 md:py-16">
         {/* Breadcrumb Navigation */}
         <div className="flex items-center justify-between gap-4 pb-8 border-b border-border/60">
           <Link
@@ -563,7 +563,7 @@ export function TermsClient() {
             </div>
           </section>
         </div>
-      </main>
+      </div>
 
       <SiteFooter />
     </div>

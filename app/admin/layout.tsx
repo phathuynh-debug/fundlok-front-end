@@ -24,7 +24,7 @@ export default function AdminLayout({
       <AdminSidebar />
 
       {/* Main Content Area */}
-      <main className="flex-1 relative overflow-y-auto bg-background focus:outline-none">
+      <div className="flex-1 relative overflow-y-auto bg-background focus:outline-none">
         {/* Top bar: mobile navigation drawer + language and theme switchers */}
         <AdminHeader />
 
@@ -33,7 +33,7 @@ export default function AdminLayout({
             {children}
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

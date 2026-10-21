@@ -73,3 +73,47 @@ describe("server-side calls to the backend", () => {
     expect(sentHeaders().has("X-Client-IP")).toBe(false);
   });
 });
+
+// fetch() has no timeout of its own, so a backend that accepts the connection
+// and then stalls would hold every gated navigation open. Each lookup passes a
+// timeout signal and treats the abort like any other network error.
+describe("a stalled backend", () => {
+  beforeEach(() => {
+    // Every timeout fires at once, and fetch never answers on its own: it only
+    // settles by rejecting when its signal aborts, as the real one does.
+    vi.spyOn(AbortSignal, "timeout").mockImplementation(() =>
+      AbortSignal.abort(new DOMException("timed out", "TimeoutError")),
+    );
+    fetchMock.mockImplementation(
+      (_input, init) =>
+        new Promise((_resolve, reject) => {
+          const signal = init?.signal;
+          if (!signal) return;
+          if (signal.aborted) reject(signal.reason);
+          signal.addEventListener("abort", () => reject(signal.reason));
+        }),
+    );
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("ends the session lookup as no session", async () => {
+    await expect(middlewareService.getCurrentUser(pageLoad())).resolves.toBe(
+      null,
+    );
+  });
+
+  it("ends the refresh as refused", async () => {
+    await expect(middlewareService.refreshSession(pageLoad())).resolves.toBe(
+      null,
+    );
+  });
+
+  it("ends the verification lookup as not approved", async () => {
+    await expect(
+      middlewareService.getVerificationApproved(pageLoad(), "SME"),
+    ).resolves.toBe(false);
+  });
+});
