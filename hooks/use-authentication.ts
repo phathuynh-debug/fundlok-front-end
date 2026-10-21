@@ -305,9 +305,11 @@ export function useTwoFactorStatus(enabled = true) {
  * Not a query: it has a side effect (it writes a new secret) and must only run
  * when the user opens the dialog, never on a refetch or a window focus.
  */
+/** Step one. Takes the account password as step-up proof (lib/step-up.ts). */
 export function useStartTwoFactorSetup() {
-  return useMutation<TotpSetup, ApiError, void>({
-    mutationFn: () => authenticationService.startTwoFactorSetup(),
+  return useMutation<TotpSetup, ApiError, string | undefined>({
+    mutationFn: (password) =>
+      authenticationService.startTwoFactorSetup(password),
   });
 }
 
@@ -370,9 +372,15 @@ export function usePasskeys(enabled = true) {
 export function useRegisterPasskey() {
   const queryClient = useQueryClient();
 
-  return useMutation<Passkey, ApiError | Error, string | undefined>({
-    mutationFn: async (name) => {
-      const options = await authenticationService.passkeyRegisterOptions();
+  return useMutation<
+    Passkey,
+    ApiError | Error,
+    { name?: string; password?: string }
+  >({
+    mutationFn: async ({ name, password }) => {
+      // The password is the step-up proof (lib/step-up.ts).
+      const options =
+        await authenticationService.passkeyRegisterOptions(password);
       const credential = await createPasskey(options);
       return authenticationService.passkeyRegisterVerify({
         credential,

@@ -2679,6 +2679,14 @@
       "title": "Tài khoản quản trị phải đăng nhập bằng xác thực hai lớp",
       "toastBody": "Hãy đăng xuất và đăng nhập lại bằng phương thức này để mở khóa khu vực quản trị."
     },
+    "stepUp": {
+      "continue": "Tiếp tục",
+      "locked": "Bạn đã nhập sai quá nhiều lần. Vui lòng thử lại sau 15 phút.",
+      "passwordHint": "Cần mật khẩu của bạn để thêm phương thức đăng nhập, để không ai khác đang dùng phiên này có thể tự thêm.",
+      "passwordLabel": "Xác nhận mật khẩu",
+      "reauthRequired": "Để bảo mật, vui lòng đăng xuất và đăng nhập lại, rồi thêm trong vài phút sau đó.",
+      "wrongPassword": "Mật khẩu không đúng."
+    },
     "twoFactor": {
       "back": "Quay lại",
       "codeHint": "Mã thay đổi mỗi 30 giây.",

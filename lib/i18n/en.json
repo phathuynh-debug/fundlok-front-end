@@ -2679,6 +2679,14 @@
       "title": "Admin accounts need two-factor sign-in",
       "toastBody": "Sign out and sign in again with it to unlock the admin area."
     },
+    "stepUp": {
+      "continue": "Continue",
+      "locked": "Too many incorrect attempts. Try again in 15 minutes.",
+      "passwordHint": "Adding a way to sign in needs your password, so nobody else using this session can add one.",
+      "passwordLabel": "Confirm your password",
+      "reauthRequired": "For your security, sign out and sign in again, then add it within a few minutes.",
+      "wrongPassword": "That password is incorrect."
+    },
     "twoFactor": {
       "back": "Back",
       "codeHint": "The code changes every 30 seconds.",
