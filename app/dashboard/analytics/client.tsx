@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { BarChart3, FlaskConical, PieChart, TableIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -113,7 +113,7 @@ export default function AnalyticsClient() {
   const allocationTotal = useMemo(() => totalAllocated(NO_ALLOCATION), []);
 
   return (
-    <motion.div {...pageTransitionProps} className="space-y-6 md:space-y-8">
+    <m.div {...pageTransitionProps} className="space-y-6 md:space-y-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -300,6 +300,6 @@ export default function AnalyticsClient() {
           )}
         </>
       )}
-    </motion.div>
+    </m.div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import {
   ChevronLeft,
   ChevronRight,
@@ -85,7 +85,7 @@ export function AchievementsCarousel({
         {/* Main Content Area */}
         <div className="w-full px-2 md:px-6 py-1 md:py-2">
           <AnimatePresence mode="wait" custom={direction}>
-            <motion.div
+            <m.div
               key={activeAchievement}
               custom={direction}
               variants={{
@@ -258,7 +258,7 @@ export function AchievementsCarousel({
                   )}
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           </AnimatePresence>
         </div>
 
@@ -296,7 +296,7 @@ export function AchievementsCarousel({
       {/* Lightbox Modal for Enlarge Photo */}
       <AnimatePresence>
         {lightboxImage && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -313,7 +313,7 @@ export function AchievementsCarousel({
             </button>
 
             {/* Modal Image Wrapper */}
-            <motion.div
+            <m.div
               initial={{ scale: 0.95 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.95 }}
@@ -342,8 +342,8 @@ export function AchievementsCarousel({
                   fetchPriority="high"
                 />
               </div>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         )}
       </AnimatePresence>
     </>

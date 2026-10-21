@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { usePublicProjects } from "@/hooks/use-projects";
 import type { Project } from "@/services/projects.service";
@@ -442,7 +442,7 @@ export default function ProjectsClient() {
   };
 
   return (
-    <motion.div {...pageTransitionProps} className="space-y-6 md:space-y-8">
+    <m.div {...pageTransitionProps} className="space-y-6 md:space-y-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -561,7 +561,7 @@ export default function ProjectsClient() {
           <div className="space-y-6">
             <AnimatePresence mode="wait">
               {isInitialLoading ? (
-                <motion.div
+                <m.div
                   key="skeleton"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -569,9 +569,9 @@ export default function ProjectsClient() {
                   transition={{ duration: 0.2 }}
                 >
                   <ProjectsSkeletonList />
-                </motion.div>
+                </m.div>
               ) : filteredItems.length > 0 ? (
-                <motion.div
+                <m.div
                   key={`${marketType}-${activeIndustry}-${searchTerm}`}
                   variants={staggerContainerVariants}
                   initial="hidden"
@@ -580,26 +580,20 @@ export default function ProjectsClient() {
                 >
                   {marketType === "primary"
                     ? (filteredItems as Project[]).map((project) => (
-                        <motion.div
-                          key={project.id}
-                          variants={springItemVariants}
-                        >
+                        <m.div key={project.id} variants={springItemVariants}>
                           <ProjectCard project={project} role="INVESTOR" />
-                        </motion.div>
+                        </m.div>
                       ))
                     : (filteredItems as SecondaryMarketListing[]).map(
                         (listing) => (
-                          <motion.div
-                            key={listing.id}
-                            variants={springItemVariants}
-                          >
+                          <m.div key={listing.id} variants={springItemVariants}>
                             <SecondaryMarketCard listing={listing} />
-                          </motion.div>
+                          </m.div>
                         ),
                       )}
-                </motion.div>
+                </m.div>
               ) : (
-                <motion.div
+                <m.div
                   key="empty"
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -618,13 +612,13 @@ export default function ProjectsClient() {
                       ? t("dashboard.projects.noProjectsDescription")
                       : t("dashboard.projects.secondaryEmptyDescription")}
                   </p>
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
           </div>
         </>
       ) : (
-        <motion.div
+        <m.div
           key="secondary-coming-soon"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -638,8 +632,8 @@ export default function ProjectsClient() {
           <p className="text-muted-foreground max-w-md">
             {t("dashboard.projects.comingSoonDescription")}
           </p>
-        </motion.div>
+        </m.div>
       )}
-    </motion.div>
+    </m.div>
   );
 }

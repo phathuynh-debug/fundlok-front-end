@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { X, Camera, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -162,7 +162,7 @@ export function CameraCaptureDialog({
   // of the page showing under the shutter. It is only ever mounted after a tap,
   // so `document` is always there.
   return createPortal(
-    <motion.div
+    <m.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="fixed inset-0 z-50 flex flex-col bg-black"
@@ -249,7 +249,7 @@ export function CameraCaptureDialog({
           )}
         </button>
       </div>
-    </motion.div>,
+    </m.div>,
     document.body,
   );
 }

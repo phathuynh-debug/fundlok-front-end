@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Mail, RefreshCw, LogOut, Loader2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCurrentUser, useLogout } from "@/hooks/use-authentication";
@@ -163,7 +163,7 @@ export function VerifyEmailClient() {
     <div className="space-y-6">
       <div className="flex flex-col items-center text-center space-y-4">
         {/* Animated mail icon */}
-        <motion.div
+        <m.div
           initial={{ scale: 0.8 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{
@@ -175,7 +175,7 @@ export function VerifyEmailClient() {
           className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 border border-emerald-500/20"
         >
           <Mail className="h-8 w-8" />
-        </motion.div>
+        </m.div>
 
         <h2 className="text-2xl lg:text-3xl font-bold text-foreground">
           {t("auth.verifyEmail.title")}

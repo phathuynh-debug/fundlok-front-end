@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 // Image handled by Logo component
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Shield, Zap, Users, TrendingUp } from "lucide-react";
 import type { ReactNode } from "react";
 import { LocaleSwitcher } from "@/components/locale-switcher";
@@ -18,7 +18,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
   const { t, localize } = useTranslations();
 
   return (
-    <motion.div
+    <m.div
       initial={{ y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
@@ -146,7 +146,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           </p>
         </footer>
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 

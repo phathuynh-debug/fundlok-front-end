@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { CheckCircle2, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLoanApplicationContext } from "./LoanApplicationContext";
@@ -29,13 +29,13 @@ export function StepIndicator() {
           style={{ zIndex: 2 }}
         >
           <div className="mx-[18px] h-full relative overflow-hidden rounded-full">
-            <motion.div
+            <m.div
               className="h-full bg-black dark:bg-white absolute left-0 top-0"
               initial={{ width: "0%" }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
             />
-            <motion.div
+            <m.div
               className="absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/30 dark:bg-white/30 blur-md"
               initial={{ left: "0%" }}
               animate={{ left: `${progress}%` }}

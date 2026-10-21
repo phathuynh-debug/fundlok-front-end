@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { KeyRound, MonitorSmartphone, ShieldCheck } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { springItemVariants, staggerContainerVariants } from "@/lib/animations";
@@ -59,14 +59,14 @@ export function SecurityPostureCard({
   ];
 
   return (
-    <motion.div
+    <m.div
       variants={staggerContainerVariants}
       initial="hidden"
       animate="show"
       className="grid grid-cols-1 lg:grid-cols-[1.1fr_2fr] gap-4"
     >
       {/* Score */}
-      <motion.div variants={springItemVariants}>
+      <m.div variants={springItemVariants}>
         <Card className="h-full p-5 gap-3">
           <div className="flex items-center justify-between gap-3">
             <span className="text-sm font-medium text-muted-foreground">
@@ -97,7 +97,7 @@ export function SecurityPostureCard({
             aria-valuemax={100}
             aria-label={t("dashboard.security.posture.scoreLabel")}
           >
-            <motion.div
+            <m.div
               className={cn("h-full rounded-full", styles.bar)}
               initial={{ width: 0 }}
               animate={{ width: `${score}%` }}
@@ -109,12 +109,12 @@ export function SecurityPostureCard({
             {t(`dashboard.security.posture.bandHint.${band}`)}
           </p>
         </Card>
-      </motion.div>
+      </m.div>
 
       {/* Supporting stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {tiles.map((tile) => (
-          <motion.div key={tile.key} variants={springItemVariants}>
+          <m.div key={tile.key} variants={springItemVariants}>
             <Card className="h-full p-5 gap-1.5">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <tile.icon className="h-4 w-4 shrink-0" />
@@ -125,9 +125,9 @@ export function SecurityPostureCard({
               </span>
               <span className="text-xs text-muted-foreground">{tile.hint}</span>
             </Card>
-          </motion.div>
+          </m.div>
         ))}
       </div>
-    </motion.div>
+    </m.div>
   );
 }

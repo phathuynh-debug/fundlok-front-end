@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import {
   AnimatePresence,
   animate,
-  motion,
+  m,
   useMotionValue,
   useReducedMotion,
   useTransform,
@@ -79,7 +79,7 @@ export function ApprovalSummary({
               </span>
             </p>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-              <motion.div
+              <m.div
                 className="h-full rounded-full bg-emerald-500"
                 initial={{ width: 0 }}
                 animate={{ width: `${approval.business_score}%` }}
@@ -161,7 +161,7 @@ function CountUp({ to, decimals }: { to: number; decimals: number }) {
     });
     return () => controls.stop();
   }, [reduce, to, value]);
-  return <motion.span>{text}</motion.span>;
+  return <m.span>{text}</m.span>;
 }
 
 // Deterministic burst: 18 pieces on a ring, so the layout is stable between
@@ -225,14 +225,14 @@ export function ApprovalCelebration({
   return (
     <AnimatePresence>
       {open && (
-        <motion.div
+        <m.div
           className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 px-4 backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={close}
         >
-          <motion.div
+          <m.div
             role="dialog"
             aria-modal="true"
             aria-labelledby="approval-celebration-title"
@@ -255,7 +255,7 @@ export function ApprovalCelebration({
             <div className="relative mx-auto mb-5 flex h-16 w-16 items-center justify-center">
               {!reduce &&
                 PIECES.map((p, i) => (
-                  <motion.span
+                  <m.span
                     key={i}
                     aria-hidden
                     className={`absolute h-2 w-2 ${p.tone} ${p.round ? "rounded-full" : "rounded-[2px]"}`}
@@ -270,7 +270,7 @@ export function ApprovalCelebration({
                     transition={{ duration: 1.3, delay: 0.15, ease: "easeOut" }}
                   />
                 ))}
-              <motion.div
+              <m.div
                 className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/15"
                 initial={reduce ? false : { scale: 0 }}
                 animate={{ scale: 1 }}
@@ -282,7 +282,7 @@ export function ApprovalCelebration({
                 }}
               >
                 <CheckCircle2 className="h-9 w-9 text-emerald-500" />
-              </motion.div>
+              </m.div>
             </div>
 
             <h2
@@ -326,8 +326,8 @@ export function ApprovalCelebration({
             <Button type="button" className="mt-6 w-full" onClick={close}>
               {t("dashboard.sme.approval.celebrateCta")}
             </Button>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

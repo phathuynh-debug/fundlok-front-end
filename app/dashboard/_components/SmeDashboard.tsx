@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -49,7 +49,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
   // through /kyc first, then returned to the application form.
   if (!project) {
     return (
-      <motion.div
+      <m.div
         initial={{ y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: "easeOut" }}
@@ -84,7 +84,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
             </Link>
           </Button>
         </Card>
-      </motion.div>
+      </m.div>
     );
   }
 
@@ -98,7 +98,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
   );
 
   return (
-    <motion.div
+    <m.div
       initial={{ y: -12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
@@ -392,6 +392,6 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
             t={t}
           />
         ))}
-    </motion.div>
+    </m.div>
   );
 }

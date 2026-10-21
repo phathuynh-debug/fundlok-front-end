@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import {
   Building2,
   TrendingUp,
@@ -143,17 +143,17 @@ export function SelectRoleClient() {
           }}
         />
         {/* Soft floating colour blobs */}
-        <motion.div
+        <m.div
           className="absolute -left-24 -top-24 h-[28rem] w-[28rem] rounded-full bg-primary/15 blur-3xl"
           animate={{ x: [0, 40, 0], y: [0, 30, 0], scale: [1, 1.08, 1] }}
           transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
         />
-        <motion.div
+        <m.div
           className="absolute -bottom-32 -right-24 h-[32rem] w-[32rem] rounded-full bg-emerald-500/10 blur-3xl"
           animate={{ x: [0, -50, 0], y: [0, -30, 0], scale: [1, 1.12, 1] }}
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
         />
-        <motion.div
+        <m.div
           className="absolute left-1/2 top-1/3 h-72 w-72 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl"
           animate={{ y: [0, 40, 0], opacity: [0.5, 0.8, 0.5] }}
           transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
@@ -164,7 +164,7 @@ export function SelectRoleClient() {
         <AnimatePresence mode="wait">
           {selectedRole || alreadyHasRole ? (
             // --- Onboarding loader ---
-            <motion.div
+            <m.div
               key="onboarding"
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -172,13 +172,13 @@ export function SelectRoleClient() {
               transition={{ duration: 0.3, ease: "easeOut" }}
               className="flex flex-col items-center justify-center gap-8 py-24 text-center"
             >
-              <motion.div
+              <m.div
                 className="relative flex h-24 w-24 items-center justify-center"
                 initial={{ scale: 0.8 }}
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", stiffness: 200, damping: 18 }}
               >
-                <motion.span
+                <m.span
                   className="absolute inset-0 rounded-full bg-primary/10"
                   animate={{ scale: [1, 1.25, 1], opacity: [0.6, 0.2, 0.6] }}
                   transition={{
@@ -188,7 +188,7 @@ export function SelectRoleClient() {
                   }}
                 />
                 <Loader2 className="h-12 w-12 animate-spin text-primary" />
-              </motion.div>
+              </m.div>
 
               <div className="space-y-3">
                 <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
@@ -198,10 +198,10 @@ export function SelectRoleClient() {
                   {t("auth.selectRole.onboardingSubtitle")}
                 </p>
               </div>
-            </motion.div>
+            </m.div>
           ) : (
             // --- Role selection ---
-            <motion.div
+            <m.div
               key="selection"
               variants={containerVariants}
               initial="hidden"
@@ -209,7 +209,7 @@ export function SelectRoleClient() {
               exit={{ opacity: 0, y: -16, transition: { duration: 0.2 } }}
               className="space-y-12"
             >
-              <motion.div
+              <m.div
                 variants={itemVariants}
                 className="flex items-center justify-end gap-3"
               >
@@ -228,23 +228,20 @@ export function SelectRoleClient() {
                   )}
                   <span>{t("common.logout")}</span>
                 </Button>
-              </motion.div>
+              </m.div>
 
-              <motion.div
-                variants={itemVariants}
-                className="space-y-4 text-center"
-              >
+              <m.div variants={itemVariants} className="space-y-4 text-center">
                 <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
                   {t("auth.selectRole.title")}
                 </h1>
                 <p className="mx-auto max-w-xl text-base text-muted-foreground md:text-lg">
                   {t("auth.selectRole.subtitle")}
                 </p>
-              </motion.div>
+              </m.div>
 
               <div className="grid gap-8 md:grid-cols-2">
                 {cards.map(({ role, icon: Icon, title, description }) => (
-                  <motion.div
+                  <m.div
                     key={role}
                     variants={itemVariants}
                     whileHover={{ y: -6, scale: 1.02 }}
@@ -252,7 +249,7 @@ export function SelectRoleClient() {
                     transition={{ type: "spring", stiffness: 320, damping: 22 }}
                     className="group flex flex-col items-center gap-5 rounded-3xl border border-border bg-card text-card-foreground p-10 text-center shadow-sm transition-colors hover:border-primary/50 hover:shadow-xl"
                   >
-                    <motion.div
+                    <m.div
                       whileHover={{ rotate: -6, scale: 1.08 }}
                       transition={{
                         type: "spring",
@@ -262,7 +259,7 @@ export function SelectRoleClient() {
                       className="flex h-20 w-20 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground"
                     >
                       <Icon className="h-9 w-9" />
-                    </motion.div>
+                    </m.div>
 
                     <h2 className="text-2xl font-bold tracking-tight">
                       {title}
@@ -279,10 +276,10 @@ export function SelectRoleClient() {
                       {t("auth.selectRole.select")}
                       <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
                     </Button>
-                  </motion.div>
+                  </m.div>
                 ))}
               </div>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>

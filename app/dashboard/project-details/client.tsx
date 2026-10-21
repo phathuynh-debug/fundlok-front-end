@@ -2,7 +2,7 @@
 
 import { useState, useSyncExternalStore } from "react";
 import { useSearchParams } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { usePublicProjects } from "@/hooks/use-projects";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { Badge } from "@/components/ui/badge";
@@ -117,7 +117,7 @@ export default function ProjectDetailsClient() {
   const revenueShareRate = dealTerms.revenueShareRate;
 
   return (
-    <motion.div
+    <m.div
       {...pageTransitionProps}
       className="flex-1 space-y-8 p-4 md:p-8 pt-6 max-w-5xl mx-auto"
     >
@@ -137,7 +137,7 @@ export default function ProjectDetailsClient() {
       </div>
 
       {/* Header section */}
-      <motion.div {...fadeInUpProps} className="flex flex-col gap-4">
+      <m.div {...fadeInUpProps} className="flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-3">
@@ -164,20 +164,20 @@ export default function ProjectDetailsClient() {
         <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl">
           {description}
         </p>
-      </motion.div>
+      </m.div>
 
       {/* KPI Cards Row */}
-      <motion.div {...fadeInUpProps}>
+      <m.div {...fadeInUpProps}>
         <InvestmentKpis
           loanAmountVnd={loanAmountVnd}
           interestRatePct={interestRatePct}
           paybackMonths={paybackMonths}
           revenueShareRate={revenueShareRate}
         />
-      </motion.div>
+      </m.div>
 
       {/* Tab pill selectors */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.25, delay: 0.15 }}
@@ -203,22 +203,22 @@ export default function ProjectDetailsClient() {
         >
           {t("dashboard.projectDetails.dueDiligence")}
         </button>
-      </motion.div>
+      </m.div>
 
       {/* Active Tab Panel Content with Animated Transitions */}
       <div className="mt-8">
         <AnimatePresence mode="wait">
           {activeTab === "risk" ? (
-            <motion.div key="risk" {...tabContentAnimation}>
+            <m.div key="risk" {...tabContentAnimation}>
               <RiskAssessmentTab score={sampleScore} />
-            </motion.div>
+            </m.div>
           ) : (
-            <motion.div key="diligence" {...tabContentAnimation}>
+            <m.div key="diligence" {...tabContentAnimation}>
               <DueDiligenceTab />
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>
-    </motion.div>
+    </m.div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { TrendingUp, Lock } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
 import { formatCompactCurrency } from "@/lib/format-currency";
@@ -637,7 +637,7 @@ export default function Mockup(props: MockupProps) {
     >
       <div className="absolute inset-0 bg-emerald-500/15 rounded-[3rem] blur-3xl pointer-events-none animate-pulse" />
 
-      <motion.div
+      <m.div
         style={{
           rotateX: props.rotateX,
           rotateY: props.rotateY,
@@ -982,7 +982,7 @@ export default function Mockup(props: MockupProps) {
             </div>
           </div>
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 

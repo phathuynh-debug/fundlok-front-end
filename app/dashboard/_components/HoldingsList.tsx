@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { ArrowRight, Medal, TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -69,7 +69,7 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
   }, [holdings]);
 
   return (
-    <motion.ul
+    <m.ul
       variants={staggerContainerVariants}
       initial="hidden"
       animate="show"
@@ -83,7 +83,7 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
         const isTopThree = rank <= 3;
 
         return (
-          <motion.li key={holding.id} variants={springItemVariants}>
+          <m.li key={holding.id} variants={springItemVariants}>
             <div
               className={cn(
                 "group/card relative flex flex-col gap-4 overflow-hidden rounded-xl border p-4 pl-5 shadow-xs transition-colors duration-200 hover:border-foreground/20 hover:bg-muted/10 md:p-5 md:pl-6",
@@ -342,9 +342,9 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
                 </Link>
               </Button>
             </div>
-          </motion.li>
+          </m.li>
         );
       })}
-    </motion.ul>
+    </m.ul>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, type Variants } from "framer-motion";
+import { m, type Variants } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 /* --------------------------------------------------------------------------
@@ -72,7 +72,7 @@ export function ResultBurst() {
       className="pointer-events-none absolute left-1/2 top-6 z-0 h-0 w-0"
     >
       {BURST_PIECES.map((piece) => (
-        <motion.span
+        <m.span
           key={piece.id}
           className={cn(
             "absolute h-1.5 w-1.5 rounded-full",

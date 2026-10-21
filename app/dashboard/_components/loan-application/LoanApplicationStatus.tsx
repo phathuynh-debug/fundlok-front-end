@@ -1,7 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { AlertCircle, Check, FileText, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ProjectLoanApplication } from "@/services/projects.service";
@@ -273,7 +273,7 @@ export function LoanApplicationStatus({
                   ) : step.state === "done" ? (
                     <Check className="h-4 w-4" />
                   ) : step.state === "active" ? (
-                    <motion.span
+                    <m.span
                       className="h-2.5 w-2.5 rounded-full bg-amber-500"
                       animate={{ scale: [1, 1.5, 1], opacity: [1, 0.6, 1] }}
                       transition={{ duration: 1.6, repeat: Infinity }}

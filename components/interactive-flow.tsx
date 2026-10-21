@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import {
-  motion,
+  m,
   useMotionValueEvent,
   useReducedMotion,
   useScroll,
@@ -429,7 +429,7 @@ function AudienceGateCard({
   opacity: MotionValue<number>;
 }) {
   return (
-    <motion.div style={{ x, opacity }} className="h-full">
+    <m.div style={{ x, opacity }} className="h-full">
       <button
         type="button"
         onClick={onChoose}
@@ -462,7 +462,7 @@ function AudienceGateCard({
           <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1" />
         </span>
       </button>
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -490,9 +490,9 @@ function ScrollProgressItem({
   const y = useTransform(progress, range, [14, 0], { clamp: true });
 
   return (
-    <motion.div style={{ opacity, y }} className={className}>
+    <m.div style={{ opacity, y }} className={className}>
       {children}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -1006,7 +1006,7 @@ export function InteractiveFlow() {
         className="relative w-full [@media(max-height:639px)]:hidden"
       >
         <div className="sticky top-0 flex min-h-[100dvh] w-full flex-col items-center justify-center px-4 pb-8 pt-28 md:pt-24">
-          <motion.div
+          <m.div
             style={{
               opacity: gateExitOpacity,
               scale: gateExitScale,
@@ -1015,7 +1015,7 @@ export function InteractiveFlow() {
             }}
             className="mx-auto w-full max-w-3xl text-center"
           >
-            <motion.div style={{ y: headerY, opacity: headerOpacity }}>
+            <m.div style={{ y: headerY, opacity: headerOpacity }}>
               <h3
                 id="audience-gate-title"
                 className="mb-3 font-sans text-2xl font-extrabold leading-[1.15] tracking-tighter text-foreground sm:text-3xl md:text-5xl"
@@ -1030,7 +1030,7 @@ export function InteractiveFlow() {
                   ? "Chọn một bên để xem đúng quy trình dành cho bạn."
                   : "Pick one to see the process that applies to you."}
               </p>
-            </motion.div>
+            </m.div>
 
             <div
               role="group"
@@ -1053,7 +1053,7 @@ export function InteractiveFlow() {
             </div>
 
             {/* Hint for scrolling harder */}
-            <motion.div
+            <m.div
               style={{ opacity: hintOpacity }}
               className="mt-5 flex flex-col items-center justify-center gap-2 md:mt-8"
             >
@@ -1063,7 +1063,7 @@ export function InteractiveFlow() {
                     ? "Chọn một bên hoặc cuộn tiếp để xem quy trình Doanh nghiệp mặc định"
                     : "Choose an option or scroll to continue with Business process by default"}
                 </span>
-                <motion.span
+                <m.span
                   aria-hidden
                   animate={{ y: [0, 3, 0] }}
                   transition={{
@@ -1074,10 +1074,10 @@ export function InteractiveFlow() {
                   className="inline-block text-emerald-600 dark:text-emerald-400"
                 >
                   <ChevronDown className="h-4 w-4" />
-                </motion.span>
+                </m.span>
               </div>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         </div>
       </div>
 
@@ -1133,7 +1133,7 @@ export function InteractiveFlow() {
             {/* The scrubbed line. Sits on the section's own bottom rule so the
                 bar reads as one object rather than a bar plus a stray track. */}
             <div className="-mb-px h-0.5 w-full bg-transparent">
-              <motion.div
+              <m.div
                 style={{ width: progressWidth }}
                 className="h-full bg-emerald-500"
               />
@@ -1142,7 +1142,7 @@ export function InteractiveFlow() {
 
           <div className="flex flex-1 flex-col justify-center py-12">
             {/* The stage itself. Cross-fades as the scroll crosses each boundary. */}
-            <motion.div
+            <m.div
               key={`${role}-${activeStep}`}
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1155,7 +1155,7 @@ export function InteractiveFlow() {
                 currentLocale={currentLocale}
                 scrollYProgress={scrollYProgress}
               />
-            </motion.div>
+            </m.div>
           </div>
         </div>
       </div>

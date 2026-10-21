@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, MotionConfig, motion } from "framer-motion";
+import { AnimatePresence, MotionConfig, m } from "framer-motion";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { useAppearance } from "@/components/appearance-provider";
 import { WelcomeVisual } from "@/components/welcome/welcome-visuals";
@@ -196,7 +196,7 @@ export function WelcomeCutscreen({
             nothing is ever cut off. */}
         <div className="relative z-10 min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
           <AnimatePresence mode="wait" custom={direction} initial={false}>
-            <motion.section
+            <m.section
               key={slide.id}
               custom={direction}
               variants={slideVariants}
@@ -229,7 +229,7 @@ export function WelcomeCutscreen({
               </div>
 
               <div className="flex w-full max-w-2xl flex-col items-center gap-3">
-                <motion.h2
+                <m.h2
                   id={titleId}
                   className="text-balance text-2xl font-bold tracking-tight sm:text-4xl md:text-5xl"
                   initial={{ opacity: 0, y: 8 }}
@@ -237,22 +237,22 @@ export function WelcomeCutscreen({
                   transition={{ delay: slide.id === "hello" ? 1 : 0.15 }}
                 >
                   {t(`${base}.title`)}
-                </motion.h2>
+                </m.h2>
                 {body !== `${base}.body` && (
-                  <motion.p
+                  <m.p
                     className="text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base md:text-lg"
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.25 }}
                   >
                     {body}
-                  </motion.p>
+                  </m.p>
                 )}
 
                 {slide.items && (
                   <ul className="mt-1 flex w-full flex-col gap-2 text-left">
                     {Array.from({ length: slide.items }, (_, item) => (
-                      <motion.li
+                      <m.li
                         key={item}
                         className="flex gap-3 rounded-xl border border-border bg-card/60 px-3.5 py-2.5 text-sm leading-relaxed text-foreground sm:text-[15px]"
                         initial={{ opacity: 0, y: 8 }}
@@ -263,24 +263,24 @@ export function WelcomeCutscreen({
                         <span className="min-w-0">
                           {t(`${base}.items.${item + 1}`)}
                         </span>
-                      </motion.li>
+                      </m.li>
                     ))}
                   </ul>
                 )}
 
                 {note !== `${base}.note` && (
-                  <motion.p
+                  <m.p
                     className="text-xs text-muted-foreground sm:text-sm"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.8 }}
                   >
                     {note}
-                  </motion.p>
+                  </m.p>
                 )}
 
                 {slide.id === "hello" && (
-                  <motion.div
+                  <m.div
                     role="group"
                     aria-label={t("welcome.common.language")}
                     className="mt-2 inline-flex rounded-full border border-border bg-card p-1"
@@ -307,10 +307,10 @@ export function WelcomeCutscreen({
                           {t(`welcome.common.languages.${option}`)}
                         </button>
                       ))}
-                  </motion.div>
+                  </m.div>
                 )}
               </div>
-            </motion.section>
+            </m.section>
           </AnimatePresence>
         </div>
 

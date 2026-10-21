@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { ArrowDownLeft, ArrowUpRight, Clock, Scale } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
 import { staggerContainerVariants, springItemVariants } from "@/lib/animations";
@@ -53,14 +53,14 @@ export function TransactionSummaryCards({
   ];
 
   return (
-    <motion.div
+    <m.div
       variants={staggerContainerVariants}
       initial="hidden"
       animate="show"
       className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"
     >
       {cards.map((card) => (
-        <motion.div
+        <m.div
           key={card.key}
           variants={springItemVariants}
           className="min-w-0 bg-card text-card-foreground border border-border rounded-xl shadow-xs p-5 space-y-1"
@@ -85,8 +85,8 @@ export function TransactionSummaryCards({
             className={`text-xl font-black ${card.valueClassName}`}
           />
           <p className="text-xs text-muted-foreground">{card.hint}</p>
-        </motion.div>
+        </m.div>
       ))}
-    </motion.div>
+    </m.div>
   );
 }

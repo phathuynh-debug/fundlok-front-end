@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card";
 import { DocumentGuide } from "@/components/document-guide";
 import { DocumentGuideVideo } from "@/components/document-guide-video";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { CheckCircle2, Loader2, AlertCircle, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -101,7 +101,7 @@ function LoanApplicationWizard() {
         {/* Step content */}
         <div className="relative overflow-hidden min-h-[360px] mt-8">
           <AnimatePresence mode="wait">
-            <motion.div
+            <m.div
               key={currentStep}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -172,7 +172,7 @@ function LoanApplicationWizard() {
                   {/* Vertical Divider Line between Upload and Info */}
                   <div className="hidden md:flex flex-col items-center py-4">
                     <div className="w-px h-full bg-gradient-to-b from-transparent via-border to-transparent relative">
-                      <motion.div
+                      <m.div
                         className={cn(
                           "absolute left-1/2 -translate-x-1/2 w-2 h-2 rounded-full shadow-md",
                           theme.pulseColor,
@@ -209,7 +209,7 @@ function LoanApplicationWizard() {
                   </div>
                 </div>
               )}
-            </motion.div>
+            </m.div>
           </AnimatePresence>
         </div>
 

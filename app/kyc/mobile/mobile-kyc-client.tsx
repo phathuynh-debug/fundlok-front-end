@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import {
   ShieldCheck,
   Loader2,
@@ -113,7 +113,7 @@ export function MobileKycClient() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/50 p-4">
-      <motion.div
+      <m.div
         initial={{ y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
@@ -251,7 +251,7 @@ export function MobileKycClient() {
           onOpenChange={setIsDialogOpen}
           flow="kyc"
         />
-      </motion.div>
+      </m.div>
     </div>
   );
 }

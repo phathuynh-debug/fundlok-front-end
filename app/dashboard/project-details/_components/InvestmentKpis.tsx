@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { Banknote, Percent, Calendar, ShieldCheck } from "lucide-react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { useTranslations } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format-currency";
 import { dailyRepaymentAmount } from "@/lib/facility-terms";
@@ -51,7 +51,7 @@ export function InvestmentKpis({
       : null;
 
   return (
-    <motion.div
+    <m.div
       variants={staggerContainerVariants}
       initial="hidden"
       animate="show"
@@ -59,7 +59,7 @@ export function InvestmentKpis({
     >
       {/* Loan Amount — spans both mobile columns: a 10-digit VND figure does
           not fit half a phone screen at a readable size. */}
-      <motion.div
+      <m.div
         variants={springItemVariants}
         className="col-span-2 md:col-span-1 h-full"
       >
@@ -95,10 +95,10 @@ export function InvestmentKpis({
             </p>
           </div>
         </Card>
-      </motion.div>
+      </m.div>
 
       {/* Expected ROI */}
-      <motion.div variants={springItemVariants} className="h-full">
+      <m.div variants={springItemVariants} className="h-full">
         <Card className="p-5 md:p-6 bg-card border flex flex-col justify-between h-full min-h-32 rounded-2xl shadow-sm">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Percent className="h-4 w-4" />
@@ -117,10 +117,10 @@ export function InvestmentKpis({
             </p>
           </div>
         </Card>
-      </motion.div>
+      </m.div>
 
       {/* Est. Payback Period */}
-      <motion.div variants={springItemVariants} className="h-full">
+      <m.div variants={springItemVariants} className="h-full">
         <Card className="p-5 md:p-6 bg-card border flex flex-col justify-between h-full min-h-32 rounded-2xl shadow-sm">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Calendar className="h-4 w-4" />
@@ -139,10 +139,10 @@ export function InvestmentKpis({
             </p>
           </div>
         </Card>
-      </motion.div>
+      </m.div>
 
       {/* Revenue Share Rate */}
-      <motion.div variants={springItemVariants} className="h-full">
+      <m.div variants={springItemVariants} className="h-full">
         <Card className="p-5 md:p-6 bg-card border flex flex-col justify-between h-full min-h-32 rounded-2xl shadow-sm">
           <div className="flex items-center gap-2 text-muted-foreground">
             <ShieldCheck className="h-4 w-4" />
@@ -161,7 +161,7 @@ export function InvestmentKpis({
             </p>
           </div>
         </Card>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 }

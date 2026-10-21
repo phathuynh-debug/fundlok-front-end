@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { m, useReducedMotion } from "framer-motion";
 import { AlertCircle, Check, Loader2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -123,7 +123,7 @@ export function InvestorPanel({
     return <InvestorCalculator getSessionId={getSessionId} />;
 
   return (
-    <motion.div
+    <m.div
       initial={false}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
@@ -158,7 +158,7 @@ export function InvestorPanel({
       >
         {t("ratePage.investor.gateContinue")}
       </Button>
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -320,7 +320,7 @@ function InvestorCalculator({ getSessionId }: { getSessionId: () => string }) {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
-      <motion.form
+      <m.form
         onSubmit={onCalculate}
         initial={false}
         animate={{ opacity: 1, y: 0 }}
@@ -532,10 +532,10 @@ function InvestorCalculator({ getSessionId }: { getSessionId: () => string }) {
             </Button>
           </>
         )}
-      </motion.form>
+      </m.form>
 
       {/* ---------------- Result ---------------- */}
-      <motion.div
+      <m.div
         initial={false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.13, ease: "easeOut" }}
@@ -578,21 +578,21 @@ function InvestorCalculator({ getSessionId }: { getSessionId: () => string }) {
         {lead && !reduceMotion && <ResultBurst key={`burst-${lead.lead_id}`} />}
 
         {estimate && (
-          <motion.div
+          <m.div
             key={lead?.lead_id}
             variants={resultVariants}
             initial="hidden"
             animate="visible"
             className="relative z-10 space-y-4"
           >
-            <motion.div
+            <m.div
               variants={resultItemVariants}
               className="border-b border-border/70 pb-4 text-center"
             >
               <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                 {t("ratePage.investor.netApy")}
               </p>
-              <motion.p
+              <m.p
                 variants={figureVariants}
                 className={cn(
                   "font-mono text-4xl font-extrabold tracking-tight text-primary transition-opacity",
@@ -600,22 +600,19 @@ function InvestorCalculator({ getSessionId }: { getSessionId: () => string }) {
                 )}
               >
                 {pct(estimate.net_apy_pct)}
-              </motion.p>
+              </m.p>
               {/* Fixed height so the panel does not jump; the text itself is
                   only rendered while an update is in flight, because text
                   hidden with opacity is still announced by screen readers. */}
               <p className="h-4 text-[11px] text-muted-foreground">
                 {choicesPending ? t("ratePage.investor.updating") : null}
               </p>
-            </motion.div>
+            </m.div>
 
             {/* The walk-down. Loss and fee carry a leading minus so the
                 arithmetic reads as arithmetic, which is the point of showing
                 it (prototype rev 5: FundLok's fee is public). */}
-            <motion.dl
-              variants={resultItemVariants}
-              className="space-y-2 text-sm"
-            >
+            <m.dl variants={resultItemVariants} className="space-y-2 text-sm">
               {[
                 [
                   "walkLoanRate",
@@ -648,11 +645,11 @@ function InvestorCalculator({ getSessionId }: { getSessionId: () => string }) {
                   {pct(estimate.net_per_loan_pct)}
                 </dd>
               </div>
-            </motion.dl>
+            </m.dl>
 
             {/* Why 10.50% per loan becomes 17.27% a year. Without this line a
                 page showing both numbers reads as a scam (prototype rev 5). */}
-            <motion.p
+            <m.p
               variants={resultItemVariants}
               className="text-xs leading-relaxed text-muted-foreground"
             >
@@ -670,9 +667,9 @@ function InvestorCalculator({ getSessionId }: { getSessionId: () => string }) {
                   apy: pct(estimate.net_apy_pct),
                 },
               )}
-            </motion.p>
+            </m.p>
 
-            <motion.div
+            <m.div
               variants={resultItemVariants}
               className="flex items-baseline justify-between gap-4 border-t border-border/70 pt-4"
             >
@@ -682,9 +679,9 @@ function InvestorCalculator({ getSessionId }: { getSessionId: () => string }) {
               <span className="font-mono text-base font-bold text-primary">
                 {formatCurrency(estimate.estimated_return_vnd, locale)}
               </span>
-            </motion.div>
+            </m.div>
 
-            <motion.div variants={resultItemVariants}>
+            <m.div variants={resultItemVariants}>
               {signup.isSuccess ? (
                 <div className="rounded-xl border border-primary/30 bg-primary/5 p-4">
                   <p className="flex items-center gap-2 text-sm font-semibold">
@@ -724,8 +721,8 @@ function InvestorCalculator({ getSessionId }: { getSessionId: () => string }) {
                   )}
                 </>
               )}
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         )}
 
         {/* Read with the number, not below the fold: Lok's wording, verbatim
@@ -733,7 +730,7 @@ function InvestorCalculator({ getSessionId }: { getSessionId: () => string }) {
         <p className="mt-6 text-[11px] leading-relaxed text-muted-foreground">
           {t("ratePage.investor.disclaimer")}
         </p>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

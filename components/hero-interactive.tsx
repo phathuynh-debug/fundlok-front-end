@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { GuillocheWaves } from "@/components/guilloche-waves";
 import Mockup from "@/components/mockup";
@@ -71,35 +71,35 @@ export function HeroInteractive({ strings }: HeroInteractiveProps) {
             paint on the page. Text that is translated still counts as painted,
             so the slide-in survives and the hero is an LCP candidate from the
             first frame. Keep it that way. */}
-        <motion.div
+        <m.div
           initial={{ y: -20 }}
           animate={{ y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="text-center px-4 flex flex-col items-center mb-2 md:mb-3 max-w-4xl mx-auto"
         >
-          <motion.h1
+          <m.h1
             initial={{ y: -10 }}
             animate={{ y: 0 }}
             transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
             className="font-sans text-3xl sm:text-4xl md:text-[2.5rem] font-extrabold text-foreground leading-[1.15] mb-2.5 tracking-tight max-w-4xl"
           >
             {strings.heroTitle}
-          </motion.h1>
-          <motion.p
+          </m.h1>
+          <m.p
             initial={{ y: 10 }}
             animate={{ y: 0 }}
             transition={{ duration: 0.8, delay: 0.35, ease: "easeOut" }}
             className="font-sans text-sm md:text-base text-muted-foreground leading-relaxed max-w-xl"
           >
             {strings.heroSubtitle}
-          </motion.p>
-        </motion.div>
+          </m.p>
+        </m.div>
 
         {/* Interactive Mockup. Transform-only entrance for the same reason as
             the hero text above: on a wide viewport the MacBook frame inside is
             the LCP element, and an `initial` opacity would keep it out of the
             running until hydration. */}
-        <motion.div
+        <m.div
           initial={{ scale: 0.96, y: 20 }}
           animate={{ scale: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.55, ease: "easeOut" }}
@@ -114,17 +114,17 @@ export function HeroInteractive({ strings }: HeroInteractiveProps) {
             shineY={shineY}
             activePartner={partner}
           />
-        </motion.div>
+        </m.div>
 
         {/* Bouncing Scroll Indicator Arrow */}
-        <motion.button
+        <m.button
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.95 }}
           onClick={scrollToProcess}
           className="relative z-20 mt-2 mb-2 text-muted-foreground hover:text-accent cursor-pointer flex flex-col items-center gap-1 text-[10px] md:text-xs tracking-wider font-bold uppercase transition-colors select-none outline-none border-none bg-transparent"
         >
-          <motion.div
+          <m.div
             animate={{ y: [0, 6, 0] }}
             transition={{
               repeat: Infinity,
@@ -135,8 +135,8 @@ export function HeroInteractive({ strings }: HeroInteractiveProps) {
           >
             <span>{strings.ourSolution}</span>
             <ChevronDown className="w-4 h-4 md:w-5 md:h-5" />
-          </motion.div>
-        </motion.button>
+          </m.div>
+        </m.button>
       </div>
     </>
   );

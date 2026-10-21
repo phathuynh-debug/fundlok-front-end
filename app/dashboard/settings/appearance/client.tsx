@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import {
   Globe,
   Laptop,
@@ -109,24 +109,24 @@ export function AppearanceClient() {
   ] as const;
 
   return (
-    <motion.div {...pageTransitionProps} className="space-y-6 md:space-y-8">
-      <motion.header {...fadeInUpProps}>
+    <m.div {...pageTransitionProps} className="space-y-6 md:space-y-8">
+      <m.header {...fadeInUpProps}>
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
           {t("dashboard.settings.appearance.title")}
         </h1>
         <p className="mt-1.5 text-sm text-muted-foreground">
           {t("dashboard.settings.appearance.subtitle")}
         </p>
-      </motion.header>
+      </m.header>
 
-      <motion.div
+      <m.div
         variants={staggerContainerVariants}
         initial="hidden"
         animate="show"
         className="space-y-6 md:space-y-8"
       >
         {/* Theme */}
-        <motion.div variants={springItemVariants}>
+        <m.div variants={springItemVariants}>
           <Card className="p-6 md:p-8">
             <div className="mb-5">
               <h2 className="flex items-center gap-2.5 text-lg font-semibold text-foreground">
@@ -168,10 +168,10 @@ export function AppearanceClient() {
               </div>
             )}
           </Card>
-        </motion.div>
+        </m.div>
 
         {/* Accent + radius: the two knobs that restyle the whole app */}
-        <motion.div variants={springItemVariants}>
+        <m.div variants={springItemVariants}>
           <Card className="p-6 md:p-8">
             <div className="mb-5">
               <h2 className="flex items-center gap-2.5 text-lg font-semibold text-foreground">
@@ -189,9 +189,9 @@ export function AppearanceClient() {
               {t("dashboard.settings.appearance.accent.scopeNote")}
             </p>
           </Card>
-        </motion.div>
+        </m.div>
 
-        <motion.div variants={springItemVariants}>
+        <m.div variants={springItemVariants}>
           <Card className="p-6 md:p-8">
             <div className="mb-5">
               <h2 className="flex items-center gap-2.5 text-lg font-semibold text-foreground">
@@ -233,10 +233,10 @@ export function AppearanceClient() {
               <ChromePreview />
             </div>
           </Card>
-        </motion.div>
+        </m.div>
 
         {/* Language */}
-        <motion.div variants={springItemVariants}>
+        <m.div variants={springItemVariants}>
           <Card className="p-6 md:p-8">
             <div className="mb-5">
               <h2 className="flex items-center gap-2.5 text-lg font-semibold text-foreground">
@@ -266,10 +266,10 @@ export function AppearanceClient() {
               ))}
             </div>
           </Card>
-        </motion.div>
+        </m.div>
 
         {/* Motion */}
-        <motion.div variants={springItemVariants}>
+        <m.div variants={springItemVariants}>
           <Card className="p-6 md:p-8">
             <div className="mb-5">
               <h2 className="flex items-center gap-2.5 text-lg font-semibold text-foreground">
@@ -305,8 +305,8 @@ export function AppearanceClient() {
               {t("dashboard.settings.appearance.motion.systemNote")}
             </p>
           </Card>
-        </motion.div>
-      </motion.div>
-    </motion.div>
+        </m.div>
+      </m.div>
+    </m.div>
   );
 }

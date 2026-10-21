@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion, Variants } from "framer-motion";
+import { m, Variants } from "framer-motion";
 import { useTranslations } from "@/lib/i18n";
 import SiteHeader from "@/components/site-header";
 import { BackgroundBlobs } from "@/components/background-blobs";
@@ -149,7 +149,7 @@ export default function WhyUsClient() {
 
       <div className="max-w-6xl mx-auto px-6 py-16 md:py-24 relative z-10">
         {/* Page Title Hero */}
-        <motion.div
+        <m.div
           initial={{ y: -20 }}
           animate={{ y: 0 }}
           transition={{ duration: 0.6 }}
@@ -165,17 +165,17 @@ export default function WhyUsClient() {
           <p className="font-sans text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             {t("specialPage.subtitle")}
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Part 1 - Our Story: FundLok's Vision */}
-        <motion.section
+        <m.section
           variants={containerVariants}
           initial="hidden"
           animate="visible"
           viewport={{ once: true }}
           className="mb-24 md:mb-32 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center"
         >
-          <motion.div
+          <m.div
             variants={aboveFoldItemVariants}
             className="lg:col-span-7 space-y-6"
           >
@@ -187,9 +187,9 @@ export default function WhyUsClient() {
               <p>{t("specialPage.vision.paragraph1")}</p>
               <p>{t("specialPage.vision.paragraph2")}</p>
             </div>
-          </motion.div>
+          </m.div>
 
-          <motion.div
+          <m.div
             variants={aboveFoldItemVariants}
             className="lg:col-span-5 bg-gradient-to-br from-emerald-500/10 via-zinc-500/5 to-transparent dark:from-emerald-500/5 dark:via-zinc-900/40 dark:to-transparent border border-border/10 p-8 rounded-2xl relative overflow-hidden backdrop-blur-sm group hover:border-emerald-500/20 transition-all duration-300"
           >
@@ -203,15 +203,15 @@ export default function WhyUsClient() {
             <p className="font-sans text-sm md:text-base text-muted-foreground leading-relaxed">
               {t("specialPage.vision.description")}
             </p>
-          </motion.div>
-        </motion.section>
+          </m.div>
+        </m.section>
 
         {/* Divider line */}
         <div className="w-full h-px bg-gradient-to-r from-transparent via-border/30 to-transparent my-20" />
 
         {/* Part 2 - Why is FundLok special? */}
         <section className="space-y-12">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -220,9 +220,9 @@ export default function WhyUsClient() {
             <h2 className="font-sans text-3xl md:text-5xl font-extrabold leading-tight text-foreground tracking-tight mb-4">
               {t("specialPage.whySpecial.header")}
             </h2>
-          </motion.div>
+          </m.div>
 
-          <motion.div
+          <m.div
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
@@ -230,7 +230,7 @@ export default function WhyUsClient() {
             className="grid grid-cols-1 md:grid-cols-3 gap-8"
           >
             {/* Card 1: Safety for Investors */}
-            <motion.div
+            <m.div
               variants={itemVariants}
               className="bg-card border border-border rounded-2xl p-8 flex flex-col justify-between hover:border-emerald-500/40 transition-colors duration-200 relative overflow-clip group"
             >
@@ -260,10 +260,10 @@ export default function WhyUsClient() {
                   </li>
                 </ul>
               </div>
-            </motion.div>
+            </m.div>
 
             {/* Card 2: Fitting to each SME */}
-            <motion.div
+            <m.div
               variants={itemVariants}
               className="bg-card border border-border rounded-2xl p-8 flex flex-col justify-between hover:border-emerald-500/40 transition-colors duration-200 relative overflow-clip group"
             >
@@ -293,10 +293,10 @@ export default function WhyUsClient() {
                   </li>
                 </ul>
               </div>
-            </motion.div>
+            </m.div>
 
             {/* Card 3: Transparent, Public, Automatic */}
-            <motion.div
+            <m.div
               variants={itemVariants}
               className="bg-card border border-border rounded-2xl p-8 flex flex-col justify-between hover:border-emerald-500/40 transition-colors duration-200 relative overflow-clip group"
             >
@@ -326,8 +326,8 @@ export default function WhyUsClient() {
                   </li>
                 </ul>
               </div>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         </section>
 
         {/* Divider line */}
@@ -335,7 +335,7 @@ export default function WhyUsClient() {
 
         {/* Part 3 - Achievements & Recognitions */}
         <section id="achievements" className="scroll-mt-24 space-y-10">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -354,7 +354,7 @@ export default function WhyUsClient() {
                 ? "Được ghi nhận trong nước và quốc tế vì sự đổi mới sáng tạo, tầm ảnh hưởng và công nghệ trong lĩnh vực FinTech và thúc đẩy đầu tư."
                 : "Recognized locally and globally for innovation, impact, and technology in FinTech and investment facilitation."}
             </p>
-          </motion.div>
+          </m.div>
 
           <AchievementsCarousel
             achievements={achievementsData[currentLocale]}
@@ -363,7 +363,7 @@ export default function WhyUsClient() {
         </section>
 
         {/* Global CTA Block */}
-        <motion.section
+        <m.section
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -393,7 +393,7 @@ export default function WhyUsClient() {
               </Link>
             </div>
           </div>
-        </motion.section>
+        </m.section>
       </div>
 
       <SiteFooter />

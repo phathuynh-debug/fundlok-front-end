@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "@/lib/i18n";
 
@@ -47,7 +47,7 @@ export function SectionLocator() {
   };
 
   return (
-    <motion.nav
+    <m.nav
       initial={{ opacity: 0, x: 12 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.6, delay: 1, ease: "easeOut" }}
@@ -85,6 +85,6 @@ export function SectionLocator() {
           </button>
         );
       })}
-    </motion.nav>
+    </m.nav>
   );
 }

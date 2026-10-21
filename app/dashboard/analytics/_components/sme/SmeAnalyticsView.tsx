@@ -14,7 +14,7 @@ export function SmeAnalyticsView() {
 /* Preserved implementation, restored with the real endpoints
 
 import { useMemo } from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import {
   FlaskConical,
   PiggyBank,
@@ -164,7 +164,7 @@ export function SmeAnalyticsViewOld() {
           aria-valuemax={100}
           aria-label={t("dashboard.smeAnalytics.progress.label")}
         >
-          <motion.div
+          <m.div
             className="h-full rounded-full bg-emerald-500"
             initial={{ width: 0 }}
             animate={{ width: `${summary.progress_pct}%` }}
@@ -174,14 +174,14 @@ export function SmeAnalyticsViewOld() {
       </Card>
 
       // KPI tiles
-      <motion.div
+      <m.div
         variants={staggerContainerVariants}
         initial="hidden"
         animate="show"
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5 gap-4"
       >
         {tiles.map((tile) => (
-          <motion.div key={tile.key} variants={springItemVariants}>
+          <m.div key={tile.key} variants={springItemVariants}>
             <Card className="h-full p-5 gap-1.5">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <tile.icon className="h-4 w-4 shrink-0" />
@@ -197,9 +197,9 @@ export function SmeAnalyticsViewOld() {
               </span>
               <span className="text-xs text-muted-foreground">{tile.hint}</span>
             </Card>
-          </motion.div>
+          </m.div>
         ))}
-      </motion.div>
+      </m.div>
 
       // Affordability warning. Gate 8 is a soft gate in the engine, so this is
       // a caution, not a failure — but an SME paying more than 30% of revenue

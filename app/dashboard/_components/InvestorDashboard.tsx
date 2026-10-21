@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Layers,
@@ -98,19 +98,19 @@ export function InvestorDashboard() {
   ];
 
   return (
-    <motion.div
+    <m.div
       {...pageTransitionProps}
       className="flex-1 space-y-6 md:space-y-8 p-4 md:p-8 pt-6"
     >
       {/* Header */}
-      <motion.div {...fadeInUpProps}>
+      <m.div {...fadeInUpProps}>
         <h2 className="text-3xl font-bold tracking-tight">
           {t("dashboard.investor.title")}
         </h2>
         <p className="text-sm text-muted-foreground mt-2">
           {t("dashboard.investor.subtitle")}
         </p>
-      </motion.div>
+      </m.div>
 
       {/* Sample-data notice — only shown while there is sample data to explain */}
       {holdings.length > 0 && (
@@ -118,7 +118,7 @@ export function InvestorDashboard() {
       )}
 
       {holdings.length === 0 ? (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
@@ -138,11 +138,11 @@ export function InvestorDashboard() {
               {t("dashboard.investor.browseProjects")}
             </Link>
           </Button>
-        </motion.div>
+        </m.div>
       ) : (
         <>
           {/* KPI Metrics Grid with Balanced Financial Hierarchy */}
-          <motion.div
+          <m.div
             variants={staggerContainerVariants}
             initial="hidden"
             animate="show"
@@ -158,7 +158,7 @@ export function InvestorDashboard() {
                   : "sm:col-span-1 xl:col-span-3";
 
               return (
-                <motion.div
+                <m.div
                   key={kpi.key}
                   variants={springItemVariants}
                   className={spanClass}
@@ -186,12 +186,12 @@ export function InvestorDashboard() {
                       )}
                     </CardContent>
                   </Card>
-                </motion.div>
+                </m.div>
               );
             })}
-          </motion.div>
+          </m.div>
 
-          <motion.div
+          <m.div
             initial={{ y: 20, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.35, delay: 0.2 }}
@@ -210,9 +210,9 @@ export function InvestorDashboard() {
               </Button>
             </div>
             <HoldingsList holdings={holdings} />
-          </motion.div>
+          </m.div>
         </>
       )}
-    </motion.div>
+    </m.div>
   );
 }

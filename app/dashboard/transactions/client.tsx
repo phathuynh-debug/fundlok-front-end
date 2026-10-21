@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import Link from "next/link";
 import { FlaskConical, History, Search, SlidersHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -135,7 +135,7 @@ export default function TransactionsClient() {
   );
 
   return (
-    <motion.div {...pageTransitionProps} className="space-y-6 md:space-y-8">
+    <m.div {...pageTransitionProps} className="space-y-6 md:space-y-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -283,7 +283,7 @@ export default function TransactionsClient() {
 
           <AnimatePresence mode="wait">
             {filteredTransactions.length > 0 ? (
-              <motion.div
+              <m.div
                 key="table"
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -291,9 +291,9 @@ export default function TransactionsClient() {
                 transition={{ duration: 0.2 }}
               >
                 <TransactionsTable transactions={filteredTransactions} />
-              </motion.div>
+              </m.div>
             ) : (
-              <motion.div
+              <m.div
                 key="empty"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -308,11 +308,11 @@ export default function TransactionsClient() {
                 <p className="text-muted-foreground max-w-md">
                   {t("dashboard.transactions.empty.description")}
                 </p>
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
         </>
       )}
-    </motion.div>
+    </m.div>
   );
 }

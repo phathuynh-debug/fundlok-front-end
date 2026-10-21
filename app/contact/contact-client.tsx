@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion, type Variants } from "framer-motion";
+import { m, useReducedMotion, type Variants } from "framer-motion";
 import SiteHeader from "@/components/site-header";
 import SiteFooter from "@/components/site-footer";
 import { ContactForm } from "@/components/contact-form";
@@ -37,7 +37,7 @@ export default function ContactClient() {
       <div className="relative z-10 mx-auto w-full max-w-6xl px-6 py-16 md:py-20">
         <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr]">
           <section className="space-y-6">
-            <motion.div
+            <m.div
               initial={reduceMotion ? false : { y: -16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, ease: "easeOut" }}
@@ -50,16 +50,16 @@ export default function ContactClient() {
               <p className="max-w-2xl text-sm leading-7 text-muted-foreground md:text-base">
                 {t("contactPage.description")}
               </p>
-            </motion.div>
+            </m.div>
 
-            <motion.div
+            <m.div
               variants={cardsContainer}
               initial={reduceMotion ? false : "hidden"}
               animate="visible"
               transition={{ delayChildren: 0.15 }}
               className="grid gap-4 sm:grid-cols-2"
             >
-              <motion.div
+              <m.div
                 variants={cardItem}
                 className="rounded-2xl border border-border bg-card p-5"
               >
@@ -69,8 +69,8 @@ export default function ContactClient() {
                 <p className="mt-3 text-sm text-muted-foreground">
                   support@fundlok.com
                 </p>
-              </motion.div>
-              <motion.div
+              </m.div>
+              <m.div
                 variants={cardItem}
                 className="rounded-2xl border border-border bg-card p-5"
               >
@@ -80,18 +80,18 @@ export default function ContactClient() {
                 <p className="mt-3 text-sm text-muted-foreground">
                   {t("contactPage.locationValue")}
                 </p>
-              </motion.div>
-            </motion.div>
+              </m.div>
+            </m.div>
           </section>
 
-          <motion.section
+          <m.section
             initial={reduceMotion ? false : { y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.28, ease: "easeOut" }}
             className="rounded-2xl border border-border bg-card p-6 md:p-8"
           >
             <ContactForm />
-          </motion.section>
+          </m.section>
         </div>
       </div>
 

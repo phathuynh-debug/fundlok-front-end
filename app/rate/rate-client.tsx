@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { motion, useReducedMotion } from "framer-motion";
+import { m, useReducedMotion } from "framer-motion";
 import { AlertCircle, Check, Copy, Loader2, Sparkles } from "lucide-react";
 import SiteHeader from "@/components/site-header";
 import SiteFooter from "@/components/site-footer";
@@ -606,7 +606,7 @@ export default function RateClient({
             rather than under a shared parent — a transformed ancestor would
             become the containing block for the result card's `lg:sticky` and
             silently kill it. */}
-        <motion.div
+        <m.div
           initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
@@ -620,12 +620,12 @@ export default function RateClient({
               ? t("ratePage.investor.subtitle")
               : t("ratePage.subtitle")}
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Who is this for. Large and first on purpose: the two panels answer
             different questions, and a visitor on the wrong one reads a
             borrowing form as an investment page. */}
-        <motion.div
+        <m.div
           initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.08, ease: "easeOut" }}
@@ -677,7 +677,7 @@ export default function RateClient({
               );
             })}
           </div>
-        </motion.div>
+        </m.div>
 
         {investorMounted && (
           <div
@@ -701,7 +701,7 @@ export default function RateClient({
         >
           <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
             {/* ---------------- Form ---------------- */}
-            <motion.form
+            <m.form
               onSubmit={onSubmit}
               initial={false}
               animate={{ opacity: 1, y: 0 }}
@@ -1102,10 +1102,10 @@ export default function RateClient({
                   ? t("ratePage.calculating")
                   : t("ratePage.submit")}
               </Button>
-            </motion.form>
+            </m.form>
 
             {/* ---------------- Result ---------------- */}
-            <motion.div
+            <m.div
               ref={resultRef}
               initial={false}
               animate={{ opacity: 1, y: 0 }}
@@ -1138,7 +1138,7 @@ export default function RateClient({
               )}
 
               {data && (
-                <motion.div
+                <m.div
                   // Keyed on the mutation's own timestamp so a recalculation
                   // replays the reveal. Without it React reuses the subtree and
                   // a visitor who tweaks a figure watches a new band appear with
@@ -1149,18 +1149,18 @@ export default function RateClient({
                   animate="visible"
                   className="relative z-10 space-y-5"
                 >
-                  <motion.div
+                  <m.div
                     variants={resultItemVariants}
                     className="flex items-start justify-between gap-3"
                   >
                     <h2 className="flex items-center gap-2 text-lg font-bold">
-                      <motion.span
+                      <m.span
                         variants={figureVariants}
                         className="inline-flex"
                         aria-hidden
                       >
                         <Sparkles className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
-                      </motion.span>
+                      </m.span>
                       {t("ratePage.resultTitle")}
                     </h2>
                     {data.data?.risk_profile?.tier && (
@@ -1181,10 +1181,10 @@ export default function RateClient({
                             : `Tier C • ${t("ratePage.tierReview")}`}
                       </span>
                     )}
-                  </motion.div>
+                  </m.div>
 
                   {/* 2 Primary Figure Cards */}
-                  <motion.div
+                  <m.div
                     variants={resultItemVariants}
                     className="grid gap-4 sm:grid-cols-2"
                   >
@@ -1194,13 +1194,13 @@ export default function RateClient({
                         {t("ratePage.monthlyRateLabel")}
                       </p>
                       <div className="flex items-baseline gap-1.5">
-                        <motion.span
+                        <m.span
                           variants={figureVariants}
                           className="origin-left font-mono text-2xl font-bold tracking-tight text-primary"
                         >
                           {data.data.rate_range.min_rate_monthly}% –{" "}
                           {data.data.rate_range.max_rate_monthly}%
-                        </motion.span>
+                        </m.span>
                         <span className="text-xs text-muted-foreground">
                           / {t("ratePage.months")}
                         </span>
@@ -1217,7 +1217,7 @@ export default function RateClient({
                         {t("ratePage.monthlyPaymentLabel")}
                       </p>
                       <div className="flex items-baseline gap-1.5">
-                        <motion.span
+                        <m.span
                           variants={figureVariants}
                           className="origin-left font-mono text-xl font-bold tracking-tight text-foreground"
                         >
@@ -1230,7 +1230,7 @@ export default function RateClient({
                             data.data.estimated_monthly_payment.max,
                             locale,
                           )}
-                        </motion.span>
+                        </m.span>
                         <span className="text-xs text-muted-foreground">
                           / {t("ratePage.months")}
                         </span>
@@ -1247,10 +1247,10 @@ export default function RateClient({
                         )}
                       </p>
                     </div>
-                  </motion.div>
+                  </m.div>
 
                   {/* Risk Profile Details */}
-                  <motion.div
+                  <m.div
                     variants={resultItemVariants}
                     className="space-y-2.5 rounded-xl border border-border/80 bg-muted/10 p-4"
                   >
@@ -1301,11 +1301,11 @@ export default function RateClient({
                         ? t("ratePage.operatingLossNotice")
                         : t("ratePage.operatingProfitNotice")}
                     </p>
-                  </motion.div>
+                  </m.div>
 
                   {/* Inquiry Reference Code */}
                   {data.inquiry_id && (
-                    <motion.div
+                    <m.div
                       variants={resultItemVariants}
                       className="flex items-center justify-between rounded-lg border border-border/60 bg-muted/20 px-3 py-2 text-xs"
                     >
@@ -1330,16 +1330,16 @@ export default function RateClient({
                           )}
                         </Button>
                       </div>
-                    </motion.div>
+                    </m.div>
                   )}
 
                   {/* Read with the number, not below it. */}
-                  <motion.p
+                  <m.p
                     variants={resultItemVariants}
                     className="text-xs font-medium leading-relaxed text-muted-foreground"
                   >
                     {t("ratePage.notAnOffer")}
-                  </motion.p>
+                  </m.p>
 
                   {/* What the engine took on faith. It brackets an unknown
                     credit-bureau score and assumes identity checks pass, so a
@@ -1347,7 +1347,7 @@ export default function RateClient({
                     estimate. Rendered from codes rather than the server's
                     English prose so a Vietnamese visitor gets Vietnamese. */}
                   {data.data.assumption_codes?.length > 0 && (
-                    <motion.div
+                    <m.div
                       variants={resultItemVariants}
                       className="space-y-2 rounded-lg border border-border/60 bg-muted/20 px-3 py-2.5"
                     >
@@ -1377,11 +1377,11 @@ export default function RateClient({
                           );
                         })}
                       </ul>
-                    </motion.div>
+                    </m.div>
                   )}
 
                   {/* Call to action */}
-                  <motion.div
+                  <m.div
                     variants={resultItemVariants}
                     className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-2"
                   >
@@ -1396,17 +1396,17 @@ export default function RateClient({
                         {t("ratePage.applyLoanButton")}
                       </Link>
                     </Button>
-                  </motion.div>
-                </motion.div>
+                  </m.div>
+                </m.div>
               )}
-            </motion.div>
+            </m.div>
           </div>
         </div>
 
         {/* FAQ for both audiences — common SME questions around the rate and
             funding, rendered from the same strings the FAQPage JSON-LD on this
             page carries (see app/rate/page.tsx). */}
-        <motion.section
+        <m.section
           aria-labelledby="rate-faq-heading"
           className="mx-auto mt-16 w-full max-w-3xl scroll-mt-28"
           initial={{ opacity: 0, y: 24 }}
@@ -1436,7 +1436,7 @@ export default function RateClient({
               </AccordionItem>
             ))}
           </Accordion>
-        </motion.section>
+        </m.section>
       </div>
 
       <SiteFooter />

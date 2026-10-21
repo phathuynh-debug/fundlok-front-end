@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import { ChevronDown, ChevronUp, Laptop, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -62,7 +62,7 @@ export function SessionList({
       <ul className="divide-y divide-border border-t border-border">
         <AnimatePresence initial={false}>
           {visibleSessions.map((session) => (
-            <motion.li
+            <m.li
               key={session.session_id}
               layout
               initial={{ opacity: 0, y: 8 }}
@@ -124,7 +124,7 @@ export function SessionList({
                     : "dashboard.security.sessions.revoke",
                 )}
               </Button>
-            </motion.li>
+            </m.li>
           ))}
         </AnimatePresence>
       </ul>

@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { MotionConfig } from "framer-motion";
+import { LazyMotion, MotionConfig } from "framer-motion";
 
 import {
   ACCENT_COOKIE_NAME,
@@ -10,6 +10,10 @@ import {
   type AccentId,
   type RadiusId,
 } from "@/lib/appearance";
+
+// Loaded after hydration; see lib/motion-features.ts.
+const loadMotionFeatures = () =>
+  import("@/lib/motion-features").then((mod) => mod.default);
 
 /**
  * The "reduce motion" preference, and the MotionConfig that enforces it.
@@ -98,7 +102,12 @@ export function AppearanceProvider({
     <AppearanceContext.Provider value={value}>
       {/* "user" defers to the OS setting; the explicit toggle overrides it. */}
       <MotionConfig reducedMotion={reduceMotion ? "always" : "user"}>
-        {children}
+        {/* `strict` makes a stray full `motion.*` component an error, since
+            one would pull the whole animation bundle back into every page.
+            Use `m.*` everywhere. */}
+        <LazyMotion features={loadMotionFeatures} strict>
+          {children}
+        </LazyMotion>
       </MotionConfig>
     </AppearanceContext.Provider>
   );

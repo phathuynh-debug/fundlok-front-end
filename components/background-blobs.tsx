@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { m, useReducedMotion } from "framer-motion";
 
 // Organic blob shapes (blobmaker-style paths, centered on origin).
 const BLOB_PATH =
@@ -85,7 +85,7 @@ export function BackgroundBlobs({ variant = "full" }: BackgroundBlobsProps) {
       className="pointer-events-none absolute inset-0 overflow-hidden z-0 hidden sm:block [transform:translateZ(0)]"
     >
       {blobs.map(({ path, className, drift, duration }, index) => (
-        <motion.svg
+        <m.svg
           key={index}
           viewBox="-100 -100 200 200"
           animate={reduceMotion ? undefined : drift}
@@ -93,7 +93,7 @@ export function BackgroundBlobs({ variant = "full" }: BackgroundBlobsProps) {
           className={`absolute ${className} will-change-transform`}
         >
           <path d={path} fill="currentColor" />
-        </motion.svg>
+        </m.svg>
       ))}
     </div>
   );

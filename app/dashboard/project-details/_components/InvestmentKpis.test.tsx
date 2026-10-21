@@ -19,7 +19,7 @@ vi.mock("@/lib/i18n", () => ({
 
 // framer-motion's variants add nothing to these assertions.
 vi.mock("framer-motion", () => ({
-  motion: {
+  m: {
     div: ({
       children,
       ...props

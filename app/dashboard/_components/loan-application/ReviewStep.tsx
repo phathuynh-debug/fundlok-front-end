@@ -2,7 +2,7 @@
 
 import { CheckCircle2 } from "lucide-react";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { ReviewRow } from "./ReviewRow";
 import { useLoanApplicationContext } from "./LoanApplicationContext";
@@ -56,7 +56,7 @@ export function ReviewStep() {
               .replace("{total}", String(totalDocuments))}
           </span>
           <div className="h-1.5 w-32 overflow-hidden rounded-full bg-border">
-            <motion.div
+            <m.div
               className="h-full rounded-full bg-emerald-500"
               animate={{ width: `${(uploadedCount / totalDocuments) * 100}%` }}
               transition={{ duration: 0.4, ease: "easeOut" }}

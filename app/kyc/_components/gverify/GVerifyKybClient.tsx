@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import {
   Building2,
   Loader2,
@@ -199,7 +199,7 @@ export function GVerifyKybClient() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/50 p-6">
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
@@ -634,7 +634,7 @@ export function GVerifyKybClient() {
           onOpenChange={setIsDialogOpen}
           flow="kyb"
         />
-      </motion.div>
+      </m.div>
     </div>
   );
 }

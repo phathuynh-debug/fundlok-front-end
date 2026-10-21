@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { LifeBuoy, LogOut, ShieldAlert } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,7 @@ export function SuspendedClient() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/50 p-6">
-      <motion.div
+      <m.div
         initial={{ y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
@@ -75,7 +75,7 @@ export function SuspendedClient() {
             {t("suspended.signOutBtn")}
           </Button>
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

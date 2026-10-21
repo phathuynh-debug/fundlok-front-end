@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Loader2, CheckCircle2, ArrowLeft, Clock } from "lucide-react";
 
 import Link from "next/link";
@@ -35,7 +35,7 @@ export function GVerifyKycClient() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/50 p-6">
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
@@ -81,7 +81,7 @@ export function GVerifyKycClient() {
           /* --- Phone QR / last result / capture --- */
           <KycCapturePanel />
         )}
-      </motion.div>
+      </m.div>
     </div>
   );
 }

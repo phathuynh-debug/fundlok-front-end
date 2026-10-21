@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Mail, Loader2, ArrowLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -77,7 +77,7 @@ export function VerifyEmailNotice({
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col items-center text-center space-y-4">
-        <motion.div
+        <m.div
           initial={{ scale: 0.8 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{
@@ -89,7 +89,7 @@ export function VerifyEmailNotice({
           className="flex h-16 w-16 items-center justify-center rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-500"
         >
           <Mail className="h-8 w-8" />
-        </motion.div>
+        </m.div>
 
         <h2 className="text-2xl font-bold text-foreground lg:text-3xl">
           {t("auth.verifyEmail.title")}

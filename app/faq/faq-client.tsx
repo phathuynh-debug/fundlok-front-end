@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import SiteHeader from "@/components/site-header";
 import SiteFooter from "@/components/site-footer";
@@ -66,7 +66,7 @@ export default function FaqClient() {
 
       <div className="relative z-10 flex-1 w-full">
         {/* Page hero */}
-        <motion.div
+        <m.div
           initial={{ y: -16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
@@ -79,10 +79,10 @@ export default function FaqClient() {
           <p className="font-sans text-sm md:text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             {t("faqPage.subtitle")}
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Category pill bar */}
-        <motion.div
+        <m.div
           initial={{ y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
@@ -103,12 +103,12 @@ export default function FaqClient() {
               {t(`faqPage.${key}.title`)}
             </button>
           ))}
-        </motion.div>
+        </m.div>
 
         {/* Question sections */}
         <div className="max-w-3xl mx-auto px-6 pb-20 space-y-16">
           {CATEGORIES.map((key) => (
-            <motion.section
+            <m.section
               key={key}
               id={sectionId(key)}
               className="scroll-mt-28"
@@ -137,11 +137,11 @@ export default function FaqClient() {
                   </AccordionItem>
                 ))}
               </Accordion>
-            </motion.section>
+            </m.section>
           ))}
 
           {/* Contact CTA */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
@@ -161,7 +161,7 @@ export default function FaqClient() {
               {t("faqPage.ctaButton")}
               <ArrowRight className="h-4 w-4" />
             </Link>
-          </motion.div>
+          </m.div>
         </div>
       </div>
 

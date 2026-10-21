@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Briefcase, Coins, Percent, TrendingUp } from "lucide-react";
 import { springItemVariants, staggerContainerVariants } from "@/lib/animations";
 import { formatCurrency } from "@/lib/format-currency";
@@ -63,14 +63,14 @@ export function AnalyticsKpiCards({
   ];
 
   return (
-    <motion.div
+    <m.div
       variants={staggerContainerVariants}
       initial="hidden"
       animate="show"
       className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-4"
     >
       {tiles.map((tile) => (
-        <motion.div
+        <m.div
           key={tile.key}
           variants={springItemVariants}
           className="min-w-0 bg-card text-card-foreground border border-border rounded-xl shadow-xs p-5 space-y-1"
@@ -95,8 +95,8 @@ export function AnalyticsKpiCards({
             className={`text-xl font-black ${tile.valueClassName}`}
           />
           <p className="text-xs text-muted-foreground">{tile.delta}</p>
-        </motion.div>
+        </m.div>
       ))}
-    </motion.div>
+    </m.div>
   );
 }

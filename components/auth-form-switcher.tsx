@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import { LoginForm } from "@/components/login-form";
 import { RegistrationForm } from "@/components/registration-form";
 import { VerifyEmailNotice } from "@/components/verify-email-notice";
@@ -79,7 +79,7 @@ export function AuthFormSwitcher({ initialMode }: AuthFormSwitcherProps) {
   return (
     <div className="relative overflow-hidden">
       <AnimatePresence mode="wait" initial={false} custom={direction}>
-        <motion.div
+        <m.div
           key={mode}
           custom={direction}
           variants={formVariants}
@@ -167,7 +167,7 @@ export function AuthFormSwitcher({ initialMode }: AuthFormSwitcherProps) {
               )}
             </>
           )}
-        </motion.div>
+        </m.div>
       </AnimatePresence>
     </div>
   );

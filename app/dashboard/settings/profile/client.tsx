@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import {
   User,
   Pencil,
@@ -136,25 +136,25 @@ export function ProfileClient() {
   };
 
   return (
-    <motion.div {...pageTransitionProps} className="space-y-6 md:space-y-8">
+    <m.div {...pageTransitionProps} className="space-y-6 md:space-y-8">
       {/* Page header */}
-      <motion.header {...fadeInUpProps}>
+      <m.header {...fadeInUpProps}>
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
           {t("dashboard.settings.profile.title")}
         </h1>
         <p className="mt-1.5 text-sm text-muted-foreground">
           {t("dashboard.settings.profile.subtitle")}
         </p>
-      </motion.header>
+      </m.header>
 
-      <motion.div
+      <m.div
         variants={staggerContainerVariants}
         initial="hidden"
         animate="show"
         className="space-y-6 md:space-y-8"
       >
         {/* Personal Information */}
-        <motion.div variants={springItemVariants}>
+        <m.div variants={springItemVariants}>
           <Card className="p-6 md:p-8">
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="mb-6 flex items-center justify-between gap-4">
@@ -414,10 +414,10 @@ export function ProfileClient() {
               </div>
             </form>
           </Card>
-        </motion.div>
+        </m.div>
 
         {/* Account Details */}
-        <motion.div variants={springItemVariants}>
+        <m.div variants={springItemVariants}>
           <Card className="p-6 md:p-8">
             <h2 className="mb-6 flex items-center gap-2.5 text-lg font-semibold text-foreground">
               <BadgeCheck className="h-5 w-5 text-primary" />
@@ -468,10 +468,10 @@ export function ProfileClient() {
               </div>
             </div>
           </Card>
-        </motion.div>
+        </m.div>
 
         {/* Security */}
-        <motion.div variants={springItemVariants}>
+        <m.div variants={springItemVariants}>
           <Card className="p-6 md:p-8">
             <h2 className="mb-6 flex items-center gap-2.5 text-lg font-semibold text-foreground">
               <Shield className="h-5 w-5 text-primary" />
@@ -531,8 +531,8 @@ export function ProfileClient() {
               </div>
             </div>
           </Card>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
 
       <SetPasswordDialog
         open={passwordOpen}
@@ -548,6 +548,6 @@ export function ProfileClient() {
         initials={avatarInitials}
         t={t}
       />
-    </motion.div>
+    </m.div>
   );
 }
