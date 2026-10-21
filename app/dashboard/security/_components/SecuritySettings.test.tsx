@@ -58,6 +58,7 @@ vi.mock("@/hooks/use-authentication", () => ({
   useRevokeOtherSessions: mutation,
   useUpdateSecurityPreferences: mutation,
   useChangePassword: mutation,
+  useCurrentUser: () => ({ data: { has_password: true } }),
   useStartTwoFactorSetup: mutation,
   useEnableTwoFactor: mutation,
   useDisableTwoFactor: mutation,

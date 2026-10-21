@@ -206,8 +206,13 @@ export const authenticationService = {
     return apiClient.get<TotpStatus>(AUTH_ENDPOINTS.twoFactor);
   },
 
-  startTwoFactorSetup() {
-    return apiClient.post<TotpSetup>(AUTH_ENDPOINTS.twoFactorSetup, {});
+  // `password` is the step-up proof (lib/step-up.ts); omitted by accounts
+  // that have none, which pass on a recent sign-in instead.
+  startTwoFactorSetup(password?: string) {
+    return apiClient.post<TotpSetup>(
+      AUTH_ENDPOINTS.twoFactorSetup,
+      password ? { password } : {},
+    );
   },
 
   enableTwoFactor(code: string) {
@@ -229,10 +234,10 @@ export const authenticationService = {
     return apiClient.get<Passkey[]>(AUTH_ENDPOINTS.passkeys);
   },
 
-  passkeyRegisterOptions() {
+  passkeyRegisterOptions(password?: string) {
     return apiClient.post<Record<string, unknown>>(
       AUTH_ENDPOINTS.passkeyRegisterOptions,
-      {},
+      password ? { password } : {},
     );
   },
 

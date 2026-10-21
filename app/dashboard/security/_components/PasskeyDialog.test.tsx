@@ -4,9 +4,12 @@ import userEvent from "@testing-library/user-event";
 
 import { PasskeyDialog } from "./PasskeyDialog";
 
-const { toast, logout } = vi.hoisted(() => ({
+const { toast, logout, account, registered } = vi.hoisted(() => ({
   toast: vi.fn(),
   logout: vi.fn(),
+  // has_password false = a Google/Microsoft-only account.
+  account: { has_password: true },
+  registered: vi.fn(),
 }));
 
 vi.mock("@/hooks/use-toast", () => ({ useToast: () => ({ toast }) }));
@@ -14,13 +17,17 @@ vi.mock("@/hooks/use-toast", () => ({ useToast: () => ({ toast }) }));
 // Registration succeeds: the browser ceremony and both API calls are behind
 // this hook, so it answers as a finished registration would.
 vi.mock("@/hooks/use-authentication", () => ({
+  useCurrentUser: () => ({ data: account }),
   usePasskeys: () => ({ data: [], isPending: false }),
   useRegisterPasskey: () => ({
     isPending: false,
     mutate: (
-      _name: string | undefined,
+      variables: { name?: string; password?: string },
       options: { onSuccess: (created: { name: string }) => void },
-    ) => options.onSuccess({ name: "MacBook Touch ID" }),
+    ) => {
+      registered(variables);
+      options.onSuccess({ name: "MacBook Touch ID" });
+    },
   }),
   useDeletePasskey: () => ({ isPending: false, mutate: vi.fn() }),
   useLogout: () => ({ isPending: false, mutate: logout }),
@@ -49,14 +56,64 @@ async function addPasskey(secondFactorRequired: boolean) {
       secondFactorRequired={secondFactorRequired}
     />,
   );
+  await userEvent.type(
+    screen.getByLabelText("security.stepUp.passwordLabel"),
+    "correct horse",
+  );
   await userEvent.click(
     screen.getByRole("button", { name: "dashboard.security.passkeys.add" }),
   );
   return toast.mock.calls[0][0];
 }
 
+describe("PasskeyDialog, adding needs more than the session", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    account.has_password = true;
+  });
+
+  it("cannot add until the password is entered, then sends it", async () => {
+    render(<PasskeyDialog open onOpenChange={vi.fn()} />);
+    const add = screen.getByRole("button", {
+      name: "dashboard.security.passkeys.add",
+    });
+    expect(add).toBeDisabled();
+
+    await userEvent.type(
+      screen.getByLabelText("security.stepUp.passwordLabel"),
+      "correct horse",
+    );
+    await userEvent.click(add);
+
+    expect(registered).toHaveBeenCalledWith({
+      name: undefined,
+      password: "correct horse",
+    });
+  });
+
+  it("asks an account without a password for nothing extra", async () => {
+    account.has_password = false;
+    render(<PasskeyDialog open onOpenChange={vi.fn()} />);
+
+    expect(
+      screen.queryByLabelText("security.stepUp.passwordLabel"),
+    ).not.toBeInTheDocument();
+    await userEvent.click(
+      screen.getByRole("button", { name: "dashboard.security.passkeys.add" }),
+    );
+
+    expect(registered).toHaveBeenCalledWith({
+      name: undefined,
+      password: undefined,
+    });
+  });
+});
+
 describe("PasskeyDialog, after adding a passkey", () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    account.has_password = true;
+  });
 
   it("says the passkey can sign you in", async () => {
     const shown = await addPasskey(false);

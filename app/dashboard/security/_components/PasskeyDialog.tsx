@@ -14,6 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import {
+  useCurrentUser,
   useDeletePasskey,
   usePasskeys,
   useRegisterPasskey,
@@ -23,6 +24,11 @@ import { useTranslations } from "@/lib/i18n";
 import { isPasskeyCancellation, isPasskeySupported } from "@/lib/passkeys";
 import { apiErrorMessage } from "@/lib/api-error-message";
 import { isSecondFactorRequired } from "@/lib/second-factor";
+import {
+  isReauthRequired,
+  isStepUpLocked,
+  needsPasswordForStepUp,
+} from "@/lib/step-up";
 import { useSignInAgainToast } from "./SecondFactorNotice";
 
 /**
@@ -50,7 +56,12 @@ export function PasskeyDialog({
   const { toast } = useToast();
   const signInAgainToast = useSignInAgainToast();
   const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
 
+  const { data: user } = useCurrentUser(open);
+  // Adding a way to sign in needs the password, not just the session: a
+  // passkey added from a stolen session outlives a password change.
+  const needsPassword = needsPasswordForStepUp(user);
   const { data: passkeys, isPending } = usePasskeys(open);
   const register = useRegisterPasskey();
   const remove = useDeletePasskey();
@@ -58,35 +69,46 @@ export function PasskeyDialog({
   const supported = isPasskeySupported();
 
   const handleAdd = () => {
-    register.mutate(name.trim() || undefined, {
-      onSuccess: (created) => {
-        setName("");
-        if (secondFactorRequired) {
-          signInAgainToast(t("dashboard.security.passkeys.addedTitle"));
-          return;
-        }
-        toast({
-          title: t("dashboard.security.passkeys.addedTitle"),
-          description: t("dashboard.security.passkeys.addedBody", {
-            name: created.name,
-          }),
-        });
+    register.mutate(
+      {
+        name: name.trim() || undefined,
+        password: needsPassword ? password : undefined,
       },
-      onError: (error) => {
-        // Dismissing the system prompt is not a failure, and a red toast for
-        // it trains people to ignore red toasts.
-        if (isPasskeyCancellation(error)) return;
-        toast({
-          variant: "destructive",
-          title: t("dashboard.security.passkeys.addFailedTitle"),
-          // An admin who already has a factor cannot add a passkey from a
-          // session that did not use it.
-          description: isSecondFactorRequired(error)
-            ? t("security.secondFactorRequired.addAnotherBody")
-            : apiErrorMessage(error, locale, t("common.tryAgain")),
-        });
+      {
+        onSuccess: (created) => {
+          setName("");
+          setPassword("");
+          if (secondFactorRequired) {
+            signInAgainToast(t("dashboard.security.passkeys.addedTitle"));
+            return;
+          }
+          toast({
+            title: t("dashboard.security.passkeys.addedTitle"),
+            description: t("dashboard.security.passkeys.addedBody", {
+              name: created.name,
+            }),
+          });
+        },
+        onError: (error) => {
+          // Dismissing the system prompt is not a failure, and a red toast for
+          // it trains people to ignore red toasts.
+          if (isPasskeyCancellation(error)) return;
+          toast({
+            variant: "destructive",
+            title: t("dashboard.security.passkeys.addFailedTitle"),
+            // An admin who already has a factor cannot add a passkey from a
+            // session that did not use it.
+            description: isSecondFactorRequired(error)
+              ? t("security.secondFactorRequired.addAnotherBody")
+              : isReauthRequired(error)
+                ? t("security.stepUp.reauthRequired")
+                : isStepUpLocked(error)
+                  ? t("security.stepUp.locked")
+                  : apiErrorMessage(error, locale, t("common.tryAgain")),
+          });
+        },
       },
-    });
+    );
   };
 
   const handleRemove = (id: string, label: string) => {
@@ -181,6 +203,27 @@ export function PasskeyDialog({
 
             {/* Add a new one */}
             <div className="space-y-2 border-t border-border pt-4">
+              {needsPassword && (
+                <div className="space-y-1.5 pb-2">
+                  <label
+                    htmlFor="passkey-password"
+                    className="text-sm font-medium text-foreground"
+                  >
+                    {t("security.stepUp.passwordLabel")}
+                  </label>
+                  <Input
+                    id="passkey-password"
+                    type="password"
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    disabled={register.isPending}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {t("security.stepUp.passwordHint")}
+                  </p>
+                </div>
+              )}
               <label
                 htmlFor="passkey-name"
                 className="text-sm font-medium text-foreground"
@@ -198,7 +241,7 @@ export function PasskeyDialog({
                 />
                 <Button
                   onClick={handleAdd}
-                  disabled={register.isPending}
+                  disabled={register.isPending || (needsPassword && !password)}
                   className="shrink-0 gap-1.5"
                 >
                   {register.isPending && (

@@ -25,6 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  useCurrentUser,
   useEnableTwoFactor,
   useStartTwoFactorSetup,
 } from "@/hooks/use-authentication";
@@ -33,6 +34,11 @@ import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { apiErrorMessage } from "@/lib/api-error-message";
 import { isSecondFactorRequired } from "@/lib/second-factor";
+import {
+  isReauthRequired,
+  isStepUpLocked,
+  needsPasswordForStepUp,
+} from "@/lib/step-up";
 import { useSignInAgainToast } from "./SecondFactorNotice";
 
 /**
@@ -44,7 +50,9 @@ import { useSignInAgainToast } from "./SecondFactorNotice";
  * second factor with no way back in if they lose their phone.
  */
 
-type Step = "scan" | "confirm" | "recovery";
+// "verify" asks for the password before a secret is minted: starting setup
+// needs it (lib/step-up.ts). Accounts without a password skip it.
+type Step = "verify" | "scan" | "confirm" | "recovery";
 
 export function TwoFactorSetupDialog({
   open,
@@ -63,7 +71,13 @@ export function TwoFactorSetupDialog({
   const { toast } = useToast();
   const signInAgainToast = useSignInAgainToast();
 
-  const [step, setStep] = useState<Step>("scan");
+  const { data: user } = useCurrentUser(open);
+  const needsPassword = needsPasswordForStepUp(user);
+  const firstStep: Step = needsPassword ? "verify" : "scan";
+
+  const [step, setStep] = useState<Step>(firstStep);
+  const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
@@ -80,12 +94,40 @@ export function TwoFactorSetupDialog({
 
   // Minting a secret is a side effect, so it runs on open rather than on
   // render. The cleanup is what keeps a stale secret from being shown if the
-  // dialog is closed and reopened.
+  // dialog is closed and reopened. With a password to confirm, it runs from
+  // the verify step instead.
   useEffect(() => {
     if (!open) return;
-    startSetup();
+    setStep(firstStep);
+    if (!needsPassword) startSetup(undefined);
     return () => resetSetup();
-  }, [open, startSetup, resetSetup]);
+  }, [open, needsPassword, firstStep, startSetup, resetSetup]);
+
+  const stepUpMessage = (apiError: unknown) =>
+    isReauthRequired(apiError)
+      ? t("security.stepUp.reauthRequired")
+      : isStepUpLocked(apiError)
+        ? t("security.stepUp.locked")
+        : null;
+
+  const handleVerify = () => {
+    setPasswordError(null);
+    startSetup(password, {
+      onSuccess: () => {
+        setPassword("");
+        setStep("scan");
+      },
+      onError: (apiError) =>
+        setPasswordError(
+          stepUpMessage(apiError) ??
+            apiErrorMessage(
+              apiError,
+              locale,
+              t("security.stepUp.wrongPassword"),
+            ),
+        ),
+    });
+  };
 
   // An admin who already has a passkey cannot add an app from a session that
   // did not use it; the backend's English sentence says to set one up, which
@@ -94,7 +136,9 @@ export function TwoFactorSetupDialog({
 
   const close = (next: boolean) => {
     if (!next) {
-      setStep("scan");
+      setStep(firstStep);
+      setPassword("");
+      setPasswordError(null);
       setCode("");
       setError(null);
       setRecoveryCodes([]);
@@ -183,8 +227,9 @@ export function TwoFactorSetupDialog({
                 <p className="text-xs leading-relaxed text-muted-foreground">
                   {setupBlocked
                     ? t("security.secondFactorRequired.addAnotherBody")
-                    : setupError.message ||
-                      t("security.twoFactor.setupFailedDescription")}
+                    : (stepUpMessage(setupError) ??
+                      (setupError.message ||
+                        t("security.twoFactor.setupFailedDescription")))}
                 </p>
               </div>
             </div>
@@ -193,12 +238,66 @@ export function TwoFactorSetupDialog({
               <Button variant="outline" onClick={() => close(false)}>
                 {t("common.cancel")}
               </Button>
-              {!setupBlocked && (
-                <Button onClick={() => startSetup()} className="gap-1.5">
+              {!setupBlocked && !isReauthRequired(setupError) && (
+                <Button
+                  onClick={() => {
+                    if (needsPassword) {
+                      resetSetup();
+                      setStep("verify");
+                    } else {
+                      startSetup(undefined);
+                    }
+                  }}
+                  className="gap-1.5"
+                >
                   <RefreshCw className="h-3.5 w-3.5" />
                   {t("security.twoFactor.retry")}
                 </Button>
               )}
+            </DialogFooter>
+          </div>
+        )}
+
+        {/* --- Step 0: confirm it is the owner --- */}
+        {step === "verify" && (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="totp-step-up-password">
+                {t("security.stepUp.passwordLabel")}
+              </Label>
+              <Input
+                id="totp-step-up-password"
+                type="password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" && password) handleVerify();
+                }}
+                disabled={isStarting}
+                autoFocus
+              />
+              <p className="text-xs text-muted-foreground">
+                {t("security.stepUp.passwordHint")}
+              </p>
+            </div>
+
+            {passwordError && (
+              <p className="text-sm text-destructive">{passwordError}</p>
+            )}
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => close(false)}>
+                {t("common.cancel")}
+              </Button>
+              <Button
+                onClick={handleVerify}
+                disabled={isStarting || !password}
+                className="gap-1.5"
+              >
+                {isStarting && <Loader2 className="h-4 w-4 animate-spin" />}
+                {t("security.stepUp.continue")}
+              </Button>
             </DialogFooter>
           </div>
         )}
