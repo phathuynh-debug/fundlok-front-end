@@ -14,10 +14,18 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useDisableTwoFactor } from "@/hooks/use-authentication";
+import {
+  useCurrentUser,
+  useDisableTwoFactor,
+} from "@/hooks/use-authentication";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
 import { apiErrorMessage } from "@/lib/api-error-message";
+import {
+  isReauthRequired,
+  isStepUpLocked,
+  needsPasswordForStepUp,
+} from "@/lib/step-up";
 
 /**
  * Turning 2FA off asks for the password AND a second factor.
@@ -37,6 +45,10 @@ export function TwoFactorDisableDialog({
   const { t, locale } = useTranslations();
   const { toast } = useToast();
   const { mutate: disable, isPending } = useDisableTwoFactor();
+  // Accounts with no password (Google/Microsoft only) prove it is them by a
+  // fresh sign-in instead (lib/step-up.ts), so they get no password field.
+  const { data: user } = useCurrentUser(open);
+  const needsPassword = needsPasswordForStepUp(user);
 
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
@@ -54,7 +66,7 @@ export function TwoFactorDisableDialog({
   const handleSubmit = () => {
     setError(null);
     disable(
-      { password, code },
+      { password: needsPassword ? password : undefined, code },
       {
         onSuccess: () => {
           toast({
@@ -70,11 +82,15 @@ export function TwoFactorDisableDialog({
             // other refusals too, hence the check on its message.
             apiError?.status === 400 && /password/i.test(apiError.message ?? "")
               ? t("security.twoFactor.disableWrongPassword")
-              : apiErrorMessage(
-                  apiError,
-                  locale,
-                  t("security.twoFactor.disableFailed"),
-                ),
+              : isReauthRequired(apiError)
+                ? t("security.stepUp.reauthRequired")
+                : isStepUpLocked(apiError)
+                  ? t("security.stepUp.locked")
+                  : apiErrorMessage(
+                      apiError,
+                      locale,
+                      t("security.twoFactor.disableFailed"),
+                    ),
           ),
       },
     );
@@ -96,19 +112,21 @@ export function TwoFactorDisableDialog({
         {/* Submit is on the button, not the form: an Enter keypress in the
             password field should not disable a security control. */}
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="disable-password">
-              {t("security.changePassword.currentLabel")}
-            </Label>
-            <Input
-              id="disable-password"
-              type="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              disabled={isPending}
-            />
-          </div>
+          {needsPassword && (
+            <div className="space-y-2">
+              <Label htmlFor="disable-password">
+                {t("security.changePassword.currentLabel")}
+              </Label>
+              <Input
+                id="disable-password"
+                type="password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                disabled={isPending}
+              />
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="disable-code">
@@ -142,7 +160,7 @@ export function TwoFactorDisableDialog({
           <Button
             variant="destructive"
             onClick={handleSubmit}
-            disabled={isPending || !password || !code}
+            disabled={isPending || (needsPassword && !password) || !code}
           >
             {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
             {t("security.twoFactor.confirmDisable")}

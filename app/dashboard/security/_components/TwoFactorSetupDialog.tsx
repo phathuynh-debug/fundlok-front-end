@@ -228,8 +228,11 @@ export function TwoFactorSetupDialog({
                   {setupBlocked
                     ? t("security.secondFactorRequired.addAnotherBody")
                     : (stepUpMessage(setupError) ??
-                      (setupError.message ||
-                        t("security.twoFactor.setupFailedDescription")))}
+                      apiErrorMessage(
+                        setupError,
+                        locale,
+                        t("security.twoFactor.setupFailedDescription"),
+                      ))}
                 </p>
               </div>
             </div>

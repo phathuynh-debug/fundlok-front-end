@@ -109,6 +109,28 @@ describe("PasskeyDialog, adding needs more than the session", () => {
   });
 });
 
+describe("PasskeyDialog, a typed password", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    account.has_password = true;
+  });
+
+  it("is gone once the dialog closes without adding", async () => {
+    const { rerender } = render(<PasskeyDialog open onOpenChange={vi.fn()} />);
+    await userEvent.type(
+      screen.getByLabelText("security.stepUp.passwordLabel"),
+      "correct horse",
+    );
+
+    rerender(<PasskeyDialog open={false} onOpenChange={vi.fn()} />);
+    rerender(<PasskeyDialog open onOpenChange={vi.fn()} />);
+
+    expect(screen.getByLabelText("security.stepUp.passwordLabel")).toHaveValue(
+      "",
+    );
+  });
+});
+
 describe("PasskeyDialog, after adding a passkey", () => {
   beforeEach(() => {
     vi.clearAllMocks();

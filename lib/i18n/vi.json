@@ -2681,7 +2681,7 @@
     },
     "stepUp": {
       "continue": "Tiếp tục",
-      "locked": "Bạn đã nhập sai mật khẩu quá nhiều lần. Vui lòng thử lại sau 15 phút.",
+      "locked": "Bạn đã nhập sai quá nhiều lần. Vui lòng thử lại sau 15 phút.",
       "passwordHint": "Cần mật khẩu của bạn để thêm phương thức đăng nhập, để không ai khác đang dùng phiên này có thể tự thêm.",
       "passwordLabel": "Xác nhận mật khẩu",
       "reauthRequired": "Để bảo mật, vui lòng đăng xuất và đăng nhập lại, rồi thêm trong vài phút sau đó.",

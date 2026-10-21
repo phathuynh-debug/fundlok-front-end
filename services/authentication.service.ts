@@ -94,7 +94,8 @@ export interface TotpEnableResult {
 }
 
 export interface TotpDisablePayload {
-  password: string;
+  /** Omitted by accounts without a password; they pass on a fresh sign-in. */
+  password?: string;
   /** A code from the app, or a recovery code — the backend accepts either. */
   code: string;
 }

@@ -2681,7 +2681,7 @@
     },
     "stepUp": {
       "continue": "Continue",
-      "locked": "Too many incorrect passwords. Try again in 15 minutes.",
+      "locked": "Too many incorrect attempts. Try again in 15 minutes.",
       "passwordHint": "Adding a way to sign in needs your password, so nobody else using this session can add one.",
       "passwordLabel": "Confirm your password",
       "reauthRequired": "For your security, sign out and sign in again, then add it within a few minutes.",
