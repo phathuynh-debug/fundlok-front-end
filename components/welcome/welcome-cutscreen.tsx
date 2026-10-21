@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { AnimatePresence, MotionConfig, m } from "framer-motion";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { useAppearance } from "@/components/appearance-provider";
@@ -71,10 +71,12 @@ export function WelcomeCutscreen({
   };
   const back = () => goTo(index - 1);
 
-  // Arrow keys move between slides; Tab stays inside the cutscreen, which
-  // covers the whole page and is modal. Escape closes only a replay. Handled
-  // on the dialog itself: focus is always inside it (see the effect below).
-  const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+  // Arrow keys move between slides and Escape closes only a replay. Listened
+  // for on the document, not the dialog: focus only moves inside one frame
+  // after mount (see the effect below), and a key pressed before then landed
+  // on <body> and was lost. The cutscreen covers the page and is modal, so
+  // every key on the page is meant for it.
+  const onDocumentKeyDown = useEffectEvent((event: KeyboardEvent) => {
     if (event.key === "ArrowRight") {
       event.preventDefault();
       if (!isLast) next();
@@ -83,7 +85,18 @@ export function WelcomeCutscreen({
       back();
     } else if (event.key === "Escape" && onClose) {
       onClose();
-    } else if (event.key === "Tab") {
+    }
+  });
+  useEffect(() => {
+    const listener = (event: KeyboardEvent) => onDocumentKeyDown(event);
+    document.addEventListener("keydown", listener);
+    return () => document.removeEventListener("keydown", listener);
+  }, []);
+
+  // Tab stays inside the cutscreen. Handled on the dialog: it is about where
+  // focus goes next, so it only matters once focus is inside.
+  const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "Tab") {
       const focusable = event.currentTarget.querySelectorAll<HTMLElement>(
         "button:not([disabled])",
       );
