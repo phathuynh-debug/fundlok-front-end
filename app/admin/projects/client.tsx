@@ -7,7 +7,7 @@ import { isAdminRole } from "@/services/authentication.service";
 import { useTranslations } from "@/lib/i18n";
 import { AdminDirectory, AdminPageLoader } from "../_components/AdminDirectory";
 
-export default function AdminProjectsPage() {
+export default function AdminProjectsClient() {
   const { user, isLoading } = useRequireAuth();
   const router = useRouter();
   const { t } = useTranslations();

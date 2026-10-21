@@ -17,7 +17,7 @@ import { SentEmailsCard } from "./_components/SentEmailsCard";
 // and sends templated email from it. A system admin also sets the recipient
 // domains every admin may send to. Admins only — the proxy turns everyone
 // else away, this page redirects as a fallback, and the API answers 403.
-export default function AdminEmailPage() {
+export default function AdminEmailClient() {
   const { user, isLoading } = useRequireAuth();
   const router = useRouter();
   const { t } = useTranslations();

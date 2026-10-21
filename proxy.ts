@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SUSPENDED, middlewareService } from "@/services/middleware.service";
+import {
+  SUSPENDED,
+  middlewareService,
+  type CurrentUser,
+} from "@/services/middleware.service";
 import { applyBackendSecret } from "@/lib/backend-secret";
 import { applyClientIp } from "@/lib/client-ip";
 import {
@@ -11,6 +15,7 @@ import {
 } from "@/lib/locale-routing";
 import { safeNextPath } from "@/lib/safe-next-path";
 import { NONCE_HEADER, contentSecurityPolicy, createNonce } from "@/lib/csp";
+import { SESSION_USER_HEADER, encodeSessionUser } from "@/lib/session-user";
 
 // Same default as next.config.ts and middleware.service.ts. Kept in step with
 // both: they all describe one hop, Next → FastAPI.
@@ -132,13 +137,22 @@ function isHandledRoute(pathname: string) {
 // out of the request's copy and stamps it on every script it renders. Every
 // page the proxy lets through leaves via this function, so none can render
 // without its nonce. See lib/csp.ts.
+//
+// `sessionUser` is the /users/me body this request was routed on, if it was
+// looked up at all; the root layout seeds it into React Query so the page does
+// not fetch it again (lib/session-user.ts). Like the language header it is
+// always overwritten, so a browser cannot hand the page a user of its own.
 function continueToPage(
   request: NextRequest,
   route: ParsedLocalePath,
+  sessionUser: CurrentUser | null = null,
 ): NextResponse {
   const headers = new Headers(request.headers);
   headers.delete(LOCALE_HEADER);
   if (route.locale) headers.set(LOCALE_HEADER, route.locale);
+  headers.delete(SESSION_USER_HEADER);
+  const encodedUser = encodeSessionUser(sessionUser);
+  if (encodedUser) headers.set(SESSION_USER_HEADER, encodedUser);
 
   const nonce = createNonce();
   const csp = contentSecurityPolicy(nonce);
@@ -266,7 +280,9 @@ async function routeRequest(request: NextRequest, refreshed: string[]) {
     route.locale ??
     (preferred === "en" || preferred === "vi" ? preferred : "vi");
   const localizedLoginPath = localizedPath("/login", effectiveLocale);
-  const pass = () => continueToPage(request, route);
+  // Set once the session is known, below; the early exits pass before then.
+  let sessionUser: CurrentUser | null = null;
+  const pass = () => continueToPage(request, route, sessionUser);
 
   // Pages with no auth, role or maintenance rule — the marketing pages (why-us,
   // rate, faq, contact, terms), /forgot-password, /reset-password, the 404 —
@@ -328,6 +344,7 @@ async function routeRequest(request: NextRequest, refreshed: string[]) {
   }
 
   const currentUser = session === SUSPENDED ? null : session;
+  sessionUser = currentUser;
 
   // A cookie the backend will not honour is NOT a session.
   //

@@ -8,7 +8,7 @@ import { useTranslations } from "@/lib/i18n";
 import { AdminDirectory, AdminPageLoader } from "../_components/AdminDirectory";
 import { InviteAdminDialog } from "./_components/InviteAdminDialog";
 
-export default function AdminUsersPage() {
+export default function AdminUsersClient() {
   const { user, isLoading } = useRequireAuth();
   const router = useRouter();
   const { t } = useTranslations();

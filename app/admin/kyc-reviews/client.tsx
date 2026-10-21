@@ -14,7 +14,7 @@ import { KybReviewQueue } from "./_components/KybReviewQueue";
 
 type ReviewKind = "kyc" | "kyb";
 
-export default function AdminKycReviewsPage() {
+export default function AdminKycReviewsClient() {
   const { user, isLoading } = useRequireAuth();
   const router = useRouter();
   const { t } = useTranslations();

@@ -31,7 +31,7 @@ import { cn } from "@/lib/utils";
 // proxy only lets an approved INVESTOR reach it, bouncing anyone unverified to
 // /kyc?next=/dashboard/invest first. Reached from the Invest button on a
 // project's detail page, carrying the amount (and projectId) as query params.
-export default function InvestPage() {
+export default function InvestClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t, locale } = useTranslations();

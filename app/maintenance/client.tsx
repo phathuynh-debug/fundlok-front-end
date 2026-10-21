@@ -9,7 +9,7 @@ import Logo from "@/components/logo";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-export default function MaintenancePage() {
+export default function MaintenanceClient() {
   const router = useRouter();
   const { t } = useTranslations();
   const { data, isLoading, isError } = useMaintenance();

@@ -147,7 +147,7 @@ export default function WhyUsClient() {
 
       <SiteHeader />
 
-      <main className="max-w-6xl mx-auto px-6 py-16 md:py-24 relative z-10">
+      <div className="max-w-6xl mx-auto px-6 py-16 md:py-24 relative z-10">
         {/* Page Title Hero */}
         <motion.div
           initial={{ y: -20 }}
@@ -394,7 +394,7 @@ export default function WhyUsClient() {
             </div>
           </div>
         </motion.section>
-      </main>
+      </div>
 
       <SiteFooter />
     </div>

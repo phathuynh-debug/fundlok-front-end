@@ -27,25 +27,14 @@ import {
   type SecurityPreferences,
 } from "@/services/users.service";
 import type { ApiError } from "@/lib/types";
+import { authKeys } from "@/hooks/auth-keys";
 import { createPasskey, getPasskeyAssertion } from "@/lib/passkeys";
 
 // ---------- Query keys ----------
-export const authKeys = {
-  all: ["auth"] as const,
-  currentUser: () => [...authKeys.all, "me"] as const,
-  securityOverview: (limit?: number) =>
-    typeof limit === "number"
-      ? ([...authKeys.all, "security-overview", limit] as const)
-      : ([...authKeys.all, "security-overview"] as const),
-  sessions: () => [...authKeys.all, "sessions"] as const,
-  securityPreferences: () => [...authKeys.all, "security-preferences"] as const,
-  securityEvents: (limit?: number) =>
-    typeof limit === "number"
-      ? ([...authKeys.all, "security-events", limit] as const)
-      : ([...authKeys.all, "security-events"] as const),
-  twoFactor: () => [...authKeys.all, "two-factor"] as const,
-  passkeys: () => [...authKeys.all, "passkeys"] as const,
-};
+// Defined in a module without "use client" so the root layout (a server
+// component) can seed the current user under the same key. See
+// lib/session-user-state.ts.
+export { authKeys };
 
 // ---------- Mutations ----------
 

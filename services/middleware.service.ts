@@ -12,6 +12,25 @@ export type CurrentUser = {
   email_verified?: boolean;
 };
 
+// Upper bounds on each proxy → FastAPI hop. Every page under /dashboard,
+// /admin, /kyc, /login and / waits on these before Next renders anything, and
+// fetch() has no timeout of its own — a backend that accepts the connection
+// and then stalls used to hold the navigation open until the platform killed
+// the function. On timeout each lookup takes the same branch it already takes
+// for any other network error (see the catch blocks below), so this bounds the
+// wait without adding a new failure mode.
+//
+// Generous on purpose: they exist for a backend that is effectively down, not
+// one that is merely slow. The refresh gets the longest budget because
+// abandoning it is the most expensive outcome — the backend may already have
+// rotated the pair, and the browser would keep the old refresh token.
+const SESSION_LOOKUP_TIMEOUT_MS = 8_000;
+const REFRESH_TIMEOUT_MS = 10_000;
+const VERIFICATION_TIMEOUT_MS = 8_000;
+// A failed maintenance read is cached like a successful one (5s), and the flag
+// only matters on /login and /maintenance, so this one can be short.
+const MAINTENANCE_TIMEOUT_MS = 3_000;
+
 type MaintenanceFlag = { enabled?: boolean } | null;
 
 // The maintenance flag is global — same answer for every visitor — so it's
@@ -50,6 +69,7 @@ async function fetchMaintenance(
         ...backendSecretHeaders(),
       },
       cache: "no-store",
+      signal: AbortSignal.timeout(MAINTENANCE_TIMEOUT_MS),
     });
 
     if (!response.ok) {
@@ -171,6 +191,7 @@ export const middlewareService = {
             ...backendSecretHeaders(),
           },
           cache: "no-store",
+          signal: AbortSignal.timeout(SESSION_LOOKUP_TIMEOUT_MS),
         });
 
         if (!response.ok) {
@@ -235,6 +256,7 @@ export const middlewareService = {
           ...backendSecretHeaders(),
         },
         cache: "no-store",
+        signal: AbortSignal.timeout(REFRESH_TIMEOUT_MS),
       });
 
       if (!response.ok) {
@@ -274,6 +296,7 @@ export const middlewareService = {
             ...backendSecretHeaders(),
           },
           cache: "no-store",
+          signal: AbortSignal.timeout(VERIFICATION_TIMEOUT_MS),
         });
 
         if (!response.ok) {

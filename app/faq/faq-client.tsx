@@ -64,7 +64,7 @@ export default function FaqClient() {
 
       <BackgroundBlobs />
 
-      <main className="relative z-10 flex-1 w-full">
+      <div className="relative z-10 flex-1 w-full">
         {/* Page hero */}
         <motion.div
           initial={{ y: -16 }}
@@ -163,7 +163,7 @@ export default function FaqClient() {
             </Link>
           </motion.div>
         </div>
-      </main>
+      </div>
 
       <SiteFooter />
     </div>

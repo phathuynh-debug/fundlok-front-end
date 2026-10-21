@@ -599,7 +599,7 @@ export default function RateClient({
       <SiteHeader />
       <BackgroundBlobs variant="compact" />
 
-      <main className="relative z-10 mx-auto w-full max-w-6xl px-6 py-16 md:py-20">
+      <div className="relative z-10 mx-auto w-full max-w-6xl px-6 py-16 md:py-20">
         {/* Entrance motion matches the other public pages (see faq-client):
             the hero drops in, then the two panels rise with a short cascade so
             the eye lands on the form first. The panels animate individually
@@ -1437,7 +1437,7 @@ export default function RateClient({
             ))}
           </Accordion>
         </motion.section>
-      </main>
+      </div>
 
       <SiteFooter />
     </div>

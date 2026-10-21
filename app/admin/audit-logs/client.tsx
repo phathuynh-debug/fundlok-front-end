@@ -128,7 +128,7 @@ const buildColumns = (t: TranslateFn, locale: string): Column<AuditLog>[] => [
   },
 ];
 
-export default function AdminAuditLogsPage() {
+export default function AdminAuditLogsClient() {
   const { user, isLoading } = useRequireAuth();
   const router = useRouter();
   const { t, locale } = useTranslations();

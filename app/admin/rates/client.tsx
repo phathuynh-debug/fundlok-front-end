@@ -10,7 +10,7 @@ import { RateInquiriesDirectory } from "./_components/RateInquiriesDirectory";
 import { InvestorLeadsDirectory } from "./_components/InvestorLeadsDirectory";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export default function AdminRatesPage() {
+export default function AdminRatesClient() {
   const { user, isLoading } = useRequireAuth();
   const router = useRouter();
   const { t } = useTranslations();

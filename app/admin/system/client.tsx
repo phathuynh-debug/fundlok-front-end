@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 import { useTranslations } from "@/lib/i18n";
 import { VerificationModeCard } from "./_components/VerificationModeCard";
 
-export default function AdminSystemPage() {
+export default function AdminSystemClient() {
   const { user, isLoading } = useRequireAuth();
   const router = useRouter();
   const { t } = useTranslations();

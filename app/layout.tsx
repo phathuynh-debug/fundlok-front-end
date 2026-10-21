@@ -16,7 +16,10 @@ import {
   parseRadiusCookie,
   parseReduceMotionCookie,
 } from "@/lib/appearance";
+import { HydrationBoundary } from "@tanstack/react-query";
 import { QueryProvider } from "@/providers/query-provider";
+import { SESSION_USER_HEADER, decodeSessionUser } from "@/lib/session-user";
+import { sessionUserState } from "@/lib/session-user-state";
 import { LocaleProvider } from "@/lib/i18n";
 import { getMessages } from "@/lib/i18n/server";
 import { SITE_URL } from "@/lib/site";
@@ -105,7 +108,13 @@ export default async function RootLayout({
   const radius = parseRadiusCookie(cookieStore.get(RADIUS_COOKIE_NAME)?.value);
   // Set by proxy.ts. Next nonces its own scripts; next-themes renders an
   // inline one (the no-flash theme switch) that the CSP blocks without it.
-  const nonce = (await headers()).get(NONCE_HEADER) ?? undefined;
+  const requestHeaders = await headers();
+  const nonce = requestHeaders.get(NONCE_HEADER) ?? undefined;
+  // The user proxy.ts already fetched to route this request, so pages start
+  // with it instead of asking /users/me again after hydrating.
+  const sessionUser = decodeSessionUser(
+    requestHeaders.get(SESSION_USER_HEADER),
+  );
 
   const localBusinessSchema = {
     "@context": "https://schema.org",
@@ -166,22 +175,31 @@ export default async function RootLayout({
         {/* GoogleOAuthProvider is NOT here: it loads Google's ~100 KB sign-in
             script on mount, so it wraps the login form only (app/login/page.tsx). */}
         <QueryProvider>
-          <LocaleProvider initialLocale={locale} messages={getMessages(locale)}>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              nonce={nonce}
+          <HydrationBoundary
+            state={sessionUser ? sessionUserState(sessionUser) : undefined}
+          >
+            <LocaleProvider
+              initialLocale={locale}
+              messages={getMessages(locale)}
             >
-              <AppearanceProvider
-                initialReduceMotion={reduceMotion}
-                initialAccent={accent}
-                initialRadius={radius}
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                nonce={nonce}
               >
-                <main>{children}</main>
-              </AppearanceProvider>
-            </ThemeProvider>
-          </LocaleProvider>
+                <AppearanceProvider
+                  initialReduceMotion={reduceMotion}
+                  initialAccent={accent}
+                  initialRadius={radius}
+                >
+                  {/* The page's one <main> landmark. Section layouts and pages
+                      use plain wrappers inside it, never a second <main>. */}
+                  <main>{children}</main>
+                </AppearanceProvider>
+              </ThemeProvider>
+            </LocaleProvider>
+          </HydrationBoundary>
         </QueryProvider>
         {/* Global notification system */}
         <Toaster />

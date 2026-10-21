@@ -34,7 +34,7 @@ export default function ContactClient() {
 
       <BackgroundBlobs variant="compact" />
 
-      <main className="relative z-10 mx-auto w-full max-w-6xl px-6 py-16 md:py-20">
+      <div className="relative z-10 mx-auto w-full max-w-6xl px-6 py-16 md:py-20">
         <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr]">
           <section className="space-y-6">
             <motion.div
@@ -93,7 +93,7 @@ export default function ContactClient() {
             <ContactForm />
           </motion.section>
         </div>
-      </main>
+      </div>
 
       <SiteFooter />
     </div>
