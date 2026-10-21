@@ -466,6 +466,250 @@ function AudienceGateCard({
   );
 }
 
+/**
+ * One stage, presented the way worldquant.com presents a belief: the title
+ * IS the slide. Display type first, one lead paragraph, and the supporting
+ * detail demoted to a quiet grid underneath rather than competing with it.
+ *
+ * leading-[1.1], not leading-none. Vietnamese stacks diacritics above the
+ * cap height (ế, ữ, ộ) and a zero-leading display line clips them. The English
+ * copy would have looked fine and the production language would not.
+ */
+function ScrollProgressItem({
+  progress,
+  range,
+  className = "",
+  children,
+}: {
+  progress: MotionValue<number>;
+  range: [number, number];
+  className?: string;
+  children: React.ReactNode;
+}) {
+  const opacity = useTransform(progress, range, [0, 1], { clamp: true });
+  const y = useTransform(progress, range, [14, 0], { clamp: true });
+
+  return (
+    <motion.div style={{ opacity, y }} className={className}>
+      {children}
+    </motion.div>
+  );
+}
+
+function ScrollDrivenStageDetail({
+  s,
+  idx,
+  totalSteps,
+  currentLocale,
+  scrollYProgress,
+}: {
+  s: (typeof contentData)["en"]["sme"]["steps"][number];
+  idx: number;
+  totalSteps: number;
+  currentLocale: string;
+  scrollYProgress: MotionValue<number>;
+}) {
+  // Normalize scroll progress within this stage's span (idx / totalSteps -> (idx + 1) / totalSteps)
+  const stageProgress = useTransform(
+    scrollYProgress,
+    [idx / totalSteps, (idx + 1) / totalSteps],
+    [0, 1],
+    { clamp: true },
+  );
+
+  const cards = [
+    [currentLocale === "vi" ? "Cách hoạt động" : "How this works", s.how],
+    [currentLocale === "vi" ? "Tại sao quan trọng" : "Why this matters", s.why],
+    [
+      currentLocale === "vi" ? "Công nghệ hỗ trợ" : "Technology behind it",
+      s.tech,
+    ],
+    [s.journeyTitle, s.emphasis],
+  ];
+
+  const cardRanges: [number, number][] = [
+    [0.02, 0.12],
+    [0.02, 0.12],
+    [0.04, 0.14],
+    [0.04, 0.14],
+  ];
+
+  const rowRanges: [number, number][] = [
+    [0.58, 0.67],
+    [0.67, 0.76],
+    [0.76, 0.85],
+    [0.85, 0.94],
+  ];
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+      <div>
+        <p className="mb-2 font-mono text-xs text-muted-foreground sm:mb-5">
+          {String(idx + 1).padStart(2, "0")}
+        </p>
+
+        <h3 className="mb-3 max-w-[14ch] font-sans text-2xl font-extrabold leading-[1.15] tracking-tighter text-foreground sm:text-4xl md:text-6xl lg:text-7xl sm:mb-6">
+          {(s as { detailTitle?: string }).detailTitle || s.title}
+        </h3>
+
+        <p className="mb-4 max-w-[52ch] font-sans text-sm leading-relaxed text-muted-foreground sm:text-base md:text-lg sm:mb-8">
+          {s.desc}
+        </p>
+
+        <div className="flex flex-wrap gap-2">
+          {s.tags.map((tag, tIdx) => (
+            <span
+              key={tIdx}
+              className="rounded-full border border-border px-3 py-1 font-sans text-xs text-muted-foreground"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Supporting detail: items presented in a 2x2 grid on mobile */}
+      <div className="flex flex-col gap-6 lg:pt-16">
+        <div className="grid grid-cols-2 gap-3 sm:gap-6">
+          {cards.map(([label, body], cIdx) => (
+            <ScrollProgressItem
+              key={label}
+              progress={stageProgress}
+              range={cardRanges[cIdx] ?? [0, 1]}
+              className="border-t border-border pt-4"
+            >
+              <h4 className="mb-2 font-sans text-xs font-semibold text-foreground">
+                {label}
+              </h4>
+              <p className="font-sans text-xs leading-relaxed text-muted-foreground">
+                {body}
+              </p>
+            </ScrollProgressItem>
+          ))}
+        </div>
+
+        <dl className="border-t border-border pt-4">
+          <ScrollProgressItem progress={stageProgress} range={[0.5, 0.58]}>
+            <dt className="mb-3 font-sans text-xs font-semibold text-foreground">
+              {currentLocale === "vi"
+                ? "Các bước thực hiện"
+                : "What happens here"}
+            </dt>
+          </ScrollProgressItem>
+          {s.rows.map((row, rIdx) => (
+            <ScrollProgressItem
+              key={rIdx}
+              progress={stageProgress}
+              range={rowRanges[rIdx] ?? [0.58, 0.95]}
+              className="flex items-start justify-between gap-6 py-2"
+            >
+              <dd className="font-sans text-xs text-muted-foreground">
+                {row[0]}
+              </dd>
+              <dd className="shrink-0 text-right font-sans text-xs font-bold text-foreground">
+                {row[1]}
+              </dd>
+            </ScrollProgressItem>
+          ))}
+        </dl>
+      </div>
+    </div>
+  );
+}
+
+function StaticStageDetail({
+  s,
+  idx,
+  currentLocale,
+}: {
+  s: (typeof contentData)["en"]["sme"]["steps"][number];
+  idx: number;
+  currentLocale: string;
+}) {
+  return (
+    <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+      <div>
+        <p className="mb-2 font-mono text-xs text-muted-foreground sm:mb-5">
+          {String(idx + 1).padStart(2, "0")}
+        </p>
+
+        <h3 className="mb-3 max-w-[14ch] font-sans text-2xl font-extrabold leading-[1.15] tracking-tighter text-foreground sm:text-4xl md:text-6xl lg:text-7xl sm:mb-6">
+          {(s as { detailTitle?: string }).detailTitle || s.title}
+        </h3>
+
+        <p className="mb-4 max-w-[52ch] font-sans text-sm leading-relaxed text-muted-foreground sm:text-base md:text-lg sm:mb-8">
+          {s.desc}
+        </p>
+
+        <div className="flex flex-wrap gap-2">
+          {s.tags.map((tag, tIdx) => (
+            <span
+              key={tIdx}
+              className="rounded-full border border-border px-3 py-1 font-sans text-xs text-muted-foreground"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-6 lg:pt-16">
+        <div className="grid grid-cols-2 gap-3 sm:gap-6">
+          {[
+            [
+              currentLocale === "vi" ? "Cách hoạt động" : "How this works",
+              s.how,
+            ],
+            [
+              currentLocale === "vi"
+                ? "Tại sao quan trọng"
+                : "Why this matters",
+              s.why,
+            ],
+            [
+              currentLocale === "vi"
+                ? "Công nghệ hỗ trợ"
+                : "Technology behind it",
+              s.tech,
+            ],
+            [s.journeyTitle, s.emphasis],
+          ].map(([label, body]) => (
+            <div key={label} className="border-t border-border pt-4">
+              <h4 className="mb-2 font-sans text-xs font-semibold text-foreground">
+                {label}
+              </h4>
+              <p className="font-sans text-xs leading-relaxed text-muted-foreground">
+                {body}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <dl className="border-t border-border pt-4">
+          <dt className="mb-3 font-sans text-xs font-semibold text-foreground">
+            {currentLocale === "vi"
+              ? "Các bước thực hiện"
+              : "What happens here"}
+          </dt>
+          {s.rows.map((row, rIdx) => (
+            <div
+              key={rIdx}
+              className="flex items-start justify-between gap-6 py-2"
+            >
+              <dd className="font-sans text-xs text-muted-foreground">
+                {row[0]}
+              </dd>
+              <dd className="shrink-0 text-right font-sans text-xs font-bold text-foreground">
+                {row[1]}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </div>
+  );
+}
+
 export function InteractiveFlow() {
   const { locale } = useTranslations();
   const currentLocale = (locale === "vi" ? "vi" : "en") as "en" | "vi";
@@ -701,253 +945,6 @@ export function InteractiveFlow() {
       </div>
     </div>
   );
-
-  /**
-   * One stage, presented the way worldquant.com presents a belief: the title
-   * IS the slide. Display type first, one lead paragraph, and the supporting
-   * detail demoted to a quiet grid underneath rather than competing with it.
-   *
-   * leading-[1.1], not leading-none. Vietnamese stacks diacritics above the
-   * cap height (ế, ữ, ộ) and a zero-leading display line clips them. The English
-   * copy would have looked fine and the production language would not.
-   */
-  function ScrollProgressItem({
-    progress,
-    range,
-    className = "",
-    children,
-  }: {
-    progress: MotionValue<number>;
-    range: [number, number];
-    className?: string;
-    children: React.ReactNode;
-  }) {
-    const opacity = useTransform(progress, range, [0, 1], { clamp: true });
-    const y = useTransform(progress, range, [14, 0], { clamp: true });
-
-    return (
-      <motion.div style={{ opacity, y }} className={className}>
-        {children}
-      </motion.div>
-    );
-  }
-
-  function ScrollDrivenStageDetail({
-    s,
-    idx,
-    totalSteps,
-    currentLocale,
-    scrollYProgress,
-  }: {
-    s: (typeof contentData)["en"]["sme"]["steps"][number];
-    idx: number;
-    totalSteps: number;
-    currentLocale: string;
-    scrollYProgress: MotionValue<number>;
-  }) {
-    // Normalize scroll progress within this stage's span (idx / totalSteps -> (idx + 1) / totalSteps)
-    const stageProgress = useTransform(
-      scrollYProgress,
-      [idx / totalSteps, (idx + 1) / totalSteps],
-      [0, 1],
-      { clamp: true },
-    );
-
-    const cards = [
-      [currentLocale === "vi" ? "Cách hoạt động" : "How this works", s.how],
-      [
-        currentLocale === "vi" ? "Tại sao quan trọng" : "Why this matters",
-        s.why,
-      ],
-      [
-        currentLocale === "vi" ? "Công nghệ hỗ trợ" : "Technology behind it",
-        s.tech,
-      ],
-      [s.journeyTitle, s.emphasis],
-    ];
-
-    const cardRanges: [number, number][] = [
-      [0.02, 0.12],
-      [0.02, 0.12],
-      [0.04, 0.14],
-      [0.04, 0.14],
-    ];
-
-    const rowRanges: [number, number][] = [
-      [0.58, 0.67],
-      [0.67, 0.76],
-      [0.76, 0.85],
-      [0.85, 0.94],
-    ];
-
-    return (
-      <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
-        <div>
-          <p className="mb-2 font-mono text-xs text-muted-foreground sm:mb-5">
-            {String(idx + 1).padStart(2, "0")}
-          </p>
-
-          <h3 className="mb-3 max-w-[14ch] font-sans text-2xl font-extrabold leading-[1.15] tracking-tighter text-foreground sm:text-4xl md:text-6xl lg:text-7xl sm:mb-6">
-            {(s as { detailTitle?: string }).detailTitle || s.title}
-          </h3>
-
-          <p className="mb-4 max-w-[52ch] font-sans text-sm leading-relaxed text-muted-foreground sm:text-base md:text-lg sm:mb-8">
-            {s.desc}
-          </p>
-
-          <div className="flex flex-wrap gap-2">
-            {s.tags.map((tag, tIdx) => (
-              <span
-                key={tIdx}
-                className="rounded-full border border-border px-3 py-1 font-sans text-xs text-muted-foreground"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Supporting detail: items presented in a 2x2 grid on mobile */}
-        <div className="flex flex-col gap-6 lg:pt-16">
-          <div className="grid grid-cols-2 gap-3 sm:gap-6">
-            {cards.map(([label, body], cIdx) => (
-              <ScrollProgressItem
-                key={label}
-                progress={stageProgress}
-                range={cardRanges[cIdx] ?? [0, 1]}
-                className="border-t border-border pt-4"
-              >
-                <h4 className="mb-2 font-sans text-xs font-semibold text-foreground">
-                  {label}
-                </h4>
-                <p className="font-sans text-xs leading-relaxed text-muted-foreground">
-                  {body}
-                </p>
-              </ScrollProgressItem>
-            ))}
-          </div>
-
-          <dl className="border-t border-border pt-4">
-            <ScrollProgressItem progress={stageProgress} range={[0.5, 0.58]}>
-              <dt className="mb-3 font-sans text-xs font-semibold text-foreground">
-                {currentLocale === "vi"
-                  ? "Các bước thực hiện"
-                  : "What happens here"}
-              </dt>
-            </ScrollProgressItem>
-            {s.rows.map((row, rIdx) => (
-              <ScrollProgressItem
-                key={rIdx}
-                progress={stageProgress}
-                range={rowRanges[rIdx] ?? [0.58, 0.95]}
-                className="flex items-start justify-between gap-6 py-2"
-              >
-                <dd className="font-sans text-xs text-muted-foreground">
-                  {row[0]}
-                </dd>
-                <dd className="shrink-0 text-right font-sans text-xs font-bold text-foreground">
-                  {row[1]}
-                </dd>
-              </ScrollProgressItem>
-            ))}
-          </dl>
-        </div>
-      </div>
-    );
-  }
-
-  function StaticStageDetail({
-    s,
-    idx,
-    currentLocale,
-  }: {
-    s: (typeof contentData)["en"]["sme"]["steps"][number];
-    idx: number;
-    currentLocale: string;
-  }) {
-    return (
-      <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
-        <div>
-          <p className="mb-2 font-mono text-xs text-muted-foreground sm:mb-5">
-            {String(idx + 1).padStart(2, "0")}
-          </p>
-
-          <h3 className="mb-3 max-w-[14ch] font-sans text-2xl font-extrabold leading-[1.15] tracking-tighter text-foreground sm:text-4xl md:text-6xl lg:text-7xl sm:mb-6">
-            {(s as { detailTitle?: string }).detailTitle || s.title}
-          </h3>
-
-          <p className="mb-4 max-w-[52ch] font-sans text-sm leading-relaxed text-muted-foreground sm:text-base md:text-lg sm:mb-8">
-            {s.desc}
-          </p>
-
-          <div className="flex flex-wrap gap-2">
-            {s.tags.map((tag, tIdx) => (
-              <span
-                key={tIdx}
-                className="rounded-full border border-border px-3 py-1 font-sans text-xs text-muted-foreground"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-6 lg:pt-16">
-          <div className="grid grid-cols-2 gap-3 sm:gap-6">
-            {[
-              [
-                currentLocale === "vi" ? "Cách hoạt động" : "How this works",
-                s.how,
-              ],
-              [
-                currentLocale === "vi"
-                  ? "Tại sao quan trọng"
-                  : "Why this matters",
-                s.why,
-              ],
-              [
-                currentLocale === "vi"
-                  ? "Công nghệ hỗ trợ"
-                  : "Technology behind it",
-                s.tech,
-              ],
-              [s.journeyTitle, s.emphasis],
-            ].map(([label, body]) => (
-              <div key={label} className="border-t border-border pt-4">
-                <h4 className="mb-2 font-sans text-xs font-semibold text-foreground">
-                  {label}
-                </h4>
-                <p className="font-sans text-xs leading-relaxed text-muted-foreground">
-                  {body}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <dl className="border-t border-border pt-4">
-            <dt className="mb-3 font-sans text-xs font-semibold text-foreground">
-              {currentLocale === "vi"
-                ? "Các bước thực hiện"
-                : "What happens here"}
-            </dt>
-            {s.rows.map((row, rIdx) => (
-              <div
-                key={rIdx}
-                className="flex items-start justify-between gap-6 py-2"
-              >
-                <dd className="font-sans text-xs text-muted-foreground">
-                  {row[0]}
-                </dd>
-                <dd className="shrink-0 text-right font-sans text-xs font-bold text-foreground">
-                  {row[1]}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-      </div>
-    );
-  }
 
   const audienceRail = (
     <div className="flex gap-1 rounded-2xl border border-border bg-card p-1 sm:p-1.5">
