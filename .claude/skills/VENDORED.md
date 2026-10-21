@@ -20,6 +20,17 @@ security, etc.) — process guidance that applies to any project.
   ci`), branch/commit conventions and cross-repo spec links. Don't overwrite
   it when re-syncing from upstream.
 
+## Vendored from other sources
+
+- **`web-performance-optimization/`**: from
+  [`secondsky/claude-skills`](https://github.com/secondsky/claude-skills)
+  (`plugins/web-performance-optimization/skills/web-performance-optimization`,
+  commit `ba827ce`, MIT; its `LICENSE` is in the folder). Copied as-is on
+  2026-10-21. Its examples are generic React Router/webpack/nginx; on this
+  Next.js + Vercel app prefer `next/dynamic`, `next/image` and Vercel Speed
+  Insights, and don't add its cache-first service worker (it would cache
+  signed-in `/api` responses on shared devices).
+
 ## Not vendored — ours
 
 - **`fundlok-frontend/`** — project-specific conventions and data flow for
