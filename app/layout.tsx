@@ -8,7 +8,6 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AppearanceProvider } from "@/components/appearance-provider";
-import { GOOGLE_CLIENT_ID_OR_PLACEHOLDER } from "@/lib/google-oauth";
 import {
   ACCENT_COOKIE_NAME,
   RADIUS_COOKIE_NAME,
@@ -19,7 +18,7 @@ import {
 } from "@/lib/appearance";
 import { QueryProvider } from "@/providers/query-provider";
 import { LocaleProvider } from "@/lib/i18n";
-import { GoogleOAuthProvider } from "@react-oauth/google";
+import { getMessages } from "@/lib/i18n/server";
 import { SITE_URL } from "@/lib/site";
 import {
   VercelAnalytics,
@@ -164,29 +163,26 @@ export default async function RootLayout({
             __html: JSON.stringify(localBusinessSchema),
           }}
         />
-        {/* Never an empty string: @react-oauth/google throws on init with one,
-            and Next turns that hydration error into a full-page crash — taking
-            password sign-in down with it. See lib/google-oauth.ts. */}
-        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID_OR_PLACEHOLDER}>
-          <QueryProvider>
-            <LocaleProvider initialLocale={locale}>
-              <ThemeProvider
-                attribute="class"
-                defaultTheme="system"
-                enableSystem
-                nonce={nonce}
+        {/* GoogleOAuthProvider is NOT here: it loads Google's ~100 KB sign-in
+            script on mount, so it wraps the login form only (app/login/page.tsx). */}
+        <QueryProvider>
+          <LocaleProvider initialLocale={locale} messages={getMessages(locale)}>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              nonce={nonce}
+            >
+              <AppearanceProvider
+                initialReduceMotion={reduceMotion}
+                initialAccent={accent}
+                initialRadius={radius}
               >
-                <AppearanceProvider
-                  initialReduceMotion={reduceMotion}
-                  initialAccent={accent}
-                  initialRadius={radius}
-                >
-                  <main>{children}</main>
-                </AppearanceProvider>
-              </ThemeProvider>
-            </LocaleProvider>
-          </QueryProvider>
-        </GoogleOAuthProvider>
+                <main>{children}</main>
+              </AppearanceProvider>
+            </ThemeProvider>
+          </LocaleProvider>
+        </QueryProvider>
         {/* Global notification system */}
         <Toaster />
         <VercelAnalytics />
