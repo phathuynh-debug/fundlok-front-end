@@ -52,6 +52,19 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        // The brand icons (app/favicon.ico, icon.png, apple-icon.png). Pages
+        // link them with a content hash, but crawlers and the JSON-LD logo use
+        // the bare URL, so the same day-plus-revalidate rule as the art above
+        // rather than a year-long immutable one.
+        source: "/:icon(favicon.ico|icon.png|apple-icon.png)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=86400, stale-while-revalidate=2592000",
+          },
+        ],
+      },
     ];
   },
   async redirects() {

@@ -63,14 +63,11 @@ export async function generateMetadata(): Promise<Metadata> {
       title: siteTitle,
       description: siteDescription,
     },
-    icons: {
-      // 1:1 square brand mark, served by the app/icon.png and app/favicon.ico
-      // file conventions. The previous value pointed at /logo/image.png or
-      // /apple-icon.png, which do not exist.
-      icon: "/icon.png",
-      shortcut: "/icon.png",
-      apple: "/icon.png",
-    },
+    // No `icons` here on purpose. app/favicon.ico, app/icon.png and
+    // app/apple-icon.png are picked up by Next's file conventions, which emit
+    // the <link> tags with a content hash (/icon.png?<hash>). Hard-coding
+    // "/icon.png" overrode that with a bare URL, so the browser and Cloudflare
+    // could only cache it briefly and had to revalidate it on every visit.
   };
 }
 
