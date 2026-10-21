@@ -1,0 +1,8 @@
+# Keeps the commit-pinned actions in .github/workflows current. A pin to a SHA
+# is only safe if something bumps it; Dependabot opens a PR per new release.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
