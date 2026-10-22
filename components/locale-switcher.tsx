@@ -1,8 +1,8 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "@/lib/i18n";
+import { usePublicPathname } from "@/lib/use-public-pathname";
 import { localizedPath, parseLocalePath } from "@/lib/locale-routing";
 import { CONTROL_IDLE } from "@/lib/ui-tokens";
 
@@ -17,7 +17,7 @@ export function LocaleSwitcher({
   className,
 }: LocaleSwitcherProps) {
   const { locale, setLocale, t } = useTranslations();
-  const route = parseLocalePath(usePathname() ?? "/");
+  const route = parseLocalePath(usePublicPathname());
   const inverted = tone === "inverted";
 
   // Two-letter codes rather than the language names. "EN"/"VI" read the same

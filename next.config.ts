@@ -11,6 +11,12 @@ const nextConfig: NextConfig = {
   // QR handoff opens the app on a phone via the Mac's LAN address, so allow
   // private-network origins in dev (no effect on production builds).
   allowedDevOrigins: ["192.168.*.*", "10.*.*.*", "*.ngrok-free.app"],
+  experimental: {
+    // The app has two root layouts (app/(app)/ and app/[lang]/), so a URL
+    // that matches no route has no layout to render a 404 in. This enables
+    // app/global-not-found.tsx, which brings its own document.
+    globalNotFound: true,
+  },
   images: {
     // An optimized image inherits the LARGER of this TTL and the upstream
     // asset's own Cache-Control, so raising it stops `/_next/image` being
@@ -24,8 +30,9 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // Content-Security-Policy is NOT here: it carries a per-request nonce,
-        // so proxy.ts sets it. See lib/csp.ts.
+        // Content-Security-Policy is NOT here: it differs between the
+        // per-request pages (a fresh nonce) and the prerendered marketing
+        // pages (a fixed policy), so proxy.ts sets it. See lib/csp.ts.
         source: "/:path*",
         headers: [
           { key: "X-Frame-Options", value: "DENY" },

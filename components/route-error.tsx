@@ -6,7 +6,8 @@ import { AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "@/lib/i18n";
 
-// Route-level error boundary. It renders inside the root layout, so the
+// Route-level error boundary, re-exported as error.tsx by both root layouts
+// (app/(app)/ and app/[lang]/). It renders inside the root layout, so the
 // LocaleProvider is available and the copy follows the chosen language rather
 // than Next's built-in English fallback.
 export default function Error({

@@ -12,8 +12,21 @@
  * third-party SDKs below (Google Sign-In, Turnstile, Vercel Analytics) without
  * the browser checking each one against a host list.
  *
- * A nonce requires a per-request render, which costs nothing here: the root
- * layout reads cookies(), so every page is already dynamically rendered.
+ * A nonce requires a per-request render, which costs nothing for the app: its
+ * root layout (app/(app)/layout.tsx) reads cookies(), so those pages are
+ * dynamically rendered anyway.
+ *
+ * THE MARKETING PAGES GET A FIXED POLICY INSTEAD
+ * app/[lang]/ (home, why-us, rate, faq, contact, terms) is prerendered once at
+ * build time so the CDN can serve it and `next/link` can prefetch it — the
+ * reason clicks between those pages are instant. A page built once cannot
+ * carry a per-request nonce, and Next's inline bootstrap scripts differ per
+ * build, so they cannot be hashed either. Those pages therefore get
+ * `script-src 'unsafe-inline'` plus the host list below, without
+ * 'strict-dynamic' (which would make the browser ignore both). This is a
+ * deliberate trade-off, accepted for pages that show no user-supplied content
+ * and hold no session data; every page that does — the app, admin, /login —
+ * keeps the nonce. Pass `null` for the fixed policy.
  *
  * STYLES STAY 'unsafe-inline'
  * React writes `style="..."` attributes (Radix positioning, framer-motion,
@@ -62,7 +75,7 @@ export function createNonce(): string {
   return btoa(String.fromCharCode(...bytes));
 }
 
-export function contentSecurityPolicy(nonce: string): string {
+export function contentSecurityPolicy(nonce: string | null): string {
   // React reconstructs server error stacks with eval() in development only.
   const isDev = process.env.NODE_ENV === "development";
   const storage = isDev
@@ -71,12 +84,14 @@ export function contentSecurityPolicy(nonce: string): string {
 
   const directives: Record<string, string[]> = {
     "default-src": ["'self'"],
-    // The host entries are ignored by browsers that understand
-    // 'strict-dynamic' and only matter to older ones that do not.
+    // With a nonce, the host entries are ignored by browsers that understand
+    // 'strict-dynamic' and only matter to older ones that do not. Without one
+    // (the marketing pages) they are the list that is enforced.
     "script-src": [
       "'self'",
-      `'nonce-${nonce}'`,
-      "'strict-dynamic'",
+      ...(nonce
+        ? [`'nonce-${nonce}'`, "'strict-dynamic'"]
+        : ["'unsafe-inline'"]),
       "https://accounts.google.com/gsi/client",
       "https://challenges.cloudflare.com",
       ...(isDev ? ["'unsafe-eval'"] : []),

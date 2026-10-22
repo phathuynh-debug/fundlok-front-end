@@ -32,10 +32,12 @@ export type SeoLocale = "en" | "vi";
  * here -- the root layout, page bodies, metadata -- so body, <title> and
  * <html lang> cannot disagree.
  *
- *   1. A localized public page: the URL decides. proxy.ts sets LOCALE_HEADER
- *      from the /en prefix (and to "vi" without it), so /rate is Vietnamese
- *      even for a visitor whose cookie says English; otherwise the page would
- *      contradict its own canonical and hreflang.
+ *   1. A localized page rendered per request (/login): the URL decides.
+ *      proxy.ts sets LOCALE_HEADER from the /en prefix (and to "vi" without
+ *      it), so /login is Vietnamese even for a visitor whose cookie says
+ *      English; otherwise the page would contradict its own canonical and
+ *      hreflang. The prerendered marketing pages do not come through here at
+ *      all: their language is the [lang] route param (see seoStringsFor).
  *   2. Anything else: the NEXT_LOCALE cookie, Vietnamese by default.
  */
 export async function resolveSeoLocale(): Promise<SeoLocale> {
@@ -63,7 +65,28 @@ export const OG_LOCALE: Record<SeoLocale, string> = {
   vi: "vi_VN",
 };
 
-export async function getSeoStrings() {
-  const locale = await resolveSeoLocale();
+/**
+ * The SEO strings for a language the caller already knows: the prerendered
+ * marketing pages (app/[lang]/) take it from their route param, and must not
+ * touch headers() or cookies(), which would make them dynamic again.
+ */
+export function seoStringsFor(locale: SeoLocale) {
   return { locale, seo: (locale === "en" ? en : vi).seo };
+}
+
+/** The route params of a page under app/[lang]/. */
+export type LangParams = Promise<{ lang: string }>;
+
+/**
+ * The language of a prerendered marketing page, from its [lang] segment. The
+ * layout's generateStaticParams only builds "vi" and "en" (and dynamicParams
+ * is off), so anything else never reaches a page; the fallback is for types.
+ */
+export async function pageLocale(params: LangParams): Promise<SeoLocale> {
+  const { lang } = await params;
+  return lang === "en" ? "en" : "vi";
+}
+
+export async function getSeoStrings() {
+  return seoStringsFor(await resolveSeoLocale());
 }

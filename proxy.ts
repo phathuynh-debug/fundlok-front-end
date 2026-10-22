@@ -9,8 +9,11 @@ import { applyClientIp } from "@/lib/client-ip";
 import {
   LOCALE_COOKIE,
   LOCALE_HEADER,
+  isMarketingPath,
   localizedPath,
+  marketingRoute,
   parseLocalePath,
+  publicPathname,
   type ParsedLocalePath,
 } from "@/lib/locale-routing";
 import { safeNextPath } from "@/lib/safe-next-path";
@@ -129,7 +132,14 @@ function isHandledRoute(pathname: string) {
 // Continue with the page, carrying the language the URL asked for and this
 // request's Content-Security-Policy.
 //
-// For /en/... the request is REWRITTEN to the unprefixed page (there is one
+// A marketing page (lib/locale-routing.ts MARKETING_PATHS) was prerendered
+// once per language under app/[lang]/, so it is REWRITTEN to that build —
+// /rate to /vi/rate; /en/rate already is one — and served as it was built. It
+// reads no request header, so it gets none, and it carries no nonce, so it
+// gets the fixed policy (contentSecurityPolicy(null), see lib/csp.ts).
+//
+// Otherwise, for /en/... (/en/login) the request is REWRITTEN to the
+// unprefixed page (there is one
 // page component per route; the prefix is not a separate route tree) and the
 // header tells the server to render English. For an unprefixed localized page
 // the header says "vi". The header is always overwritten here, never passed
@@ -149,6 +159,23 @@ function continueToPage(
   route: ParsedLocalePath,
   sessionUser: CurrentUser | null = null,
 ): NextResponse {
+  if (route.locale && isMarketingPath(route.path)) {
+    const target = marketingRoute(route.path, route.locale);
+    let response: NextResponse;
+    if (target === request.nextUrl.pathname) {
+      response = NextResponse.next();
+    } else {
+      const url = request.nextUrl.clone();
+      url.pathname = target;
+      response = NextResponse.rewrite(url);
+    }
+    response.headers.set(
+      "Content-Security-Policy",
+      contentSecurityPolicy(null),
+    );
+    return response;
+  }
+
   const headers = new Headers(request.headers);
   headers.delete(LOCALE_HEADER);
   if (route.locale) headers.set(LOCALE_HEADER, route.locale);
@@ -246,6 +273,16 @@ async function routeRequest(request: NextRequest, refreshed: string[]) {
   // (English). See lib/locale-routing.ts. Everything below this block works on
   // the UNPREFIXED path, so every auth and role rule applies to /en/login
   // exactly as it does to /login.
+  // /vi/rate and friends: the internal route a marketing page is prerendered
+  // at (see continueToPage), not a URL of its own. Sent to the public one, so
+  // the same page is never reachable — or indexable — at two addresses.
+  const publicPath = publicPathname(rawPathname);
+  if (publicPath !== rawPathname) {
+    const url = request.nextUrl.clone();
+    url.pathname = publicPath;
+    return NextResponse.redirect(url, 308);
+  }
+
   const route = parseLocalePath(rawPathname);
   if (route.prefixed && route.locale === null) {
     // /en/dashboard and friends: no English URL exists for pages that are not
@@ -288,7 +325,8 @@ async function routeRequest(request: NextRequest, refreshed: string[]) {
 
   // Pages with no auth, role or maintenance rule — the marketing pages (why-us,
   // rate, faq, contact, terms), /forgot-password, /reset-password, the 404 —
-  // are in the matcher only for the language header and the CSP nonce.
+  // are in the matcher only for the language, the CSP and (marketing) the
+  // rewrite to their prerendered build.
   // Returning here keeps them off the session lookup below.
   if (!isHandledRoute(pathname) && pathname !== MAINTENANCE_ROUTE) {
     return pass();
@@ -603,8 +641,9 @@ export const config = {
     // never runs and the secret is never attached — the failure would be
     // silent, since next.config.ts still proxies the traffic.
     "/api/:path*",
-    // Every page, because every page needs its own CSP nonce (a page the proxy
-    // skipped would get no Content-Security-Policy at all). Pages without auth
+    // Every page, because every page needs a Content-Security-Policy (a page
+    // the proxy skipped would get none at all) and the marketing pages need
+    // the rewrite to their prerendered build. Pages without auth
     // rules return before any session or maintenance lookup, so matching them
     // costs no backend call. Excludes Next's build assets, Vercel's analytics
     // endpoints and any path with a file extension — public/ files,

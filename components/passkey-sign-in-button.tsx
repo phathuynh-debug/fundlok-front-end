@@ -6,7 +6,7 @@ import { Fingerprint, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { usePasskeyLogin } from "@/hooks/use-authentication";
-import { landingRouteFor } from "@/app/login/use-login";
+import { landingRouteFor } from "@/app/(app)/login/use-login";
 import { isPasskeyCancellation, isPasskeySupported } from "@/lib/passkeys";
 import { useTranslations } from "@/lib/i18n";
 import { apiErrorMessage } from "@/lib/api-error-message";

@@ -1,11 +1,21 @@
 import type { Metadata } from "next";
 
-import { getSeoStrings, localeAlternates, OG_LOCALE } from "@/lib/seo";
+import {
+  localeAlternates,
+  OG_LOCALE,
+  pageLocale,
+  seoStringsFor,
+  type LangParams,
+} from "@/lib/seo";
 import ContactClient from "./contact-client";
 import { SITE_URL } from "@/lib/site";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { locale, seo } = await getSeoStrings();
+export async function generateMetadata({
+  params,
+}: {
+  params: LangParams;
+}): Promise<Metadata> {
+  const { locale, seo } = seoStringsFor(await pageLocale(params));
   const title = seo.contactTitle;
   const description = seo.contactDescription;
 

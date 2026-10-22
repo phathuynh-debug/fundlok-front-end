@@ -4,10 +4,11 @@ import en from "@/lib/i18n/en.json";
 import vi from "@/lib/i18n/vi.json";
 import { FAQ_CATEGORIES, faqQuestionNumbers } from "@/lib/faq-questions";
 import {
-  getSeoStrings,
   localeAlternates,
   OG_LOCALE,
-  resolveSeoLocale,
+  pageLocale,
+  seoStringsFor,
+  type LangParams,
   type SeoLocale,
 } from "@/lib/seo";
 import FaqClient from "./faq-client";
@@ -33,8 +34,12 @@ function qaPairsFor(locale: SeoLocale) {
   });
 }
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { locale, seo } = await getSeoStrings();
+export async function generateMetadata({
+  params,
+}: {
+  params: LangParams;
+}): Promise<Metadata> {
+  const { locale, seo } = seoStringsFor(await pageLocale(params));
   const title = seo.faqTitle;
   const description = seo.faqDescription;
 
@@ -67,8 +72,8 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function FaqPage() {
-  const locale = await resolveSeoLocale();
+export default async function FaqPage({ params }: { params: LangParams }) {
+  const locale = await pageLocale(params);
 
   // FAQPage rich-result structured data: every question with its full answer.
   // This is what makes Q&As eligible to appear directly in search results.

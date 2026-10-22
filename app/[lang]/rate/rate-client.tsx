@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { m, useReducedMotion } from "framer-motion";
@@ -280,20 +286,34 @@ const HEADER_CLEARANCE_PX = 88;
 
 type Audience = "sme" | "investor";
 
-export default function RateClient({
-  initialAudience = "sme",
-}: {
-  initialAudience?: Audience;
-}) {
-  const [audience, setAudience] = useState<Audience>(initialAudience);
+// /rate?for=investor opens the investor tab. The page is prerendered, so the
+// query is unknown on the server: hydrate as "sme", then read it from the URL.
+// Not useSearchParams(): in a static page that bails the whole calculator out
+// of the prerendered HTML.
+const noSubscribe = () => () => {};
+const linkedToInvestor = () =>
+  new URLSearchParams(window.location.search).get("for") === "investor";
+
+export default function RateClient() {
+  const linkedInvestor = useSyncExternalStore(
+    noSubscribe,
+    linkedToInvestor,
+    () => false,
+  );
+  // The tab the visitor picked; until they pick one, the link decides.
+  const [chosen, setAudience] = useState<Audience | null>(null);
+  const audience: Audience = chosen ?? (linkedInvestor ? "investor" : "sme");
   // Mounted on first visit, then kept (hidden) so switching back and forth
   // keeps what the visitor typed, the lead, and the live estimate.
-  const [investorMounted, setInvestorMounted] = useState(
-    initialAudience === "investor",
-  );
+  const [investorVisited, setInvestorMounted] = useState(false);
+  const investorMounted = investorVisited || audience === "investor";
   const switchAudience = (next: Audience) => {
     setAudience(next);
-    if (next === "investor") setInvestorMounted(true);
+    // Also when leaving it: a tab opened by the link was never "chosen", and
+    // must stay mounted like one that was.
+    if (next === "investor" || audience === "investor") {
+      setInvestorMounted(true);
+    }
     // Shareable and back-button friendly without a navigation: the tab is
     // presentation state, so replaceState rather than a router push.
     const url = new URL(window.location.href);

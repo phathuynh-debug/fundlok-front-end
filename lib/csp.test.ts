@@ -95,3 +95,28 @@ describe("contentSecurityPolicy", () => {
     expect(connect.some((s) => s.startsWith("ws"))).toBe(false);
   });
 });
+
+describe("contentSecurityPolicy(null), for the prerendered marketing pages", () => {
+  it("allows inline scripts, with no nonce and no 'strict-dynamic'", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    const scripts = directive(contentSecurityPolicy(null), "script-src");
+    expect(scripts).toContain("'self'");
+    expect(scripts).toContain("'unsafe-inline'");
+    // 'strict-dynamic' would make the browser ignore 'unsafe-inline' and the
+    // host list, blocking every script on the page.
+    expect(scripts).not.toContain("'strict-dynamic'");
+    expect(scripts.some((s) => s.startsWith("'nonce-"))).toBe(false);
+    expect(scripts).not.toContain("'unsafe-eval'");
+  });
+
+  it("keeps every other directive the same as the nonce policy", () => {
+    const without = (csp: string) =>
+      csp
+        .split(";")
+        .map((d) => d.trim())
+        .filter((d) => !d.startsWith("script-src"));
+    expect(without(contentSecurityPolicy(null))).toEqual(
+      without(contentSecurityPolicy("abc123")),
+    );
+  });
+});

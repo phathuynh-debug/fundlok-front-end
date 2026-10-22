@@ -3,10 +3,11 @@ import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 
 import {
-  getSeoStrings,
   localeAlternates,
   OG_LOCALE,
-  resolveSeoLocale,
+  pageLocale,
+  seoStringsFor,
+  type LangParams,
 } from "@/lib/seo";
 import SiteHeader from "@/components/site-header";
 import { SectionLocator } from "@/components/section-locator";
@@ -120,8 +121,12 @@ const dict = {
   },
 };
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { locale, seo } = await getSeoStrings();
+export async function generateMetadata({
+  params,
+}: {
+  params: LangParams;
+}): Promise<Metadata> {
+  const { locale, seo } = seoStringsFor(await pageLocale(params));
 
   return {
     alternates: localeAlternates("/", locale),
@@ -182,11 +187,11 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function Page() {
-  // This page builds its copy on the server, so it resolves the language
-  // itself rather than reading the client context: the URL (/ or /en), the
-  // same resolver the layout and metadata use.
-  const locale = await resolveSeoLocale();
+export default async function Page({ params }: { params: LangParams }) {
+  // This page builds its copy on the server, so it takes the language from
+  // the URL (/ or /en, the [lang] segment) rather than the client context —
+  // the same source the layout and metadata use.
+  const locale = await pageLocale(params);
   const currentLocale = locale;
   const strings = dict[currentLocale];
 

@@ -3,6 +3,8 @@ import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { proxy } from "./proxy";
+import { NONCE_HEADER } from "@/lib/csp";
+import { LOCALE_HEADER } from "@/lib/locale-routing";
 import {
   SESSION_USER_HEADER,
   decodeSessionUser,
@@ -111,7 +113,9 @@ describe("the session user hand-off", () => {
   it("never passes on a copy the browser sent", async () => {
     const forged = encodeSessionUser({ ...USER, role: "SYSTEM_ADMIN" });
     const response = await proxy(
-      new NextRequest("https://www.fundlok.com/faq", {
+      // A page rendered per request: the prerendered marketing pages read no
+      // request header at all, so there is nothing there to forge.
+      new NextRequest("https://www.fundlok.com/forgot-password", {
         headers: { [SESSION_USER_HEADER]: forged ?? "" },
       }),
     );
@@ -158,5 +162,80 @@ describe("the KYC handoff bypass", () => {
       const response = await signedOut(path);
       expect(response.headers.get("location")).toContain("/login");
     }
+  });
+});
+
+// The marketing pages are prerendered once per language under app/[lang]/
+// (lib/locale-routing.ts MARKETING_PATHS); the public URLs are rewritten to
+// those builds and get the fixed CSP, since a built page cannot carry a nonce.
+describe("the prerendered marketing pages", () => {
+  const rewrittenTo = (response: Response) => {
+    const target = response.headers.get("x-middleware-rewrite");
+    return target === null ? null : new URL(target).pathname;
+  };
+
+  it("serves an unprefixed page from its Vietnamese build", async () => {
+    const response = await proxy(
+      new NextRequest("https://www.fundlok.com/rate?for=investor"),
+    );
+    expect(rewrittenTo(response)).toBe("/vi/rate");
+    expect(response.headers.get("x-middleware-rewrite")).toContain(
+      "for=investor",
+    );
+  });
+
+  it("serves the home page from /vi", async () => {
+    const response = await proxy(new NextRequest("https://www.fundlok.com/"));
+    expect(rewrittenTo(response)).toBe("/vi");
+  });
+
+  it("serves an English page at its own URL, which is its build", async () => {
+    const response = await proxy(
+      new NextRequest("https://www.fundlok.com/en/faq"),
+    );
+    expect(response.headers.get("location")).toBeNull();
+    expect(rewrittenTo(response)).toBeNull();
+  });
+
+  it("gives them the fixed policy, with no nonce", async () => {
+    const response = await proxy(
+      new NextRequest("https://www.fundlok.com/contact"),
+    );
+    const csp = response.headers.get("Content-Security-Policy") ?? "";
+    expect(csp).toContain("'unsafe-inline'");
+    expect(csp).not.toContain("'nonce-");
+    expect(forwardedHeaders(response).get(NONCE_HEADER)).toBeNull();
+  });
+
+  it("sends the internal /vi URL to the public one", async () => {
+    for (const [from, to] of [
+      ["/vi/rate", "/rate"],
+      ["/vi", "/"],
+    ]) {
+      const response = await proxy(
+        new NextRequest(`https://www.fundlok.com${from}`),
+      );
+      expect(response.status).toBe(308);
+      expect(new URL(response.headers.get("location")!).pathname).toBe(to);
+    }
+  });
+
+  it("keeps /login per request, with its nonce and language", async () => {
+    const response = await proxy(
+      new NextRequest("https://www.fundlok.com/en/login"),
+    );
+    expect(rewrittenTo(response)).toBe("/login");
+    expect(response.headers.get("Content-Security-Policy")).toContain(
+      "'nonce-",
+    );
+    expect(forwardedHeaders(response).get(LOCALE_HEADER)).toBe("en");
+  });
+
+  it("keeps the app per request, with its nonce", async () => {
+    const response = await proxy(
+      new NextRequest("https://www.fundlok.com/forgot-password"),
+    );
+    expect(rewrittenTo(response)).toBeNull();
+    expect(forwardedHeaders(response).get(NONCE_HEADER)).toBeTruthy();
   });
 });

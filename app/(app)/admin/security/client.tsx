@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { isAdminRole } from "@/services/authentication.service";
 import { AdminPageLoader } from "../_components/AdminDirectory";
-import { SecuritySettings } from "@/app/dashboard/security/_components/SecuritySettings";
+import { SecuritySettings } from "@/app/(app)/dashboard/security/_components/SecuritySettings";
 
 // Admin > Security: the signed-in admin manages the protections on their OWN
 // account — password, two-factor auth, passkeys, sign-in alerts, sessions.

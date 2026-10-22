@@ -16,7 +16,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
-import { useResetPassword } from "@/app/reset-password/use-reset-password";
+import { useResetPassword } from "@/app/(app)/reset-password/use-reset-password";
 import { apiErrorMessage } from "@/lib/api-error-message";
 import { isPasswordBreached, passwordProblem } from "@/lib/password-policy";
 

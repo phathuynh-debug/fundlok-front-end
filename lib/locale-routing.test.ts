@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import {
   LOCALIZED_PATHS,
+  MARKETING_PATHS,
+  isLocalizedPath,
   languageAlternates,
+  marketingRoute,
+  publicPathname,
   localizedHref,
   localizedPath,
   parseLocalePath,
@@ -111,5 +115,34 @@ describe("languageAlternates", () => {
       en: "/en/rate",
       "x-default": "/rate",
     });
+  });
+});
+
+describe("marketingRoute / publicPathname", () => {
+  it("builds each language under its own prefix, the home page bare", () => {
+    expect(marketingRoute("/rate", "vi")).toBe("/vi/rate");
+    expect(marketingRoute("/rate", "en")).toBe("/en/rate");
+    expect(marketingRoute("/", "vi")).toBe("/vi");
+    expect(marketingRoute("/", "en")).toBe("/en");
+  });
+
+  it("reads a Vietnamese build's route as its public URL", () => {
+    for (const path of MARKETING_PATHS) {
+      expect(publicPathname(marketingRoute(path, "vi"))).toBe(path);
+    }
+  });
+
+  it("leaves public URLs, English ones and look-alikes alone", () => {
+    expect(publicPathname("/rate")).toBe("/rate");
+    expect(publicPathname("/en/rate")).toBe("/en/rate");
+    expect(publicPathname("/vip")).toBe("/vip");
+    // Not a marketing page, so not an internal route either.
+    expect(publicPathname("/vi/dashboard")).toBe("/vi/dashboard");
+  });
+
+  it("prerenders only localized pages", () => {
+    for (const path of MARKETING_PATHS) {
+      expect(isLocalizedPath(path)).toBe(true);
+    }
   });
 });

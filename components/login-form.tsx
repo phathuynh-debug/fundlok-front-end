@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { useLogin } from "@/app/login/use-login";
+import { useLogin } from "@/app/(app)/login/use-login";
 import { Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
 import { PasskeySignInButton } from "@/components/passkey-sign-in-button";

@@ -7,6 +7,9 @@ import {
   ACCENT_COOKIE_NAME,
   RADIUS_COOKIE_NAME,
   REDUCE_MOTION_COOKIE_NAME,
+  parseAccentCookie,
+  parseRadiusCookie,
+  parseReduceMotionCookie,
   type AccentId,
   type RadiusId,
 } from "@/lib/appearance";
@@ -48,6 +51,13 @@ type AppearanceContextValue = {
 /** One cookie write, one <html> attribute — the two halves of persisting a
  *  preference that CSS reads. The attribute is what takes effect now; the
  *  cookie is what makes the server render it on the next request. */
+/** A cookie's value in the browser; undefined on the server. */
+function readCookie(name: string): string | undefined {
+  if (typeof document === "undefined") return undefined;
+  const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+  return match ? decodeURIComponent(match[1]) : undefined;
+}
+
 function persist(attribute: string, cookieName: string, value: string) {
   document.documentElement.setAttribute(attribute, value);
   document.cookie = `${cookieName}=${value}; path=/; max-age=31536000; samesite=lax`;
@@ -61,14 +71,28 @@ export function AppearanceProvider({
   initialRadius,
   children,
 }: {
-  initialReduceMotion: boolean;
-  initialAccent: AccentId;
-  initialRadius: RadiusId;
+  /**
+   * The cookie values, read server-side by the dynamic root layout. Omitted on
+   * the prerendered marketing pages, which cannot read cookies on the server;
+   * the state then starts from the browser's cookies, so the effects below
+   * write back the visitor's choice rather than resetting it to the default.
+   */
+  initialReduceMotion?: boolean;
+  initialAccent?: AccentId;
+  initialRadius?: RadiusId;
   children: React.ReactNode;
 }) {
-  const [reduceMotion, setReduceMotionState] = useState(initialReduceMotion);
-  const [accent, setAccentState] = useState(initialAccent);
-  const [radius, setRadiusState] = useState(initialRadius);
+  const [reduceMotion, setReduceMotionState] = useState(
+    () =>
+      initialReduceMotion ??
+      parseReduceMotionCookie(readCookie(REDUCE_MOTION_COOKIE_NAME)),
+  );
+  const [accent, setAccentState] = useState(
+    () => initialAccent ?? parseAccentCookie(readCookie(ACCENT_COOKIE_NAME)),
+  );
+  const [radius, setRadiusState] = useState(
+    () => initialRadius ?? parseRadiusCookie(readCookie(RADIUS_COOKIE_NAME)),
+  );
 
   // Effects, not the setters, own persistence — so a preference restored from
   // the server is also re-affirmed, and the cookie can never drift from state.

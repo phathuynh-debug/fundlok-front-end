@@ -8,13 +8,14 @@ import {
   useMemo,
   useState,
 } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   LOCALE_COOKIE,
   localizedHref,
   localizedPath,
   parseLocalePath,
 } from "@/lib/locale-routing";
+import { usePublicPathname } from "@/lib/use-public-pathname";
 // Type only. A value import of either dictionary here would put it in the
 // client bundle of every page: this module is imported by the root layout.
 // The root layout passes the active locale's dictionary in instead, and the
@@ -127,7 +128,7 @@ export function LocaleProvider({
   // admin, ...): starts from the cookie the server read.
   const [cookieLocale, setLocaleState] = useState<Locale>(initialLocale);
   const router = useRouter();
-  const pathname = usePathname() ?? "/";
+  const pathname = usePublicPathname();
   // On a public page the URL decides (see lib/locale-routing.ts). Derived here
   // rather than taken from `initialLocale` because the root layout does not
   // re-render on client navigation: going from /faq to /en/faq would

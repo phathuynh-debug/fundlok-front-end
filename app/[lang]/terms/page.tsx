@@ -1,11 +1,21 @@
 import type { Metadata } from "next";
 import { TermsClient } from "./terms-client";
 import { SITE_URL } from "@/lib/site";
-import { getServerTranslations } from "@/lib/i18n/server";
-import { localeAlternates, OG_LOCALE } from "@/lib/seo";
+import { createServerTranslator } from "@/lib/i18n/server";
+import {
+  localeAlternates,
+  OG_LOCALE,
+  pageLocale,
+  type LangParams,
+} from "@/lib/seo";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { locale, t } = await getServerTranslations();
+export async function generateMetadata({
+  params,
+}: {
+  params: LangParams;
+}): Promise<Metadata> {
+  const locale = await pageLocale(params);
+  const t = createServerTranslator(locale);
   // termsTitle carries the full rendered title including the brand suffix, so
   // `absolute` keeps the root template from appending a second "| FundLok".
   const title = t("seo.termsTitle");

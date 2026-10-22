@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import Logo from "@/components/logo";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Menu } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
+import { usePublicPathname } from "@/lib/use-public-pathname";
 import {
   Sheet,
   SheetContent,
@@ -28,7 +28,8 @@ const NAV_LINKS = [
 // is handled by the SectionLocator rail instead.
 export default function SiteHeader() {
   const { t, localize } = useTranslations();
-  const pathname = usePathname();
+  // Not the raw usePathname(): see usePublicPathname for why.
+  const pathname = usePublicPathname();
 
   const linkClass = (href: string) =>
     pathname === href

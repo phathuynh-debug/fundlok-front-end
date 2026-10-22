@@ -54,6 +54,60 @@ export function isLocalizedPath(path: string): boolean {
   return (LOCALIZED_PATHS as readonly string[]).includes(path);
 }
 
+/**
+ * The localized pages that are PRERENDERED, one build per language, under
+ * app/[lang]/. Every localized page but /login, which redirects signed-in
+ * visitors and so renders per request like the rest of the app.
+ */
+export const MARKETING_PATHS = [
+  "/",
+  "/why-us",
+  "/rate",
+  "/faq",
+  "/contact",
+  "/terms",
+] as const;
+
+/** The [lang] values app/[lang]/ is built for. */
+export const MARKETING_LOCALES = [
+  "vi",
+  "en",
+] as const satisfies readonly RouteLocale[];
+
+/**
+ * Internal prefix of the Vietnamese build of a marketing page. The public URL
+ * has no prefix (/rate); proxy.ts rewrites it to /vi/rate, the route the page
+ * was prerendered at. English needs no rewrite: /en/rate is both.
+ */
+export const VI_PREFIX = "/vi";
+
+export function isMarketingPath(path: string): boolean {
+  return (MARKETING_PATHS as readonly string[]).includes(path);
+}
+
+/** The app/[lang]/ route a marketing page in `locale` was prerendered at. */
+export function marketingRoute(path: string, locale: RouteLocale): string {
+  const prefix = locale === "en" ? EN_PREFIX : VI_PREFIX;
+  return path === "/" ? prefix : `${prefix}${path}`;
+}
+
+/**
+ * The public pathname for one `usePathname()` returns.
+ *
+ * A prerendered marketing page was built at its internal route (/vi/rate), so
+ * during that build `usePathname()` returns "/vi/rate", while in the browser,
+ * after proxy.ts's rewrite, it returns "/rate". Anything rendered from the raw
+ * value would differ between the two and fail hydration. This maps the
+ * internal form to the public one, so both sides agree.
+ */
+export function publicPathname(pathname: string): string {
+  if (pathname !== VI_PREFIX && !pathname.startsWith(`${VI_PREFIX}/`)) {
+    return pathname;
+  }
+  const rest = pathname.slice(VI_PREFIX.length) || "/";
+  return isMarketingPath(rest) ? rest : pathname;
+}
+
 export interface ParsedLocalePath {
   /** The page's default-language path, e.g. "/rate" for "/en/rate". */
   path: string;

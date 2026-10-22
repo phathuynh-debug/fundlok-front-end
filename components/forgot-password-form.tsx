@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Mail, Loader2, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
-import { useForgotPassword } from "@/app/forgot-password/use-forgot-password";
+import { useForgotPassword } from "@/app/(app)/forgot-password/use-forgot-password";
 import { apiErrorMessage } from "@/lib/api-error-message";
 
 export function ForgotPasswordForm() {
