@@ -10,15 +10,20 @@ import { t } from "../support/i18n";
 const investorTab = (page: Page) =>
   page.getByRole("tab", { name: new RegExp(t("ratePage.audience.investor")) });
 
+// Scoped to the investor panel: the page has other fields labelled "Email".
+const panel = (page: Page) => page.locator("#rate-panel-investor");
+
 async function passGate(page: Page) {
-  await page.getByRole("checkbox").first().click();
+  // /rate is prerendered, so ?for=investor is applied after hydration: the
+  // page paints on the SME tab and switches. Wait for the switch, and take the
+  // gate's checkbox from the investor panel — the first one on the page is the
+  // SME form's, which the switch hides.
+  await expect(investorTab(page)).toHaveAttribute("aria-selected", "true");
+  await panel(page).getByRole("checkbox").first().click();
   await page
     .getByRole("button", { name: t("ratePage.investor.gateContinue") })
     .click();
 }
-
-// Scoped to the investor panel: the page has other fields labelled "Email".
-const panel = (page: Page) => page.locator("#rate-panel-investor");
 
 async function fillDetails(page: Page) {
   await panel(page)
@@ -50,9 +55,7 @@ test("the SME form is the default and the investor tab is one click away", async
   ).toBeVisible();
 });
 
-test("?for=investor opens the investor tab from the first render", async ({
-  page,
-}) => {
+test("?for=investor opens the investor tab", async ({ page }) => {
   await page.goto("/rate?for=investor");
   await expect(investorTab(page)).toHaveAttribute("aria-selected", "true");
 });

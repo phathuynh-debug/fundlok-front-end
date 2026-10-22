@@ -7,11 +7,16 @@ import { settle } from "../support/ui";
 /**
  * Content-Security-Policy (lib/csp.ts, set by proxy.ts).
  *
- * The policy is strict — scripts run only if they carry this request's nonce —
- * so the failure mode is not "the header is missing" but "a page renders and
- * nothing on it works": a script without the nonce is silently blocked and the
- * page never hydrates. These tests therefore assert from a real browser that
- * pages report no violations, not just that the header string looks right.
+ * Two policies. Pages rendered per request (the app, admin, /login, the 404)
+ * are strict — scripts run only if they carry this request's nonce. The
+ * marketing pages (lib/locale-routing.ts MARKETING_PATHS) are prerendered, so
+ * they cannot carry a nonce and get a fixed policy that allows inline scripts.
+ *
+ * The failure mode is not "the header is missing" but "a page renders and
+ * nothing on it works": a script the policy does not allow is silently blocked
+ * and the page never hydrates. These tests therefore assert from a real
+ * browser that pages report no violations, not just that the header string
+ * looks right.
  */
 
 /** Record every CSP violation the page reports, from the very first byte. */
@@ -36,8 +41,10 @@ function nonceOf(csp: string | undefined): string | undefined {
   return csp?.match(/'nonce-([^']+)'/)?.[1];
 }
 
+// /login: a page rendered per request. The marketing pages ("/") are covered
+// by the fixed-policy test below.
 test("pages are served with a nonce-based policy", async ({ request }) => {
-  const res = await request.get("/");
+  const res = await request.get("/login");
   const csp = res.headers()["content-security-policy"];
 
   expect(csp).toBeTruthy();
@@ -49,10 +56,10 @@ test("pages are served with a nonce-based policy", async ({ request }) => {
 
 test("the nonce changes on every request", async ({ request }) => {
   const a = nonceOf(
-    (await request.get("/")).headers()["content-security-policy"],
+    (await request.get("/login")).headers()["content-security-policy"],
   );
   const b = nonceOf(
-    (await request.get("/")).headers()["content-security-policy"],
+    (await request.get("/login")).headers()["content-security-policy"],
   );
   expect(a).not.toEqual(b);
 });
@@ -60,7 +67,7 @@ test("the nonce changes on every request", async ({ request }) => {
 test("every executable script in the HTML carries the response's nonce", async ({
   request,
 }) => {
-  const res = await request.get("/");
+  const res = await request.get("/login");
   const nonce = nonceOf(res.headers()["content-security-policy"]);
   const html = await res.text();
 
@@ -76,14 +83,26 @@ test("every executable script in the HTML carries the response's nonce", async (
   }
 });
 
+test("the prerendered marketing pages get the fixed policy", async ({
+  request,
+}) => {
+  for (const path of ["/", "/en", "/rate", "/en/faq"]) {
+    const csp = (await request.get(path)).headers()["content-security-policy"];
+    expect(csp, `${path} has no policy`).toBeTruthy();
+    expect(nonceOf(csp), `${path} has a nonce`).toBeUndefined();
+    expect(csp).toMatch(/script-src[^;]*'unsafe-inline'/);
+    // 'strict-dynamic' would make the browser ignore 'unsafe-inline' and block
+    // every script on the page.
+    expect(csp).not.toContain("'strict-dynamic'");
+    expect(csp).toContain("frame-ancestors 'none'");
+  }
+});
+
 test("pages outside the auth rules get the policy too", async ({ request }) => {
   // Not auth-gated, so the proxy only runs on them for the CSP; a page it
-  // skipped would be served with no policy at all.
-  for (const path of [
-    "/forgot-password",
-    "/en/faq",
-    "/this-page-does-not-exist",
-  ]) {
+  // skipped would be served with no policy at all. The 404 is rendered per
+  // request, so it gets a nonce like the app.
+  for (const path of ["/forgot-password", "/this-page-does-not-exist"]) {
     const res = await request.get(path);
     expect(
       nonceOf(res.headers()["content-security-policy"]),
@@ -130,6 +149,20 @@ for (const { path, user } of PAGES) {
     expect(violations).toEqual([]);
   });
 }
+
+test("client-side navigation between marketing pages works under the fixed policy", async ({
+  page,
+}) => {
+  const violations = await collectViolations(page);
+  await page.goto("/faq");
+  await settle(page);
+
+  await page.locator('header a[href="/rate"]').first().click();
+  await expect(page).toHaveURL(/\/rate$/);
+  await settle(page);
+
+  expect(violations).toEqual([]);
+});
 
 test("client-side navigation keeps working under the policy", async ({
   page,
