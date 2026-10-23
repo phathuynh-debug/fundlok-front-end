@@ -6,15 +6,13 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: [
-        "/dashboard/",
-        "/project-application",
-        // Cloudflare's email-protection interstitial, injected on pages that
-        // show an address. It is their page, not ours — it has a Cloudflare
-        // title we cannot set, no content of our own, and it was being
-        // crawled from /contact.
-        "/cdn-cgi/",
-      ],
+      // Do NOT disallow /cdn-cgi/. Cloudflare's email obfuscation rewrites the
+      // footer mailto into a link to /cdn-cgi/l/email-protection on every page.
+      // That page already answers 404 with `noindex`, but a robots block hides
+      // both from Google, so it indexed the bare URL from the links instead
+      // ("Indexed, though blocked by robots.txt", Oct 2026). Left crawlable,
+      // Google sees the noindex and drops it.
+      disallow: ["/dashboard/", "/project-application"],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
   };
