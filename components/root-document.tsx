@@ -155,6 +155,7 @@ export function RootDocument({
   appearance,
   nonce,
   sessionUser,
+  brandAccent = false,
   children,
 }: {
   locale: SeoLocale;
@@ -172,6 +173,11 @@ export function RootDocument({
   nonce?: string;
   /** The user proxy.ts already fetched to route this request, if any. */
   sessionUser?: User | null;
+  /**
+   * A per-request page that keeps the brand accent anyway: /login and the
+   * other signed-out entry pages (lib/appearance.ts BRAND_ACCENT_PATHS).
+   */
+  brandAccent?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -179,7 +185,9 @@ export function RootDocument({
       lang={locale}
       // Rendered server-side so the accent and radius are correct on the
       // first paint; the CSS in globals.css keys off these attributes.
-      data-accent={appearance?.accent ?? DEFAULT_ACCENT}
+      data-accent={
+        brandAccent ? DEFAULT_ACCENT : (appearance?.accent ?? DEFAULT_ACCENT)
+      }
       data-radius={appearance?.radius ?? DEFAULT_RADIUS}
       suppressHydrationWarning
     >
@@ -217,7 +225,9 @@ export function RootDocument({
                   initialAccent={appearance?.accent}
                   initialRadius={appearance?.radius}
                   // The marketing layout (no `appearance`): brand colours
-                  // only. See APPEARANCE_SCRIPT.
+                  // only. See APPEARANCE_SCRIPT. /login and friends are
+                  // handled per path inside the provider, so the accent comes
+                  // back on the client-side hop from /login to the dashboard.
                   applyAccent={Boolean(appearance)}
                 >
                   {/* The page's one <main> landmark. Section layouts and pages

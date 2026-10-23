@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { proxy } from "./proxy";
+import { BRAND_ACCENT_HEADER } from "@/lib/appearance";
 import { NONCE_HEADER } from "@/lib/csp";
 import { LOCALE_HEADER } from "@/lib/locale-routing";
 import {
@@ -237,5 +238,29 @@ describe("the prerendered marketing pages", () => {
     );
     expect(rewrittenTo(response)).toBeNull();
     expect(forwardedHeaders(response).get(NONCE_HEADER)).toBeTruthy();
+  });
+});
+
+describe("the brand-accent header", () => {
+  it("marks the signed-out entry pages, in either language", async () => {
+    for (const path of ["/login", "/en/login", "/forgot-password"]) {
+      const response = await proxy(
+        new NextRequest(`https://www.fundlok.com${path}`),
+      );
+      expect(forwardedHeaders(response).get(BRAND_ACCENT_HEADER), path).toBe(
+        "1",
+      );
+    }
+  });
+
+  it("drops one the browser sent on any other page", async () => {
+    const response = await proxy(
+      new NextRequest("https://www.fundlok.com/no-such-page", {
+        headers: { [BRAND_ACCENT_HEADER]: "1" },
+      }),
+    );
+    const forwarded = forwardedHeaders(response);
+    expect(forwarded.names).not.toContain(BRAND_ACCENT_HEADER);
+    expect(forwarded.get(BRAND_ACCENT_HEADER)).toBeNull();
   });
 });

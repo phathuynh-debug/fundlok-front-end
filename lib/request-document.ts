@@ -2,6 +2,7 @@ import { cookies, headers } from "next/headers";
 
 import {
   ACCENT_COOKIE_NAME,
+  BRAND_ACCENT_HEADER,
   RADIUS_COOKIE_NAME,
   REDUCE_MOTION_COOKIE_NAME,
   parseAccentCookie,
@@ -44,5 +45,8 @@ export async function requestDocumentProps() {
   const sessionUser = decodeSessionUser(
     requestHeaders.get(SESSION_USER_HEADER),
   );
-  return { locale, seo, appearance, nonce, sessionUser };
+  // Set by proxy.ts on /login and the other signed-out entry pages, which keep
+  // the brand accent (see BRAND_ACCENT_PATHS).
+  const brandAccent = requestHeaders.get(BRAND_ACCENT_HEADER) === "1";
+  return { locale, seo, appearance, nonce, sessionUser, brandAccent };
 }

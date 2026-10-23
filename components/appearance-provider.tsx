@@ -1,10 +1,13 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
 import { LazyMotion, MotionConfig } from "framer-motion";
 
 import {
   ACCENT_COOKIE_NAME,
+  DEFAULT_ACCENT,
+  isBrandAccentPath,
   RADIUS_COOKIE_NAME,
   REDUCE_MOTION_COOKIE_NAME,
   parseAccentCookie,
@@ -13,6 +16,7 @@ import {
   type AccentId,
   type RadiusId,
 } from "@/lib/appearance";
+import { parseLocalePath } from "@/lib/locale-routing";
 
 // Loaded after hydration; see lib/motion-features.ts.
 const loadMotionFeatures = () =>
@@ -109,9 +113,22 @@ export function AppearanceProvider({
     }; path=/; max-age=31536000; samesite=lax`;
   }, [reduceMotion]);
 
+  // /login and the other signed-out entry pages keep the brand accent too. By
+  // path, not by a prop from the layout: the root layout does not re-render on
+  // the client-side hop from /login to the dashboard, which must get the
+  // user's accent back. parseLocalePath strips /en, so /en/login counts.
+  const pathname = usePathname();
+  const brandAccent =
+    !applyAccent || isBrandAccentPath(parseLocalePath(pathname).path);
+
   useEffect(() => {
-    if (applyAccent) persist("data-accent", ACCENT_COOKIE_NAME, accent);
-  }, [accent, applyAccent]);
+    if (brandAccent) {
+      // The attribute only: the cookie keeps the user's choice.
+      document.documentElement.setAttribute("data-accent", DEFAULT_ACCENT);
+    } else {
+      persist("data-accent", ACCENT_COOKIE_NAME, accent);
+    }
+  }, [accent, brandAccent]);
 
   useEffect(() => {
     persist("data-radius", RADIUS_COOKIE_NAME, radius);

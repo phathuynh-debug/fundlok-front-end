@@ -51,6 +51,29 @@ export type AccentId = (typeof ACCENTS)[number]["id"];
 /** Graphite is the current design — the near-black/near-white neutral. */
 export const DEFAULT_ACCENT: AccentId = "graphite";
 
+/**
+ * The per-request pages a signed-out visitor reaches from the marketing site.
+ * Like the marketing pages, they keep the brand accent rather than the one a
+ * user chose for their dashboard: the accent is a dashboard preference, and a
+ * rose sign-in button under a graphite site looks like a different product.
+ */
+export const BRAND_ACCENT_PATHS = [
+  "/login",
+  "/forgot-password",
+  "/reset-password",
+] as const;
+
+/**
+ * Set by proxy.ts on a request for one of BRAND_ACCENT_PATHS, read by the root
+ * layout (a layout is not told its pathname). Always overwritten there, so a
+ * browser cannot set it itself.
+ */
+export const BRAND_ACCENT_HEADER = "x-fundlok-brand-accent";
+
+export function isBrandAccentPath(path: string): boolean {
+  return (BRAND_ACCENT_PATHS as readonly string[]).includes(path);
+}
+
 export function parseAccentCookie(value?: string | null): AccentId {
   const match = ACCENTS.find((accent) => accent.id === value);
   return match ? match.id : DEFAULT_ACCENT;

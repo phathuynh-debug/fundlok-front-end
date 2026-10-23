@@ -17,6 +17,7 @@ import {
   type ParsedLocalePath,
 } from "@/lib/locale-routing";
 import { safeNextPath } from "@/lib/safe-next-path";
+import { BRAND_ACCENT_HEADER, isBrandAccentPath } from "@/lib/appearance";
 import { NONCE_HEADER, contentSecurityPolicy, createNonce } from "@/lib/csp";
 import { SESSION_USER_HEADER, encodeSessionUser } from "@/lib/session-user";
 
@@ -179,6 +180,8 @@ function continueToPage(
   const headers = new Headers(request.headers);
   headers.delete(LOCALE_HEADER);
   if (route.locale) headers.set(LOCALE_HEADER, route.locale);
+  headers.delete(BRAND_ACCENT_HEADER);
+  if (isBrandAccentPath(route.path)) headers.set(BRAND_ACCENT_HEADER, "1");
   headers.delete(SESSION_USER_HEADER);
   const encodedUser = encodeSessionUser(sessionUser);
   if (encodedUser) headers.set(SESSION_USER_HEADER, encodedUser);
