@@ -59,7 +59,7 @@ const dict = {
     variableRate: "Variable rate",
     processTitle: "A clearer, technology-enabled way to get funded",
     processSubtitle:
-      "FundLok makes funding more flexible for SMEs and more transparent for investors. Automation, data-driven assessment, secure fund handling and clear repayment tracking do the heavy lifting, so the experience stays simple.",
+      "FundLok makes funding more flexible for SMEs and investing in SMEs more transparent for investors. Automation, data-driven assessment, secure fund handling and clear repayment tracking do the heavy lifting, so the experience stays simple.",
     ourSolution: "Our Solution",
     partnersEyebrow: "BACKED BY",
     partnersTitle: "Partners & programs",
@@ -100,7 +100,7 @@ const dict = {
     variableRate: "Lãi suất thả nổi",
     processTitle: "Vay vốn minh bạch hơn nhờ công nghệ",
     processSubtitle:
-      "FundLok giúp doanh nghiệp SME gọi vốn linh hoạt hơn và giúp nhà đầu tư theo dõi minh bạch hơn. Tự động hóa, thẩm định dựa trên dữ liệu, quản lý dòng vốn an toàn và theo dõi hoàn trả rõ ràng lo phần phức tạp, để trải nghiệm luôn đơn giản.",
+      "FundLok giúp doanh nghiệp SME gọi vốn linh hoạt hơn và giúp việc đầu tư SME minh bạch hơn cho nhà đầu tư. Tự động hóa, thẩm định dựa trên dữ liệu, quản lý dòng vốn an toàn và theo dõi hoàn trả rõ ràng lo phần phức tạp, để trải nghiệm luôn đơn giản.",
     ourSolution: "Giải pháp của chúng tôi",
     partnersEyebrow: "ĐỒNG HÀNH CÙNG",
     partnersTitle: "Đối tác & chương trình",
@@ -170,6 +170,23 @@ export async function generateMetadata({
       "sàn huy động vốn SME",
       "nền tảng huy động vốn",
       "kết nối vốn doanh nghiệp SME",
+      // The investor side of the same marketplace. "đầu tư SME" also leads
+      // the vi homeDescription and an investor FAQ question, which is what
+      // Google actually ranks on.
+      "đầu tư SME",
+      "đầu tư SMEs",
+      "đầu tư vào SME",
+      "đầu tư doanh nghiệp SME",
+      "đầu tư doanh nghiệp vừa và nhỏ",
+      "đầu tư vào doanh nghiệp vừa và nhỏ",
+      "kênh đầu tư SME",
+      "nền tảng đầu tư SME",
+      "cơ hội đầu tư SME Việt Nam",
+      "dau tu SME",
+      "invest in SMEs",
+      "invest in SMEs Vietnam",
+      "SME investment Vietnam",
+      "SME investing platform",
     ],
     openGraph: {
       url: localeAlternates("/", locale).canonical,

@@ -39,8 +39,10 @@ export function GET() {
 - The rate is all-in, starts from a reference rate, moves with the business's
   0-100 internal score, and is capped at the statutory 20%/yr ceiling.
 
-## For investors
+## For investors (đầu tư SME / investing in SMEs)
 
+- FundLok is a way to invest in SMEs in Vietnam ("đầu tư SME"): investors
+  fund listed businesses directly, from 10,000,000 VND.
 - Returns are targets and ranges, never guarantees.
 - If a business underperforms, the investor bears the loss.
 - Every listing shows the business score, the verified revenue behind it, the

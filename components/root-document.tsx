@@ -54,6 +54,8 @@ const SITE_KEYWORDS = [
   "flexible capital",
   "on-chain credit",
   "investor portal",
+  "đầu tư SME",
+  "invest in SMEs",
   "flexible funding",
   "AI business score",
   "on-chain SME funding",
