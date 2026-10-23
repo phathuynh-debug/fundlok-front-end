@@ -30,7 +30,7 @@ const achievementsData = {
       category: "Government Recognition",
       description:
         "FundLok was recognized as a top-3 fintech project by the Australian Government for facilitating sustainable cross-border investments and ESG-aligned SME funding.",
-      images: ["/achivements/sustainability-action-2.webp"],
+      images: ["/achivements/sustainability-action-landscape.webp"],
     },
     {
       title: "Seed Stage Start-up Incubation in FinTech Industry 2025",
@@ -62,7 +62,7 @@ const achievementsData = {
       category: "Ghi nhận từ Chính phủ",
       description:
         "FundLok được ghi nhận là một trong 3 dự án FinTech xuất sắc nhất bởi Chính phủ Úc trong việc thúc đẩy đầu tư bền vững và hỗ trợ vốn SME theo tiêu chuẩn ESG.",
-      images: ["/achivements/sustainability-action-2.webp"],
+      images: ["/achivements/sustainability-action-landscape.webp"],
     },
     {
       title: "Ươm tạo Khởi nghiệp Giai đoạn Hạt giống ngành FinTech 2025",

@@ -60,6 +60,8 @@ const dict = {
     processTitle: "A clearer, technology-enabled way to get funded",
     processSubtitle:
       "FundLok makes funding more flexible for SMEs and investing in SMEs more transparent for investors. Automation, data-driven assessment, secure fund handling and clear repayment tracking do the heavy lifting, so the experience stays simple.",
+    heroCtaPrimary: "Get started",
+    heroCtaSecondary: "See reference rates",
     ourSolution: "Our Solution",
     partnersEyebrow: "BACKED BY",
     partnersTitle: "Partners & programs",
@@ -101,6 +103,8 @@ const dict = {
     processTitle: "Vay vốn minh bạch hơn nhờ công nghệ",
     processSubtitle:
       "FundLok giúp doanh nghiệp SME gọi vốn linh hoạt hơn và giúp việc đầu tư SME minh bạch hơn cho nhà đầu tư. Tự động hóa, thẩm định dựa trên dữ liệu, quản lý dòng vốn an toàn và theo dõi hoàn trả rõ ràng lo phần phức tạp, để trải nghiệm luôn đơn giản.",
+    heroCtaPrimary: "Bắt đầu ngay",
+    heroCtaSecondary: "Xem lãi suất tham khảo",
     ourSolution: "Giải pháp của chúng tôi",
     partnersEyebrow: "ĐỒNG HÀNH CÙNG",
     partnersTitle: "Đối tác & chương trình",

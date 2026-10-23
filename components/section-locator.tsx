@@ -52,7 +52,9 @@ export function SectionLocator() {
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.6, delay: 1, ease: "easeOut" }}
       aria-label={t("common.pageSections")}
-      className="fixed right-5 top-1/2 -translate-y-1/2 z-30 hidden lg:flex flex-col items-end gap-5"
+      // xl, not lg: between 1024 and 1280px the content runs nearly to the
+      // edge and even the dots sat on top of it.
+      className="fixed right-5 top-1/2 -translate-y-1/2 z-30 hidden xl:flex flex-col items-end gap-5"
     >
       {SECTIONS.map(({ id, labelKey }) => {
         const isActive = activeId === id;
@@ -66,10 +68,14 @@ export function SectionLocator() {
           >
             <span
               className={cn(
-                "whitespace-nowrap text-xs tracking-wider font-bold uppercase transition-all duration-300 select-none",
+                // Labels show on hover only: a label that stayed visible for
+                // the active section sat on top of the process cards. The
+                // active dot already says where you are. The pill keeps a
+                // hovered label legible over text.
+                "whitespace-nowrap rounded-full bg-background/80 backdrop-blur-sm px-2 py-0.5 text-xs tracking-wider font-bold uppercase transition-all duration-300 select-none opacity-0 translate-x-1.5 group-hover:opacity-100 group-hover:translate-x-0 group-focus-visible:opacity-100 group-focus-visible:translate-x-0",
                 isActive
-                  ? "text-emerald-600 dark:text-emerald-400 opacity-100 translate-x-0"
-                  : "text-zinc-500 dark:text-zinc-400 opacity-0 translate-x-1.5 group-hover:opacity-100 group-hover:translate-x-0",
+                  ? "text-emerald-600 dark:text-emerald-400"
+                  : "text-zinc-500 dark:text-zinc-400",
               )}
             >
               {t(labelKey)}

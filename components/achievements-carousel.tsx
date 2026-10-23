@@ -125,13 +125,9 @@ export function AchievementsCarousel({
                         src={currentAchievement.images[activeImageIndex]}
                         alt={currentAchievement.title}
                         fill
-                        className={`object-cover transition-transform duration-500 ${
-                          currentAchievement.images[activeImageIndex]?.includes(
-                            "sustainability-action-2",
-                          )
-                            ? "rotate-270 scale-[1.33] group-hover:scale-[1.40]"
-                            : "group-hover:scale-105"
-                        }`}
+                        // Contain, not cover: these are certificates and
+                        // posters, and cover cut their text off at the edges.
+                        className="object-contain transition-transform duration-500 group-hover:scale-105"
                         sizes="(max-width: 1024px) 100vw, 400px"
                       />
                       {/* Zoom Indicator */}
@@ -326,11 +322,7 @@ export function AchievementsCarousel({
                   src={lightboxImage}
                   alt={currentAchievement.title}
                   fill
-                  className={`object-contain transition-transform duration-300 ${
-                    lightboxImage.includes("sustainability-action-2")
-                      ? "rotate-270 scale-[0.75]"
-                      : ""
-                  }`}
+                  className="object-contain"
                   // The lightbox is capped at max-w-5xl (1024px), so `100vw`
                   // was asking the optimizer for a candidate several times
                   // wider than anything that gets painted.

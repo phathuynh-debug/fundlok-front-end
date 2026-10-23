@@ -37,7 +37,7 @@ export default function SiteHeader() {
       : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white";
 
   return (
-    <header className="sticky top-0 z-30 w-full bg-background/45 backdrop-blur-md border-b border-border/10 flex items-center justify-between px-6 py-4 md:px-12">
+    <header className="sticky top-0 z-30 w-full bg-background/45 backdrop-blur-md border-b border-border/10 flex items-center justify-between gap-4 px-4 sm:px-6 py-4 md:px-12 lg:px-8 xl:px-12">
       <Link
         href={localize("/")}
         className="flex items-center gap-2 group relative z-40"
@@ -45,12 +45,12 @@ export default function SiteHeader() {
         <Logo />
       </Link>
 
-      <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
+      <nav className="hidden lg:flex items-center gap-5 xl:gap-8">
         {NAV_LINKS.map(({ href, labelKey }) => (
           <Link
             key={href}
             href={localize(href)}
-            className={`transition-colors duration-200 text-sm font-medium ${linkClass(href)}`}
+            className={`whitespace-nowrap transition-colors duration-200 text-sm font-medium ${linkClass(href)}`}
           >
             {t(labelKey)}
           </Link>
@@ -63,7 +63,7 @@ export default function SiteHeader() {
         <ThemeToggle />
         <a
           href={localize("/login")}
-          className="rounded-full bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-6 py-2.5 text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"
+          className="whitespace-nowrap rounded-full bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-5 xl:px-6 py-2.5 text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"
         >
           {t("header.enterApp")}
         </a>
@@ -73,7 +73,9 @@ export default function SiteHeader() {
       <div className="flex lg:hidden items-center gap-2 relative z-30">
         <a
           href={localize("/login")}
-          className="w-full text-center rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-6 py-3.5 text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"
+          // A compact pill on one line: at w-full/py-3.5 the Vietnamese
+          // label wrapped onto two lines and took a third of the header.
+          className="whitespace-nowrap text-center rounded-full bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-4 py-2 text-xs sm:text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"
         >
           {t("header.enterApp")}
         </a>

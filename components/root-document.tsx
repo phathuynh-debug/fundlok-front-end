@@ -10,7 +10,6 @@ import {
   VercelSpeedInsights,
 } from "@/components/vercel-analytics";
 import {
-  ACCENT_COOKIE_NAME,
   DEFAULT_ACCENT,
   DEFAULT_RADIUS,
   RADIUS_COOKIE_NAME,
@@ -139,11 +138,16 @@ function localBusinessSchema(seo: SeoStrings) {
 
 /**
  * A prerendered page cannot read the appearance cookies on the server, so it
- * ships the defaults and this swaps in the visitor's choice before the body
- * paints — the same attributes the dynamic layout renders server-side. Only the static layout uses it: the
- * dynamic one would need a nonce for it, and has no need.
+ * ships the defaults and this swaps in the visitor's radius before the body
+ * paints — the same attribute the dynamic layout renders server-side. Only the
+ * static layout uses it: the dynamic one would need a nonce for it, and has no
+ * need.
+ *
+ * The ACCENT is deliberately not swapped in. The static layout is the marketing
+ * site, which keeps the brand colours whatever accent a signed-in user picked
+ * for their dashboard; the accent stays at DEFAULT_ACCENT, rendered below.
  */
-const APPEARANCE_SCRIPT = `(function(){try{var c=document.cookie,r=document.documentElement,m;if((m=c.match(/(?:^|; )${ACCENT_COOKIE_NAME}=([a-z-]+)/)))r.setAttribute("data-accent",m[1]);if((m=c.match(/(?:^|; )${RADIUS_COOKIE_NAME}=([a-z-]+)/)))r.setAttribute("data-radius",m[1]);}catch(e){}})();`;
+const APPEARANCE_SCRIPT = `(function(){try{var c=document.cookie,r=document.documentElement,m;if((m=c.match(/(?:^|; )${RADIUS_COOKIE_NAME}=([a-z-]+)/)))r.setAttribute("data-radius",m[1]);}catch(e){}})();`;
 
 export function RootDocument({
   locale,
@@ -212,6 +216,9 @@ export function RootDocument({
                   initialReduceMotion={appearance?.reduceMotion}
                   initialAccent={appearance?.accent}
                   initialRadius={appearance?.radius}
+                  // The marketing layout (no `appearance`): brand colours
+                  // only. See APPEARANCE_SCRIPT.
+                  applyAccent={Boolean(appearance)}
                 >
                   {/* The page's one <main> landmark. Section layouts and pages
                     use plain wrappers inside it, never a second <main>. */}

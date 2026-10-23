@@ -69,6 +69,7 @@ export function AppearanceProvider({
   initialReduceMotion,
   initialAccent,
   initialRadius,
+  applyAccent = true,
   children,
 }: {
   /**
@@ -80,6 +81,12 @@ export function AppearanceProvider({
   initialReduceMotion?: boolean;
   initialAccent?: AccentId;
   initialRadius?: RadiusId;
+  /**
+   * False on the marketing pages, which keep the brand accent. The chosen
+   * accent is then neither put on <html> nor written back to its cookie, so
+   * the dashboard still shows it.
+   */
+  applyAccent?: boolean;
   children: React.ReactNode;
 }) {
   const [reduceMotion, setReduceMotionState] = useState(
@@ -103,8 +110,8 @@ export function AppearanceProvider({
   }, [reduceMotion]);
 
   useEffect(() => {
-    persist("data-accent", ACCENT_COOKIE_NAME, accent);
-  }, [accent]);
+    if (applyAccent) persist("data-accent", ACCENT_COOKIE_NAME, accent);
+  }, [accent, applyAccent]);
 
   useEffect(() => {
     persist("data-radius", RADIUS_COOKIE_NAME, radius);

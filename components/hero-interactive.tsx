@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { m } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { GuillocheWaves } from "@/components/guilloche-waves";
 import Mockup from "@/components/mockup";
 import { useTranslations } from "@/lib/i18n";
@@ -11,12 +12,14 @@ type HeroInteractiveProps = {
   strings: {
     heroTitle: string;
     heroSubtitle: string;
+    heroCtaPrimary: string;
+    heroCtaSecondary: string;
     ourSolution: string;
   };
 };
 
 export function HeroInteractive({ strings }: HeroInteractiveProps) {
-  const { t } = useTranslations();
+  const { t, localize } = useTranslations();
   // The mockup showcases a single demo portal (FundLok's own terminal).
   // "Funding", not "Lending": FundLok arranges capital; it is not the lender.
   const partner = {
@@ -93,6 +96,29 @@ export function HeroInteractive({ strings }: HeroInteractiveProps) {
           >
             {strings.heroSubtitle}
           </m.p>
+          {/* The first screen's only action used to be "Enter app" in the
+              header. Sign-up is a plain <a>, like the header's: /login renders
+              per request, so a client-side transition buys nothing. */}
+          <m.div
+            initial={{ y: 10 }}
+            animate={{ y: 0 }}
+            transition={{ duration: 0.8, delay: 0.45, ease: "easeOut" }}
+            className="mt-4 flex flex-wrap items-center justify-center gap-3"
+          >
+            <a
+              href={localize("/login?mode=register")}
+              className="inline-flex items-center gap-2 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-5 py-2.5 text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"
+            >
+              {strings.heroCtaPrimary}
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </a>
+            <Link
+              href={localize("/rate")}
+              className="inline-flex items-center rounded-full border border-border bg-background/60 backdrop-blur-sm hover:border-emerald-500/50 hover:text-emerald-700 dark:hover:text-emerald-400 px-5 py-2.5 text-sm font-semibold text-foreground transition-all duration-300 active:scale-95"
+            >
+              {strings.heroCtaSecondary}
+            </Link>
+          </m.div>
         </m.div>
 
         {/* Interactive Mockup. Transform-only entrance for the same reason as
