@@ -27,6 +27,7 @@ import { ChangePasswordDialog } from "./ChangePasswordDialog";
 import { TwoFactorDisableDialog } from "./TwoFactorDisableDialog";
 import { TwoFactorSetupDialog } from "./TwoFactorSetupDialog";
 import { PasskeyDialog } from "./PasskeyDialog";
+import { LoginAlertsOffDialog } from "./LoginAlertsOffDialog";
 import { SecondFactorNotice } from "./SecondFactorNotice";
 import { apiErrorMessage } from "@/lib/api-error-message";
 import { isSecondFactorRequired } from "@/lib/second-factor";
@@ -139,6 +140,7 @@ export function SecuritySettings({
   const [totpSetupOpen, setTotpSetupOpen] = useState(false);
   const [totpDisableOpen, setTotpDisableOpen] = useState(false);
   const [passkeyDialogOpen, setPasskeyDialogOpen] = useState(false);
+  const [alertsOffOpen, setAlertsOffOpen] = useState(false);
 
   const { data: passkeys, isLoading: isPasskeysLoading } =
     usePasskeys(slicesEnabled);
@@ -187,8 +189,18 @@ export function SecuritySettings({
       return;
     }
     if (key !== "loginAlerts") return;
+    // Turning alerts off is confirmed first (LoginAlertsOffDialog); turning
+    // them back on is one click.
+    if (preferences?.signin_alerts_enabled) {
+      setAlertsOffOpen(true);
+      return;
+    }
+    saveSigninAlerts(true);
+  };
+
+  const saveSigninAlerts = (enabled: boolean) => {
     updatePreferences(
-      { signin_alerts_enabled: !(preferences?.signin_alerts_enabled ?? false) },
+      { signin_alerts_enabled: enabled },
       {
         onError: (error) =>
           toast({
@@ -330,6 +342,12 @@ export function SecuritySettings({
       <TwoFactorDisableDialog
         open={totpDisableOpen}
         onOpenChange={setTotpDisableOpen}
+      />
+
+      <LoginAlertsOffDialog
+        open={alertsOffOpen}
+        onOpenChange={setAlertsOffOpen}
+        onConfirm={() => saveSigninAlerts(false)}
       />
     </div>
   );

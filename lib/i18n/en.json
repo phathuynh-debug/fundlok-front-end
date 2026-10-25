@@ -1256,6 +1256,12 @@
           "password": "Password",
           "totp": "Two-factor authentication"
         },
+        "loginAlertsOff": {
+          "body": "We will stop emailing you when a device you have not used before signs in to your account. If someone else gets your password, you would only find out by checking this page.",
+          "confirm": "Turn off alerts",
+          "keep": "Keep alerts on",
+          "title": "Turn off sign-in alerts?"
+        },
         "saveFailedTitle": "Could not save that change",
         "state": {
           "off": "Off",

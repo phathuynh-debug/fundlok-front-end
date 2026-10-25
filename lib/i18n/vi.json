@@ -1256,6 +1256,12 @@
           "password": "Mật khẩu",
           "totp": "Xác thực hai lớp"
         },
+        "loginAlertsOff": {
+          "body": "Chúng tôi sẽ không gửi email cho bạn khi có đăng nhập từ thiết bị lạ nữa. Nếu người khác có được mật khẩu của bạn, bạn chỉ có thể phát hiện khi tự kiểm tra trang này.",
+          "confirm": "Tắt cảnh báo",
+          "keep": "Giữ cảnh báo",
+          "title": "Tắt cảnh báo đăng nhập?"
+        },
         "saveFailedTitle": "Không thể lưu thay đổi",
         "state": {
           "off": "Đang tắt",

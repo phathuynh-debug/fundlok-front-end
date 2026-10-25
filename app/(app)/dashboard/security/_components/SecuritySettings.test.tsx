@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { SecuritySettings } from "./SecuritySettings";
 
@@ -9,7 +10,10 @@ const account = vi.hoisted(() => ({
   secondFactorRequired: false,
   totpEnabled: false,
   passkeys: [] as { id: string; name: string }[],
+  signinAlertsEnabled: true,
 }));
+
+const savePreferences = vi.hoisted(() => vi.fn());
 
 const mutation = vi.hoisted(() => () => ({
   mutate: vi.fn(),
@@ -29,7 +33,9 @@ vi.mock("@/hooks/use-authentication", () => ({
       passkeys: account.passkeys,
       sessions: [],
       security_events: [],
-      security_preferences: { signin_alerts_enabled: false },
+      security_preferences: {
+        signin_alerts_enabled: account.signinAlertsEnabled,
+      },
     },
     isLoading: false,
     isFetched: true,
@@ -44,7 +50,10 @@ vi.mock("@/hooks/use-authentication", () => ({
     isLoading: false,
     isFetching: false,
   }),
-  useSecurityPreferences: () => ({ data: undefined, isLoading: false }),
+  useSecurityPreferences: () => ({
+    data: { signin_alerts_enabled: account.signinAlertsEnabled },
+    isLoading: false,
+  }),
   useTwoFactorStatus: () => ({
     data: { enabled: account.totpEnabled },
     isLoading: false,
@@ -56,7 +65,10 @@ vi.mock("@/hooks/use-authentication", () => ({
   }),
   useRevokeSession: mutation,
   useRevokeOtherSessions: mutation,
-  useUpdateSecurityPreferences: mutation,
+  useUpdateSecurityPreferences: () => ({
+    ...mutation(),
+    mutate: savePreferences,
+  }),
   useChangePassword: mutation,
   useCurrentUser: () => ({ data: { has_password: true } }),
   useStartTwoFactorSetup: mutation,
@@ -136,5 +148,85 @@ describe("SecuritySettings, admin without a second factor", () => {
     expect(
       screen.getByText("dashboard.security.protections.items.loginAlerts"),
     ).toBeInTheDocument();
+  });
+});
+
+describe("SecuritySettings, sign-in alerts", () => {
+  beforeEach(() => {
+    account.sessionsError = null;
+    account.totpEnabled = false;
+    account.passkeys = [];
+    account.signinAlertsEnabled = true;
+    savePreferences.mockClear();
+  });
+
+  const alertsRow = () =>
+    within(
+      screen
+        .getByText("dashboard.security.protections.items.loginAlerts")
+        .closest("li") as HTMLElement,
+    );
+
+  it("warns before turning alerts off, and saves only once confirmed", async () => {
+    const user = userEvent.setup();
+    render(<SecuritySettings />);
+
+    await user.click(
+      alertsRow().getByRole("button", {
+        name: "dashboard.security.protections.action.turnOff",
+      }),
+    );
+    const dialog = await screen.findByRole("alertdialog");
+    expect(
+      within(dialog).getByText(
+        "dashboard.security.protections.loginAlertsOff.body",
+      ),
+    ).toBeInTheDocument();
+    expect(savePreferences).not.toHaveBeenCalled();
+
+    await user.click(
+      within(dialog).getByRole("button", {
+        name: "dashboard.security.protections.loginAlertsOff.confirm",
+      }),
+    );
+    expect(savePreferences).toHaveBeenCalledTimes(1);
+    expect(savePreferences.mock.calls[0][0]).toEqual({
+      signin_alerts_enabled: false,
+    });
+  });
+
+  it("leaves alerts on when the warning is dismissed", async () => {
+    const user = userEvent.setup();
+    render(<SecuritySettings />);
+
+    await user.click(
+      alertsRow().getByRole("button", {
+        name: "dashboard.security.protections.action.turnOff",
+      }),
+    );
+    const dialog = await screen.findByRole("alertdialog");
+    await user.click(
+      within(dialog).getByRole("button", {
+        name: "dashboard.security.protections.loginAlertsOff.keep",
+      }),
+    );
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(savePreferences).not.toHaveBeenCalled();
+  });
+
+  it("turns alerts back on with one click, no warning", async () => {
+    account.signinAlertsEnabled = false;
+    const user = userEvent.setup();
+    render(<SecuritySettings />);
+
+    await user.click(
+      alertsRow().getByRole("button", {
+        name: "dashboard.security.protections.action.turnOn",
+      }),
+    );
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(savePreferences.mock.calls[0][0]).toEqual({
+      signin_alerts_enabled: true,
+    });
   });
 });
