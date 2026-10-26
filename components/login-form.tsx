@@ -79,11 +79,18 @@ export function LoginForm() {
           toast({
             variant: "destructive",
             title: t("auth.login.failedTitle"),
-            description: apiErrorMessage(
-              error,
-              locale,
-              t("auth.login.failedDescription"),
-            ),
+            // The two 429s get their own copy: on the Vietnamese site the
+            // fallback below would call a lockout a wrong password.
+            description:
+              error.code === "SIGN_IN_LOCKED"
+                ? t("auth.login.lockedDescription")
+                : error.code === "RATE_LIMITED"
+                  ? t("auth.login.rateLimitedDescription")
+                  : apiErrorMessage(
+                      error,
+                      locale,
+                      t("auth.login.failedDescription"),
+                    ),
           });
         },
       },

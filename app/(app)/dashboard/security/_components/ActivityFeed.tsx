@@ -41,6 +41,7 @@ const ACTION_KEYS: Record<string, string> = {
   SIGN_IN: "dashboard.security.activity.events.signIn",
   LOGIN: "dashboard.security.activity.events.signIn",
   SIGN_IN_FAILED: "dashboard.security.activity.events.failedAttempt",
+  SIGN_IN_LOCKED: "dashboard.security.activity.events.signInLocked",
   FAILED_ATTEMPT: "dashboard.security.activity.events.failedAttempt",
   LOGIN_FAILED: "dashboard.security.activity.events.failedAttempt",
   NEW_DEVICE: "dashboard.security.activity.events.newDevice",

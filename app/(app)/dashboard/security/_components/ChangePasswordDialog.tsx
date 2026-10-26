@@ -18,6 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
 import { apiErrorMessage } from "@/lib/api-error-message";
 import { isPasswordBreached, passwordProblem } from "@/lib/password-policy";
+import { isStepUpLocked } from "@/lib/step-up";
 
 export function ChangePasswordDialog({
   open,
@@ -84,15 +85,18 @@ export function ChangePasswordDialog({
             // its code first. Any other 400 is the backend refusing the
             // current password: say so in the user's language rather than a
             // generic failure, since it is an error the user can fix on the spot.
+            // Five wrong ones lock it for 15 minutes, like the other step-ups.
             isPasswordBreached(apiError)
               ? t("auth.passwordPolicy.breached")
-              : apiError?.status === 400
-                ? t("security.changePassword.errorWrongCurrent")
-                : apiErrorMessage(
-                    apiError,
-                    locale,
-                    t("security.changePassword.errorGeneric"),
-                  ),
+              : isStepUpLocked(apiError)
+                ? t("security.stepUp.locked")
+                : apiError?.status === 400
+                  ? t("security.changePassword.errorWrongCurrent")
+                  : apiErrorMessage(
+                      apiError,
+                      locale,
+                      t("security.changePassword.errorGeneric"),
+                    ),
           ),
       },
     );

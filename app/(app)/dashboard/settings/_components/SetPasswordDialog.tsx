@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useSetPassword } from "@/hooks/use-users";
 import { apiErrorMessage } from "@/lib/api-error-message";
 import { isPasswordBreached, passwordProblem } from "@/lib/password-policy";
+import { isReauthRequired } from "@/lib/step-up";
 import { useTranslations } from "@/lib/i18n";
 
 // Sets a FIRST password, for accounts created without one (OAuth sign-in).
@@ -24,6 +25,9 @@ import { useTranslations } from "@/lib/i18n";
 // changing an existing one goes through /forgot-password instead, where the
 // emailed token is the proof. The profile page only opens this dialog when
 // `has_password` is false; the backend enforces the same rule.
+//
+// The backend also wants a recent sign-in, as for adding 2FA: a first password
+// is enough to enrol an authenticator, so a borrowed session must not set one.
 interface SetPasswordDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -92,13 +96,15 @@ export function SetPasswordDialog({
           // disappears while the user is still looking at the form.
           const message = isPasswordBreached(err)
             ? t("auth.passwordPolicy.breached")
-            : apiErrorMessage(
-                err,
-                locale,
-                t(
-                  "dashboard.settings.profile.setPasswordDialog.failedDescription",
-                ),
-              );
+            : isReauthRequired(err)
+              ? t("dashboard.settings.profile.setPasswordDialog.reauthRequired")
+              : apiErrorMessage(
+                  err,
+                  locale,
+                  t(
+                    "dashboard.settings.profile.setPasswordDialog.failedDescription",
+                  ),
+                );
           setError(message);
           toast({
             variant: "destructive",
