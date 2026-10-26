@@ -3,6 +3,7 @@ import { Sidebar } from "@/components/sidebar";
 import { DashboardHeader } from "./_components/DashboardHeader";
 import { getServerTranslations } from "@/lib/i18n/server";
 import { ProductTour, ProductTourProvider } from "@/components/product-tour";
+import { NewNotificationsAlert } from "@/components/new-notifications-alert";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getServerTranslations();
@@ -41,6 +42,8 @@ export default function DashboardLayout({
         {/* First-run walkthrough. Renders nothing once dismissed, and nothing at
           all on a viewport where the sidebar is hidden. */}
         <ProductTour />
+
+        <NewNotificationsAlert />
       </div>
     </ProductTourProvider>
   );

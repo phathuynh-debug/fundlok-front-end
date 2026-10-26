@@ -63,11 +63,33 @@ const EVENT_PRESENTATION: Record<
   },
 };
 
-const TONE_CLASS: Record<NotificationTone, string> = {
+export const TONE_CLASS: Record<NotificationTone, string> = {
   info: "bg-muted text-muted-foreground",
   positive: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
   negative: "bg-destructive/10 text-destructive",
 };
+
+/**
+ * The icon, tone and sentence for one notification, shared by the bell's list
+ * and the new-notifications alert.
+ *
+ * A deployed backend can be ahead of a cached client, so an event this build
+ * has never heard of still renders as a dated, readable row rather than a
+ * blank one.
+ */
+export function presentNotification(
+  notification: AppNotification,
+  t: (key: string) => string,
+): { icon: LucideIcon; tone: NotificationTone; message: string } {
+  const presentation = EVENT_PRESENTATION[notification.event];
+  return {
+    icon: presentation?.icon ?? FileCheck2,
+    tone: presentation?.tone ?? "info",
+    message: presentation
+      ? t(presentation.messageKey)
+      : t("notifications.items.unknown"),
+  };
+}
 
 export function NotificationsPanel() {
   const { locale, t } = useTranslations();
@@ -174,15 +196,9 @@ function NotificationRow({
   t: (key: string, values?: Record<string, string | number>) => string;
   onRead: () => void;
 }) {
-  // A deployed backend can be ahead of a cached client, so an event this
-  // build has never heard of still renders as a dated, readable row rather
-  // than a blank one — and clicking it still clears the badge.
-  const presentation = EVENT_PRESENTATION[notification.event];
-  const Icon = presentation?.icon ?? FileCheck2;
-  const tone = presentation?.tone ?? "info";
-  const message = presentation
-    ? t(presentation.messageKey)
-    : t("notifications.items.unknown");
+  // An unknown event still renders (see presentNotification), and clicking it
+  // still clears the badge.
+  const { icon: Icon, tone, message } = presentNotification(notification, t);
   const isRead = notification.read_at !== null;
 
   return (

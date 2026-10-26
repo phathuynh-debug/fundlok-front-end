@@ -2352,6 +2352,12 @@
     "pageTitle": "Không tìm thấy trang"
   },
   "notifications": {
+    "alert": {
+      "acknowledge": "Đã xem",
+      "later": "Để sau",
+      "titleMany": "Bạn có {count} thông báo mới",
+      "titleOne": "Bạn có thông báo mới"
+    },
     "ariaLabel": "Thông báo",
     "ariaLabelUnread": "Thông báo, {count} chưa đọc",
     "empty": "Hiện chưa có gì mới.",

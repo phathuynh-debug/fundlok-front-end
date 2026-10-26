@@ -2352,6 +2352,12 @@
     "pageTitle": "Page not found"
   },
   "notifications": {
+    "alert": {
+      "acknowledge": "Got it",
+      "later": "Later",
+      "titleMany": "You have {count} new notifications",
+      "titleOne": "You have a new notification"
+    },
     "ariaLabel": "Notifications",
     "ariaLabelUnread": "Notifications, {count} unread",
     "empty": "Nothing new right now.",
