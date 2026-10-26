@@ -18,9 +18,14 @@ import {
 } from "@/lib/appearance";
 import { parseLocalePath } from "@/lib/locale-routing";
 
-// Loaded after hydration; see lib/motion-features.ts.
-const loadMotionFeatures = () =>
-  import("@/lib/motion-features").then((mod) => mod.default);
+// Loaded after hydration; see lib/motion-features.ts. One promise for the
+// whole app, so a component can wait on the very load LazyMotion waits on
+// (WelcomeCutscreen does).
+let motionFeatures: Promise<typeof import("@/lib/motion-features").default>;
+export const loadMotionFeatures = () =>
+  (motionFeatures ??= import("@/lib/motion-features").then(
+    (mod) => mod.default,
+  ));
 
 /**
  * The "reduce motion" preference, and the MotionConfig that enforces it.

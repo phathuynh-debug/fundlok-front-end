@@ -3,7 +3,10 @@
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { AnimatePresence, MotionConfig, m } from "framer-motion";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
-import { useAppearance } from "@/components/appearance-provider";
+import {
+  loadMotionFeatures,
+  useAppearance,
+} from "@/components/appearance-provider";
 import { WelcomeVisual } from "@/components/welcome/welcome-visuals";
 import {
   welcomeSlideKey,
@@ -119,6 +122,26 @@ export function WelcomeCutscreen({
     };
   }, []);
 
+  // The animation features load lazily (AppearanceProvider's LazyMotion).
+  // A slide change that lands in the same render as their arrival leaves the
+  // outgoing slide's exit unstarted: framer-motion only starts an exit when it
+  // sees the slide go from present to absent, and a feature attached mid-exit
+  // never sees that. AnimatePresence (mode="wait") then waits on it for good,
+  // and the next slide never mounts. Remounting AnimatePresence once the
+  // features are in drops any such slide; every slide after that mounts with
+  // them. LazyMotion subscribed to this promise first, so they are registered
+  // by the time this runs.
+  const [motionReady, setMotionReady] = useState(false);
+  useEffect(() => {
+    let mounted = true;
+    void loadMotionFeatures().then(() => {
+      if (mounted) setMotionReady(true);
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   // Keep focus on the forward control as slides change, so Enter/Space keeps
   // moving and a screen reader lands on the new slide's action.
   useEffect(() => {
@@ -203,7 +226,12 @@ export function WelcomeCutscreen({
         {/* The slide. Scrolls on its own if a small phone cannot fit it, so
             nothing is ever cut off. */}
         <div className="relative z-10 min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
-          <AnimatePresence mode="wait" custom={direction} initial={false}>
+          <AnimatePresence
+            key={motionReady ? "animated" : "loading"}
+            mode="wait"
+            custom={direction}
+            initial={false}
+          >
             <m.section
               key={slide.id}
               custom={direction}
