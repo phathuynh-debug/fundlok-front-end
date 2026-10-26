@@ -7,9 +7,8 @@ import { finishWelcome } from "../support/welcome";
 // The first-run welcome cutscreen: a full-screen, slide-by-slide explanation
 // of how FundLok works, shown before the dashboard tour. Its job is to make
 // sure every new user understands fixed daily repayment — so the load-bearing
-// checks are that it cannot be skipped on a first run, that the SME sequence
-// says what the repayment rules actually are, and that each role gets only
-// its own sequence.
+// checks are that the SME sequence says what the repayment rules actually are,
+// and that each role gets only its own sequence. A first run can be skipped.
 
 const firstRun =
   (user: "smeNoProject" | "investor") =>
@@ -53,23 +52,27 @@ test.describe("an SME arriving for the first time", () => {
     );
   });
 
-  test("cannot be skipped or closed on a first run", async ({ page }) => {
+  test("can be skipped on a first run", async ({ page }) => {
     await page.goto("/dashboard");
     const welcome = cutscreen(page);
     await expect(welcome).toBeVisible();
 
-    await expect(
-      welcome.getByRole("button", { name: t("welcome.common.close") }),
-    ).toHaveCount(0);
-    await page.keyboard.press("Escape");
-    await expect(welcome).toBeVisible();
-
-    // Dots ahead of the furthest slide reached are not a way round it.
+    // Dots ahead of the furthest slide reached still do not jump ahead: the
+    // way out is the close button or Escape, not a shortcut through.
     await expect(
       welcome.getByRole("button", {
         name: t("welcome.common.goToSlide", { n: 4 }),
       }),
     ).toBeDisabled();
+    await expect(
+      welcome.getByRole("button", { name: t("welcome.common.close") }),
+    ).toBeVisible();
+
+    // Skipping counts as finishing: on into the tour, which has its own Skip.
+    await page.keyboard.press("Escape");
+    await expect(page.getByText(t("welcome.common.hello.title"))).toHaveCount(
+      0,
+    );
   });
 
   test("moves with the arrow keys", async ({ page }) => {

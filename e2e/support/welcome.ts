@@ -5,7 +5,7 @@ import { t } from "./i18n";
 
 /**
  * Step through the first-run welcome cutscreen to its last slide and press
- * its call to action, the way a first-time user must: there is no skip.
+ * its call to action, the way a first-time user who reads it all does.
  *
  * Specs that exercise what comes AFTER the cutscreen (the dashboard tour) use
  * this; specs for the cutscreen itself drive it directly.

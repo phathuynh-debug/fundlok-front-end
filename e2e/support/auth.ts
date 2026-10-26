@@ -1,6 +1,7 @@
 import { test, type BrowserContext, type Page } from "@playwright/test";
 
 import type { StubUserKey } from "../stub-api/fixtures";
+import { dismissNotificationsAlert } from "./notifications";
 import { settle } from "./ui";
 
 /**
@@ -78,6 +79,8 @@ export async function signInAs(
   // and its scrim would swallow the clicks the rest of the suite depends on.
   // product-tour.spec.ts passes `skipTour: false` to exercise it.
   if (skipTour) await skipProductTour(context, domain);
+  // Same reasoning as the tour: an overlay these specs are not testing.
+  await dismissNotificationsAlert(context);
   await context.addCookies([
     {
       name: "access_token",
