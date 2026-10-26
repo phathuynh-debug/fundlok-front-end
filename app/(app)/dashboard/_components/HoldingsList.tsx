@@ -80,7 +80,6 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
         const chrome = getIndustryChrome(holding.industry, "list");
         const Icon = chrome.icon;
         const rank = rankMap.get(holding.id) ?? 1;
-        const isTopThree = rank <= 3;
 
         return (
           <m.li key={holding.id} variants={springItemVariants}>

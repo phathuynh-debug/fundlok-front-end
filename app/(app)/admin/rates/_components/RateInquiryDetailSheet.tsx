@@ -2,19 +2,15 @@
 
 import { useState } from "react";
 import {
-  Calendar,
   Check,
   Copy,
   Building2,
   DollarSign,
   TrendingUp,
-  Percent,
   Clock,
-  Users,
   Shield,
   FileSpreadsheet,
   Globe,
-  ExternalLink,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,7 +21,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { Separator } from "@/components/ui/separator";
 import { useTranslations } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format-currency";
 import type { RateInquiryAdminItem } from "@/services/rates.service";

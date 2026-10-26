@@ -15,7 +15,7 @@ import {
   ArrowLeft,
   ShieldCheck,
 } from "lucide-react";
-import { useForm, type Path } from "react-hook-form";
+import { useForm, useWatch, type Path } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -215,7 +215,7 @@ export default function ProjectApplicationClient() {
     trigger,
     getValues,
     setValue,
-    watch,
+    control,
     formState: { errors },
   } = useForm<ProjectApplicationValues>({
     resolver: zodResolver(projectApplicationSchema),
@@ -298,17 +298,22 @@ export default function ProjectApplicationClient() {
     setValue,
   ]);
 
-  const selectedIndustry = watch("industry");
-  const legalNameValue = watch("legal_name");
-  const taxIdValue = watch("tax_id");
-  const employeeCount = watch("employee_count");
+  // useWatch, not watch(): the React Compiler skips any component that calls
+  // watch(), so this whole form went unoptimised.
+  const selectedIndustry = useWatch({ control, name: "industry" });
+  const legalNameValue = useWatch({ control, name: "legal_name" });
+  const taxIdValue = useWatch({ control, name: "tax_id" });
+  const employeeCount = useWatch({ control, name: "employee_count" });
   const derivedCompanySize = companySizeForHeadcount(Number(employeeCount));
-  const requestedAmount = watch("loan.requested_amount");
-  const selectedDuration = watch("loan.duration_months");
-  const selectedRepayment = watch("loan.repayment_preference");
-  const streetValue = watch("address.street");
-  const selectedCity = watch("address.city");
-  const selectedCountry = watch("address.country");
+  const requestedAmount = useWatch({ control, name: "loan.requested_amount" });
+  const selectedDuration = useWatch({ control, name: "loan.duration_months" });
+  const selectedRepayment = useWatch({
+    control,
+    name: "loan.repayment_preference",
+  });
+  const streetValue = useWatch({ control, name: "address.street" });
+  const selectedCity = useWatch({ control, name: "address.city" });
+  const selectedCountry = useWatch({ control, name: "address.country" });
 
   // Derived, not stored: each notice describes what is currently in its step's
   // fields, so it retires itself once the SME has edited those values away from

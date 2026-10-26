@@ -92,16 +92,24 @@ export function TwoFactorSetupDialog({
   } = useStartTwoFactorSetup();
   const { mutate: enable, isPending: isEnabling } = useEnableTwoFactor();
 
+  // Back to the first step on every open, and again if the user loads after
+  // opening and turns out to need the password step. Set during render, as
+  // React recommends for state that follows a prop, not in the effect below.
+  const [stepFor, setStepFor] = useState({ open, firstStep });
+  if (open !== stepFor.open || firstStep !== stepFor.firstStep) {
+    setStepFor({ open, firstStep });
+    if (open) setStep(firstStep);
+  }
+
   // Minting a secret is a side effect, so it runs on open rather than on
   // render. The cleanup is what keeps a stale secret from being shown if the
   // dialog is closed and reopened. With a password to confirm, it runs from
   // the verify step instead.
   useEffect(() => {
     if (!open) return;
-    setStep(firstStep);
     if (!needsPassword) startSetup(undefined);
     return () => resetSetup();
-  }, [open, needsPassword, firstStep, startSetup, resetSetup]);
+  }, [open, needsPassword, startSetup, resetSetup]);
 
   const stepUpMessage = (apiError: unknown) =>
     isReauthRequired(apiError)

@@ -324,6 +324,7 @@ export default async function Page({ params }: { params: LangParams }) {
                         aria-label={logo.alt}
                         className="group flex items-center justify-center rounded-2xl border border-border/40 bg-card/60 dark:bg-white/[0.04] shadow-sm p-6 h-28 w-52 md:h-32 md:w-60 hover:-translate-y-1 hover:shadow-md hover:border-emerald-500/30 transition-all duration-300"
                       >
+                        {/* eslint-disable-next-line @next/next/no-img-element -- plain file from public/, edge-cached; see components/logo.tsx */}
                         <img
                           src={logo.src}
                           alt={logo.alt}
@@ -365,6 +366,7 @@ export default async function Page({ params }: { params: LangParams }) {
               {/* Team Member 1: Huy Pham */}
               <div className="flex flex-col bg-card border border-border rounded-2xl p-5 transition-colors duration-200">
                 <div className="relative aspect-square w-full rounded-2xl overflow-hidden mb-5 bg-slate-100 dark:bg-slate-800">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- plain file from public/, edge-cached; see components/logo.tsx */}
                   <img
                     src="/images/huy.webp"
                     width={672}
@@ -405,6 +407,7 @@ export default async function Page({ params }: { params: LangParams }) {
               {/* Team Member 2: Loc Vuong */}
               <div className="flex flex-col bg-card border border-border rounded-2xl p-5 transition-colors duration-200">
                 <div className="relative aspect-square w-full rounded-2xl overflow-hidden mb-5 bg-slate-100 dark:bg-slate-800">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- plain file from public/, edge-cached; see components/logo.tsx */}
                   <img
                     src="/images/loc.webp"
                     width={533}
@@ -445,6 +448,7 @@ export default async function Page({ params }: { params: LangParams }) {
               {/* Team Member 3: Edward Wong */}
               <div className="flex flex-col bg-card border border-border rounded-2xl p-5 transition-colors duration-200">
                 <div className="relative aspect-square w-full rounded-2xl overflow-hidden mb-5 bg-slate-100 dark:bg-slate-800">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- plain file from public/, edge-cached; see components/logo.tsx */}
                   <img
                     src="/images/edward.webp"
                     width={800}

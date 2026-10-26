@@ -9,7 +9,11 @@ import { NOTIFICATION_ENDPOINTS } from "@/lib/endpoints";
  * added with it. Unknown values are still handled at the render site, because
  * a deployed backend can be ahead of a cached client.
  */
-export type NotificationEvent = "APPLICATION_APPROVED" | "APPLICATION_REJECTED";
+export type NotificationEvent =
+  | "APPLICATION_APPROVED"
+  | "APPLICATION_REJECTED"
+  /** `data.check` is "KYC" (investor) or "KYB" (SME). */
+  | "VERIFICATION_REQUIRED";
 
 export interface AppNotification {
   id: string;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Fingerprint, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -60,9 +60,13 @@ export function PasskeyDialog({
 
   // The dialog stays mounted while closed, so a typed password would still
   // be filled in for whoever opens it next. Only a success cleared it.
-  useEffect(() => {
+  // Cleared during render when `open` turns false, as React recommends for
+  // state that follows a prop, rather than in an effect.
+  const [wasOpen, setWasOpen] = useState(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
     if (!open) setPassword("");
-  }, [open]);
+  }
 
   const { data: user } = useCurrentUser(open);
   // Adding a way to sign in needs the password, not just the session: a

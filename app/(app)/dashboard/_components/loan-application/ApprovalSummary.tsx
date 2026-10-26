@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import {
   AnimatePresence,
   animate,
@@ -139,6 +139,12 @@ function seenBefore(id: string): boolean {
   }
 }
 
+// The seen flag only changes through `close` below, which re-renders anyway,
+// so there is nothing to listen for.
+function subscribeToNothing() {
+  return () => {};
+}
+
 function markSeen(id: string) {
   try {
     window.localStorage.setItem(SEEN_KEY(id), "1");
@@ -195,15 +201,21 @@ export function ApprovalCelebration({
   t: (key: string) => string;
 }) {
   const reduce = useReducedMotion();
-  // Read after mount: localStorage does not exist during server render.
-  const [open, setOpen] = useState(false);
-  useEffect(() => {
-    if (!seenBefore(applicationId)) setOpen(true);
-  }, [applicationId]);
+  // localStorage does not exist during server render, so the server answers
+  // "seen" and the celebration first appears on the client, as before.
+  const seen = useSyncExternalStore(
+    subscribeToNothing,
+    () => seenBefore(applicationId),
+    () => true,
+  );
+  // Closed in this visit. Keyed by application so a different one still
+  // celebrates.
+  const [closedFor, setClosedFor] = useState<string | null>(null);
+  const open = !seen && closedFor !== applicationId;
 
   const close = () => {
     markSeen(applicationId);
-    setOpen(false);
+    setClosedFor(applicationId);
     document.querySelector('[data-testid="approval-summary"]')?.scrollIntoView({
       behavior: reduce ? "auto" : "smooth",
       block: "center",

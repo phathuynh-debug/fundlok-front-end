@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { NotificationsPanel } from "./notifications-panel";
@@ -182,5 +182,113 @@ describe("NotificationsPanel", () => {
     await userEvent.hover(screen.getAllByRole("button")[0]);
 
     expect(await screen.findByText("notifications.empty")).toBeInTheDocument();
+  });
+});
+
+describe("NotificationsPanel — verification reminder", () => {
+  const reminder = (check: "KYC" | "KYB") =>
+    notification({
+      id: "r1",
+      event: "VERIFICATION_REQUIRED",
+      entity_type: "USER",
+      entity_id: "u1",
+      data: { check },
+    });
+
+  it.each([
+    ["KYB", "notifications.items.verificationRequiredKyb"],
+    ["KYC", "notifications.items.verificationRequiredKyc"],
+  ] as const)("words a %s reminder for that check", async (check, copy) => {
+    listResult.data = { items: [reminder(check)], unread: 1 };
+    render(<NotificationsPanel />);
+    await userEvent.hover(screen.getAllByRole("button")[0]);
+
+    expect(await screen.findByText(copy)).toBeInTheDocument();
+  });
+
+  it("links to verification without marking the reminder read", async () => {
+    // The API marks it read once the verification is submitted; a click
+    // alone has not done what it asks.
+    listResult.data = { items: [reminder("KYB")], unread: 1 };
+    render(<NotificationsPanel />);
+    await userEvent.hover(screen.getAllByRole("button")[0]);
+
+    const link = await screen.findByRole("link", {
+      name: /notifications\.items\.verificationRequiredKyb/,
+    });
+    expect(link).toHaveAttribute("href", "/kyc");
+    await userEvent.click(link);
+    expect(markRead).not.toHaveBeenCalled();
+  });
+});
+
+describe("NotificationsPanel — new-notification label", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("says so beside the bell when something is unread", () => {
+    render(<NotificationsPanel />);
+    expect(
+      screen.getByText("notifications.alert.titleOne"),
+    ).toBeInTheDocument();
+  });
+
+  it("counts several", () => {
+    listResult.data = {
+      items: [notification(), notification({ id: "n3" })],
+      unread: 2,
+    };
+    render(<NotificationsPanel />);
+    expect(
+      screen.getByText('notifications.alert.titleMany:{"count":2}'),
+    ).toBeInTheDocument();
+  });
+
+  it("stays quiet when nothing is unread", () => {
+    listResult.data = {
+      items: [notification({ read_at: "2026-09-20" })],
+      unread: 0,
+    };
+    render(<NotificationsPanel />);
+    expect(screen.queryByText("notifications.alert.titleOne")).toBeNull();
+  });
+
+  it("goes after a few seconds and leaves the dot", () => {
+    vi.useFakeTimers();
+    render(<NotificationsPanel />);
+    expect(
+      screen.getByText("notifications.alert.titleOne"),
+    ).toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+
+    expect(screen.queryByText("notifications.alert.titleOne")).toBeNull();
+    // Still unread: only the label went.
+    expect(
+      screen.getByRole("button", {
+        name: 'notifications.ariaLabelUnread:{"count":1}',
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("comes back when another one arrives", () => {
+    vi.useFakeTimers();
+    const { rerender } = render(<NotificationsPanel />);
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+
+    listResult.data = {
+      items: [notification({ id: "n3" }), notification()],
+      unread: 2,
+    };
+    rerender(<NotificationsPanel />);
+
+    expect(
+      screen.getByText('notifications.alert.titleMany:{"count":2}'),
+    ).toBeInTheDocument();
   });
 });

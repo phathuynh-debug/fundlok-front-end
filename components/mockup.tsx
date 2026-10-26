@@ -220,6 +220,7 @@ export default function Mockup(props: MockupProps) {
               frame reserves its box before the bytes land; `fetchPriority` is
               high because on a wide viewport this is the largest thing above
               the fold, i.e. the LCP element. */}
+        {/* eslint-disable-next-line @next/next/no-img-element -- plain file from public/, edge-cached; see components/logo.tsx */}
         <img
           src="/images/macbook.webp"
           // Decorative frame around the product screenshot.

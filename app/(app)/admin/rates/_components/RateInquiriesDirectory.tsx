@@ -5,14 +5,12 @@ import {
   Calculator,
   ChevronLeft,
   ChevronRight,
-  Filter,
   RefreshCw,
   Search,
   ShieldCheck,
   TrendingUp,
   DollarSign,
   Eye,
-  SlidersHorizontal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

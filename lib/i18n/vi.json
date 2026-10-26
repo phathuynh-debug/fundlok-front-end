@@ -2352,6 +2352,9 @@
     "pageTitle": "Không tìm thấy trang"
   },
   "notifications": {
+    "actions": {
+      "verify": "Xác minh ngay"
+    },
     "alert": {
       "acknowledge": "Đã xem",
       "later": "Để sau",
@@ -2364,7 +2367,9 @@
     "items": {
       "applicationApproved": "Hồ sơ đề nghị vay của bạn đã được duyệt.",
       "applicationRejected": "Hồ sơ đề nghị vay của bạn chưa được duyệt.",
-      "unknown": "Tài khoản của bạn có cập nhật mới."
+      "unknown": "Tài khoản của bạn có cập nhật mới.",
+      "verificationRequiredKyb": "Hãy xác minh doanh nghiệp (KYB) để có thể gửi hồ sơ đề nghị vay.",
+      "verificationRequiredKyc": "Hãy xác minh danh tính (KYC) để có thể bắt đầu đầu tư."
     },
     "markAllRead": "Đánh dấu tất cả đã đọc",
     "title": "Thông báo"

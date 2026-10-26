@@ -28,6 +28,19 @@ vi.mock("@/hooks/use-notifications", () => ({
   useMarkAllNotificationsRead: () => ({ mutate: markAllRead }),
 }));
 
+// The dialog waits for the first-run welcome and the tour; most tests are
+// about an account that has been through both.
+let firstRunStatus: "pending" | "seen" | "unseen";
+let tourOpen: boolean;
+
+vi.mock("@/hooks/use-product-tour", () => ({
+  useFirstRunStatus: () => ({ role: "SME", status: firstRunStatus }),
+}));
+
+vi.mock("@/components/product-tour", () => ({
+  useProductTourControls: () => ({ isOpen: tourOpen }),
+}));
+
 const notification = (over: Partial<NotificationList["items"][0]> = {}) => ({
   id: "n1",
   event: "APPLICATION_APPROVED" as const,
@@ -42,6 +55,8 @@ const notification = (over: Partial<NotificationList["items"][0]> = {}) => ({
 beforeEach(() => {
   markRead.mockClear();
   markAllRead.mockClear();
+  firstRunStatus = "seen";
+  tourOpen = false;
   listResult = {
     data: {
       items: [
@@ -122,5 +137,71 @@ describe("NewNotificationsAlert", () => {
     await waitFor(() =>
       expect(screen.queryByText("notifications.alert.titleOne")).toBeNull(),
     );
+  });
+});
+
+describe("NewNotificationsAlert — verification reminder", () => {
+  it("offers a way straight to verification", () => {
+    listResult.data = {
+      items: [
+        notification({
+          id: "r1",
+          event: "VERIFICATION_REQUIRED",
+          entity_type: "USER",
+          entity_id: "u1",
+          data: { check: "KYC" },
+        }),
+      ],
+      unread: 1,
+    };
+    render(<NewNotificationsAlert />);
+
+    expect(
+      screen.getByText("notifications.items.verificationRequiredKyc"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "notifications.actions.verify" }),
+    ).toHaveAttribute("href", "/kyc");
+  });
+});
+
+describe("NewNotificationsAlert — placement and timing", () => {
+  it("opens as a dialog, titled by its heading", () => {
+    render(<NewNotificationsAlert />);
+    expect(
+      screen.getByRole("dialog", { name: "notifications.alert.titleOne" }),
+    ).toBeInTheDocument();
+  });
+
+  it("closes on Escape without marking anything read", async () => {
+    render(<NewNotificationsAlert />);
+    await userEvent.keyboard("{Escape}");
+
+    expect(markRead).not.toHaveBeenCalled();
+    expect(markAllRead).not.toHaveBeenCalled();
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+  });
+
+  it.each(["unseen", "pending"] as const)(
+    "waits while the first run is %s, so it never covers the welcome",
+    (status) => {
+      firstRunStatus = status;
+      render(<NewNotificationsAlert />);
+      expect(screen.queryByRole("dialog")).toBeNull();
+    },
+  );
+
+  it("waits while the tour is open", () => {
+    tourOpen = true;
+    render(<NewNotificationsAlert />);
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  it("opens once the tour is done", () => {
+    tourOpen = true;
+    const { rerender } = render(<NewNotificationsAlert />);
+    tourOpen = false;
+    rerender(<NewNotificationsAlert />);
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 });

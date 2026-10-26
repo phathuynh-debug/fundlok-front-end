@@ -27,6 +27,7 @@ export default function Logo({
           fetched, so a light-mode visitor never pays for the dark mark. The
           light one stays eager + high priority because it is the first thing
           painted in the header. */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- deliberate, see the note above LIGHT_SRC */}
       <img
         src={LIGHT_SRC}
         alt={alt}
@@ -36,6 +37,7 @@ export default function Logo({
         decoding="async"
         className="absolute pl-5 inset-0 h-full w-full object-contain dark:hidden"
       />
+      {/* eslint-disable-next-line @next/next/no-img-element -- deliberate, see the note above LIGHT_SRC */}
       <img
         src={DARK_SRC}
         alt={alt}
