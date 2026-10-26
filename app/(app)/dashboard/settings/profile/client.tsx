@@ -85,10 +85,15 @@ export function ProfileClient() {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema(t)),
-    defaultValues: { full_name: "", phone: "", bio: "", email_signature: "" },
+    defaultValues: {
+      full_name: user?.full_name ?? "",
+      phone: user?.phone ?? "",
+      bio: user?.bio ?? "",
+      email_signature: user?.email_signature ?? "",
+    },
   });
 
   const isSaving = updateProfile.isPending;
@@ -104,6 +109,16 @@ export function ProfileClient() {
     setIsEditing(true);
   };
 
+  const cancelEditing = () => {
+    reset({
+      full_name: user?.full_name ?? "",
+      phone: user?.phone ?? "",
+      bio: user?.bio ?? "",
+      email_signature: user?.email_signature ?? "",
+    });
+    setIsEditing(false);
+  };
+
   const onSubmit = (values: ProfileFormValues) => {
     updateProfile.mutate(
       {
@@ -113,8 +128,14 @@ export function ProfileClient() {
         email_signature: values.email_signature || null,
       },
       {
-        onSuccess: () => {
+        onSuccess: (updatedUser) => {
           setIsEditing(false);
+          reset({
+            full_name: updatedUser.full_name ?? "",
+            phone: updatedUser.phone ?? "",
+            bio: updatedUser.bio ?? "",
+            email_signature: updatedUser.email_signature ?? "",
+          });
           toast({
             title: t("dashboard.settings.profile.updatedTitle"),
             description: t("dashboard.settings.profile.updatedDescription"),
@@ -170,7 +191,7 @@ export function ProfileClient() {
                       size="sm"
                       className="gap-2"
                       disabled={isSaving}
-                      onClick={() => setIsEditing(false)}
+                      onClick={cancelEditing}
                     >
                       <X className="h-3.5 w-3.5" />
                       <span className="hidden sm:inline">
@@ -181,7 +202,7 @@ export function ProfileClient() {
                       type="submit"
                       size="sm"
                       className="gap-2"
-                      disabled={isSaving}
+                      disabled={isSaving || !isDirty}
                     >
                       {isSaving ? (
                         <Loader2 className="h-3.5 w-3.5 animate-spin" />

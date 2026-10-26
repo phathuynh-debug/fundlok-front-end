@@ -62,6 +62,20 @@ test("the email address stays locked even in edit mode", async ({ page }) => {
   await expect(emailField(page)).not.toBeEditable();
 });
 
+test("the save button is disabled until changes are made", async ({ page }) => {
+  await page
+    .getByRole("button", { name: t("dashboard.settings.profile.editProfile") })
+    .click();
+
+  const saveBtn = page.getByRole("button", {
+    name: t("dashboard.settings.profile.save"),
+  });
+  await expect(saveBtn).toBeDisabled();
+
+  await fullNameField(page).fill("Renamed In E2E");
+  await expect(saveBtn).toBeEnabled();
+});
+
 test("saving a new name confirms the change", async ({ page }) => {
   await page
     .getByRole("button", { name: t("dashboard.settings.profile.editProfile") })
