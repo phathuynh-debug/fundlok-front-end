@@ -12,6 +12,19 @@
   // Objects, which is what the old PartyKit CLI tried to create.
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Main"] }],
 
+  // Workers Logs: one invocation log per request (each socket connect and each
+  // backend publish), searchable in the dashboard. Set here and not only in the
+  // dashboard, or the next deploy from the Vercel build turns it back off.
+  // Inherited by env.staging.
+  "observability": {
+    // Sockets connect with ?token=<realtime JWT>; keep it out of stored logs.
+    "redact_query_string": true,
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true,
+    },
+  },
+
   "env": {
     // `wrangler deploy --env staging`: a SEPARATE worker with its own Durable
     // Object namespace and its own secrets, so staging can never reach (or be
