@@ -119,8 +119,14 @@ export function ProductTourProvider({
         {children}
         {role && hasWelcome && (
           <>
+            {/* Skipping a first run counts as finishing it: on into the
+                tour, which has its own Skip, and the first run is recorded. */}
             {firstRunWelcome && !welcomeReplaying && (
-              <WelcomeCutscreen role={role} onFinish={finishFirstRun} />
+              <WelcomeCutscreen
+                role={role}
+                onFinish={finishFirstRun}
+                onClose={finishFirstRun}
+              />
             )}
             {welcomeReplaying && (
               <WelcomeCutscreen

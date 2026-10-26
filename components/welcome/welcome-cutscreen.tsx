@@ -15,10 +15,10 @@ import type { SelectableRole } from "@/services/authentication.service";
 
 /**
  * The first-run welcome: a full-screen, slide-by-slide walk through how
- * FundLok works, modelled on Apple's "hello" setup screen. It is deliberately
- * slow — arrows (buttons, keyboard or swipe) and no skip on a first run —
- * because the daily repayment mechanism is the one thing every user must
- * understand before they act.
+ * FundLok works, modelled on Apple's "hello" setup screen. It moves one slide
+ * at a time — arrows (buttons, keyboard or swipe) — because the daily
+ * repayment mechanism is the one thing every user must understand before they
+ * act, but it can always be skipped, first run included.
  *
  * Always the dark brand stage (`dark brand-stage`), whatever the app theme:
  * Handbook §7.3 puts the brand on dark grounds.
@@ -41,11 +41,8 @@ export function WelcomeCutscreen({
   role: SelectableRole;
   /** The last slide's call to action. */
   onFinish: () => void;
-  /**
-   * Offered only on a replay. A first run has no way out but through: the
-   * user asked for that, so the explanation is actually read.
-   */
-  onClose?: () => void;
+  /** The close button and Escape: skips the rest of the cutscreen. */
+  onClose: () => void;
 }) {
   const { t, locale, setLocale } = useTranslations();
   const { reduceMotion } = useAppearance();
@@ -71,7 +68,7 @@ export function WelcomeCutscreen({
   };
   const back = () => goTo(index - 1);
 
-  // Arrow keys move between slides and Escape closes only a replay. Listened
+  // Arrow keys move between slides and Escape closes. Listened
   // for on the document, not the dialog: focus only moves inside one frame
   // after mount (see the effect below), and a key pressed before then landed
   // on <body> and was lost. The cutscreen covers the page and is modal, so
@@ -83,7 +80,7 @@ export function WelcomeCutscreen({
     } else if (event.key === "ArrowLeft") {
       event.preventDefault();
       back();
-    } else if (event.key === "Escape" && onClose) {
+    } else if (event.key === "Escape") {
       onClose();
     }
   });
@@ -163,7 +160,7 @@ export function WelcomeCutscreen({
           <div className="absolute -bottom-40 -right-24 h-[28rem] w-[28rem] rounded-full bg-brand-blue/10 blur-3xl" />
         </div>
 
-        {/* Top bar: progress, and a close button on a replay only. */}
+        {/* Top bar: progress, and a close button. */}
         <div className="relative z-10 flex h-14 shrink-0 items-center justify-center px-4 sm:h-16">
           <p className="sr-only" aria-live="polite">
             {t("welcome.common.progress", {
@@ -193,16 +190,14 @@ export function WelcomeCutscreen({
               />
             ))}
           </div>
-          {onClose && (
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label={t("welcome.common.close")}
-              className="absolute right-3 flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:right-5"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={t("welcome.common.close")}
+            className="absolute right-3 flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:right-5"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
 
         {/* The slide. Scrolls on its own if a small phone cannot fit it, so
