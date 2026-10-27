@@ -263,7 +263,8 @@
         "COMPANY_BRANCH": "Chi nhánh công ty",
         "HOUSEHOLD": "Hộ kinh doanh"
       },
-      "empty": "Không có lượt xác minh doanh nghiệp nào đang chờ duyệt.",
+      "empty": "Không có lượt xác minh doanh nghiệp nào cần xử lý.",
+      "emptyAll": "Chưa có lượt xác minh doanh nghiệp nào.",
       "emptyOther": "Không có lượt xác minh doanh nghiệp nào ở trạng thái này.",
       "fields": {
         "address": "Địa chỉ",
@@ -311,7 +312,8 @@
       "decisionHeading": "Quyết định của bạn",
       "detailLoadFailed": "Không thể tải chi tiết lượt xác minh danh tính. Vui lòng thử lại.",
       "detailsRequired": "Nhập số giấy tờ và họ tên trên thẻ để duyệt.",
-      "empty": "Không có lượt xác minh nào đang chờ xét duyệt.",
+      "empty": "Không có lượt xác minh danh tính nào cần xử lý.",
+      "emptyAll": "Chưa có lượt xác minh danh tính nào.",
       "emptyOther": "Không có lượt xác minh nào ở trạng thái này.",
       "faceMatchValue": "Tương đồng {score}%",
       "fields": {
@@ -324,6 +326,12 @@
         "nameOnCard": "Tên trên thẻ",
         "submitted": "Ngày gửi",
         "verified": "Ngày xác minh"
+      },
+      "filters": {
+        "ALL": "Tất cả trạng thái",
+        "APPROVED": "Đã duyệt",
+        "MANUAL_REVIEW": "Cần xử lý",
+        "REJECTED": "Đã từ chối"
       },
       "idNumberInvalid": "Số giấy tờ phải gồm 9 hoặc 12 chữ số.",
       "imageMissing": "Không được lưu",
@@ -339,6 +347,7 @@
       "inputIdNumber": "Số CCCD hoặc CMND",
       "kindKyb": "Doanh nghiệp (KYB)",
       "kindKyc": "Danh tính (KYC)",
+      "kindLabel": "Loại xác minh",
       "manualBanner": "Chế độ duyệt thủ công đang bật. Hệ thống không dùng nhà cung cấp xác minh, nên mọi lượt gửi KYC và KYB mới đều chờ quyết định tại đây.",
       "manualMode": "Chế độ thủ công",
       "noConflict": "Hiện không còn trùng",
@@ -355,7 +364,7 @@
       "selfBlocked": "Bạn không thể tự xét duyệt lượt xác minh của chính mình.",
       "sheetSubtitle": "Kiểm tra CCCD và ảnh chân dung đã gửi trước khi quyết định.",
       "sheetTitle": "Xác minh danh tính",
-      "subtitle": "Các lượt xác minh danh tính (KYC) và doanh nghiệp (KYB) đang chờ người duyệt: những lượt nhà cung cấp không tự quyết được, và mọi lượt gửi khi đang ở chế độ duyệt thủ công.",
+      "subtitle": "Các lượt xác minh danh tính (KYC) và doanh nghiệp (KYB). Những lượt cần xử lý được xếp lên đầu: nhà cung cấp không tự quyết được, hoặc được gửi khi đang ở chế độ duyệt thủ công.",
       "table": {
         "conflicts": "Lý do gắn cờ",
         "idNumber": "Số CCCD",
@@ -363,11 +372,6 @@
         "nameOnCard": "Tên trên thẻ",
         "status": "Trạng thái",
         "submitted": "Ngày gửi"
-      },
-      "tabs": {
-        "APPROVED": "Đã duyệt",
-        "MANUAL_REVIEW": "Chờ xét duyệt",
-        "REJECTED": "Đã từ chối"
       },
       "title": "Xét duyệt KYC / KYB",
       "whyDuplicate": "Số CCCD này đã được xác minh trên một tài khoản FundLok khác. Ảnh cắt từ CCCD của người khác vẫn có thể qua bước so khớp khuôn mặt, vì vậy hãy kiểm tra hai tài khoản có cùng một người trước khi duyệt.",
@@ -384,7 +388,8 @@
       "perPage": "Mỗi trang",
       "prev": "Trước",
       "projects": "dự án",
-      "users": "người dùng"
+      "users": "người dùng",
+      "verifications": "lượt xác minh"
     },
     "preview": {
       "applicationDecided": "Đã ghi nhận quyết định",

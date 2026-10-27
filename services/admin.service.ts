@@ -145,6 +145,16 @@ export interface AdminKybVerification {
 export type AdminKycStatus =
   "MANUAL_REVIEW" | "APPROVED" | "REJECTED" | "FAILED";
 
+/** The review lists' filter: one status, or ALL (in review, approved and
+ *  rejected together, the ones needing action first). */
+export type AdminReviewFilter = AdminKycStatus | "ALL";
+
+export interface AdminReviewListParams {
+  status: AdminReviewFilter;
+  page: number;
+  page_size: number;
+}
+
 /** The three images an attempt stores, in the order a reviewer reads them. */
 export const KYC_IMAGE_NAMES = ["id_front", "id_back", "portrait"] as const;
 export type AdminKycImageName = (typeof KYC_IMAGE_NAMES)[number];
@@ -469,11 +479,12 @@ export const adminService = {
     );
   },
 
-  // Admin only. KYC attempts in one status, oldest first (the queue order).
-  getKycVerifications(status: AdminKycStatus = "MANUAL_REVIEW") {
-    return apiClient.get<AdminKycVerification[]>(
+  // Admin only. One page of KYC attempts: those needing action first and
+  // oldest first (the queue order), decided ones after, newest first.
+  getKycVerifications(params: AdminReviewListParams) {
+    return apiClient.get<AdminTable<AdminKycVerification>>(
       ADMIN_ENDPOINTS.kycVerifications,
-      { params: { status } },
+      { params },
     );
   },
 
@@ -500,11 +511,12 @@ export const adminService = {
     );
   },
 
-  // Admin only. Oldest first; defaults to the review queue.
-  getKybVerifications(status: AdminKycStatus = "MANUAL_REVIEW") {
-    return apiClient.get<AdminKybReview[]>(ADMIN_ENDPOINTS.kybVerifications, {
-      params: { status },
-    });
+  // Admin only. One page of KYB attempts, in the same order as KYC.
+  getKybVerifications(params: AdminReviewListParams) {
+    return apiClient.get<AdminTable<AdminKybReview>>(
+      ADMIN_ENDPOINTS.kybVerifications,
+      { params },
+    );
   },
 
   getKybVerification(verificationId: string) {

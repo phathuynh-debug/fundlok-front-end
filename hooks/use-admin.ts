@@ -19,13 +19,14 @@ import {
   type AdminKybVerification,
   type AdminKycImageName,
   type AdminKycImageUrl,
-  type AdminKycStatus,
   type AdminKycResolvePayload,
   type AdminKycVerification,
   type AdminLoanApplication,
   type AdminOverview,
   type AdminOverviewParams,
   type AdminProjectDetail,
+  type AdminReviewListParams,
+  type AdminTable,
   type AdminUserDetail,
   type AdminUserFullDetail,
   type AdminUserStatusPayload,
@@ -52,13 +53,13 @@ export const adminKeys = {
     [...adminKeys.all, "project", projectId] as const,
   userDetail: (userId: string) => [...adminKeys.all, "user", userId] as const,
   kycAll: () => [...adminKeys.all, "kyc"] as const,
-  kycQueue: (status: AdminKycStatus) =>
-    [...adminKeys.kycAll(), "list", status] as const,
+  kycQueue: (params: AdminReviewListParams) =>
+    [...adminKeys.kycAll(), "list", params] as const,
   kycVerification: (id: string) =>
     [...adminKeys.kycAll(), "detail", id] as const,
   kybAll: () => [...adminKeys.all, "kyb"] as const,
-  kybQueue: (status: AdminKycStatus) =>
-    [...adminKeys.kybAll(), "list", status] as const,
+  kybQueue: (params: AdminReviewListParams) =>
+    [...adminKeys.kybAll(), "list", params] as const,
   kybVerification: (id: string) =>
     [...adminKeys.kybAll(), "detail", id] as const,
   kybCertificate: (id: string) =>
@@ -238,12 +239,10 @@ export function useAdminDocumentUrl(documentId: string | null) {
 
 // KYC attempts in one status. Defaults to the review queue; staleTime is short
 // because the queue is worked by several people.
-export function useAdminKycVerifications(
-  status: AdminKycStatus = "MANUAL_REVIEW",
-) {
-  return useQuery<AdminKycVerification[], ApiError>({
-    queryKey: adminKeys.kycQueue(status),
-    queryFn: () => adminService.getKycVerifications(status),
+export function useAdminKycVerifications(params: AdminReviewListParams) {
+  return useQuery<AdminTable<AdminKycVerification>, ApiError>({
+    queryKey: adminKeys.kycQueue(params),
+    queryFn: () => adminService.getKycVerifications(params),
     staleTime: 15 * 1000,
     retry: false,
     placeholderData: keepPreviousData,
@@ -288,10 +287,10 @@ export function useResolveKycVerification() {
 
 // ---------- KYB review queue ----------
 
-export function useAdminKybVerifications(status: AdminKycStatus) {
-  return useQuery<AdminKybReview[], ApiError>({
-    queryKey: adminKeys.kybQueue(status),
-    queryFn: () => adminService.getKybVerifications(status),
+export function useAdminKybVerifications(params: AdminReviewListParams) {
+  return useQuery<AdminTable<AdminKybReview>, ApiError>({
+    queryKey: adminKeys.kybQueue(params),
+    queryFn: () => adminService.getKybVerifications(params),
     staleTime: 30 * 1000,
     retry: false,
     placeholderData: keepPreviousData,

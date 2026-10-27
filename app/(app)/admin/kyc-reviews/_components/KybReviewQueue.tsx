@@ -2,27 +2,34 @@
 
 import { useState } from "react";
 
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DataTable, type Column } from "../../_components/DataTable";
+import { TablePager } from "../../_components/TablePager";
 import { KybReviewSheet } from "./KybReviewSheet";
+import {
+  REVIEW_PAGE_SIZE,
+  ReviewStatusBadge,
+  reviewEmptyMessage,
+} from "./KycReviewQueue";
 import { useAdminKybVerifications } from "@/hooks/use-admin";
 import { useTranslations } from "@/lib/i18n";
 import { formatDateTime } from "@/lib/format-date";
-import { enumLabel } from "@/lib/enum-labels";
-import type { AdminKybReview, AdminKycStatus } from "@/services/admin.service";
+import type {
+  AdminKybReview,
+  AdminReviewFilter,
+} from "@/services/admin.service";
 
-// Business verifications (KYB) waiting for a person. In AUTOMATIC mode only
-// borderline provider results land here; in MANUAL mode every submission
-// does. Same shape as the KYC queue: the review tab is the work, the other
-// two are history.
-const TABS: AdminKycStatus[] = ["MANUAL_REVIEW", "APPROVED", "REJECTED"];
-
-export function KybReviewQueue() {
+// Business verifications (KYB). In AUTOMATIC mode only borderline provider
+// results need action; in MANUAL mode every submission does. Same shape as
+// the KYC queue: "needs action" is the work, the rest is history.
+export function KybReviewQueue({ status }: { status: AdminReviewFilter }) {
   const { t, locale } = useTranslations();
-  const [status, setStatus] = useState<AdminKycStatus>("MANUAL_REVIEW");
+  const [page, setPage] = useState(1);
   const [openId, setOpenId] = useState<string | null>(null);
-  const { data, isLoading, isFetching } = useAdminKybVerifications(status);
+  const { data, isLoading, isFetching } = useAdminKybVerifications({
+    status,
+    page,
+    page_size: REVIEW_PAGE_SIZE,
+  });
 
   const columns: Column<AdminKybReview>[] = [
     {
@@ -69,52 +76,35 @@ export function KybReviewQueue() {
     {
       key: "status",
       header: t("admin.kybReviews.table.status"),
-      render: (row) => (
-        <Badge
-          variant={row.status === "REJECTED" ? "destructive" : "secondary"}
-        >
-          {enumLabel(t, "verificationStatus", row.status)}
-        </Badge>
-      ),
+      render: (row) => <ReviewStatusBadge status={row.status} />,
     },
   ];
 
   return (
-    <div className="flex flex-col gap-4">
-      <Tabs
-        value={status}
-        onValueChange={(value) => setStatus(value as AdminKycStatus)}
-      >
-        <TabsList>
-          {TABS.map((tab) => (
-            <TabsTrigger key={tab} value={tab}>
-              {t(`admin.kycReviews.tabs.${tab}`)}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
-
-      <div className="rounded-xl border border-border bg-card">
-        <DataTable
-          columns={columns}
-          rows={data ?? []}
-          getRowKey={(row) => row.id}
-          isLoading={isLoading}
-          isFetching={isFetching}
-          emptyMessage={
-            status === "MANUAL_REVIEW"
-              ? t("admin.kybReviews.empty")
-              : t("admin.kybReviews.emptyOther")
-          }
-          onRowClick={(row) => setOpenId(row.id)}
-          getRowLabel={(row) =>
-            t("admin.kybReviews.rowLabel").replace(
-              "{name}",
-              row.projects[0] || row.user.full_name || row.user.email,
-            )
-          }
-        />
-      </div>
+    <>
+      <DataTable
+        columns={columns}
+        rows={data?.items ?? []}
+        getRowKey={(row) => row.id}
+        isLoading={isLoading}
+        isFetching={isFetching}
+        emptyMessage={reviewEmptyMessage(t, "kybReviews", status)}
+        onRowClick={(row) => setOpenId(row.id)}
+        getRowLabel={(row) =>
+          t("admin.kybReviews.rowLabel").replace(
+            "{name}",
+            row.projects[0] || row.user.full_name || row.user.email,
+          )
+        }
+      />
+      <TablePager
+        page={page}
+        pageSize={REVIEW_PAGE_SIZE}
+        total={data?.total ?? 0}
+        unit={t("admin.pagination.verifications")}
+        isFetching={isFetching}
+        onPageChange={setPage}
+      />
 
       <KybReviewSheet
         verificationId={openId}
@@ -122,7 +112,7 @@ export function KybReviewQueue() {
           if (!open) setOpenId(null);
         }}
       />
-    </div>
+    </>
   );
 }
 

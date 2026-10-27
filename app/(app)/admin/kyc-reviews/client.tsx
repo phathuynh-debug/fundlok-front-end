@@ -7,9 +7,19 @@ import { useRequireAuth } from "@/hooks/use-authentication";
 import { useVerificationMode } from "@/hooks/use-gverify";
 import { isAdminRole } from "@/services/authentication.service";
 import { useTranslations } from "@/lib/i18n";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { AdminReviewFilter } from "@/services/admin.service";
 import { AdminPageLoader } from "../_components/AdminDirectory";
-import { KycReviewQueue } from "./_components/KycReviewQueue";
+import {
+  KycReviewQueue,
+  REVIEW_FILTERS,
+} from "./_components/KycReviewQueue";
 import { KybReviewQueue } from "./_components/KybReviewQueue";
 
 type ReviewKind = "kyc" | "kyb";
@@ -21,6 +31,8 @@ export default function AdminKycReviewsClient() {
   const isAdmin = !isLoading && !!user && isAdminRole(user.role);
   const { data: mode } = useVerificationMode(isAdmin);
   const [kind, setKind] = useState<ReviewKind>("kyc");
+  // Every status by default: the attempts needing action are sorted first.
+  const [status, setStatus] = useState<AdminReviewFilter>("ALL");
 
   useEffect(() => {
     if (!isLoading && user && !isAdminRole(user.role)) {
@@ -58,17 +70,57 @@ export default function AdminKycReviewsClient() {
         </p>
       )}
 
-      <Tabs
-        value={kind}
-        onValueChange={(value) => setKind(value as ReviewKind)}
-      >
-        <TabsList>
-          <TabsTrigger value="kyc">{t("admin.kycReviews.kindKyc")}</TabsTrigger>
-          <TabsTrigger value="kyb">{t("admin.kycReviews.kindKyb")}</TabsTrigger>
-        </TabsList>
-      </Tabs>
+      <div className="rounded-lg border bg-card">
+        <div className="flex flex-col gap-2 border-b p-4 sm:flex-row sm:flex-wrap sm:items-center">
+          <Select
+            value={kind}
+            onValueChange={(value) => setKind(value as ReviewKind)}
+          >
+            <SelectTrigger
+              size="sm"
+              className="w-full sm:w-48"
+              aria-label={t("admin.kycReviews.kindLabel")}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="kyc">
+                {t("admin.kycReviews.kindKyc")}
+              </SelectItem>
+              <SelectItem value="kyb">
+                {t("admin.kycReviews.kindKyb")}
+              </SelectItem>
+            </SelectContent>
+          </Select>
 
-      {kind === "kyc" ? <KycReviewQueue /> : <KybReviewQueue />}
+          <Select
+            value={status}
+            onValueChange={(value) => setStatus(value as AdminReviewFilter)}
+          >
+            <SelectTrigger
+              size="sm"
+              className="w-full sm:w-44"
+              aria-label={t("admin.table.status")}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {REVIEW_FILTERS.map((filter) => (
+                <SelectItem key={filter} value={filter}>
+                  {t(`admin.kycReviews.filters.${filter}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Keyed by the filter so a change starts again on page 1. */}
+        {kind === "kyc" ? (
+          <KycReviewQueue key={status} status={status} />
+        ) : (
+          <KybReviewQueue key={status} status={status} />
+        )}
+      </div>
     </div>
   );
 }

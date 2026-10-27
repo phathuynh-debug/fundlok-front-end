@@ -263,7 +263,8 @@
         "COMPANY_BRANCH": "Company branch",
         "HOUSEHOLD": "Household business"
       },
-      "empty": "No business checks are waiting for review.",
+      "empty": "No business checks need action.",
+      "emptyAll": "No business checks yet.",
       "emptyOther": "No business checks with this status.",
       "fields": {
         "address": "Address",
@@ -311,7 +312,8 @@
       "decisionHeading": "Your decision",
       "detailLoadFailed": "Couldn't load identity check details. Please try again.",
       "detailsRequired": "Enter the ID number and full name from the card to approve.",
-      "empty": "No identity checks are waiting for review.",
+      "empty": "No identity checks need action.",
+      "emptyAll": "No identity checks yet.",
       "emptyOther": "No identity checks with this status.",
       "faceMatchValue": "{score}% similar",
       "fields": {
@@ -324,6 +326,12 @@
         "nameOnCard": "Name on card",
         "submitted": "Submitted",
         "verified": "Verified"
+      },
+      "filters": {
+        "ALL": "All statuses",
+        "APPROVED": "Approved",
+        "MANUAL_REVIEW": "Needs action",
+        "REJECTED": "Rejected"
       },
       "idNumberInvalid": "The ID number must be 9 or 12 digits.",
       "imageMissing": "Not stored",
@@ -339,6 +347,7 @@
       "inputIdNumber": "ID number (CCCD or CMND)",
       "kindKyb": "Business (KYB)",
       "kindKyc": "Identity (KYC)",
+      "kindLabel": "Verification type",
       "manualBanner": "Manual review mode is on. The verification provider isn't being used, so every new KYC and KYB submission waits here for a decision.",
       "manualMode": "Manual mode",
       "noConflict": "No conflict now",
@@ -355,7 +364,7 @@
       "selfBlocked": "You can't review your own identity check.",
       "sheetSubtitle": "Check the submitted ID card and selfie before you decide.",
       "sheetTitle": "Identity check",
-      "subtitle": "Identity (KYC) and business (KYB) checks waiting for a person: ones the provider couldn't settle, and every submission while verification is in manual mode.",
+      "subtitle": "Identity (KYC) and business (KYB) checks. Ones that need action are listed first: the provider couldn't settle them, or they came in while verification was in manual mode.",
       "table": {
         "conflicts": "Why flagged",
         "idNumber": "ID number",
@@ -363,11 +372,6 @@
         "nameOnCard": "Name on card",
         "status": "Status",
         "submitted": "Submitted"
-      },
-      "tabs": {
-        "APPROVED": "Approved",
-        "MANUAL_REVIEW": "Waiting for review",
-        "REJECTED": "Rejected"
       },
       "title": "KYC / KYB reviews",
       "whyDuplicate": "This ID number is already verified on another FundLok account. A photo cut from someone's ID card can pass the face match, so check that both accounts belong to the same person before approving.",
@@ -384,7 +388,8 @@
       "perPage": "Per page",
       "prev": "Prev",
       "projects": "projects",
-      "users": "users"
+      "users": "users",
+      "verifications": "checks"
     },
     "preview": {
       "applicationDecided": "Decision recorded",
