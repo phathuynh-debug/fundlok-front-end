@@ -74,12 +74,13 @@ describe("ProjectCard — investor view (FE-008)", () => {
     expect(screen.getByText("₫800,000,000")).toBeInTheDocument();
   });
 
-  it("marks duration, ROI and score as pending rather than inventing numbers", () => {
+  it("marks duration and score as pending rather than inventing numbers", () => {
     render(<ProjectCard project={withLoan()} role="INVESTOR" />);
-    // Duration and ROI: the backend has not supplied them.
-    expect(screen.getAllByText("dashboard.projectCard.pending")).toHaveLength(
-      2,
-    );
+    // Duration: the backend has not supplied it. ROI shows a dash, never
+    // "pending", when the listing carries no rate.
+    expect(
+      screen.getByText("dashboard.projectCard.pending"),
+    ).toBeInTheDocument();
     // The score badge: no locked score run yet.
     expect(
       screen.getByText("dashboard.projectCard.pendingGrading"),
@@ -137,25 +138,27 @@ describe("ProjectCard — investor view (FE-008)", () => {
     ).toBeInTheDocument();
   });
 
-  it("uses real duration and ROI once the backend supplies them", () => {
+  it("uses real duration and the ROI in money once the backend supplies the rate", () => {
     render(
       <ProjectCard
-        project={withLoan({ duration_months: 9, interest_rate_pct: 14.32 })}
+        project={withLoan({ duration_months: 9, bank_rate_pct: 12 })}
         role="INVESTOR"
       />,
     );
     expect(
       screen.getByText('dashboard.projectCard.months:{"count":9}'),
     ).toBeInTheDocument();
-    expect(screen.getByText("14.3%")).toBeInTheDocument();
+    // The ROI as money: 12% of the 800,000,000 request.
+    expect(screen.getByText(/96[.,]000[.,]000/)).toBeInTheDocument();
+    expect(screen.queryByText("12.0%")).toBeNull();
     expect(screen.queryByText("dashboard.projectCard.pending")).toBeNull();
   });
 
   it("shows pending when the project has no application at all", () => {
     render(<ProjectCard project={project()} role="INVESTOR" />);
-    // Asking amount, duration and ROI.
+    // Asking amount and duration.
     expect(screen.getAllByText("dashboard.projectCard.pending")).toHaveLength(
-      3,
+      2,
     );
   });
 

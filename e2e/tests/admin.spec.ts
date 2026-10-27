@@ -581,11 +581,24 @@ test.describe("KYC review", () => {
       }),
     });
 
+  // The status filter (Radix Select): ALL by default, or one status.
+  const showStatus = async (
+    page: import("@playwright/test").Page,
+    status: "ALL" | "MANUAL_REVIEW" | "APPROVED" | "REJECTED",
+  ) => {
+    await page.getByRole("combobox", { name: t("admin.table.status") }).click();
+    await page
+      .getByRole("option", { name: t(`admin.kycReviews.filters.${status}`) })
+      .click();
+  };
+
+  // Opens an attempt from the queue proper: the "needs action" filter.
   const openReview = async (
     page: import("@playwright/test").Page,
     user: { full_name: string | null; email: string },
   ) => {
     await page.goto("/admin/kyc-reviews");
+    await showStatus(page, "MANUAL_REVIEW");
     await rowFor(page, user).click();
     const panel = page.getByRole("dialog");
     await expect(panel).toBeVisible();
@@ -607,23 +620,41 @@ test.describe("KYC review", () => {
     page,
   }) => {
     await page.goto("/admin/kyc-reviews");
+    await showStatus(page, "MANUAL_REVIEW");
 
     const row = rowFor(page, STUB_KYC_REVIEW_LISTED.user);
     await expect(row).toContainText(STUB_KYC_REVIEW_LISTED.person_number);
     await expect(row).toContainText(t("admin.kycReviews.conflictOne"));
-    // History is a separate tab: the already-verified owner is not queued.
+    await expect(row).toContainText(
+      t("admin.kycReviews.filters.MANUAL_REVIEW"),
+    );
+    // History is another filter: the already-verified owner is not queued.
     await expect(
       page.getByText(STUB_KYC_OWNER_APPROVED.user.email),
     ).toHaveCount(0);
   });
 
-  test("the approved tab shows past verifications", async ({ page }) => {
+  test("the approved filter shows past verifications", async ({ page }) => {
     await page.goto("/admin/kyc-reviews");
-    await page
-      .getByRole("tab", { name: t("admin.kycReviews.tabs.APPROVED") })
-      .click();
+    await showStatus(page, "APPROVED");
 
     await expect(rowFor(page, STUB_KYC_OWNER_APPROVED.user)).toBeVisible();
+    await expect(rowFor(page, STUB_KYC_REVIEW_LISTED.user)).toHaveCount(0);
+  });
+
+  test("all statuses is the default and lists those needing action first", async ({
+    page,
+  }) => {
+    await page.goto("/admin/kyc-reviews");
+
+    await expect(rowFor(page, STUB_KYC_REVIEW_LISTED.user)).toBeVisible();
+    await expect(rowFor(page, STUB_KYC_OWNER_APPROVED.user)).toBeVisible();
+    // Rows carry "Review identity check for <name>" as their label.
+    const labelPrefix = t("admin.kycReviews.rowLabel", { name: "" }).trim();
+    const first = page.locator(`[aria-label^="${labelPrefix}"]`).first();
+    await expect(first).toContainText(
+      t("admin.kycReviews.filters.MANUAL_REVIEW"),
+    );
   });
 
   test("the panel shows both accounts and the submitted images", async ({
@@ -717,17 +748,13 @@ test.describe("KYC review", () => {
       page.getByText(t("admin.kycReviews.resolved"), { exact: true }),
     ).toBeVisible();
     await expect(rowFor(page, user)).toHaveCount(0);
-    await page
-      .getByRole("tab", { name: t("admin.kycReviews.tabs.REJECTED") })
-      .click();
+    await showStatus(page, "REJECTED");
     await expect(rowFor(page, user)).toBeVisible();
   });
 
   test("a decided attempt offers no decision controls", async ({ page }) => {
     await page.goto("/admin/kyc-reviews");
-    await page
-      .getByRole("tab", { name: t("admin.kycReviews.tabs.APPROVED") })
-      .click();
+    await showStatus(page, "APPROVED");
     await rowFor(page, STUB_KYC_OWNER_APPROVED.user).click();
     const panel = page.getByRole("dialog");
 

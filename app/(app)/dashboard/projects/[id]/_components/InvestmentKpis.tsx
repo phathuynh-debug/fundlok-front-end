@@ -6,6 +6,7 @@ import { m } from "framer-motion";
 import { useTranslations } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format-currency";
 import { dailyRepaymentAmount } from "@/lib/facility-terms";
+import { targetReturnVnd } from "@/lib/listing-figures";
 import { staggerContainerVariants, springItemVariants } from "@/lib/animations";
 
 interface InvestmentKpisProps {
@@ -47,7 +48,11 @@ export function InvestmentKpis({
 
   // What the SME pays across the whole loan each business day — only derived
   // when amount, rate and term are all present so figures strictly reconcile.
+  // Only with the deal's own revenue-share terms (today, the demo set): the
+  // rate shown above is the investor's target return, and the SME's daily
+  // repayment must not be derived from it.
   const dailyObligationVnd =
+    displayRevShare !== undefined &&
     displayAmount !== undefined &&
     displayRate !== undefined &&
     displayMonths !== undefined
@@ -106,11 +111,21 @@ export function InvestmentKpis({
           </div>
           <div className="min-w-0 mt-2">
             <div className="truncate whitespace-nowrap text-2xl md:text-xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400">
-              {displayRate !== undefined
-                ? `${displayRate.toFixed(1)}%`
+              {/* As money: the rate on the whole request, like the card. */}
+              {displayRate !== undefined && displayAmount !== undefined
+                ? formatCurrency(
+                    targetReturnVnd(displayAmount, displayRate),
+                    locale,
+                  )
                 : t("common.na")}
             </div>
             <p className="text-xs text-muted-foreground mt-1 truncate">
+              {displayRate !== undefined &&
+                displayAmount !== undefined &&
+                `${t("dashboard.projectCard.roiBasis", {
+                  rate: `${displayRate}%`,
+                  amount: formatCurrency(displayAmount, locale),
+                })} · `}
               {t("dashboard.projectCard.notGuaranteed")}
             </p>
           </div>

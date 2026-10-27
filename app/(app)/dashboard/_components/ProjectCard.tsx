@@ -20,7 +20,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import type { Project } from "@/services/projects.service";
-import { listingDaysLeft, listingFundedPercent } from "@/lib/listing-figures";
+import {
+  listingDaysLeft,
+  listingFundedPercent,
+  targetReturnVnd,
+} from "@/lib/listing-figures";
 import Link from "next/link";
 import { useTranslations } from "@/lib/i18n";
 import { formatDate } from "@/lib/format-date";
@@ -68,7 +72,14 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
       ? undefined
       : Number(loanApplication.requested_amount);
   const durationMonths = loanApplication?.duration_months ?? undefined;
-  const expectedRoiPct = loanApplication?.interest_rate_pct ?? undefined;
+  // The investor's target return: FundLok's bank rate in force, as the listing
+  // returns it (bank_rate_pct), the same on every card.
+  const expectedRoiPct = loanApplication?.bank_rate_pct ?? undefined;
+  // Shown as money: that rate on the business's whole request.
+  const expectedRoiVnd =
+    expectedRoiPct !== undefined && askingAmount !== undefined
+      ? targetReturnVnd(askingAmount, expectedRoiPct)
+      : undefined;
 
   // Assuming address has city and country based on log
   const address = project.address as ProjectAddress | null | undefined;
@@ -257,22 +268,27 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                 <span
                   className={cn(
                     "text-xl font-bold tabular-nums",
-                    expectedRoiPct === undefined
+                    expectedRoiVnd === undefined
                       ? "text-muted-foreground"
                       : "text-emerald-600 dark:text-emerald-400",
                   )}
                 >
-                  {expectedRoiPct === undefined
-                    ? t("dashboard.projectCard.pending")
-                    : `${expectedRoiPct.toFixed(1)}%`}
+                  {expectedRoiVnd === undefined
+                    ? "—"
+                    : formatCurrency(expectedRoiVnd, locale)}
                 </span>
                 {/* Handbook §5.13 / §8: a projected return is never presented
                     as a promise. The figure carries the "target, not
                     guaranteed" disclaimer inline (the tooltip above expands
                     on it) — an investor must not be able to read it as a
                     fixed or guaranteed yield. */}
-                {expectedRoiPct !== undefined && (
+                {expectedRoiVnd !== undefined && (
                   <span className="break-words text-xs font-medium text-muted-foreground">
+                    {t("dashboard.projectCard.roiBasis", {
+                      rate: `${expectedRoiPct}%`,
+                      amount: formatCurrency(askingAmount!, locale),
+                    })}
+                    {" · "}
                     {t("dashboard.projectCard.notGuaranteed")}
                   </span>
                 )}

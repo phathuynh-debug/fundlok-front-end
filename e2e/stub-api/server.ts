@@ -1917,12 +1917,29 @@ const server = createServer(async (req, res) => {
     // a note, only MANUAL_REVIEW settles, and the investor-facing reason on a
     // rejection is fixed, never the note.
     if (path === "/admin/kyc-verifications" && method === "GET") {
+      // One status, or ALL (in review, approved, rejected), in pages: waiting
+      // attempts first, as app/admin/service.py's _review_page orders them.
       const status = url.searchParams.get("status") ?? "MANUAL_REVIEW";
-      return json(
-        res,
-        200,
-        [...kycReviews.values()].filter((row) => row.status === status),
-      );
+      const page = Number(url.searchParams.get("page") ?? 1);
+      const pageSize = Number(url.searchParams.get("page_size") ?? 20);
+      const rows = [...kycReviews.values()]
+        .filter((row) =>
+          status === "ALL"
+            ? ["MANUAL_REVIEW", "APPROVED", "REJECTED"].includes(row.status)
+            : row.status === status,
+        )
+        .sort(
+          (a, b) =>
+            Number(b.status === "MANUAL_REVIEW") -
+            Number(a.status === "MANUAL_REVIEW"),
+        );
+      return json(res, 200, {
+        items: rows.slice((page - 1) * pageSize, page * pageSize),
+        total: rows.length,
+        page,
+        page_size: pageSize,
+        total_pages: Math.ceil(rows.length / pageSize),
+      });
     }
 
     const kycImageMatch = path.match(

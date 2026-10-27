@@ -198,7 +198,7 @@ export default function ProjectDetailsClient({
         <m.div {...fadeInUpProps}>
           <InvestmentKpis
             loanAmountVnd={Number(loanApplication.requested_amount)}
-            interestRatePct={loanApplication.interest_rate_pct ?? undefined}
+            interestRatePct={loanApplication.bank_rate_pct ?? undefined}
             paybackMonths={loanApplication.duration_months ?? undefined}
             minTicketVnd={listing?.min_ticket}
           />

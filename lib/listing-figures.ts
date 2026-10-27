@@ -28,3 +28,12 @@ export function listingDaysLeft(
   const ms = new Date(listing.close_at).getTime() - now.getTime();
   return Math.max(0, Math.ceil(ms / (1000 * 60 * 60 * 24)));
 }
+
+/**
+ * The target return in VND on the business's whole request: the asking
+ * amount at the marketplace rate (bank_rate_pct), flat, as the ROI box shows
+ * it. A target, never a promise; the caller shows that beside it.
+ */
+export function targetReturnVnd(amountVnd: number, ratePct: number): number {
+  return Math.round((amountVnd * ratePct) / 100);
+}

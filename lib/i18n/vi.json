@@ -1089,8 +1089,8 @@
       "daysLeft": "Còn {count} ngày",
       "duration": "Thời hạn",
       "edit": "Chỉnh sửa",
-      "expectedRoi": "Tỷ suất lợi nhuận năm",
-      "expectedRoiHint": "Lãi suất năm dự kiến mà doanh nghiệp trả cho khoản vay này. Đây là mục tiêu, không phải lợi nhuận được cam kết. Nếu doanh nghiệp không đạt kỳ vọng, bạn là người chịu khoản lỗ.",
+      "expectedRoi": "Lợi nhuận (ROI)",
+      "expectedRoiHint": "Lợi nhuận mục tiêu trên toàn bộ số tiền doanh nghiệp cần huy động, theo lãi suất tham chiếu hiện hành của FundLok. Đây là mục tiêu, không phải lợi nhuận được cam kết. Nếu doanh nghiệp không đạt kỳ vọng, bạn là người chịu khoản lỗ.",
       "fundedPercent": "Đã huy động {percent}%",
       "hotDeal": "Dự án HOT",
       "incorporation": "Thành lập",
@@ -1106,6 +1106,7 @@
       "pending": "Chưa có",
       "pendingGrading": "Chờ điểm doanh nghiệp",
       "raisedOfTarget": "Đã gọi {raised} / {target}",
+      "roiBasis": "{rate} trên {amount}",
       "score": "Điểm {score}/100",
       "status": {
         "active": "ĐANG HOẠT ĐỘNG",
@@ -2148,7 +2149,7 @@
     "kpis": {
       "dailyObligation": "Nghĩa vụ trả hằng ngày",
       "estPaybackPeriod": "Thời hạn vay",
-      "expectedRoi": "Tỷ suất lợi nhuận năm",
+      "expectedRoi": "Lợi nhuận (ROI)",
       "loanAmount": "Số tiền vay",
       "months": "{count} tháng",
       "ofDailyRevenue": "trên doanh thu hằng ngày",

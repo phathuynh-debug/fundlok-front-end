@@ -1089,8 +1089,8 @@
       "daysLeft": "{count} days left",
       "duration": "Duration",
       "edit": "Edit",
-      "expectedRoi": "Annualized ROI",
-      "expectedRoiHint": "The expected annual interest the business pays on this loan. It's a target, not a guaranteed return. If the business underperforms, you bear the loss.",
+      "expectedRoi": "ROI",
+      "expectedRoiHint": "The target return on the full amount the business is asking for, at FundLok's current reference rate. It's a target, not a guaranteed return. If the business underperforms, you bear the loss.",
       "fundedPercent": "{percent}% funded",
       "hotDeal": "Hot deal",
       "incorporation": "Incorporation",
@@ -1106,6 +1106,7 @@
       "pending": "Pending",
       "pendingGrading": "Pending score",
       "raisedOfTarget": "{raised} raised of {target}",
+      "roiBasis": "{rate} of {amount}",
       "score": "Score {score}/100",
       "status": {
         "active": "ACTIVE",
@@ -2148,7 +2149,7 @@
     "kpis": {
       "dailyObligation": "Daily obligation amount",
       "estPaybackPeriod": "Loan duration",
-      "expectedRoi": "Annualized ROI",
+      "expectedRoi": "ROI",
       "loanAmount": "Loan amount",
       "months": "{count} mo",
       "ofDailyRevenue": "of daily revenue",

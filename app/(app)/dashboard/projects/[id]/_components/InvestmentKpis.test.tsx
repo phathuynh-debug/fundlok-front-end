@@ -46,6 +46,12 @@ describe("InvestmentKpis", () => {
     expect(screen.getByText("1.000.000.000 ₫")).toBeInTheDocument();
   });
 
+  it("shows the ROI as money: the rate on the whole request", () => {
+    render(<InvestmentKpis loanAmountVnd={60_000_000} interestRatePct={12} />);
+    expect(screen.getByText("₫7,200,000")).toBeInTheDocument();
+    expect(screen.queryByText("12.0%")).not.toBeInTheDocument();
+  });
+
   it("renders a real backend amount, not the mock default", () => {
     render(<InvestmentKpis loanAmountVnd={500_000_000} />);
     expect(screen.getByText("₫500,000,000")).toBeInTheDocument();

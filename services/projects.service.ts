@@ -67,6 +67,12 @@ export interface ProjectLoanApplication {
    * Absent or null until the request has a contract and an open listing.
    */
   listing?: MarketplaceListing | null;
+  /**
+   * Investor listing only: the marketplace's target return, FundLok's bank
+   * rate in force (bank_rate_config.rate_pct), e.g. 12 for 12%. A target, not
+   * a promise.
+   */
+  bank_rate_pct?: number | null;
 }
 
 /** Backend MarketplaceListingOut: real funding figures for a marketplace card. */
