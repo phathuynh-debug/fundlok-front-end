@@ -34,8 +34,8 @@ export function TablePager({
             {t("admin.pagination.page")}{" "}
             <span className="font-medium text-foreground">{page}</span>{" "}
             {t("admin.pagination.of")}{" "}
-            <span className="font-medium text-foreground">{totalPages}</span>{" "}
-            · {total} {unit}
+            <span className="font-medium text-foreground">{totalPages}</span> ·{" "}
+            {total} {unit}
           </>
         ) : (
           "—"

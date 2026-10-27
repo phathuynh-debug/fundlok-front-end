@@ -6,7 +6,6 @@ import { useRequireAuth } from "@/hooks/use-authentication";
 import { usePublicProjects } from "@/hooks/use-projects";
 import type { Project } from "@/services/projects.service";
 import { ProjectCard } from "../_components/ProjectCard";
-import { SampleDataNotice } from "../_components/SampleDataNotice";
 import {
   Search,
   SlidersHorizontal,
@@ -24,7 +23,6 @@ import { useTranslations } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format-currency";
 import { dailyRepaymentAmount } from "@/lib/facility-terms";
 import { industryLabel } from "@/lib/industry-label";
-import { sampleListingDealTerms } from "@/lib/sample-listing-figures";
 
 interface SecondaryMarketListing {
   id: string;
@@ -384,26 +382,9 @@ export default function ProjectsClient() {
 
   const isInitialLoading = isAuthLoading || isProjectsLoading;
 
-  // Enrich marketplace primary projects with realistic benchmark deal terms when
-  // underwriting/grading fields (duration_months, interest_rate_pct) are pending from backend
-  const enrichedPublicProjects = publicProjects.map((project, idx) => {
-    if (!project.loan_application) return project;
-    const terms = sampleListingDealTerms(project, idx);
-
-    return {
-      ...project,
-      loan_application: {
-        ...project.loan_application,
-        requested_amount: String(terms.askingAmount),
-        duration_months: terms.durationMonths,
-        interest_rate_pct: terms.interestRatePct,
-      },
-    };
-  });
-
   // Active datasource based on selection
   const activeDataSource =
-    marketType === "primary" ? enrichedPublicProjects : mockSecondaryMarket;
+    marketType === "primary" ? publicProjects : mockSecondaryMarket;
 
   const industries = [
     t("common.all"),
@@ -421,7 +402,7 @@ export default function ProjectsClient() {
     : t("common.all");
 
   const filteredItems = (
-    marketType === "primary" ? enrichedPublicProjects : mockSecondaryMarket
+    marketType === "primary" ? publicProjects : mockSecondaryMarket
   ).filter((item) => {
     const name = "legal_name" in item ? item.legal_name : item.legalName;
     const matchesSearch =
@@ -536,14 +517,6 @@ export default function ProjectsClient() {
               ))}
             </div>
           </div>
-
-          {/* The card mixes real application data with presentation figures
-            derived from the project id — funding progress, investor count,
-            days remaining and the business score. An investor reading
-            "Score 73/100" as a real assessment is exactly the misreading the
-            handbook's disclosure rules exist to prevent (§3), so the page
-            says which half is which. */}
-          <SampleDataNotice message={t("dashboard.projectCard.sampleNotice")} />
 
           {/* Count display label below search/filters */}
           <div className="text-xs font-semibold text-muted-foreground tracking-wide">

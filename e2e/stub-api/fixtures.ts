@@ -298,6 +298,17 @@ export const STUB_PUBLIC_PROJECTS = [
     loan_application: {
       ...STUB_PROJECT.loan_application,
       verified_documents: ["legal_charter", "cic_report"],
+      // An open round, so the invest form renders (verification-tab.spec).
+      listing: {
+        id: "40000000-0000-0000-0000-000000000002",
+        status: "OPEN",
+        target_amount: 80_000_000,
+        funded_amount: 20_000_000,
+        min_ticket: null,
+        investor_count: 3,
+        open_at: "2026-05-02T08:30:00+07:00",
+        close_at: null,
+      },
     },
   },
   {

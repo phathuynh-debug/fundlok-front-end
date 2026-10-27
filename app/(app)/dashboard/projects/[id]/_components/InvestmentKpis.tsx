@@ -17,6 +17,9 @@ interface InvestmentKpisProps {
   /** Loan term in months; rendered per locale. */
   paybackMonths?: number;
   revenueShareRate?: string;
+  /** The listing's minimum ticket, VND. Not shown when absent: it used to be
+      derived as 1% of the amount, which disagreed with the real listing. */
+  minTicketVnd?: number | null;
 }
 
 export function InvestmentKpis({
@@ -24,6 +27,7 @@ export function InvestmentKpis({
   interestRatePct,
   paybackMonths,
   revenueShareRate,
+  minTicketVnd,
 }: InvestmentKpisProps) {
   const { locale, t } = useTranslations();
 
@@ -80,19 +84,13 @@ export function InvestmentKpis({
                 ? formatCurrency(displayAmount, locale)
                 : t("common.na")}
             </div>
-            <p className="text-xs text-muted-foreground mt-1 truncate">
-              {t("dashboard.projectCard.minTicket", {
-                amount: formatCurrency(
-                  Math.max(
-                    2_000_000,
-                    Math.round(
-                      ((displayAmount ?? 500_000_000) * 0.01) / 1_000_000,
-                    ) * 1_000_000,
-                  ),
-                  locale,
-                ),
-              })}
-            </p>
+            {minTicketVnd != null && (
+              <p className="text-xs text-muted-foreground mt-1 truncate">
+                {t("dashboard.projectCard.minTicket", {
+                  amount: formatCurrency(minTicketVnd, locale),
+                })}
+              </p>
+            )}
           </div>
         </Card>
       </m.div>

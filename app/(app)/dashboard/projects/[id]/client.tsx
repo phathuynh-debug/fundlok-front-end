@@ -13,12 +13,9 @@ import { InvestmentKpis } from "./_components/InvestmentKpis";
 import { RiskAssessmentTab } from "./_components/RiskAssessmentTab";
 import { DueDiligenceTab } from "./_components/DueDiligenceTab";
 import { OwnerProjectView } from "./_components/OwnerProjectView";
+import { ScoreLabel } from "./_components/ScoreLabel";
 import { useTranslations } from "@/lib/i18n";
 import { industryLabel } from "@/lib/industry-label";
-import {
-  sampleListingScore,
-  sampleListingDealTerms,
-} from "@/lib/sample-listing-figures";
 import {
   pageTransitionProps,
   fadeInUpProps,
@@ -94,15 +91,11 @@ export default function ProjectDetailsClient({
   const { data: myProjects = [], isLoading: isMyProjectsLoading } =
     useMyProjects(!isAuthLoading && isOwnerView);
 
-  const projectIndex = projects.findIndex((p) => p.id === projectId);
-  const project = projectIndex >= 0 ? projects[projectIndex] : undefined;
-  const dealTerms = sampleListingDealTerms(
-    project,
-    projectIndex >= 0 ? projectIndex : 0,
-  );
-  // Same source as the marketplace card, so the score a user clicked through
-  // from is the score they land on. See lib/sample-listing-figures.ts.
-  const sampleScore = sampleListingScore(project?.id ?? projectId);
+  const project = projects.find((p) => p.id === projectId);
+  // The locked score run's business score, from the listing: the same figure
+  // as the marketplace card the user clicked through from, and as the SME's
+  // own approval summary. Null until a run is locked.
+  const businessScore = project?.loan_application?.business_score ?? null;
 
   if (!isMounted || isAuthLoading || isProjectsLoading || isMyProjectsLoading) {
     return <ProjectDetailsSkeleton />;
@@ -114,20 +107,35 @@ export default function ProjectDetailsClient({
     );
   }
 
-  // Fallback details if no project found to make it look nice anyway
-  const displayName =
-    project?.legal_name || t("dashboard.projectDetails.fallbackName");
-  const displayIndustry =
-    industryLabel(project?.industry, t) ||
-    t("dashboard.projectDetails.fallbackIndustry");
-  const description =
-    project?.loan_application?.purpose ||
-    t("dashboard.projectDetails.description");
+  // Not on the marketplace (an unknown id, or a project taken off it): say so.
+  // This used to render a made-up company ("TechStart Solutions") with sample
+  // figures, which an investor could take for a real listing.
+  if (!project) {
+    return (
+      <div className="flex-1 space-y-6 p-4 md:p-8 pt-6 max-w-5xl mx-auto">
+        <Button
+          variant="ghost"
+          size="sm"
+          asChild
+          className={cn("gap-2 -ml-2", CONTROL_IDLE)}
+        >
+          <Link href="/dashboard/projects">
+            <ArrowLeft className="h-4 w-4" />
+            {t("dashboard.projectDetails.backToMarketplace")}
+          </Link>
+        </Button>
+        <p className="rounded-xl border bg-muted/20 p-6 text-sm text-muted-foreground">
+          {t("dashboard.projectDetails.notFound")}
+        </p>
+      </div>
+    );
+  }
 
-  const loanAmountVnd = dealTerms.askingAmount;
-  const interestRatePct = dealTerms.interestRatePct;
-  const paybackMonths = dealTerms.durationMonths;
-  const revenueShareRate = dealTerms.revenueShareRate;
+  const displayName = project.legal_name;
+  const displayIndustry = industryLabel(project.industry, t) || "—";
+  const description = project.loan_application?.purpose ?? null;
+  const loanApplication = project.loan_application ?? null;
+  const listing = loanApplication?.listing ?? null;
 
   return (
     <m.div
@@ -165,7 +173,7 @@ export default function ProjectDetailsClient({
                   variant="outline"
                   className="bg-background text-foreground rounded-full px-3 py-0.5 text-xs font-semibold border-muted"
                 >
-                  {t("dashboard.projectDetails.score", { score: sampleScore })}
+                  <ScoreLabel score={businessScore} />
                 </Badge>
               </div>
             </div>
@@ -174,20 +182,28 @@ export default function ProjectDetailsClient({
             </p>
           </div>
         </div>
-        <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl">
-          {description}
-        </p>
+        {description && (
+          <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl">
+            {description}
+          </p>
+        )}
       </m.div>
 
-      {/* KPI Cards Row */}
-      <m.div {...fadeInUpProps}>
-        <InvestmentKpis
-          loanAmountVnd={loanAmountVnd}
-          interestRatePct={interestRatePct}
-          paybackMonths={paybackMonths}
-          revenueShareRate={revenueShareRate}
-        />
-      </m.div>
+      {/* KPI Cards Row. Real terms only: the asking amount and term from the
+          request; the investor return and revenue share read "n/a" until the
+          listing carries them (they used to be sample figures). Not rendered
+          without a request, where InvestmentKpis would fall back to its demo
+          set. */}
+      {loanApplication && (
+        <m.div {...fadeInUpProps}>
+          <InvestmentKpis
+            loanAmountVnd={Number(loanApplication.requested_amount)}
+            interestRatePct={loanApplication.interest_rate_pct ?? undefined}
+            paybackMonths={loanApplication.duration_months ?? undefined}
+            minTicketVnd={listing?.min_ticket}
+          />
+        </m.div>
+      )}
 
       {/* Tab pill selectors */}
       <m.div
@@ -223,7 +239,11 @@ export default function ProjectDetailsClient({
         <AnimatePresence mode="wait">
           {activeTab === "risk" ? (
             <m.div key="risk" {...tabContentAnimation}>
-              <RiskAssessmentTab score={sampleScore} />
+              <RiskAssessmentTab
+                score={businessScore}
+                projectId={projectId}
+                listing={listing}
+              />
             </m.div>
           ) : (
             <m.div key="diligence" {...tabContentAnimation}>

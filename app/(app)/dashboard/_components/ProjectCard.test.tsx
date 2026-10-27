@@ -74,13 +74,66 @@ describe("ProjectCard — investor view (FE-008)", () => {
     expect(screen.getByText("₫800,000,000")).toBeInTheDocument();
   });
 
-  it("marks duration and ROI as pending rather than inventing numbers", () => {
+  it("marks duration, ROI and score as pending rather than inventing numbers", () => {
     render(<ProjectCard project={withLoan()} role="INVESTOR" />);
-    expect(
-      screen.getByText("dashboard.projectCard.pending"),
-    ).toBeInTheDocument();
+    // Duration and ROI: the backend has not supplied them.
+    expect(screen.getAllByText("dashboard.projectCard.pending")).toHaveLength(
+      2,
+    );
+    // The score badge: no locked score run yet.
     expect(
       screen.getByText("dashboard.projectCard.pendingGrading"),
+    ).toBeInTheDocument();
+  });
+
+  it("shows the round's real funding figures from the listing", () => {
+    render(
+      <ProjectCard
+        project={withLoan({
+          listing: {
+            id: "lst1",
+            status: "OPEN",
+            target_amount: 80_000_000,
+            funded_amount: 20_000_000,
+            min_ticket: 1_000_000,
+            investor_count: 3,
+            open_at: null,
+            close_at: null,
+          },
+        })}
+        role="INVESTOR"
+      />,
+    );
+    expect(
+      screen.getByText('dashboard.projectCard.fundedPercent:{"percent":25}'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('dashboard.projectCard.backers:{"count":3}'),
+    ).toBeInTheDocument();
+    // No closing date on the listing: no "days left" to show.
+    expect(screen.queryByText(/dashboard\.projectCard\.daysLeft/)).toBeNull();
+    expect(screen.queryByText("dashboard.projectCard.notOpenYet")).toBeNull();
+  });
+
+  it("says the round is not open yet when there is no listing", () => {
+    render(<ProjectCard project={withLoan()} role="INVESTOR" />);
+    expect(
+      screen.getByText("dashboard.projectCard.notOpenYet"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/dashboard\.projectCard\.fundedPercent/),
+    ).toBeNull();
+  });
+
+  it("shows the locked score run's business score from the listing", () => {
+    render(
+      <ProjectCard
+        project={withLoan({ business_score: 79.25 })}
+        role="INVESTOR"
+      />,
+    );
+    expect(
+      screen.getByText('dashboard.projectCard.score:{"score":"79.25"}'),
     ).toBeInTheDocument();
   });
 
@@ -100,8 +153,9 @@ describe("ProjectCard — investor view (FE-008)", () => {
 
   it("shows pending when the project has no application at all", () => {
     render(<ProjectCard project={project()} role="INVESTOR" />);
+    // Asking amount, duration and ROI.
     expect(screen.getAllByText("dashboard.projectCard.pending")).toHaveLength(
-      2,
+      3,
     );
   });
 

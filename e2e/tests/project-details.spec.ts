@@ -101,7 +101,9 @@ test("the old project-details link lands on the project page", async ({
   page,
 }) => {
   await page.goto(`/dashboard/project-details?id=${project.id}`);
-  await expect(page).toHaveURL(new RegExp(`/dashboard/projects/${project.id}$`));
+  await expect(page).toHaveURL(
+    new RegExp(`/dashboard/projects/${project.id}$`),
+  );
   await expect(page.getByText(project.legal_name).first()).toBeVisible();
 });
 
@@ -125,5 +127,7 @@ test("due diligence names the reviewed documents, with no files", async ({
     page.getByText(t("investment.dueDiligence.verifiedBy")),
   ).toHaveCount(2);
   // Names only: nothing on the tab downloads or opens a file.
-  await expect(page.getByRole("button", { name: /download|tải/i })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /download|tải/i })).toHaveCount(
+    0,
+  );
 });

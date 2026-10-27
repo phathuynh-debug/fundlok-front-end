@@ -2,8 +2,18 @@ import { Card } from "@/components/ui/card";
 import { CheckCircle2, AlertTriangle } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
 import { InvestmentTab } from "./InvestmentTab";
+import { ScoreLabel } from "./ScoreLabel";
+import type { MarketplaceListing } from "@/services/projects.service";
 
-export function RiskAssessmentTab({ score }: { score: number }) {
+export function RiskAssessmentTab({
+  score,
+  projectId,
+  listing,
+}: {
+  score: number | null;
+  projectId: string;
+  listing: MarketplaceListing | null;
+}) {
   const { messages, t } = useTranslations();
   const strengths = messages.investment.risk.strengthItems;
   const risks = messages.investment.risk.riskItems;
@@ -22,7 +32,7 @@ export function RiskAssessmentTab({ score }: { score: number }) {
             </p>
           </div>
           <div className="flex items-center gap-2 self-start md:self-center px-4 py-2 bg-muted/40 rounded-xl border font-semibold text-lg">
-            {t("dashboard.projectDetails.score", { score })}
+            <ScoreLabel score={score} />
           </div>
         </div>
 
@@ -69,7 +79,7 @@ export function RiskAssessmentTab({ score }: { score: number }) {
       </Card>
 
       {/* Investment Tab content embedded directly below Risk Assessment */}
-      <InvestmentTab />
+      <InvestmentTab projectId={projectId} listing={listing} />
     </div>
   );
 }

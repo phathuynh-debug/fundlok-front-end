@@ -24,7 +24,11 @@ import { LoanApplicationSection } from "@/app/(app)/dashboard/_components/loan-a
 // instead is their funding request as it stands: the upload wizard while it
 // is a draft, then the review status, the approval summary (business score,
 // reference rate, repayment) and the documents on file.
-export function OwnerProjectView({ project }: { project: Project | undefined }) {
+export function OwnerProjectView({
+  project,
+}: {
+  project: Project | undefined;
+}) {
   const { t, locale } = useTranslations();
 
   return (

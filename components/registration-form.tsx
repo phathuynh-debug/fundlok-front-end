@@ -141,12 +141,12 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
             description: isPasswordBreached(error)
               ? t("auth.passwordPolicy.breached")
               : isPhoneTaken(error)
-              ? t("auth.register.phoneTaken")
-              : apiErrorMessage(
-                  error,
-                  locale,
-                  t("auth.register.failedDescription"),
-                ),
+                ? t("auth.register.phoneTaken")
+                : apiErrorMessage(
+                    error,
+                    locale,
+                    t("auth.register.failedDescription"),
+                  ),
           });
         },
       },

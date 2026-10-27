@@ -56,6 +56,34 @@ export interface ProjectLoanApplication {
    * files themselves are never shared with investors.
    */
   verified_documents?: string[];
+  /**
+   * Investor listing only: the 0-100 business score of the locked score run
+   * the request was approved on (2dp, the figure the SME's approval summary
+   * shows). Never a credit rating. Null until a run is locked.
+   */
+  business_score?: number | null;
+  /**
+   * Investor listing only: the funding round, from the request's listing.
+   * Absent or null until the request has a contract and an open listing.
+   */
+  listing?: MarketplaceListing | null;
+}
+
+/** Backend MarketplaceListingOut: real funding figures for a marketplace card. */
+export interface MarketplaceListing {
+  id: string;
+  status: "OPEN" | "FUNDED" | "CLOSED" | string;
+  /** VND. */
+  target_amount: number;
+  /** VND. */
+  funded_amount: number;
+  /** VND; null when the listing sets no minimum. */
+  min_ticket: number | null;
+  /** Distinct investors with a filled order. */
+  investor_count: number;
+  open_at: string | null;
+  /** Null when the listing has no closing date. */
+  close_at: string | null;
 }
 
 /** The applicant-facing summary of an approval (backend LoanApprovalOut). */

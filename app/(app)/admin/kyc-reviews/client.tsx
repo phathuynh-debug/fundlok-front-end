@@ -16,10 +16,7 @@ import {
 } from "@/components/ui/select";
 import type { AdminReviewFilter } from "@/services/admin.service";
 import { AdminPageLoader } from "../_components/AdminDirectory";
-import {
-  KycReviewQueue,
-  REVIEW_FILTERS,
-} from "./_components/KycReviewQueue";
+import { KycReviewQueue, REVIEW_FILTERS } from "./_components/KycReviewQueue";
 import { KybReviewQueue } from "./_components/KybReviewQueue";
 
 type ReviewKind = "kyc" | "kyb";

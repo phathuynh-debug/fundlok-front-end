@@ -20,12 +20,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import type { Project } from "@/services/projects.service";
+import { listingDaysLeft, listingFundedPercent } from "@/lib/listing-figures";
 import Link from "next/link";
 import { useTranslations } from "@/lib/i18n";
 import { formatDate } from "@/lib/format-date";
 import { formatCurrency } from "@/lib/format-currency";
 import { industryLabel } from "@/lib/industry-label";
-import { listingHash, sampleListingScore } from "@/lib/sample-listing-figures";
 import { cn } from "@/lib/utils";
 import { getIndustryChrome } from "./sme-dashboard-config";
 import { CONTROL_IDLE } from "@/lib/ui-tokens";
@@ -77,25 +77,14 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
       ? `${address.city}, ${address.country}`
       : t("common.locationUnavailable");
 
-  // Deterministic presentation metrics for active deals in the marketplace.
-  // See lib/sample-listing-figures.ts — the details page behind this card
-  // derives its score from the same place so the two cannot disagree.
-  const listingSeed = project.id || project.legal_name;
-  const hash = listingHash(listingSeed);
-  const fundingProgressPct = askingAmount ? (hash % 29) + 65 : 0; // 65% - 93%
-  const raisedAmount = askingAmount
-    ? Math.round((askingAmount * (fundingProgressPct / 100)) / 1_000_000) *
-      1_000_000
-    : 0;
-  const backersCount = (hash % 24) + 16; // 16 - 39 investors
-  const daysRemaining = (hash % 16) + 5; // 5 - 20 days left
-  const minInvestment = askingAmount
-    ? Math.max(
-        2_000_000,
-        Math.round((askingAmount * 0.01) / 1_000_000) * 1_000_000,
-      )
-    : 5_000_000;
-  const sampleScore = sampleListingScore(listingSeed);
+  // The funding round, from the listing: real figures, the same ones the
+  // details page behind this card shows. These used to be derived from a hash
+  // of the project id under a "sample figures" notice. Null until the request
+  // has a contract and a listing.
+  const listing = loanApplication?.listing ?? null;
+  const fundingProgressPct = listing ? listingFundedPercent(listing) : 0;
+  const daysRemaining = listing ? listingDaysLeft(listing) : null;
+  const businessScore = loanApplication?.business_score ?? null;
   const isHot = fundingProgressPct >= 75;
 
   return (
@@ -154,7 +143,11 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                   variant="outline"
                   className="bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-zinc-300 dark:border-zinc-700 text-xs font-semibold rounded-full px-2.5 py-0.5"
                 >
-                  {t("dashboard.projectCard.score", { score: sampleScore })}
+                  {businessScore === null
+                    ? t("dashboard.projectCard.pendingGrading")
+                    : t("dashboard.projectCard.score", {
+                        score: businessScore.toFixed(2),
+                      })}
                 </Badge>
               </>
             )}
@@ -211,10 +204,10 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                     ? t("dashboard.projectCard.pending")
                     : formatCurrency(askingAmount, locale)}
                 </span>
-                {askingAmount !== undefined && (
+                {listing?.min_ticket != null && (
                   <span className="text-[11px] font-medium text-muted-foreground">
                     {t("dashboard.projectCard.minTicket", {
-                      amount: formatCurrency(minInvestment, locale),
+                      amount: formatCurrency(listing.min_ticket, locale),
                     })}
                   </span>
                 )}
@@ -270,7 +263,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                   )}
                 >
                   {expectedRoiPct === undefined
-                    ? t("dashboard.projectCard.pendingGrading")
+                    ? t("dashboard.projectCard.pending")
                     : `${expectedRoiPct.toFixed(1)}%`}
                 </span>
                 {/* Handbook §5.13 / §8: a projected return is never presented
@@ -339,7 +332,12 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
         </div>
 
         {/* Funding Progress Bar (Investor View with active loan) */}
-        {role === "INVESTOR" && askingAmount !== undefined && (
+        {role === "INVESTOR" && !listing && (
+          <p className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/50 text-xs text-muted-foreground">
+            {t("dashboard.projectCard.notOpenYet")}
+          </p>
+        )}
+        {role === "INVESTOR" && listing && (
           <div className="space-y-2 p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/50">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
               <div className="flex items-center gap-1.5">
@@ -351,8 +349,8 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                 <span className="text-muted-foreground">
                   •{" "}
                   {t("dashboard.projectCard.raisedOfTarget", {
-                    raised: formatCurrency(raisedAmount, locale),
-                    target: formatCurrency(askingAmount, locale),
+                    raised: formatCurrency(listing.funded_amount, locale),
+                    target: formatCurrency(listing.target_amount, locale),
                   })}
                 </span>
               </div>
@@ -360,15 +358,17 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                 <span className="flex items-center gap-1">
                   <Users className="w-3.5 h-3.5" />
                   {t("dashboard.projectCard.backers", {
-                    count: backersCount,
+                    count: listing.investor_count,
                   })}
                 </span>
-                <span className="flex items-center gap-1">
-                  <Calendar className="w-3.5 h-3.5" />
-                  {t("dashboard.projectCard.daysLeft", {
-                    count: daysRemaining,
-                  })}
-                </span>
+                {daysRemaining !== null && (
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-3.5 h-3.5" />
+                    {t("dashboard.projectCard.daysLeft", {
+                      count: daysRemaining,
+                    })}
+                  </span>
+                )}
               </div>
             </div>
             <div className="h-2 w-full rounded-full bg-zinc-200/70 dark:bg-zinc-800 overflow-hidden">
