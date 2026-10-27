@@ -430,10 +430,14 @@
       "missingInputs": "Missing for a score:",
       "noApplications": "No funding requests yet.",
       "noKyb": "This company has not started business verification yet.",
+      "noOwner": "No owner account is linked to this business.",
       "noScoreRun": "The grading engine has not run for this request yet.",
       "notPreviewable": "This file type cannot be shown in the browser. Download it to open it.",
       "notePlaceholder": "Reason (optional) — the applicant sees this, and it is recorded in the audit log",
       "openRow": "Preview {name}",
+      "ownerHeading": "Owner",
+      "ownerKyc": "Identity check (KYC)",
+      "ownerNoKyc": "Not started",
       "reject": "Reject",
       "rescore": "Run again",
       "runScoring": "Run scoring",
@@ -448,7 +452,10 @@
       "scoreNeedsSubmitted": "Scoring runs once the business has submitted this request.",
       "scoreRate": "Reference rate",
       "subtitle": "A business goes live once its funding request and its score are both approved.",
-      "title": "Project preview"
+      "title": "Project preview",
+      "viewKyb": "View business certificate",
+      "viewOwner": "View owner's account",
+      "viewOwnerKyc": "View ID documents"
     },
     "projectsPage": {
       "subtitle": "Review company applications and their approvals.",

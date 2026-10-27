@@ -430,10 +430,14 @@
       "missingInputs": "Còn thiếu để tính điểm:",
       "noApplications": "Chưa có đề nghị vay nào.",
       "noKyb": "Doanh nghiệp này chưa bắt đầu xác minh.",
+      "noOwner": "Doanh nghiệp này chưa gắn với tài khoản chủ sở hữu nào.",
       "noScoreRun": "Hệ thống tính điểm chưa chạy cho đề nghị này.",
       "notPreviewable": "Không thể xem loại tệp này trên trình duyệt. Hãy tải xuống để mở.",
       "notePlaceholder": "Lý do (không bắt buộc) — doanh nghiệp sẽ đọc được nội dung này, và nó cũng được ghi vào nhật ký",
       "openRow": "Xem nhanh {name}",
+      "ownerHeading": "Chủ sở hữu",
+      "ownerKyc": "Xác minh danh tính (KYC)",
+      "ownerNoKyc": "Chưa thực hiện",
       "reject": "Từ chối",
       "rescore": "Chạy lại",
       "runScoring": "Chạy tính điểm",
@@ -448,7 +452,10 @@
       "scoreNeedsSubmitted": "Việc tính điểm chỉ chạy sau khi doanh nghiệp đã gửi đề nghị này.",
       "scoreRate": "Lãi suất tham khảo",
       "subtitle": "Doanh nghiệp chỉ hoạt động khi cả đề nghị vay và kết quả tính điểm đều được phê duyệt.",
-      "title": "Xem nhanh hồ sơ"
+      "title": "Xem nhanh hồ sơ",
+      "viewKyb": "Xem giấy chứng nhận doanh nghiệp",
+      "viewOwner": "Xem tài khoản chủ sở hữu",
+      "viewOwnerKyc": "Xem giấy tờ tùy thân"
     },
     "projectsPage": {
       "subtitle": "Xem hồ sơ doanh nghiệp và tình trạng phê duyệt.",

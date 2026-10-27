@@ -336,6 +336,22 @@ export interface AdminProjectDetail {
   created_at: string | null;
   applications: AdminLoanApplication[];
   kyb: AdminKybVerification | null;
+  // Optional: a backend that predates the field omits it.
+  owner?: AdminProjectOwner | null;
+}
+
+// The account that owns the company, with its latest personal KYC attempt
+// (null when it never started one).
+export interface AdminProjectOwner {
+  id: string;
+  email: string;
+  full_name: string | null;
+  phone: string | null;
+  role: string | null;
+  status: string;
+  created_at: string | null;
+  kyc_verification_id: string | null;
+  kyc_status: string | null;
 }
 
 // Account statuses. Only SUSPENDED denies — the backend rejects a suspended

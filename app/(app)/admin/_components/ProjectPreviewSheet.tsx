@@ -5,10 +5,14 @@ import {
   AlertTriangle,
   CheckCircle2,
   Clock,
+  Eye,
+  FileCheck,
   FileText,
   Loader2,
   Play,
+  ScanFace,
   ShieldCheck,
+  UserRound,
   XCircle,
 } from "lucide-react";
 
@@ -25,6 +29,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { DocumentViewerDialog } from "./DocumentViewerDialog";
+import { UserPreviewSheet } from "./UserPreviewSheet";
+import { KybReviewSheet } from "../kyc-reviews/_components/KybReviewSheet";
+import { KycReviewSheet } from "../kyc-reviews/_components/KycReviewSheet";
 import { useToast } from "@/hooks/use-toast";
 import {
   useAdminProjectDetail,
@@ -82,6 +89,11 @@ export function ProjectPreviewSheet({
   // Which document the viewer dialog is showing; null = closed.
   const [viewerDocument, setViewerDocument] =
     useState<AdminApplicationDocument | null>(null);
+  // The owner's account and the two verification records open on top of this
+  // panel, so the operator never loses the project they were reviewing.
+  const [ownerOpen, setOwnerOpen] = useState(false);
+  const [kycReviewId, setKycReviewId] = useState<string | null>(null);
+  const [kybReviewId, setKybReviewId] = useState<string | null>(null);
   // One note box per decision target, keyed by record id — a rejection reason
   // typed against one application must not follow the operator to the next.
   const [notes, setNotes] = useState<Record<string, string>>({});
@@ -203,6 +215,70 @@ export function ProjectPreviewSheet({
 
             <Separator />
 
+            {/* --- Who owns it, and their own identity check --- */}
+            <section className="space-y-3">
+              <h3 className="text-sm font-semibold">
+                {t("admin.preview.ownerHeading")}
+              </h3>
+              {!data.owner ? (
+                <p className="text-sm text-muted-foreground">
+                  {t("admin.preview.noOwner")}
+                </p>
+              ) : (
+                <div className="space-y-3 rounded-xl border border-border bg-muted/30 p-4">
+                  <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                    <Row label={t("admin.table.name")}>
+                      {data.owner.full_name || "—"}
+                    </Row>
+                    <Row label={t("admin.table.email")}>
+                      <span className="break-all">{data.owner.email}</span>
+                    </Row>
+                    <Row label={t("auth.register.phoneLabel")}>
+                      {data.owner.phone || "—"}
+                    </Row>
+                    <Row label={t("admin.preview.ownerKyc")}>
+                      {data.owner.kyc_status ? (
+                        <span className="inline-flex items-center gap-1.5">
+                          <StatusIcon status={data.owner.kyc_status} />
+                          {enumLabel(
+                            t,
+                            "verificationStatus",
+                            data.owner.kyc_status,
+                          )}
+                        </span>
+                      ) : (
+                        t("admin.preview.ownerNoKyc")
+                      )}
+                    </Row>
+                  </dl>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setOwnerOpen(true)}
+                    >
+                      <UserRound className="h-4 w-4" aria-hidden />
+                      {t("admin.preview.viewOwner")}
+                    </Button>
+                    {data.owner.kyc_verification_id && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          setKycReviewId(data.owner!.kyc_verification_id)
+                        }
+                      >
+                        <ScanFace className="h-4 w-4" aria-hidden />
+                        {t("admin.preview.viewOwnerKyc")}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </section>
+
+            <Separator />
+
             {/* --- The business verification (KYB) --- */}
             <section className="space-y-3">
               <h3 className="text-sm font-semibold">
@@ -225,6 +301,14 @@ export function ProjectPreviewSheet({
                       {data.kyb.rejection_reason}
                     </p>
                   )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setKybReviewId(data.kyb!.id)}
+                  >
+                    <FileCheck className="h-4 w-4" aria-hidden />
+                    {t("admin.preview.viewKyb")}
+                  </Button>
                   {data.kyb.status === "MANUAL_REVIEW" && (
                     <DecisionControls
                       note={noteFor(data.kyb.id)}
@@ -358,6 +442,35 @@ export function ProjectPreviewSheet({
         document={viewerDocument}
         onOpenChange={(open) => {
           if (!open) setViewerDocument(null);
+        }}
+      />
+      <UserPreviewSheet
+        user={
+          ownerOpen && data?.owner
+            ? {
+                id: data.owner.id,
+                email: data.owner.email,
+                full_name: data.owner.full_name ?? "",
+                role: data.owner.role ?? "",
+                status: data.owner.status,
+                created_at: data.owner.created_at,
+              }
+            : null
+        }
+        onOpenChange={(open) => {
+          if (!open) setOwnerOpen(false);
+        }}
+      />
+      <KycReviewSheet
+        verificationId={kycReviewId}
+        onOpenChange={(open) => {
+          if (!open) setKycReviewId(null);
+        }}
+      />
+      <KybReviewSheet
+        verificationId={kybReviewId}
+        onOpenChange={(open) => {
+          if (!open) setKybReviewId(null);
         }}
       />
     </Sheet>
@@ -658,6 +771,10 @@ function DocumentList({
             <Badge variant="secondary" className="ml-auto shrink-0">
               {enumLabel(t, "documentStatus", document.status)}
             </Badge>
+          )}
+          {/* The row was always a button; this says so. */}
+          {openable && (
+            <Eye className="ml-auto h-3.5 w-3.5 shrink-0" aria-hidden />
           )}
         </button>
       </li>
