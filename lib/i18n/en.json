@@ -1117,6 +1117,7 @@
       "viewDetails": "View project details"
     },
     "projectDetails": {
+      "backToDashboard": "Back to overview",
       "backToMarketplace": "Back to marketplace",
       "description": "Growing SaaS company looking to expand operations and hire additional developers.",
       "dueDiligence": "Due diligence",
@@ -1124,6 +1125,8 @@
       "fallbackName": "TechStart Solutions",
       "investment": "Investment",
       "loading": "Loading project details...",
+      "noApplication": "This project has no funding request yet.",
+      "notYours": "This project isn't in your account.",
       "riskAssessment": "Risk assessment",
       "score": "Score {score}/100"
     },
@@ -2127,23 +2130,22 @@
   },
   "investment": {
     "dueDiligence": {
-      "documents": [
-        "Tax Filing 2025.pdf",
-        "VAT Filing Q4 2025.pdf",
-        "Financial Statement 2025.pdf"
-      ],
-      "download": "Download",
-      "downloadingFile": "Downloading file",
-      "reminderText": "Read every document before you invest. Weigh the risk level and business score. If the business underperforms, you bear the loss.",
-      "reminderTitle": "Due diligence reminder",
-      "sampleFiles": {
-        "financialStatement": "Financial Statement 2025.pdf",
-        "taxFiling": "Tax Filing 2025.pdf",
-        "vatFiling": "VAT Filing Q4 2025.pdf"
+      "documentTypes": {
+        "business_registration": "Business registration certificate",
+        "cic_report": "CIC credit report",
+        "e_invoice_data": "E-invoice data (12 months)",
+        "financial_report": "Financial statements",
+        "legal_charter": "Company charter",
+        "tax_filings": "Tax filings (VAT declarations and year-end statements)",
+        "vat_tax_zip": "VAT declarations"
       },
-      "startingDownload": "Starting download for {filename}...",
-      "subtitle": "Review the SME's submitted documents for due diligence",
-      "title": "Documents & financial information"
+      "filesPrivate": "The files themselves stay private: they hold the business's tax, invoice and credit details, so only the FundLok team reviews them.",
+      "noDocuments": "No documents have been reviewed for this project yet.",
+      "reminderText": "Weigh the risk level and business score before you invest. A document review does not remove the risk: if the business underperforms, you bear the loss.",
+      "reminderTitle": "Due diligence reminder",
+      "subtitle": "What this business submitted. The FundLok team reviewed each document before the project was approved.",
+      "title": "Documents & financial information",
+      "verifiedBy": "Verified by the FundLok team"
     },
     "kpis": {
       "dailyObligation": "Daily obligation amount",

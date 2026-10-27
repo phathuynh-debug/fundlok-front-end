@@ -23,8 +23,7 @@ import { getIndustryTheme } from "./sme-dashboard-config";
 import { formatDate, formatDateTime } from "@/lib/format-date";
 import { enumLabel } from "@/lib/enum-labels";
 import { useVerificationGate } from "@/hooks/use-verification-gate";
-import { LoanApplicationUpload } from "./loan-application/LoanApplicationUpload";
-import { LoanApplicationStatus } from "./loan-application/LoanApplicationStatus";
+import { LoanApplicationSection } from "./loan-application/LoanApplicationSection";
 
 type ProjectAddress = {
   street?: string;
@@ -358,7 +357,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
                 size="sm"
                 className="w-full gap-1.5 text-xs font-semibold"
               >
-                <Link href={`/dashboard/project-details?id=${project.id}`}>
+                <Link href={`/dashboard/projects/${project.id}`}>
                   <span>
                     {locale === "vi"
                       ? "Xem chi tiết dự án"
@@ -372,26 +371,14 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
         </div>
       </Card>
 
-      {/* Loan application section. A DRAFT application (created together with
-          the project) shows the document upload wizard; once submitted it
-          flips to a read-only "submitted — awaiting review" status panel. */}
-      {project.loan_application &&
-        (project.loan_application.status === "DRAFT" ? (
-          <LoanApplicationUpload
-            loanApplicationId={project.loan_application.id}
-            locale={locale}
-            theme={theme}
-            t={t}
-          />
-        ) : (
-          <LoanApplicationStatus
-            loanApplication={project.loan_application}
-            companyName={project.legal_name}
-            locale={locale}
-            theme={theme}
-            t={t}
-          />
-        ))}
+      {/* Loan application section: the upload wizard while DRAFT, then the
+          read-only status panel. */}
+      <LoanApplicationSection
+        project={project}
+        locale={locale}
+        theme={theme}
+        t={t}
+      />
     </m.div>
   );
 }

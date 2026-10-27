@@ -1,29 +1,17 @@
-import type { Metadata } from "next";
-import { getServerTranslations } from "@/lib/i18n/server";
-import { Suspense } from "react";
-import ProjectDetailsClient from "./client";
-import { Loader2 } from "lucide-react";
+import { redirect } from "next/navigation";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getServerTranslations();
-  return {
-    title: t("seo.projectDetailsTitle"),
-    description: t("seo.projectDetailsDescription"),
-  };
-}
-
-export default function ProjectDetailsPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="h-screen w-full flex items-center justify-center bg-background">
-          <div className="flex flex-col items-center gap-2">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        </div>
-      }
-    >
-      <ProjectDetailsClient />
-    </Suspense>
+// The project page moved to /dashboard/projects/<id>. Kept so links already
+// sent or bookmarked as /dashboard/project-details?id=<id> still land on it.
+export default async function ProjectDetailsRedirect({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const { id } = await searchParams;
+  const projectId = Array.isArray(id) ? id[0] : id;
+  redirect(
+    projectId
+      ? `/dashboard/projects/${encodeURIComponent(projectId)}`
+      : "/dashboard/projects",
   );
 }

@@ -39,18 +39,18 @@ test("reports how many opportunities are available", async ({ page }) => {
 test("each card links through to the project details", async ({ page }) => {
   const first = STUB_PUBLIC_PROJECTS[0];
   const card = page
-    .locator("a[href*='/dashboard/project-details']")
+    .locator("a[href*='/dashboard/projects/']")
     .filter({ hasText: first.legal_name })
     .or(
       page
         .locator("div")
         .filter({ hasText: first.legal_name })
-        .locator("a[href*='/dashboard/project-details']"),
+        .locator("a[href*='/dashboard/projects/']"),
     );
 
   await expect(card.first()).toHaveAttribute(
     "href",
-    new RegExp(`/dashboard/project-details\\?id=${first.id}`),
+    new RegExp(`/dashboard/projects/${first.id}$`),
   );
 });
 

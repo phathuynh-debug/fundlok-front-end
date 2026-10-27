@@ -50,6 +50,12 @@ export interface ProjectLoanApplication {
    * omit it.
    */
   approval?: LoanApproval | null;
+  /**
+   * Investor listing (GET /projects/public) only: the document types the
+   * FundLok team reviewed before approving the request. Types alone — the
+   * files themselves are never shared with investors.
+   */
+  verified_documents?: string[];
 }
 
 /** The applicant-facing summary of an approval (backend LoanApprovalOut). */

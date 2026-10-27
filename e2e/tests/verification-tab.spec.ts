@@ -30,7 +30,7 @@ async function openProjectPage(page: Page) {
       (response) =>
         response.url().includes("/gverify/kyc/status") && response.ok(),
     ),
-    page.goto(`/dashboard/project-details?id=${project.id}`),
+    page.goto(`/dashboard/projects/${project.id}`),
   ]);
   // Two frames: enough for React to have committed the query result.
   await page.evaluate(
@@ -55,7 +55,7 @@ test("Invest opens KYC in a new tab, which closes and returns the user to the ac
   ]);
 
   // The original tab stays where it was and says what's happening.
-  await expect(page).toHaveURL(/\/dashboard\/project-details/);
+  await expect(page).toHaveURL(/\/dashboard\/projects\//);
   await expect(
     page.getByText(t("kyc.newTab.title"), { exact: true }),
   ).toBeVisible();
@@ -96,7 +96,7 @@ test("a verified investor's Invest goes straight to the investment, no new tab",
   context,
 }) => {
   await signInAs(context, "investor");
-  await page.goto(`/dashboard/project-details?id=${project.id}`);
+  await page.goto(`/dashboard/projects/${project.id}`);
 
   let opened = false;
   page.on("popup", () => {

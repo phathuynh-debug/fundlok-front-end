@@ -620,12 +620,14 @@ async function routeRequest(request: NextRequest, refreshed: string[]) {
     return NextResponse.redirect(new URL(ADMIN_ROUTE, request.url));
   }
 
-  // Block SME users from accessing /dashboard/projects
+  // Block SME users from the marketplace listing, /dashboard/projects. Its
+  // project pages (/dashboard/projects/<id>) stay open: the SME dashboard
+  // links an SME to their own one, as it did when it was project-details.
   if (
     isAuthenticated &&
     !isInvestor &&
     !canAccessAdmin &&
-    pathname.startsWith("/dashboard/projects")
+    (pathname === "/dashboard/projects" || pathname === "/dashboard/projects/")
   ) {
     return NextResponse.redirect(new URL(DASHBOARD_ROUTE, request.url));
   }

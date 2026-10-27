@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
-import { useSearchParams } from "next/navigation";
 import { m, AnimatePresence } from "framer-motion";
-import { usePublicProjects } from "@/hooks/use-projects";
+import { useMyProjects, usePublicProjects } from "@/hooks/use-projects";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,6 +12,7 @@ import Link from "next/link";
 import { InvestmentKpis } from "./_components/InvestmentKpis";
 import { RiskAssessmentTab } from "./_components/RiskAssessmentTab";
 import { DueDiligenceTab } from "./_components/DueDiligenceTab";
+import { OwnerProjectView } from "./_components/OwnerProjectView";
 import { useTranslations } from "@/lib/i18n";
 import { industryLabel } from "@/lib/industry-label";
 import {
@@ -70,9 +70,11 @@ function ProjectDetailsSkeleton() {
   );
 }
 
-export default function ProjectDetailsClient() {
-  const searchParams = useSearchParams();
-  const projectId = searchParams.get("id");
+export default function ProjectDetailsClient({
+  projectId,
+}: {
+  projectId: string;
+}) {
   const [activeTab, setActiveTab] = useState<TabType>("risk");
   const isMounted = useSyncExternalStore(
     emptySubscribe,
@@ -83,9 +85,14 @@ export default function ProjectDetailsClient() {
 
   const { user, isLoading: isAuthLoading } = useRequireAuth();
 
-  // We load public projects to find the matching one
+  // An investor finds the project in the marketplace list; an SME opening
+  // one of their own (the dashboard links here) gets it from their projects,
+  // with their real figures instead of the marketplace's sample ones.
+  const isOwnerView = user?.role === "SME";
   const { data: projects = [], isLoading: isProjectsLoading } =
     usePublicProjects(!isAuthLoading && user?.role === "INVESTOR");
+  const { data: myProjects = [], isLoading: isMyProjectsLoading } =
+    useMyProjects(!isAuthLoading && isOwnerView);
 
   const projectIndex = projects.findIndex((p) => p.id === projectId);
   const project = projectIndex >= 0 ? projects[projectIndex] : undefined;
@@ -97,8 +104,14 @@ export default function ProjectDetailsClient() {
   // from is the score they land on. See lib/sample-listing-figures.ts.
   const sampleScore = sampleListingScore(project?.id ?? projectId);
 
-  if (!isMounted || isAuthLoading || isProjectsLoading) {
+  if (!isMounted || isAuthLoading || isProjectsLoading || isMyProjectsLoading) {
     return <ProjectDetailsSkeleton />;
+  }
+
+  if (isOwnerView) {
+    return (
+      <OwnerProjectView project={myProjects.find((p) => p.id === projectId)} />
+    );
   }
 
   // Fallback details if no project found to make it look nice anyway
@@ -214,7 +227,11 @@ export default function ProjectDetailsClient() {
             </m.div>
           ) : (
             <m.div key="diligence" {...tabContentAnimation}>
-              <DueDiligenceTab />
+              <DueDiligenceTab
+                documentTypes={
+                  project?.loan_application?.verified_documents ?? []
+                }
+              />
             </m.div>
           )}
         </AnimatePresence>

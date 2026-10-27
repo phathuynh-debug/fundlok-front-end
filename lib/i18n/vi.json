@@ -1117,6 +1117,7 @@
       "viewDetails": "Xem chi tiết dự án"
     },
     "projectDetails": {
+      "backToDashboard": "Quay lại tổng quan",
       "backToMarketplace": "Quay lại thị trường",
       "description": "Công ty SaaS đang phát triển muốn mở rộng hoạt động và tuyển thêm nhà phát triển.",
       "dueDiligence": "Thẩm định",
@@ -1124,6 +1125,8 @@
       "fallbackName": "TechStart Solutions",
       "investment": "Đầu tư",
       "loading": "Đang tải chi tiết dự án...",
+      "noApplication": "Dự án này chưa có đề nghị vay nào.",
+      "notYours": "Không tìm thấy dự án này trong tài khoản của bạn.",
       "riskAssessment": "Đánh giá rủi ro",
       "score": "Điểm {score}/100"
     },
@@ -2127,23 +2130,22 @@
   },
   "investment": {
     "dueDiligence": {
-      "documents": [
-        "Tax Filing 2025.pdf",
-        "VAT Filing Q4 2025.pdf",
-        "Financial Statement 2025.pdf"
-      ],
-      "download": "Tải xuống",
-      "downloadingFile": "Đang tải tệp",
-      "reminderText": "Hãy đọc kỹ mọi tài liệu trước khi đầu tư. Cân nhắc mức độ rủi ro và điểm doanh nghiệp. Nếu doanh nghiệp không đạt kỳ vọng, bạn là người chịu khoản lỗ.",
-      "reminderTitle": "Nhắc nhở thẩm định",
-      "sampleFiles": {
-        "financialStatement": "Báo cáo tài chính 2025.pdf",
-        "taxFiling": "Tờ khai thuế 2025.pdf",
-        "vatFiling": "Tờ khai GTGT Q4 2025.pdf"
+      "documentTypes": {
+        "business_registration": "Giấy chứng nhận đăng ký doanh nghiệp",
+        "cic_report": "Báo cáo tín dụng CIC",
+        "e_invoice_data": "Dữ liệu hóa đơn điện tử (12 tháng)",
+        "financial_report": "Báo cáo tài chính",
+        "legal_charter": "Điều lệ công ty",
+        "tax_filings": "Hồ sơ thuế (tờ khai GTGT và báo cáo cuối năm)",
+        "vat_tax_zip": "Tờ khai thuế GTGT"
       },
-      "startingDownload": "Bắt đầu tải {filename}...",
-      "subtitle": "Xem lại các tài liệu SME đã nộp để thẩm định",
-      "title": "Tài liệu & thông tin tài chính"
+      "filesPrivate": "Bản gốc của tài liệu được giữ kín vì chứa thông tin thuế, hóa đơn và tín dụng của doanh nghiệp; chỉ đội ngũ FundLok xem xét các tài liệu này.",
+      "noDocuments": "Dự án này chưa có tài liệu nào được xem xét.",
+      "reminderText": "Hãy cân nhắc mức độ rủi ro và điểm doanh nghiệp trước khi đầu tư. Việc xem xét tài liệu không loại bỏ rủi ro: nếu doanh nghiệp không đạt kỳ vọng, bạn là người chịu khoản lỗ.",
+      "reminderTitle": "Nhắc nhở thẩm định",
+      "subtitle": "Những tài liệu doanh nghiệp đã nộp. Đội ngũ FundLok đã xem xét từng tài liệu trước khi dự án được phê duyệt.",
+      "title": "Tài liệu & thông tin tài chính",
+      "verifiedBy": "Đã được đội ngũ FundLok xác minh"
     },
     "kpis": {
       "dailyObligation": "Nghĩa vụ trả hằng ngày",

@@ -414,7 +414,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
               CONTROL_IDLE,
             )}
           >
-            <Link href={`/dashboard/project-details?id=${project.id}`}>
+            <Link href={`/dashboard/projects/${project.id}`}>
               <span>{t("dashboard.projectCard.viewDetails")}</span>
               <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover/details:translate-x-1" />
             </Link>

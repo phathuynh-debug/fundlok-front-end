@@ -335,7 +335,7 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
                   CONTROL_HOVER,
                 )}
               >
-                <Link href={`/dashboard/project-details?id=${holding.id}`}>
+                <Link href={`/dashboard/projects/${holding.id}`}>
                   <span>{t("dashboard.investor.holdingViewDetails")}</span>
                   <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover/card:translate-x-1" />
                 </Link>

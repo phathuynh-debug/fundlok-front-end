@@ -294,6 +294,11 @@ export const STUB_PUBLIC_PROJECTS = [
     id: "20000000-0000-0000-0000-000000000002",
     legal_name: "Delta Foods JSC",
     industry: "Food & Beverage",
+    // GET /projects/public names the types the team reviewed, never the files.
+    loan_application: {
+      ...STUB_PROJECT.loan_application,
+      verified_documents: ["legal_charter", "cic_report"],
+    },
   },
   {
     ...STUB_PROJECT,
