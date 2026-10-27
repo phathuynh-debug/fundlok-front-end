@@ -754,6 +754,7 @@
       "phoneInvalid": "Please enter a valid phone number. Vietnamese numbers like 09xxxxxxxx, +849xxxxxxxx, or international formats are allowed.",
       "phoneLabel": "Phone number",
       "phonePlaceholder": "09xx xxx xxx",
+      "phoneTaken": "This phone number is already used by another account. Sign in to that account, or use a different number.",
       "submit": "Create account",
       "submitting": "Creating account...",
       "successDescription": "Your account is ready. Please sign in to continue.",

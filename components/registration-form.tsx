@@ -14,6 +14,18 @@ import { User, Mail, Lock, Phone, Loader2, Eye, EyeOff } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
 import { apiErrorMessage } from "@/lib/api-error-message";
 import { isPasswordBreached, passwordProblem } from "@/lib/password-policy";
+import type { ApiError } from "@/lib/types";
+
+// The one signup refusal the visitor can fix themselves. The backend sends no
+// X-Error-Code for it yet, so this matches its fixed detail; otherwise
+// apiErrorMessage turns it into "check your information" on the Vietnamese
+// site and the visitor never learns the number is taken.
+const PHONE_TAKEN_DETAIL = "Phone number already registered";
+
+const isPhoneTaken = (error: unknown) => {
+  const { status, message } = (error ?? {}) as Partial<ApiError>;
+  return status === 400 && message === PHONE_TAKEN_DETAIL;
+};
 
 const normalizePhoneNumber = (value: string) =>
   value.trim().replace(/[\s().-]/g, "");
@@ -128,6 +140,8 @@ export function RegistrationForm({ onSuccess }: RegistrationFormProps) {
             title: t("auth.register.failedTitle"),
             description: isPasswordBreached(error)
               ? t("auth.passwordPolicy.breached")
+              : isPhoneTaken(error)
+              ? t("auth.register.phoneTaken")
               : apiErrorMessage(
                   error,
                   locale,

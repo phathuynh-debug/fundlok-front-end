@@ -754,6 +754,7 @@
       "phoneInvalid": "Vui lòng nhập số điện thoại hợp lệ. Hỗ trợ số Việt Nam như 09xxxxxxxx, +849xxxxxxxx, hoặc định dạng quốc tế.",
       "phoneLabel": "Số điện thoại",
       "phonePlaceholder": "09xx xxx xxx",
+      "phoneTaken": "Số điện thoại này đã được dùng cho một tài khoản khác. Hãy đăng nhập vào tài khoản đó hoặc dùng số khác.",
       "submit": "Tạo tài khoản",
       "submitting": "Đang tạo tài khoản...",
       "successDescription": "Tài khoản của bạn đã sẵn sàng. Vui lòng đăng nhập để tiếp tục.",
