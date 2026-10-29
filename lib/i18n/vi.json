@@ -1414,6 +1414,7 @@
             "holderTypeHint": "Chỉ chọn Doanh nghiệp nếu tài khoản thuộc sở hữu của doanh nghiệp.",
             "invalidNumber": "Số tài khoản không hợp lệ.",
             "manualDivider": "hoặc nhập thông tin",
+            "noVietQr": "Không hỗ trợ VietQR",
             "otherBanks": "Tất cả ngân hàng",
             "popularBanks": "Phổ biến",
             "save": "Lưu tài khoản",
@@ -1440,7 +1441,7 @@
             "description": "Quét bằng bất kỳ ứng dụng ngân hàng nào để chuyển tiền vào tài khoản này. Người chuyển tự nhập số tiền.",
             "loadFailed": "Không tải được mã QR. Vui lòng thử lại.",
             "title": "Mã VietQR của tài khoản",
-            "unavailable": "Không thể tạo mã QR cho số tài khoản này."
+            "unavailable": "Không thể tạo mã VietQR cho tài khoản này. Người gửi vẫn có thể chuyển khoản bằng số tài khoản."
           },
           "rejectedHint": "Vui lòng lưu tài khoản đã sửa thành một tài khoản mới.",
           "rejectedReason": "Lý do: {reason}",

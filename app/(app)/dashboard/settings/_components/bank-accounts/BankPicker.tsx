@@ -64,10 +64,15 @@ export function BankPicker({
           bank.bin === value ? "opacity-100" : "opacity-0",
         )}
       />
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <p className="truncate font-medium">{bank.short_name}</p>
         <p className="truncate text-xs text-muted-foreground">{bank.name}</p>
       </div>
+      {!bank.vietqr && (
+        <span className="shrink-0 rounded-full border border-border px-2 py-0.5 text-[10px] text-muted-foreground">
+          {t(`${K}.noVietQr`)}
+        </span>
+      )}
     </CommandItem>
   );
 

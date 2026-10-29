@@ -10,6 +10,9 @@ export interface Bank {
   name: string;
   kind: "BANK" | "WALLET";
   popular: boolean;
+  // False for banks a VietQR cannot pay into (HSBC, Citibank, …): an account
+  // there can be saved, but it gets no QR.
+  vietqr: boolean;
 }
 
 export type PaymentAccountStatus = "PENDING" | "APPROVED" | "REJECTED";

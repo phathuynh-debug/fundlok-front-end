@@ -54,6 +54,7 @@ const STUB_BANKS = [
     name: "Ngân hàng TMCP Kỹ thương Việt Nam",
     kind: "BANK",
     popular: true,
+    vietqr: true,
   },
   {
     bin: "970422",
@@ -62,6 +63,7 @@ const STUB_BANKS = [
     name: "Ngân hàng TMCP Quân đội",
     kind: "BANK",
     popular: true,
+    vietqr: true,
   },
   {
     bin: "970425",
@@ -70,6 +72,7 @@ const STUB_BANKS = [
     name: "Ngân hàng TMCP An Bình",
     kind: "BANK",
     popular: false,
+    vietqr: true,
   },
 ];
 

@@ -13,6 +13,7 @@ const BANKS: Bank[] = [
     name: "Ngân hàng TMCP Kỹ thương Việt Nam",
     kind: "BANK",
     popular: true,
+    vietqr: true,
   },
   {
     bin: "970422",
@@ -21,6 +22,7 @@ const BANKS: Bank[] = [
     name: "Ngân hàng TMCP Quân đội",
     kind: "BANK",
     popular: true,
+    vietqr: true,
   },
   {
     bin: "970425",
@@ -29,6 +31,16 @@ const BANKS: Bank[] = [
     name: "Ngân hàng TMCP An Bình",
     kind: "BANK",
     popular: false,
+    vietqr: true,
+  },
+  {
+    bin: "458761",
+    code: "HSBC",
+    short_name: "HSBC",
+    name: "Ngân hàng TNHH MTV HSBC (Việt Nam)",
+    kind: "BANK",
+    popular: false,
+    vietqr: false,
   },
 ];
 
@@ -161,6 +173,17 @@ describe("AddBankAccountDialog", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "That QR is for a card or a shop, not a bank account.",
     );
+  });
+
+  it("marks banks a VietQR cannot pay into", async () => {
+    const user = userEvent.setup();
+    renderDialog();
+
+    await user.click(screen.getByRole("combobox"));
+    const hsbc = (await screen.findByText("HSBC")).closest('[role="option"]');
+    const mb = screen.getByText("MBBank").closest('[role="option"]');
+    expect(hsbc).toHaveTextContent("No VietQR");
+    expect(mb).not.toHaveTextContent("No VietQR");
   });
 
   it("saves a hand-entered account", async () => {

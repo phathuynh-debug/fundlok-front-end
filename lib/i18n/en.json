@@ -1414,6 +1414,7 @@
             "holderTypeHint": "Choose Company only if a business owns the account.",
             "invalidNumber": "This account number is not valid.",
             "manualDivider": "or enter the details",
+            "noVietQr": "No VietQR",
             "otherBanks": "All banks",
             "popularBanks": "Popular",
             "save": "Save account",
@@ -1440,7 +1441,7 @@
             "description": "Scan with any banking app to send money to this account. The sender enters the amount.",
             "loadFailed": "Could not load the QR. Please try again.",
             "title": "VietQR for this account",
-            "unavailable": "A QR can't be made for this account number."
+            "unavailable": "A VietQR can't be made for this account. Senders can still transfer to it by account number."
           },
           "rejectedHint": "Save the corrected account as a new one.",
           "rejectedReason": "Reason: {reason}",

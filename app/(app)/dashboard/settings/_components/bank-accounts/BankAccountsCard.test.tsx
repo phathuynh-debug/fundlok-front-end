@@ -143,7 +143,7 @@ describe("BankAccountsCard", () => {
     await user.click(screen.getByRole("button", { name: "Show QR" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "A QR can't be made for this account number.",
+      "A VietQR can't be made for this account.",
     );
   });
 });
