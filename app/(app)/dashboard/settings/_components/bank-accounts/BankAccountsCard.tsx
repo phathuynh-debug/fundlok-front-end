@@ -31,9 +31,9 @@ interface BankAccountsCardProps {
   role: "SME" | "INVESTOR";
 }
 
-// The bank accounts a user sends and receives transfers with. Each one starts
-// PENDING until staff approve it; a wrong account is fixed by saving a new one
-// (there is no edit or delete).
+// The bank accounts a user sends and receives transfers with. An account is
+// usable as soon as it is saved (no review step); a wrong account is fixed by
+// saving a new one (there is no edit or delete).
 export function BankAccountsCard({ role }: BankAccountsCardProps) {
   const { t, locale } = useTranslations();
   const accounts = usePaymentAccounts();
@@ -96,14 +96,18 @@ export function BankAccountsCard({ role }: BankAccountsCardProps) {
                     <p className="font-semibold text-foreground">
                       {account.bank_name}
                     </p>
-                    <Badge
-                      className={cn(
-                        "rounded-full border",
-                        STATUS_CLASSES[account.status],
-                      )}
-                    >
-                      {t(`${K}.status.${account.status}`)}
-                    </Badge>
+                    {/* Accounts are approved on save (no review), so a badge
+                        only appears for one that is not live. */}
+                    {account.status !== "APPROVED" && (
+                      <Badge
+                        className={cn(
+                          "rounded-full border",
+                          STATUS_CLASSES[account.status],
+                        )}
+                      >
+                        {t(`${K}.status.${account.status}`)}
+                      </Badge>
+                    )}
                   </div>
                   <p className="font-mono text-sm text-foreground">
                     {account.account_number}

@@ -1107,10 +1107,10 @@ const server = createServer(async (req, res) => {
       bank_name: bank?.short_name ?? body.other_bank_name ?? "Bank",
       account_number: body.account_number,
       account_name: body.account_name,
-      status: "PENDING",
+      status: "APPROVED",
       rejection_reason: null,
       created_at: new Date().toISOString(),
-      approved_at: null,
+      approved_at: new Date().toISOString(),
     });
   }
   // Reads the account out of a static VietQR. Only the shape the fixture QR
