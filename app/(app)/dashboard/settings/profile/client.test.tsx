@@ -39,6 +39,13 @@ vi.mock("@/hooks/use-users", () => ({
   }),
 }));
 
+// The bank account card has its own tests; here we only check where it shows.
+vi.mock("../_components/bank-accounts/BankAccountsCard", () => ({
+  BankAccountsCard: ({ role }: { role: string }) => (
+    <div data-testid="bank-accounts-card" data-role={role} />
+  ),
+}));
+
 vi.mock("@/hooks/use-toast", () => ({
   useToast: () => ({
     toast: vi.fn(),
@@ -101,6 +108,25 @@ describe("ProfileClient", () => {
       /Email signature/i,
     ) as HTMLTextAreaElement;
     expect(sigTextarea.value).toBe("Best regards,\nPhat");
+  });
+
+  it("shows the bank account card to SMEs and investors only", () => {
+    const { unmount } = render(<ProfileClient />);
+    expect(screen.getByTestId("bank-accounts-card")).toHaveAttribute(
+      "data-role",
+      "SME",
+    );
+    unmount();
+
+    mockUser.role = "ADMIN";
+    try {
+      render(<ProfileClient />);
+      expect(
+        screen.queryByTestId("bank-accounts-card"),
+      ).not.toBeInTheDocument();
+    } finally {
+      mockUser.role = "SME";
+    }
   });
 
   it("disables 'Save changes' button when entering edit mode with no changes", async () => {

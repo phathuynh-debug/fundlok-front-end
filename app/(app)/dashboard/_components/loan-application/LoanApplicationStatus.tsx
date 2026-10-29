@@ -9,6 +9,7 @@ import type { LoanDocumentType } from "@/services/uploads.service";
 import type { IndustryTheme } from "../sme-dashboard-config";
 import { formatDate } from "@/lib/format-date";
 import { ApprovalCelebration, ApprovalSummary } from "./ApprovalSummary";
+import { BankAccountPrompt } from "./BankAccountPrompt";
 import { FundingStatus } from "./FundingStatus";
 
 interface LoanApplicationStatusProps {
@@ -332,6 +333,9 @@ export function LoanApplicationStatus({
 
         {/* Approved is not funded: investors fund the listing after the offer is
             signed, and nothing has been invested yet. */}
+        {/* Investors only see a project with a bank account to pay into, so an
+            approved SME without one is asked for it here. */}
+        {decided?.finalStep === "done" && <BankAccountPrompt t={t} />}
         {decided?.finalStep === "done" && <FundingStatus t={t} />}
 
         {/* Why the answer is what it is. An outcome with no explanation is

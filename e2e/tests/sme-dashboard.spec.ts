@@ -215,6 +215,27 @@ test.describe("an SME whose request was approved", () => {
     ).toHaveCount(0);
   });
 
+  test("is asked to add a bank account so the project can be shown", async ({
+    page,
+  }) => {
+    // Investors only see a project whose owner has saved a bank account, and
+    // the stub API has none for this SME.
+    await page.goto("/dashboard");
+    await page.keyboard.press("Escape");
+
+    const prompt = page.getByTestId("bank-account-prompt");
+    await expect(prompt).toBeVisible();
+    await expect(prompt).toContainText(
+      t("dashboard.sme.bankAccountPrompt.title"),
+    );
+    await prompt
+      .getByRole("link", { name: t("dashboard.sme.bankAccountPrompt.cta") })
+      .click();
+    await expect(page).toHaveURL(
+      /\/dashboard\/settings\/profile#bank-account$/,
+    );
+  });
+
   test("says that nothing has been invested yet, and shows no sample figures", async ({
     page,
   }) => {
