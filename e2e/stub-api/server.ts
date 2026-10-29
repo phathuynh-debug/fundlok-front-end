@@ -1093,8 +1093,32 @@ const server = createServer(async (req, res) => {
   if (path === "/direct-transfer/banks" && method === "GET") {
     return json(res, 200, STUB_BANKS);
   }
+  // An investor has one saved account by default, because investing needs
+  // one and most specs are about something else. SMEs start with none (the
+  // dashboard asks for one). The `stub_bank_accounts=none` cookie empties the
+  // list for a spec that tests having no account (support/auth.ts).
   if (path === "/payment-accounts" && method === "GET") {
-    return json(res, 200, []);
+    if (
+      user.role !== "INVESTOR" ||
+      readCookie(req, "stub_bank_accounts") === "none"
+    ) {
+      return json(res, 200, []);
+    }
+    return json(res, 200, [
+      {
+        id: "3b9d2f4e-6a1c-4e8b-9f2d-7c5a1e3b8d04",
+        holder_role: "INVESTOR",
+        holder_type: "INDIVIDUAL",
+        bank_bin: "970436",
+        bank_name: "Vietcombank",
+        account_number: "0011001234567",
+        account_name: user.full_name.toUpperCase(),
+        status: "APPROVED",
+        rejection_reason: null,
+        created_at: "2026-10-01T03:00:00Z",
+        approved_at: "2026-10-01T03:00:00Z",
+      },
+    ]);
   }
   if (path === "/payment-accounts" && method === "POST") {
     const body = await readBody(req);

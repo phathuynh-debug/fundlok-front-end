@@ -1,7 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 
 import { STUB_USERS } from "../stub-api/fixtures";
-import { signInAs } from "../support/auth";
+import { signInAs, withoutBankAccounts } from "../support/auth";
 import { t } from "../support/i18n";
 import { toast } from "../support/ui";
 
@@ -125,7 +125,10 @@ const BANK = "dashboard.settings.profile.bankAccount";
 
 test("an investor adds a bank account from their bank app's QR", async ({
   page,
+  context,
 }) => {
+  await withoutBankAccounts(context);
+  await page.reload();
   await expect(page.getByText(t(`${BANK}.empty`))).toBeVisible();
   await page.getByRole("button", { name: t(`${BANK}.add`) }).click();
 

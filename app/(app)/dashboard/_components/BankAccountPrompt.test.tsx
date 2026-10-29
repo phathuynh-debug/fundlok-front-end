@@ -10,7 +10,10 @@ const state: { data?: PaymentAccount[]; isSuccess: boolean } = {
 };
 
 vi.mock("@/hooks/use-payment-accounts", () => ({
-  usePaymentAccounts: () => state,
+  useHasBankAccount: () => ({
+    hasAccount: (state.data ?? []).some((a) => a.status !== "REJECTED"),
+    isLoaded: state.isSuccess,
+  }),
 }));
 
 const t = (key: string) => {
@@ -47,7 +50,7 @@ describe("BankAccountPrompt", () => {
   });
 
   it("asks an SME with no bank account to add one, linking to the profile", () => {
-    render(<BankAccountPrompt t={t} />);
+    render(<BankAccountPrompt t={t} audience="sme" />);
 
     expect(
       screen.getByText("Add your bank account to make your project available"),
@@ -59,20 +62,31 @@ describe("BankAccountPrompt", () => {
 
   it("stays away once an account is saved, even while it is pending", () => {
     state.data = [account("PENDING")];
-    render(<BankAccountPrompt t={t} />);
+    render(<BankAccountPrompt t={t} audience="sme" />);
     expect(screen.queryByTestId("bank-account-prompt")).not.toBeInTheDocument();
   });
 
   it("asks again when every saved account was rejected", () => {
     state.data = [account("REJECTED")];
-    render(<BankAccountPrompt t={t} />);
+    render(<BankAccountPrompt t={t} audience="sme" />);
     expect(screen.getByTestId("bank-account-prompt")).toBeInTheDocument();
+  });
+
+  it("asks an investor in the investor's words", () => {
+    render(<BankAccountPrompt t={t} audience="investor" />);
+
+    expect(
+      screen.getByText("Add your bank account to invest"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Add bank account" }),
+    ).toHaveAttribute("href", "/dashboard/settings/profile#bank-account");
   });
 
   it("does not flash up before the accounts have loaded", () => {
     state.data = undefined;
     state.isSuccess = false;
-    render(<BankAccountPrompt t={t} />);
+    render(<BankAccountPrompt t={t} audience="sme" />);
     expect(screen.queryByTestId("bank-account-prompt")).not.toBeInTheDocument();
   });
 });

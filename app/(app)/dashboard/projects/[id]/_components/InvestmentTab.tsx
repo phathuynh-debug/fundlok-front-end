@@ -9,6 +9,8 @@ import { Banknote } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format-currency";
 import { useVerificationGate } from "@/hooks/use-verification-gate";
+import { useHasBankAccount } from "@/hooks/use-payment-accounts";
+import { BankAccountPrompt } from "../../../_components/BankAccountPrompt";
 import { cn } from "@/lib/utils";
 import { listingFundedPercent, listingRemaining } from "@/lib/listing-figures";
 import type { MarketplaceListing } from "@/services/projects.service";
@@ -31,6 +33,10 @@ export function InvestmentTab({
   const { toast } = useToast();
   const { t, locale } = useTranslations();
   const { proceed } = useVerificationGate();
+  // Repayments go back to the investor's own bank account, and the order
+  // endpoint refuses an investor without one (BANK_ACCOUNT_REQUIRED).
+  const bankAccount = useHasBankAccount();
+  const needsBankAccount = bankAccount.isLoaded && !bankAccount.hasAccount;
 
   const open = listing?.status === "OPEN";
   const progressPercent = listing ? listingFundedPercent(listing) : 0;
@@ -46,6 +52,7 @@ export function InvestmentTab({
   // visit is bounced to /kyc?next=… in the same tab as before.
   const handleInvest = (e: React.FormEvent) => {
     e.preventDefault();
+    if (needsBankAccount) return;
     const numericAmount = parseFloat(amount);
 
     if (isNaN(numericAmount) || numericAmount <= 0) {
@@ -247,10 +254,11 @@ export function InvestmentTab({
             </div>
 
             <div className="space-y-3">
+              <BankAccountPrompt t={t} audience="investor" />
               <Button
                 type="submit"
                 className="w-full py-5 h-12 rounded-xl text-base font-semibold flex items-center justify-center gap-2"
-                disabled={isPending}
+                disabled={isPending || needsBankAccount}
               >
                 <Banknote className="h-4 w-4" />
                 {isPending

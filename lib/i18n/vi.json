@@ -2265,6 +2265,11 @@
     "tab": {
       "agreement": "Khi đầu tư, bạn đồng ý rằng tiền được giữ tại các đối tác ngân hàng lưu ký. FundLok không sở hữu số tiền này và không có quyền sử dụng cho mục đích riêng. Chúng tôi chỉ có quyền ra lệnh trong các điều kiện do ngân hàng thực thi.",
       "amountTooHighTitle": "Vượt quá số tiền còn lại",
+      "bankAccountPrompt": {
+        "body": "Khoản hoàn trả được chuyển vào tài khoản ngân hàng của bạn, vì vậy bạn cần lưu một tài khoản trước khi đầu tư.",
+        "cta": "Thêm tài khoản ngân hàng",
+        "title": "Thêm tài khoản ngân hàng để đầu tư"
+      },
       "belowMinimum": "Số tiền đầu tư tối thiểu cho dự án này là {amount}.",
       "closedBody": "Đợt gọi vốn này đã ngừng nhận đầu tư.",
       "enterAmount": "Bạn muốn đầu tư bao nhiêu?",
