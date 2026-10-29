@@ -38,6 +38,7 @@ import {
 } from "@/lib/animations";
 import { AvatarUploadDialog } from "../_components/AvatarUploadDialog";
 import { SetPasswordDialog } from "../_components/SetPasswordDialog";
+import { BankAccountsCard } from "../_components/bank-accounts/BankAccountsCard";
 import { profileFormSchema, type ProfileFormValues } from "./form-schema";
 import { apiErrorMessage } from "@/lib/api-error-message";
 
@@ -490,6 +491,13 @@ export function ProfileClient() {
             </div>
           </Card>
         </m.div>
+
+        {/* Bank account — only SMEs and investors send or receive transfers */}
+        {(user?.role === "SME" || user?.role === "INVESTOR") && (
+          <m.div variants={springItemVariants}>
+            <BankAccountsCard role={user.role} />
+          </m.div>
+        )}
 
         {/* Security */}
         <m.div variants={springItemVariants}>

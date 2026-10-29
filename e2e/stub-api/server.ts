@@ -45,6 +45,34 @@ import {
 
 const PORT = Number(process.env.PORT ?? 8100);
 
+// A few rows of the backend's NAPAS bank list (app/direct_transfer/data/vn_banks.json).
+const STUB_BANKS = [
+  {
+    bin: "970407",
+    code: "TCB",
+    short_name: "Techcombank",
+    name: "Ngân hàng TMCP Kỹ thương Việt Nam",
+    kind: "BANK",
+    popular: true,
+  },
+  {
+    bin: "970422",
+    code: "MB",
+    short_name: "MBBank",
+    name: "Ngân hàng TMCP Quân đội",
+    kind: "BANK",
+    popular: true,
+  },
+  {
+    bin: "970425",
+    code: "ABB",
+    short_name: "ABBANK",
+    name: "Ngân hàng TMCP An Bình",
+    kind: "BANK",
+    popular: false,
+  },
+];
+
 /**
  * 2FA state, in memory and per stub user.
  *
@@ -1054,6 +1082,71 @@ const server = createServer(async (req, res) => {
   if (path === "/users/me" && method === "PATCH") {
     const body = await readBody(req);
     return json(res, 200, { ...user, ...body });
+  }
+
+  // Bank accounts on the profile page (HANDOFF-04 Epic 0). Stateless like the
+  // profile edit: GET always starts empty and a save echoes the new PENDING
+  // account, which the frontend appends to its cache without refetching.
+  if (path === "/direct-transfer/banks" && method === "GET") {
+    return json(res, 200, STUB_BANKS);
+  }
+  if (path === "/payment-accounts" && method === "GET") {
+    return json(res, 200, []);
+  }
+  if (path === "/evidence-files" && method === "POST") {
+    // Multipart body: drained, not parsed — the stub only needs an id back.
+    for await (const chunk of req) void chunk;
+    return json(res, 201, {
+      file_id: "5d0f8a52-1c6e-4b7a-9d39-0c7e2a4b8f11",
+      sha256: "0".repeat(64),
+    });
+  }
+  if (path === "/payment-accounts" && method === "POST") {
+    const body = await readBody(req);
+    const bank = STUB_BANKS.find((b) => b.bin === body.bank_bin);
+    return json(res, 201, {
+      id: "8f2c1e7a-4b3d-4c9e-a1f0-6d5e4c3b2a19",
+      holder_role: user.role,
+      holder_type: body.holder_type,
+      bank_bin: body.bank_bin,
+      bank_name: bank?.short_name ?? "Bank",
+      account_number: body.account_number,
+      account_name: body.account_name,
+      status: "PENDING",
+      rejection_reason: null,
+      created_at: new Date().toISOString(),
+      approved_at: null,
+    });
+  }
+  // Reads the account out of a static VietQR. Only the shape the fixture QR
+  // (e2e/fixtures/vietqr-techcombank.png) carries is understood; anything else
+  // is refused the way the backend refuses a non-VietQR.
+  if (path === "/payment-accounts/parse-vietqr" && method === "POST") {
+    const body = await readBody(req);
+    const match = /0006(\d{6})01\d{2}(\w+?)0208QRIBFTTA/.exec(
+      String(body.payload ?? ""),
+    );
+    if (!match) {
+      return json(
+        res,
+        400,
+        { detail: "Not a valid VietQR" },
+        { "x-error-code": "INVALID_QR" },
+      );
+    }
+    const bank = STUB_BANKS.find((b) => b.bin === match[1]);
+    return json(res, 200, {
+      bank_bin: match[1],
+      bank_name: bank?.short_name ?? "Bank",
+      account_number: match[2],
+      account_name: null,
+    });
+  }
+  if (path.startsWith("/payment-accounts/") && path.endsWith("/vietqr")) {
+    return json(res, 200, {
+      payload:
+        "00020101021138550010A000000727012500069704070111190367890120208QRIBFTTA53037045802VN6304EFF0",
+    });
   }
 
   // Role selection (/select-role).

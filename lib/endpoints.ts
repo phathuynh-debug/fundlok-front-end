@@ -58,6 +58,18 @@ export const USER_ENDPOINTS = {
   securityPreferences: "/users/me/security-preferences",
 } as const;
 
+// Bank accounts a user pays from or is paid into (HANDOFF-04 Epic 0). Saved
+// accounts start PENDING until staff check them against the uploaded statement.
+export const PAYMENT_ACCOUNT_ENDPOINTS = {
+  banks: "/direct-transfer/banks",
+  list: "/payment-accounts",
+  create: "/payment-accounts",
+  evidenceFiles: "/evidence-files",
+  // Reads bank + account number from the text of a bank-app QR (decoded in the browser).
+  parseVietQr: "/payment-accounts/parse-vietqr",
+  vietQr: (id: string) => `/payment-accounts/${id}/vietqr`,
+} as const;
+
 export const PROJECT_ENDPOINTS = {
   list: "/projects",
   create: "/projects",
