@@ -1090,7 +1090,7 @@
       "duration": "Thời hạn",
       "edit": "Chỉnh sửa",
       "expectedRoi": "Lợi nhuận (ROI)",
-      "expectedRoiHint": "Lợi nhuận mục tiêu trên toàn bộ số tiền doanh nghiệp cần huy động, theo lãi suất tham chiếu hiện hành của FundLok. Đây là mục tiêu, không phải lợi nhuận được cam kết. Nếu doanh nghiệp không đạt kỳ vọng, bạn là người chịu khoản lỗ.",
+      "expectedRoiHint": "Lợi nhuận mục tiêu trong thời hạn khoản vay, trên toàn bộ số tiền doanh nghiệp cần huy động, theo lãi suất tham chiếu hiện hành của FundLok (lãi suất năm, tính theo số tháng của khoản vay). Đây là mục tiêu, không phải lợi nhuận được cam kết. Nếu doanh nghiệp không đạt kỳ vọng, bạn là người chịu khoản lỗ.",
       "fundedPercent": "Đã huy động {percent}%",
       "hotDeal": "Dự án HOT",
       "incorporation": "Thành lập",
@@ -1106,7 +1106,7 @@
       "pending": "Chưa có",
       "pendingGrading": "Chờ điểm doanh nghiệp",
       "raisedOfTarget": "Đã gọi {raised} / {target}",
-      "roiBasis": "{rate} trên {amount}",
+      "roiBasis": "{rate}/năm trong {term} trên {amount}",
       "score": "Điểm {score}/100",
       "status": {
         "active": "ĐANG HOẠT ĐỘNG",

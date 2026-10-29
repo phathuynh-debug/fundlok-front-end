@@ -1090,7 +1090,7 @@
       "duration": "Duration",
       "edit": "Edit",
       "expectedRoi": "ROI",
-      "expectedRoiHint": "The target return on the full amount the business is asking for, at FundLok's current reference rate. It's a target, not a guaranteed return. If the business underperforms, you bear the loss.",
+      "expectedRoiHint": "The target return over the loan's term on the full amount the business is asking for, at FundLok's current reference rate (a yearly rate, counted for the months of the loan). It's a target, not a guaranteed return. If the business underperforms, you bear the loss.",
       "fundedPercent": "{percent}% funded",
       "hotDeal": "Hot deal",
       "incorporation": "Incorporation",
@@ -1106,7 +1106,7 @@
       "pending": "Pending",
       "pendingGrading": "Pending score",
       "raisedOfTarget": "{raised} raised of {target}",
-      "roiBasis": "{rate} of {amount}",
+      "roiBasis": "{rate} a year for {term} on {amount}",
       "score": "Score {score}/100",
       "status": {
         "active": "ACTIVE",

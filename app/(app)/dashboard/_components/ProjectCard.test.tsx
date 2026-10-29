@@ -148,8 +148,10 @@ describe("ProjectCard — investor view (FE-008)", () => {
     expect(
       screen.getByText('dashboard.projectCard.months:{"count":9}'),
     ).toBeInTheDocument();
-    // The ROI as money: 12% of the 800,000,000 request.
-    expect(screen.getByText(/96[.,]000[.,]000/)).toBeInTheDocument();
+    // The ROI as money: 12% a year on the 800,000,000 request, for its 9
+    // months (not a full year's 96,000,000).
+    expect(screen.getByText(/72[.,]000[.,]000/)).toBeInTheDocument();
+    expect(screen.queryByText(/96[.,]000[.,]000/)).toBeNull();
     expect(screen.queryByText("12.0%")).toBeNull();
     expect(screen.queryByText("dashboard.projectCard.pending")).toBeNull();
   });
