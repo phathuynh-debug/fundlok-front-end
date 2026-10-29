@@ -59,7 +59,7 @@ export const USER_ENDPOINTS = {
 } as const;
 
 // Bank accounts a user pays from or is paid into (HANDOFF-04 Epic 0). Saved
-// accounts start PENDING until staff approve them.
+// accounts are approved at once; there is no review step.
 export const PAYMENT_ACCOUNT_ENDPOINTS = {
   banks: "/direct-transfer/banks",
   list: "/payment-accounts",

@@ -110,7 +110,8 @@ describe("BankAccountsCard", () => {
     render(<BankAccountsCard role="INVESTOR" />);
 
     expect(screen.getByText("Pending review")).toBeInTheDocument();
-    expect(screen.getByText("Approved")).toBeInTheDocument();
+    // Approved is the normal state (approved on save), so it carries no badge.
+    expect(screen.queryByText("Approved")).not.toBeInTheDocument();
     expect(screen.getByText("Rejected")).toBeInTheDocument();
     expect(screen.getByText("0123456789")).toBeInTheDocument();
     expect(screen.getByText("Reason: Name does not match")).toBeInTheDocument();

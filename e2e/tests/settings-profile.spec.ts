@@ -146,9 +146,10 @@ test("an investor adds a bank account from their bank app's QR", async ({
   await dialog.getByRole("button", { name: t(`${BANK}.form.save`) }).click();
 
   await expect(toast(page, t(`${BANK}.form.savedTitle`))).toBeVisible();
+  // Usable at once: no review step, so no "pending review" badge.
   await expect(
     page.getByText(t(`${BANK}.status.PENDING`), { exact: true }),
-  ).toBeVisible();
+  ).toHaveCount(0);
   await expect(page.getByText("19036789012")).toBeVisible();
 });
 
