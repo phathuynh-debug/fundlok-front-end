@@ -31,9 +31,17 @@ export function listingDaysLeft(
 
 /**
  * The target return in VND on the business's whole request: the asking
- * amount at the marketplace rate (bank_rate_pct), flat, as the ROI box shows
- * it. A target, never a promise; the caller shows that beside it.
+ * amount at the marketplace rate (bank_rate_pct), flat, over the loan's term.
+ * The rate is a yearly one, so it is pro-rated by the term: a 4-month loan
+ * earns a third of a year's return. Leaving the term out showed a full year's
+ * return on every loan (6,000,000 ₫ on a 4-month, 50,000,000 ₫ request, more
+ * than the 2,573,904 ₫ of interest that business pays). A target, never a
+ * promise; the caller shows that beside it.
  */
-export function targetReturnVnd(amountVnd: number, ratePct: number): number {
-  return Math.round((amountVnd * ratePct) / 100);
+export function targetReturnVnd(
+  amountVnd: number,
+  annualRatePct: number,
+  termMonths: number,
+): number {
+  return Math.round((amountVnd * annualRatePct * termMonths) / (100 * 12));
 }

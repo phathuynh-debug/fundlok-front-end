@@ -75,10 +75,13 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
   // The investor's target return: FundLok's bank rate in force, as the listing
   // returns it (bank_rate_pct), the same on every card.
   const expectedRoiPct = loanApplication?.bank_rate_pct ?? undefined;
-  // Shown as money: that rate on the business's whole request.
+  // Shown as money: that yearly rate on the business's whole request, over the
+  // loan's term. No term, no figure: a year's return would overstate it.
   const expectedRoiVnd =
-    expectedRoiPct !== undefined && askingAmount !== undefined
-      ? targetReturnVnd(askingAmount, expectedRoiPct)
+    expectedRoiPct !== undefined &&
+    askingAmount !== undefined &&
+    durationMonths !== undefined
+      ? targetReturnVnd(askingAmount, expectedRoiPct, durationMonths)
       : undefined;
 
   // Assuming address has city and country based on log
@@ -286,6 +289,9 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                   <span className="break-words text-xs font-medium text-muted-foreground">
                     {t("dashboard.projectCard.roiBasis", {
                       rate: `${expectedRoiPct}%`,
+                      term: t("dashboard.projectCard.months", {
+                        count: durationMonths!,
+                      }),
                       amount: formatCurrency(askingAmount!, locale),
                     })}
                     {" · "}

@@ -111,10 +111,13 @@ export function InvestmentKpis({
           </div>
           <div className="min-w-0 mt-2">
             <div className="truncate whitespace-nowrap text-2xl md:text-xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400">
-              {/* As money: the rate on the whole request, like the card. */}
-              {displayRate !== undefined && displayAmount !== undefined
+              {/* As money: the yearly rate on the whole request over the
+                  loan's term, like the card. */}
+              {displayRate !== undefined &&
+              displayAmount !== undefined &&
+              displayMonths !== undefined
                 ? formatCurrency(
-                    targetReturnVnd(displayAmount, displayRate),
+                    targetReturnVnd(displayAmount, displayRate, displayMonths),
                     locale,
                   )
                 : t("common.na")}
@@ -122,8 +125,12 @@ export function InvestmentKpis({
             <p className="text-xs text-muted-foreground mt-1 truncate">
               {displayRate !== undefined &&
                 displayAmount !== undefined &&
+                displayMonths !== undefined &&
                 `${t("dashboard.projectCard.roiBasis", {
                   rate: `${displayRate}%`,
+                  term: t("dashboard.projectCard.months", {
+                    count: displayMonths,
+                  }),
                   amount: formatCurrency(displayAmount, locale),
                 })} · `}
               {t("dashboard.projectCard.notGuaranteed")}
