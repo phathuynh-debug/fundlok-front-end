@@ -2265,6 +2265,11 @@
     "tab": {
       "agreement": "By investing, you agree that funds are held by our custodial bank partners. FundLok does not own them and cannot draw on them. We hold instruction rights within conditions the bank enforces.",
       "amountTooHighTitle": "Amount exceeds what's left",
+      "bankAccountPrompt": {
+        "body": "Repayments are paid into your own bank account, so you need one saved before you can invest.",
+        "cta": "Add bank account",
+        "title": "Add your bank account to invest"
+      },
       "belowMinimum": "The minimum investment for this project is {amount}.",
       "closedBody": "This round is no longer taking investments.",
       "enterAmount": "How much would you like to invest?",

@@ -22,6 +22,8 @@ import {
 } from "@/components/ui/dialog";
 import { TruncatedFigure } from "@/components/truncated-figure";
 import { useRequireAuth } from "@/hooks/use-authentication";
+import { useHasBankAccount } from "@/hooks/use-payment-accounts";
+import { BankAccountPrompt } from "../_components/BankAccountPrompt";
 import { useTranslations } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format-currency";
 import { CONTROL_IDLE } from "@/lib/ui-tokens";
@@ -36,6 +38,10 @@ export default function InvestClient() {
   const searchParams = useSearchParams();
   const { t, locale } = useTranslations();
   const { isLoading } = useRequireAuth();
+  // Reached by URL too, so it checks for a bank account itself rather than
+  // trusting the project page's button to have done so.
+  const bankAccount = useHasBankAccount();
+  const needsBankAccount = bankAccount.isLoaded && !bankAccount.hasAccount;
 
   const amount = Number(searchParams.get("amount") || 0);
   const [isPending, setIsPending] = useState(false);
@@ -144,6 +150,8 @@ export default function InvestClient() {
               </Button>
             </div>
           </div>
+        ) : needsBankAccount ? (
+          <BankAccountPrompt t={t} audience="investor" />
         ) : (
           <Button
             type="button"

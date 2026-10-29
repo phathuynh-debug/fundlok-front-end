@@ -104,6 +104,20 @@ export async function signInAs(
  * Force the UI into a locale. Server-rendered from this cookie (app/layout.tsx
  * reads it for `initialLocale`), so it must be set before the first navigation.
  */
+/**
+ * Sign-in leaves an investor with one saved bank account (the stub's default,
+ * since investing needs one). This empties the list, for a spec about having
+ * no account yet. Reload the page after calling it.
+ */
+export async function withoutBankAccounts(
+  context: BrowserContext,
+  domain: StubHost = "127.0.0.1",
+): Promise<void> {
+  await context.addCookies([
+    { name: "stub_bank_accounts", value: "none", domain, path: "/" },
+  ]);
+}
+
 export async function useLocale(
   context: BrowserContext,
   locale: "en" | "vi",
