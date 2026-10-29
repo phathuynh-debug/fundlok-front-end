@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2, Loader2, QrCode, TriangleAlert } from "lucide-react";
 import {
@@ -29,6 +29,7 @@ import { CONTROL_HOVER } from "@/lib/ui-tokens";
 import type { ApiError } from "@/lib/types";
 import { BankPicker } from "./BankPicker";
 import {
+  OTHER_BANK,
   bankAccountFormSchema,
   type BankAccountFormInput,
   type BankAccountFormValues,
@@ -75,6 +76,7 @@ export function AddBankAccountDialog({
 
   const defaultValues: BankAccountFormInput = {
     bank_bin: "",
+    other_bank_name: "",
     account_number: "",
     account_name: "",
     holder_type: defaultHolderType,
@@ -91,6 +93,7 @@ export function AddBankAccountDialog({
     resolver: zodResolver(bankAccountFormSchema(t)),
     defaultValues,
   });
+  const isOtherBank = useWatch({ control, name: "bank_bin" }) === OTHER_BANK;
 
   const errorText = (
     error: ApiError | null | undefined,
@@ -145,23 +148,35 @@ export function AddBankAccountDialog({
     });
   };
 
-  const onSubmit = (values: BankAccountFormValues) => {
-    save.mutate(values, {
-      onSuccess: () => {
-        toast({
-          title: t(`${K}.savedTitle`),
-          description: t(`${K}.savedDescription`),
-        });
-        handleOpenChange(false);
+  const onSubmit = ({
+    bank_bin,
+    other_bank_name,
+    ...account
+  }: BankAccountFormValues) => {
+    // A bank outside the list has no BIN: send its typed name instead.
+    const bank =
+      bank_bin === OTHER_BANK
+        ? { bank_bin: null, other_bank_name }
+        : { bank_bin, other_bank_name: null };
+    save.mutate(
+      { ...account, ...bank },
+      {
+        onSuccess: () => {
+          toast({
+            title: t(`${K}.savedTitle`),
+            description: t(`${K}.savedDescription`),
+          });
+          handleOpenChange(false);
+        },
+        onError: (error) => {
+          toast({
+            variant: "destructive",
+            title: t(`${K}.failedTitle`),
+            description: errorText(error, "failedDescription"),
+          });
+        },
       },
-      onError: (error) => {
-        toast({
-          variant: "destructive",
-          title: t(`${K}.failedTitle`),
-          description: errorText(error, "failedDescription"),
-        });
-      },
-    });
+    );
   };
 
   const isSaving = save.isPending;
@@ -265,6 +280,28 @@ export function AddBankAccountDialog({
               </p>
             )}
           </div>
+
+          {isOtherBank && (
+            <div className="space-y-2">
+              <Label htmlFor="other-bank-name">{t(`${K}.otherBankName`)}</Label>
+              <Input
+                id="other-bank-name"
+                autoComplete="off"
+                placeholder={t(`${K}.otherBankNamePlaceholder`)}
+                aria-invalid={Boolean(errors.other_bank_name) || undefined}
+                disabled={isSaving}
+                {...register("other_bank_name")}
+              />
+              <p className="text-xs text-muted-foreground">
+                {t(`${K}.otherBankHint`)}
+              </p>
+              {errors.other_bank_name && (
+                <p className="text-xs font-medium text-destructive">
+                  {errors.other_bank_name.message}
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="account-number">{t(`${K}.accountNumber`)}</Label>

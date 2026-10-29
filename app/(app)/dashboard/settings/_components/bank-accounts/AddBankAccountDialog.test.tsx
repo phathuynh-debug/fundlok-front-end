@@ -200,9 +200,51 @@ describe("AddBankAccountDialog", () => {
     const [variables] = saveMutate.mock.calls[0];
     expect(variables).toEqual({
       bank_bin: "970422",
+      other_bank_name: null,
       account_number: "0123456789",
       account_name: "TRAN THI B",
       holder_type: "INDIVIDUAL",
     });
+  });
+
+  it("saves an account at a bank outside the list by its typed name", async () => {
+    const user = userEvent.setup();
+    renderDialog();
+
+    await user.click(screen.getByRole("combobox"));
+    await user.type(screen.getByPlaceholderText("Search banks"), "zzz");
+    await user.click(await screen.findByText("Other bank (not in the list)"));
+    await user.type(
+      screen.getByLabelText("Bank name"),
+      "Quỹ tín dụng nhân dân Phú Thọ",
+    );
+    await user.type(screen.getByLabelText("Account number"), "555000111");
+    await user.type(screen.getByLabelText("Account holder name"), "LE VAN C");
+    await user.click(screen.getByRole("button", { name: "Save account" }));
+
+    await waitFor(() => expect(saveMutate).toHaveBeenCalledTimes(1));
+    expect(saveMutate.mock.calls[0][0]).toEqual({
+      bank_bin: null,
+      other_bank_name: "Quỹ tín dụng nhân dân Phú Thọ",
+      account_number: "555000111",
+      account_name: "LE VAN C",
+      holder_type: "INDIVIDUAL",
+    });
+  });
+
+  it("needs the name of a bank outside the list", async () => {
+    const user = userEvent.setup();
+    renderDialog();
+
+    await user.click(screen.getByRole("combobox"));
+    await user.click(await screen.findByText("Other bank (not in the list)"));
+    await user.type(screen.getByLabelText("Account number"), "555000111");
+    await user.type(screen.getByLabelText("Account holder name"), "LE VAN C");
+    await user.click(screen.getByRole("button", { name: "Save account" }));
+
+    expect(
+      await screen.findByText("Enter your bank's name."),
+    ).toBeInTheDocument();
+    expect(saveMutate).not.toHaveBeenCalled();
   });
 });

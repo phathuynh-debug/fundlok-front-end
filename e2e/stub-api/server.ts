@@ -1104,7 +1104,7 @@ const server = createServer(async (req, res) => {
       holder_role: user.role,
       holder_type: body.holder_type,
       bank_bin: body.bank_bin,
-      bank_name: bank?.short_name ?? "Bank",
+      bank_name: bank?.short_name ?? body.other_bank_name ?? "Bank",
       account_number: body.account_number,
       account_name: body.account_name,
       status: "PENDING",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, PencilLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { CONTROL_HOVER } from "@/lib/ui-tokens";
 import { useTranslations } from "@/lib/i18n";
 import type { Bank } from "@/services/payment-accounts.service";
+import { OTHER_BANK } from "./bank-account-schema";
 
 interface BankPickerProps {
   id?: string;
@@ -34,6 +35,8 @@ const K = "dashboard.settings.profile.bankAccount.form";
 
 // Popular banks pinned on top, the rest searchable by short name, full name or
 // code. The value is the bank's BIN: users pick a bank, they never type a BIN.
+// "Other bank" (value OTHER_BANK) stays visible whatever the search, for a bank
+// that is not in the list; the dialog then asks for its name.
 export function BankPicker({
   id,
   banks,
@@ -46,6 +49,7 @@ export function BankPicker({
   const [open, setOpen] = useState(false);
 
   const selected = banks.find((bank) => bank.bin === value);
+  const isOther = value === OTHER_BANK;
   const popular = useMemo(() => banks.filter((b) => b.popular), [banks]);
   const others = useMemo(() => banks.filter((b) => !b.popular), [banks]);
 
@@ -90,12 +94,16 @@ export function BankPicker({
           className={cn(
             "w-full justify-between font-normal",
             CONTROL_HOVER,
-            !selected && "text-muted-foreground",
+            !selected && !isOther && "text-muted-foreground",
             invalid && "border-destructive",
           )}
         >
           <span className="truncate">
-            {selected ? selected.short_name : t(`${K}.bankPlaceholder`)}
+            {selected
+              ? selected.short_name
+              : isOther
+                ? t(`${K}.otherBank`)
+                : t(`${K}.bankPlaceholder`)}
           </span>
           <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -118,6 +126,25 @@ export function BankPicker({
                 {others.map(renderItem)}
               </CommandGroup>
             )}
+            <CommandGroup forceMount>
+              <CommandItem
+                forceMount
+                value={OTHER_BANK}
+                onSelect={() => {
+                  onChange(OTHER_BANK);
+                  setOpen(false);
+                }}
+              >
+                <Check
+                  className={cn(
+                    "h-4 w-4",
+                    isOther ? "opacity-100" : "opacity-0",
+                  )}
+                />
+                <PencilLine className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium">{t(`${K}.otherBank`)}</span>
+              </CommandItem>
+            </CommandGroup>
           </CommandList>
         </Command>
       </PopoverContent>

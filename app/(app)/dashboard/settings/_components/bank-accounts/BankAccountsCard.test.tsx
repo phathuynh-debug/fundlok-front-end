@@ -117,6 +117,20 @@ describe("BankAccountsCard", () => {
     expect(screen.getAllByText("Added 10/29/2026")).toHaveLength(3);
   });
 
+  it("offers no QR for a bank outside the list", () => {
+    accountsState.data = [
+      account({ bank_bin: null, bank_name: "Quỹ tín dụng nhân dân Phú Thọ" }),
+    ];
+    render(<BankAccountsCard role="INVESTOR" />);
+
+    expect(
+      screen.getByText("Quỹ tín dụng nhân dân Phú Thọ"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Show QR" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("opens the account's VietQR", async () => {
     const user = userEvent.setup();
     accountsState.data = [account({})];

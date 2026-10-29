@@ -23,7 +23,8 @@ export interface PaymentAccount {
   id: string;
   holder_role: "SME" | "INVESTOR";
   holder_type: HolderType;
-  bank_bin: string;
+  // null for a bank outside the list; bank_name is then what the user typed.
+  bank_bin: string | null;
   bank_name: string;
   account_number: string;
   account_name: string;
@@ -34,10 +35,14 @@ export interface PaymentAccount {
 }
 
 // Mirrors backend PaymentAccountCreate (POST /payment-accounts). The holder's
-// role is taken from the signed-in user, and the bank name from the bank list.
+// role is taken from the signed-in user, and the bank name from the bank list
+// (or the typed name, for a bank outside it).
 export interface CreatePaymentAccountRequest {
   holder_type: HolderType;
-  bank_bin: string;
+  // A bank from the list (`bank_bin`), or one outside it: `bank_bin: null` and
+  // `other_bank_name` set. Exactly one of the two.
+  bank_bin: string | null;
+  other_bank_name: string | null;
   account_number: string;
   account_name: string;
 }

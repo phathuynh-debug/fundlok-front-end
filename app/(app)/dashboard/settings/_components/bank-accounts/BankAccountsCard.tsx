@@ -120,16 +120,19 @@ export function BankAccountsCard({ role }: BankAccountsCardProps) {
                     })}
                   </p>
                 </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className={CONTROL_HOVER}
-                  onClick={() => setQrAccount(account)}
-                >
-                  <QrCode className="h-4 w-4" />
-                  {t(`${K}.showQr`)}
-                </Button>
+                {/* A bank outside the list has no BIN, so no VietQR. */}
+                {account.bank_bin && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className={CONTROL_HOVER}
+                    onClick={() => setQrAccount(account)}
+                  >
+                    <QrCode className="h-4 w-4" />
+                    {t(`${K}.showQr`)}
+                  </Button>
+                )}
               </div>
 
               {account.status === "PENDING" && (
