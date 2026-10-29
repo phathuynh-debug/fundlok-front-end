@@ -23,6 +23,7 @@ import type { Project } from "@/services/projects.service";
 import {
   listingDaysLeft,
   listingFundedPercent,
+  INVESTOR_TARGET_RETURN_PCT,
   targetReturnVnd,
 } from "@/lib/listing-figures";
 import Link from "next/link";
@@ -72,17 +73,10 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
       ? undefined
       : Number(loanApplication.requested_amount);
   const durationMonths = loanApplication?.duration_months ?? undefined;
-  // The investor's target return: FundLok's bank rate in force, as the listing
-  // returns it (bank_rate_pct), the same on every card.
-  const expectedRoiPct = loanApplication?.bank_rate_pct ?? undefined;
-  // Shown as money: that yearly rate on the business's whole request, over the
-  // loan's term. No term, no figure: a year's return would overstate it.
+  // The investor's target return in money: INVESTOR_TARGET_RETURN_PCT of the
+  // business's whole request, flat for the whole loan, the same on every card.
   const expectedRoiVnd =
-    expectedRoiPct !== undefined &&
-    askingAmount !== undefined &&
-    durationMonths !== undefined
-      ? targetReturnVnd(askingAmount, expectedRoiPct, durationMonths)
-      : undefined;
+    askingAmount !== undefined ? targetReturnVnd(askingAmount) : undefined;
 
   // Assuming address has city and country based on log
   const address = project.address as ProjectAddress | null | undefined;
@@ -257,14 +251,18 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                     <TooltipTrigger asChild>
                       <button
                         type="button"
-                        aria-label={t("dashboard.projectCard.expectedRoiHint")}
+                        aria-label={t("dashboard.projectCard.expectedRoiHint", {
+                          rate: `${INVESTOR_TARGET_RETURN_PCT}%`,
+                        })}
                         className="text-emerald-600/70 hover:text-emerald-700 dark:text-emerald-400/70 dark:hover:text-emerald-300"
                       >
                         <HelpCircle className="h-3 w-3" />
                       </button>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-xs">
-                      {t("dashboard.projectCard.expectedRoiHint")}
+                      {t("dashboard.projectCard.expectedRoiHint", {
+                        rate: `${INVESTOR_TARGET_RETURN_PCT}%`,
+                      })}
                     </TooltipContent>
                   </Tooltip>
                 </span>
@@ -288,10 +286,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                 {expectedRoiVnd !== undefined && (
                   <span className="break-words text-xs font-medium text-muted-foreground">
                     {t("dashboard.projectCard.roiBasis", {
-                      rate: `${expectedRoiPct}%`,
-                      term: t("dashboard.projectCard.months", {
-                        count: durationMonths!,
-                      }),
+                      rate: `${INVESTOR_TARGET_RETURN_PCT}%`,
                       amount: formatCurrency(askingAmount!, locale),
                     })}
                     {" · "}
