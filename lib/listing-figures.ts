@@ -30,18 +30,18 @@ export function listingDaysLeft(
 }
 
 /**
- * The target return in VND on the business's whole request: the asking
- * amount at the marketplace rate (bank_rate_pct), flat, over the loan's term.
- * The rate is a yearly one, so it is pro-rated by the term: a 4-month loan
- * earns a third of a year's return. Leaving the term out showed a full year's
- * return on every loan (6,000,000 ₫ on a 4-month, 50,000,000 ₫ request, more
- * than the 2,573,904 ₫ of interest that business pays). A target, never a
- * promise; the caller shows that beside it.
+ * The investor's target return, as a share of what they put in: 2.5% for the
+ * whole loan, flat, whatever its term (Phat, 2026-10-29). Not a yearly rate,
+ * and not FundLok's bank reference rate, which is never shown publicly
+ * (docs/specs/rates/investor-rate-calculator.md).
  */
-export function targetReturnVnd(
-  amountVnd: number,
-  annualRatePct: number,
-  termMonths: number,
-): number {
-  return Math.round((amountVnd * annualRatePct * termMonths) / (100 * 12));
+export const INVESTOR_TARGET_RETURN_PCT = 2.5;
+
+/**
+ * The target return in VND on the business's whole request: what investing
+ * the full asking amount would return, at INVESTOR_TARGET_RETURN_PCT. A
+ * target, never a promise; the caller shows that beside it.
+ */
+export function targetReturnVnd(amountVnd: number): number {
+  return Math.round((amountVnd * INVESTOR_TARGET_RETURN_PCT) / 100);
 }

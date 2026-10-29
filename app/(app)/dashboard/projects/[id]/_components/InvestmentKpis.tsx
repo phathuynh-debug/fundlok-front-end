@@ -6,7 +6,10 @@ import { m } from "framer-motion";
 import { useTranslations } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format-currency";
 import { dailyRepaymentAmount } from "@/lib/facility-terms";
-import { targetReturnVnd } from "@/lib/listing-figures";
+import {
+  INVESTOR_TARGET_RETURN_PCT,
+  targetReturnVnd,
+} from "@/lib/listing-figures";
 import { staggerContainerVariants, springItemVariants } from "@/lib/animations";
 
 interface InvestmentKpisProps {
@@ -111,26 +114,16 @@ export function InvestmentKpis({
           </div>
           <div className="min-w-0 mt-2">
             <div className="truncate whitespace-nowrap text-2xl md:text-xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400">
-              {/* As money: the yearly rate on the whole request over the
-                  loan's term, like the card. */}
-              {displayRate !== undefined &&
-              displayAmount !== undefined &&
-              displayMonths !== undefined
-                ? formatCurrency(
-                    targetReturnVnd(displayAmount, displayRate, displayMonths),
-                    locale,
-                  )
+              {/* As money: the target share of the whole request, like the
+                  card. */}
+              {displayAmount !== undefined
+                ? formatCurrency(targetReturnVnd(displayAmount), locale)
                 : t("common.na")}
             </div>
             <p className="text-xs text-muted-foreground mt-1 truncate">
-              {displayRate !== undefined &&
-                displayAmount !== undefined &&
-                displayMonths !== undefined &&
+              {displayAmount !== undefined &&
                 `${t("dashboard.projectCard.roiBasis", {
-                  rate: `${displayRate}%`,
-                  term: t("dashboard.projectCard.months", {
-                    count: displayMonths,
-                  }),
+                  rate: `${INVESTOR_TARGET_RETURN_PCT}%`,
                   amount: formatCurrency(displayAmount, locale),
                 })} · `}
               {t("dashboard.projectCard.notGuaranteed")}

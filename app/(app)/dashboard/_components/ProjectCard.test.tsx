@@ -76,8 +76,8 @@ describe("ProjectCard — investor view (FE-008)", () => {
 
   it("marks duration and score as pending rather than inventing numbers", () => {
     render(<ProjectCard project={withLoan()} role="INVESTOR" />);
-    // Duration: the backend has not supplied it. ROI shows a dash, never
-    // "pending", when the listing carries no rate.
+    // Duration: the backend has not supplied it. The ROI needs only the
+    // asking amount, so it is shown.
     expect(
       screen.getByText("dashboard.projectCard.pending"),
     ).toBeInTheDocument();
@@ -148,9 +148,9 @@ describe("ProjectCard — investor view (FE-008)", () => {
     expect(
       screen.getByText('dashboard.projectCard.months:{"count":9}'),
     ).toBeInTheDocument();
-    // The ROI as money: 12% a year on the 800,000,000 request, for its 9
-    // months (not a full year's 96,000,000).
-    expect(screen.getByText(/72[.,]000[.,]000/)).toBeInTheDocument();
+    // The ROI as money: 2.5% of the 800,000,000 request, for the whole loan;
+    // not the bank rate (12% would be 96,000,000).
+    expect(screen.getByText(/20[.,]000[.,]000/)).toBeInTheDocument();
     expect(screen.queryByText(/96[.,]000[.,]000/)).toBeNull();
     expect(screen.queryByText("12.0%")).toBeNull();
     expect(screen.queryByText("dashboard.projectCard.pending")).toBeNull();

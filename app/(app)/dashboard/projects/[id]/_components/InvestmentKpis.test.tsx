@@ -46,8 +46,8 @@ describe("InvestmentKpis", () => {
     expect(screen.getByText("1.000.000.000 ₫")).toBeInTheDocument();
   });
 
-  it("shows the ROI as money: the yearly rate on the request over its term", () => {
-    // 50,000,000 for 4 months at 12% a year: a third of a year's 6,000,000.
+  it("shows the ROI as money: 2.5% of the whole request", () => {
+    // 50,000,000 for 4 months: 1,250,000, whatever the term or bank rate.
     render(
       <InvestmentKpis
         loanAmountVnd={50_000_000}
@@ -55,14 +55,9 @@ describe("InvestmentKpis", () => {
         paybackMonths={4}
       />,
     );
-    expect(screen.getByText("₫2,000,000")).toBeInTheDocument();
+    expect(screen.getByText("₫1,250,000")).toBeInTheDocument();
+    expect(screen.queryByText("₫2,000,000")).not.toBeInTheDocument();
     expect(screen.queryByText("₫6,000,000")).not.toBeInTheDocument();
-    expect(screen.queryByText("12.0%")).not.toBeInTheDocument();
-  });
-
-  it("shows no ROI figure without the loan's term", () => {
-    render(<InvestmentKpis loanAmountVnd={60_000_000} interestRatePct={12} />);
-    expect(screen.queryByText("₫7,200,000")).not.toBeInTheDocument();
   });
 
   it("renders a real backend amount, not the mock default", () => {
