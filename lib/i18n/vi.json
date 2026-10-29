@@ -1558,6 +1558,11 @@
         "total": "Tổng số tiền phải trả"
       },
       "backBtn": "Quay lại",
+      "bankAccountPrompt": {
+        "body": "Nhà đầu tư chỉ thấy các dự án mà chủ dự án đã thêm tài khoản ngân hàng. Hãy thêm tài khoản bạn sẽ dùng để nhận vốn.",
+        "cta": "Thêm tài khoản ngân hàng",
+        "title": "Thêm tài khoản ngân hàng để dự án của bạn hiển thị với nhà đầu tư"
+      },
       "chooseFile": "Chọn tệp",
       "cicCreditReport": "Báo cáo tín dụng CIC khách hàng",
       "cicError": {

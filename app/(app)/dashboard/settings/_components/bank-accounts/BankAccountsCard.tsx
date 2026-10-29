@@ -43,7 +43,7 @@ export function BankAccountsCard({ role }: BankAccountsCardProps) {
   const list = accounts.data ?? [];
 
   return (
-    <Card className="p-6 md:p-8">
+    <Card id="bank-account" className="scroll-mt-24 p-6 md:p-8">
       <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-1">
           <h2 className="flex items-center gap-2.5 text-lg font-semibold text-foreground">

@@ -1558,6 +1558,11 @@
         "total": "Total to repay"
       },
       "backBtn": "Back",
+      "bankAccountPrompt": {
+        "body": "Investors only see projects whose owner has added a bank account. Add the account you will receive funds in.",
+        "cta": "Add bank account",
+        "title": "Add your bank account to make your project available"
+      },
       "chooseFile": "Choose file",
       "cicCreditReport": "Customer CIC credit report",
       "cicError": {
