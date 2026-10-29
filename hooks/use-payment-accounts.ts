@@ -3,7 +3,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   paymentAccountsService,
-  type AccountEvidencePurpose,
   type Bank,
   type CreatePaymentAccountRequest,
   type ParsedVietQr,
@@ -41,30 +40,12 @@ export function usePaymentAccounts(enabled = true) {
   });
 }
 
-export interface SavePaymentAccountVariables extends Omit<
-  CreatePaymentAccountRequest,
-  "evidence_file_id"
-> {
-  statement: File;
-  statementPurpose: AccountEvidencePurpose;
-}
-
-// Upload the statement, then save the account that points at it. One mutation,
-// so the dialog has a single pending/error state for the whole save.
 export function useSavePaymentAccount() {
   const queryClient = useQueryClient();
 
-  return useMutation<PaymentAccount, ApiError, SavePaymentAccountVariables>({
-    mutationFn: async ({ statement, statementPurpose, ...account }) => {
-      const evidence = await paymentAccountsService.uploadBankStatement(
-        statement,
-        statementPurpose,
-      );
-      return paymentAccountsService.createPaymentAccount({
-        ...account,
-        evidence_file_id: evidence.file_id,
-      });
-    },
+  return useMutation<PaymentAccount, ApiError, CreatePaymentAccountRequest>({
+    mutationFn: (payload) =>
+      paymentAccountsService.createPaymentAccount(payload),
     onSuccess: (account) => {
       queryClient.setQueryData<PaymentAccount[]>(
         paymentAccountKeys.mine(),

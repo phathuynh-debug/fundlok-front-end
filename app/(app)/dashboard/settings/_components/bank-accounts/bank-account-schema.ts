@@ -24,7 +24,6 @@ export function bankAccountFormSchema(t: Translate) {
       .min(1, t(`${K}.accountNameRequired`))
       .max(128),
     holder_type: z.enum(["INDIVIDUAL", "ENTITY"]),
-    statement_purpose: z.enum(["BANK_STATEMENT", "BANK_CONFIRMATION"]),
   });
 }
 

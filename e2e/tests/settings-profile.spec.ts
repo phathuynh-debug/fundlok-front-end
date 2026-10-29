@@ -143,15 +143,12 @@ test("an investor adds a bank account from their bank app's QR", async ({
   await dialog
     .getByLabel(t(`${BANK}.form.accountName`), { exact: true })
     .fill("INVESTOR TEST");
-  await dialog.getByTestId("bank-statement-input").setInputFiles({
-    name: "statement.pdf",
-    mimeType: "application/pdf",
-    buffer: Buffer.from("%PDF-1.4 stub statement"),
-  });
   await dialog.getByRole("button", { name: t(`${BANK}.form.save`) }).click();
 
   await expect(toast(page, t(`${BANK}.form.savedTitle`))).toBeVisible();
-  await expect(page.getByText(t(`${BANK}.status.PENDING`))).toBeVisible();
+  await expect(
+    page.getByText(t(`${BANK}.status.PENDING`), { exact: true }),
+  ).toBeVisible();
   await expect(page.getByText("19036789012")).toBeVisible();
 });
 

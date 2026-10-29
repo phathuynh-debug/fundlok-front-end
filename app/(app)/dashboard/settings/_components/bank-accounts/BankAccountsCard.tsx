@@ -32,8 +32,8 @@ interface BankAccountsCardProps {
 }
 
 // The bank accounts a user sends and receives transfers with. Each one starts
-// PENDING until staff check it against the uploaded statement; a wrong account
-// is fixed by saving a new one (there is no edit or delete).
+// PENDING until staff approve it; a wrong account is fixed by saving a new one
+// (there is no edit or delete).
 export function BankAccountsCard({ role }: BankAccountsCardProps) {
   const { t, locale } = useTranslations();
   const accounts = usePaymentAccounts();

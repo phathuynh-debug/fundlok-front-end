@@ -37,14 +37,6 @@ export interface CreatePaymentAccountRequest {
   bank_bin: string;
   account_number: string;
   account_name: string;
-  evidence_file_id: string;
-}
-
-export type AccountEvidencePurpose = "BANK_STATEMENT" | "BANK_CONFIRMATION";
-
-export interface EvidenceFile {
-  file_id: string;
-  sha256: string;
 }
 
 export interface VietQr {
@@ -59,17 +51,6 @@ export interface ParsedVietQr {
   account_name: string | null;
 }
 
-// Same limits the backend enforces on evidence files.
-export const BANK_STATEMENT_RULES = {
-  contentTypes: [
-    "application/pdf",
-    "image/png",
-    "image/jpeg",
-    "image/webp",
-  ] as const,
-  maxSizeMb: 10,
-};
-
 export const paymentAccountsService = {
   // GET /direct-transfer/banks — popular banks first, then A–Z. Static data.
   listBanks() {
@@ -79,17 +60,6 @@ export const paymentAccountsService = {
   // GET /payment-accounts — the caller's own accounts, oldest first.
   listPaymentAccounts() {
     return apiClient.get<PaymentAccount[]>(PAYMENT_ACCOUNT_ENDPOINTS.list);
-  },
-
-  // POST /evidence-files — multipart; the statement staff check the account against.
-  uploadBankStatement(file: File, purpose: AccountEvidencePurpose) {
-    const form = new FormData();
-    form.append("purpose", purpose);
-    form.append("file", file);
-    return apiClient.post<EvidenceFile>(
-      PAYMENT_ACCOUNT_ENDPOINTS.evidenceFiles,
-      form,
-    );
   },
 
   // POST /payment-accounts — saves the account as PENDING.

@@ -1093,14 +1093,6 @@ const server = createServer(async (req, res) => {
   if (path === "/payment-accounts" && method === "GET") {
     return json(res, 200, []);
   }
-  if (path === "/evidence-files" && method === "POST") {
-    // Multipart body: drained, not parsed — the stub only needs an id back.
-    for await (const chunk of req) void chunk;
-    return json(res, 201, {
-      file_id: "5d0f8a52-1c6e-4b7a-9d39-0c7e2a4b8f11",
-      sha256: "0".repeat(64),
-    });
-  }
   if (path === "/payment-accounts" && method === "POST") {
     const body = await readBody(req);
     const bank = STUB_BANKS.find((b) => b.bin === body.bank_bin);

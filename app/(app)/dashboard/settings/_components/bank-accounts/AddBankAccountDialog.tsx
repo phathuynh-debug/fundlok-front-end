@@ -3,13 +3,7 @@
 import { useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  CheckCircle2,
-  FileText,
-  Loader2,
-  QrCode,
-  TriangleAlert,
-} from "lucide-react";
+import { CheckCircle2, Loader2, QrCode, TriangleAlert } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -32,9 +26,7 @@ import { apiErrorMessage } from "@/lib/api-error-message";
 import { decodeQrImage } from "@/lib/decode-qr-image";
 import { useTranslations } from "@/lib/i18n";
 import { CONTROL_HOVER } from "@/lib/ui-tokens";
-import { cn } from "@/lib/utils";
 import type { ApiError } from "@/lib/types";
-import { BANK_STATEMENT_RULES } from "@/services/payment-accounts.service";
 import { BankPicker } from "./BankPicker";
 import {
   bankAccountFormSchema,
@@ -51,8 +43,6 @@ const ERROR_KEYS: Record<string, string> = {
   ACCOUNT_EXISTS: "duplicate",
   "Unsupported bank": "unsupportedBank",
   "Invalid account number": "invalidNumber",
-  FILE_TOO_LARGE: "statementTooLarge",
-  UNSUPPORTED_TYPE: "statementInvalidType",
   INVALID_QR: "scanNotVietQr",
   NOT_AN_ACCOUNT_QR: "scanNotAccount",
 };
@@ -81,17 +71,13 @@ export function AddBankAccountDialog({
   const save = useSavePaymentAccount();
 
   const qrInputRef = useRef<HTMLInputElement>(null);
-  const statementInputRef = useRef<HTMLInputElement>(null);
   const [scan, setScan] = useState<ScanState>({ kind: "idle" });
-  const [statement, setStatement] = useState<File | null>(null);
-  const [statementError, setStatementError] = useState<string | null>(null);
 
   const defaultValues: BankAccountFormInput = {
     bank_bin: "",
     account_number: "",
     account_name: "",
     holder_type: defaultHolderType,
-    statement_purpose: "BANK_STATEMENT",
   };
   const {
     control,
@@ -111,9 +97,7 @@ export function AddBankAccountDialog({
     fallbackKey: string,
   ) => {
     const key = error?.code ? ERROR_KEYS[error.code] : undefined;
-    if (key) {
-      return t(`${K}.${key}`, { maxSize: BANK_STATEMENT_RULES.maxSizeMb });
-    }
+    if (key) return t(`${K}.${key}`);
     return apiErrorMessage(error, locale, t(`${K}.${fallbackKey}`));
   };
 
@@ -121,8 +105,6 @@ export function AddBankAccountDialog({
     if (!next) {
       reset(defaultValues);
       setScan({ kind: "idle" });
-      setStatement(null);
-      setStatementError(null);
     }
     onOpenChange(next);
   };
@@ -163,51 +145,23 @@ export function AddBankAccountDialog({
     });
   };
 
-  const handleStatementPicked = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const picked = e.target.files?.[0];
-    e.target.value = "";
-    if (!picked) return;
-    if (!BANK_STATEMENT_RULES.contentTypes.includes(picked.type as never)) {
-      setStatementError(t(`${K}.statementInvalidType`));
-      return;
-    }
-    if (picked.size > BANK_STATEMENT_RULES.maxSizeMb * 1024 * 1024) {
-      setStatementError(
-        t(`${K}.statementTooLarge`, {
-          maxSize: BANK_STATEMENT_RULES.maxSizeMb,
-        }),
-      );
-      return;
-    }
-    setStatement(picked);
-    setStatementError(null);
-  };
-
   const onSubmit = (values: BankAccountFormValues) => {
-    if (!statement) {
-      setStatementError(t(`${K}.statementRequired`));
-      return;
-    }
-    const { statement_purpose, ...account } = values;
-    save.mutate(
-      { ...account, statement, statementPurpose: statement_purpose },
-      {
-        onSuccess: () => {
-          toast({
-            title: t(`${K}.savedTitle`),
-            description: t(`${K}.savedDescription`),
-          });
-          handleOpenChange(false);
-        },
-        onError: (error) => {
-          toast({
-            variant: "destructive",
-            title: t(`${K}.failedTitle`),
-            description: errorText(error, "failedDescription"),
-          });
-        },
+    save.mutate(values, {
+      onSuccess: () => {
+        toast({
+          title: t(`${K}.savedTitle`),
+          description: t(`${K}.savedDescription`),
+        });
+        handleOpenChange(false);
       },
-    );
+      onError: (error) => {
+        toast({
+          variant: "destructive",
+          title: t(`${K}.failedTitle`),
+          description: errorText(error, "failedDescription"),
+        });
+      },
+    });
   };
 
   const isSaving = save.isPending;
@@ -382,85 +336,6 @@ export function AddBankAccountDialog({
             <p className="text-xs text-muted-foreground">
               {t(`${K}.holderTypeHint`)}
             </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label>{t(`${K}.statement`)}</Label>
-            <Controller
-              control={control}
-              name="statement_purpose"
-              render={({ field }) => (
-                <RadioGroup
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  className="flex flex-wrap gap-5"
-                  disabled={isSaving}
-                >
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem
-                      value="BANK_STATEMENT"
-                      id="purpose-statement"
-                    />
-                    <Label htmlFor="purpose-statement" className="font-normal">
-                      {t(`${K}.statementKindStatement`)}
-                    </Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem
-                      value="BANK_CONFIRMATION"
-                      id="purpose-confirmation"
-                    />
-                    <Label
-                      htmlFor="purpose-confirmation"
-                      className="font-normal"
-                    >
-                      {t(`${K}.statementKindConfirmation`)}
-                    </Label>
-                  </div>
-                </RadioGroup>
-              )}
-            />
-            <input
-              ref={statementInputRef}
-              type="file"
-              accept={BANK_STATEMENT_RULES.contentTypes.join(",")}
-              className="hidden"
-              onChange={handleStatementPicked}
-              data-testid="bank-statement-input"
-            />
-            <div
-              className={cn(
-                "flex items-center gap-3 rounded-xl border border-border/60 bg-muted/20 p-3",
-                statementError && "border-destructive",
-              )}
-            >
-              <FileText className="h-5 w-5 shrink-0 text-muted-foreground" />
-              <p className="min-w-0 flex-1 truncate text-sm text-foreground">
-                {statement ? statement.name : "—"}
-              </p>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className={CONTROL_HOVER}
-                disabled={isSaving}
-                onClick={() => statementInputRef.current?.click()}
-              >
-                {statement
-                  ? t(`${K}.statementChange`)
-                  : t(`${K}.statementChoose`)}
-              </Button>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {t(`${K}.statementHint`, {
-                maxSize: BANK_STATEMENT_RULES.maxSizeMb,
-              })}
-            </p>
-            {statementError && (
-              <p className="text-xs font-medium text-destructive">
-                {statementError}
-              </p>
-            )}
           </div>
         </form>
 

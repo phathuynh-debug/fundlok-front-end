@@ -103,8 +103,6 @@ function renderDialog() {
 }
 
 const qrImage = () => new File(["png"], "qr.png", { type: "image/png" });
-const statementPdf = () =>
-  new File(["%PDF"], "statement.pdf", { type: "application/pdf" });
 
 describe("AddBankAccountDialog", () => {
   beforeEach(() => {
@@ -165,67 +163,23 @@ describe("AddBankAccountDialog", () => {
     );
   });
 
-  it("requires a statement before saving", async () => {
+  it("saves a hand-entered account", async () => {
     const user = userEvent.setup();
-    decodeQrImage.mockResolvedValue("PAYLOAD");
-    parseMutate.mockImplementation((_payload, { onSuccess }) =>
-      onSuccess(PARSED),
-    );
-    renderDialog();
-
-    await user.upload(screen.getByTestId("bank-qr-input"), qrImage());
-    await user.type(
-      screen.getByLabelText("Account holder name"),
-      "NGUYEN VAN A",
-    );
-    await user.click(screen.getByRole("button", { name: "Save account" }));
-
-    expect(
-      await screen.findByText(
-        "Upload a bank statement or confirmation letter.",
-      ),
-    ).toBeInTheDocument();
-    expect(saveMutate).not.toHaveBeenCalled();
-  });
-
-  it("saves a hand-entered account with the statement", async () => {
-    const user = userEvent.setup({ applyAccept: false });
     renderDialog();
 
     await user.click(screen.getByRole("combobox"));
     await user.click(await screen.findByText("MBBank"));
     await user.type(screen.getByLabelText("Account number"), "0123 4567 89");
     await user.type(screen.getByLabelText("Account holder name"), "TRAN THI B");
-    await user.click(screen.getByLabelText("Bank confirmation letter"));
-    await user.upload(
-      screen.getByTestId("bank-statement-input"),
-      statementPdf(),
-    );
     await user.click(screen.getByRole("button", { name: "Save account" }));
 
     await waitFor(() => expect(saveMutate).toHaveBeenCalledTimes(1));
     const [variables] = saveMutate.mock.calls[0];
-    expect(variables).toMatchObject({
+    expect(variables).toEqual({
       bank_bin: "970422",
       account_number: "0123456789",
       account_name: "TRAN THI B",
       holder_type: "INDIVIDUAL",
-      statementPurpose: "BANK_CONFIRMATION",
     });
-    expect(variables.statement.name).toBe("statement.pdf");
-  });
-
-  it("refuses a statement of the wrong type", async () => {
-    const user = userEvent.setup({ applyAccept: false });
-    renderDialog();
-
-    await user.upload(
-      screen.getByTestId("bank-statement-input"),
-      new File(["x"], "notes.txt", { type: "text/plain" }),
-    );
-
-    expect(
-      await screen.findByText("Please choose a PDF, JPG, PNG or WebP file."),
-    ).toBeInTheDocument();
   });
 });
