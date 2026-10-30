@@ -46,6 +46,21 @@ test("the project page shows the round and the range one ticket can take", async
   ).toBeVisible();
 });
 
+test("a typed amount is grouped and shows its 2.5% target return", async ({
+  page,
+}) => {
+  await page.goto(`/dashboard/projects/${project.id}`);
+  const input = page.locator("#investmentAmount");
+  await input.fill("25000000");
+
+  await expect(input).toHaveValue("25.000.000");
+  const target = page.getByTestId("target-return");
+  await expect(target).toContainText(
+    normalizeSpaces(formatCurrency(625_000, "vi")),
+  );
+  await expect(target).toContainText(t("dashboard.projectCard.notGuaranteed"));
+});
+
 test("an amount below the minimum is refused on the project page", async ({
   page,
 }) => {

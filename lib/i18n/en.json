@@ -2425,6 +2425,7 @@
       "progress": "Progress",
       "remaining": "Still open",
       "reserved": "Reserved",
+      "targetReturn": "Target return",
       "trackFunding": "Track how much of this loan has been funded",
       "validAmount": "Please enter a valid investment amount.",
       "windowLoadFailed": "We couldn't load this funding round. Try again in a moment.",

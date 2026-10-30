@@ -2425,6 +2425,7 @@
       "progress": "Tiến độ",
       "remaining": "Còn mở",
       "reserved": "Đã giữ chỗ",
+      "targetReturn": "Lợi nhuận mục tiêu",
       "trackFunding": "Theo dõi số tiền đã được tài trợ cho khoản vay này",
       "validAmount": "Vui lòng nhập số tiền đầu tư hợp lệ.",
       "windowLoadFailed": "Không tải được thông tin đợt gọi vốn. Vui lòng thử lại sau.",

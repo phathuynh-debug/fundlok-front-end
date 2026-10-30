@@ -9,14 +9,18 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowRight, Banknote } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
-import { formatCurrency } from "@/lib/format-currency";
+import { formatAmountInput, formatCurrency } from "@/lib/format-currency";
 import { formatDate } from "@/lib/format-date";
 import { useVerificationGate } from "@/hooks/use-verification-gate";
 import { useHasBankAccount } from "@/hooks/use-payment-accounts";
 import { useFundingWindow, useMyTranches } from "@/hooks/use-funding";
 import { BankAccountPrompt } from "../../../_components/BankAccountPrompt";
 import { cn } from "@/lib/utils";
-import { ticketBounds } from "@/lib/listing-figures";
+import {
+  INVESTOR_TARGET_RETURN_PCT,
+  targetReturnVnd,
+  ticketBounds,
+} from "@/lib/listing-figures";
 import { LIVE_TRANCHE_STATUSES } from "@/services/funding.service";
 import type { MarketplaceListing } from "@/services/projects.service";
 
@@ -249,7 +253,9 @@ export function InvestmentTab({
                   id="investmentAmount"
                   placeholder={t(`${K}.placeholder`)}
                   className="pr-8 bg-muted/20 border-muted focus-visible:ring-1 focus-visible:ring-foreground py-5 rounded-xl text-base"
-                  value={amount}
+                  // Grouped as typed ("25.000.000" / "25,000,000"); the state
+                  // keeps the bare digits.
+                  value={formatAmountInput(amount, locale)}
                   onValueChange={setAmount}
                   disabled={isPending}
                   required
@@ -316,6 +322,30 @@ export function InvestmentTab({
                   amount: formatCurrency(bounds!.max, locale),
                 })}
               </p>
+
+              {/* What this amount targets: INVESTOR_TARGET_RETURN_PCT of it,
+                  for the whole loan, as on the project's ROI card. A target,
+                  and said so. */}
+              {Number(amount) > 0 && (
+                <div
+                  className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 rounded-xl border bg-muted/30 px-4 py-3"
+                  data-testid="target-return"
+                >
+                  <span className="text-sm font-medium text-foreground">
+                    {t(`${K}.targetReturn`)}
+                  </span>
+                  <span className="text-lg font-bold tabular-nums text-emerald-600 dark:text-emerald-400">
+                    {formatCurrency(targetReturnVnd(Number(amount)), locale)}
+                  </span>
+                  <span className="w-full text-xs text-muted-foreground">
+                    {t("dashboard.projectCard.roiBasis", {
+                      rate: `${INVESTOR_TARGET_RETURN_PCT}%`,
+                      amount: formatCurrency(Number(amount), locale),
+                    })}{" "}
+                    · {t("dashboard.projectCard.notGuaranteed")}
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="space-y-3">
