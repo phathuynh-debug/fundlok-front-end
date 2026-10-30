@@ -491,6 +491,28 @@
       "viewOwner": "View owner's account",
       "viewOwnerKyc": "View ID documents"
     },
+    "projectFunding": {
+      "closes": "Closes {date}",
+      "errors": {
+        "ACCOUNT_NOT_APPROVED": "The business has no approved bank account at a bank on the list.",
+        "BORROWER_CAP_EXCEEDED": "The business's total borrowing would exceed the cap.",
+        "LISTING_NOT_OPENABLE": "This request's funding round has already ended.",
+        "PROJECT_NOT_LIVE": "The project is not live on the marketplace yet.",
+        "RATE_ABOVE_CAP": "The rate is above the legal cap.",
+        "SME_INVOICE_UNPAID": "The business has an unpaid FundLok invoice.",
+        "TARGET_ABOVE_CAP": "The amount asked is above the limit for one funding round.",
+        "TERMS_NOT_LOCKED": "The project has no approved request with locked terms.",
+        "generic": "Something went wrong. Try again in a moment."
+      },
+      "heading": "Investment",
+      "hint": "It opens on its own once the project is live and the business's bank account is approved.",
+      "none": "Not open for investment yet.",
+      "open": "Open for investment",
+      "openFailed": "Couldn't open the project for investment",
+      "opened": "Project opened for investment",
+      "opening": "Opening…",
+      "progress": "{confirmed} confirmed · {reserved} reserved · target {target}"
+    },
     "projectsPage": {
       "subtitle": "Review company applications and their approvals.",
       "title": "Projects"
@@ -2032,6 +2054,8 @@
       "CREATE": "Created",
       "CREATE_BUSINESS": "Business created",
       "DISBURSEMENT": "Disbursement",
+      "FUNDING_WINDOW_OPENED": "Opened for investment",
+      "INVESTMENT_RESERVED": "Investment reserved",
       "KYB_MANUAL_REVIEW_RESOLVED": "Business verification review resolved",
       "KYC_MANUAL_REVIEW_RESOLVED": "Identity verification review resolved",
       "LINK": "Account linked",
@@ -2085,6 +2109,7 @@
       "RATE_INQUIRY": "Rate inquiry",
       "SCORE_RUN": "Score run",
       "SESSION": "Session",
+      "TRANCHE": "Investment",
       "USER": "User"
     },
     "documentStatus": {
@@ -2093,6 +2118,15 @@
       "REJECTED": "Rejected",
       "SCANNING": "Scanning",
       "UPLOADED": "Uploaded"
+    },
+    "fundingWindowStatus": {
+      "CANCELLED": "Cancelled",
+      "CLOSING": "Closing",
+      "FAILED": "Not funded",
+      "FULL": "Fully reserved",
+      "OPEN": "Open",
+      "REPAID": "Repaid",
+      "REPAYING": "Repaying"
     },
     "projectStatus": {
       "ACTIVE": "Active",
@@ -2226,20 +2260,78 @@
   },
   "investConfirm": {
     "amountLabel": "Investment amount",
+    "amountOutOfRangeBody": "This round takes between {min} and {max} per investor. Go back to the project to choose an amount.",
+    "amountOutOfRangeTitle": "Choose an amount within the range",
     "back": "Back to marketplace",
-    "confirmBtn": "Confirm investment",
-    "doneHint": "Your investment has been placed.",
-    "goToDashboard": "Go to dashboard",
-    "processing": "Processing…",
-    "subtitle": "Review the amount below and confirm to place your investment.",
-    "successDescription": "You have invested {amount}.",
-    "successTitle": "Investment successful",
-    "title": "Confirm your investment",
-    "unavailableAction": "Back to marketplace",
-    "unavailableDescription": "This project is not currently available for investment because our payment gateway is not yet integrated. We are currently working on connecting bank payment channels and will notify you as soon as payment is supported.",
-    "unavailableTitle": "Project Not Currently Available",
-    "verifiedBadge": "Identity verified",
-    "viewDetailsNotice": "View notice again"
+    "backToProject": "Back to project",
+    "closes": "Round closes",
+    "confirming": "Your transfer has been reported and is being confirmed.",
+    "errors": {
+      "ACCOUNT_NOT_APPROVED": "You need an approved bank account, at a bank on our list, to invest.",
+      "ALREADY_HAS_LIVE_TRANCHE": "You already have an investment in this round.",
+      "BANK_ACCOUNT_REQUIRED": "Add a bank account, and wait for it to be approved, before investing.",
+      "BELOW_MIN_TICKET": "The amount is below this round's minimum.",
+      "CAPACITY_EXCEEDED": "The amount is more than what is still open in this round.",
+      "INVESTOR_FEE_UNPAID": "You have an unpaid FundLok invoice. Pay it before investing again.",
+      "TERMS_OUTDATED": "The investing terms have just changed. Reload the page, read them again and agree.",
+      "WINDOW_NOT_OPEN": "This round is no longer taking investments.",
+      "generic": "Something went wrong. Try again in a moment."
+    },
+    "notOpenBody": "This project is not taking investments right now.",
+    "notOpenTitle": "Not open for investment",
+    "reserveFailed": "Couldn't reserve your investment",
+    "steps": {
+      "amount": "Amount",
+      "terms": "Terms",
+      "transfer": "Transfer"
+    },
+    "term": "Loan term",
+    "termValue": "{months} months",
+    "terms": {
+      "agree": "I have read and agree to FundLok's investing terms. I understand that my investment is not guaranteed and that I can lose some or all of it.",
+      "intro": "Read these before you reserve. Agreeing signs them electronically, together with your reservation.",
+      "rules": {
+        "direct": "You lend directly to {business}, under your own loan contract with it, for a term of {months} months.",
+        "exact": "Transfer exactly the amount you reserve, with the payment memo unchanged, before your reservation's time runs out. Money sent above it is not part of the loan.",
+        "fees": "FundLok charges investors a yearly service fee on the outstanding principal, invoiced separately. It is never deducted from your repayments.",
+        "noGuarantee": "Nothing is guaranteed: not your principal, the interest or any return. If the business does not repay, you bear the loss, in part or in full.",
+        "notParty": "FundLok connects investors with businesses. It is not a party to your loan and does not lend or borrow.",
+        "ownAccount": "You transfer from a bank account in your own name to the business's own account, shown on the next screen. The money does not pass through FundLok.",
+        "partial": "The round closes on {date}. If less than {minRaise} of the {target} target is confirmed by then, no loan is formed and the business refunds your transfer. Otherwise the loan is formed for the amount confirmed.",
+        "record": "Your agreement is signed electronically and kept, with the evidence of your transfer, as the record of this investment.",
+        "repayments": "The business repays you directly into your approved bank account, after withholding any personal income tax due on your interest."
+      },
+      "submit": "Agree and reserve {amount}",
+      "submitting": "Reserving…",
+      "title": "Investing terms",
+      "version": "Terms version {version}"
+    },
+    "title": "Your investment",
+    "transfer": {
+      "accountName": "Account holder",
+      "accountNumber": "Account number",
+      "amount": "Amount",
+      "bank": "Bank",
+      "copied": "Copied",
+      "copy": "Copy",
+      "copyLabel": "Copy {field}",
+      "deadline": "Transfer by {time}",
+      "expiredBody": "Your reservation was held for a limited time, and that time has passed. If you have already transferred, keep your bank receipt and contact FundLok support. If not, do not transfer now.",
+      "expiredTitle": "The time to transfer has passed",
+      "loadFailed": "We couldn't load the transfer details. Refresh the page to try again.",
+      "memo": "Payment memo",
+      "qrHint": "Scan with your bank app: the account, amount and memo fill in by themselves.",
+      "rules": {
+        "direct": "The money goes straight to {name}'s account. It does not pass through FundLok.",
+        "exact": "Don't change the amount or the memo: they link your transfer to this investment.",
+        "ownAccount": "Pay from a bank account in your own name.",
+        "receipt": "Keep your bank's transfer receipt: it is the evidence of your investment."
+      },
+      "subtitle": "Send this amount to {name} from your bank app.",
+      "timeLeft": "{time} left",
+      "title": "Transfer to the business"
+    },
+    "verifiedBadge": "Identity verified"
   },
   "investment": {
     "dueDiligence": {
@@ -2301,7 +2393,7 @@
       "title": "FundLok risk assessment"
     },
     "tab": {
-      "agreement": "By investing, you agree that funds are held by our custodial bank partners. FundLok does not own them and cannot draw on them. We hold instruction rights within conditions the bank enforces.",
+      "agreement": "Next you'll read the investing terms and get the business's bank details. You transfer the money straight to the business's own account; it does not pass through FundLok.",
       "amountTooHighTitle": "Amount exceeds what's left",
       "bankAccountPrompt": {
         "body": "Repayments are paid into your own bank account, so you need one saved before you can invest.",
@@ -2313,26 +2405,34 @@
       },
       "belowMinimum": "The minimum investment for this project is {amount}.",
       "closedBody": "This round is no longer taking investments.",
+      "confirmed": "Confirmed",
+      "daysLeft": "{days} days left · closes {date}",
       "enterAmount": "How much would you like to invest?",
-      "funded": "Funded",
+      "fullBody": "Investors have reserved the whole amount. If a reservation lapses, that amount opens again until the round closes.",
+      "fullTitle": "Fully reserved",
       "fundingProgress": "Funding progress",
       "invalidAmountTitle": "Invalid amount",
       "investNow": "Invest now",
       "investmentAmount": "Investment amount (VND)",
-      "investmentSuccessfulDescription": "You've invested {amount} in this project.",
-      "investmentSuccessfulTitle": "Investment successful",
       "makeInvestment": "Make an investment",
       "maxRemainingAmount": "The maximum remaining amount you can invest is {amount}.",
       "maximum": "Maximum: {amount}",
       "minimum": "Minimum: {amount}",
-      "notOpenBody": "This project is not taking investments yet. Funding opens once its offer is signed and the listing goes live.",
+      "notOpenBody": "This project is not taking investments yet. It opens once the business's bank account is approved.",
       "notOpenTitle": "Not open for investment",
       "placeholder": "Enter amount",
       "processing": "Processing...",
       "progress": "Progress",
-      "remaining": "Remaining",
+      "remaining": "Still open",
+      "reserved": "Reserved",
+      "targetReturn": "Target return",
       "trackFunding": "Track how much of this loan has been funded",
-      "validAmount": "Please enter a valid investment amount."
+      "validAmount": "Please enter a valid investment amount.",
+      "windowLoadFailed": "We couldn't load this funding round. Try again in a moment.",
+      "yourTicketBody": "Transfer it to the business with the payment memo to complete your investment.",
+      "yourTicketConfirming": "Your transfer has been reported and is being confirmed.",
+      "yourTicketCta": "View transfer details",
+      "yourTicketTitle": "You've reserved {amount}"
     }
   },
   "kyc": {

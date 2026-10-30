@@ -29,6 +29,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { DocumentViewerDialog } from "./DocumentViewerDialog";
+import { ProjectFunding } from "./ProjectFunding";
 import { UserPreviewSheet } from "./UserPreviewSheet";
 import { KybReviewSheet } from "../kyc-reviews/_components/KybReviewSheet";
 import { KycReviewSheet } from "../kyc-reviews/_components/KycReviewSheet";
@@ -212,6 +213,17 @@ export function ProjectPreviewSheet({
                 </Row>
               </dl>
             </section>
+
+            <Separator />
+
+            {/* --- Its funding window: open for investment or not --- */}
+            <ProjectFunding
+              projectId={data.id}
+              projectStatus={data.status}
+              fundingWindow={data.funding_window ?? null}
+              locale={locale}
+              t={t}
+            />
 
             <Separator />
 

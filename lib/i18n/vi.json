@@ -491,6 +491,28 @@
       "viewOwner": "Xem tài khoản chủ sở hữu",
       "viewOwnerKyc": "Xem giấy tờ tùy thân"
     },
+    "projectFunding": {
+      "closes": "Đóng ngày {date}",
+      "errors": {
+        "ACCOUNT_NOT_APPROVED": "Doanh nghiệp chưa có tài khoản ngân hàng được duyệt tại ngân hàng trong danh sách.",
+        "BORROWER_CAP_EXCEEDED": "Tổng dư nợ của doanh nghiệp sẽ vượt hạn mức.",
+        "LISTING_NOT_OPENABLE": "Đợt gọi vốn của yêu cầu này đã kết thúc.",
+        "PROJECT_NOT_LIVE": "Dự án chưa được niêm yết trên thị trường.",
+        "RATE_ABOVE_CAP": "Lãi suất vượt mức trần theo luật.",
+        "SME_INVOICE_UNPAID": "Doanh nghiệp có hóa đơn FundLok chưa thanh toán.",
+        "TARGET_ABOVE_CAP": "Số tiền đề nghị vượt hạn mức của một đợt gọi vốn.",
+        "TERMS_NOT_LOCKED": "Dự án chưa có yêu cầu được duyệt với điều khoản đã chốt.",
+        "generic": "Đã có lỗi xảy ra. Vui lòng thử lại sau."
+      },
+      "heading": "Gọi vốn",
+      "hint": "Dự án tự mở nhận đầu tư khi đã được niêm yết và tài khoản ngân hàng của doanh nghiệp được duyệt.",
+      "none": "Chưa mở nhận đầu tư.",
+      "open": "Mở nhận đầu tư",
+      "openFailed": "Không mở được dự án để nhận đầu tư",
+      "opened": "Đã mở dự án để nhận đầu tư",
+      "opening": "Đang mở…",
+      "progress": "{confirmed} đã xác nhận · {reserved} đã giữ chỗ · mục tiêu {target}"
+    },
     "projectsPage": {
       "subtitle": "Xem hồ sơ doanh nghiệp và tình trạng phê duyệt.",
       "title": "Dự án"
@@ -2032,6 +2054,8 @@
       "CREATE": "Đã tạo",
       "CREATE_BUSINESS": "Đã tạo doanh nghiệp",
       "DISBURSEMENT": "Giải ngân",
+      "FUNDING_WINDOW_OPENED": "Mở nhận đầu tư",
+      "INVESTMENT_RESERVED": "Giữ chỗ đầu tư",
       "KYB_MANUAL_REVIEW_RESOLVED": "Đã xử lý xem xét xác minh doanh nghiệp",
       "KYC_MANUAL_REVIEW_RESOLVED": "Đã xử lý xét duyệt xác minh danh tính",
       "LINK": "Đã liên kết tài khoản",
@@ -2085,6 +2109,7 @@
       "RATE_INQUIRY": "Lượt tra cứu lãi suất",
       "SCORE_RUN": "Lượt tính điểm",
       "SESSION": "Phiên đăng nhập",
+      "TRANCHE": "Khoản đầu tư",
       "USER": "Người dùng"
     },
     "documentStatus": {
@@ -2093,6 +2118,15 @@
       "REJECTED": "Bị từ chối",
       "SCANNING": "Đang quét",
       "UPLOADED": "Đã tải lên"
+    },
+    "fundingWindowStatus": {
+      "CANCELLED": "Đã hủy",
+      "CLOSING": "Đang đóng",
+      "FAILED": "Không đủ vốn",
+      "FULL": "Đã giữ chỗ hết",
+      "OPEN": "Đang mở",
+      "REPAID": "Đã trả xong",
+      "REPAYING": "Đang trả nợ"
     },
     "projectStatus": {
       "ACTIVE": "Đang hoạt động",
@@ -2226,20 +2260,78 @@
   },
   "investConfirm": {
     "amountLabel": "Số tiền đầu tư",
+    "amountOutOfRangeBody": "Đợt gọi vốn này nhận từ {min} đến {max} cho mỗi nhà đầu tư. Hãy quay lại trang dự án để chọn số tiền.",
+    "amountOutOfRangeTitle": "Hãy chọn số tiền trong khoảng cho phép",
     "back": "Quay lại thị trường",
-    "confirmBtn": "Xác nhận đầu tư",
-    "doneHint": "Khoản đầu tư của bạn đã được thực hiện.",
-    "goToDashboard": "Về trang tổng quan",
-    "processing": "Đang xử lý…",
-    "subtitle": "Xem lại số tiền bên dưới và xác nhận để thực hiện khoản đầu tư.",
-    "successDescription": "Bạn đã đầu tư {amount}.",
-    "successTitle": "Đầu tư thành công",
-    "title": "Xác nhận khoản đầu tư",
-    "unavailableAction": "Quay lại thị trường",
-    "unavailableDescription": "Dự án này hiện chưa thể tiếp nhận đầu tư do hệ thống chưa tích hợp cổng thanh toán. Chúng tôi đang hoàn thiện kết nối kênh thanh toán với đối tác ngân hàng và sẽ thông báo đến bạn ngay khi sẵn sàng.",
-    "unavailableTitle": "Dự án hiện chưa khả dụng",
-    "verifiedBadge": "Đã xác minh danh tính",
-    "viewDetailsNotice": "Xem lại thông báo"
+    "backToProject": "Quay lại dự án",
+    "closes": "Đóng đợt gọi vốn",
+    "confirming": "Khoản chuyển của bạn đã được báo và đang được xác nhận.",
+    "errors": {
+      "ACCOUNT_NOT_APPROVED": "Bạn cần một tài khoản ngân hàng đã được duyệt, tại ngân hàng có trong danh sách, để đầu tư.",
+      "ALREADY_HAS_LIVE_TRANCHE": "Bạn đã có một khoản đầu tư trong đợt gọi vốn này.",
+      "BANK_ACCOUNT_REQUIRED": "Hãy thêm tài khoản ngân hàng và chờ được duyệt trước khi đầu tư.",
+      "BELOW_MIN_TICKET": "Số tiền thấp hơn mức tối thiểu của đợt gọi vốn này.",
+      "CAPACITY_EXCEEDED": "Số tiền vượt quá phần còn mở của đợt gọi vốn này.",
+      "INVESTOR_FEE_UNPAID": "Bạn có hóa đơn FundLok chưa thanh toán. Hãy thanh toán trước khi đầu tư tiếp.",
+      "TERMS_OUTDATED": "Điều khoản đầu tư vừa được cập nhật. Hãy tải lại trang, đọc lại và đồng ý.",
+      "WINDOW_NOT_OPEN": "Đợt gọi vốn này đã ngừng nhận đầu tư.",
+      "generic": "Đã có lỗi xảy ra. Vui lòng thử lại sau."
+    },
+    "notOpenBody": "Dự án này hiện không nhận đầu tư.",
+    "notOpenTitle": "Chưa mở nhận đầu tư",
+    "reserveFailed": "Không giữ chỗ được khoản đầu tư",
+    "steps": {
+      "amount": "Số tiền",
+      "terms": "Điều khoản",
+      "transfer": "Chuyển khoản"
+    },
+    "term": "Kỳ hạn khoản vay",
+    "termValue": "{months} tháng",
+    "terms": {
+      "agree": "Tôi đã đọc và đồng ý với điều khoản đầu tư của FundLok. Tôi hiểu rằng khoản đầu tư không được bảo đảm và tôi có thể mất một phần hoặc toàn bộ số tiền.",
+      "intro": "Hãy đọc kỹ trước khi giữ chỗ. Khi đồng ý, bạn ký điện tử các điều khoản này cùng với lượt giữ chỗ.",
+      "rules": {
+        "direct": "Bạn cho {business} vay trực tiếp, theo hợp đồng vay riêng giữa bạn và doanh nghiệp, với kỳ hạn {months} tháng.",
+        "exact": "Hãy chuyển đúng số tiền đã giữ chỗ, giữ nguyên nội dung chuyển khoản, trước khi hết thời gian giữ chỗ. Phần tiền chuyển dư không thuộc khoản vay.",
+        "fees": "FundLok thu của nhà đầu tư một khoản phí dịch vụ hằng năm trên dư nợ gốc, xuất hóa đơn riêng. Phí này không bao giờ bị trừ vào khoản hoàn trả của bạn.",
+        "noGuarantee": "Không có gì được bảo đảm: cả tiền gốc, tiền lãi lẫn lợi nhuận. Nếu doanh nghiệp không trả nợ, bạn chịu khoản lỗ, một phần hoặc toàn bộ.",
+        "notParty": "FundLok kết nối nhà đầu tư với doanh nghiệp. FundLok không phải là một bên của khoản vay và không cho vay hay đi vay.",
+        "ownAccount": "Bạn chuyển khoản từ tài khoản ngân hàng đứng tên chính mình vào tài khoản của doanh nghiệp, hiển thị ở bước tiếp theo. Khoản tiền không đi qua FundLok.",
+        "partial": "Đợt gọi vốn đóng vào ngày {date}. Nếu đến lúc đó số tiền được xác nhận dưới {minRaise} trên mục tiêu {target}, khoản vay không được hình thành và doanh nghiệp hoàn lại tiền cho bạn. Ngược lại, khoản vay được hình thành theo số tiền đã xác nhận.",
+        "record": "Thỏa thuận của bạn được ký điện tử và lưu lại, cùng bằng chứng chuyển khoản, làm hồ sơ cho khoản đầu tư này.",
+        "repayments": "Doanh nghiệp trả nợ trực tiếp vào tài khoản ngân hàng đã được duyệt của bạn, sau khi khấu trừ thuế thu nhập cá nhân phải nộp trên tiền lãi (nếu có)."
+      },
+      "submit": "Đồng ý và giữ chỗ {amount}",
+      "submitting": "Đang giữ chỗ…",
+      "title": "Điều khoản đầu tư",
+      "version": "Phiên bản điều khoản {version}"
+    },
+    "title": "Khoản đầu tư của bạn",
+    "transfer": {
+      "accountName": "Chủ tài khoản",
+      "accountNumber": "Số tài khoản",
+      "amount": "Số tiền",
+      "bank": "Ngân hàng",
+      "copied": "Đã sao chép",
+      "copy": "Sao chép",
+      "copyLabel": "Sao chép {field}",
+      "deadline": "Chuyển khoản trước {time}",
+      "expiredBody": "Lượt giữ chỗ chỉ có hiệu lực trong thời gian giới hạn và đã hết hạn. Nếu bạn đã chuyển khoản, hãy giữ biên lai và liên hệ bộ phận hỗ trợ của FundLok. Nếu chưa, đừng chuyển khoản lúc này.",
+      "expiredTitle": "Đã hết thời gian chuyển khoản",
+      "loadFailed": "Không tải được thông tin chuyển khoản. Hãy tải lại trang để thử lại.",
+      "memo": "Nội dung chuyển khoản",
+      "qrHint": "Quét bằng ứng dụng ngân hàng: số tài khoản, số tiền và nội dung sẽ tự điền.",
+      "rules": {
+        "direct": "Tiền được chuyển thẳng vào tài khoản của {name}, không đi qua FundLok.",
+        "exact": "Không thay đổi số tiền hay nội dung chuyển khoản: chúng liên kết khoản chuyển với khoản đầu tư này.",
+        "ownAccount": "Hãy chuyển từ tài khoản ngân hàng đứng tên chính bạn.",
+        "receipt": "Hãy giữ biên lai chuyển khoản của ngân hàng: đó là bằng chứng cho khoản đầu tư của bạn."
+      },
+      "subtitle": "Chuyển số tiền này cho {name} từ ứng dụng ngân hàng của bạn.",
+      "timeLeft": "Còn {time}",
+      "title": "Chuyển khoản cho doanh nghiệp"
+    },
+    "verifiedBadge": "Đã xác minh danh tính"
   },
   "investment": {
     "dueDiligence": {
@@ -2301,7 +2393,7 @@
       "title": "Đánh giá rủi ro FundLok"
     },
     "tab": {
-      "agreement": "Khi đầu tư, bạn đồng ý rằng tiền được giữ tại các đối tác ngân hàng lưu ký. FundLok không sở hữu số tiền này và không có quyền sử dụng cho mục đích riêng. Chúng tôi chỉ có quyền ra lệnh trong các điều kiện do ngân hàng thực thi.",
+      "agreement": "Tiếp theo, bạn sẽ đọc điều khoản đầu tư và nhận thông tin tài khoản ngân hàng của doanh nghiệp. Bạn chuyển tiền thẳng vào tài khoản của chính doanh nghiệp; khoản tiền này không đi qua FundLok.",
       "amountTooHighTitle": "Vượt quá số tiền còn lại",
       "bankAccountPrompt": {
         "body": "Khoản hoàn trả được chuyển vào tài khoản ngân hàng của bạn, vì vậy bạn cần lưu một tài khoản trước khi đầu tư.",
@@ -2313,26 +2405,34 @@
       },
       "belowMinimum": "Số tiền đầu tư tối thiểu cho dự án này là {amount}.",
       "closedBody": "Đợt gọi vốn này đã ngừng nhận đầu tư.",
+      "confirmed": "Đã xác nhận",
+      "daysLeft": "Còn {days} ngày · đóng ngày {date}",
       "enterAmount": "Bạn muốn đầu tư bao nhiêu?",
-      "funded": "Đã tài trợ",
+      "fullBody": "Nhà đầu tư đã giữ chỗ toàn bộ số tiền. Nếu một lượt giữ chỗ hết hạn, phần đó sẽ mở lại cho đến khi đợt gọi vốn đóng.",
+      "fullTitle": "Đã được giữ chỗ hết",
       "fundingProgress": "Tiến độ gọi vốn",
       "invalidAmountTitle": "Số tiền không hợp lệ",
       "investNow": "Đầu tư ngay",
       "investmentAmount": "Số tiền đầu tư (VND)",
-      "investmentSuccessfulDescription": "Bạn đã đầu tư {amount} vào dự án này.",
-      "investmentSuccessfulTitle": "Đầu tư thành công",
       "makeInvestment": "Thực hiện đầu tư",
       "maxRemainingAmount": "Số tiền tối đa còn lại bạn có thể đầu tư là {amount}.",
       "maximum": "Tối đa: {amount}",
       "minimum": "Tối thiểu: {amount}",
-      "notOpenBody": "Dự án này chưa nhận đầu tư. Việc gọi vốn bắt đầu sau khi doanh nghiệp ký đề nghị tài trợ và hồ sơ được niêm yết.",
+      "notOpenBody": "Dự án này chưa nhận đầu tư. Dự án sẽ mở sau khi tài khoản ngân hàng của doanh nghiệp được duyệt.",
       "notOpenTitle": "Chưa mở nhận đầu tư",
       "placeholder": "Nhập số tiền",
       "processing": "Đang xử lý...",
       "progress": "Tiến độ",
-      "remaining": "Còn lại",
+      "remaining": "Còn mở",
+      "reserved": "Đã giữ chỗ",
+      "targetReturn": "Lợi nhuận mục tiêu",
       "trackFunding": "Theo dõi số tiền đã được tài trợ cho khoản vay này",
-      "validAmount": "Vui lòng nhập số tiền đầu tư hợp lệ."
+      "validAmount": "Vui lòng nhập số tiền đầu tư hợp lệ.",
+      "windowLoadFailed": "Không tải được thông tin đợt gọi vốn. Vui lòng thử lại sau.",
+      "yourTicketBody": "Hãy chuyển khoản cho doanh nghiệp kèm nội dung chuyển khoản để hoàn tất khoản đầu tư.",
+      "yourTicketConfirming": "Khoản chuyển của bạn đã được báo và đang được xác nhận.",
+      "yourTicketCta": "Xem thông tin chuyển khoản",
+      "yourTicketTitle": "Bạn đã giữ chỗ {amount}"
     }
   },
   "kyc": {

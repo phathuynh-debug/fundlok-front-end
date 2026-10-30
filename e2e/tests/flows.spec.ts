@@ -3,6 +3,7 @@ import { test, expect } from "@playwright/test";
 import { LOAN_DURATIONS_MONTHS } from "../../lib/constants/loan-constraints";
 import { INDUSTRY_OPTIONS } from "../../lib/constants/industries";
 import { formatCurrency } from "../../lib/format-currency";
+import { STUB_PUBLIC_PROJECTS } from "../stub-api/fixtures";
 import { signInAs } from "../support/auth";
 import { normalizeSpaces, t } from "../support/i18n";
 
@@ -10,15 +11,20 @@ import { normalizeSpaces, t } from "../support/i18n";
 // money, and an SME asking for it. Both are reached only by an APPROVED user —
 // the unapproved diversion to /kyc is covered in auth-gating.spec.ts.
 
+// The investing flow itself (terms, then the business's bank details) is in
+// invest-flow.spec.ts; here, only that an approved investor reaches it.
 test.describe("/dashboard/invest", () => {
-  const amount = 500_000_000;
+  const project = STUB_PUBLIC_PROJECTS[0];
+  const amount = 20_000_000;
 
   test.beforeEach(async ({ context }) => {
     await signInAs(context, "investor");
   });
 
-  test("shows the amount to be confirmed, in VND", async ({ page }) => {
-    await page.goto(`/dashboard/invest?amount=${amount}`);
+  test("shows the amount chosen, in VND", async ({ page }) => {
+    await page.goto(
+      `/dashboard/invest?amount=${amount}&projectId=${project.id}`,
+    );
 
     await expect(
       page.getByRole("heading", { name: t("investConfirm.title") }),
@@ -27,31 +33,24 @@ test.describe("/dashboard/invest", () => {
       page.getByText(t("investConfirm.amountLabel"), { exact: true }),
     ).toBeVisible();
     await expect(
+      // Exact: the agree button repeats the amount.
       page.getByText(normalizeSpaces(formatCurrency(amount, "vi")), {
-        exact: false,
+        exact: true,
       }),
     ).toBeVisible();
   });
 
-  test("confirming informs that project is not currently available", async ({
-    page,
-  }) => {
-    await page.goto(`/dashboard/invest?amount=${amount}`);
+  test("offers a way back to the project", async ({ page }) => {
+    await page.goto(
+      `/dashboard/invest?amount=${amount}&projectId=${project.id}`,
+    );
 
     await page
-      .getByRole("button", { name: t("investConfirm.confirmBtn") })
+      .getByRole("link", { name: t("investConfirm.backToProject") })
       .click();
-
-    await expect(
-      page.getByText(t("investConfirm.unavailableTitle")).first(),
-    ).toBeVisible();
-  });
-
-  test("offers a way back to the marketplace", async ({ page }) => {
-    await page.goto(`/dashboard/invest?amount=${amount}`);
-
-    await page.getByRole("link", { name: t("investConfirm.back") }).click();
-    await expect(page).toHaveURL(/\/dashboard\/projects$/);
+    await expect(page).toHaveURL(
+      new RegExp(`/dashboard/projects/${project.id}$`),
+    );
   });
 });
 

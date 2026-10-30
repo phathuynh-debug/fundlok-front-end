@@ -168,6 +168,64 @@ const paymentAccountDecisions = new Map<
   }
 >();
 
+/**
+ * Investors' tickets on funding windows, keyed by stub_scope and account
+ * (verificationScope): a reservation made in one test is never another test's
+ * "you have reserved".
+ */
+const fundingTickets = new Map<
+  string,
+  {
+    id: string;
+    window_id: string;
+    status: "SIGNED";
+    amount_vnd: number;
+    reference_code: string;
+    hold_expires_at: string;
+    signed_at: string;
+    attested_at: null;
+  }[]
+>();
+
+/** Must match services/funding.service.ts and the backend's constant. */
+const STUB_TERMS_VERSION = "2026-10-30";
+
+/**
+ * The funding window of an OPEN stub listing, over the listing's own figures
+ * (what has been funded counts as confirmed). Null for any other listing.
+ */
+/** A public stub project's listing, when it has one. */
+function stubListing(project: (typeof STUB_PUBLIC_PROJECTS)[number]) {
+  const application = project.loan_application;
+  return application && "listing" in application ? application.listing : null;
+}
+
+function stubFundingWindow(listingId: string) {
+  const project = STUB_PUBLIC_PROJECTS.find(
+    (p) => stubListing(p)?.id === listingId,
+  );
+  const listing = project ? stubListing(project) : null;
+  if (!project || !listing || listing.status !== "OPEN") return null;
+  const target = listing.target_amount;
+  return {
+    id: listingId.replace(/^4/, "5"),
+    listing_id: listingId,
+    status: "OPEN",
+    target_vnd: target,
+    min_raise_vnd: Math.ceil(target / 2),
+    min_ticket_vnd: 10_000_000,
+    confirmed_vnd: listing.funded_amount,
+    reserved_vnd: 0,
+    capacity_vnd: target - listing.funded_amount,
+    annual_rate_pct: "16.000",
+    term_months: project.loan_application?.duration_months ?? 6,
+    window_start: "2026-10-30T03:00:00Z",
+    window_end: "2026-11-13T03:00:00Z",
+    days_left: 14,
+    tranche_count: 3,
+  };
+}
+
 /** The bank accounts the admin review queue starts with: one waiting each. */
 function stubAdminPaymentAccounts() {
   return [
@@ -1558,6 +1616,96 @@ const server = createServer(async (req, res) => {
 
   if (path === "/projects/public" && method === "GET") {
     return json(res, 200, STUB_PUBLIC_PROJECTS);
+  }
+
+  // --- Funding windows (ADR-009) -------------------------------------------
+  // Reserving checks what the backend checks that a test can reach: the terms
+  // were agreed in their current version, and the amount is within the window.
+  const windowMatch = /^\/funding\/listings\/([^/]+)\/window$/.exec(path);
+  if (windowMatch && method === "GET") {
+    const fundingWindow = stubFundingWindow(windowMatch[1]);
+    return fundingWindow
+      ? json(res, 200, fundingWindow)
+      : detail(res, 404, "Window not found");
+  }
+  if (path === "/funding/me/tranches" && method === "GET") {
+    return json(
+      res,
+      200,
+      fundingTickets.get(verificationScope(req, key)) ?? [],
+    );
+  }
+  const reserveMatch = /^\/funding\/windows\/([^/]+)\/reservations$/.exec(path);
+  if (reserveMatch && method === "POST") {
+    const body = await readBody(req);
+    const fundingWindow = STUB_PUBLIC_PROJECTS.map((p) =>
+      stubFundingWindow(stubListing(p)?.id ?? ""),
+    ).find((w) => w?.id === reserveMatch[1]);
+    if (!fundingWindow) return detail(res, 404, "Window not found");
+    if (body.ack_risk_disclosure !== true) {
+      return json(
+        res,
+        400,
+        { detail: "The risk disclosure must be acknowledged" },
+        { "x-error-code": "RISK_ACK_REQUIRED" },
+      );
+    }
+    if (body.terms_version !== STUB_TERMS_VERSION) {
+      return json(
+        res,
+        409,
+        { detail: "The investing terms have changed" },
+        { "x-error-code": "TERMS_OUTDATED" },
+      );
+    }
+    const amount = Number(body.amount_vnd);
+    if (amount < fundingWindow.min_ticket_vnd) {
+      return json(
+        res,
+        409,
+        { detail: "The amount is below the minimum ticket" },
+        { "x-error-code": "BELOW_MIN_TICKET" },
+      );
+    }
+    if (amount > fundingWindow.capacity_vnd) {
+      return json(
+        res,
+        409,
+        { detail: "The amount exceeds the remaining capacity" },
+        { "x-error-code": "CAPACITY_EXCEEDED" },
+      );
+    }
+    const scope = verificationScope(req, key);
+    const ticket = {
+      id: "60000000-0000-0000-0000-000000000001",
+      window_id: fundingWindow.id,
+      status: "SIGNED" as const,
+      amount_vnd: amount,
+      reference_code: "FLAB12CD34",
+      hold_expires_at: new Date(Date.now() + 2 * 3600 * 1000).toISOString(),
+      signed_at: new Date().toISOString(),
+      attested_at: null,
+    };
+    fundingTickets.set(scope, [ticket]);
+    return json(res, 201, ticket);
+  }
+  const paymentMatch = /^\/funding\/tranches\/([^/]+)\/payment$/.exec(path);
+  if (paymentMatch && method === "GET") {
+    const ticket = (fundingTickets.get(verificationScope(req, key)) ?? []).find(
+      (t) => t.id === paymentMatch[1],
+    );
+    if (!ticket) return detail(res, 404, "Tranche not found");
+    return json(res, 200, {
+      bank_name: "Techcombank",
+      bank_bin: "970407",
+      account_number: "19036789012",
+      account_name: "CONG TY DELTA FOODS",
+      amount_vnd: ticket.amount_vnd,
+      reference_code: ticket.reference_code,
+      vietqr_payload: `00020101021238550010A000000727012500069704070111190367890120208QRIBFTTA530370454${String(ticket.amount_vnd).length.toString().padStart(2, "0")}${ticket.amount_vnd}5802VN62140810${ticket.reference_code}6304ABCD`,
+      hold_expires_at: ticket.hold_expires_at,
+      warning: "Pay from an account in your own name.",
+    });
   }
 
   // --- Lite grading figures ------------------------------------------------

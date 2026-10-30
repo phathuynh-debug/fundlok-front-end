@@ -37,16 +37,14 @@ test("the project page asks for a bank account and holds back Invest", async ({
   await expect(page).toHaveURL(/\/dashboard\/settings\/profile#bank-account$/);
 });
 
-test("the confirm page asks for a bank account instead of confirming", async ({
+test("the invest page asks for a bank account instead of the terms", async ({
   page,
 }) => {
   // Reached by URL, it checks for itself rather than trusting the button.
-  await page.goto(`/dashboard/invest?amount=1000000&projectId=${project.id}`);
+  await page.goto(`/dashboard/invest?amount=10000000&projectId=${project.id}`);
 
   await expect(page.getByTestId("bank-account-prompt")).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: t("investConfirm.confirmBtn") }),
-  ).toHaveCount(0);
+  await expect(page.getByTestId("investing-terms")).toHaveCount(0);
 });
 
 test("an investor with a saved account sees no prompt", async ({
