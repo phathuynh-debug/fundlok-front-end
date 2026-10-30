@@ -153,6 +153,53 @@ const adminProjectSeeded = new Set<string>();
 /** Status changes made during a run, keyed by stub user id. */
 const adminUserStatuses = new Map<string, string>();
 
+/**
+ * Bank-account review decisions made during a run, keyed by stub_scope and
+ * account id (verificationScope) so one test's approval never leaks into
+ * another's queue.
+ */
+const paymentAccountDecisions = new Map<
+  string,
+  {
+    status: "APPROVED" | "REJECTED";
+    note: string | null;
+    by: string;
+    at: string;
+  }
+>();
+
+/** The bank accounts the admin review queue starts with: one waiting each. */
+function stubAdminPaymentAccounts() {
+  return [
+    {
+      id: "6a1e3d2c-0b4f-4a7e-9c3d-1f2e3d4c5b6a",
+      user_id: STUB_USERS.investor.id,
+      user_email: STUB_USERS.investor.email,
+      user_full_name: STUB_USERS.investor.full_name,
+      holder_role: "INVESTOR",
+      holder_type: "INDIVIDUAL",
+      bank_bin: "970436",
+      bank_name: "Vietcombank",
+      account_number: "0011001234567",
+      account_name: "INVESTOR TEST",
+      created_at: "2026-10-28T03:00:00Z",
+    },
+    {
+      id: "7b2f4e3d-1c5a-4b8f-8d4e-2a3f4e5d6c7b",
+      user_id: STUB_USERS.sme.id,
+      user_email: STUB_USERS.sme.email,
+      user_full_name: STUB_USERS.sme.full_name,
+      holder_role: "SME",
+      holder_type: "ENTITY",
+      bank_bin: "970407",
+      bank_name: "Techcombank",
+      account_number: "19036789012",
+      account_name: "SME TEST",
+      created_at: "2026-10-29T03:00:00Z",
+    },
+  ];
+}
+
 /** Notifications, keyed by stub user. Mutable: read state is the whole point. */
 const notificationsByUser = new Map<string, StubNotification[]>();
 
@@ -1093,17 +1140,17 @@ const server = createServer(async (req, res) => {
   if (path === "/direct-transfer/banks" && method === "GET") {
     return json(res, 200, STUB_BANKS);
   }
-  // An investor has one saved account by default, because investing needs
+  // An investor has one approved account by default, because investing needs
   // one and most specs are about something else. SMEs start with none (the
-  // dashboard asks for one). The `stub_bank_accounts=none` cookie empties the
-  // list for a spec that tests having no account (support/auth.ts).
+  // dashboard asks for one). The `stub_bank_accounts` cookie (support/auth.ts)
+  // empties the list (`none`) or leaves the account waiting for an admin
+  // (`pending`), for the specs about those.
   if (path === "/payment-accounts" && method === "GET") {
-    if (
-      user.role !== "INVESTOR" ||
-      readCookie(req, "stub_bank_accounts") === "none"
-    ) {
+    const bankAccounts = readCookie(req, "stub_bank_accounts");
+    if (user.role !== "INVESTOR" || bankAccounts === "none") {
       return json(res, 200, []);
     }
+    const pendingOnly = bankAccounts === "pending";
     return json(res, 200, [
       {
         id: "3b9d2f4e-6a1c-4e8b-9f2d-7c5a1e3b8d04",
@@ -1113,10 +1160,10 @@ const server = createServer(async (req, res) => {
         bank_name: "Vietcombank",
         account_number: "0011001234567",
         account_name: user.full_name.toUpperCase(),
-        status: "APPROVED",
+        status: pendingOnly ? "PENDING" : "APPROVED",
         rejection_reason: null,
         created_at: "2026-10-01T03:00:00Z",
-        approved_at: "2026-10-01T03:00:00Z",
+        approved_at: pendingOnly ? null : "2026-10-01T03:00:00Z",
       },
     ]);
   }
@@ -1131,10 +1178,10 @@ const server = createServer(async (req, res) => {
       bank_name: bank?.short_name ?? body.other_bank_name ?? "Bank",
       account_number: body.account_number,
       account_name: body.account_name,
-      status: "APPROVED",
+      status: "PENDING",
       rejection_reason: null,
       created_at: new Date().toISOString(),
-      approved_at: new Date().toISOString(),
+      approved_at: null,
     });
   }
   // Reads the account out of a static VietQR. Only the shape the fixture QR
@@ -1963,6 +2010,71 @@ const server = createServer(async (req, res) => {
       return json(res, 200, {
         ...target,
         status: String(body.status),
+      });
+    }
+
+    // Bank-account review: the queue and the approve/reject decision.
+    if (path === "/admin/payment-accounts" && method === "GET") {
+      const status = url.searchParams.get("status") ?? "PENDING";
+      const rows = stubAdminPaymentAccounts().map((row) => {
+        const decided = paymentAccountDecisions.get(
+          verificationScope(req, row.id),
+        );
+        return {
+          ...row,
+          status: decided?.status ?? "PENDING",
+          rejection_reason:
+            decided?.status === "REJECTED" ? decided.note : null,
+          approved_at: decided?.at ?? null,
+          approved_by_email: decided?.by ?? null,
+        };
+      });
+      return json(
+        res,
+        200,
+        status === "ALL" ? rows : rows.filter((r) => r.status === status),
+      );
+    }
+    const paymentDecisionMatch = path.match(
+      /^\/admin\/payment-accounts\/([^/]+)\/decision$/,
+    );
+    if (paymentDecisionMatch && method === "POST") {
+      const body = await readBody(req);
+      const row = stubAdminPaymentAccounts().find(
+        (r) => r.id === paymentDecisionMatch[1],
+      );
+      if (!row) return json(res, 404, { detail: "Bank account not found" });
+      const key = verificationScope(req, row.id);
+      if (paymentAccountDecisions.has(key)) {
+        return json(
+          res,
+          409,
+          { detail: "This account has already been decided" },
+          { "x-error-code": "ALREADY_DECIDED" },
+        );
+      }
+      const note = String(body.note ?? "").trim() || null;
+      if (body.decision === "REJECTED" && !note) {
+        return json(
+          res,
+          422,
+          { detail: "Give the reason for rejecting this bank account" },
+          { "x-error-code": "REASON_REQUIRED" },
+        );
+      }
+      const decided = {
+        status: body.decision as "APPROVED" | "REJECTED",
+        note,
+        by: user.email,
+        at: new Date().toISOString(),
+      };
+      paymentAccountDecisions.set(key, decided);
+      return json(res, 200, {
+        ...row,
+        status: decided.status,
+        rejection_reason: decided.status === "REJECTED" ? note : null,
+        approved_at: decided.at,
+        approved_by_email: decided.by,
       });
     }
 

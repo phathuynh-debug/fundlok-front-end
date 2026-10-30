@@ -16,6 +16,7 @@ import {
   Mail,
   KeyRound,
   type LucideIcon,
+  Landmark,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCurrentUser, useLogout } from "@/hooks/use-authentication";
@@ -43,6 +44,11 @@ export const adminNavItems: NavItem[] = [
     labelKey: "admin.sidebar.kycReviews",
     href: "/admin/kyc-reviews",
     icon: ScanFace,
+  },
+  {
+    labelKey: "admin.sidebar.bankAccounts",
+    href: "/admin/bank-accounts",
+    icon: Landmark,
   },
   {
     labelKey: "admin.sidebar.rates",

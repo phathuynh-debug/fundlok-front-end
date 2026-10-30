@@ -11,7 +11,8 @@ const state: { data?: PaymentAccount[]; isSuccess: boolean } = {
 
 vi.mock("@/hooks/use-payment-accounts", () => ({
   useHasBankAccount: () => ({
-    hasAccount: (state.data ?? []).some((a) => a.status !== "REJECTED"),
+    hasAccount: (state.data ?? []).some((a) => a.status === "APPROVED"),
+    hasPending: (state.data ?? []).some((a) => a.status === "PENDING"),
     isLoaded: state.isSuccess,
   }),
 }));
@@ -60,10 +61,23 @@ describe("BankAccountPrompt", () => {
     ).toHaveAttribute("href", "/dashboard/settings/profile#bank-account");
   });
 
-  it("stays away once an account is saved, even while it is pending", () => {
-    state.data = [account("PENDING")];
+  it("stays away once an account is approved", () => {
+    state.data = [account("APPROVED")];
     render(<BankAccountPrompt t={t} audience="sme" />);
     expect(screen.queryByTestId("bank-account-prompt")).not.toBeInTheDocument();
+  });
+
+  it("says a saved account is waiting for approval", () => {
+    state.data = [account("PENDING")];
+    render(<BankAccountPrompt t={t} audience="sme" />);
+    const prompt = screen.getByTestId("bank-account-prompt");
+    expect(prompt).toHaveAttribute("data-state", "pending");
+    expect(
+      screen.getByText("Your bank account is waiting for approval"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "View bank account" }),
+    ).toHaveAttribute("href", "/dashboard/settings/profile#bank-account");
   });
 
   it("asks again when every saved account was rejected", () => {

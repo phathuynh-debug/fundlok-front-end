@@ -18,6 +18,35 @@
       "time": "Thời gian",
       "title": "Nhật ký kiểm toán"
     },
+    "bankAccounts": {
+      "approve": "Duyệt",
+      "approvedBy": "Duyệt bởi {email} ngày {date}",
+      "approvedOnSave": "Tự động duyệt khi lưu, trước khi áp dụng quy trình duyệt",
+      "approvedToast": "Đã duyệt tài khoản ngân hàng",
+      "decisionFailed": "Không thể lưu quyết định",
+      "decisionFailedDescription": "Vui lòng thử lại.",
+      "empty": {
+        "ALL": "Chưa có tài khoản ngân hàng nào được lưu.",
+        "APPROVED": "Chưa có tài khoản nào được duyệt.",
+        "PENDING": "Không có tài khoản nào chờ duyệt.",
+        "REJECTED": "Không có tài khoản nào bị từ chối."
+      },
+      "filters": {
+        "ALL": "Tất cả",
+        "APPROVED": "Đã duyệt",
+        "PENDING": "Chờ duyệt",
+        "REJECTED": "Bị từ chối"
+      },
+      "loadFailed": "Không tải được danh sách tài khoản ngân hàng.",
+      "note": "Ghi chú",
+      "notePlaceholder": "Ghi chú lưu vào nhật ký. Bắt buộc khi từ chối; người dùng sẽ thấy đây là lý do.",
+      "reasonRequired": "Vui lòng nhập lý do từ chối.",
+      "reject": "Từ chối",
+      "rejectedBy": "Từ chối bởi {email} ngày {date}",
+      "rejectedToast": "Đã từ chối tài khoản ngân hàng",
+      "subtitle": "Tài khoản ngân hàng doanh nghiệp và nhà đầu tư đã lưu. Chỉ tài khoản đã duyệt mới cho phép niêm yết dự án của doanh nghiệp hoặc cho nhà đầu tư đầu tư.",
+      "title": "Tài khoản ngân hàng"
+    },
     "email": {
       "compose": {
         "allowedDomains": "Tên miền được phép: {list}.",
@@ -535,6 +564,7 @@
     "sidebar": {
       "auditLogs": "Nhật ký kiểm toán",
       "badge": "Quản trị",
+      "bankAccounts": "Tài khoản ngân hàng",
       "email": "Email",
       "kycReviews": "Xét duyệt KYC / KYB",
       "logout": "Đăng xuất",
@@ -1392,7 +1422,7 @@
         "bankAccount": {
           "add": "Thêm tài khoản ngân hàng",
           "addedOn": "Thêm ngày {date}",
-          "description": "Tài khoản bạn dùng để chuyển và nhận tiền.",
+          "description": "Tài khoản bạn dùng để chuyển và nhận tiền. Đội ngũ FundLok xem xét tài khoản mới trước khi bạn có thể sử dụng.",
           "empty": "Chưa có tài khoản ngân hàng.",
           "form": {
             "accountName": "Tên chủ tài khoản",
@@ -1425,7 +1455,7 @@
             "otherBanks": "Tất cả ngân hàng",
             "popularBanks": "Phổ biến",
             "save": "Lưu tài khoản",
-            "savedDescription": "Bạn có thể sử dụng tài khoản này ngay.",
+            "savedDescription": "Chúng tôi sẽ xem xét tài khoản. Bạn có thể sử dụng sau khi được duyệt.",
             "savedTitle": "Đã lưu tài khoản ngân hàng",
             "saving": "Đang lưu...",
             "scanButton": "Tải ảnh mã QR",
@@ -1563,6 +1593,9 @@
       "bankAccountPrompt": {
         "body": "Nhà đầu tư chỉ thấy các dự án mà chủ dự án đã thêm tài khoản ngân hàng. Hãy thêm tài khoản bạn sẽ dùng để nhận vốn.",
         "cta": "Thêm tài khoản ngân hàng",
+        "pendingBody": "Đội ngũ FundLok đang xem xét. Dự án của bạn sẽ hiển thị với nhà đầu tư sau khi tài khoản được duyệt.",
+        "pendingCta": "Xem tài khoản",
+        "pendingTitle": "Tài khoản ngân hàng của bạn đang chờ duyệt",
         "title": "Thêm tài khoản ngân hàng để dự án của bạn hiển thị với nhà đầu tư"
       },
       "chooseFile": "Chọn tệp",
@@ -2007,6 +2040,9 @@
       "PASSWORD_CHANGED": "Đã đổi mật khẩu",
       "PASSWORD_RESET": "Đã đặt lại mật khẩu",
       "PASSWORD_SET": "Đã đặt mật khẩu",
+      "PAYMENT_ACCOUNT_APPROVED": "Duyệt tài khoản ngân hàng",
+      "PAYMENT_ACCOUNT_REJECTED": "Từ chối tài khoản ngân hàng",
+      "PAYOUT_ACCOUNT_ADDED": "Thêm tài khoản ngân hàng",
       "PLACE": "Đã đặt lệnh",
       "PRESIGN": "Đã cấp liên kết tải lên",
       "PROFILE_UPDATED": "Đã cập nhật hồ sơ",
@@ -2270,6 +2306,9 @@
       "bankAccountPrompt": {
         "body": "Khoản hoàn trả được chuyển vào tài khoản ngân hàng của bạn, vì vậy bạn cần lưu một tài khoản trước khi đầu tư.",
         "cta": "Thêm tài khoản ngân hàng",
+        "pendingBody": "Bạn có thể đầu tư sau khi đội ngũ FundLok duyệt tài khoản.",
+        "pendingCta": "Xem tài khoản",
+        "pendingTitle": "Tài khoản ngân hàng của bạn đang chờ duyệt",
         "title": "Thêm tài khoản ngân hàng để đầu tư"
       },
       "belowMinimum": "Số tiền đầu tư tối thiểu cho dự án này là {amount}.",

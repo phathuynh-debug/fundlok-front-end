@@ -118,6 +118,19 @@ export async function withoutBankAccounts(
   ]);
 }
 
+/**
+ * Leaves the investor's one saved account waiting for an admin (PENDING), for
+ * a spec about investing before the account is approved. Reload after.
+ */
+export async function withPendingBankAccount(
+  context: BrowserContext,
+  domain: StubHost = "127.0.0.1",
+): Promise<void> {
+  await context.addCookies([
+    { name: "stub_bank_accounts", value: "pending", domain, path: "/" },
+  ]);
+}
+
 export async function useLocale(
   context: BrowserContext,
   locale: "en" | "vi",

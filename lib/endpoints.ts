@@ -169,6 +169,10 @@ export const ADMIN_ENDPOINTS = {
   userStatus: (id: string) => `/admin/users/${id}/status`,
   // Full detail preview for one account (profile + projects + investments + security).
   userDetail: (id: string) => `/admin/users/${id}`,
+  // Bank accounts users saved: the review queue and the approve/reject call.
+  paymentAccounts: "/admin/payment-accounts",
+  paymentAccountDecision: (id: string) =>
+    `/admin/payment-accounts/${id}/decision`,
   // SYSTEM_ADMIN only. Creates an ADMIN account with no password and emails
   // the invitee a single-use link to choose one.
   inviteAdmin: "/admin/users/admins",

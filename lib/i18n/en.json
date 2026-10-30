@@ -18,6 +18,35 @@
       "time": "Time",
       "title": "Audit logs"
     },
+    "bankAccounts": {
+      "approve": "Approve",
+      "approvedBy": "Approved by {email} on {date}",
+      "approvedOnSave": "Approved on save, before reviews were required",
+      "approvedToast": "Bank account approved",
+      "decisionFailed": "Could not save the decision",
+      "decisionFailedDescription": "Please try again.",
+      "empty": {
+        "ALL": "No bank accounts have been saved yet.",
+        "APPROVED": "No approved bank accounts yet.",
+        "PENDING": "No bank accounts are waiting for review.",
+        "REJECTED": "No rejected bank accounts."
+      },
+      "filters": {
+        "ALL": "All",
+        "APPROVED": "Approved",
+        "PENDING": "Waiting for review",
+        "REJECTED": "Rejected"
+      },
+      "loadFailed": "Could not load bank accounts.",
+      "note": "Note",
+      "notePlaceholder": "Note for the audit log. Required to reject; the user sees it as the reason.",
+      "reasonRequired": "Give the reason for rejecting.",
+      "reject": "Reject",
+      "rejectedBy": "Rejected by {email} on {date}",
+      "rejectedToast": "Bank account rejected",
+      "subtitle": "The bank accounts SMEs and investors saved. Only an approved account lists an SME's project or lets an investor invest.",
+      "title": "Bank accounts"
+    },
     "email": {
       "compose": {
         "allowedDomains": "Allowed domains: {list}.",
@@ -535,6 +564,7 @@
     "sidebar": {
       "auditLogs": "Audit logs",
       "badge": "Admin",
+      "bankAccounts": "Bank accounts",
       "email": "Email",
       "kycReviews": "KYC / KYB reviews",
       "logout": "Log out",
@@ -1392,7 +1422,7 @@
         "bankAccount": {
           "add": "Add bank account",
           "addedOn": "Added {date}",
-          "description": "The account you send and receive transfers with.",
+          "description": "The account you send and receive transfers with. Our team reviews new accounts before you can use them.",
           "empty": "No bank account yet.",
           "form": {
             "accountName": "Account holder name",
@@ -1425,7 +1455,7 @@
             "otherBanks": "All banks",
             "popularBanks": "Popular",
             "save": "Save account",
-            "savedDescription": "You can use it straight away.",
+            "savedDescription": "We'll review it. You can use it once it's approved.",
             "savedTitle": "Bank account saved",
             "saving": "Saving...",
             "scanButton": "Upload QR image",
@@ -1563,6 +1593,9 @@
       "bankAccountPrompt": {
         "body": "Investors only see projects whose owner has added a bank account. Add the account you will receive funds in.",
         "cta": "Add bank account",
+        "pendingBody": "Our team is reviewing it. Your project is shown to investors once it's approved.",
+        "pendingCta": "View bank account",
+        "pendingTitle": "Your bank account is waiting for approval",
         "title": "Add your bank account to make your project available"
       },
       "chooseFile": "Choose file",
@@ -2007,6 +2040,9 @@
       "PASSWORD_CHANGED": "Password changed",
       "PASSWORD_RESET": "Password reset",
       "PASSWORD_SET": "Password set",
+      "PAYMENT_ACCOUNT_APPROVED": "Bank account approved",
+      "PAYMENT_ACCOUNT_REJECTED": "Bank account rejected",
+      "PAYOUT_ACCOUNT_ADDED": "Bank account added",
       "PLACE": "Order placed",
       "PRESIGN": "Upload link issued",
       "PROFILE_UPDATED": "Profile updated",
@@ -2270,6 +2306,9 @@
       "bankAccountPrompt": {
         "body": "Repayments are paid into your own bank account, so you need one saved before you can invest.",
         "cta": "Add bank account",
+        "pendingBody": "You can invest once our team approves it.",
+        "pendingCta": "View bank account",
+        "pendingTitle": "Your bank account is waiting for approval",
         "title": "Add your bank account to invest"
       },
       "belowMinimum": "The minimum investment for this project is {amount}.",
