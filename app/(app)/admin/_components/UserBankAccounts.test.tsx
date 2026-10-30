@@ -1,8 +1,13 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import enDictionary from "@/lib/i18n/en.json";
-import type { PaymentAccount } from "@/services/payment-accounts.service";
+import type { AdminPaymentAccount } from "@/services/admin.service";
 import { UserBankAccounts } from "./UserBankAccounts";
+
+vi.mock("@/hooks/use-admin", () => ({
+  useDecidePaymentAccount: () => ({ mutate: vi.fn(), isPending: false }),
+}));
+vi.mock("@/hooks/use-toast", () => ({ useToast: () => ({ toast: vi.fn() }) }));
 
 const t = (key: string, vars?: Record<string, string | number>) => {
   const value = key
@@ -21,7 +26,9 @@ const t = (key: string, vars?: Record<string, string | number>) => {
   );
 };
 
-const account = (overrides: Partial<PaymentAccount>): PaymentAccount => ({
+const account = (
+  overrides: Partial<AdminPaymentAccount>,
+): AdminPaymentAccount => ({
   id: "acc-1",
   holder_role: "INVESTOR",
   holder_type: "INDIVIDUAL",
@@ -33,6 +40,10 @@ const account = (overrides: Partial<PaymentAccount>): PaymentAccount => ({
   rejection_reason: null,
   created_at: "2026-10-29T08:00:00Z",
   approved_at: "2026-10-29T08:00:00Z",
+  user_id: "user-1",
+  user_email: "investor@example.com",
+  user_full_name: "Huynh Tan Phat",
+  approved_by_email: "admin@fundlok.com",
   ...overrides,
 });
 
@@ -61,9 +72,12 @@ describe("UserBankAccounts", () => {
       screen.getByText("Quỹ tín dụng nhân dân Phú Thọ"),
     ).toBeInTheDocument();
     expect(screen.getByText("555000111")).toBeInTheDocument();
-    // A typed bank is marked as outside the list; a live account has no status badge.
+    // A typed bank is marked as outside the list; who approved each is shown.
     expect(screen.getByText("Bank outside the list")).toBeInTheDocument();
-    expect(screen.queryByText("Approved")).not.toBeInTheDocument();
+    expect(screen.getAllByText("Approved")).toHaveLength(2);
+    expect(
+      screen.getAllByText("Approved by admin@fundlok.com on 10/29/2026"),
+    ).toHaveLength(2);
     expect(screen.getByText(/Company/)).toBeInTheDocument();
   });
 

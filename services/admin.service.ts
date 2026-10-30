@@ -431,7 +431,7 @@ export interface AdminUserFullDetail {
   linked_accounts_count: number; // Mock linked_accounts table (app/banking); not shown any more
   // Bank accounts the user saved on their profile, oldest first, in full.
   // Optional: an older backend does not send it.
-  payment_accounts?: PaymentAccount[];
+  payment_accounts?: AdminPaymentAccount[];
   // Associated Entities
   projects: AdminUserProjectRef[];
   investments: AdminUserInvestmentSummary;
@@ -461,6 +461,19 @@ export interface AdminDecisionPayload {
   decision: AdminDecision;
   note?: string | null;
 }
+
+// A saved bank account as an admin reviews it (GET /admin/payment-accounts):
+// whose it is, in full, and who decided it. approved_by_email is null while it
+// is PENDING, and for accounts approved on save while there was no review.
+export interface AdminPaymentAccount extends PaymentAccount {
+  user_id: string;
+  user_email: string;
+  user_full_name: string | null;
+  approved_by_email: string | null;
+}
+
+export type AdminPaymentAccountFilter =
+  "PENDING" | "APPROVED" | "REJECTED" | "ALL";
 
 export const adminService = {
   getOverview(params: AdminOverviewParams = {}) {
@@ -565,6 +578,25 @@ export const adminService = {
   setUserStatus(userId: string, body: AdminUserStatusPayload) {
     return apiClient.patch<AdminUserDetail>(
       ADMIN_ENDPOINTS.userStatus(userId),
+      body,
+    );
+  },
+
+  // Admin only. The bank-account review queue, oldest first; PENDING by
+  // default. Reads are logged server-side (full account numbers).
+  listPaymentAccounts(status: AdminPaymentAccountFilter) {
+    return apiClient.get<AdminPaymentAccount[]>(
+      ADMIN_ENDPOINTS.paymentAccounts,
+      { params: { status } },
+    );
+  },
+
+  // Admin only. Approve or reject a saved bank account; a rejection needs a
+  // note (422 REASON_REQUIRED), and a decision is final (409 ALREADY_DECIDED).
+  // Recorded in the audit log with the deciding admin.
+  decidePaymentAccount(id: string, body: AdminDecisionPayload) {
+    return apiClient.post<AdminPaymentAccount>(
+      ADMIN_ENDPOINTS.paymentAccountDecision(id),
       body,
     );
   },

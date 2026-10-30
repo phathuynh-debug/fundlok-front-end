@@ -24,6 +24,8 @@ import {
   type AdminLoanApplication,
   type AdminOverview,
   type AdminOverviewParams,
+  type AdminPaymentAccount,
+  type AdminPaymentAccountFilter,
   type AdminProjectDetail,
   type AdminReviewListParams,
   type AdminTable,
@@ -65,6 +67,9 @@ export const adminKeys = {
   kybCertificate: (id: string) =>
     [...adminKeys.kybAll(), "certificate", id] as const,
   verificationMode: () => [...adminKeys.all, "verification-mode"] as const,
+  paymentAccountsAll: () => [...adminKeys.all, "payment-accounts"] as const,
+  paymentAccounts: (status: AdminPaymentAccountFilter) =>
+    [...adminKeys.paymentAccountsAll(), status] as const,
   kycImage: (id: string, name: AdminKycImageName) =>
     [...adminKeys.kycAll(), "image", id, name] as const,
 };
@@ -205,6 +210,37 @@ export function useSetUserStatus() {
     mutationFn: ({ id, body }) => adminService.setUserStatus(id, body),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: adminKeys.all });
+    },
+  });
+}
+
+// The bank-account review queue (GET /admin/payment-accounts).
+export function useAdminPaymentAccounts(status: AdminPaymentAccountFilter) {
+  return useQuery<AdminPaymentAccount[], ApiError>({
+    queryKey: adminKeys.paymentAccounts(status),
+    queryFn: () => adminService.listPaymentAccounts(status),
+    staleTime: 0,
+    retry: false,
+  });
+}
+
+// Approve or reject a saved bank account. Refreshes the queue and the user
+// panels, which both show the account's status.
+export function useDecidePaymentAccount() {
+  const queryClient = useQueryClient();
+  return useMutation<
+    AdminPaymentAccount,
+    ApiError,
+    { id: string; body: AdminDecisionPayload }
+  >({
+    mutationFn: ({ id, body }) => adminService.decidePaymentAccount(id, body),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: adminKeys.paymentAccountsAll(),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: [...adminKeys.all, "user"],
+      });
     },
   });
 }

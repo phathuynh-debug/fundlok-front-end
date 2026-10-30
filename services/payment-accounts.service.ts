@@ -70,7 +70,7 @@ export const paymentAccountsService = {
     return apiClient.get<PaymentAccount[]>(PAYMENT_ACCOUNT_ENDPOINTS.list);
   },
 
-  // POST /payment-accounts — saves the account as PENDING.
+  // POST /payment-accounts — saves the account as PENDING, for an admin to approve.
   createPaymentAccount(payload: CreatePaymentAccountRequest) {
     return apiClient.post<PaymentAccount>(
       PAYMENT_ACCOUNT_ENDPOINTS.create,

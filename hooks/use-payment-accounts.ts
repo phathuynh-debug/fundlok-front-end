@@ -40,16 +40,19 @@ export function usePaymentAccounts(enabled = true) {
   });
 }
 
-// Whether the user has a saved account that counts: anything not rejected.
-// The same rule the backend applies before listing an SME's project or
-// accepting an investor's order. `isLoaded` is false until the list is in,
-// so callers can avoid flashing a "no account" state.
+// Whether the user has an account that counts: one an admin APPROVED, the
+// same rule the backend applies before listing an SME's project or accepting
+// an investor's order. `hasPending` says one is saved and waiting for review.
+// `isLoaded` is false until the list is in, so callers can avoid flashing a
+// "no account" state.
 export function useHasBankAccount(enabled = true) {
   const accounts = usePaymentAccounts(enabled);
-  const hasAccount = (accounts.data ?? []).some(
-    (account) => account.status !== "REJECTED",
-  );
-  return { hasAccount, isLoaded: accounts.isSuccess };
+  const list = accounts.data ?? [];
+  return {
+    hasAccount: list.some((account) => account.status === "APPROVED"),
+    hasPending: list.some((account) => account.status === "PENDING"),
+    isLoaded: accounts.isSuccess,
+  };
 }
 
 export function useSavePaymentAccount() {

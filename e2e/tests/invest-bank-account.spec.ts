@@ -1,7 +1,11 @@
 import { test, expect } from "@playwright/test";
 
 import { STUB_PUBLIC_PROJECTS } from "../stub-api/fixtures";
-import { signInAs, withoutBankAccounts } from "../support/auth";
+import {
+  signInAs,
+  withPendingBankAccount,
+  withoutBankAccounts,
+} from "../support/auth";
 import { t } from "../support/i18n";
 
 // An investor can only invest once they have saved a bank account: repayments
@@ -56,4 +60,19 @@ test("an investor with a saved account sees no prompt", async ({
     page.getByRole("button", { name: t("investment.tab.investNow") }),
   ).toBeEnabled();
   await expect(page.getByTestId("bank-account-prompt")).toHaveCount(0);
+});
+
+test("an account waiting for approval holds back Invest and says so", async ({
+  page,
+  context,
+}) => {
+  await withPendingBankAccount(context);
+  await page.goto(`/dashboard/projects/${project.id}`);
+
+  const prompt = page.getByTestId("bank-account-prompt");
+  await expect(prompt).toHaveAttribute("data-state", "pending");
+  await expect(prompt).toContainText(t(`${PROMPT}.pendingTitle`));
+  await expect(
+    page.getByRole("button", { name: t("investment.tab.investNow") }),
+  ).toBeDisabled();
 });
