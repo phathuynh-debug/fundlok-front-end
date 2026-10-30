@@ -1,4 +1,5 @@
 import { apiClient } from "@/lib/api-client";
+import type { PaymentAccount } from "@/services/payment-accounts.service";
 import { ADMIN_ENDPOINTS } from "@/lib/endpoints";
 
 // Which table the BFF /admin/overview endpoint should return alongside stats.
@@ -427,7 +428,10 @@ export interface AdminUserFullDetail {
   last_sign_in_at: string | null; // Timestamp of most recent activity
   // Verification & Banking Insight
   kyc_status: "APPROVED" | "REJECTED" | "MANUAL_REVIEW" | "PENDING" | null; // Latest eKYC result
-  linked_accounts_count: number; // Number of active linked bank/e-wallet accounts
+  linked_accounts_count: number; // Mock linked_accounts table (app/banking); not shown any more
+  // Bank accounts the user saved on their profile, oldest first, in full.
+  // Optional: an older backend does not send it.
+  payment_accounts?: PaymentAccount[];
   // Associated Entities
   projects: AdminUserProjectRef[];
   investments: AdminUserInvestmentSummary;
