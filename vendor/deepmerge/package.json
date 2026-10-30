@@ -1,0 +1,8 @@
+{
+  "name": "deepmerge",
+  "description": "deepmerge 4.3.1 with a FundLok patch for GHSA-gcqx-w48m-w2h4 (no upstream fix exists). See PATCH.md.",
+  "version": "4.3.1-fundlok.1",
+  "main": "dist/cjs.js",
+  "types": "index.d.ts",
+  "license": "MIT"
+}
