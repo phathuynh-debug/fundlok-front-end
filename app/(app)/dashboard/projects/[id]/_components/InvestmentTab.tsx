@@ -1,25 +1,32 @@
 import React, { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { NumericInput } from "@/components/ui/numeric-input";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { Banknote } from "lucide-react";
+import { ArrowRight, Banknote } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format-currency";
+import { formatDate } from "@/lib/format-date";
 import { useVerificationGate } from "@/hooks/use-verification-gate";
 import { useHasBankAccount } from "@/hooks/use-payment-accounts";
+import { useFundingWindow, useMyTranches } from "@/hooks/use-funding";
 import { BankAccountPrompt } from "../../../_components/BankAccountPrompt";
 import { cn } from "@/lib/utils";
-import { listingFundedPercent, listingRemaining } from "@/lib/listing-figures";
+import { ticketBounds } from "@/lib/listing-figures";
+import { LIVE_TRANCHE_STATUSES } from "@/services/funding.service";
 import type { MarketplaceListing } from "@/services/projects.service";
 
-// The funding round and the investment form, from the project's listing:
-// real progress and amounts, and the listing's own minimum ticket and what is
-// left as the bounds. These were constants (70% of 1.25 billion, a 375 million
-// cap) on every project. With no open listing there is nothing to invest in,
-// so the form gives way to a "not open yet" note.
+const K = "investment.tab";
+
+// The funding round and the investment form, from the project's funding
+// window (ADR-009): confirmed and reserved totals, the window's own minimum
+// ticket and what is still open as the bounds. Invest goes on to the terms and
+// then the business's bank details (/dashboard/invest). An investor who already
+// holds a ticket here gets a way back to its transfer details instead.
 export function InvestmentTab({
   projectId,
   listing,
@@ -33,18 +40,34 @@ export function InvestmentTab({
   const { toast } = useToast();
   const { t, locale } = useTranslations();
   const { proceed } = useVerificationGate();
-  // Repayments go back to the investor's own bank account, and the order
-  // endpoint refuses an investor without one (BANK_ACCOUNT_REQUIRED).
+  // Repayments go back to the investor's own bank account, and the backend
+  // refuses a reservation without an approved one (BANK_ACCOUNT_REQUIRED).
   const bankAccount = useHasBankAccount();
   const needsBankAccount = bankAccount.isLoaded && !bankAccount.hasAccount;
 
-  const open = listing?.status === "OPEN";
-  const progressPercent = listing ? listingFundedPercent(listing) : 0;
-  const fundedAmount = listing?.funded_amount ?? 0;
-  const remainingAmount = listing ? listingRemaining(listing) : 0;
-  // What is left is the most one order can take (place_order refuses more).
-  const maxAmount = remainingAmount;
-  const minAmount = listing?.min_ticket ?? null;
+  const windowQuery = useFundingWindow(listing?.id ?? null);
+  const fundingWindow = windowQuery.data ?? null;
+  const tranches = useMyTranches(Boolean(fundingWindow));
+  const myTicket = fundingWindow
+    ? tranches.data?.find(
+        (tranche) =>
+          tranche.window_id === fundingWindow.id &&
+          LIVE_TRANCHE_STATUSES.includes(tranche.status),
+      )
+    : undefined;
+
+  if (listing && windowQuery.isLoading) {
+    return <Skeleton className="h-96 w-full rounded-2xl" />;
+  }
+
+  const target = fundingWindow?.target_vnd ?? 0;
+  const confirmed = fundingWindow?.confirmed_vnd ?? 0;
+  const reserved = fundingWindow?.reserved_vnd ?? 0;
+  const percent = (value: number) =>
+    target > 0 ? Math.min(100, (value / target) * 100) : 0;
+  const takenPercent = Math.floor(percent(confirmed + reserved));
+  const bounds = fundingWindow ? ticketBounds(fundingWindow) : null;
+  const open = fundingWindow?.status === "OPEN" && (bounds?.max ?? 0) > 0;
 
   // Investing requires an approved KYC. An unverified investor gets KYC in a
   // new tab; when it's approved that tab closes and this one goes on to
@@ -52,35 +75,35 @@ export function InvestmentTab({
   // visit is bounced to /kyc?next=… in the same tab as before.
   const handleInvest = (e: React.FormEvent) => {
     e.preventDefault();
-    if (needsBankAccount) return;
+    if (needsBankAccount || !bounds) return;
     const numericAmount = parseFloat(amount);
 
     if (isNaN(numericAmount) || numericAmount <= 0) {
       toast({
         variant: "destructive",
-        title: t("investment.tab.invalidAmountTitle"),
-        description: t("investment.tab.validAmount"),
+        title: t(`${K}.invalidAmountTitle`),
+        description: t(`${K}.validAmount`),
       });
       return;
     }
 
-    if (minAmount !== null && numericAmount < minAmount) {
+    if (numericAmount < bounds.min) {
       toast({
         variant: "destructive",
-        title: t("investment.tab.invalidAmountTitle"),
-        description: t("investment.tab.belowMinimum", {
-          amount: formatCurrency(minAmount, locale),
+        title: t(`${K}.invalidAmountTitle`),
+        description: t(`${K}.belowMinimum`, {
+          amount: formatCurrency(bounds.min, locale),
         }),
       });
       return;
     }
 
-    if (numericAmount > maxAmount) {
+    if (numericAmount > bounds.max) {
       toast({
         variant: "destructive",
-        title: t("investment.tab.amountTooHighTitle"),
-        description: t("investment.tab.maxRemainingAmount", {
-          amount: formatCurrency(maxAmount, locale),
+        title: t(`${K}.amountTooHighTitle`),
+        description: t(`${K}.maxRemainingAmount`, {
+          amount: formatCurrency(bounds.max, locale),
         }),
       });
       return;
@@ -100,71 +123,110 @@ export function InvestmentTab({
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
       {/* Funding Progress Card */}
-      <Card className="p-6 md:p-8 rounded-2xl border shadow-sm bg-card space-y-6">
-        <div>
-          <h3 className="text-xl font-bold text-foreground">
-            {t("investment.tab.fundingProgress")}
-          </h3>
-          <p className="text-sm text-muted-foreground mt-1">
-            {t("investment.tab.trackFunding")}
-          </p>
-        </div>
-
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm font-semibold">
-            <span className="text-muted-foreground">
-              {t("investment.tab.progress")}
-            </span>
-            <span className="text-foreground">{progressPercent}%</span>
+      {fundingWindow && (
+        <Card className="p-6 md:p-8 rounded-2xl border shadow-sm bg-card space-y-6">
+          <div>
+            <h3 className="text-xl font-bold text-foreground">
+              {t(`${K}.fundingProgress`)}
+            </h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              {fundingWindow.status === "OPEN" ||
+              fundingWindow.status === "FULL"
+                ? t(`${K}.daysLeft`, {
+                    days: fundingWindow.days_left,
+                    date: formatDate(fundingWindow.window_end, locale),
+                  })
+                : t(`${K}.trackFunding`)}
+            </p>
           </div>
-          {/* Progress Bar Container */}
-          <div className="w-full bg-muted h-3.5 rounded-full overflow-hidden">
+
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm font-semibold">
+              <span className="text-muted-foreground">
+                {t(`${K}.progress`)}
+              </span>
+              <span className="text-foreground">{takenPercent}%</span>
+            </div>
+            {/* Confirmed transfers, then reservations still being paid. */}
             <div
-              className="bg-foreground h-full rounded-full transition-all duration-500 ease-out"
-              style={{ width: `${progressPercent}%` }}
-            />
+              className="flex w-full bg-muted h-3.5 rounded-full overflow-hidden"
+              data-testid="funding-progress"
+            >
+              <div
+                className="bg-foreground h-full transition-all duration-500 ease-out"
+                style={{ width: `${percent(confirmed)}%` }}
+              />
+              <div
+                className="bg-foreground/35 h-full transition-all duration-500 ease-out"
+                style={{ width: `${percent(reserved)}%` }}
+              />
+            </div>
           </div>
-        </div>
 
-        {/* Funded / Remaining Labels */}
-        <div className="grid grid-cols-1 gap-4 pt-2 border-t min-[420px]:grid-cols-2">
-          <div className="min-w-0">
-            <p className="stat-label">{t("investment.tab.funded")}</p>
-            <p className="mt-1 whitespace-nowrap text-lg font-bold tabular-nums text-foreground sm:text-xl">
-              {formatCurrency(fundedAmount, locale)}
+          <div className="grid grid-cols-1 gap-4 pt-2 border-t min-[420px]:grid-cols-3">
+            {[
+              { label: t(`${K}.confirmed`), value: confirmed },
+              { label: t(`${K}.reserved`), value: reserved },
+              { label: t(`${K}.remaining`), value: fundingWindow.capacity_vnd },
+            ].map((item) => (
+              <div key={item.label} className="min-w-0">
+                <p className="stat-label">{item.label}</p>
+                <p className="mt-1 whitespace-nowrap text-lg font-bold tabular-nums text-foreground">
+                  {formatCurrency(item.value, locale)}
+                </p>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {myTicket ? (
+        <Card
+          className="p-6 md:p-8 rounded-2xl border shadow-sm bg-card space-y-4"
+          data-testid="my-ticket"
+        >
+          <div>
+            <h3 className="text-xl font-bold text-foreground">
+              {t(`${K}.yourTicketTitle`, {
+                amount: formatCurrency(myTicket.amount_vnd, locale),
+              })}
+            </h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              {myTicket.status === "RESERVED" || myTicket.status === "SIGNED"
+                ? t(`${K}.yourTicketBody`)
+                : t(`${K}.yourTicketConfirming`)}
             </p>
           </div>
-          <div className="min-w-0">
-            <p className="stat-label">{t("investment.tab.remaining")}</p>
-            <p className="mt-1 whitespace-nowrap text-lg font-bold tabular-nums text-foreground sm:text-xl">
-              {formatCurrency(remainingAmount, locale)}
-            </p>
-          </div>
-        </div>
-      </Card>
-
-      {/* Make an Investment Card */}
-      {!open ? (
+          <Button asChild className="h-11 rounded-xl">
+            <Link href={`/dashboard/invest?projectId=${projectId}`}>
+              {t(`${K}.yourTicketCta`)}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
+        </Card>
+      ) : !open ? (
         <Card className="p-6 md:p-8 rounded-2xl border shadow-sm bg-card space-y-2">
           <h3 className="text-xl font-bold text-foreground">
-            {t("investment.tab.notOpenTitle")}
+            {fundingWindow?.status === "FULL"
+              ? t(`${K}.fullTitle`)
+              : t(`${K}.notOpenTitle`)}
           </h3>
           <p className="text-sm text-muted-foreground">
-            {t(
-              listing
-                ? "investment.tab.closedBody"
-                : "investment.tab.notOpenBody",
-            )}
+            {fundingWindow?.status === "FULL"
+              ? t(`${K}.fullBody`)
+              : windowQuery.isError && windowQuery.error?.status !== 404
+                ? t(`${K}.windowLoadFailed`)
+                : t(fundingWindow ? `${K}.closedBody` : `${K}.notOpenBody`)}
           </p>
         </Card>
       ) : (
         <Card className="p-6 md:p-8 rounded-2xl border shadow-sm bg-card space-y-6">
           <div>
             <h3 className="text-xl font-bold text-foreground">
-              {t("investment.tab.makeInvestment")}
+              {t(`${K}.makeInvestment`)}
             </h3>
             <p className="text-sm text-muted-foreground mt-1">
-              {t("investment.tab.enterAmount")}
+              {t(`${K}.enterAmount`)}
             </p>
           </div>
 
@@ -174,7 +236,7 @@ export function InvestmentTab({
                 htmlFor="investmentAmount"
                 className="text-sm font-semibold"
               >
-                {t("investment.tab.investmentAmount")}
+                {t(`${K}.investmentAmount`)}
               </Label>
               {/* Trailing ₫, not a leading $: Vietnamese writes the symbol after
                 the amount, and this input takes VND like every other money
@@ -185,7 +247,7 @@ export function InvestmentTab({
                 </span>
                 <NumericInput
                   id="investmentAmount"
-                  placeholder={t("investment.tab.placeholder")}
+                  placeholder={t(`${K}.placeholder`)}
                   className="pr-8 bg-muted/20 border-muted focus-visible:ring-1 focus-visible:ring-foreground py-5 rounded-xl text-base"
                   value={amount}
                   onValueChange={setAmount}
@@ -213,13 +275,16 @@ export function InvestmentTab({
                     label: locale === "vi" ? "100 triệu" : "100M",
                     val: 100_000_000,
                   },
-                  { label: locale === "vi" ? "Tối đa" : "Max", val: maxAmount },
+                  {
+                    label: locale === "vi" ? "Tối đa" : "Max",
+                    val: bounds!.max,
+                  },
                 ]
-                  // Only amounts this listing can take.
+                  // Only amounts this window can take.
                   .filter(
                     (preset, i, all) =>
-                      preset.val <= maxAmount &&
-                      (minAmount === null || preset.val >= minAmount) &&
+                      preset.val <= bounds!.max &&
+                      preset.val >= bounds!.min &&
                       all.findIndex((p) => p.val === preset.val) === i,
                   )
                   .map((preset) => {
@@ -243,12 +308,12 @@ export function InvestmentTab({
               </div>
 
               <p className="text-xs text-muted-foreground tracking-wide">
-                {minAmount !== null &&
-                  `${t("investment.tab.minimum", {
-                    amount: formatCurrency(minAmount, locale),
-                  })} · `}
-                {t("investment.tab.maximum", {
-                  amount: formatCurrency(maxAmount, locale),
+                {t(`${K}.minimum`, {
+                  amount: formatCurrency(bounds!.min, locale),
+                })}{" "}
+                ·{" "}
+                {t(`${K}.maximum`, {
+                  amount: formatCurrency(bounds!.max, locale),
                 })}
               </p>
             </div>
@@ -261,12 +326,10 @@ export function InvestmentTab({
                 disabled={isPending || needsBankAccount}
               >
                 <Banknote className="h-4 w-4" />
-                {isPending
-                  ? t("investment.tab.processing")
-                  : t("investment.tab.investNow")}
+                {isPending ? t(`${K}.processing`) : t(`${K}.investNow`)}
               </Button>
               <p className="text-center text-xs text-muted-foreground leading-relaxed px-4">
-                {t("investment.tab.agreement")}
+                {t(`${K}.agreement`)}
               </p>
             </div>
           </form>

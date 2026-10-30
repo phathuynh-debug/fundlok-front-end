@@ -1,4 +1,5 @@
 import { apiClient } from "@/lib/api-client";
+import type { FundingWindow } from "@/services/funding.service";
 import type { PaymentAccount } from "@/services/payment-accounts.service";
 import { ADMIN_ENDPOINTS } from "@/lib/endpoints";
 
@@ -349,6 +350,8 @@ export interface AdminProjectDetail {
   kyb: AdminKybVerification | null;
   // Optional: a backend that predates the field omits it.
   owner?: AdminProjectOwner | null;
+  // The latest funding window (live or ended); null if it never opened one.
+  funding_window?: FundingWindow | null;
 }
 
 // The account that owns the company, with its latest personal KYC attempt
@@ -484,6 +487,14 @@ export const adminService = {
   getProjectDetail(projectId: string) {
     return apiClient.get<AdminProjectDetail>(
       ADMIN_ENDPOINTS.projectDetail(projectId),
+    );
+  },
+
+  // Admin only. Opens a live project for investment; the live window when it
+  // is already open. 4xx with an X-Error-Code saying why it cannot open.
+  openProjectForFunding(projectId: string) {
+    return apiClient.post<FundingWindow>(
+      ADMIN_ENDPOINTS.projectFundingWindow(projectId),
     );
   },
 

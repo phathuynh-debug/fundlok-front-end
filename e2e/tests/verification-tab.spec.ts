@@ -48,7 +48,7 @@ test("Invest opens KYC in a new tab, which closes and returns the user to the ac
   await signInAs(context, "unapprovedInvestorTab");
   await openProjectPage(page);
 
-  await page.locator("#investmentAmount").fill("131");
+  await page.locator("#investmentAmount").fill("10000000");
   const [verification] = await Promise.all([
     page.waitForEvent("popup"),
     page.getByRole("button", { name: t("investment.tab.investNow") }).click(),
@@ -63,7 +63,9 @@ test("Invest opens KYC in a new tab, which closes and returns the user to the ac
   // The new tab is the KYC screen, carrying the destination and its tab id.
   await expect(verification).toHaveURL(/\/kyc\?next=.*vtab=/);
   const next = new URL(verification.url()).searchParams.get("next");
-  expect(next).toBe(`/dashboard/invest?amount=131&projectId=${project.id}`);
+  expect(next).toBe(
+    `/dashboard/invest?amount=10000000&projectId=${project.id}`,
+  );
 
   // On desktop, KYC exclusively shows the QR code to verify via phone.
   const qrCode = verification.getByTestId("kyc-qr-code");
@@ -87,7 +89,7 @@ test("Invest opens KYC in a new tab, which closes and returns the user to the ac
 
   // ...and the original tab moves on to the investment it was starting.
   await expect(page).toHaveURL(
-    new RegExp(`/dashboard/invest\\?amount=131&projectId=${project.id}`),
+    new RegExp(`/dashboard/invest\\?amount=10000000&projectId=${project.id}`),
   );
 });
 
@@ -102,12 +104,12 @@ test("a verified investor's Invest goes straight to the investment, no new tab",
   page.on("popup", () => {
     opened = true;
   });
-  await page.locator("#investmentAmount").fill("131");
+  await page.locator("#investmentAmount").fill("10000000");
   await page
     .getByRole("button", { name: t("investment.tab.investNow") })
     .click();
 
-  await expect(page).toHaveURL(/\/dashboard\/invest\?amount=131/);
+  await expect(page).toHaveURL(/\/dashboard\/invest\?amount=10000000/);
   expect(opened).toBe(false);
 });
 
@@ -117,7 +119,7 @@ test("pressing Invest again reuses the open verification tab", async ({
 }) => {
   await signInAs(context, "unapprovedInvestor");
   await openProjectPage(page);
-  await page.locator("#investmentAmount").fill("131");
+  await page.locator("#investmentAmount").fill("10000000");
 
   const invest = page.getByRole("button", {
     name: t("investment.tab.investNow"),

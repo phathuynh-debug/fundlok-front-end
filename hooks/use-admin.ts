@@ -7,6 +7,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import type { ApiError } from "@/lib/types";
+import type { FundingWindow } from "@/services/funding.service";
 import { gverifyKeys } from "@/hooks/use-gverify";
 import {
   adminService,
@@ -240,6 +241,19 @@ export function useDecidePaymentAccount() {
       });
       void queryClient.invalidateQueries({
         queryKey: [...adminKeys.all, "user"],
+      });
+    },
+  });
+}
+
+// Opens a live project for investment by hand; the panel then shows its window.
+export function useOpenProjectForFunding(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation<FundingWindow, ApiError, void>({
+    mutationFn: () => adminService.openProjectForFunding(projectId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: adminKeys.projectDetail(projectId),
       });
     },
   });

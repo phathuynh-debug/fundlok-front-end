@@ -69,6 +69,18 @@ export const PAYMENT_ACCOUNT_ENDPOINTS = {
   vietQr: (id: string) => `/payment-accounts/${id}/vietqr`,
 } as const;
 
+// Investing through a project's funding window (ADR-009): the investor holds an
+// amount, agrees to the investing terms, then pays the business directly.
+export const FUNDING_ENDPOINTS = {
+  window: (listingId: string) => `/funding/listings/${listingId}/window`,
+  // Reserves the amount and signs the acceptance in one call; needs an
+  // Idempotency-Key header.
+  reserve: (windowId: string) => `/funding/windows/${windowId}/reservations`,
+  // The business's account, the exact amount, the memo and the VietQR.
+  payment: (trancheId: string) => `/funding/tranches/${trancheId}/payment`,
+  myTranches: "/funding/me/tranches",
+} as const;
+
 export const PROJECT_ENDPOINTS = {
   list: "/projects",
   create: "/projects",
@@ -141,6 +153,9 @@ export const ADMIN_ENDPOINTS = {
   // The project preview: one company, its funding requests, and the owner's
   // latest KYB attempt — both halves of the two-approval gate in one payload.
   projectDetail: (id: string) => `/admin/projects/${id}`,
+  // Opens a live project for investment by hand, for one that did not open
+  // when its business's bank account was approved.
+  projectFundingWindow: (id: string) => `/admin/projects/${id}/funding-window`,
   // The operator's two decisions. Both are admin-only server-side and both are
   // one-way: a decided record answers 409, never a silent overwrite.
   resolveKybVerification: (id: string) =>

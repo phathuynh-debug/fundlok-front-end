@@ -1,3 +1,4 @@
+import type { FundingWindow } from "@/services/funding.service";
 import type { MarketplaceListing } from "@/services/projects.service";
 
 /**
@@ -44,4 +45,20 @@ export const INVESTOR_TARGET_RETURN_PCT = 2.5;
  */
 export function targetReturnVnd(amountVnd: number): number {
   return Math.round((amountVnd * INVESTOR_TARGET_RETURN_PCT) / 100);
+}
+
+/**
+ * The smallest and largest amount one ticket can take on a funding window:
+ * its minimum ticket up to what is still open. The last ticket may be below
+ * the minimum when it takes exactly what is left (funding-window.md I-6); the
+ * backend has the final say.
+ */
+export function ticketBounds(fundingWindow: FundingWindow): {
+  min: number;
+  max: number;
+} {
+  const max = fundingWindow.capacity_vnd;
+  const min =
+    max < fundingWindow.min_ticket_vnd ? max : fundingWindow.min_ticket_vnd;
+  return { min, max };
 }
