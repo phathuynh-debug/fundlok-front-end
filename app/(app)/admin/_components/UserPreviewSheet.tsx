@@ -43,6 +43,7 @@ import { getInitials } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import type { AdminUserRow, AdminUserStatus } from "@/services/admin.service";
 import { apiErrorMessage } from "@/lib/api-error-message";
+import { UserBankAccounts } from "./UserBankAccounts";
 
 // Account status, changed from the users table.
 //
@@ -81,6 +82,8 @@ export function UserPreviewSheet({
   const { mutateAsync: setStatus, isPending: isUpdatingStatus } =
     useSetUserStatus();
   const { data: detail, isLoading } = useAdminUserDetail(user?.id ?? null);
+  // The bank accounts the user saved on their profile (absent from an older backend).
+  const bankAccounts = detail?.payment_accounts ?? [];
   const [note, setNote] = useState("");
 
   const isSelf = !!user && !!me && user.id === me.id;
@@ -385,22 +388,36 @@ export function UserPreviewSheet({
                       )}
                     </div>
 
-                    {/* Linked Bank Accounts */}
+                    {/* Bank accounts the user saved on their profile */}
                     <div className="rounded-lg border bg-muted/20 p-3 space-y-1.5">
                       <span className="text-xs text-muted-foreground block">
-                        {t("admin.userPreview.linkedAccounts")}
+                        {t("admin.userPreview.bankAccounts")}
                       </span>
                       <div className="flex items-center gap-2">
                         <Building2 className="h-4 w-4 text-primary" />
-                        <span className="text-xs font-semibold text-foreground">
-                          {t("admin.userPreview.linkedAccountsCount").replace(
-                            "{count}",
-                            String(detail.linked_accounts_count),
+                        <span
+                          className={cn(
+                            "text-xs font-semibold",
+                            bankAccounts.length > 0
+                              ? "text-foreground"
+                              : "text-amber-600 dark:text-amber-400",
                           )}
+                        >
+                          {bankAccounts.length > 0
+                            ? t("admin.userPreview.bankAccountsCount", {
+                                count: bankAccounts.length,
+                              })
+                            : t("admin.userPreview.bankAccountsNone")}
                         </span>
                       </div>
                     </div>
                   </div>
+
+                  <UserBankAccounts
+                    accounts={bankAccounts}
+                    locale={locale}
+                    t={t}
+                  />
                 </div>
 
                 <Separator />
