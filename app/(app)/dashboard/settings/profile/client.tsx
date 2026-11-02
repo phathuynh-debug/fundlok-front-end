@@ -39,6 +39,7 @@ import {
 import { AvatarUploadDialog } from "../_components/AvatarUploadDialog";
 import { SetPasswordDialog } from "../_components/SetPasswordDialog";
 import { BankAccountsCard } from "../_components/bank-accounts/BankAccountsCard";
+import { SepayConnectionCard } from "../_components/sepay/SepayConnectionCard";
 import { profileFormSchema, type ProfileFormValues } from "./form-schema";
 import { apiErrorMessage } from "@/lib/api-error-message";
 
@@ -496,6 +497,13 @@ export function ProfileClient() {
         {(user?.role === "SME" || user?.role === "INVESTOR") && (
           <m.div variants={springItemVariants}>
             <BankAccountsCard role={user.role} />
+          </m.div>
+        )}
+
+        {/* SePay connection — hides itself until the server has it configured */}
+        {(user?.role === "SME" || user?.role === "INVESTOR") && (
+          <m.div variants={springItemVariants}>
+            <SepayConnectionCard />
           </m.div>
         )}
 

@@ -5,6 +5,7 @@ import {
   fundingService,
   type FundingWindow,
   type PaymentInstructions,
+  type ReceiptResult,
   type ReserveRequest,
   type Tranche,
 } from "@/services/funding.service";
@@ -69,6 +70,24 @@ export function useReserveTicket() {
       // The window's reserved and capacity figures moved.
       queryClient.invalidateQueries({
         queryKey: [...fundingKeys.all, "window"],
+      });
+    },
+  });
+}
+
+export function useUploadReceipt() {
+  const queryClient = useQueryClient();
+  return useMutation<
+    ReceiptResult,
+    ApiError,
+    { trancheId: string; file: File; idempotencyKey: string }
+  >({
+    mutationFn: ({ trancheId, file, idempotencyKey }) =>
+      fundingService.uploadReceipt(trancheId, file, idempotencyKey),
+    onSuccess: () => {
+      // The ticket now carries receipt_submitted_at (or went UNDER_REVIEW).
+      void queryClient.invalidateQueries({
+        queryKey: fundingKeys.myTranches(),
       });
     },
   });

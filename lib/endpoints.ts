@@ -69,6 +69,16 @@ export const PAYMENT_ACCOUNT_ENDPOINTS = {
   vietQr: (id: string) => `/payment-accounts/${id}/vietqr`,
 } as const;
 
+// Connecting the user's own SePay account over OAuth2 (backend spec
+// docs/specs/oauth/sepay-connect.md). Tokens stay on the server.
+export const SEPAY_ENDPOINTS = {
+  status: "/integrations/sepay",
+  connect: "/integrations/sepay/connect",
+  callback: "/integrations/sepay/callback",
+  bankAccounts: "/integrations/sepay/bank-accounts",
+  disconnect: "/integrations/sepay",
+} as const;
+
 // Investing through a project's funding window (ADR-009): the investor holds an
 // amount, agrees to the investing terms, then pays the business directly.
 export const FUNDING_ENDPOINTS = {
@@ -79,6 +89,8 @@ export const FUNDING_ENDPOINTS = {
   // The business's account, the exact amount, the memo and the VietQR.
   payment: (trancheId: string) => `/funding/tranches/${trancheId}/payment`,
   myTranches: "/funding/me/tranches",
+  // The investor's bank receipt for their transfer (multipart `file`).
+  receipt: (trancheId: string) => `/funding/tranches/${trancheId}/receipt`,
 } as const;
 
 export const PROJECT_ENDPOINTS = {

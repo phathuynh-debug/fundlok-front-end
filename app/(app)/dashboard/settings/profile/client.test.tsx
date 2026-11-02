@@ -46,6 +46,11 @@ vi.mock("../_components/bank-accounts/BankAccountsCard", () => ({
   ),
 }));
 
+// Same for the SePay card.
+vi.mock("../_components/sepay/SepayConnectionCard", () => ({
+  SepayConnectionCard: () => <div data-testid="sepay-card" />,
+}));
+
 vi.mock("@/hooks/use-toast", () => ({
   useToast: () => ({
     toast: vi.fn(),
