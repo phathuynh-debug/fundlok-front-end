@@ -31,6 +31,8 @@ const eslintConfig = defineConfig([
     ".vbsec-tmp/**",
     // Separate package with its own tsconfig-less Workers runtime.
     "party/**",
+    // Vendored third-party packages.
+    "vendor/**",
     "node_modules/**",
   ]),
 ]);

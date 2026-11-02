@@ -197,6 +197,11 @@ jobs:
       - name: Audit all dependencies
         run: bun audit --audit-level=high --ignore=GHSA-vfj7-8cjw-p6xm
 
+      # The Cloudflare Worker (party/) has its own lockfile; audit it too.
+      - name: Audit PartyKit worker dependencies
+        working-directory: party
+        run: bun audit --audit-level=moderate
+
   e2e:
     name: E2E (Playwright)
     runs-on: ubuntu-latest

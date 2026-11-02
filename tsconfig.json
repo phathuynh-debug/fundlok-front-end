@@ -34,5 +34,5 @@
     ".next-perf/types/**/*.ts",
     ".next-perf/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "party"]
+  "exclude": ["node_modules", "party", "vendor"]
 }

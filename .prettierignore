@@ -1,6 +1,7 @@
 .next
 .next-*
 node_modules
+vendor
 dist
 build
 bun.lock
