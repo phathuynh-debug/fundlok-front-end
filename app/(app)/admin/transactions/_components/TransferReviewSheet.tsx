@@ -33,6 +33,7 @@ import type {
   AdminReceiptFields,
 } from "@/services/admin-funding.service";
 import { ReceiptViewer } from "./ReceiptViewer";
+import { RepaymentPreview } from "./RepaymentPreview";
 import { TransferHistory } from "./TransferHistory";
 import { TransferStatusBadge } from "./TransferQueue";
 import { transferErrorMessage } from "./transfer-errors";
@@ -46,6 +47,8 @@ import { transferErrorMessage } from "./transfer-errors";
 // is rejected, and the investor can upload the right one. Approved means
 // received: the business has nothing to confirm. A ticket under
 // review (a late receipt, or the business disputing) is settled the same way.
+// Beside the decision, the repayment approving starts is worked out step by
+// step: the money is received, so the loan works from the next working day.
 // Staff never decide money they sent themselves.
 export function TransferReviewSheet({
   trancheId,
@@ -176,6 +179,16 @@ export function TransferReviewSheet({
               )}
               {data.transfer?.parsed_fields && <CheckResult transfer={data} />}
             </section>
+
+            {/* --- The repayment approving starts, worked out --- */}
+            {(data.needs_action ||
+              data.status === "CONFIRMED" ||
+              data.status === "ACTIVE") && (
+              <>
+                <Separator />
+                <RepaymentPreview key={data.id} trancheId={data.id} />
+              </>
+            )}
 
             <Separator />
 

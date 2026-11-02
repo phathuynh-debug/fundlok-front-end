@@ -4,12 +4,14 @@ import { TransferReviewSheet } from "./TransferReviewSheet";
 import type {
   AdminFundingActivity,
   AdminInvestorTransfer,
+  AdminRepaymentPreview,
 } from "@/services/admin-funding.service";
 
 const decideMock = vi.fn();
 let row: AdminInvestorTransfer;
 let me = { id: "admin-1" };
 let history: AdminFundingActivity[] = [];
+let preview: AdminRepaymentPreview | undefined;
 
 vi.mock("@/hooks/use-toast", () => ({ useToast: () => ({ toast: vi.fn() }) }));
 vi.mock("@/hooks/use-authentication", () => ({
@@ -23,6 +25,7 @@ vi.mock("@/hooks/use-admin-funding", () => ({
   }),
   useAdminReceiptUrl: () => ({ data: undefined, isLoading: false }),
   useAdminRepaymentReceiptUrl: () => ({ data: undefined, isLoading: false }),
+  useAdminRepaymentPreview: () => ({ data: preview, isLoading: false }),
   useDecideReceipt: () => ({ mutate: decideMock, isPending: false }),
   useAdminFundingActivity: () => ({
     data: { items: history, total: history.length, page: 1, page_size: 50 },
@@ -31,7 +34,11 @@ vi.mock("@/hooks/use-admin-funding", () => ({
   }),
 }));
 vi.mock("@/lib/i18n", () => ({
-  useTranslations: () => ({ locale: "en", t: (key: string) => key }),
+  useTranslations: () => ({
+    locale: "en",
+    t: (key: string, values?: Record<string, string | number>) =>
+      values ? `${key}:${JSON.stringify(values)}` : key,
+  }),
 }));
 
 const base: AdminInvestorTransfer = {
@@ -81,6 +88,7 @@ describe("TransferReviewSheet", () => {
     row = base;
     me = { id: "admin-1" };
     history = [];
+    preview = undefined;
   });
 
   it("lets staff approve after looking at the receipt, typing nothing in", () => {
@@ -119,6 +127,84 @@ describe("TransferReviewSheet", () => {
       { transferId: "tf-1", body: { outcome: "APPROVED", reason: null } },
       expect.anything(),
     );
+  });
+
+  it("works out the repayment approving starts, beside the decision", () => {
+    preview = {
+      kind: "PREVIEW",
+      assumed_close_date: "2026-11-02",
+      start_date: "2026-11-03",
+      business_day_count: 84,
+      days: [
+        {
+          kind: "STUB",
+          day_index: 0,
+          due_date: "2026-11-03",
+          principal_vnd: 0,
+          interest_vnd: 2_976,
+          gross_vnd: 2_976,
+          tax_withheld_vnd: 148,
+          net_vnd: 2_828,
+        },
+        {
+          kind: "INSTALMENT",
+          day_index: 1,
+          due_date: "2026-11-03",
+          principal_vnd: 119_048,
+          interest_vnd: 2_975,
+          gross_vnd: 122_023,
+          tax_withheld_vnd: 148,
+          net_vnd: 121_875,
+        },
+      ],
+      totals: {
+        gross_vnd: 10_252_976,
+        tax_withheld_vnd: 12_648,
+        net_vnd: 10_240_328,
+      },
+      basis: {
+        principal_vnd: 10_000_000,
+        loan_rate_pct: "16.000",
+        investor_return_pct: "2.5",
+        investor_rate_pct: "7.5",
+        term_months: 4,
+        working_days_per_month: 21,
+        business_day_count: 84,
+        interest_vnd: 250_000,
+        total_vnd: 10_250_000,
+        daily_vnd: 122_023,
+        final_vnd: 122_091,
+        received_on: "2026-11-02",
+        approved_on: "2026-11-02",
+        start_date: "2026-11-03",
+        end_date: "2027-03-05",
+        stub_days: 1,
+        stub_basis_days: 252,
+        stub_interest_vnd: 2_976,
+        individual: true,
+        withholding_pct: "5",
+        tax_vnd: 12_648,
+      },
+    };
+    open();
+
+    const block = screen.getByTestId("repayment-preview");
+    expect(block).toHaveTextContent(
+      "admin.transactions.preview.headingPreview",
+    );
+    const steps = screen.getByTestId("repayment-preview-steps");
+    // Approved today, it repays from the next working day.
+    expect(steps).toHaveTextContent(
+      'admin.transactions.preview.steps.datesPreview:{"approved":"11/02/2026","start":"11/03/2026","end":"03/05/2027"}',
+    );
+    // The return, the days, each day's amount, the first-period interest, the tax.
+    expect(steps).toHaveTextContent('"return":"2.5","term":4,"rate":"7.5"');
+    expect(steps).toHaveTextContent('"perMonth":21,"count":84');
+    expect(steps).toHaveTextContent('"daily":"₫122,023","last":"₫122,091"');
+    expect(steps).toHaveTextContent('"stub":"₫2,976"');
+    expect(steps).toHaveTextContent('"amount":"₫12,648"');
+    // Day one carries the first-period interest.
+    expect(block).toHaveTextContent('"gross":"₫124,999","net":"₫124,703"');
   });
 
   it("denies with the note staff gave", () => {

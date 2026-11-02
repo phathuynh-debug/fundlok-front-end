@@ -882,6 +882,35 @@
           "submitted": "Tải lên"
         },
         "unit": "biên lai"
+      },
+      "preview": {
+        "dayIndex": "Kỳ {index}",
+        "end": "Kỳ cuối",
+        "endValue": "{date} ({count} ngày làm việc)",
+        "firstDay": "Số tiền kỳ 1",
+        "heading": "Lịch trả nợ",
+        "headingPreview": "Lịch trả nợ nếu duyệt hôm nay",
+        "hideDays": "Ẩn các ngày",
+        "howHeading": "Cách tính",
+        "ifApproved": "Nếu duyệt bây giờ",
+        "showDays": "Xem từng ngày",
+        "split": "{gross} (nhà đầu tư nhận {net})",
+        "start": "Kỳ 1",
+        "steps": {
+          "daily": "Mỗi ngày: ({principal} + {interest}) ÷ {count} = {daily}.",
+          "dailyWithLast": "Mỗi ngày: ({principal} + {interest}) ÷ {count} = {daily}; ngày cuối là {last}, gồm phần dư.",
+          "dates": "Đã duyệt ngày {approved}; kỳ 1 là {start}, kỳ cuối là {end}.",
+          "datesPreview": "Duyệt hôm nay, {approved}: tiền đã nhận và khoản vay bắt đầu ngay, nên kỳ 1 là ngày làm việc tiếp theo, {start}. Kỳ cuối là {end}.",
+          "days": "Trả trong {term} tháng × {perMonth} ngày làm việc = {count} ngày làm việc.",
+          "noTax": "Nhà đầu tư là tổ chức: không khấu trừ thuế.",
+          "principal": "Số tiền đầu tư: {principal}.",
+          "rate": "Lãi: {rate}%/năm trong {term} tháng, tức {interest}.",
+          "return": "Lợi nhuận nhà đầu tư: {return}% cho cả khoản vay {term} tháng, tức {rate}%/năm (không vượt lãi suất {loanRate}%/năm của doanh nghiệp), nên tiền lãi là {interest}.",
+          "stub": "Lãi kỳ đầu: tiền đến ngày {received}, {days} ngày làm việc trước kỳ 1: {principal} × {rate}% × {days} ÷ {basis} = {stub}, trả cùng kỳ 1.",
+          "tax": "Thuế TNCN: {tax}% chỉ trên phần lãi, tổng cộng {amount}. Doanh nghiệp giữ lại và nộp cho cơ quan thuế; nhà đầu tư nhận phần còn lại."
+        },
+        "total": "Tổng phải trả",
+        "transferShort": "nhận {net}"
       }
     },
     "userPreview": {

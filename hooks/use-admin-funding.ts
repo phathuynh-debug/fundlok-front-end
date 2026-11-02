@@ -20,6 +20,7 @@ import {
   type AdminReceiptDecisionPayload,
   type AdminReceiptUrl,
   type AdminRepaymentListParams,
+  type AdminRepaymentPreview,
   type AdminRepaymentReceipt,
   type AdminRoundFilter,
   type AdminTransferListParams,
@@ -37,6 +38,8 @@ export const adminFundingKeys = {
     [...adminFundingKeys.all, "receipt-url", transferId] as const,
   activity: (params: AdminActivityParams) =>
     [...adminFundingKeys.all, "activity", params] as const,
+  repaymentPreview: (trancheId: string) =>
+    [...adminFundingKeys.all, "repayment-preview", trancheId] as const,
   repayments: (params: AdminRepaymentListParams) =>
     [...adminFundingKeys.all, "repayments", params] as const,
   repayment: (receiptId: string) =>
@@ -82,6 +85,18 @@ export function useAdminInvestorTransfer(trancheId: string | null) {
     queryFn: () => adminFundingService.getTransfer(trancheId as string),
     enabled: Boolean(trancheId),
     staleTime: 0,
+    retry: false,
+  });
+}
+
+// The repayment approving starts. Under adminFundingKeys.all, so a decision
+// turns the preview into the days the investment got.
+export function useAdminRepaymentPreview(trancheId: string, enabled = true) {
+  return useQuery<AdminRepaymentPreview, ApiError>({
+    queryKey: adminFundingKeys.repaymentPreview(trancheId),
+    queryFn: () => adminFundingService.getRepaymentPreview(trancheId),
+    enabled,
+    staleTime: 30 * 1000,
     retry: false,
   });
 }

@@ -2,6 +2,10 @@ import { apiClient } from "@/lib/api-client";
 import { ADMIN_ENDPOINTS } from "@/lib/endpoints";
 import type { AdminTable } from "@/services/admin.service";
 import type { FundingWindow, TrancheStatus } from "@/services/funding.service";
+import type {
+  ProjectedSchedule,
+  ProjectionBasis,
+} from "@/services/repayment.service";
 
 // The admin Transactions tab (backend app/admin/funding.py): the funding rounds
 // taking investment, and every investor transfer with the receipt checks staff
@@ -164,6 +168,13 @@ export interface AdminFundingActivity {
   reason: string | null;
 }
 
+// Mirrors backend AdminRepaymentPreviewOut. PREVIEW: the days an investment
+// gets if approved today (from the next working day). ACTUAL: the days it got.
+export interface AdminRepaymentPreview extends ProjectedSchedule {
+  kind: "PREVIEW" | "ACTUAL";
+  basis: ProjectionBasis;
+}
+
 /** NEEDS_ACTION is the queue: a receipt waiting on staff. */
 export const REPAYMENT_FILTERS = ["NEEDS_ACTION", "DECIDED", "ALL"] as const;
 export type AdminRepaymentFilter = (typeof REPAYMENT_FILTERS)[number];
@@ -257,6 +268,13 @@ export const adminFundingService = {
   getTransfer(trancheId: string) {
     return apiClient.get<AdminInvestorTransfer>(
       ADMIN_ENDPOINTS.fundingTransfer(trancheId),
+    );
+  },
+
+  // The repayment approving starts, worked out step by step.
+  getRepaymentPreview(trancheId: string) {
+    return apiClient.get<AdminRepaymentPreview>(
+      ADMIN_ENDPOINTS.fundingTransferRepayment(trancheId),
     );
   },
 

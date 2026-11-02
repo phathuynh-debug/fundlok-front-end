@@ -225,6 +225,9 @@ export const ADMIN_ENDPOINTS = {
   fundingActivity: "/admin/funding/activity",
   fundingTransfer: (trancheId: string) =>
     `/admin/funding/transfers/${trancheId}`,
+  // The repayment approving starts, worked out step by step.
+  fundingTransferRepayment: (trancheId: string) =>
+    `/admin/funding/transfers/${trancheId}/repayment`,
   transferReceiptUrl: (transferId: string) =>
     `/admin/funding/transfers/${transferId}/receipt-url`,
   transferDecision: (transferId: string) =>

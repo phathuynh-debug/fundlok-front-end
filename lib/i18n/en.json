@@ -882,6 +882,35 @@
           "submitted": "Uploaded"
         },
         "unit": "receipts"
+      },
+      "preview": {
+        "dayIndex": "Day {index}",
+        "end": "Last day",
+        "endValue": "{date} ({count} working days)",
+        "firstDay": "Day 1 amount",
+        "heading": "Repayment schedule",
+        "headingPreview": "Repayment if approved today",
+        "hideDays": "Hide days",
+        "howHeading": "How it's worked out",
+        "ifApproved": "If approved now",
+        "showDays": "Show every day",
+        "split": "{gross} (investor receives {net})",
+        "start": "Day 1",
+        "steps": {
+          "daily": "Each day: ({principal} + {interest}) ÷ {count} = {daily}.",
+          "dailyWithLast": "Each day: ({principal} + {interest}) ÷ {count} = {daily}; the last day is {last}, with the leftover đồng.",
+          "dates": "Approved on {approved}; day 1 is {start} and the last day is {end}.",
+          "datesPreview": "Approved today, {approved}: the money is received and the loan works at once, so day 1 is the next working day, {start}. The last day is {end}.",
+          "days": "Repaid over {term} months × {perMonth} working days = {count} working days.",
+          "noTax": "The investor is an organisation: no tax is withheld.",
+          "principal": "Investment: {principal}.",
+          "rate": "Interest: {rate}% a year for {term} months, so {interest}.",
+          "return": "Investor return: {return}% over the whole {term}-month loan, which is {rate}% a year (never above the business's {loanRate}% a year), so the interest is {interest}.",
+          "stub": "First-period interest: the money arrived on {received}, {days} working days before day 1: {principal} × {rate}% × {days} ÷ {basis} = {stub}, paid with day 1.",
+          "tax": "Personal income tax: {tax}% of the interest only, {amount} in all. The business keeps it back and pays it to the tax office; the investor receives the rest."
+        },
+        "total": "Total to repay",
+        "transferShort": "receives {net}"
       }
     },
     "userPreview": {

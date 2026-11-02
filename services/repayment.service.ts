@@ -60,6 +60,37 @@ export interface ProjectedDay {
   net_vnd: number;
 }
 
+/** Mirrors backend ProjectionBasisOut: each step of the arithmetic. Rates are
+ *  percentages, sent as decimal strings. */
+export interface ProjectionBasis {
+  principal_vnd: number;
+  /** The business's yearly rate. */
+  loan_rate_pct: string;
+  /** The investors' return over the whole loan (e.g. "2.5"). */
+  investor_return_pct: string | null;
+  /** That return as a yearly rate, never above the business's. */
+  investor_rate_pct: string;
+  term_months: number;
+  working_days_per_month: number;
+  business_day_count: number;
+  interest_vnd: number;
+  /** Principal plus interest. */
+  total_vnd: number;
+  daily_vnd: number;
+  /** The last day: the daily amount plus the leftover. */
+  final_vnd: number;
+  received_on: string;
+  approved_on: string;
+  start_date: string;
+  end_date: string;
+  stub_days: number;
+  stub_basis_days: number;
+  stub_interest_vnd: number;
+  individual: boolean;
+  withholding_pct: string;
+  tax_vnd: number;
+}
+
 // Mirrors backend ProjectedScheduleOut.
 export interface ProjectedSchedule {
   /** The round's last day: the latest it can close, so the latest dates. */
@@ -68,6 +99,7 @@ export interface ProjectedSchedule {
   business_day_count: number;
   days: ProjectedDay[];
   totals: { gross_vnd: number; tax_withheld_vnd: number; net_vnd: number };
+  basis?: ProjectionBasis | null;
 }
 
 // Mirrors backend InvestmentDueOut: what the business owes one investor now,
