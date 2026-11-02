@@ -23,6 +23,8 @@ import {
 } from "@/lib/animations";
 import { TruncatedFigure } from "@/components/truncated-figure";
 import { HoldingsList } from "./HoldingsList";
+import { MyInvestments, isInvestment } from "./investments/MyInvestments";
+import { useMyTranches } from "@/hooks/use-funding";
 import { SampleDataNotice } from "./SampleDataNotice";
 import {
   // MOCK_HOLDINGS commented out — an investor sees the clean empty state until
@@ -40,6 +42,10 @@ export function InvestorDashboard() {
   // const holdings = MOCK_HOLDINGS;
   const holdings = useMemo<Holding[]>(() => [], []);
   const summary = useMemo(() => summarizePortfolio(holdings), [holdings]);
+  // The investor's real tickets. Until the portfolio figures above are live,
+  // these are what the dashboard shows once there is any investment at all.
+  const tranches = useMyTranches();
+  const hasInvestments = (tranches.data ?? []).some(isInvestment);
 
   // `caption` carries the qualifier a figure cannot be shown without — a
   // target range needs "not guaranteed", a loss figure needs who bears it.
@@ -117,7 +123,9 @@ export function InvestorDashboard() {
         <SampleDataNotice message={t("dashboard.investor.mockNotice")} />
       )}
 
-      {holdings.length === 0 ? (
+      {holdings.length === 0 && hasInvestments ? (
+        <MyInvestments />
+      ) : holdings.length === 0 ? (
         <m.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}

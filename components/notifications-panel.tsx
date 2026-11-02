@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, m } from "framer-motion";
 import {
+  Banknote,
   Bell,
   BellOff,
   CircleCheck,
@@ -18,6 +19,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import { formatCurrency } from "@/lib/format-currency";
 import { formatDateTime } from "@/lib/format-date";
 import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -65,6 +67,11 @@ const EVENT_PRESENTATION: Record<
   {
     /** A fixed key, or one picked from the notification's placeholders. */
     messageKey: string | ((notification: AppNotification) => string);
+    /** The `{placeholders}` the copy names, formatted for the reader. */
+    values?: (
+      notification: AppNotification,
+      locale: string,
+    ) => Record<string, string | number>;
     tone: NotificationTone;
     icon: LucideIcon;
     action?: NotificationAction;
@@ -92,6 +99,22 @@ const EVENT_PRESENTATION: Record<
     icon: ShieldCheck,
     action: { labelKey: "notifications.actions.verify", href: "/kyc" },
   },
+  // To the business: staff approved an investor's transfer to its account. A
+  // matched receipt (ATTESTED) still leaves two working days to say the money
+  // never arrived, so that copy says so; a settled review (CONFIRMED) is final.
+  INVESTMENT_TRANSFER_APPROVED: {
+    messageKey: (notification) =>
+      notification.data.status === "CONFIRMED"
+        ? "notifications.items.transferConfirmed"
+        : "notifications.items.transferApproved",
+    values: (notification, locale) => ({
+      amount: formatCurrency(Number(notification.data.amount_vnd ?? 0), locale),
+      memo: String(notification.data.memo ?? ""),
+      investor: String(notification.data.investor ?? ""),
+    }),
+    tone: "positive",
+    icon: Banknote,
+  },
 };
 
 export const TONE_CLASS: Record<NotificationTone, string> = {
@@ -111,7 +134,8 @@ export const TONE_CLASS: Record<NotificationTone, string> = {
  */
 export function presentNotification(
   notification: AppNotification,
-  t: (key: string) => string,
+  t: (key: string, values?: Record<string, string | number>) => string,
+  locale = "vi",
 ): {
   icon: LucideIcon;
   tone: NotificationTone;
@@ -132,6 +156,7 @@ export function presentNotification(
     tone: presentation.tone,
     message: t(
       typeof messageKey === "function" ? messageKey(notification) : messageKey,
+      presentation.values?.(notification, locale),
     ),
     action: presentation.action,
   };
@@ -317,7 +342,7 @@ function NotificationRow({
     tone,
     message,
     action,
-  } = presentNotification(notification, t);
+  } = presentNotification(notification, t, locale);
   const isRead = notification.read_at !== null;
 
   const content = (

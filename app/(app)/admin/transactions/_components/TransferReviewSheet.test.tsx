@@ -6,7 +6,6 @@ import type {
   AdminInvestorTransfer,
 } from "@/services/admin-funding.service";
 
-const enterMock = vi.fn();
 const decideMock = vi.fn();
 let row: AdminInvestorTransfer;
 let me = { id: "admin-1" };
@@ -23,8 +22,7 @@ vi.mock("@/hooks/use-admin-funding", () => ({
     isError: false,
   }),
   useAdminReceiptUrl: () => ({ data: undefined, isLoading: false }),
-  useEnterTransferFields: () => ({ mutate: enterMock, isPending: false }),
-  useDecideTransfer: () => ({ mutate: decideMock, isPending: false }),
+  useDecideReceipt: () => ({ mutate: decideMock, isPending: false }),
   useAdminFundingActivity: () => ({
     data: { items: history, total: history.length, page: 1, page_size: 50 },
     isLoading: false,
@@ -78,49 +76,70 @@ const open = () =>
 
 describe("TransferReviewSheet", () => {
   beforeEach(() => {
-    enterMock.mockReset();
     decideMock.mockReset();
     row = base;
     me = { id: "admin-1" };
     history = [];
   });
 
-  it("asks staff to type what the receipt shows, with nothing prefilled", () => {
+  it("lets staff approve after looking at the receipt, typing nothing in", () => {
     open();
 
+    // What to look for on the receipt, beside it; no fields to fill.
     expect(screen.getByText("123123123123")).toBeInTheDocument();
-    const amount = screen.getByLabelText(
-      "admin.transactions.fields.amount_vnd",
-    );
-    expect(amount).toHaveValue("");
-    const submit = screen.getByRole("button", {
-      name: "admin.transactions.sheet.check",
-    });
-    expect(submit).toBeDisabled();
+    expect(
+      screen.queryByLabelText("admin.transactions.fields.amount_vnd"),
+    ).toBeNull();
+    expect(
+      screen.getByText("admin.transactions.sheet.receiptHint"),
+    ).toBeInTheDocument();
 
-    fireEvent.change(amount, { target: { value: "10.000.000" } });
-    fireEvent.change(
-      screen.getByLabelText("admin.transactions.fields.transferred_at"),
-      { target: { value: "2026-11-02T12:35" } },
+    fireEvent.click(
+      screen.getByRole("button", { name: "admin.transactions.sheet.approve" }),
     );
-    fireEvent.change(screen.getByLabelText("admin.transactions.fields.memo"), {
-      target: { value: "FL8TKK1UAQ chuyen tien" },
-    });
-    fireEvent.change(screen.getByLabelText("admin.transactions.sheet.note"), {
-      target: { value: "Read from the receipt" },
-    });
-    fireEvent.click(submit);
-
-    expect(enterMock).toHaveBeenCalledOnce();
-    const [{ transferId, body }] = enterMock.mock.calls[0];
-    expect(transferId).toBe("tf-1");
-    expect(body.amount_vnd).toBe(10_000_000);
-    expect(body.memo).toBe("FL8TKK1UAQ chuyen tien");
-    expect(body.payer_name).toBeNull(); // left blank: the checks will flag it
-    expect(body.transferred_at).toMatch(/Z$/);
+    expect(decideMock).toHaveBeenCalledWith(
+      { transferId: "tf-1", body: { outcome: "APPROVED", reason: null } },
+      expect.anything(),
+    );
   });
 
-  it("shows what did not match and asks whether the money arrived", () => {
+  it("lets staff settle a ticket left waiting for the business", () => {
+    row = {
+      ...base,
+      status: "ATTESTED",
+      transfer: { ...base.transfer!, check_status: "MATCHED" },
+    };
+    open();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "admin.transactions.sheet.approve" }),
+    );
+    expect(decideMock).toHaveBeenCalledWith(
+      { transferId: "tf-1", body: { outcome: "APPROVED", reason: null } },
+      expect.anything(),
+    );
+  });
+
+  it("denies with the note staff gave", () => {
+    open();
+
+    fireEvent.change(
+      screen.getByLabelText("admin.transactions.sheet.notePlaceholder"),
+      { target: { value: "Screenshot of another transfer" } },
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "admin.transactions.sheet.deny" }),
+    );
+    expect(decideMock).toHaveBeenCalledWith(
+      {
+        transferId: "tf-1",
+        body: { outcome: "DENIED", reason: "Screenshot of another transfer" },
+      },
+      expect.anything(),
+    );
+  });
+
+  it("settles a ticket under review with the same approve / deny", () => {
     row = {
       ...base,
       status: "UNDER_REVIEW",
@@ -149,26 +168,24 @@ describe("TransferReviewSheet", () => {
 
     // The test translator has no dictionary, so the label falls back to the code.
     expect(screen.getByText("AMOUNT_MISMATCH")).toBeInTheDocument();
-    const received = screen.getByRole("button", {
-      name: "admin.transactions.sheet.received",
-    });
-    expect(received).toBeDisabled(); // a reason is required
+    // No dictionary here, so the cause falls back to the general question.
+    expect(
+      screen.getByText("admin.transactions.sheet.decideBody"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("admin.transactions.sheet.reviewHint"),
+    ).toBeInTheDocument();
 
-    fireEvent.change(
-      screen.getByLabelText("admin.transactions.sheet.decisionPlaceholder"),
-      { target: { value: "Bank statement shows it" } },
+    fireEvent.click(
+      screen.getByRole("button", { name: "admin.transactions.sheet.approve" }),
     );
-    fireEvent.click(received);
     expect(decideMock).toHaveBeenCalledWith(
-      {
-        reviewId: "d-1",
-        body: { outcome: "RECEIVED", reason: "Bank statement shows it" },
-      },
+      { transferId: "tf-1", body: { outcome: "APPROVED", reason: null } },
       expect.anything(),
     );
   });
 
-  it("does not let staff check their own investment", () => {
+  it("does not let staff decide their own investment", () => {
     me = { id: "inv-1" };
     open();
 
@@ -176,7 +193,9 @@ describe("TransferReviewSheet", () => {
       screen.getByText("admin.transactions.sheet.ownTransfer"),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "admin.transactions.sheet.check" }),
+      screen.queryByRole("button", {
+        name: "admin.transactions.sheet.approve",
+      }),
     ).toBeNull();
   });
 

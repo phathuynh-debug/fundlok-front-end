@@ -222,6 +222,42 @@ describe("NotificationsPanel — verification reminder", () => {
   });
 });
 
+describe("NotificationsPanel — transfer approved", () => {
+  const approved = (status: "ATTESTED" | "CONFIRMED") =>
+    notification({
+      id: "t1",
+      event: "INVESTMENT_TRANSFER_APPROVED",
+      entity_type: "TRANCHE",
+      entity_id: "tr1",
+      data: {
+        status,
+        amount_vnd: 10_000_000,
+        memo: "FL8TKK1UAQ",
+        investor: "P. H***",
+        project: "Delta Foods",
+      },
+    });
+
+  it.each([
+    ["ATTESTED", "notifications.items.transferApproved"],
+    ["CONFIRMED", "notifications.items.transferConfirmed"],
+  ] as const)(
+    "tells the business of a %s transfer, naming the amount and memo",
+    async (status, copy) => {
+      listResult.data = { items: [approved(status)], unread: 1 };
+      render(<NotificationsPanel />);
+      await userEvent.hover(screen.getAllByRole("button")[0]);
+
+      const message = await screen.findByText((text) =>
+        text.startsWith(`${copy}:`),
+      );
+      expect(message.textContent).toContain('"memo":"FL8TKK1UAQ"');
+      expect(message.textContent).toContain('"investor":"P. H***"');
+      expect(message.textContent).toContain("10,000,000"); // formatted for the reader
+    },
+  );
+});
+
 describe("NotificationsPanel — new-notification label", () => {
   afterEach(() => {
     vi.useRealTimers();

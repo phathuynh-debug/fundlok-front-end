@@ -70,6 +70,9 @@ export interface Tranche {
   attested_at: string | null;
   /** When the investor uploaded their transfer receipt; null until then. */
   receipt_submitted_at: string | null;
+  /** In the investor's own list: the project the ticket is in. */
+  project_id?: string | null;
+  project_name?: string | null;
 }
 
 /** What the receipt upload is checked for, client-side, before it is sent. */
@@ -90,6 +93,30 @@ export interface ReceiptResult {
   check_status: "AWAITING_FIELDS" | "MATCHED" | "MISMATCH" | "REJECTED" | "DUE";
   failure_codes: string[];
   confirmation_level: string;
+}
+
+/** One investor's ticket as the business sees it: the investor masked. */
+export interface SmeTicket {
+  id: string;
+  amount_vnd: number;
+  status: TrancheStatus;
+  reference_code: string;
+  /** e.g. "N. A***" */
+  investor_display: string;
+  attested_at: string | null;
+  confirm_deadline: string | null;
+  review_cause: string | null;
+}
+
+// Mirrors backend SmeRoundOut: the business's own round and its tickets.
+export interface SmeRound extends FundingWindow {
+  project_id: string;
+  project_name: string;
+  tickets: SmeTicket[];
+  closing_started_at: string | null;
+  close_wait_until: string | null;
+  /** Set once the loan formed: the first repayment day. */
+  repayment_start_date: string | null;
 }
 
 export interface ReserveRequest {
@@ -141,6 +168,18 @@ export const fundingService = {
       FUNDING_ENDPOINTS.receipt(trancheId),
       form,
       { headers: { "Idempotency-Key": idempotencyKey } },
+    );
+  },
+
+  // GET /funding/me/rounds — the business's rounds, newest first.
+  listMyRounds() {
+    return apiClient.get<SmeRound[]>(FUNDING_ENDPOINTS.myRounds);
+  },
+
+  // POST /funding/windows/{id}/close-early — once the minimum is confirmed.
+  closeEarly(windowId: string) {
+    return apiClient.post<FundingWindow>(
+      FUNDING_ENDPOINTS.closeEarly(windowId),
     );
   },
 

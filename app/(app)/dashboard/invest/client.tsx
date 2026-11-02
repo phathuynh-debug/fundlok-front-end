@@ -219,8 +219,13 @@ export default function InvestClient() {
           t={t}
         />
       ) : (
+        // Received once staff approve it; repaid daily once the loan forms.
         <p className="rounded-xl border bg-muted/20 p-4 text-sm text-muted-foreground">
-          {t(`${K}.confirming`)}
+          {ticket.status === "CONFIRMED"
+            ? t(`${K}.received`)
+            : ticket.status === "ACTIVE"
+              ? t(`${K}.repaying`)
+              : t(`${K}.confirming`)}
         </p>
       );
   } else if (!project || !fundingWindow || !open) {

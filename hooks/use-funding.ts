@@ -7,6 +7,7 @@ import {
   type PaymentInstructions,
   type ReceiptResult,
   type ReserveRequest,
+  type SmeRound,
   type Tranche,
 } from "@/services/funding.service";
 import type { ApiError } from "@/lib/types";
@@ -18,6 +19,7 @@ export const fundingKeys = {
   myTranches: () => [...fundingKeys.all, "my-tranches"] as const,
   payment: (trancheId: string) =>
     [...fundingKeys.all, "payment", trancheId] as const,
+  myRounds: () => [...fundingKeys.all, "my-rounds"] as const,
 };
 
 // The project's funding window, by its listing. Null id: nothing to fetch (the
@@ -91,4 +93,34 @@ export function useUploadReceipt() {
       });
     },
   });
+}
+
+// The business's rounds and tickets.
+export function useMyRounds(enabled = true) {
+  return useQuery<SmeRound[], ApiError>({
+    queryKey: fundingKeys.myRounds(),
+    queryFn: () => fundingService.listMyRounds(),
+    enabled,
+    staleTime: 30 * 1000,
+    retry: false,
+  });
+}
+
+// Closing early moves the round's status and figures.
+function useRoundMutation<TVars, TResult>(
+  mutationFn: (vars: TVars) => Promise<TResult>,
+) {
+  const queryClient = useQueryClient();
+  return useMutation<TResult, ApiError, TVars>({
+    mutationFn,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: fundingKeys.myRounds() });
+    },
+  });
+}
+
+export function useCloseRoundEarly() {
+  return useRoundMutation((windowId: string) =>
+    fundingService.closeEarly(windowId),
+  );
 }

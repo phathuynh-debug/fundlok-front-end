@@ -22,7 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useCurrentUser } from "@/hooks/use-authentication";
 import {
   useAdminInvestorTransfer,
-  useDecideTransfer,
+  useDecideReceipt,
 } from "@/hooks/use-admin-funding";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
@@ -32,7 +32,6 @@ import type {
   AdminInvestorTransfer,
   AdminReceiptFields,
 } from "@/services/admin-funding.service";
-import { ReceiptFieldsForm } from "./ReceiptFieldsForm";
 import { ReceiptViewer } from "./ReceiptViewer";
 import { TransferHistory } from "./TransferHistory";
 import { TransferStatusBadge } from "./TransferQueue";
@@ -41,11 +40,13 @@ import { transferErrorMessage } from "./transfer-errors";
 // The review panel for one investor ticket.
 //
 // Built around the question staff answer: did this money reach the business,
-// as FundLok's QR asked? So it puts what a matching receipt shows next to the
-// receipt itself, then asks for what the receipt says. The checks compare the
-// two. A ticket that fails them, or whose receipt came late, waits here for a
-// decision: received (it counts toward the round) or not (void, its place
-// freed). Staff never check money they sent themselves.
+// as FundLok's QR asked? So it shows what the receipt should show next to the
+// receipt itself, and staff approve or deny after looking: nothing is typed in
+// or compared. A receipt approved records the investment as paid; one denied
+// is rejected, and the investor can upload the right one. Approved means
+// received: the business has nothing to confirm. A ticket under
+// review (a late receipt, or the business disputing) is settled the same way.
+// Staff never decide money they sent themselves.
 export function TransferReviewSheet({
   trancheId,
   onOpenChange,
@@ -295,7 +296,7 @@ function failureLabel(t: (key: string) => string, code: string): string {
   return label === key ? code : label;
 }
 
-// What staff can do now: read the receipt in, or decide a review.
+// What staff can do now: approve or deny, after looking at the receipt.
 function Actions({
   transfer,
   own,
@@ -304,25 +305,23 @@ function Actions({
   own: boolean;
 }) {
   const { t } = useTranslations();
-  const toCheck =
-    transfer.transfer?.check_status === "AWAITING_FIELDS" &&
-    transfer.transfer.has_file;
+  const receipt = transfer.transfer;
   const review =
     transfer.dispute && transfer.dispute.status !== "DECIDED"
       ? transfer.dispute
       : null;
+  // A ticket left ATTESTED waits on staff too: approval means received.
+  const toDecide =
+    receipt !== null &&
+    (review !== null ||
+      transfer.status === "ATTESTED" ||
+      (receipt.check_status === "AWAITING_FIELDS" && receipt.has_file));
 
-  if (!toCheck && !review) {
+  if (!toDecide) {
     return (
       <section className="flex items-start gap-2.5 rounded-xl border bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground">
         <Info className="mt-px h-4 w-4 shrink-0" aria-hidden />
-        <p>
-          {transfer.dispute?.outcome
-            ? t(`admin.transactions.sheet.decided.${transfer.dispute.outcome}`)
-            : transfer.transfer
-              ? t("admin.transactions.sheet.nothingToDo")
-              : t("admin.transactions.sheet.waitingForReceipt")}
-        </p>
+        <p>{settledText(t, transfer)}</p>
       </section>
     );
   }
@@ -333,54 +332,62 @@ function Actions({
       </p>
     );
   }
-  if (toCheck) {
-    return (
-      <section className="space-y-3">
-        <div className="space-y-1">
-          <h3 className="text-sm font-semibold">
-            {t("admin.transactions.sheet.checkHeading")}
-          </h3>
-          <p className="text-xs leading-relaxed text-muted-foreground">
-            {transfer.status === "UNDER_REVIEW"
-              ? t("admin.transactions.sheet.checkLateBody")
-              : t("admin.transactions.sheet.checkBody")}
-          </p>
-        </div>
-        <ReceiptFieldsForm
-          key={transfer.transfer!.id}
-          transferId={transfer.transfer!.id}
-        />
-      </section>
-    );
-  }
   return (
     <DecisionForm
-      key={review!.id}
-      reviewId={review!.id}
-      cause={review!.cause}
+      key={`${receipt!.id}:${review?.id ?? ""}`}
+      transferId={receipt!.id}
+      body={
+        review
+          ? causeText(t, review.cause)
+          : t("admin.transactions.sheet.decideReceiptBody")
+      }
+      hint={
+        review
+          ? t("admin.transactions.sheet.reviewHint")
+          : t("admin.transactions.sheet.receiptHint")
+      }
     />
   );
 }
 
+/** Where a ticket with nothing to decide stands. */
+function settledText(
+  t: (key: string) => string,
+  transfer: AdminInvestorTransfer,
+): string {
+  if (transfer.dispute?.outcome) {
+    return t(`admin.transactions.sheet.decided.${transfer.dispute.outcome}`);
+  }
+  if (transfer.transfer?.check_status === "REJECTED") {
+    return t("admin.transactions.sheet.receiptDenied");
+  }
+  return transfer.transfer
+    ? t("admin.transactions.sheet.nothingToDo")
+    : t("admin.transactions.sheet.waitingForReceipt");
+}
+
+// Approve or deny, with an optional note for the record. Nothing from the
+// receipt is typed in: staff look at it and decide.
 function DecisionForm({
-  reviewId,
-  cause,
+  transferId,
+  body,
+  hint,
 }: {
-  reviewId: string;
-  cause: string;
+  transferId: string;
+  body: string;
+  hint: string;
 }) {
   const { t, locale } = useTranslations();
   const { toast } = useToast();
-  const decide = useDecideTransfer();
+  const decide = useDecideReceipt();
   const [reason, setReason] = useState("");
 
-  const send = (outcome: "RECEIVED" | "NOT_RECEIVED") => {
-    if (!reason.trim()) return;
+  const send = (outcome: "APPROVED" | "DENIED") => {
     decide.mutate(
-      { reviewId, body: { outcome, reason: reason.trim() } },
+      { transferId, body: { outcome, reason: reason.trim() || null } },
       {
         onSuccess: () =>
-          toast({ title: t(`admin.transactions.sheet.decided.${outcome}`) }),
+          toast({ title: t(`admin.transactions.sheet.toast.${outcome}`) }),
         onError: (error) =>
           toast({
             variant: "destructive",
@@ -397,47 +404,45 @@ function DecisionForm({
         <h3 className="text-sm font-semibold">
           {t("admin.transactions.sheet.decideHeading")}
         </h3>
-        <p className="text-xs leading-relaxed text-muted-foreground">
-          {causeText(t, cause)}
-        </p>
+        <p className="text-xs leading-relaxed text-muted-foreground">{body}</p>
       </div>
       <Textarea
-        rows={3}
+        rows={2}
         value={reason}
         disabled={decide.isPending}
         onChange={(event) => setReason(event.target.value)}
-        placeholder={t("admin.transactions.sheet.decisionPlaceholder")}
-        aria-label={t("admin.transactions.sheet.decisionPlaceholder")}
+        placeholder={t("admin.transactions.sheet.notePlaceholder")}
+        aria-label={t("admin.transactions.sheet.notePlaceholder")}
       />
       <div className="flex gap-2">
         <Button
           type="button"
           size="sm"
           className="flex-1 gap-2"
-          disabled={decide.isPending || !reason.trim()}
-          onClick={() => send("RECEIVED")}
+          disabled={decide.isPending}
+          onClick={() => send("APPROVED")}
         >
           {decide.isPending ? (
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
           ) : (
             <CheckCircle2 className="h-3.5 w-3.5" />
           )}
-          {t("admin.transactions.sheet.received")}
+          {t("admin.transactions.sheet.approve")}
         </Button>
         <Button
           type="button"
           size="sm"
           variant="outline"
           className="flex-1 gap-2"
-          disabled={decide.isPending || !reason.trim()}
-          onClick={() => send("NOT_RECEIVED")}
+          disabled={decide.isPending}
+          onClick={() => send("DENIED")}
         >
           <XCircle className="h-3.5 w-3.5" />
-          {t("admin.transactions.sheet.notReceived")}
+          {t("admin.transactions.sheet.deny")}
         </Button>
       </div>
       <p className="text-[11px] leading-relaxed text-muted-foreground">
-        {t("admin.transactions.sheet.decisionHint")}
+        {hint}
       </p>
     </section>
   );

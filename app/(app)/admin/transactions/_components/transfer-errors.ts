@@ -3,8 +3,8 @@ import type { ApiError } from "@/lib/types";
 
 // Failures staff can act on, by X-Error-Code.
 const KNOWN = new Set([
-  "FIELDS_ALREADY_ENTERED",
-  "DUPLICATE_BANK_TXN",
+  "ALREADY_DECIDED",
+  "NOTHING_TO_DECIDE",
   "DISPUTE_ALREADY_DECIDED",
   "CAPACITY_EXCEEDED",
 ]);

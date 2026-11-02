@@ -1,8 +1,16 @@
 "use client";
 
+import { FastForward, Loader2 } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { useAdminFundingRounds } from "@/hooks/use-admin-funding";
+import {
+  useAdminFundingRounds,
+  useAdvanceRound,
+} from "@/hooks/use-admin-funding";
+import { useToast } from "@/hooks/use-toast";
+import { apiErrorMessage } from "@/lib/api-error-message";
 import { useTranslations } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format-currency";
 import { formatDate } from "@/lib/format-date";
@@ -15,7 +23,9 @@ import { DataTable, type Column } from "../../_components/DataTable";
 
 // Funding rounds, closing soonest first: what each has raised (confirmed) and
 // holds (reserved, not yet paid), what is still open, and how many of its
-// tickets wait on staff. A row opens the round's transfers.
+// tickets wait on staff. A row opens the round's transfers. "Advance" does what
+// is due on the round now (close it, then form the loan and its daily
+// repayment days): the scheduled job that would do it is not running.
 export function FundingRoundsTable({
   status,
   onOpen,
@@ -25,6 +35,8 @@ export function FundingRoundsTable({
 }) {
   const { t, locale } = useTranslations();
   const { data, isLoading, isFetching } = useAdminFundingRounds(status);
+  const advance = useAdvanceRound();
+  const { toast } = useToast();
   const money = (vnd: number) => formatCurrency(vnd, locale);
 
   const columns: Column<AdminFundingRound>[] = [
@@ -129,6 +141,51 @@ export function FundingRoundsTable({
           )}
         </div>
       ),
+    },
+    {
+      key: "advance",
+      header: t("admin.transactions.rounds.action"),
+      render: (row) =>
+        ["OPEN", "FULL", "CLOSING"].includes(row.status) ? (
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="gap-1.5"
+            title={t("admin.transactions.rounds.advanceHint")}
+            disabled={advance.isPending}
+            onClick={(event) => {
+              // The row itself opens the round's transfers.
+              event.stopPropagation();
+              advance.mutate(row.id, {
+                onSuccess: (round) =>
+                  toast({
+                    title: t("admin.transactions.rounds.advancedToast").replace(
+                      "{status}",
+                      enumLabel(t, "fundingWindowStatus", round.status),
+                    ),
+                  }),
+                onError: (error) =>
+                  toast({
+                    variant: "destructive",
+                    title: t("admin.transactions.rounds.advanceFailed"),
+                    description: apiErrorMessage(
+                      error,
+                      locale,
+                      t("common.tryAgain"),
+                    ),
+                  }),
+              });
+            }}
+          >
+            {advance.isPending && advance.variables === row.id ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <FastForward className="h-3.5 w-3.5" />
+            )}
+            {t("admin.transactions.rounds.advance")}
+          </Button>
+        ) : null,
     },
   ];
 

@@ -681,8 +681,8 @@
         },
         "kinds": {
           "approvedMatch": "Approved: receipt matched",
-          "notReceived": "Denied: money not received",
-          "received": "Approved: money received",
+          "notReceived": "Denied",
+          "received": "Approved",
           "rejected": "Rejected: bank transaction reused",
           "reserved": "Investor reserved",
           "sentToReview": "Sent to review: didn't match",
@@ -697,18 +697,18 @@
         "time": "Time"
       },
       "causes": {
-        "LATE_RECEIPT": "The receipt came after the time to transfer had passed. If the money arrived and the round still has room, it counts.",
-        "RECEIPT_MISMATCH": "The receipt didn't match the reservation. Check the business's bank statement or ask the investor, then decide whether the money arrived.",
+        "LATE_RECEIPT": "The receipt came after the transfer deadline. Approve if the money arrived and the round still has room; otherwise deny.",
+        "RECEIPT_MISMATCH": "The receipt didn't match the reservation. Look at it and at the business's statement, then approve if the money arrived.",
         "SME_DISPUTE": "The business says the money didn't arrive. Weigh both sides, then decide."
       },
       "clearRound": "Show every round",
       "empty": "No transfers match this filter.",
       "emptyQueue": "Nothing waits on staff. Every receipt has been checked.",
       "errors": {
+        "ALREADY_DECIDED": "This receipt was already decided. Reload to see the result.",
         "CAPACITY_EXCEEDED": "The round no longer has room for this investment, so it can't count.",
         "DISPUTE_ALREADY_DECIDED": "Someone already decided this review. Reload to see the outcome.",
-        "DUPLICATE_BANK_TXN": "This bank transaction ID was already used for another transfer. The receipt was rejected and the investor can upload a new one.",
-        "FIELDS_ALREADY_ENTERED": "This receipt was already checked. Reload to see the result."
+        "NOTHING_TO_DECIDE": "Nothing on this transfer waits for a decision. Reload to see where it stands."
       },
       "failures": {
         "AMOUNT_MISMATCH": "The amount differs from the reservation.",
@@ -740,6 +740,11 @@
       },
       "roundChip": "Round: {name}",
       "rounds": {
+        "action": "Action",
+        "advance": "Advance",
+        "advanceFailed": "Couldn't advance the round",
+        "advanceHint": "Do what is due now: close the round if it is due, then form the loan once nothing is pending.",
+        "advancedToast": "Round is now: {status}",
         "closes": "Closes",
         "daysLeft": "{days} days left",
         "empty": "No round is taking investment right now.",
@@ -758,45 +763,42 @@
       "rowLabel": "Review {name}'s transfer, memo {memo}",
       "sheet": {
         "afterReserved": "After the reservation, not in the future",
-        "blankHint": "Leave a field blank if the receipt doesn't show it. The transfer then goes to review.",
-        "check": "Record and check",
-        "checkBody": "Type what the receipt shows, not what you expect. If it all matches, the investment is recorded as paid and the business has two working days to dispute it; otherwise it goes to review.",
-        "checkFailed": "Couldn't record the receipt",
-        "checkHeading": "Check the receipt",
-        "checkLateBody": "This receipt came after the deadline. Type what it shows; you'll then decide whether the transfer counts.",
+        "approve": "Approve",
         "deadline": "Transfer deadline",
         "decideBody": "Decide whether the money reached the business's account.",
         "decideFailed": "Couldn't record the decision",
-        "decideHeading": "Did the money arrive?",
+        "decideHeading": "Approve this transfer?",
+        "decideReceiptBody": "Look at the receipt: it should show the amount, the payment memo and the business's account above. Approve if it does: that marks the money received.",
         "decided": {
           "NOT_RECEIVED": "Decided: the money didn't arrive and the investment is void.",
           "RECEIVED": "Decided: the money arrived and the investment counts."
         },
-        "decisionHint": "Received: the investment counts toward the round. Not received: it is void and its place in the round is freed. The decision is final and recorded with your name.",
-        "decisionPlaceholder": "Why (required): what you checked, e.g. the business's bank statement",
+        "deny": "Deny",
         "expectedHeading": "What a matching receipt shows",
         "historyHeading": "History",
         "loadFailed": "Couldn't load this transfer. Close the panel and try again.",
         "matched": "Everything matches the reservation.",
-        "matchedToast": "Receipt matched: the investment is recorded as paid",
         "memoContains": "Contains {memo}",
         "mismatch": "The receipt doesn't match:",
-        "mismatchToast": "The receipt didn't match: the transfer is now under review",
         "noReceipt": "The investor hasn't uploaded a receipt yet.",
-        "notReceived": "Not received",
-        "note": "Note",
-        "notePlaceholder": "Your note for the record (required), e.g. Read from the investor's receipt",
+        "notePlaceholder": "Note for the record (optional)",
         "nothingToDo": "Nothing to do: this transfer has been checked.",
         "openReceipt": "Open in a new tab",
         "ownTransfer": "This is your own investment, so another admin has to check it.",
         "receiptAlt": "The investor's transfer receipt",
+        "receiptDenied": "Receipt denied: waiting for the investor to upload the right one.",
         "receiptFailed": "Couldn't open the receipt. Try again.",
         "receiptHeading": "The investor's receipt",
-        "received": "Money received",
+        "receiptHint": "Approve: the money is received and the investment counts toward the round; the business has nothing to confirm. Deny: the receipt is rejected and the investor can upload the right one before the transfer deadline. Final, and recorded with your name.",
+        "reviewHint": "Approve: the money arrived and the investment counts toward the round. Deny: it didn't; the investment is void and its place in the round is freed. Final, and recorded with your name.",
         "showReceipt": "Show receipt",
         "subtitle": "Investor transfer",
         "ticketHeading": "The investment",
         "title": "Transfer",
+        "toast": {
+          "APPROVED": "Transfer approved",
+          "DENIED": "Transfer denied"
+        },
         "waitingForReceipt": "Waiting for the investor to transfer and upload a receipt."
       },
       "subtitle": "Funding rounds taking investment, and the transfers investors report for them. Staff read each receipt and confirm the money arrived.",
@@ -1282,6 +1284,45 @@
       },
       "holdingViewDetails": "View project details",
       "holdingsTitle": "Your positions ({count})",
+      "investments": {
+        "cancel": "Cancel",
+        "continue": "Continue",
+        "dayStatus": {
+          "DUE": "Due",
+          "MATCHED": "Confirmed",
+          "PRESUMED_PAID": "Paid (per the business)",
+          "REPORTED_MISSED": "You reported it missing"
+        },
+        "heading": "Your investments",
+        "hideSchedule": "Hide schedule",
+        "kind": {
+          "INSTALMENT": "Daily",
+          "STUB": "First-period interest"
+        },
+        "memo": "Memo",
+        "next": "Next: {amount} on {date}",
+        "received": "Paid to you so far: {paid} of {total}",
+        "report": "Not received",
+        "reportClosed": "It's too late to report this day: the report window has closed.",
+        "reportFailed": "Couldn't send the report",
+        "reportHint": "If a day marked paid hasn't reached your account, report it within two working days.",
+        "reportPlaceholder": "What happened? e.g. nothing arrived from this business today",
+        "reportSend": "Report",
+        "reportedToast": "Reported: FundLok will check with the business",
+        "schedule": "Repayment schedule",
+        "status": {
+          "ACTIVE": "Repaying",
+          "ATTESTED": "Being confirmed",
+          "CONFIRMED": "Received by the business",
+          "EXPIRED": "Expired",
+          "RESERVED": "Reserved",
+          "SIGNED": "Waiting for your transfer",
+          "UNDER_REVIEW": "Under review",
+          "VOID": "Void"
+        },
+        "taxNote": "Amounts are after the personal income tax the business withholds for you.",
+        "waitingClose": "Your money is confirmed. Repayments start once the round closes and the loan forms."
+      },
       "investorBearsLoss": "The investor bears this loss.",
       "mockNotice": "The system isn't connected to live accounts yet. The portfolio below is sample data.",
       "noInvestmentsDescription": "You haven't invested in a business yet. Please browse open listings and invest to view your portfolio analytics.",
@@ -1862,9 +1903,34 @@
       "fileUploadFailed": "Upload failed. Please try again.",
       "finalizing": "Finalizing...",
       "funding": {
+        "cancel": "Cancel",
+        "closeBody": "No new investments after this. Once every transfer is settled, FundLok forms your loan from what was confirmed ({confirmed} so far) and your daily repayments begin.",
+        "closeEarly": "Close round now",
+        "closeEarlyHint": "You can close early once at least {min} is confirmed.",
+        "closeFailed": "Couldn't close the round",
+        "closeTitle": "Close your round now?",
+        "closedToast": "Your round is closing",
+        "closes": "closes {date} ({days} days left)",
+        "closingNote": "Your round is closing. Once every transfer is settled, FundLok forms your loan and your daily repayments begin.",
+        "details": "Waiting on transfers: {reserved} · {count} investors · minimum {min}",
+        "failedNote": "The round did not reach its minimum, so no loan formed. Refund each investor who paid; FundLok will contact you.",
         "heading": "Funding",
+        "noTickets": "No investor has reserved yet.",
         "none": "No investment yet",
-        "noneHint": "Your request is presented to investors after you review and sign the offer. Whether they fund it is their decision."
+        "noneHint": "Your request is presented to investors after you review and sign the offer. Whether they fund it is their decision.",
+        "ofTarget": "confirmed of {target}",
+        "repayingNote": "Your loan is formed. Daily repayments start on {date}.",
+        "ticketStatus": {
+          "ACTIVE": "In your loan",
+          "ATTESTED": "Being confirmed by FundLok",
+          "CONFIRMED": "Received",
+          "EXPIRED": "Expired",
+          "RESERVED": "Reserved",
+          "SIGNED": "Awaiting transfer",
+          "UNDER_REVIEW": "Under review",
+          "VOID": "Void"
+        },
+        "ticketsHeading": "Investors"
       },
       "howToObtainCic": "How to obtain your CIC report",
       "howToObtainIt": "How to obtain it",
@@ -1939,6 +2005,31 @@
       "projectTitle": "Project: {name}",
       "readyToSend": "Ready to send",
       "registeredAddress": "Registered address",
+      "repayments": {
+        "heading": "Today's repayments",
+        "hideQr": "Hide",
+        "hint": "Pay each investor separately, to their account and with their memo; the QR fills both in. Investors have two working days to report a payment that didn't arrive.",
+        "kind": {
+          "INSTALMENT": "Daily",
+          "STUB": "First-period interest"
+        },
+        "markFailed": "Couldn't mark them paid",
+        "markPaid": "Mark paid ({count})",
+        "markedToast": "Marked paid",
+        "memo": "Memo",
+        "none": "Nothing due today.",
+        "qrHint": "Scan with your bank app: account, amount and memo fill in.",
+        "select": "Select {name}",
+        "showQr": "QR",
+        "status": {
+          "DUE": "Due",
+          "MATCHED": "Confirmed",
+          "PRESUMED_PAID": "Marked paid",
+          "REPORTED_MISSED": "Reported missing"
+        },
+        "total": "To pay investors: {net}",
+        "withheld": "Personal income tax you withhold: {tax}"
+      },
       "requiredDocsMissingDescription": "Please upload all required documentation to submit your loan application.",
       "requiredDocsMissingTitle": "Required documents missing",
       "resumeSending": "Resume sending",
@@ -2478,6 +2569,8 @@
       "uploaded": "Receipt uploaded",
       "uploading": "Uploading…"
     },
+    "received": "FundLok checked your transfer: the business has received your investment. Repayments start once the round closes and the loan forms.",
+    "repaying": "Your investment is in the loan and being repaid daily. See the schedule on your dashboard.",
     "reserveFailed": "Couldn't reserve your investment",
     "steps": {
       "amount": "Amount",
@@ -2812,6 +2905,8 @@
     "items": {
       "applicationApproved": "Your funding request has been approved.",
       "applicationRejected": "Your funding request was not approved.",
+      "transferApproved": "FundLok approved a transfer of {amount} from investor {investor} (memo {memo}). If it hasn't reached your account, contact FundLok within 2 working days.",
+      "transferConfirmed": "FundLok confirmed a transfer of {amount} from investor {investor} (memo {memo}) to your business.",
       "unknown": "You have an update on your account.",
       "verificationRequiredKyb": "Verify your business (KYB) so you can submit a funding request.",
       "verificationRequiredKyc": "Verify your identity (KYC) so you can start investing."

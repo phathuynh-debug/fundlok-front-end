@@ -1,0 +1,81 @@
+import { apiClient } from "@/lib/api-client";
+import { REPAYMENT_ENDPOINTS } from "@/lib/endpoints";
+
+// Daily repayment once a round has formed its loan (backend
+// app/market/repayment_router.py; spec repayment-collection.md section 4).
+// The business pays each investor directly, one transfer per investor and day.
+
+export type RepaymentDayStatus =
+  "DUE" | "PRESUMED_PAID" | "REPORTED_MISSED" | "MATCHED";
+
+export interface RepaymentPayee {
+  bank_name: string;
+  bank_bin: string;
+  account_number: string;
+  account_name: string;
+}
+
+// Mirrors backend RepaymentRowOut: one investor's payment for one day.
+export interface RepaymentRow {
+  repayment_day_id: string;
+  tranche_id: string;
+  /** STUB: interest for the days between transfer and the loan's start. */
+  kind: "INSTALMENT" | "STUB";
+  /** Masked, e.g. "N. A***". */
+  investor_display: string;
+  due_date: string;
+  principal_vnd: number;
+  interest_vnd: number;
+  gross_vnd: number;
+  /** Personal income tax the business withholds (individual investors). */
+  tax_withheld_vnd: number;
+  /** What the business transfers: gross less the tax withheld. */
+  net_vnd: number;
+  status: RepaymentDayStatus;
+  /** The investor can report the day missing until this. */
+  report_deadline: string;
+  payee: RepaymentPayee | null;
+  /** The memo the transfer must carry. */
+  reference_code: string;
+  /** VietQR for the exact net amount; null when nothing is to transfer. */
+  vietqr_payload: string | null;
+}
+
+export interface TodaysPayments {
+  date: string;
+  rows: RepaymentRow[];
+  totals: { gross_vnd: number; tax_withheld_vnd: number; net_vnd: number };
+}
+
+export const repaymentService = {
+  // GET /repayment/today — due today or earlier and not yet settled.
+  getToday() {
+    return apiClient.get<TodaysPayments>(REPAYMENT_ENDPOINTS.today);
+  },
+
+  // POST /repayment/days/mark-paid — DUE -> PRESUMED_PAID. Replaying the same
+  // key marks nothing twice.
+  markPaid(repaymentDayIds: string[], idempotencyKey: string) {
+    return apiClient.post<RepaymentRow[]>(
+      REPAYMENT_ENDPOINTS.markPaid,
+      { repayment_day_ids: repaymentDayIds },
+      { headers: { "Idempotency-Key": idempotencyKey } },
+    );
+  },
+
+  // POST /repayment/days/{id}/report-missing — the investor says a due day
+  // never arrived.
+  reportMissing(dayId: string, statement: string | null) {
+    return apiClient.post<RepaymentRow>(
+      REPAYMENT_ENDPOINTS.reportMissing(dayId),
+      { statement },
+    );
+  },
+
+  // GET /repayment/tranches/{id}/schedule — every day of one ticket.
+  getSchedule(trancheId: string) {
+    return apiClient.get<RepaymentRow[]>(
+      REPAYMENT_ENDPOINTS.schedule(trancheId),
+    );
+  },
+};

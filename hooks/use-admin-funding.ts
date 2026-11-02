@@ -16,10 +16,9 @@ import {
   type AdminFundingActivity,
   type AdminFundingRound,
   type AdminInvestorTransfer,
-  type AdminReceiptFieldsPayload,
+  type AdminReceiptDecisionPayload,
   type AdminReceiptUrl,
   type AdminRoundFilter,
-  type AdminTransferDecisionPayload,
   type AdminTransferListParams,
 } from "@/services/admin-funding.service";
 
@@ -91,37 +90,31 @@ export function useAdminReceiptUrl(transferId: string | null) {
   });
 }
 
-// Both decisions move the ticket, the round's totals and its counts.
-function useInvalidateFunding() {
+// A decision moves the ticket, the round's totals and its counts, and the
+// investor's own view of their ticket.
+export function useDecideReceipt() {
   const queryClient = useQueryClient();
-  return () => {
-    void queryClient.invalidateQueries({ queryKey: adminFundingKeys.all });
-    void queryClient.invalidateQueries({ queryKey: fundingKeys.all });
-  };
-}
-
-export function useEnterTransferFields() {
-  const invalidate = useInvalidateFunding();
   return useMutation<
     AdminInvestorTransfer,
     ApiError,
-    { transferId: string; body: AdminReceiptFieldsPayload }
+    { transferId: string; body: AdminReceiptDecisionPayload }
   >({
     mutationFn: ({ transferId, body }) =>
-      adminFundingService.enterFields(transferId, body),
-    onSuccess: invalidate,
+      adminFundingService.decide(transferId, body),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: adminFundingKeys.all });
+      void queryClient.invalidateQueries({ queryKey: fundingKeys.all });
+    },
   });
 }
 
-export function useDecideTransfer() {
-  const invalidate = useInvalidateFunding();
-  return useMutation<
-    AdminInvestorTransfer,
-    ApiError,
-    { reviewId: string; body: AdminTransferDecisionPayload }
-  >({
-    mutationFn: ({ reviewId, body }) =>
-      adminFundingService.decide(reviewId, body),
-    onSuccess: invalidate,
+// Moves the round and may form its loan: every admin funding view refreshes.
+export function useAdvanceRound() {
+  const queryClient = useQueryClient();
+  return useMutation<AdminFundingRound, ApiError, string>({
+    mutationFn: (windowId) => adminFundingService.advanceRound(windowId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: adminFundingKeys.all });
+    },
   });
 }

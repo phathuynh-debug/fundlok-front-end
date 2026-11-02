@@ -81,6 +81,20 @@ export const FUNDING_ENDPOINTS = {
   myTranches: "/funding/me/tranches",
   // The investor's bank receipt for their transfer (multipart `file`).
   receipt: (trancheId: string) => `/funding/tranches/${trancheId}/receipt`,
+  // The business's side: its rounds and tickets (investors masked), and
+  // closing early once the minimum is confirmed.
+  myRounds: "/funding/me/rounds",
+  closeEarly: (windowId: string) => `/funding/windows/${windowId}/close-early`,
+} as const;
+
+// Daily repayment once a round has formed its loan: what the business owes each
+// investor today (one VietQR per investor), marking days paid, and a ticket's
+// whole schedule.
+export const REPAYMENT_ENDPOINTS = {
+  today: "/repayment/today",
+  markPaid: "/repayment/days/mark-paid",
+  schedule: (trancheId: string) => `/repayment/tranches/${trancheId}/schedule`,
+  reportMissing: (dayId: string) => `/repayment/days/${dayId}/report-missing`,
 } as const;
 
 export const PROJECT_ENDPOINTS = {
@@ -190,10 +204,13 @@ export const ADMIN_ENDPOINTS = {
   paymentAccounts: "/admin/payment-accounts",
   paymentAccountDecision: (id: string) =>
     `/admin/payment-accounts/${id}/decision`,
-  // The Transactions tab: funding rounds, investor transfers, and the receipt
-  // checks staff do by hand (a 10-minute link to the receipt, what it shows,
-  // and the decision on a ticket under review).
+  // The Transactions tab: funding rounds, investor transfers, a 10-minute link
+  // to a receipt, and the approve / deny staff make after looking at it.
   fundingRounds: "/admin/funding/rounds",
+  // Does what is due on a round now (close, then form the loan); stands in for
+  // the scheduled job.
+  fundingRoundAdvance: (windowId: string) =>
+    `/admin/funding/rounds/${windowId}/advance`,
   fundingTransfers: "/admin/funding/transfers",
   // The transfers' audit trail: who approved or denied what, and why.
   fundingActivity: "/admin/funding/activity",
@@ -201,10 +218,8 @@ export const ADMIN_ENDPOINTS = {
     `/admin/funding/transfers/${trancheId}`,
   transferReceiptUrl: (transferId: string) =>
     `/admin/funding/transfers/${transferId}/receipt-url`,
-  transferFields: (transferId: string) =>
-    `/admin/funding/transfers/${transferId}/fields`,
-  transferDecision: (reviewId: string) =>
-    `/admin/funding/reviews/${reviewId}/decision`,
+  transferDecision: (transferId: string) =>
+    `/admin/funding/transfers/${transferId}/decision`,
   // SYSTEM_ADMIN only. Creates an ADMIN account with no password and emails
   // the invitee a single-use link to choose one.
   inviteAdmin: "/admin/users/admins",

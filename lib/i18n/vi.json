@@ -681,8 +681,8 @@
         },
         "kinds": {
           "approvedMatch": "Đã duyệt: biên lai khớp",
-          "notReceived": "Từ chối: chưa nhận tiền",
-          "received": "Đã duyệt: đã nhận tiền",
+          "notReceived": "Từ chối",
+          "received": "Đã duyệt",
           "rejected": "Từ chối: mã giao dịch đã dùng",
           "reserved": "Nhà đầu tư giữ chỗ",
           "sentToReview": "Chuyển xem xét: không khớp",
@@ -697,18 +697,18 @@
         "time": "Thời gian"
       },
       "causes": {
-        "LATE_RECEIPT": "Biên lai được gửi sau khi hết thời gian chuyển khoản. Nếu tiền đã đến và đợt còn chỗ, khoản này được tính.",
-        "RECEIPT_MISMATCH": "Biên lai không khớp với lượt giữ chỗ. Hãy kiểm tra sao kê ngân hàng của doanh nghiệp hoặc hỏi nhà đầu tư, rồi quyết định tiền đã đến hay chưa.",
+        "LATE_RECEIPT": "Biên lai được gửi sau hạn chuyển khoản. Duyệt nếu tiền đã đến và đợt còn chỗ; nếu không, hãy từ chối.",
+        "RECEIPT_MISMATCH": "Biên lai không khớp với lượt giữ chỗ. Hãy xem biên lai và sao kê của doanh nghiệp, rồi duyệt nếu tiền đã đến.",
         "SME_DISPUTE": "Doanh nghiệp cho biết chưa nhận được tiền. Hãy xem xét cả hai bên rồi quyết định."
       },
       "clearRound": "Hiện mọi đợt",
       "empty": "Không có khoản chuyển nào khớp bộ lọc này.",
       "emptyQueue": "Không có việc nào chờ nhân viên. Mọi biên lai đã được kiểm tra.",
       "errors": {
+        "ALREADY_DECIDED": "Biên lai này đã được quyết định. Hãy tải lại để xem kết quả.",
         "CAPACITY_EXCEEDED": "Đợt gọi vốn không còn chỗ cho khoản đầu tư này nên không thể tính.",
         "DISPUTE_ALREADY_DECIDED": "Đã có người quyết định trường hợp này. Hãy tải lại để xem kết quả.",
-        "DUPLICATE_BANK_TXN": "Mã giao dịch ngân hàng này đã được dùng cho một khoản chuyển khác. Biên lai bị từ chối và nhà đầu tư có thể tải lên biên lai mới.",
-        "FIELDS_ALREADY_ENTERED": "Biên lai này đã được kiểm tra. Hãy tải lại để xem kết quả."
+        "NOTHING_TO_DECIDE": "Khoản chuyển này không có gì chờ quyết định. Hãy tải lại để xem trạng thái."
       },
       "failures": {
         "AMOUNT_MISMATCH": "Số tiền khác với lượt giữ chỗ.",
@@ -740,6 +740,11 @@
       },
       "roundChip": "Đợt: {name}",
       "rounds": {
+        "action": "Thao tác",
+        "advance": "Tiến hành",
+        "advanceFailed": "Không tiến hành được",
+        "advanceHint": "Thực hiện việc đến hạn ngay: đóng đợt nếu đến hạn, rồi lập khoản vay khi không còn gì chờ xử lý.",
+        "advancedToast": "Trạng thái đợt: {status}",
         "closes": "Đóng",
         "daysLeft": "Còn {days} ngày",
         "empty": "Hiện không có đợt nào nhận đầu tư.",
@@ -758,45 +763,42 @@
       "rowLabel": "Xem khoản chuyển của {name}, nội dung {memo}",
       "sheet": {
         "afterReserved": "Sau lúc giữ chỗ, không ở tương lai",
-        "blankHint": "Để trống ô nào biên lai không hiển thị. Khi đó khoản chuyển sẽ được xem xét.",
-        "check": "Ghi nhận và kiểm tra",
-        "checkBody": "Hãy nhập đúng những gì biên lai hiển thị, không phải điều bạn mong đợi. Nếu tất cả đều khớp, khoản đầu tư được ghi nhận là đã chuyển và doanh nghiệp có hai ngày làm việc để phản đối; nếu không, khoản chuyển sẽ được xem xét.",
-        "checkFailed": "Không ghi nhận được biên lai",
-        "checkHeading": "Kiểm tra biên lai",
-        "checkLateBody": "Biên lai này được gửi sau hạn. Hãy nhập những gì nó hiển thị; sau đó bạn sẽ quyết định khoản chuyển có được tính hay không.",
+        "approve": "Duyệt",
         "deadline": "Hạn chuyển khoản",
         "decideBody": "Quyết định tiền đã vào tài khoản của doanh nghiệp hay chưa.",
         "decideFailed": "Không ghi nhận được quyết định",
-        "decideHeading": "Tiền đã đến chưa?",
+        "decideHeading": "Duyệt khoản chuyển này?",
+        "decideReceiptBody": "Hãy xem biên lai: biên lai cần thể hiện số tiền, nội dung chuyển khoản và tài khoản của doanh nghiệp như trên. Duyệt nếu đúng: tiền sẽ được ghi nhận là đã nhận.",
         "decided": {
           "NOT_RECEIVED": "Đã quyết định: tiền chưa đến và khoản đầu tư vô hiệu.",
           "RECEIVED": "Đã quyết định: tiền đã đến và khoản đầu tư được tính."
         },
-        "decisionHint": "Đã nhận: khoản đầu tư được tính vào đợt gọi vốn. Chưa nhận: khoản này vô hiệu và chỗ của nó trong đợt được giải phóng. Quyết định là cuối cùng và được ghi lại kèm tên bạn.",
-        "decisionPlaceholder": "Lý do (bắt buộc): bạn đã kiểm tra gì, ví dụ sao kê ngân hàng của doanh nghiệp",
+        "deny": "Từ chối",
         "expectedHeading": "Biên lai khớp sẽ cho thấy",
         "historyHeading": "Lịch sử",
         "loadFailed": "Không tải được khoản chuyển này. Hãy đóng bảng và thử lại.",
         "matched": "Mọi thông tin khớp với lượt giữ chỗ.",
-        "matchedToast": "Biên lai khớp: khoản đầu tư được ghi nhận là đã chuyển",
         "memoContains": "Có chứa {memo}",
         "mismatch": "Biên lai không khớp:",
-        "mismatchToast": "Biên lai không khớp: khoản chuyển đang được xem xét",
         "noReceipt": "Nhà đầu tư chưa tải lên biên lai.",
-        "notReceived": "Chưa nhận",
-        "note": "Ghi chú",
-        "notePlaceholder": "Ghi chú lưu hồ sơ (bắt buộc), ví dụ: Đọc từ biên lai của nhà đầu tư",
+        "notePlaceholder": "Ghi chú lưu hồ sơ (không bắt buộc)",
         "nothingToDo": "Không cần làm gì: khoản chuyển này đã được kiểm tra.",
         "openReceipt": "Mở trong thẻ mới",
         "ownTransfer": "Đây là khoản đầu tư của chính bạn, nên một quản trị viên khác phải kiểm tra.",
         "receiptAlt": "Biên lai chuyển khoản của nhà đầu tư",
+        "receiptDenied": "Đã từ chối biên lai: đang chờ nhà đầu tư tải lên biên lai đúng.",
         "receiptFailed": "Không mở được biên lai. Hãy thử lại.",
         "receiptHeading": "Biên lai của nhà đầu tư",
-        "received": "Đã nhận tiền",
+        "receiptHint": "Duyệt: tiền được ghi nhận là đã nhận và khoản đầu tư được tính vào đợt gọi vốn; doanh nghiệp không cần xác nhận thêm. Từ chối: biên lai bị từ chối và nhà đầu tư có thể tải lên biên lai đúng trước hạn chuyển khoản. Quyết định là cuối cùng và được ghi lại kèm tên bạn.",
+        "reviewHint": "Duyệt: tiền đã đến và khoản đầu tư được tính vào đợt gọi vốn. Từ chối: tiền chưa đến; khoản đầu tư vô hiệu và chỗ của nó trong đợt được giải phóng. Quyết định là cuối cùng và được ghi lại kèm tên bạn.",
         "showReceipt": "Xem biên lai",
         "subtitle": "Khoản chuyển của nhà đầu tư",
         "ticketHeading": "Khoản đầu tư",
         "title": "Khoản chuyển",
+        "toast": {
+          "APPROVED": "Đã duyệt khoản chuyển",
+          "DENIED": "Đã từ chối khoản chuyển"
+        },
         "waitingForReceipt": "Đang chờ nhà đầu tư chuyển khoản và tải lên biên lai."
       },
       "subtitle": "Các đợt gọi vốn đang nhận đầu tư và các khoản chuyển mà nhà đầu tư báo. Nhân viên đọc từng biên lai và xác nhận tiền đã đến.",
@@ -1282,6 +1284,45 @@
       },
       "holdingViewDetails": "Xem chi tiết dự án",
       "holdingsTitle": "Khoản đầu tư của bạn ({count})",
+      "investments": {
+        "cancel": "Hủy",
+        "continue": "Tiếp tục",
+        "dayStatus": {
+          "DUE": "Đến hạn",
+          "MATCHED": "Đã xác nhận",
+          "PRESUMED_PAID": "Đã trả (theo doanh nghiệp)",
+          "REPORTED_MISSED": "Bạn đã báo chưa nhận"
+        },
+        "heading": "Khoản đầu tư của bạn",
+        "hideSchedule": "Ẩn lịch",
+        "kind": {
+          "INSTALMENT": "Hằng ngày",
+          "STUB": "Lãi kỳ đầu"
+        },
+        "memo": "Nội dung",
+        "next": "Kỳ tới: {amount} ngày {date}",
+        "received": "Đã trả cho bạn: {paid} / {total}",
+        "report": "Chưa nhận được",
+        "reportClosed": "Đã quá hạn để báo kỳ này: thời gian báo đã kết thúc.",
+        "reportFailed": "Không gửi được",
+        "reportHint": "Nếu một kỳ được đánh dấu đã trả mà tiền chưa vào tài khoản, hãy báo trong vòng hai ngày làm việc.",
+        "reportPlaceholder": "Chuyện gì đã xảy ra? Ví dụ: hôm nay không nhận được tiền từ doanh nghiệp này",
+        "reportSend": "Báo",
+        "reportedToast": "Đã báo: FundLok sẽ kiểm tra với doanh nghiệp",
+        "schedule": "Lịch trả nợ",
+        "status": {
+          "ACTIVE": "Đang trả nợ",
+          "ATTESTED": "Đang xác nhận",
+          "CONFIRMED": "Doanh nghiệp đã nhận",
+          "EXPIRED": "Hết hạn",
+          "RESERVED": "Đã giữ chỗ",
+          "SIGNED": "Chờ bạn chuyển khoản",
+          "UNDER_REVIEW": "Đang xem xét",
+          "VOID": "Vô hiệu"
+        },
+        "taxNote": "Số tiền đã trừ thuế TNCN mà doanh nghiệp khấu trừ thay bạn.",
+        "waitingClose": "Tiền của bạn đã được xác nhận. Việc trả nợ bắt đầu khi đợt gọi vốn đóng và khoản vay được lập."
+      },
       "investorBearsLoss": "Nhà đầu tư chịu khoản lỗ này.",
       "mockNotice": "Hệ thống chưa được kết nối với tài khoản thật, danh mục bên dưới là danh mục mẫu.",
       "noInvestmentsDescription": "Bạn chưa đầu tư vào doanh nghiệp nào. Vui lòng khám phá các dự án đang gọi vốn và đầu tư để xem phân tích danh mục.",
@@ -1862,9 +1903,34 @@
       "fileUploadFailed": "Tải lên thất bại. Vui lòng thử lại.",
       "finalizing": "Đang hoàn tất...",
       "funding": {
+        "cancel": "Hủy",
+        "closeBody": "Sau khi đóng sẽ không nhận thêm đầu tư. Khi mọi khoản chuyển được xử lý xong, FundLok lập khoản vay từ số đã xác nhận (hiện là {confirmed}) và bạn bắt đầu trả nợ hằng ngày.",
+        "closeEarly": "Đóng đợt gọi vốn",
+        "closeEarlyHint": "Bạn có thể đóng sớm khi đã xác nhận ít nhất {min}.",
+        "closeFailed": "Không đóng được đợt gọi vốn",
+        "closeTitle": "Đóng đợt gọi vốn ngay?",
+        "closedToast": "Đợt gọi vốn đang đóng",
+        "closes": "đóng {date} (còn {days} ngày)",
+        "closingNote": "Đợt gọi vốn đang đóng. Khi mọi khoản chuyển được xử lý xong, FundLok sẽ lập khoản vay và bạn bắt đầu trả nợ hằng ngày.",
+        "details": "Đang chờ chuyển khoản: {reserved} · {count} nhà đầu tư · tối thiểu {min}",
+        "failedNote": "Đợt gọi vốn không đạt mức tối thiểu nên không lập khoản vay. Hãy hoàn tiền cho từng nhà đầu tư đã chuyển; FundLok sẽ liên hệ với bạn.",
         "heading": "Huy động vốn",
+        "noTickets": "Chưa có nhà đầu tư nào giữ chỗ.",
         "none": "Chưa có khoản đầu tư",
-        "noneHint": "Hồ sơ của bạn sẽ được giới thiệu tới nhà đầu tư sau khi bạn xem và ký đề nghị tài trợ. Việc có đầu tư hay không do nhà đầu tư quyết định."
+        "noneHint": "Hồ sơ của bạn sẽ được giới thiệu tới nhà đầu tư sau khi bạn xem và ký đề nghị tài trợ. Việc có đầu tư hay không do nhà đầu tư quyết định.",
+        "ofTarget": "đã xác nhận / mục tiêu {target}",
+        "repayingNote": "Khoản vay đã được lập. Việc trả nợ hằng ngày bắt đầu từ {date}.",
+        "ticketStatus": {
+          "ACTIVE": "Trong khoản vay",
+          "ATTESTED": "FundLok đang xác nhận",
+          "CONFIRMED": "Đã nhận",
+          "EXPIRED": "Hết hạn",
+          "RESERVED": "Đã giữ chỗ",
+          "SIGNED": "Chờ chuyển khoản",
+          "UNDER_REVIEW": "Đang xem xét",
+          "VOID": "Vô hiệu"
+        },
+        "ticketsHeading": "Nhà đầu tư"
       },
       "howToObtainCic": "Cách lấy báo cáo CIC của bạn",
       "howToObtainIt": "Cách lấy hồ sơ",
@@ -1939,6 +2005,31 @@
       "projectTitle": "Dự án: {name}",
       "readyToSend": "Sẵn sàng gửi",
       "registeredAddress": "Địa chỉ đăng ký",
+      "repayments": {
+        "heading": "Trả nợ hôm nay",
+        "hideQr": "Ẩn",
+        "hint": "Hãy chuyển riêng cho từng nhà đầu tư, đúng tài khoản và nội dung; mã QR tự điền cả hai. Nhà đầu tư có hai ngày làm việc để báo khoản chưa nhận được.",
+        "kind": {
+          "INSTALMENT": "Hằng ngày",
+          "STUB": "Lãi kỳ đầu"
+        },
+        "markFailed": "Không đánh dấu được",
+        "markPaid": "Đánh dấu đã trả ({count})",
+        "markedToast": "Đã đánh dấu đã trả",
+        "memo": "Nội dung",
+        "none": "Hôm nay không có khoản nào đến hạn.",
+        "qrHint": "Quét bằng ứng dụng ngân hàng: tài khoản, số tiền và nội dung sẽ tự điền.",
+        "select": "Chọn {name}",
+        "showQr": "QR",
+        "status": {
+          "DUE": "Đến hạn",
+          "MATCHED": "Đã xác nhận",
+          "PRESUMED_PAID": "Đã đánh dấu đã trả",
+          "REPORTED_MISSED": "Bị báo chưa nhận"
+        },
+        "total": "Cần chuyển cho nhà đầu tư: {net}",
+        "withheld": "Thuế TNCN bạn khấu trừ: {tax}"
+      },
       "requiredDocsMissingDescription": "Vui lòng tải lên tất cả các tài liệu bắt buộc để gửi hồ sơ vay.",
       "requiredDocsMissingTitle": "Thiếu tài liệu bắt buộc",
       "resumeSending": "Tiếp tục gửi",
@@ -2478,6 +2569,8 @@
       "uploaded": "Đã tải lên biên lai",
       "uploading": "Đang tải lên…"
     },
+    "received": "FundLok đã kiểm tra khoản chuyển: doanh nghiệp đã nhận khoản đầu tư của bạn. Việc trả nợ bắt đầu khi đợt gọi vốn đóng và khoản vay được lập.",
+    "repaying": "Khoản đầu tư của bạn đã nằm trong khoản vay và đang được trả hằng ngày. Xem lịch trả nợ trên trang tổng quan.",
     "reserveFailed": "Không giữ chỗ được khoản đầu tư",
     "steps": {
       "amount": "Số tiền",
@@ -2812,6 +2905,8 @@
     "items": {
       "applicationApproved": "Hồ sơ đề nghị vay của bạn đã được duyệt.",
       "applicationRejected": "Hồ sơ đề nghị vay của bạn chưa được duyệt.",
+      "transferApproved": "FundLok đã duyệt khoản chuyển {amount} từ nhà đầu tư {investor} (nội dung {memo}). Nếu tiền chưa vào tài khoản của bạn, hãy liên hệ FundLok trong vòng 2 ngày làm việc.",
+      "transferConfirmed": "FundLok đã xác nhận khoản chuyển {amount} từ nhà đầu tư {investor} (nội dung {memo}) cho doanh nghiệp của bạn.",
       "unknown": "Tài khoản của bạn có cập nhật mới.",
       "verificationRequiredKyb": "Hãy xác minh doanh nghiệp (KYB) để có thể gửi hồ sơ đề nghị vay.",
       "verificationRequiredKyc": "Hãy xác minh danh tính (KYC) để có thể bắt đầu đầu tư."

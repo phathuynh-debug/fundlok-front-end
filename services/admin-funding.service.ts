@@ -111,22 +111,10 @@ export interface AdminReceiptUrl {
   original_filename: string | null;
 }
 
-/** Leave a field blank (null) when the receipt does not show it. */
-export interface AdminReceiptFieldsPayload {
-  amount_vnd: number;
-  /** ISO 8601 with an offset. */
-  transferred_at: string;
-  payer_name: string | null;
-  payer_account: string | null;
-  payee_account: string | null;
-  memo: string | null;
-  bank_txn_id: string | null;
-  reason: string;
-}
-
-export interface AdminTransferDecisionPayload {
-  outcome: "RECEIVED" | "NOT_RECEIVED";
-  reason: string;
+/** A note is optional; an empty one records that staff viewed the receipt. */
+export interface AdminReceiptDecisionPayload {
+  outcome: "APPROVED" | "DENIED";
+  reason: string | null;
 }
 
 /** DECISIONS: receipts checked or rejected, reviews settled. INVESTOR:
@@ -181,6 +169,13 @@ export const adminFundingService = {
     });
   },
 
+  // Does what is due on a round now; audited.
+  advanceRound(windowId: string) {
+    return apiClient.post<AdminFundingRound>(
+      ADMIN_ENDPOINTS.fundingRoundAdvance(windowId),
+    );
+  },
+
   listTransfers(params: AdminTransferListParams) {
     return apiClient.get<AdminTable<AdminInvestorTransfer>>(
       ADMIN_ENDPOINTS.fundingTransfers,
@@ -208,16 +203,10 @@ export const adminFundingService = {
     );
   },
 
-  enterFields(transferId: string, body: AdminReceiptFieldsPayload) {
+  // Approve or deny after looking at the receipt; settles a review too.
+  decide(transferId: string, body: AdminReceiptDecisionPayload) {
     return apiClient.post<AdminInvestorTransfer>(
-      ADMIN_ENDPOINTS.transferFields(transferId),
-      body,
-    );
-  },
-
-  decide(reviewId: string, body: AdminTransferDecisionPayload) {
-    return apiClient.post<AdminInvestorTransfer>(
-      ADMIN_ENDPOINTS.transferDecision(reviewId),
+      ADMIN_ENDPOINTS.transferDecision(transferId),
       body,
     );
   },

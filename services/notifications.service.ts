@@ -13,7 +13,14 @@ export type NotificationEvent =
   | "APPLICATION_APPROVED"
   | "APPLICATION_REJECTED"
   /** `data.check` is "KYC" (investor) or "KYB" (SME). */
-  | "VERIFICATION_REQUIRED";
+  | "VERIFICATION_REQUIRED"
+  /**
+   * To the business: staff approved an investor's transfer to its account.
+   * `data.status` is ATTESTED (the receipt matched; two working days to say the
+   * money did not arrive) or CONFIRMED (a review settled as received); `data`
+   * also has `amount_vnd`, `memo`, `project` and the masked `investor`.
+   */
+  | "INVESTMENT_TRANSFER_APPROVED";
 
 export interface AppNotification {
   id: string;

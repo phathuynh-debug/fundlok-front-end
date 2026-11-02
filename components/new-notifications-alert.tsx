@@ -143,7 +143,7 @@ export function NewNotificationsAlert() {
                   tone,
                   message,
                   action,
-                } = presentNotification(item, t);
+                } = presentNotification(item, t, locale);
                 return (
                   <li
                     key={item.id}
