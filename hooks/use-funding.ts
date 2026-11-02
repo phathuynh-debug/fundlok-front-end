@@ -7,6 +7,7 @@ import {
   type PaymentInstructions,
   type ReceiptResult,
   type ReserveRequest,
+  type SmeRepaymentPlan,
   type SmeRound,
   type Tranche,
 } from "@/services/funding.service";
@@ -20,6 +21,8 @@ export const fundingKeys = {
   payment: (trancheId: string) =>
     [...fundingKeys.all, "payment", trancheId] as const,
   myRounds: () => [...fundingKeys.all, "my-rounds"] as const,
+  repaymentPlan: (windowId: string) =>
+    [...fundingKeys.all, "repayment-plan", windowId] as const,
 };
 
 // The project's funding window, by its listing. Null id: nothing to fetch (the
@@ -123,4 +126,15 @@ export function useCloseRoundEarly() {
   return useRoundMutation((windowId: string) =>
     fundingService.closeEarly(windowId),
   );
+}
+
+// The business's daily repayments: projected until the loan forms, then real.
+export function useRepaymentPlan(windowId: string, enabled = true) {
+  return useQuery<SmeRepaymentPlan, ApiError>({
+    queryKey: fundingKeys.repaymentPlan(windowId),
+    queryFn: () => fundingService.getRepaymentPlan(windowId),
+    enabled,
+    staleTime: 60 * 1000,
+    retry: false,
+  });
 }

@@ -119,6 +119,33 @@ export interface SmeRound extends FundingWindow {
   repayment_start_date: string | null;
 }
 
+/** One day the business pays, summed over its investors. */
+export interface SmeRepaymentDay {
+  due_date: string;
+  /** Investors' money coming back. */
+  principal_vnd: number;
+  /** Tax is withheld on this part only. */
+  interest_vnd: number;
+  /** What it owes that day: net to investors plus the tax it withholds. */
+  gross_vnd: number;
+  tax_withheld_vnd: number;
+  net_vnd: number;
+  /** Investors' tickets that day; paid / missing only once the loan formed. */
+  tickets: number;
+  paid: number;
+  missing: number;
+}
+
+// Mirrors backend SmeRepaymentPlanOut.
+export interface SmeRepaymentPlan {
+  /** PROJECTED before the loan forms (not a promise), ACTUAL after. */
+  kind: "PROJECTED" | "ACTUAL";
+  assumed_close_date: string | null;
+  start_date: string | null;
+  days: SmeRepaymentDay[];
+  totals: { gross_vnd: number; tax_withheld_vnd: number; net_vnd: number };
+}
+
 export interface ReserveRequest {
   amount_vnd: number;
   ack_risk_disclosure: boolean;
@@ -174,6 +201,14 @@ export const fundingService = {
   // GET /funding/me/rounds — the business's rounds, newest first.
   listMyRounds() {
     return apiClient.get<SmeRound[]>(FUNDING_ENDPOINTS.myRounds);
+  },
+
+  // GET /funding/me/rounds/{id}/repayment-plan — the business's daily
+  // repayments to its investors.
+  getRepaymentPlan(windowId: string) {
+    return apiClient.get<SmeRepaymentPlan>(
+      FUNDING_ENDPOINTS.repaymentPlan(windowId),
+    );
   },
 
   // POST /funding/windows/{id}/close-early — once the minimum is confirmed.

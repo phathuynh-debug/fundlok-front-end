@@ -15,6 +15,7 @@ import { formatDate } from "@/lib/format-date";
 import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import type { RepaymentRow } from "@/services/repayment.service";
+import { Breakdown } from "./Breakdown";
 
 const K = "dashboard.sme.repayments";
 
@@ -107,6 +108,13 @@ export function TodaysRepayments() {
 
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div className="space-y-0.5 text-xs text-muted-foreground">
+              {data.totals.tax_withheld_vnd > 0 && (
+                <p className="text-foreground">
+                  {t(`${K}.grossTotal`, {
+                    gross: money(data.totals.gross_vnd),
+                  })}
+                </p>
+              )}
               <p className="text-sm text-foreground">
                 {t(`${K}.total`, { net: money(data.totals.net_vnd) })}
               </p>
@@ -175,8 +183,18 @@ function RepaymentTicket({
               </span>
             </p>
             <div className="flex items-center gap-2">
-              <span className="font-semibold tabular-nums text-foreground">
-                {formatCurrency(row.net_vnd, locale)}
+              <span className="text-right">
+                {/* What to transfer (the QR's amount); tax included beneath. */}
+                <span className="block font-semibold tabular-nums text-foreground">
+                  {formatCurrency(row.net_vnd, locale)}
+                </span>
+                {row.tax_withheld_vnd > 0 && (
+                  <span className="block text-[11px] tabular-nums text-muted-foreground">
+                    {t(`${K}.inclTax`, {
+                      gross: formatCurrency(row.gross_vnd, locale),
+                    })}
+                  </span>
+                )}
               </span>
               <Badge
                 variant="outline"
@@ -205,6 +223,7 @@ function RepaymentTicket({
               {row.reference_code}
             </span>
           </p>
+          <Breakdown row={row} />
         </div>
         {row.vietqr_payload && (
           <Button

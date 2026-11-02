@@ -109,7 +109,13 @@ export function InvestmentCard({ tranche }: { tranche: Tranche }) {
             {summary.next && (
               <p className="text-foreground sm:text-right">
                 {t(`${K}.next`, {
-                  amount: money(summary.next.net_vnd),
+                  amount:
+                    summary.next.tax_withheld_vnd > 0
+                      ? t(`${K}.amountSplit`, {
+                          net: money(summary.next.net_vnd),
+                          gross: money(summary.next.gross_vnd),
+                        })
+                      : money(summary.next.net_vnd),
                   date: formatDate(summary.next.due_date, locale),
                 })}
               </p>

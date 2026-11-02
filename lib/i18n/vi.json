@@ -1285,6 +1285,7 @@
       "holdingViewDetails": "Xem chi tiết dự án",
       "holdingsTitle": "Khoản đầu tư của bạn ({count})",
       "investments": {
+        "amountSplit": "{net} (đã gồm thuế: {gross})",
         "cancel": "Hủy",
         "continue": "Tiếp tục",
         "dayStatus": {
@@ -1295,6 +1296,7 @@
         },
         "heading": "Khoản đầu tư của bạn",
         "hideSchedule": "Ẩn lịch",
+        "inclTax": "Đã gồm thuế: {gross}",
         "kind": {
           "INSTALMENT": "Hằng ngày",
           "STUB": "Lãi kỳ đầu"
@@ -1308,15 +1310,17 @@
           "heading": "Lịch trả nợ dự kiến",
           "hide": "Ẩn các kỳ dự kiến",
           "note": "Dự kiến, không đảm bảo: giả định đợt gọi vốn đóng vào {date}, muộn nhất có thể. Lịch thật được lập khi khoản vay hình thành; nếu đợt đóng sớm hơn, mọi ngày sẽ sớm hơn. Nếu doanh thu của doanh nghiệp giảm, thời hạn có thể kéo dài và khoản trả mỗi ngày nhỏ hơn. Việc trả nợ phụ thuộc vào doanh nghiệp và bạn chịu rủi ro tín dụng.",
-          "perDay": "Mỗi ngày làm việc",
+          "perDay": "Bạn nhận mỗi ngày làm việc (đã trừ thuế)",
+          "perDayGross": "Mỗi ngày làm việc (đã gồm thuế)",
           "periods": "Số kỳ",
           "periodsValue": "{count} ngày làm việc, {start} – {end}",
           "range": "{low}–{high}",
           "show": "Xem các kỳ dự kiến",
           "stub": "Lãi kỳ đầu (trong kỳ nhận đầu tiên)",
-          "total": "Tổng dự kiến nhận về"
+          "total": "Tổng dự kiến nhận về (đã trừ thuế)",
+          "totalGross": "Tổng dự kiến (đã gồm thuế)"
         },
-        "received": "Đã trả cho bạn: {paid} / {total}",
+        "received": "Đã trả cho bạn (đã trừ thuế): {paid} / {total}",
         "report": "Chưa nhận được",
         "reportClosed": "Đã quá hạn để báo kỳ này: thời gian báo đã kết thúc.",
         "reportFailed": "Không gửi được",
@@ -1335,8 +1339,8 @@
           "UNDER_REVIEW": "Đang xem xét",
           "VOID": "Vô hiệu"
         },
-        "taxNote": "Số tiền đã trừ thuế TNCN mà doanh nghiệp khấu trừ thay bạn.",
-        "waitingClose": "Tiền của bạn đã được xác nhận. Việc trả nợ bắt đầu khi đợt gọi vốn đóng và khoản vay được lập."
+        "taxNote": "Số tiền đã trừ thuế TNCN 5% chỉ tính trên phần lãi (không tính trên tiền gốc bạn nhận lại), do doanh nghiệp khấu trừ thay bạn.",
+        "waitingClose": "Tiền của bạn đã được xác nhận. Việc trả nợ hằng ngày bắt đầu từ ngày làm việc tiếp theo."
       },
       "investorBearsLoss": "Nhà đầu tư chịu khoản lỗ này.",
       "mockNotice": "Hệ thống chưa được kết nối với tài khoản thật, danh mục bên dưới là danh mục mẫu.",
@@ -1446,6 +1450,10 @@
       "showingListings": "Đang hiển thị {shown} trong {total} tin",
       "subtitle": "Khám phá các dự án SME đã được thẩm định và thực hiện khoản đầu tư tiếp theo của bạn",
       "title": "Cơ hội đầu tư"
+    },
+    "repaymentBreakdown": {
+      "noTax": "Gốc {principal} + lãi {interest}",
+      "withTax": "Gốc {principal} + lãi {interest} − thuế 5% trên lãi {tax}"
     },
     "security": {
       "activity": {
@@ -1919,24 +1927,24 @@
       "finalizing": "Đang hoàn tất...",
       "funding": {
         "cancel": "Hủy",
-        "closeBody": "Sau khi đóng sẽ không nhận thêm đầu tư. Khi mọi khoản chuyển được xử lý xong, FundLok lập khoản vay từ số đã xác nhận (hiện là {confirmed}) và bạn bắt đầu trả nợ hằng ngày.",
+        "closeBody": "Sau khi đóng sẽ không nhận thêm đầu tư. Mỗi khoản đầu tư (hiện là {confirmed}) đã được trả theo lịch riêng; đóng đợt chỉ kết thúc việc huy động.",
         "closeEarly": "Đóng đợt gọi vốn",
         "closeEarlyHint": "Bạn có thể đóng sớm khi đã xác nhận ít nhất {min}.",
         "closeFailed": "Không đóng được đợt gọi vốn",
         "closeTitle": "Đóng đợt gọi vốn ngay?",
         "closedToast": "Đợt gọi vốn đang đóng",
         "closes": "đóng {date} (còn {days} ngày)",
-        "closingNote": "Đợt gọi vốn đang đóng. Khi mọi khoản chuyển được xử lý xong, FundLok sẽ lập khoản vay và bạn bắt đầu trả nợ hằng ngày.",
+        "closingNote": "Đợt gọi vốn đang đóng: không nhận thêm đầu tư. Mỗi khoản đầu tư vẫn được trả theo lịch riêng.",
         "details": "Đang chờ chuyển khoản: {reserved} · {count} nhà đầu tư · tối thiểu {min}",
-        "failedNote": "Đợt gọi vốn không đạt mức tối thiểu nên không lập khoản vay. Hãy hoàn tiền cho từng nhà đầu tư đã chuyển; FundLok sẽ liên hệ với bạn.",
+        "failedNote": "Đợt gọi vốn đã đóng mà không nhận được khoản đầu tư nào.",
         "heading": "Huy động vốn",
         "noTickets": "Chưa có nhà đầu tư nào giữ chỗ.",
         "none": "Chưa có khoản đầu tư",
         "noneHint": "Hồ sơ của bạn sẽ được giới thiệu tới nhà đầu tư sau khi bạn xem và ký đề nghị tài trợ. Việc có đầu tư hay không do nhà đầu tư quyết định.",
         "ofTarget": "đã xác nhận / mục tiêu {target}",
-        "repayingNote": "Khoản vay đã được lập. Việc trả nợ hằng ngày bắt đầu từ {date}.",
+        "repayingNote": "Đợt gọi vốn đã đóng. Việc trả nợ đã bắt đầu từ {date}.",
         "ticketStatus": {
-          "ACTIVE": "Trong khoản vay",
+          "ACTIVE": "Đang trả nợ",
           "ATTESTED": "FundLok đang xác nhận",
           "CONFIRMED": "Đã nhận",
           "EXPIRED": "Hết hạn",
@@ -2007,6 +2015,38 @@
       "noFileChosen": "Chưa chọn tệp",
       "noLoanPurpose": "Chưa cung cấp",
       "notSelectedYet": "Chưa chọn",
+      "plan": {
+        "amountSplit": "{gross} (chuyển {net})",
+        "badge": "Dự kiến, không đảm bảo",
+        "first": "Kỳ trả đầu tiên",
+        "firstValue": "{amount} ngày {date}",
+        "heading": "Lịch trả nợ",
+        "headingProjected": "Lịch trả nợ dự kiến",
+        "hide": "Ẩn các ngày",
+        "investors": "{count} khoản cho nhà đầu tư",
+        "next": "Kỳ trả tiếp theo",
+        "note": "Số tiền này chuyển cho nhà đầu tư, vào tài khoản riêng của từng người; phí của FundLok được xuất hóa đơn riêng. Nếu doanh thu giảm, thời hạn có thể kéo dài và khoản trả mỗi ngày nhỏ hơn, khi đó tổng số tiền phải trả tăng lên.",
+        "perDay": "Mỗi ngày làm việc (đã gồm thuế)",
+        "perDayNet": "Bạn chuyển cho nhà đầu tư mỗi ngày",
+        "periods": "Số kỳ",
+        "periodsValue": "{count} ngày làm việc, {start} – {end}",
+        "progress": "Đã trả",
+        "progressValue": "{paid} / {count} ngày",
+        "projectedNote": "Dự kiến theo {confirmed} đã xác nhận đến nay, giả định đợt gọi vốn đóng vào {date}: có thêm khoản đầu tư thì mỗi kỳ sẽ tăng, và lịch thật được lập khi khoản vay hình thành.",
+        "range": "{low}–{high}",
+        "show": "Xem từng ngày",
+        "status": {
+          "due": "Đến hạn",
+          "missing": "Bị báo chưa nhận",
+          "paid": "Đã trả",
+          "upcoming": "Sắp tới"
+        },
+        "taxKept": "Thuế bạn giữ lại để nộp",
+        "taxNote": "Mọi số tiền ở đây đã trừ thuế TNCN của nhà đầu tư (chỉ 5% trên phần lãi, tổng cộng {tax}): bạn giữ lại khoản này và tự nộp cho cơ quan thuế.",
+        "total": "Tổng bạn chuyển cho nhà đầu tư",
+        "totalGross": "Tổng phải trả (đã gồm thuế)",
+        "transferShort": "chuyển {net}"
+      },
       "postalCode": "Mã bưu chính",
       "preview": "Xem trước",
       "previewUnavailable": "Không thể xem trước loại tệp này. Bạn vẫn có thể gửi.",
@@ -2021,9 +2061,11 @@
       "readyToSend": "Sẵn sàng gửi",
       "registeredAddress": "Địa chỉ đăng ký",
       "repayments": {
+        "grossTotal": "Tổng phải trả (đã gồm thuế): {gross}",
         "heading": "Trả nợ hôm nay",
         "hideQr": "Ẩn",
         "hint": "Hãy chuyển riêng cho từng nhà đầu tư, đúng tài khoản và nội dung; mã QR tự điền cả hai. Nhà đầu tư có hai ngày làm việc để báo khoản chưa nhận được.",
+        "inclTax": "Đã gồm thuế: {gross}",
         "kind": {
           "INSTALMENT": "Hằng ngày",
           "STUB": "Lãi kỳ đầu"
@@ -2043,7 +2085,7 @@
           "REPORTED_MISSED": "Bị báo chưa nhận"
         },
         "total": "Cần chuyển cho nhà đầu tư: {net}",
-        "withheld": "Thuế TNCN bạn khấu trừ: {tax}"
+        "withheld": "Thuế bạn giữ lại để nộp cho cơ quan thuế (chỉ 5% trên phần lãi): {tax}"
       },
       "requiredDocsMissingDescription": "Vui lòng tải lên tất cả các tài liệu bắt buộc để gửi hồ sơ vay.",
       "requiredDocsMissingTitle": "Thiếu tài liệu bắt buộc",
@@ -2584,7 +2626,7 @@
       "uploaded": "Đã tải lên biên lai",
       "uploading": "Đang tải lên…"
     },
-    "received": "FundLok đã kiểm tra khoản chuyển: doanh nghiệp đã nhận khoản đầu tư của bạn. Việc trả nợ bắt đầu khi đợt gọi vốn đóng và khoản vay được lập.",
+    "received": "FundLok đã kiểm tra khoản chuyển: doanh nghiệp đã nhận khoản đầu tư của bạn. Việc trả nợ hằng ngày bắt đầu từ ngày làm việc tiếp theo.",
     "repaying": "Khoản đầu tư của bạn đã nằm trong khoản vay và đang được trả hằng ngày. Xem lịch trả nợ trên trang tổng quan.",
     "reserveFailed": "Không giữ chỗ được khoản đầu tư",
     "steps": {
@@ -2922,6 +2964,7 @@
       "applicationRejected": "Hồ sơ đề nghị vay của bạn chưa được duyệt.",
       "transferApproved": "FundLok đã duyệt khoản chuyển {amount} từ nhà đầu tư {investor} (nội dung {memo}). Nếu tiền chưa vào tài khoản của bạn, hãy liên hệ FundLok trong vòng 2 ngày làm việc.",
       "transferConfirmed": "FundLok đã xác nhận khoản chuyển {amount} từ nhà đầu tư {investor} (nội dung {memo}) cho doanh nghiệp của bạn.",
+      "transferRepaying": "FundLok đã xác nhận khoản chuyển {amount} từ nhà đầu tư {investor} (nội dung {memo}). Bạn trả nợ nhà đầu tư này mỗi ngày làm việc, bắt đầu từ ngày làm việc tiếp theo.",
       "unknown": "Tài khoản của bạn có cập nhật mới.",
       "verificationRequiredKyb": "Hãy xác minh doanh nghiệp (KYB) để có thể gửi hồ sơ đề nghị vay.",
       "verificationRequiredKyc": "Hãy xác minh danh tính (KYC) để có thể bắt đầu đầu tư."

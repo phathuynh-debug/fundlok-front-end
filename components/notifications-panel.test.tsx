@@ -223,7 +223,7 @@ describe("NotificationsPanel — verification reminder", () => {
 });
 
 describe("NotificationsPanel — transfer approved", () => {
-  const approved = (status: "ATTESTED" | "CONFIRMED") =>
+  const approved = (status: "ATTESTED" | "CONFIRMED" | "ACTIVE") =>
     notification({
       id: "t1",
       event: "INVESTMENT_TRANSFER_APPROVED",
@@ -241,6 +241,7 @@ describe("NotificationsPanel — transfer approved", () => {
   it.each([
     ["ATTESTED", "notifications.items.transferApproved"],
     ["CONFIRMED", "notifications.items.transferConfirmed"],
+    ["ACTIVE", "notifications.items.transferRepaying"],
   ] as const)(
     "tells the business of a %s transfer, naming the amount and memo",
     async (status, copy) => {

@@ -99,14 +99,17 @@ const EVENT_PRESENTATION: Record<
     icon: ShieldCheck,
     action: { labelKey: "notifications.actions.verify", href: "/kyc" },
   },
-  // To the business: staff approved an investor's transfer to its account. A
-  // matched receipt (ATTESTED) still leaves two working days to say the money
-  // never arrived, so that copy says so; a settled review (CONFIRMED) is final.
+  // To the business: staff approved an investor's transfer to its account.
+  // ACTIVE: received, and the business repays that investor from the next
+  // working day. CONFIRMED: received. ATTESTED (older approvals) still left two
+  // working days to say the money never arrived, so that copy says so.
   INVESTMENT_TRANSFER_APPROVED: {
     messageKey: (notification) =>
-      notification.data.status === "CONFIRMED"
-        ? "notifications.items.transferConfirmed"
-        : "notifications.items.transferApproved",
+      notification.data.status === "ACTIVE"
+        ? "notifications.items.transferRepaying"
+        : notification.data.status === "CONFIRMED"
+          ? "notifications.items.transferConfirmed"
+          : "notifications.items.transferApproved",
     values: (notification, locale) => ({
       amount: formatCurrency(Number(notification.data.amount_vnd ?? 0), locale),
       memo: String(notification.data.memo ?? ""),

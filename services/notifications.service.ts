@@ -16,9 +16,9 @@ export type NotificationEvent =
   | "VERIFICATION_REQUIRED"
   /**
    * To the business: staff approved an investor's transfer to its account.
-   * `data.status` is ATTESTED (the receipt matched; two working days to say the
-   * money did not arrive) or CONFIRMED (a review settled as received); `data`
-   * also has `amount_vnd`, `memo`, `project` and the masked `investor`.
+   * `data.status` is ACTIVE (received, repaying from the next working day),
+   * CONFIRMED (received) or ATTESTED (older: two working days to dispute);
+   * `data` also has `amount_vnd`, `memo`, `project` and the masked `investor`.
    */
   | "INVESTMENT_TRANSFER_APPROVED";
 

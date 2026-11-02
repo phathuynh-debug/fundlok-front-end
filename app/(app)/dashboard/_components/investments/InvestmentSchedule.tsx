@@ -13,6 +13,7 @@ import { formatDate } from "@/lib/format-date";
 import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import type { RepaymentRow } from "@/services/repayment.service";
+import { Breakdown } from "../funding/Breakdown";
 
 const K = "dashboard.investor.investments";
 
@@ -98,15 +99,28 @@ function ScheduleRow({
   return (
     <li className="space-y-2 px-3 py-2 text-sm">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-foreground">
-          {formatDate(row.due_date, locale)}
-          <span className="ml-2 text-xs text-muted-foreground">
-            {t(`${K}.kind.${row.kind}`)}
-          </span>
-        </p>
+        <div className="min-w-0">
+          <p className="text-foreground">
+            {formatDate(row.due_date, locale)}
+            <span className="ml-2 text-xs text-muted-foreground">
+              {t(`${K}.kind.${row.kind}`)}
+            </span>
+          </p>
+          <Breakdown row={row} />
+        </div>
         <div className="flex items-center gap-2">
-          <span className="font-medium tabular-nums text-foreground">
-            {formatCurrency(row.net_vnd, locale)}
+          <span className="text-right">
+            {/* What reaches the investor; the repayment tax included beneath. */}
+            <span className="block font-medium tabular-nums text-foreground">
+              {formatCurrency(row.net_vnd, locale)}
+            </span>
+            {row.tax_withheld_vnd > 0 && (
+              <span className="block text-[11px] tabular-nums text-muted-foreground">
+                {t(`${K}.inclTax`, {
+                  gross: formatCurrency(row.gross_vnd, locale),
+                })}
+              </span>
+            )}
           </span>
           <Badge
             variant="outline"

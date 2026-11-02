@@ -113,6 +113,11 @@ describe("InvestmentCard", () => {
     const rows = within(screen.getByTestId("investment-schedule")).getAllByRole(
       "listitem",
     );
+    // Each day: what reaches the investor, and the repayment tax included.
+    expect(rows[0]).toHaveTextContent("₫125,080");
+    expect(rows[0]).toHaveTextContent(
+      'dashboard.investor.investments.inclTax:{"gross":"₫125,397"}',
+    );
     // Only a day already due can be reported; next year's cannot.
     expect(
       within(rows[1]).queryByRole("button", {
@@ -186,8 +191,14 @@ describe("InvestmentCard", () => {
     );
     // The daily amount spans a range: never one bare figure.
     expect(block).toHaveTextContent('"low":"₫101,900","high":"₫101,901"');
-    // The first payment carries the first-period interest too.
-    expect(block).toHaveTextContent('"amount":"₫149,400"');
+    // What the investor receives after tax, beside the same with tax included.
+    expect(block).toHaveTextContent(
+      "dashboard.investor.investments.projected.perDayGross",
+    );
+    expect(block).toHaveTextContent('"low":"₫102,000","high":"₫102,002"');
+    // The first payment carries the first-period interest too: 149,400 after tax.
+    expect(block).toHaveTextContent("₫149,400");
+    expect(block).toHaveTextContent("₫152,000");
     fireEvent.click(
       screen.getByRole("button", {
         name: "dashboard.investor.investments.projected.show",

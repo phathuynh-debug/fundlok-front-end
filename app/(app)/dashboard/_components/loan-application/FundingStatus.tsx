@@ -1,13 +1,15 @@
 import { Loader2, Users } from "lucide-react";
 import { useMyRounds } from "@/hooks/use-funding";
 import { RoundProgress } from "../funding/RoundProgress";
+import { RepaymentPlan } from "../funding/RepaymentPlan";
 import { RoundTickets } from "../funding/RoundTickets";
 import { TodaysRepayments } from "../funding/TodaysRepayments";
 
 /**
  * Where funding stands on an approved request, from the business's own round:
- * what investors have put in, each investor's ticket (masked), and once the
- * loan has formed, what is due to each investor today.
+ * what investors have put in, each investor's ticket (masked), its daily
+ * repayments (projected until the loan forms), and once it has formed, what is
+ * due to each investor today.
  *
  * Approval is not funding: until the round opens (it opens by itself once the
  * project is live and the business's bank account is approved) this says so
@@ -63,7 +65,15 @@ export function FundingStatus({
         <RoundProgress round={round} />
         <RoundTickets round={round} />
       </section>
-      {round.status === "REPAYING" && <TodaysRepayments />}
+      {/* An investment repays from its approval, so payments can be due while
+          the round is still open. */}
+      {(round.status === "REPAYING" ||
+        round.tickets.some((ticket) => ticket.status === "ACTIVE")) && (
+        <TodaysRepayments />
+      )}
+      {(round.confirmed_vnd > 0 ||
+        round.status === "REPAYING" ||
+        round.status === "REPAID") && <RepaymentPlan round={round} />}
     </div>
   );
 }

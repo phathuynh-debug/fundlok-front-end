@@ -1285,6 +1285,7 @@
       "holdingViewDetails": "View project details",
       "holdingsTitle": "Your positions ({count})",
       "investments": {
+        "amountSplit": "{net} ({gross} tax included)",
         "cancel": "Cancel",
         "continue": "Continue",
         "dayStatus": {
@@ -1295,6 +1296,7 @@
         },
         "heading": "Your investments",
         "hideSchedule": "Hide schedule",
+        "inclTax": "Tax included: {gross}",
         "kind": {
           "INSTALMENT": "Daily",
           "STUB": "First-period interest"
@@ -1308,15 +1310,17 @@
           "heading": "Projected repayment",
           "hide": "Hide projected payments",
           "note": "Projected, not guaranteed: it assumes the round closes on {date}, the latest it can. The real schedule is set when the loan forms; if the round closes earlier, every date moves earlier. If the business's revenue drops, the term can stretch out and the daily repayment gets smaller. Repayment depends on the business, and you bear the credit risk.",
-          "perDay": "Each working day",
+          "perDay": "You receive each working day, after tax",
+          "perDayGross": "Each working day, tax included",
           "periods": "Periods",
           "periodsValue": "{count} working days, {start} – {end}",
           "range": "{low}–{high}",
           "show": "Show projected payments",
           "stub": "First-period interest (in the first payment)",
-          "total": "Projected total back to you"
+          "total": "Projected total back to you, after tax",
+          "totalGross": "Projected total, tax included"
         },
-        "received": "Paid to you so far: {paid} of {total}",
+        "received": "Paid to you so far, after tax: {paid} of {total}",
         "report": "Not received",
         "reportClosed": "It's too late to report this day: the report window has closed.",
         "reportFailed": "Couldn't send the report",
@@ -1335,8 +1339,8 @@
           "UNDER_REVIEW": "Under review",
           "VOID": "Void"
         },
-        "taxNote": "Amounts are after the personal income tax the business withholds for you.",
-        "waitingClose": "Your money is confirmed. Repayments start once the round closes and the loan forms."
+        "taxNote": "Amounts are after personal income tax of 5% on the interest part only (not on your money coming back), which the business withholds for you.",
+        "waitingClose": "Your money is confirmed. Its daily repayments start from the next working day."
       },
       "investorBearsLoss": "The investor bears this loss.",
       "mockNotice": "The system isn't connected to live accounts yet. The portfolio below is sample data.",
@@ -1446,6 +1450,10 @@
       "showingListings": "Showing {shown} of {total} listings",
       "subtitle": "Explore vetted SME projects and make your next investment",
       "title": "Investment opportunities"
+    },
+    "repaymentBreakdown": {
+      "noTax": "Principal {principal} + interest {interest}",
+      "withTax": "Principal {principal} + interest {interest} − tax 5% of interest {tax}"
     },
     "security": {
       "activity": {
@@ -1919,24 +1927,24 @@
       "finalizing": "Finalizing...",
       "funding": {
         "cancel": "Cancel",
-        "closeBody": "No new investments after this. Once every transfer is settled, FundLok forms your loan from what was confirmed ({confirmed} so far) and your daily repayments begin.",
+        "closeBody": "No new investments after this. Each investment ({confirmed} so far) already repays on its own schedule; closing just ends the round.",
         "closeEarly": "Close round now",
         "closeEarlyHint": "You can close early once at least {min} is confirmed.",
         "closeFailed": "Couldn't close the round",
         "closeTitle": "Close your round now?",
         "closedToast": "Your round is closing",
         "closes": "closes {date} ({days} days left)",
-        "closingNote": "Your round is closing. Once every transfer is settled, FundLok forms your loan and your daily repayments begin.",
+        "closingNote": "Your round is closing: no new investments. Each investment keeps repaying on its own schedule.",
         "details": "Waiting on transfers: {reserved} · {count} investors · minimum {min}",
-        "failedNote": "The round did not reach its minimum, so no loan formed. Refund each investor who paid; FundLok will contact you.",
+        "failedNote": "The round closed without any investment received.",
         "heading": "Funding",
         "noTickets": "No investor has reserved yet.",
         "none": "No investment yet",
         "noneHint": "Your request is presented to investors after you review and sign the offer. Whether they fund it is their decision.",
         "ofTarget": "confirmed of {target}",
-        "repayingNote": "Your loan is formed. Daily repayments start on {date}.",
+        "repayingNote": "Your round is closed. Repayments started on {date}.",
         "ticketStatus": {
-          "ACTIVE": "In your loan",
+          "ACTIVE": "Repaying",
           "ATTESTED": "Being confirmed by FundLok",
           "CONFIRMED": "Received",
           "EXPIRED": "Expired",
@@ -2007,6 +2015,38 @@
       "noFileChosen": "No file chosen",
       "noLoanPurpose": "Not specified yet",
       "notSelectedYet": "Not selected",
+      "plan": {
+        "amountSplit": "{gross} (you transfer {net})",
+        "badge": "Projected, not guaranteed",
+        "first": "First payment",
+        "firstValue": "{amount} on {date}",
+        "heading": "Repayment schedule",
+        "headingProjected": "Projected repayment schedule",
+        "hide": "Hide days",
+        "investors": "{count} investor payments",
+        "next": "Next payment",
+        "note": "These amounts go to your investors, each to their own account; FundLok's fee is invoiced separately. If your revenue drops, the term can stretch out and the daily repayment gets smaller, and the total repayable goes up.",
+        "perDay": "Each working day, tax included",
+        "perDayNet": "You transfer to investors each day",
+        "periods": "Periods",
+        "periodsValue": "{count} working days, {start} – {end}",
+        "progress": "Paid",
+        "progressValue": "{paid} of {count} days",
+        "projectedNote": "Projected from the {confirmed} confirmed so far, assuming the round closes on {date}: more investment makes each day larger, and the real schedule is set when the loan forms.",
+        "range": "{low}–{high}",
+        "show": "Show every day",
+        "status": {
+          "due": "Due",
+          "missing": "Reported missing",
+          "paid": "Paid",
+          "upcoming": "Upcoming"
+        },
+        "taxKept": "Tax you keep back for the tax office",
+        "taxNote": "Every amount here is after deducting the investors' personal income tax (5% of the interest only, {tax} in all): you keep it back and pay it to the tax office yourself.",
+        "total": "Total you transfer to investors",
+        "totalGross": "Total to repay, tax included",
+        "transferShort": "you transfer {net}"
+      },
       "postalCode": "Postal code",
       "preview": "Preview",
       "previewUnavailable": "Preview isn't available for this file type. You can still send it.",
@@ -2021,9 +2061,11 @@
       "readyToSend": "Ready to send",
       "registeredAddress": "Registered address",
       "repayments": {
+        "grossTotal": "Total due, tax included: {gross}",
         "heading": "Today's repayments",
         "hideQr": "Hide",
         "hint": "Pay each investor separately, to their account and with their memo; the QR fills both in. Investors have two working days to report a payment that didn't arrive.",
+        "inclTax": "Tax included: {gross}",
         "kind": {
           "INSTALMENT": "Daily",
           "STUB": "First-period interest"
@@ -2043,7 +2085,7 @@
           "REPORTED_MISSED": "Reported missing"
         },
         "total": "To pay investors: {net}",
-        "withheld": "Personal income tax you withhold: {tax}"
+        "withheld": "Tax you keep back for the tax office (5% of the interest only): {tax}"
       },
       "requiredDocsMissingDescription": "Please upload all required documentation to submit your loan application.",
       "requiredDocsMissingTitle": "Required documents missing",
@@ -2584,7 +2626,7 @@
       "uploaded": "Receipt uploaded",
       "uploading": "Uploading…"
     },
-    "received": "FundLok checked your transfer: the business has received your investment. Repayments start once the round closes and the loan forms.",
+    "received": "FundLok checked your transfer: the business has received your investment. Its daily repayments start from the next working day.",
     "repaying": "Your investment is in the loan and being repaid daily. See the schedule on your dashboard.",
     "reserveFailed": "Couldn't reserve your investment",
     "steps": {
@@ -2922,6 +2964,7 @@
       "applicationRejected": "Your funding request was not approved.",
       "transferApproved": "FundLok approved a transfer of {amount} from investor {investor} (memo {memo}). If it hasn't reached your account, contact FundLok within 2 working days.",
       "transferConfirmed": "FundLok confirmed a transfer of {amount} from investor {investor} (memo {memo}) to your business.",
+      "transferRepaying": "FundLok confirmed a transfer of {amount} from investor {investor} (memo {memo}). You repay this investor every working day, from the next working day.",
       "unknown": "You have an update on your account.",
       "verificationRequiredKyb": "Verify your business (KYB) so you can submit a funding request.",
       "verificationRequiredKyc": "Verify your identity (KYC) so you can start investing."

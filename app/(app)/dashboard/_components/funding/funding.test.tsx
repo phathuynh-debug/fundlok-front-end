@@ -2,17 +2,19 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { FundingStatus } from "../loan-application/FundingStatus";
 import { TodaysRepayments } from "./TodaysRepayments";
-import type { SmeRound } from "@/services/funding.service";
+import type { SmeRepaymentPlan, SmeRound } from "@/services/funding.service";
 import type { TodaysPayments } from "@/services/repayment.service";
 
 const closeMock = vi.fn();
 const markPaidMock = vi.fn();
 let rounds: SmeRound[] = [];
 let today: TodaysPayments | undefined;
+let plan: SmeRepaymentPlan | undefined;
 
 vi.mock("@/hooks/use-funding", () => ({
   useMyRounds: () => ({ data: rounds, isLoading: false }),
   useCloseRoundEarly: () => ({ mutate: closeMock, isPending: false }),
+  useRepaymentPlan: () => ({ data: plan, isLoading: false }),
 }));
 vi.mock("@/hooks/use-repayment", () => ({
   useTodaysPayments: () => ({ data: today, isLoading: false }),
@@ -80,6 +82,7 @@ beforeEach(() => {
   markPaidMock.mockReset();
   rounds = [];
   today = undefined;
+  plan = undefined;
 });
 
 describe("FundingStatus", () => {
@@ -180,6 +183,15 @@ describe("TodaysRepayments", () => {
 
     const ticket = screen.getByTestId("repayment-ticket");
     expect(ticket).toHaveTextContent("19036789012");
+    // What to transfer, and the repayment tax included beneath it.
+    expect(ticket).toHaveTextContent("₫125,080");
+    expect(ticket).toHaveTextContent(
+      'dashboard.sme.repayments.inclTax:{"gross":"₫125,397"}',
+    );
+    // The tax is 5% of the interest (6,349), not of the whole 125,397.
+    expect(within(ticket).getByTestId("repayment-breakdown")).toHaveTextContent(
+      'dashboard.repaymentBreakdown.withTax:{"principal":"₫119,048","interest":"₫6,349","tax":"₫317"}',
+    );
     expect(ticket).toHaveTextContent("FL8TKK1UAQ");
     fireEvent.click(
       screen.getByRole("button", { name: "dashboard.sme.repayments.showQr" }),
@@ -197,5 +209,120 @@ describe("TodaysRepayments", () => {
     const [{ repaymentDayIds, idempotencyKey }] = markPaidMock.mock.calls[0];
     expect(repaymentDayIds).toEqual(["d-1"]);
     expect(idempotencyKey).toEqual(expect.any(String));
+  });
+});
+
+describe("RepaymentPlan", () => {
+  const day = (due_date: string, gross: number, over = {}) => ({
+    due_date,
+    principal_vnd: gross - 3_000,
+    interest_vnd: 3_000,
+    gross_vnd: gross,
+    tax_withheld_vnd: 0,
+    net_vnd: gross,
+    tickets: 1,
+    paid: 0,
+    missing: 0,
+    ...over,
+  });
+
+  it("shows the business its projected daily tickets before the loan forms", () => {
+    rounds = [round({ confirmed_vnd: 10_000_000 })];
+    plan = {
+      kind: "PROJECTED",
+      assumed_close_date: "2026-11-13",
+      start_date: "2026-11-16",
+      days: [
+        day("2026-11-16", 180_000, { tickets: 2 }),
+        day("2026-11-17", 122_023),
+        day("2026-11-18", 122_024),
+      ],
+      totals: { gross_vnd: 424_047, tax_withheld_vnd: 0, net_vnd: 424_047 },
+    };
+    render(<FundingStatus projectId="p-1" t={t} />);
+
+    const card = screen.getByTestId("repayment-plan");
+    expect(card).toHaveTextContent("dashboard.sme.plan.headingProjected");
+    expect(card).toHaveTextContent("dashboard.sme.plan.badge");
+    // The first day carries the first-period interest: the range is the days after it.
+    expect(card).toHaveTextContent('"low":"₫122,023","high":"₫122,024"');
+    fireEvent.click(
+      screen.getByRole("button", { name: "dashboard.sme.plan.show" }),
+    );
+    expect(
+      within(screen.getByTestId("repayment-plan-days")).getAllByRole(
+        "listitem",
+      ),
+    ).toHaveLength(3);
+    // Each day says what it is made of: money coming back and interest.
+    expect(
+      within(screen.getByTestId("repayment-plan-days")).getAllByTestId(
+        "repayment-breakdown",
+      )[1],
+    ).toHaveTextContent('"principal":"₫119,023","interest":"₫3,000"');
+  });
+
+  it("shows each repayment tax included, and what the business transfers after keeping the tax back", () => {
+    rounds = [round({ confirmed_vnd: 10_000_000 })];
+    plan = {
+      kind: "ACTUAL",
+      assumed_close_date: null,
+      start_date: "2026-11-03",
+      days: [
+        day("2026-11-03", 122_023, { tax_withheld_vnd: 148, net_vnd: 121_875 }),
+        day("2026-11-04", 122_023, { tax_withheld_vnd: 148, net_vnd: 121_875 }),
+      ],
+      totals: { gross_vnd: 244_046, tax_withheld_vnd: 296, net_vnd: 243_750 },
+    };
+    render(<FundingStatus projectId="p-1" t={t} />);
+
+    const card = screen.getByTestId("repayment-plan");
+    expect(card).toHaveTextContent("₫244,046"); // to repay, tax included
+    expect(card).toHaveTextContent("₫243,750"); // transferred to investors
+    expect(card).toHaveTextContent("dashboard.sme.plan.taxKept");
+    expect(card).toHaveTextContent("₫296"); // kept back for the tax office
+    // Each working day both ways: repaid tax included, and transferred.
+    expect(card).toHaveTextContent("dashboard.sme.plan.perDay₫122,023");
+    expect(card).toHaveTextContent("dashboard.sme.plan.perDayNet₫121,875");
+  });
+
+  it("shows which real days are paid once the loan has formed", () => {
+    rounds = [
+      round({
+        status: "REPAYING",
+        confirmed_vnd: 10_000_000,
+        repayment_start_date: "2020-01-02",
+      }),
+    ];
+    today = {
+      date: "2020-01-03",
+      rows: [],
+      totals: { gross_vnd: 0, tax_withheld_vnd: 0, net_vnd: 0 },
+    };
+    plan = {
+      kind: "ACTUAL",
+      assumed_close_date: null,
+      start_date: "2020-01-02",
+      days: [
+        day("2020-01-02", 180_000, { tickets: 2, paid: 2 }),
+        day("2020-01-03", 122_024, { missing: 1 }),
+        day("2099-01-04", 122_024),
+      ],
+      totals: { gross_vnd: 424_048, tax_withheld_vnd: 0, net_vnd: 424_048 },
+    };
+    render(<FundingStatus projectId="p-1" t={t} />);
+
+    const card = screen.getByTestId("repayment-plan");
+    expect(card).toHaveTextContent("dashboard.sme.plan.heading");
+    expect(card).toHaveTextContent('"paid":1,"count":3');
+    fireEvent.click(
+      screen.getByRole("button", { name: "dashboard.sme.plan.show" }),
+    );
+    const days = within(screen.getByTestId("repayment-plan-days")).getAllByRole(
+      "listitem",
+    );
+    expect(days[0]).toHaveTextContent("dashboard.sme.plan.status.paid");
+    expect(days[1]).toHaveTextContent("dashboard.sme.plan.status.missing");
+    expect(days[2]).toHaveTextContent("dashboard.sme.plan.status.upcoming");
   });
 });

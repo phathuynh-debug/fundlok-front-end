@@ -84,6 +84,9 @@ export const FUNDING_ENDPOINTS = {
   // The business's side: its rounds and tickets (investors masked), and
   // closing early once the minimum is confirmed.
   myRounds: "/funding/me/rounds",
+  // Its daily repayments to investors: projected until the loan forms.
+  repaymentPlan: (windowId: string) =>
+    `/funding/me/rounds/${windowId}/repayment-plan`,
   closeEarly: (windowId: string) => `/funding/windows/${windowId}/close-early`,
 } as const;
 

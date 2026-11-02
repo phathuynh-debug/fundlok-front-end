@@ -9,6 +9,7 @@ import { formatCurrency } from "@/lib/format-currency";
 import { formatDate } from "@/lib/format-date";
 import { useTranslations } from "@/lib/i18n";
 import type { ProjectedSchedule } from "@/services/repayment.service";
+import { Breakdown } from "../funding/Breakdown";
 
 const K = "dashboard.investor.investments.projected";
 
@@ -27,14 +28,21 @@ export function ProjectedRepayments({
   const money = (vnd: number) => formatCurrency(vnd, locale);
   const instalments = projection.days.filter((d) => d.kind === "INSTALMENT");
   const stub = projection.days.find((d) => d.kind === "STUB");
-  const nets = instalments.map((d) => d.net_vnd);
-  const low = Math.min(...nets);
-  const high = Math.max(...nets);
+  const range = (amounts: number[]) => {
+    const low = Math.min(...amounts);
+    const high = Math.max(...amounts);
+    return low === high
+      ? money(low)
+      : t(`${K}.range`, { low: money(low), high: money(high) });
+  };
+  const withTax = projection.totals.tax_withheld_vnd > 0;
   const last = instalments[instalments.length - 1];
   // The first-period interest is paid with the first instalment, on the start date.
-  const firstAmount = projection.days
-    .filter((d) => d.due_date === projection.start_date)
-    .reduce((sum, d) => sum + d.net_vnd, 0);
+  const firstDays = projection.days.filter(
+    (d) => d.due_date === projection.start_date,
+  );
+  const firstNet = firstDays.reduce((sum, d) => sum + d.net_vnd, 0);
+  const firstGross = firstDays.reduce((sum, d) => sum + d.gross_vnd, 0);
 
   return (
     <div className="space-y-3" data-testid="projected-repayments">
@@ -52,10 +60,13 @@ export function ProjectedRepayments({
 
       <dl className="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
         <Figure label={t(`${K}.perDay`)}>
-          {low === high
-            ? money(low)
-            : t(`${K}.range`, { low: money(low), high: money(high) })}
+          {range(instalments.map((d) => d.net_vnd))}
         </Figure>
+        {withTax && (
+          <Figure label={t(`${K}.perDayGross`)}>
+            {range(instalments.map((d) => d.gross_vnd))}
+          </Figure>
+        )}
         <Figure label={t(`${K}.periods`)}>
           {t(`${K}.periodsValue`, {
             count: projection.business_day_count,
@@ -65,13 +76,23 @@ export function ProjectedRepayments({
         </Figure>
         <Figure label={t(`${K}.first`)}>
           {t(`${K}.firstValue`, {
-            amount: money(firstAmount),
+            amount: withTax
+              ? t("dashboard.investor.investments.amountSplit", {
+                  net: money(firstNet),
+                  gross: money(firstGross),
+                })
+              : money(firstNet),
             date: formatDate(projection.start_date, locale),
           })}
         </Figure>
         <Figure label={t(`${K}.total`)}>
           {money(projection.totals.net_vnd)}
         </Figure>
+        {withTax && (
+          <Figure label={t(`${K}.totalGross`)}>
+            {money(projection.totals.gross_vnd)}
+          </Figure>
+        )}
         {stub && <Figure label={t(`${K}.stub`)}>{money(stub.net_vnd)}</Figure>}
       </dl>
 
@@ -108,14 +129,26 @@ export function ProjectedRepayments({
               key={`${day.kind}-${day.day_index}`}
               className="flex items-center justify-between gap-2 px-3 py-2 text-sm"
             >
-              <span className="text-foreground">
-                {formatDate(day.due_date, locale)}
-                <span className="ml-2 text-xs text-muted-foreground">
-                  {t(`dashboard.investor.investments.kind.${day.kind}`)}
+              <span className="min-w-0">
+                <span className="block text-foreground">
+                  {formatDate(day.due_date, locale)}
+                  <span className="ml-2 text-xs text-muted-foreground">
+                    {t(`dashboard.investor.investments.kind.${day.kind}`)}
+                  </span>
                 </span>
+                <Breakdown row={day} />
               </span>
-              <span className="tabular-nums text-foreground">
-                {money(day.net_vnd)}
+              <span className="text-right">
+                <span className="block tabular-nums text-foreground">
+                  {money(day.net_vnd)}
+                </span>
+                {day.tax_withheld_vnd > 0 && (
+                  <span className="block text-[11px] tabular-nums text-muted-foreground">
+                    {t("dashboard.investor.investments.inclTax", {
+                      gross: money(day.gross_vnd),
+                    })}
+                  </span>
+                )}
               </span>
             </li>
           ))}
