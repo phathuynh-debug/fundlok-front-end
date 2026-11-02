@@ -95,6 +95,9 @@ export const REPAYMENT_ENDPOINTS = {
   markPaid: "/repayment/days/mark-paid",
   schedule: (trancheId: string) => `/repayment/tranches/${trancheId}/schedule`,
   reportMissing: (dayId: string) => `/repayment/days/${dayId}/report-missing`,
+  // Before the loan forms: what a confirmed ticket's days would be.
+  projection: (trancheId: string) =>
+    `/repayment/tranches/${trancheId}/projection`,
 } as const;
 
 export const PROJECT_ENDPOINTS = {

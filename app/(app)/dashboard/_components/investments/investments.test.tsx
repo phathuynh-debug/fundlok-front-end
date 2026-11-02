@@ -2,13 +2,18 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { InvestmentCard, repaymentSummary } from "./InvestmentCard";
 import type { Tranche } from "@/services/funding.service";
-import type { RepaymentRow } from "@/services/repayment.service";
+import type {
+  ProjectedSchedule,
+  RepaymentRow,
+} from "@/services/repayment.service";
 
 const reportMock = vi.fn();
 let schedule: RepaymentRow[] | undefined;
+let projection: ProjectedSchedule | undefined;
 
 vi.mock("@/hooks/use-repayment", () => ({
   useRepaymentSchedule: () => ({ data: schedule, isLoading: false }),
+  useRepaymentProjection: () => ({ data: projection, isLoading: false }),
   useReportMissingDay: () => ({ mutate: reportMock, isPending: false }),
 }));
 vi.mock("@/hooks/use-toast", () => ({ useToast: () => ({ toast: vi.fn() }) }));
@@ -57,6 +62,7 @@ const day = (over: Partial<RepaymentRow>): RepaymentRow => ({
 beforeEach(() => {
   reportMock.mockReset();
   schedule = undefined;
+  projection = undefined;
 });
 
 describe("repaymentSummary", () => {
@@ -131,5 +137,64 @@ describe("InvestmentCard", () => {
       { dayId: "d-1", statement: "Nothing arrived" },
       expect.anything(),
     );
+  });
+
+  it("shows the projected repayment of a received investment, as a range and not a promise", () => {
+    projection = {
+      assumed_close_date: "2026-11-13",
+      start_date: "2026-11-16",
+      business_day_count: 2,
+      days: [
+        {
+          kind: "STUB",
+          day_index: 0,
+          due_date: "2026-11-16",
+          principal_vnd: 0,
+          interest_vnd: 50_000,
+          gross_vnd: 50_000,
+          tax_withheld_vnd: 2_500,
+          net_vnd: 47_500,
+        },
+        {
+          kind: "INSTALMENT",
+          day_index: 1,
+          due_date: "2026-11-16",
+          principal_vnd: 100_000,
+          interest_vnd: 2_000,
+          gross_vnd: 102_000,
+          tax_withheld_vnd: 100,
+          net_vnd: 101_900,
+        },
+        {
+          kind: "INSTALMENT",
+          day_index: 2,
+          due_date: "2026-11-17",
+          principal_vnd: 100_000,
+          interest_vnd: 2_002,
+          gross_vnd: 102_002,
+          tax_withheld_vnd: 101,
+          net_vnd: 101_901,
+        },
+      ],
+      totals: { gross_vnd: 254_002, tax_withheld_vnd: 2_701, net_vnd: 251_301 },
+    };
+    render(<InvestmentCard tranche={tranche({ status: "CONFIRMED" })} />);
+
+    const block = screen.getByTestId("projected-repayments");
+    expect(block).toHaveTextContent(
+      "dashboard.investor.investments.projected.badge",
+    );
+    // The daily amount spans a range: never one bare figure.
+    expect(block).toHaveTextContent('"low":"₫101,900","high":"₫101,901"');
+    // The first payment carries the first-period interest too.
+    expect(block).toHaveTextContent('"amount":"₫149,400"');
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "dashboard.investor.investments.projected.show",
+      }),
+    );
+    expect(
+      within(screen.getByTestId("projected-days")).getAllByRole("listitem"),
+    ).toHaveLength(3);
   });
 });

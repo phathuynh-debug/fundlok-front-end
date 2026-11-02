@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ApiError } from "@/lib/types";
 import {
   repaymentService,
+  type ProjectedSchedule,
   type RepaymentRow,
   type TodaysPayments,
 } from "@/services/repayment.service";
@@ -13,6 +14,8 @@ export const repaymentKeys = {
   today: () => [...repaymentKeys.all, "today"] as const,
   schedule: (trancheId: string) =>
     [...repaymentKeys.all, "schedule", trancheId] as const,
+  projection: (trancheId: string) =>
+    [...repaymentKeys.all, "projection", trancheId] as const,
 };
 
 export function useTodaysPayments(enabled = true) {
@@ -65,5 +68,16 @@ export function useReportMissingDay(trancheId: string) {
         queryKey: repaymentKeys.schedule(trancheId),
       });
     },
+  });
+}
+
+// A confirmed ticket's projected days, until its loan forms.
+export function useRepaymentProjection(trancheId: string, enabled = true) {
+  return useQuery<ProjectedSchedule, ApiError>({
+    queryKey: repaymentKeys.projection(trancheId),
+    queryFn: () => repaymentService.getProjection(trancheId),
+    enabled,
+    staleTime: 5 * 60 * 1000,
+    retry: false,
   });
 }

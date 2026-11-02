@@ -6,7 +6,10 @@ import { ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useRepaymentSchedule } from "@/hooks/use-repayment";
+import {
+  useRepaymentProjection,
+  useRepaymentSchedule,
+} from "@/hooks/use-repayment";
 import { formatCurrency } from "@/lib/format-currency";
 import { formatDate } from "@/lib/format-date";
 import { useTranslations } from "@/lib/i18n";
@@ -14,6 +17,7 @@ import { cn } from "@/lib/utils";
 import type { Tranche } from "@/services/funding.service";
 import type { RepaymentRow } from "@/services/repayment.service";
 import { InvestmentSchedule } from "./InvestmentSchedule";
+import { ProjectedRepayments } from "./ProjectedRepayments";
 
 const K = "dashboard.investor.investments";
 
@@ -28,13 +32,15 @@ export function repaymentSummary(rows: RepaymentRow[]) {
   return { total, paid, next };
 }
 
-// One investment. Before the loan forms it says where the money stands (and
-// links back to the transfer while it is still awaited); once repaying it shows
-// what has been paid, the next payment, and the whole daily schedule.
+// One investment. While the transfer is awaited it links back to it; once the
+// money is received it shows the projected repayment (until the round closes);
+// once repaying, what has been paid, the next payment and the real schedule.
 export function InvestmentCard({ tranche }: { tranche: Tranche }) {
   const { t, locale } = useTranslations();
   const repaying = tranche.status === "ACTIVE";
   const schedule = useRepaymentSchedule(tranche.id, repaying);
+  const received = tranche.status === "CONFIRMED";
+  const projection = useRepaymentProjection(tranche.id, received);
   const [open, setOpen] = useState(false);
   const money = (vnd: number) => formatCurrency(vnd, locale);
   const awaitingTransfer =
@@ -82,11 +88,14 @@ export function InvestmentCard({ tranche }: { tranche: Tranche }) {
           </Link>
         </Button>
       )}
-      {tranche.status === "CONFIRMED" && (
-        <p className="text-xs leading-relaxed text-muted-foreground">
-          {t(`${K}.waitingClose`)}
-        </p>
-      )}
+      {received &&
+        (projection.data ? (
+          <ProjectedRepayments projection={projection.data} />
+        ) : (
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            {t(`${K}.waitingClose`)}
+          </p>
+        ))}
 
       {repaying && summary && (
         <div className="space-y-2">

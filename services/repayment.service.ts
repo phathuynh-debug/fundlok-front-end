@@ -47,6 +47,29 @@ export interface TodaysPayments {
   totals: { gross_vnd: number; tax_withheld_vnd: number; net_vnd: number };
 }
 
+/** One projected day: what a ticket would be paid, if the round closed on
+ *  the assumed date. Never a promise. */
+export interface ProjectedDay {
+  kind: "INSTALMENT" | "STUB";
+  day_index: number;
+  due_date: string;
+  principal_vnd: number;
+  interest_vnd: number;
+  gross_vnd: number;
+  tax_withheld_vnd: number;
+  net_vnd: number;
+}
+
+// Mirrors backend ProjectedScheduleOut.
+export interface ProjectedSchedule {
+  /** The round's last day: the latest it can close, so the latest dates. */
+  assumed_close_date: string;
+  start_date: string;
+  business_day_count: number;
+  days: ProjectedDay[];
+  totals: { gross_vnd: number; tax_withheld_vnd: number; net_vnd: number };
+}
+
 export const repaymentService = {
   // GET /repayment/today — due today or earlier and not yet settled.
   getToday() {
@@ -69,6 +92,14 @@ export const repaymentService = {
     return apiClient.post<RepaymentRow>(
       REPAYMENT_ENDPOINTS.reportMissing(dayId),
       { statement },
+    );
+  },
+
+  // GET /repayment/tranches/{id}/projection — a confirmed ticket's projected
+  // days, before the loan forms.
+  getProjection(trancheId: string) {
+    return apiClient.get<ProjectedSchedule>(
+      REPAYMENT_ENDPOINTS.projection(trancheId),
     );
   },
 
