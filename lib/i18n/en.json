@@ -411,12 +411,14 @@
     "loading": "Loading admin…",
     "pagination": {
       "emails": "emails",
+      "entries": "entries",
       "next": "Next",
       "of": "of",
       "page": "Page",
       "perPage": "Per page",
       "prev": "Prev",
       "projects": "projects",
+      "transfers": "transfers",
       "users": "users",
       "verifications": "checks"
     },
@@ -595,6 +597,7 @@
       "rates": "Rate Inquiries",
       "security": "Security",
       "systemSettings": "System settings",
+      "transactions": "Transactions",
       "users": "Users"
     },
     "stats": {
@@ -657,6 +660,161 @@
       "status": "Status"
     },
     "title": "Admin overview",
+    "transactions": {
+      "activity": {
+        "action": "Action",
+        "by": "By",
+        "byName": "By {name}",
+        "empty": {
+          "ALL": "Nothing recorded yet.",
+          "DECISIONS": "No transfer has been approved or denied yet.",
+          "INVESTOR": "No investor activity yet.",
+          "VIEWS": "No one has opened a receipt yet."
+        },
+        "flagged": "Checks failed: {count}",
+        "groupLabel": "Show",
+        "groups": {
+          "ALL": "Everything",
+          "DECISIONS": "Approvals and denials",
+          "INVESTOR": "Investor actions",
+          "VIEWS": "Receipt views"
+        },
+        "kinds": {
+          "approvedMatch": "Approved: receipt matched",
+          "notReceived": "Denied: money not received",
+          "received": "Approved: money received",
+          "rejected": "Rejected: bank transaction reused",
+          "reserved": "Investor reserved",
+          "sentToReview": "Sent to review: didn't match",
+          "uploaded": "Receipt uploaded",
+          "viewed": "Receipt viewed"
+        },
+        "loadFailed": "Couldn't load the history.",
+        "note": "Note",
+        "rowLabel": "Open the investment with memo {memo}",
+        "system": "System",
+        "ticket": "Investment",
+        "time": "Time"
+      },
+      "causes": {
+        "LATE_RECEIPT": "The receipt came after the time to transfer had passed. If the money arrived and the round still has room, it counts.",
+        "RECEIPT_MISMATCH": "The receipt didn't match the reservation. Check the business's bank statement or ask the investor, then decide whether the money arrived.",
+        "SME_DISPUTE": "The business says the money didn't arrive. Weigh both sides, then decide."
+      },
+      "clearRound": "Show every round",
+      "empty": "No transfers match this filter.",
+      "emptyQueue": "Nothing waits on staff. Every receipt has been checked.",
+      "errors": {
+        "CAPACITY_EXCEEDED": "The round no longer has room for this investment, so it can't count.",
+        "DISPUTE_ALREADY_DECIDED": "Someone already decided this review. Reload to see the outcome.",
+        "DUPLICATE_BANK_TXN": "This bank transaction ID was already used for another transfer. The receipt was rejected and the investor can upload a new one.",
+        "FIELDS_ALREADY_ENTERED": "This receipt was already checked. Reload to see the result."
+      },
+      "failures": {
+        "AMOUNT_MISMATCH": "The amount differs from the reservation.",
+        "MISSING_FIELD": "Not on the receipt: {field}",
+        "PAYEE_MISMATCH": "It was paid into a different account.",
+        "PAYER_NAME_MISMATCH": "The sender's name differs from the investor's verified name.",
+        "REFERENCE_MISSING": "The memo doesn't contain the payment memo.",
+        "TIME_OUT_OF_RANGE": "The transfer time is before the reservation or in the future."
+      },
+      "fields": {
+        "amount_vnd": "Amount",
+        "bank_txn_id": "Bank transaction ID",
+        "memo": "Transfer memo",
+        "payee_account": "Recipient account",
+        "payer_account": "Sender's account",
+        "payer_name": "Sender's name",
+        "transferred_at": "Transfer time"
+      },
+      "filters": {
+        "ALL": "All transfers",
+        "AWAITING_TRANSFER": "Awaiting transfer",
+        "ENDED": "Expired or void",
+        "NEEDS_ACTION": "Needs action",
+        "RECEIVED": "Received"
+      },
+      "needs": {
+        "decision": "Decision needed",
+        "receipt": "Receipt to check"
+      },
+      "roundChip": "Round: {name}",
+      "rounds": {
+        "closes": "Closes",
+        "daysLeft": "{days} days left",
+        "empty": "No round is taking investment right now.",
+        "emptyAll": "No funding rounds yet.",
+        "filterAll": "All rounds",
+        "filterOpen": "Open rounds",
+        "needsAction": "Needs action",
+        "open": "Still open",
+        "project": "Project",
+        "raised": "Confirmed / target",
+        "reserved": "Reserved",
+        "rowLabel": "Show the transfers for {name}",
+        "status": "Status",
+        "tickets": "Tickets"
+      },
+      "rowLabel": "Review {name}'s transfer, memo {memo}",
+      "sheet": {
+        "afterReserved": "After the reservation, not in the future",
+        "blankHint": "Leave a field blank if the receipt doesn't show it. The transfer then goes to review.",
+        "check": "Record and check",
+        "checkBody": "Type what the receipt shows, not what you expect. If it all matches, the investment is recorded as paid and the business has two working days to dispute it; otherwise it goes to review.",
+        "checkFailed": "Couldn't record the receipt",
+        "checkHeading": "Check the receipt",
+        "checkLateBody": "This receipt came after the deadline. Type what it shows; you'll then decide whether the transfer counts.",
+        "deadline": "Transfer deadline",
+        "decideBody": "Decide whether the money reached the business's account.",
+        "decideFailed": "Couldn't record the decision",
+        "decideHeading": "Did the money arrive?",
+        "decided": {
+          "NOT_RECEIVED": "Decided: the money didn't arrive and the investment is void.",
+          "RECEIVED": "Decided: the money arrived and the investment counts."
+        },
+        "decisionHint": "Received: the investment counts toward the round. Not received: it is void and its place in the round is freed. The decision is final and recorded with your name.",
+        "decisionPlaceholder": "Why (required): what you checked, e.g. the business's bank statement",
+        "expectedHeading": "What a matching receipt shows",
+        "historyHeading": "History",
+        "loadFailed": "Couldn't load this transfer. Close the panel and try again.",
+        "matched": "Everything matches the reservation.",
+        "matchedToast": "Receipt matched: the investment is recorded as paid",
+        "memoContains": "Contains {memo}",
+        "mismatch": "The receipt doesn't match:",
+        "mismatchToast": "The receipt didn't match: the transfer is now under review",
+        "noReceipt": "The investor hasn't uploaded a receipt yet.",
+        "notReceived": "Not received",
+        "note": "Note",
+        "notePlaceholder": "Your note for the record (required), e.g. Read from the investor's receipt",
+        "nothingToDo": "Nothing to do: this transfer has been checked.",
+        "openReceipt": "Open in a new tab",
+        "ownTransfer": "This is your own investment, so another admin has to check it.",
+        "receiptAlt": "The investor's transfer receipt",
+        "receiptFailed": "Couldn't open the receipt. Try again.",
+        "receiptHeading": "The investor's receipt",
+        "received": "Money received",
+        "showReceipt": "Show receipt",
+        "subtitle": "Investor transfer",
+        "ticketHeading": "The investment",
+        "title": "Transfer",
+        "waitingForReceipt": "Waiting for the investor to transfer and upload a receipt."
+      },
+      "subtitle": "Funding rounds taking investment, and the transfers investors report for them. Staff read each receipt and confirm the money arrived.",
+      "tabActivity": "Activity log",
+      "tabRounds": "Open rounds",
+      "tabTransfers": "Transfers",
+      "table": {
+        "amount": "Amount",
+        "investor": "Investor",
+        "memo": "Payment memo",
+        "project": "Project",
+        "receipt": "Receipt",
+        "receiptIn": "Uploaded",
+        "reserved": "Reserved",
+        "status": "Status"
+      },
+      "title": "Transactions"
+    },
     "userPreview": {
       "activeSessions": "Active Sessions",
       "activeSessionsCount": "{count} active",
@@ -2055,6 +2213,7 @@
       "CREATE_BUSINESS": "Business created",
       "DISBURSEMENT": "Disbursement",
       "FUNDING_WINDOW_OPENED": "Opened for investment",
+      "INVESTMENT_RECEIPT_UPLOADED": "Investment receipt uploaded",
       "INVESTMENT_RESERVED": "Investment reserved",
       "KYB_MANUAL_REVIEW_RESOLVED": "Business verification review resolved",
       "KYC_MANUAL_REVIEW_RESOLVED": "Identity verification review resolved",
@@ -2081,6 +2240,11 @@
       "SUBMIT": "Submitted",
       "TOTP_DISABLED": "Two-factor turned off",
       "TOTP_ENABLED": "Two-factor turned on",
+      "TRANSFER_NOT_RECEIVED": "Transfer marked not received",
+      "TRANSFER_RECEIPT_CHECKED": "Transfer receipt checked",
+      "TRANSFER_RECEIPT_REJECTED": "Transfer receipt rejected",
+      "TRANSFER_RECEIPT_VIEWED": "Transfer receipt viewed",
+      "TRANSFER_RECEIVED": "Transfer marked received",
       "UNLINK": "Account unlinked",
       "UPLOAD_INITIATED": "Upload started",
       "USER_STATUS_CHANGED": "Account status changed",
@@ -2095,6 +2259,7 @@
       "BANK_RATE_CONFIG": "Bank rate settings",
       "CONTRACT": "Contract",
       "DOCUMENT": "Document",
+      "FUNDING_WINDOW": "Funding round",
       "GVERIFY_KYB_VERIFICATION": "Business verification",
       "GVERIFY_KYC_VERIFICATION": "Identity verification",
       "INTERNAL_EMAIL": "Internal email",
@@ -2110,6 +2275,7 @@
       "SCORE_RUN": "Score run",
       "SESSION": "Session",
       "TRANCHE": "Investment",
+      "TRANSFER": "Transfer",
       "USER": "User"
     },
     "documentStatus": {
@@ -2150,6 +2316,16 @@
       "LOCKED": "Locked",
       "READY": "Ready",
       "RUNNING": "Running"
+    },
+    "trancheStatus": {
+      "ACTIVE": "Active",
+      "ATTESTED": "Receipt matched",
+      "CONFIRMED": "Confirmed",
+      "EXPIRED": "Expired",
+      "RESERVED": "Reserved",
+      "SIGNED": "Awaiting transfer",
+      "UNDER_REVIEW": "Under review",
+      "VOID": "Void"
     },
     "userStatus": {
       "ACTIVE": "Active",
@@ -2280,6 +2456,28 @@
     },
     "notOpenBody": "This project is not taking investments right now.",
     "notOpenTitle": "Not open for investment",
+    "receipt": {
+      "body": "After you transfer, upload the receipt your bank app shows (a screenshot or PDF). FundLok checks it against this reservation: the amount, the business's account and the payment memo.",
+      "choose": "Choose file",
+      "errors": {
+        "DUPLICATE_FILE": "This file was already uploaded. Upload the receipt for this transfer.",
+        "FILE_TOO_LARGE": "The file is larger than 10 MB.",
+        "RECEIPT_ALREADY_SUBMITTED": "A receipt was already uploaded for this investment.",
+        "TRANCHE_NOT_SIGNED": "This investment isn't waiting for a receipt any more.",
+        "UNSUPPORTED_TYPE": "Upload a PDF, PNG, JPEG or WEBP file.",
+        "generic": "Something went wrong. Try again in a moment."
+      },
+      "failed": "Couldn't upload your receipt",
+      "hint": "PDF, PNG, JPEG or WEBP, up to 10 MB.",
+      "lateBody": "Your receipt arrived after the time to transfer had passed, so FundLok staff will review it and confirm whether your transfer counts.",
+      "receivedBody": "You uploaded your receipt on {date}. FundLok is checking it against your reservation; your investment is confirmed once the transfer is verified.",
+      "receivedTitle": "Receipt received",
+      "remove": "Remove file",
+      "title": "Upload your transfer receipt",
+      "upload": "Upload receipt",
+      "uploaded": "Receipt uploaded",
+      "uploading": "Uploading…"
+    },
     "reserveFailed": "Couldn't reserve your investment",
     "steps": {
       "amount": "Amount",
@@ -2317,7 +2515,7 @@
       "copy": "Copy",
       "copyLabel": "Copy {field}",
       "deadline": "Transfer by {time}",
-      "expiredBody": "Your reservation was held for a limited time, and that time has passed. If you have already transferred, keep your bank receipt and contact FundLok support, and don't reserve again. If not, don't transfer to these details: reserve again to get a new deadline and payment memo.",
+      "expiredBody": "Your reservation was held for a limited time, and that time has passed. If you have already transferred, upload your bank receipt below for FundLok to review, and don't reserve again. If not, don't transfer to these details: reserve again to get a new deadline and payment memo.",
       "expiredTitle": "The time to transfer has passed",
       "loadFailed": "We couldn't load the transfer details. Refresh the page to try again.",
       "memo": "Payment memo",

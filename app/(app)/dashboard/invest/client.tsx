@@ -24,6 +24,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { BankAccountPrompt } from "../_components/BankAccountPrompt";
 import { InvestTerms } from "./_components/InvestTerms";
+import { ReceiptUpload } from "./_components/ReceiptUpload";
 import { TransferDetails } from "./_components/TransferDetails";
 import { useTranslations } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format-currency";
@@ -98,7 +99,10 @@ export default function InvestClient() {
   // Newest first, as the backend lists them.
   const onWindow =
     tranches.data?.filter((t) => t.window_id === fundingWindow?.id) ?? [];
+  // The listed copy of a ticket reserved on this visit is the fresher one: it
+  // picks up the receipt and any status change.
   const ticket =
+    onWindow.find((tranche) => tranche.id === reserve.data?.id) ??
     reserve.data ??
     onWindow.find(
       (tranche) =>
@@ -182,18 +186,37 @@ export default function InvestClient() {
 
   let body: React.ReactNode;
   if (ticket) {
+    const awaitingTransfer =
+      ticket.status === "RESERVED" || ticket.status === "SIGNED";
     body =
-      ticket.status === "RESERVED" || ticket.status === "SIGNED" ? (
-        <TransferDetails
+      awaitingTransfer && !ticket.receipt_submitted_at ? (
+        <>
+          <TransferDetails
+            trancheId={ticket.id}
+            locale={locale}
+            t={t}
+            onReserveAgain={
+              // FULL may only be this lapsed hold; reading the window frees it.
+              open || fundingWindow?.status === "FULL"
+                ? () => reserveAgain(ticket)
+                : undefined
+            }
+          />
+          <ReceiptUpload
+            key={ticket.id}
+            trancheId={ticket.id}
+            submittedAt={null}
+            locale={locale}
+            t={t}
+          />
+        </>
+      ) : awaitingTransfer ? (
+        // Receipt in: no deadline any more, FundLok is checking it.
+        <ReceiptUpload
           trancheId={ticket.id}
+          submittedAt={ticket.receipt_submitted_at}
           locale={locale}
           t={t}
-          onReserveAgain={
-            // FULL may only be this lapsed hold; reading the window frees it.
-            open || fundingWindow?.status === "FULL"
-              ? () => reserveAgain(ticket)
-              : undefined
-          }
         />
       ) : (
         <p className="rounded-xl border bg-muted/20 p-4 text-sm text-muted-foreground">
@@ -208,21 +231,31 @@ export default function InvestClient() {
     body = <BankAccountPrompt t={t} audience="investor" />;
   } else if (lapsed && !amount) {
     body = (
-      <Notice
-        title={t(`${K}.transfer.expiredTitle`)}
-        body={t(`${K}.transfer.expiredBody`)}
-        action={
-          <Button
-            type="button"
-            size="sm"
-            className="mt-2 gap-2"
-            onClick={() => reserveAgain(lapsed)}
-          >
-            <RotateCcw className="h-4 w-4" />
-            {t(`${K}.transfer.reserveAgain`)}
-          </Button>
-        }
-      />
+      <>
+        <Notice
+          title={t(`${K}.transfer.expiredTitle`)}
+          body={t(`${K}.transfer.expiredBody`)}
+          action={
+            <Button
+              type="button"
+              size="sm"
+              className="mt-2 gap-2"
+              onClick={() => reserveAgain(lapsed)}
+            >
+              <RotateCcw className="h-4 w-4" />
+              {t(`${K}.transfer.reserveAgain`)}
+            </Button>
+          }
+        />
+        {/* Already paid: a late receipt still goes to FundLok for review. */}
+        <ReceiptUpload
+          key={lapsed.id}
+          trancheId={lapsed.id}
+          submittedAt={lapsed.receipt_submitted_at}
+          locale={locale}
+          t={t}
+        />
+      </>
     );
   } else if (!amountInBounds) {
     body = (

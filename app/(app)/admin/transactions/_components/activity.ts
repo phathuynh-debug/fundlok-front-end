@@ -1,0 +1,46 @@
+import type { AdminFundingActivity } from "@/services/admin-funding.service";
+
+export type ActivityTone = "approve" | "deny" | "review" | "neutral";
+
+/** What an audit entry means for the ticket, as a label key and a tone. A
+ *  receipt check is an approval when it matched and a referral when not. */
+export function activityKind(entry: AdminFundingActivity): {
+  key: string;
+  tone: ActivityTone;
+} {
+  switch (entry.action) {
+    case "TRANSFER_RECEIPT_CHECKED":
+      return entry.check_status === "MATCHED"
+        ? { key: "approvedMatch", tone: "approve" }
+        : { key: "sentToReview", tone: "review" };
+    case "TRANSFER_RECEIVED":
+      return { key: "received", tone: "approve" };
+    case "TRANSFER_NOT_RECEIVED":
+      return { key: "notReceived", tone: "deny" };
+    case "TRANSFER_RECEIPT_REJECTED":
+      return { key: "rejected", tone: "deny" };
+    case "INVESTMENT_RESERVED":
+      return { key: "reserved", tone: "neutral" };
+    case "INVESTMENT_RECEIPT_UPLOADED":
+      return { key: "uploaded", tone: "neutral" };
+    case "TRANSFER_RECEIPT_VIEWED":
+      return { key: "viewed", tone: "neutral" };
+    default:
+      return { key: "other", tone: "neutral" };
+  }
+}
+
+export const TONE_CLASS: Record<ActivityTone, string> = {
+  approve:
+    "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+  deny: "border-destructive/40 bg-destructive/10 text-destructive",
+  review:
+    "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300",
+  neutral: "",
+};
+
+export function personName(
+  person: { full_name: string | null; email: string | null } | null,
+): string | null {
+  return person ? person.full_name || person.email : null;
+}

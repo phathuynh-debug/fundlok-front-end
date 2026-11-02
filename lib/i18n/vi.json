@@ -411,12 +411,14 @@
     "loading": "Đang tải trang quản trị…",
     "pagination": {
       "emails": "email",
+      "entries": "mục",
       "next": "Sau",
       "of": "trên",
       "page": "Trang",
       "perPage": "Mỗi trang",
       "prev": "Trước",
       "projects": "dự án",
+      "transfers": "khoản chuyển",
       "users": "người dùng",
       "verifications": "lượt xác minh"
     },
@@ -595,6 +597,7 @@
       "rates": "Yêu cầu định phí",
       "security": "Bảo mật",
       "systemSettings": "Cài đặt hệ thống",
+      "transactions": "Giao dịch",
       "users": "Người dùng"
     },
     "stats": {
@@ -657,6 +660,161 @@
       "status": "Trạng thái"
     },
     "title": "Tổng quan quản trị",
+    "transactions": {
+      "activity": {
+        "action": "Hành động",
+        "by": "Người thực hiện",
+        "byName": "Bởi {name}",
+        "empty": {
+          "ALL": "Chưa có gì được ghi lại.",
+          "DECISIONS": "Chưa có khoản chuyển nào được duyệt hoặc từ chối.",
+          "INVESTOR": "Chưa có hoạt động nào của nhà đầu tư.",
+          "VIEWS": "Chưa ai mở biên lai nào."
+        },
+        "flagged": "Số mục không khớp: {count}",
+        "groupLabel": "Hiển thị",
+        "groups": {
+          "ALL": "Tất cả",
+          "DECISIONS": "Duyệt và từ chối",
+          "INVESTOR": "Hoạt động của nhà đầu tư",
+          "VIEWS": "Lượt xem biên lai"
+        },
+        "kinds": {
+          "approvedMatch": "Đã duyệt: biên lai khớp",
+          "notReceived": "Từ chối: chưa nhận tiền",
+          "received": "Đã duyệt: đã nhận tiền",
+          "rejected": "Từ chối: mã giao dịch đã dùng",
+          "reserved": "Nhà đầu tư giữ chỗ",
+          "sentToReview": "Chuyển xem xét: không khớp",
+          "uploaded": "Đã tải lên biên lai",
+          "viewed": "Đã xem biên lai"
+        },
+        "loadFailed": "Không tải được lịch sử.",
+        "note": "Ghi chú",
+        "rowLabel": "Mở khoản đầu tư có nội dung {memo}",
+        "system": "Hệ thống",
+        "ticket": "Khoản đầu tư",
+        "time": "Thời gian"
+      },
+      "causes": {
+        "LATE_RECEIPT": "Biên lai được gửi sau khi hết thời gian chuyển khoản. Nếu tiền đã đến và đợt còn chỗ, khoản này được tính.",
+        "RECEIPT_MISMATCH": "Biên lai không khớp với lượt giữ chỗ. Hãy kiểm tra sao kê ngân hàng của doanh nghiệp hoặc hỏi nhà đầu tư, rồi quyết định tiền đã đến hay chưa.",
+        "SME_DISPUTE": "Doanh nghiệp cho biết chưa nhận được tiền. Hãy xem xét cả hai bên rồi quyết định."
+      },
+      "clearRound": "Hiện mọi đợt",
+      "empty": "Không có khoản chuyển nào khớp bộ lọc này.",
+      "emptyQueue": "Không có việc nào chờ nhân viên. Mọi biên lai đã được kiểm tra.",
+      "errors": {
+        "CAPACITY_EXCEEDED": "Đợt gọi vốn không còn chỗ cho khoản đầu tư này nên không thể tính.",
+        "DISPUTE_ALREADY_DECIDED": "Đã có người quyết định trường hợp này. Hãy tải lại để xem kết quả.",
+        "DUPLICATE_BANK_TXN": "Mã giao dịch ngân hàng này đã được dùng cho một khoản chuyển khác. Biên lai bị từ chối và nhà đầu tư có thể tải lên biên lai mới.",
+        "FIELDS_ALREADY_ENTERED": "Biên lai này đã được kiểm tra. Hãy tải lại để xem kết quả."
+      },
+      "failures": {
+        "AMOUNT_MISMATCH": "Số tiền khác với lượt giữ chỗ.",
+        "MISSING_FIELD": "Biên lai không có: {field}",
+        "PAYEE_MISMATCH": "Tiền được chuyển vào một tài khoản khác.",
+        "PAYER_NAME_MISMATCH": "Tên người chuyển khác với tên đã xác minh của nhà đầu tư.",
+        "REFERENCE_MISSING": "Nội dung chuyển khoản không có mã thanh toán.",
+        "TIME_OUT_OF_RANGE": "Thời gian chuyển trước lúc giữ chỗ hoặc ở tương lai."
+      },
+      "fields": {
+        "amount_vnd": "Số tiền",
+        "bank_txn_id": "Mã giao dịch ngân hàng",
+        "memo": "Nội dung chuyển khoản",
+        "payee_account": "Tài khoản người nhận",
+        "payer_account": "Tài khoản người chuyển",
+        "payer_name": "Tên người chuyển",
+        "transferred_at": "Thời gian chuyển"
+      },
+      "filters": {
+        "ALL": "Tất cả khoản chuyển",
+        "AWAITING_TRANSFER": "Chờ chuyển khoản",
+        "ENDED": "Hết hạn hoặc vô hiệu",
+        "NEEDS_ACTION": "Cần xử lý",
+        "RECEIVED": "Đã nhận"
+      },
+      "needs": {
+        "decision": "Cần quyết định",
+        "receipt": "Cần kiểm tra biên lai"
+      },
+      "roundChip": "Đợt: {name}",
+      "rounds": {
+        "closes": "Đóng",
+        "daysLeft": "Còn {days} ngày",
+        "empty": "Hiện không có đợt nào nhận đầu tư.",
+        "emptyAll": "Chưa có đợt gọi vốn nào.",
+        "filterAll": "Tất cả các đợt",
+        "filterOpen": "Đợt đang mở",
+        "needsAction": "Cần xử lý",
+        "open": "Còn mở",
+        "project": "Dự án",
+        "raised": "Đã xác nhận / mục tiêu",
+        "reserved": "Đang giữ chỗ",
+        "rowLabel": "Xem các khoản chuyển của {name}",
+        "status": "Trạng thái",
+        "tickets": "Lượt đầu tư"
+      },
+      "rowLabel": "Xem khoản chuyển của {name}, nội dung {memo}",
+      "sheet": {
+        "afterReserved": "Sau lúc giữ chỗ, không ở tương lai",
+        "blankHint": "Để trống ô nào biên lai không hiển thị. Khi đó khoản chuyển sẽ được xem xét.",
+        "check": "Ghi nhận và kiểm tra",
+        "checkBody": "Hãy nhập đúng những gì biên lai hiển thị, không phải điều bạn mong đợi. Nếu tất cả đều khớp, khoản đầu tư được ghi nhận là đã chuyển và doanh nghiệp có hai ngày làm việc để phản đối; nếu không, khoản chuyển sẽ được xem xét.",
+        "checkFailed": "Không ghi nhận được biên lai",
+        "checkHeading": "Kiểm tra biên lai",
+        "checkLateBody": "Biên lai này được gửi sau hạn. Hãy nhập những gì nó hiển thị; sau đó bạn sẽ quyết định khoản chuyển có được tính hay không.",
+        "deadline": "Hạn chuyển khoản",
+        "decideBody": "Quyết định tiền đã vào tài khoản của doanh nghiệp hay chưa.",
+        "decideFailed": "Không ghi nhận được quyết định",
+        "decideHeading": "Tiền đã đến chưa?",
+        "decided": {
+          "NOT_RECEIVED": "Đã quyết định: tiền chưa đến và khoản đầu tư vô hiệu.",
+          "RECEIVED": "Đã quyết định: tiền đã đến và khoản đầu tư được tính."
+        },
+        "decisionHint": "Đã nhận: khoản đầu tư được tính vào đợt gọi vốn. Chưa nhận: khoản này vô hiệu và chỗ của nó trong đợt được giải phóng. Quyết định là cuối cùng và được ghi lại kèm tên bạn.",
+        "decisionPlaceholder": "Lý do (bắt buộc): bạn đã kiểm tra gì, ví dụ sao kê ngân hàng của doanh nghiệp",
+        "expectedHeading": "Biên lai khớp sẽ cho thấy",
+        "historyHeading": "Lịch sử",
+        "loadFailed": "Không tải được khoản chuyển này. Hãy đóng bảng và thử lại.",
+        "matched": "Mọi thông tin khớp với lượt giữ chỗ.",
+        "matchedToast": "Biên lai khớp: khoản đầu tư được ghi nhận là đã chuyển",
+        "memoContains": "Có chứa {memo}",
+        "mismatch": "Biên lai không khớp:",
+        "mismatchToast": "Biên lai không khớp: khoản chuyển đang được xem xét",
+        "noReceipt": "Nhà đầu tư chưa tải lên biên lai.",
+        "notReceived": "Chưa nhận",
+        "note": "Ghi chú",
+        "notePlaceholder": "Ghi chú lưu hồ sơ (bắt buộc), ví dụ: Đọc từ biên lai của nhà đầu tư",
+        "nothingToDo": "Không cần làm gì: khoản chuyển này đã được kiểm tra.",
+        "openReceipt": "Mở trong thẻ mới",
+        "ownTransfer": "Đây là khoản đầu tư của chính bạn, nên một quản trị viên khác phải kiểm tra.",
+        "receiptAlt": "Biên lai chuyển khoản của nhà đầu tư",
+        "receiptFailed": "Không mở được biên lai. Hãy thử lại.",
+        "receiptHeading": "Biên lai của nhà đầu tư",
+        "received": "Đã nhận tiền",
+        "showReceipt": "Xem biên lai",
+        "subtitle": "Khoản chuyển của nhà đầu tư",
+        "ticketHeading": "Khoản đầu tư",
+        "title": "Khoản chuyển",
+        "waitingForReceipt": "Đang chờ nhà đầu tư chuyển khoản và tải lên biên lai."
+      },
+      "subtitle": "Các đợt gọi vốn đang nhận đầu tư và các khoản chuyển mà nhà đầu tư báo. Nhân viên đọc từng biên lai và xác nhận tiền đã đến.",
+      "tabActivity": "Nhật ký hoạt động",
+      "tabRounds": "Đợt đang mở",
+      "tabTransfers": "Khoản chuyển",
+      "table": {
+        "amount": "Số tiền",
+        "investor": "Nhà đầu tư",
+        "memo": "Nội dung chuyển khoản",
+        "project": "Dự án",
+        "receipt": "Biên lai",
+        "receiptIn": "Đã tải lên",
+        "reserved": "Giữ chỗ lúc",
+        "status": "Trạng thái"
+      },
+      "title": "Giao dịch"
+    },
     "userPreview": {
       "activeSessions": "Phiên hoạt động",
       "activeSessionsCount": "{count} phiên",
@@ -2055,6 +2213,7 @@
       "CREATE_BUSINESS": "Đã tạo doanh nghiệp",
       "DISBURSEMENT": "Giải ngân",
       "FUNDING_WINDOW_OPENED": "Mở nhận đầu tư",
+      "INVESTMENT_RECEIPT_UPLOADED": "Tải lên biên lai đầu tư",
       "INVESTMENT_RESERVED": "Giữ chỗ đầu tư",
       "KYB_MANUAL_REVIEW_RESOLVED": "Đã xử lý xem xét xác minh doanh nghiệp",
       "KYC_MANUAL_REVIEW_RESOLVED": "Đã xử lý xét duyệt xác minh danh tính",
@@ -2081,6 +2240,11 @@
       "SUBMIT": "Đã gửi",
       "TOTP_DISABLED": "Đã tắt xác thực hai lớp",
       "TOTP_ENABLED": "Đã bật xác thực hai lớp",
+      "TRANSFER_NOT_RECEIVED": "Xác nhận chưa nhận tiền",
+      "TRANSFER_RECEIPT_CHECKED": "Kiểm tra biên lai chuyển khoản",
+      "TRANSFER_RECEIPT_REJECTED": "Từ chối biên lai chuyển khoản",
+      "TRANSFER_RECEIPT_VIEWED": "Xem biên lai chuyển khoản",
+      "TRANSFER_RECEIVED": "Xác nhận đã nhận tiền",
       "UNLINK": "Đã hủy liên kết tài khoản",
       "UPLOAD_INITIATED": "Đã bắt đầu tải lên",
       "USER_STATUS_CHANGED": "Đã đổi trạng thái tài khoản",
@@ -2095,6 +2259,7 @@
       "BANK_RATE_CONFIG": "Cấu hình lãi suất tham khảo",
       "CONTRACT": "Hợp đồng",
       "DOCUMENT": "Tài liệu",
+      "FUNDING_WINDOW": "Đợt gọi vốn",
       "GVERIFY_KYB_VERIFICATION": "Xác minh doanh nghiệp",
       "GVERIFY_KYC_VERIFICATION": "Xác minh danh tính",
       "INTERNAL_EMAIL": "Email nội bộ",
@@ -2110,6 +2275,7 @@
       "SCORE_RUN": "Lượt tính điểm",
       "SESSION": "Phiên đăng nhập",
       "TRANCHE": "Khoản đầu tư",
+      "TRANSFER": "Khoản chuyển",
       "USER": "Người dùng"
     },
     "documentStatus": {
@@ -2150,6 +2316,16 @@
       "LOCKED": "Đã khóa",
       "READY": "Sẵn sàng",
       "RUNNING": "Đang chạy"
+    },
+    "trancheStatus": {
+      "ACTIVE": "Đang hiệu lực",
+      "ATTESTED": "Biên lai đã khớp",
+      "CONFIRMED": "Đã xác nhận",
+      "EXPIRED": "Hết hạn",
+      "RESERVED": "Đã giữ chỗ",
+      "SIGNED": "Chờ chuyển khoản",
+      "UNDER_REVIEW": "Đang xem xét",
+      "VOID": "Vô hiệu"
     },
     "userStatus": {
       "ACTIVE": "Hoạt động",
@@ -2280,6 +2456,28 @@
     },
     "notOpenBody": "Dự án này hiện không nhận đầu tư.",
     "notOpenTitle": "Chưa mở nhận đầu tư",
+    "receipt": {
+      "body": "Sau khi chuyển khoản, hãy tải lên biên lai mà ứng dụng ngân hàng hiển thị (ảnh chụp màn hình hoặc PDF). FundLok sẽ đối chiếu với lượt giữ chỗ này: số tiền, tài khoản của doanh nghiệp và nội dung chuyển khoản.",
+      "choose": "Chọn tệp",
+      "errors": {
+        "DUPLICATE_FILE": "Tệp này đã được tải lên trước đó. Hãy tải lên biên lai của khoản chuyển này.",
+        "FILE_TOO_LARGE": "Tệp lớn hơn 10 MB.",
+        "RECEIPT_ALREADY_SUBMITTED": "Khoản đầu tư này đã có biên lai.",
+        "TRANCHE_NOT_SIGNED": "Khoản đầu tư này không còn chờ biên lai nữa.",
+        "UNSUPPORTED_TYPE": "Hãy tải lên tệp PDF, PNG, JPEG hoặc WEBP.",
+        "generic": "Đã có lỗi xảy ra. Vui lòng thử lại sau."
+      },
+      "failed": "Không tải lên được biên lai",
+      "hint": "PDF, PNG, JPEG hoặc WEBP, tối đa 10 MB.",
+      "lateBody": "Biên lai được gửi sau khi đã hết thời gian chuyển khoản, nên nhân viên FundLok sẽ xem xét và xác nhận khoản chuyển của bạn có được tính hay không.",
+      "receivedBody": "Bạn đã tải lên biên lai lúc {date}. FundLok đang đối chiếu với lượt giữ chỗ của bạn; khoản đầu tư được xác nhận khi khoản chuyển được kiểm tra xong.",
+      "receivedTitle": "Đã nhận biên lai",
+      "remove": "Bỏ tệp",
+      "title": "Tải lên biên lai chuyển khoản",
+      "upload": "Tải lên biên lai",
+      "uploaded": "Đã tải lên biên lai",
+      "uploading": "Đang tải lên…"
+    },
     "reserveFailed": "Không giữ chỗ được khoản đầu tư",
     "steps": {
       "amount": "Số tiền",
@@ -2317,7 +2515,7 @@
       "copy": "Sao chép",
       "copyLabel": "Sao chép {field}",
       "deadline": "Chuyển khoản trước {time}",
-      "expiredBody": "Lượt giữ chỗ chỉ có hiệu lực trong thời gian giới hạn và đã hết hạn. Nếu bạn đã chuyển khoản, hãy giữ biên lai, liên hệ bộ phận hỗ trợ của FundLok và đừng giữ chỗ lại. Nếu chưa, đừng chuyển theo thông tin này: hãy giữ chỗ lại để nhận hạn chuyển khoản và nội dung chuyển khoản mới.",
+      "expiredBody": "Lượt giữ chỗ chỉ có hiệu lực trong thời gian giới hạn và đã hết hạn. Nếu bạn đã chuyển khoản, hãy tải lên biên lai bên dưới để FundLok xem xét và đừng giữ chỗ lại. Nếu chưa, đừng chuyển theo thông tin này: hãy giữ chỗ lại để nhận hạn chuyển khoản và nội dung chuyển khoản mới.",
       "expiredTitle": "Đã hết thời gian chuyển khoản",
       "loadFailed": "Không tải được thông tin chuyển khoản. Hãy tải lại trang để thử lại.",
       "memo": "Nội dung chuyển khoản",

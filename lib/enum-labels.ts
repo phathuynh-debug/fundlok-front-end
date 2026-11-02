@@ -25,7 +25,8 @@ export type EnumGroup =
   | "scoreDecision"
   | "auditAction"
   | "auditEntity"
-  | "fundingWindowStatus";
+  | "fundingWindowStatus"
+  | "trancheStatus";
 
 export function humanizeEnum(value: string): string {
   const words = value.replace(/[_-]+/g, " ").trim().toLowerCase();

@@ -16,6 +16,10 @@ const nextConfig: NextConfig = {
     // that matches no route has no layout to render a 404 in. This enables
     // app/global-not-found.tsx, which brings its own document.
     globalNotFound: true,
+    // proxy.ts runs on /api, so Next buffers each request body and cuts it off
+    // at this size (default 10mb). A transfer receipt may be 10 MB (the
+    // backend's cap) plus the multipart envelope, so leave room above it.
+    proxyClientMaxBodySize: "11mb",
   },
   images: {
     // An optimized image inherits the LARGER of this TTL and the upstream

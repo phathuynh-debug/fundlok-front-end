@@ -68,6 +68,28 @@ export interface Tranche {
   hold_expires_at: string;
   signed_at: string | null;
   attested_at: string | null;
+  /** When the investor uploaded their transfer receipt; null until then. */
+  receipt_submitted_at: string | null;
+}
+
+/** What the receipt upload is checked for, client-side, before it is sent. */
+export const RECEIPT_TYPES = [
+  "application/pdf",
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+] as const;
+export const RECEIPT_MAX_BYTES = 10 * 1024 * 1024;
+
+// Mirrors backend ReceiptResultOut.
+export interface ReceiptResult {
+  transfer_id: string;
+  /** UNDER_REVIEW when the receipt came after the hold lapsed. */
+  tranche_status: TrancheStatus;
+  /** AWAITING_FIELDS: FundLok staff read the receipt (no automatic reading yet). */
+  check_status: "AWAITING_FIELDS" | "MATCHED" | "MISMATCH" | "REJECTED" | "DUE";
+  failure_codes: string[];
+  confirmation_level: string;
 }
 
 export interface ReserveRequest {
@@ -107,6 +129,18 @@ export const fundingService = {
   getPayment(trancheId: string) {
     return apiClient.get<PaymentInstructions>(
       FUNDING_ENDPOINTS.payment(trancheId),
+    );
+  },
+
+  // POST /funding/tranches/{id}/receipt — the investor's bank receipt for the
+  // transfer. Replaying the same key returns the same result.
+  uploadReceipt(trancheId: string, file: File, idempotencyKey: string) {
+    const form = new FormData();
+    form.append("file", file);
+    return apiClient.post<ReceiptResult>(
+      FUNDING_ENDPOINTS.receipt(trancheId),
+      form,
+      { headers: { "Idempotency-Key": idempotencyKey } },
     );
   },
 

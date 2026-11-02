@@ -17,6 +17,7 @@ import {
   KeyRound,
   type LucideIcon,
   Landmark,
+  ArrowLeftRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCurrentUser, useLogout } from "@/hooks/use-authentication";
@@ -49,6 +50,11 @@ export const adminNavItems: NavItem[] = [
     labelKey: "admin.sidebar.bankAccounts",
     href: "/admin/bank-accounts",
     icon: Landmark,
+  },
+  {
+    labelKey: "admin.sidebar.transactions",
+    href: "/admin/transactions",
+    icon: ArrowLeftRight,
   },
   {
     labelKey: "admin.sidebar.rates",

@@ -79,6 +79,8 @@ export const FUNDING_ENDPOINTS = {
   // The business's account, the exact amount, the memo and the VietQR.
   payment: (trancheId: string) => `/funding/tranches/${trancheId}/payment`,
   myTranches: "/funding/me/tranches",
+  // The investor's bank receipt for their transfer (multipart `file`).
+  receipt: (trancheId: string) => `/funding/tranches/${trancheId}/receipt`,
 } as const;
 
 export const PROJECT_ENDPOINTS = {
@@ -188,6 +190,21 @@ export const ADMIN_ENDPOINTS = {
   paymentAccounts: "/admin/payment-accounts",
   paymentAccountDecision: (id: string) =>
     `/admin/payment-accounts/${id}/decision`,
+  // The Transactions tab: funding rounds, investor transfers, and the receipt
+  // checks staff do by hand (a 10-minute link to the receipt, what it shows,
+  // and the decision on a ticket under review).
+  fundingRounds: "/admin/funding/rounds",
+  fundingTransfers: "/admin/funding/transfers",
+  // The transfers' audit trail: who approved or denied what, and why.
+  fundingActivity: "/admin/funding/activity",
+  fundingTransfer: (trancheId: string) =>
+    `/admin/funding/transfers/${trancheId}`,
+  transferReceiptUrl: (transferId: string) =>
+    `/admin/funding/transfers/${transferId}/receipt-url`,
+  transferFields: (transferId: string) =>
+    `/admin/funding/transfers/${transferId}/fields`,
+  transferDecision: (reviewId: string) =>
+    `/admin/funding/reviews/${reviewId}/decision`,
   // SYSTEM_ADMIN only. Creates an ADMIN account with no password and emails
   // the invitee a single-use link to choose one.
   inviteAdmin: "/admin/users/admins",
