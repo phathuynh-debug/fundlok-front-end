@@ -14,50 +14,15 @@
 // return it (snake_case, ISO-8601 timestamps, minor-unit-free decimals) so the
 // component code does not have to change when the real thing arrives.
 
-export type TransactionType =
-  | "INVESTMENT"
-  | "RETURN"
-  | "DEPOSIT"
-  | "WITHDRAWAL"
-  | "REPAYMENT"
-  | "FEE"
-  // Borrower-side movements. An SME never invests or receives a distribution;
-  // it receives a disbursement and repays. See sme/mock-sme-transactions.ts.
-  | "DISBURSEMENT"
-  | "EARLY_REPAYMENT";
+// The types now live with the real data, in services/portfolio.service.ts;
+// re-exported here so the components reading them did not have to move.
+import type { Transaction } from "@/services/portfolio.service";
 
-export type TransactionStatus = "COMPLETED" | "PENDING" | "FAILED";
-
-export interface Transaction {
-  id: string;
-  /** Human-facing reference shown in the table and in receipts. */
-  reference: string;
-  type: TransactionType;
-  status: TransactionStatus;
-  /** ISO-8601. Rendered with formatDate/formatDateTime so vi gets DD/MM/YYYY. */
-  created_at: string;
-  /**
-   * Signed: negative is money leaving the account (investments, withdrawals,
-   * fees), positive is money arriving (returns, deposits, repayments). Storing
-   * the sign rather than a separate direction flag keeps the summary maths a
-   * plain sum.
-   */
-  amount: number;
-  currency: "VND";
-  /** Project or company the movement relates to; "—" for account-level items. */
-  counterparty: string;
-  /**
-   * How the money moved, as an i18n key under
-   * `dashboard.transactions.methods`. A key rather than a literal for two
-   * reasons: the column was rendering untranslated English under the
-   * Vietnamese locale, and free text here is how a named bank ends up on
-   * screen. We never name a custodial bank — funds sit with custodial bank
-   * partners, plural and unnamed (fundlok-domain §4).
-   */
-  method_key: string;
-  /** Masked account reference shown after the method, e.g. "••••4417". */
-  method_ref?: string;
-}
+export type {
+  Transaction,
+  TransactionStatus,
+  TransactionType,
+} from "@/services/portfolio.service";
 
 export const MOCK_TRANSACTIONS: Transaction[] = [
   {

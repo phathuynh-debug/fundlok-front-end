@@ -1279,9 +1279,9 @@
         "deployed": "Vốn đã giải ngân",
         "positions": "Khoản đầu tư đang hoạt động",
         "positionsHint": "Các dự án đang được cấp vốn",
-        "returns": "Lợi nhuận nhận được",
-        "roi": "Tỷ suất trên vốn",
-        "roiHint": "Lợi nhuận so với vốn đã giải ngân"
+        "returns": "Đã nhận lại (gốc + lãi)",
+        "roi": "Lãi trên vốn",
+        "roiHint": "Lãi đã nhận (sau thuế) so với vốn đã đầu tư"
       },
       "mockNotice": "Hệ thống chưa được kết nối với tài khoản thật, danh mục bên dưới là danh mục mẫu.",
       "range": {
@@ -2346,7 +2346,7 @@
         "backstop": "Hạn tất toán cuối cùng",
         "backstopHint": "Mọi khoản còn lại sẽ đến hạn thanh toán đầy đủ vào ngày này.",
         "costOfCapital": "Chi phí khoản vay",
-        "costOfCapitalHint": "Tổng lãi ở mức {rate}% trong {months} tháng",
+        "costOfCapitalHint": "Lãi trả nhà đầu tư {rate}%/năm trong {months} tháng; phí FundLok xuất hóa đơn riêng",
         "dailyRepayment": "Khoản trả mỗi ngày",
         "dailyRepaymentHint": "Mỗi ngày làm việc. Kỳ này tổng cộng {total} đến ngày {date}.",
         "earlyPayoff": "Tất toán sớm",
@@ -2445,14 +2445,14 @@
       "smeMockNotice": "Dữ liệu mẫu. Màn hình này chưa kết nối với tài khoản của bạn, nên các số liệu dưới đây không phải số liệu thật.",
       "smeSubtitle": "Toàn bộ dòng tiền của khoản vay: số bạn đã nhận, số đã trả và phí FundLok đã thu.",
       "smeSummary": {
-        "disbursed": "Đã giải ngân cho bạn",
-        "disbursedHint": "Tiền gốc đã chuyển vào tài khoản của bạn",
-        "fees": "Phí nền tảng",
-        "feesHint": "Trừ trực tiếp khi giải ngân, không xuất hóa đơn riêng",
+        "disbursed": "Đã nhận từ nhà đầu tư",
+        "disbursedHint": "Các khoản đầu tư chuyển thẳng vào tài khoản của bạn",
+        "fees": "Phí FundLok",
+        "feesHint": "Xuất hóa đơn riêng, không trừ vào khoản đầu tư",
         "pending": "Đang xử lý",
-        "pendingHint": "Các khoản chưa hoàn tất",
+        "pendingHint": "FundLok đang kiểm tra, hoặc hóa đơn chưa thanh toán",
         "repaid": "Đã trả đến nay",
-        "repaidHint": "Các khoản trả hằng ngày và khoản trả sớm (nếu có)"
+        "repaidHint": "Số bạn đã chuyển cho nhà đầu tư, sau khi giữ lại thuế"
       },
       "smeTitle": "Giao dịch khoản vay",
       "status": {
@@ -2460,16 +2460,16 @@
         "failed": "Thất bại",
         "pending": "Đang xử lý"
       },
-      "subtitle": "Toàn bộ dòng tiền ra vào tài khoản FundLok của bạn.",
+      "subtitle": "Mọi khoản bạn đã chuyển để đầu tư và mọi khoản trả nợ bạn đã nhận.",
       "summary": {
         "moneyIn": "Tiền vào",
-        "moneyInHint": "Lợi nhuận, hoàn vốn và nạp tiền",
+        "moneyInHint": "Các khoản trả nợ đã nhận, sau thuế",
         "moneyOut": "Tiền ra",
-        "moneyOutHint": "Đầu tư, rút tiền và phí",
+        "moneyOutHint": "Các khoản đã chuyển để đầu tư",
         "net": "Chênh lệch ròng",
         "netHint": "Tiền vào trừ tiền ra",
         "pending": "Đang xử lý",
-        "pendingHint": "Chờ hoàn tất"
+        "pendingHint": "FundLok đang kiểm tra"
       },
       "table": {
         "amount": "Số tiền",

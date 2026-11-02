@@ -38,63 +38,19 @@ import {
 
 export { RATE_CEILING_PCT };
 
-export interface RepaymentMonth {
-  /** ISO year-month, e.g. "2026-08". */
-  month: string;
-  /** Collected across this month's business days, VND. */
-  repaid: number;
-  /** Cumulative repaid to date, VND. */
-  repaid_cumulative: number;
-  /**
-   * Share of that month's revenue that went to repayment, as a decimal.
-   * The scoring engine's soft gate 8 fires at 0.30 — above that a facility is
-   * considered unaffordable, so it is the line an SME needs to see.
-   */
-  revenue_share: number;
-}
+// The types now live with the real data, in services/portfolio.service.ts;
+// re-exported here so the components reading them did not have to move.
+import type {
+  RepaymentMonth,
+  ScoreFactor,
+  SmeFacility,
+} from "@/services/portfolio.service";
 
-/** One of the scoring engine's four group premiums, 0-100. */
-export interface ScoreFactor {
-  /** i18n key suffix under dashboard.smeAnalytics.factors. */
-  key: "bcq" | "rsg" | "sector" | "behavioral";
-  score: number;
-  /** Weight in the final score — 0.40 / 0.25 / 0.25 / 0.10 per the engine. */
-  weight: number;
-}
-
-export interface SmeFacility {
-  /** Principal disbursed, VND. */
-  principal: number;
-  /**
-   * Everything owed across the term, as set on the day the contract was
-   * signed. A good month never shrinks it; if revenue drops and the term
-   * stretches, interest on the extra time is added (stretchedTerm in
-   * lib/facility-terms.ts). This sample facility has not stretched.
-   */
-  total_obligation: number;
-  /** The all-in annual rate, capped at the statutory ceiling. */
-  interest_rate_pct: number;
-  /** Declared term: 1 to 6 months. */
-  term_months: TermMonths;
-  /** When the facility was disbursed — the backstop counts from here. */
-  disbursed_at: string;
-  /** Business days remaining in the declared term. */
-  days_remaining: number;
-  /** The fixed amount charged each business day, VND. */
-  target_daily: number;
-  /** What the current true-up period totals across its business days, VND. */
-  current_period_total: number;
-  current_period_end_date: string;
-  /** Consecutive on-time business days — feeds the behavioural premium. */
-  on_time_streak: number;
-  // No "interest saved by early repayment" field: Handbook §5.9 fixes the
-  // origination total at signing, and early settlement clears the remaining
-  // total with no rebate. Closing early costs nothing extra and saves nothing
-  // — the amount to settle today is simply the outstanding balance, derived in
-  // deriveRepaymentSummary().
-  /** Final score from the last locked score run, 0-100. */
-  score: number;
-}
+export type {
+  RepaymentMonth,
+  ScoreFactor,
+  SmeFacility,
+} from "@/services/portfolio.service";
 
 // Mock data switched off — SmeAnalyticsView was derived entirely from these
 // three constants, and analytics/client.tsx now sends SMEs to the shared empty
@@ -201,7 +157,10 @@ export function deriveRepaymentSummary(
         : (repaid / facility.total_obligation) * 100,
     cost_of_capital: facility.total_obligation - facility.principal,
     latest_revenue_share: latest,
-    backstop_date: backstopDate(facility.disbursed_at, facility.term_months),
+    backstop_date: backstopDate(
+      facility.disbursed_at,
+      facility.term_months as TermMonths,
+    ),
   };
 }
 

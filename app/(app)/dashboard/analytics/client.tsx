@@ -3,10 +3,11 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { m } from "framer-motion";
-import { BarChart3, FlaskConical, PieChart, TableIcon } from "lucide-react";
+import { BarChart3, PieChart, TableIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRequireAuth } from "@/hooks/use-authentication";
+import { useBusinessAnalytics, useMyAnalytics } from "@/hooks/use-portfolio";
 import { pageTransitionProps } from "@/lib/animations";
 import { useTranslations } from "@/lib/i18n";
 import { AnalyticsKpiCards } from "./_components/AnalyticsKpiCards";
@@ -16,25 +17,24 @@ import { CapitalStatusChart } from "./_components/CapitalStatusChart";
 import { IndustryAllocationChart } from "./_components/IndustryAllocationChart";
 import { IndustrySplitChart } from "./_components/IndustrySplitChart";
 import { MonthlyReturnsChart } from "./_components/MonthlyReturnsChart";
-// import { SmeAnalyticsView } from "./_components/sme/SmeAnalyticsView";
-// — commented out with the SME mock data; SMEs get the empty state instead.
+import { SmeAnalyticsView } from "./_components/sme/SmeAnalyticsView";
 import {
   deriveKpis,
-  // MOCK_ALLOCATION, MOCK_CAPITAL_STATUS, MOCK_MONTHLY and sliceByRange —
-  // commented out with the mock data; investors see the empty state below
-  // until a portfolio-analytics endpoint exists.
+  sliceByRange,
   totalAllocated,
-  type CapitalStatusAllocation,
-  type IndustryAllocation,
-  type MonthlyPoint,
   type RangeKey,
 } from "./_components/mock-analytics";
+import type {
+  CapitalStatusAllocation,
+  IndustryAllocation,
+  MonthlyPoint,
+} from "@/services/portfolio.service";
 import { CONTROL_IDLE } from "@/lib/ui-tokens";
 
 const RANGES: RangeKey[] = ["3M", "6M", "12M"];
 
-// Stand in for the analytics API until it exists. Module-level so their
-// identity is stable across renders (the useMemos below depend on them).
+// Nothing yet. Module-level so their identity is stable across renders (the
+// useMemos below depend on them).
 const NO_POINTS: MonthlyPoint[] = [];
 const NO_ALLOCATION: IndustryAllocation[] = [];
 const NO_CAPITAL_STATUS: CapitalStatusAllocation[] = [];
@@ -100,17 +100,32 @@ export default function AnalyticsClient() {
   const [range, setRange] = useState<RangeKey>("12M");
   const [view, setView] = useState<"charts" | "table">("charts");
 
-  // Investor and SME mock data are both commented out — until the portfolio
-  // analytics (investor) and repayment schedule / score (SME) endpoints exist
-  // there is nothing real to chart, so everyone falls through to the empty
-  // state below instead of the mock-driven charts or SmeAnalyticsView.
-  // const points = useMemo(
-  //   () => (isSme ? [] : sliceByRange(MOCK_MONTHLY, range)),
-  //   [isSme, range],
-  // );
-  const points = NO_POINTS;
-  const kpis = useMemo(() => deriveKpis(points), [points]);
-  const allocationTotal = useMemo(() => totalAllocated(NO_ALLOCATION), []);
+  // An investor's real portfolio, from their investments and the days the
+  // businesses repaid them; a business's loan, from its investments and the
+  // days it repaid them, on its own screen (one loan, not a portfolio).
+  // Before any of that, the empty state below.
+  const isInvestor = user?.role === "INVESTOR";
+  const analytics = useMyAnalytics(isInvestor);
+  const loan = useBusinessAnalytics(isSme);
+  const facility = isSme ? (loan.data?.facility ?? null) : null;
+  const data = isInvestor ? analytics.data : undefined;
+  const monthly = data?.monthly ?? NO_POINTS;
+  const allocation = data?.allocation ?? NO_ALLOCATION;
+  const capitalStatus = data?.capital_status ?? NO_CAPITAL_STATUS;
+  const points = useMemo(() => sliceByRange(monthly, range), [monthly, range]);
+  const kpis = useMemo(
+    () =>
+      deriveKpis(points, {
+        activePositions: data?.active_positions ?? 0,
+        // Earnings to date over the whole series, not only the range shown.
+        earned: monthly.reduce((sum, p) => sum + p.yield_monthly, 0),
+      }),
+    [points, monthly, data?.active_positions],
+  );
+  const allocationTotal = useMemo(
+    () => totalAllocated(allocation),
+    [allocation],
+  );
 
   return (
     <m.div {...pageTransitionProps} className="space-y-6 md:space-y-8">
@@ -134,24 +149,11 @@ export default function AnalyticsClient() {
         </div>
       </div>
 
-      {/* Sample-data notice — only shown while there is something on screen
-            to label; the SME mock data it described is commented out. */}
-      {points.length > 0 && (
-        <div className="flex items-start gap-2.5 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3">
-          <FlaskConical className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-          <p className="text-xs text-amber-700 dark:text-amber-300">
-            {t(
-              isSme
-                ? "dashboard.smeAnalytics.mockNotice"
-                : "dashboard.analytics.mockNotice",
-            )}
-          </p>
-        </div>
-      )}
-
-      {isAuthLoading ? (
+      {isAuthLoading ||
+      (isInvestor && analytics.isLoading) ||
+      (isSme && loan.isLoading) ? (
         <AnalyticsSkeleton />
-      ) : points.length === 0 ? (
+      ) : (isSme ? facility === null : points.length === 0) ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/40 py-20 px-4 text-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground mb-4">
             <BarChart3 className="h-6 w-6" />
@@ -180,9 +182,14 @@ export default function AnalyticsClient() {
             </Link>
           </Button>
         </div>
+      ) : isSme && facility ? (
+        <SmeAnalyticsView
+          facility={facility}
+          months={loan.data?.months ?? []}
+          factors={loan.data?.score_factors ?? []}
+          revenueBasis={loan.data?.revenue_basis_vnd ?? null}
+        />
       ) : (
-        /* The SME mock view is commented out with the mock data:
-             isSme ? <SmeAnalyticsView /> : */
         <>
           {/* One filter row above everything it scopes -- the range applies to
                 the KPIs and every chart at once, never per-card. */}
@@ -264,7 +271,7 @@ export default function AnalyticsClient() {
                   description={t("dashboard.analytics.charts.allocationDesc")}
                 >
                   <IndustryAllocationChart
-                    allocation={NO_ALLOCATION}
+                    allocation={allocation}
                     total={allocationTotal}
                   />
                 </ChartCard>
@@ -274,7 +281,7 @@ export default function AnalyticsClient() {
                   description={t("dashboard.analytics.charts.splitDesc")}
                 >
                   <IndustrySplitChart
-                    allocation={NO_ALLOCATION}
+                    allocation={allocation}
                     total={allocationTotal}
                   />
                 </ChartCard>
@@ -284,7 +291,7 @@ export default function AnalyticsClient() {
                   description={t("dashboard.analytics.charts.statusDesc")}
                 >
                   <CapitalStatusChart
-                    statusAllocation={NO_CAPITAL_STATUS}
+                    statusAllocation={capitalStatus}
                     total={allocationTotal}
                   />
                 </ChartCard>
@@ -293,8 +300,8 @@ export default function AnalyticsClient() {
           ) : (
             <AnalyticsTableView
               points={points}
-              allocation={NO_ALLOCATION}
-              capitalStatus={NO_CAPITAL_STATUS}
+              allocation={allocation}
+              capitalStatus={capitalStatus}
               total={allocationTotal}
             />
           )}

@@ -98,6 +98,18 @@ describe("deriveKpis", () => {
     );
   });
 
+  it("rates earnings, not money coming back, against capital", () => {
+    const latest = MOCK_MONTHLY[MOCK_MONTHLY.length - 1];
+    const earned = MOCK_MONTHLY.reduce((sum, p) => sum + p.yield_monthly, 0);
+    const kpis = deriveKpis(MOCK_MONTHLY, { earned, activePositions: 3 });
+
+    expect(kpis.roi).toBeCloseTo((earned / latest.deployed_cumulative) * 100);
+    expect(kpis.roi).toBeLessThan(
+      (latest.returns_cumulative / latest.deployed_cumulative) * 100,
+    );
+    expect(kpis.activePositions).toBe(3);
+  });
+
   it("survives an empty series without dividing by zero", () => {
     const kpis = deriveKpis([]);
 

@@ -3,36 +3,36 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, m } from "framer-motion";
 import Link from "next/link";
-import { FlaskConical, History, Search, SlidersHorizontal } from "lucide-react";
+import { History, Search, SlidersHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRequireAuth } from "@/hooks/use-authentication";
+import {
+  useBusinessTransactions,
+  useMyTransactions,
+} from "@/hooks/use-portfolio";
 import { pageTransitionProps } from "@/lib/animations";
 import { useTranslations } from "@/lib/i18n";
 import { TransactionSummaryCards } from "./_components/TransactionSummaryCards";
 import { TransactionsTable } from "./_components/TransactionsTable";
 import { SmeTransactionSummaryCards } from "./_components/sme/SmeTransactionSummaryCards";
 import {
-  // MOCK_SME_TRANSACTIONS — commented out with the mock data; the SME ledger
-  // shows its empty state until a real ledger endpoint exists.
   SME_TYPE_FILTERS,
   summarizeSme,
 } from "./_components/sme/mock-sme-transactions";
 import { transactionTypeLabelKey } from "./_components/TransactionTypeCell";
-import {
-  // MOCK_TRANSACTIONS — commented out with the mock data; the investor ledger
-  // shows its empty state until a real transactions endpoint exists.
-  summarize,
-  type Transaction,
-  type TransactionStatus,
-  type TransactionType,
-} from "./_components/mock-transactions";
+import { summarize } from "./_components/mock-transactions";
+import type {
+  Transaction,
+  TransactionStatus,
+  TransactionType,
+} from "@/services/portfolio.service";
 import { CONTROL_HOVER, CONTROL_IDLE } from "@/lib/ui-tokens";
 
-// Stands in for the transactions API until it exists. Module-level so its
-// identity is stable across renders (the useMemos below depend on it).
+// Nothing yet. Module-level so its identity is stable across renders (the
+// useMemos below depend on it).
 const NO_TRANSACTIONS: Transaction[] = [];
 
 const TYPE_FILTERS: TransactionType[] = [
@@ -90,11 +90,15 @@ export default function TransactionsClient() {
   // distributions describe an investor, so the SME gets its own dataset,
   // summary tiles and filter chips rather than the investor screen relabelled.
   const isSme = user?.role === "SME";
-  // MOCK_TRANSACTIONS and MOCK_SME_TRANSACTIONS are both commented out with the
-  // mock data — investors and SMEs see the empty state below instead of
-  // invented ledger rows until a real transactions endpoint exists.
-  // const transactions = useMemo(() => (isSme ? MOCK_SME_TRANSACTIONS : MOCK_TRANSACTIONS), [isSme]);
-  const transactions = NO_TRANSACTIONS;
+  // Each side's real money in and out. An investor: each investment sent to a
+  // business, and each day it repaid them. A business: each investment it
+  // received, each day it repaid an investor, and FundLok's fee invoices.
+  const isInvestor = user?.role === "INVESTOR";
+  const mine = useMyTransactions(isInvestor);
+  const business = useBusinessTransactions(isSme);
+  const ledger = isSme ? business : mine;
+  const transactions =
+    ((isSme || isInvestor) && ledger.data) || NO_TRANSACTIONS;
   const typeFilters = isSme ? SME_TYPE_FILTERS : TYPE_FILTERS;
 
   // All local UI state: none of this round-trips to the server, so it stays in
@@ -167,21 +171,7 @@ export default function TransactionsClient() {
         )}
       </div>
 
-      {/* Sample-data notice */}
-      {transactions.length > 0 && (
-        <div className="flex items-start gap-2.5 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3">
-          <FlaskConical className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-          <p className="text-xs text-amber-700 dark:text-amber-300">
-            {t(
-              isSme
-                ? "dashboard.transactions.smeMockNotice"
-                : "dashboard.transactions.mockNotice",
-            )}
-          </p>
-        </div>
-      )}
-
-      {isAuthLoading ? (
+      {isAuthLoading || ((isSme || isInvestor) && ledger.isLoading) ? (
         <TransactionsSkeleton />
       ) : transactions.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/40 py-20 px-4 text-center">

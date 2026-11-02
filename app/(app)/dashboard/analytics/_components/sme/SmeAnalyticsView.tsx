@@ -1,18 +1,5 @@
 "use client";
 
-// Mock data commented out. This view was derived entirely from
-// MOCK_SME_FACILITY / MOCK_REPAYMENT_MONTHS / MOCK_SCORE_FACTORS in
-// mock-sme-analytics.ts, and those constants are switched off, so the view
-// renders nothing. analytics/client.tsx now sends SMEs to the shared empty
-// state instead. When a real repayment schedule / score endpoint lands, move
-// this component onto the hook and un-comment both the constants and the
-// implementation kept below — the swap is mechanical.
-export function SmeAnalyticsView() {
-  return null;
-}
-
-/* Preserved implementation, restored with the real endpoints
-
 import { useMemo } from "react";
 import { m } from "framer-motion";
 import {
@@ -28,14 +15,16 @@ import { formatCurrency } from "@/lib/format-currency";
 import { formatDate } from "@/lib/format-date";
 import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import type {
+  RepaymentMonth,
+  ScoreFactor,
+  SmeFacility,
+} from "@/services/portfolio.service";
 import { RepaymentProgressChart } from "./RepaymentProgressChart";
 import { RevenueShareChart } from "./RevenueShareChart";
 import { ScoreFactorsPanel } from "./ScoreFactorsPanel";
 import {
   deriveRepaymentSummary,
-  MOCK_SCORE_FACTORS,
-  MOCK_REPAYMENT_MONTHS,
-  MOCK_SME_FACILITY,
   REVENUE_SHARE_CEILING,
 } from "./mock-sme-analytics";
 
@@ -59,18 +48,33 @@ function ChartCard({
   );
 }
 
-// FE-013. A borrower's screen, not the investor screen relabelled: one loan,
-// what is left on it, how much of daily revenue it eats, and what moves the
-// score. Nothing here is a portfolio.
-export function SmeAnalyticsViewOld() {
+// FE-013. A borrower's screen, not the investor screen relabelled: one loan
+// (the sum of its investments, each repaying on its own), what is left on it,
+// how much of its revenue it takes, and what makes up the business score.
+// Nothing here is a portfolio. The revenue share needs the revenue the loan
+// was sized on, and the score panel a locked score: each is left out without.
+export function SmeAnalyticsView({
+  facility,
+  months,
+  factors,
+  revenueBasis,
+}: {
+  facility: SmeFacility;
+  months: RepaymentMonth[];
+  factors: ScoreFactor[];
+  /** The average monthly revenue the loan was sized on; null without one. */
+  revenueBasis: number | null;
+}) {
   const { locale, t } = useTranslations();
 
   const summary = useMemo(
-    () => deriveRepaymentSummary(MOCK_SME_FACILITY, MOCK_REPAYMENT_MONTHS),
-    [],
+    () => deriveRepaymentSummary(facility, months),
+    [facility, months],
   );
 
-  const overCeiling = summary.latest_revenue_share > REVENUE_SHARE_CEILING;
+  const overCeiling =
+    revenueBasis !== null &&
+    summary.latest_revenue_share > REVENUE_SHARE_CEILING;
 
   const tiles = [
     {
@@ -81,20 +85,18 @@ export function SmeAnalyticsViewOld() {
         percent: summary.progress_pct.toFixed(0),
       }),
       icon: Wallet,
-      valueClassName: "text-foreground",
     },
     {
       // The unit of repayment is the business day, not the month. Showing a
       // monthly "next payment" describes a product we do not sell.
       key: "dailyRepayment",
       label: t("dashboard.smeAnalytics.kpi.dailyRepayment"),
-      value: formatCurrency(MOCK_SME_FACILITY.target_daily, locale),
+      value: formatCurrency(facility.target_daily, locale),
       hint: t("dashboard.smeAnalytics.kpi.dailyRepaymentHint", {
-        total: formatCurrency(MOCK_SME_FACILITY.current_period_total, locale),
-        date: formatDate(MOCK_SME_FACILITY.current_period_end_date, locale),
+        total: formatCurrency(facility.current_period_total, locale),
+        date: formatDate(facility.current_period_end_date, locale),
       }),
       icon: PiggyBank,
-      valueClassName: "text-foreground",
     },
     {
       // The SME has known this date since signing; the screen should not be
@@ -104,38 +106,33 @@ export function SmeAnalyticsViewOld() {
       value: formatDate(summary.backstop_date, locale),
       hint: t("dashboard.smeAnalytics.kpi.backstopHint"),
       icon: ShieldAlert,
-      valueClassName: "text-foreground",
     },
     {
       key: "costOfCapital",
       label: t("dashboard.smeAnalytics.kpi.costOfCapital"),
       value: formatCurrency(summary.cost_of_capital, locale),
       hint: t("dashboard.smeAnalytics.kpi.costOfCapitalHint", {
-        rate: MOCK_SME_FACILITY.interest_rate_pct.toFixed(2),
-        months: MOCK_SME_FACILITY.term_months,
+        rate: facility.interest_rate_pct.toFixed(2),
+        months: facility.term_months,
       }),
       icon: FlaskConical,
-      valueClassName: "text-foreground",
     },
     {
-      // Was "Save by repaying early", showing interest avoided by closing
-      // today. Handbook §5.9: the origination total is fixed at signing and
-      // early settlement clears the remaining total with NO rebate — the
-      // benefit is "no prepayment penalty", never "pay early, pay less". The
-      // tile now shows what it actually costs to close today, and says so.
+      // Handbook §5.9: the total is fixed at approval and settling early
+      // clears what is left with no rebate — "no prepayment penalty", never
+      // "pay early, pay less". The tile shows what closing today costs.
       key: "earlyPayoff",
       label: t("dashboard.smeAnalytics.kpi.earlyPayoff"),
       value: formatCurrency(summary.outstanding, locale),
       hint: t("dashboard.smeAnalytics.kpi.earlyPayoffHint"),
       icon: ShieldCheck,
-      valueClassName: "text-foreground",
     },
   ];
 
   return (
-    <div className="space-y-6">
-      // Repayment progress bar — the single most important number for a
-      // borrower, so it leads and is not buried in a chart.
+    <div className="space-y-6" data-testid="sme-analytics">
+      {/* Repayment progress — the single most important number for a
+          borrower, so it leads and is not buried in a chart. */}
       <Card className="p-5 gap-3">
         <div className="flex flex-wrap items-end justify-between gap-2">
           <div>
@@ -146,13 +143,13 @@ export function SmeAnalyticsViewOld() {
               {formatCurrency(summary.repaid, locale)}
               <span className="text-sm font-medium text-muted-foreground">
                 {" / "}
-                {formatCurrency(MOCK_SME_FACILITY.total_obligation, locale)}
+                {formatCurrency(facility.total_obligation, locale)}
               </span>
             </p>
           </div>
           <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
             {t("dashboard.smeAnalytics.progress.remaining", {
-              days: MOCK_SME_FACILITY.days_remaining,
+              days: facility.days_remaining,
             })}
           </p>
         </div>
@@ -173,7 +170,6 @@ export function SmeAnalyticsViewOld() {
         </div>
       </Card>
 
-      // KPI tiles
       <m.div
         variants={staggerContainerVariants}
         initial="hidden"
@@ -189,8 +185,7 @@ export function SmeAnalyticsViewOld() {
               </div>
               <span
                 className={cn(
-                  "truncate whitespace-nowrap text-xl font-bold tracking-tight",
-                  tile.valueClassName,
+                  "truncate whitespace-nowrap text-xl font-bold tracking-tight text-foreground",
                 )}
               >
                 {tile.value}
@@ -201,9 +196,9 @@ export function SmeAnalyticsViewOld() {
         ))}
       </m.div>
 
-      // Affordability warning. Gate 8 is a soft gate in the engine, so this is
-      // a caution, not a failure — but an SME paying more than 30% of revenue
-      // should hear it plainly.
+      {/* Affordability. Gate 8 is a soft gate in the engine, so this is a
+          caution, not a failure — but an SME paying more than 30% of revenue
+          should hear it plainly. */}
       {overCeiling && (
         <div className="flex items-start gap-2.5 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3">
           <ShieldCheck className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
@@ -216,39 +211,44 @@ export function SmeAnalyticsViewOld() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div
+        className={cn(
+          "grid grid-cols-1 gap-6",
+          revenueBasis !== null && "lg:grid-cols-2",
+        )}
+      >
         <ChartCard
           title={t("dashboard.smeAnalytics.charts.repaymentTitle")}
           description={t("dashboard.smeAnalytics.charts.repaymentDesc")}
         >
           <RepaymentProgressChart
-            months={MOCK_REPAYMENT_MONTHS}
-            totalObligation={MOCK_SME_FACILITY.total_obligation}
+            months={months}
+            totalObligation={facility.total_obligation}
           />
         </ChartCard>
 
-        <ChartCard
-          title={t("dashboard.smeAnalytics.charts.revenueShareTitle")}
-          description={t("dashboard.smeAnalytics.charts.revenueShareDesc", {
-            ceiling: (REVENUE_SHARE_CEILING * 100).toFixed(0),
-          })}
-        >
-          <RevenueShareChart months={MOCK_REPAYMENT_MONTHS} />
-        </ChartCard>
+        {revenueBasis !== null && (
+          <ChartCard
+            title={t("dashboard.smeAnalytics.charts.revenueShareTitle")}
+            description={t("dashboard.smeAnalytics.charts.revenueShareDesc", {
+              ceiling: (REVENUE_SHARE_CEILING * 100).toFixed(0),
+            })}
+          >
+            <RevenueShareChart months={months} />
+          </ChartCard>
+        )}
       </div>
 
-      <ChartCard
-        title={t("dashboard.smeAnalytics.charts.scoreTitle")}
-        description={t("dashboard.smeAnalytics.charts.scoreDesc", {
-          score: MOCK_SME_FACILITY.score.toFixed(2),
-        })}
-      >
-        <ScoreFactorsPanel
-          factors={MOCK_SCORE_FACTORS}
-          score={MOCK_SME_FACILITY.score}
-        />
-      </ChartCard>
+      {facility.score !== null && factors.length > 0 && (
+        <ChartCard
+          title={t("dashboard.smeAnalytics.charts.scoreTitle")}
+          description={t("dashboard.smeAnalytics.charts.scoreDesc", {
+            score: facility.score.toFixed(2),
+          })}
+        >
+          <ScoreFactorsPanel factors={factors} score={facility.score} />
+        </ChartCard>
+      )}
     </div>
   );
 }
-*/

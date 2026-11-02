@@ -7,42 +7,19 @@
 // delete the MOCK_* constants and read from the hook. The derive* helpers below
 // are pure and move across unchanged.
 
-export interface MonthlyPoint {
-  /** ISO year-month, e.g. "2026-08". */
-  month: string;
-  /** Cumulative capital deployed to date, VND. */
-  deployed_cumulative: number;
-  /**
-   * Cumulative money received back to date, VND — principal AND yield, not
-   * yield alone. Most of what arrives on any given day is the investor's own
-   * capital coming home, not earnings.
-   */
-  returns_cumulative: number;
-  /** Money received back in this month alone, VND. Principal + yield. */
-  returns_monthly: number;
-  /**
-   * The principal half of `returns_monthly`, VND — capital returned, which is
-   * not profit.
-   */
-  principal_monthly: number;
-  /**
-   * The interest half of `returns_monthly`, VND — the only part that is
-   * actually earnings.
-   *
-   * `principal_monthly + yield_monthly === returns_monthly` for every row;
-   * mock-analytics.test.ts enforces it. Split out because "how much came back"
-   * and "how much did I make" are different questions and a single number
-   * cannot answer both — reading a repayment as profit overstates returns by
-   * roughly 15x at these ratios.
-   */
-  yield_monthly: number;
-}
+// The types now live with the real data, in services/portfolio.service.ts;
+// re-exported here so the components reading them did not have to move.
+import type {
+  CapitalStatusAllocation,
+  IndustryAllocation,
+  MonthlyPoint,
+} from "@/services/portfolio.service";
 
-export interface IndustryAllocation {
-  industry: string;
-  /** Capital currently deployed into this industry, VND. */
-  deployed: number;
-}
+export type {
+  CapitalStatusAllocation,
+  IndustryAllocation,
+  MonthlyPoint,
+} from "@/services/portfolio.service";
 
 // 12 months to 2026-08. Deployments are lumpy (capital goes out when a deal
 // closes); returns compound gently as more positions come online.
@@ -159,11 +136,6 @@ export const MOCK_ALLOCATION: IndustryAllocation[] = [
   { industry: "Logistics & Transport", deployed: 500000000 },
 ];
 
-export interface CapitalStatusAllocation {
-  statusKey: "active" | "repaying" | "completed" | "writtenDown";
-  amount: number;
-}
-
 // Breakdown of deployed capital across facility lifecycle stages. Sums to
 // 4,250,000,000 VND.
 //
@@ -198,7 +170,7 @@ export function sliceByRange(
 export interface AnalyticsKpis {
   deployed: number;
   returns: number;
-  /** Returns as a share of deployed capital, in percent. */
+  /** Earnings (interest after tax) as a share of capital invested, in percent. */
   roi: number;
   activePositions: number;
   /** Capital deployed during the selected range only. */
@@ -209,29 +181,39 @@ export interface AnalyticsKpis {
 
 // Cumulative series: the headline is the latest point, and the "in range"
 // figures are the movement across the window rather than a re-based total.
-export function deriveKpis(points: MonthlyPoint[]): AnalyticsKpis {
+// The rate is earnings over capital: money coming back is mostly the
+// investor's own capital, so reading it as profit would overstate it many
+// times over. `earned` is the earnings to date (the whole series, not just
+// the range); without it, the earnings in the points given.
+export function deriveKpis(
+  points: MonthlyPoint[],
+  context: { activePositions?: number; earned?: number } = {},
+): AnalyticsKpis {
   const latest = points[points.length - 1];
   const first = points[0];
+  const activePositions = context.activePositions ?? 0;
 
   if (!latest || !first) {
     return {
       deployed: 0,
       returns: 0,
       roi: 0,
-      activePositions: MOCK_ACTIVE_POSITIONS,
+      activePositions,
       deployedInRange: 0,
       returnsInRange: 0,
     };
   }
 
+  const earned =
+    context.earned ?? points.reduce((sum, p) => sum + p.yield_monthly, 0);
   return {
     deployed: latest.deployed_cumulative,
     returns: latest.returns_cumulative,
     roi:
       latest.deployed_cumulative === 0
         ? 0
-        : (latest.returns_cumulative / latest.deployed_cumulative) * 100,
-    activePositions: MOCK_ACTIVE_POSITIONS,
+        : (earned / latest.deployed_cumulative) * 100,
+    activePositions,
     deployedInRange: latest.deployed_cumulative - first.deployed_cumulative,
     returnsInRange: points.reduce((sum, p) => sum + p.returns_monthly, 0),
   };

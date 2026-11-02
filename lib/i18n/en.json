@@ -1279,9 +1279,9 @@
         "deployed": "Capital deployed",
         "positions": "Active positions",
         "positionsHint": "Projects currently funded",
-        "returns": "Returns received",
-        "roi": "Return on capital",
-        "roiHint": "Returns as a share of capital deployed"
+        "returns": "Received back (capital + earnings)",
+        "roi": "Earnings on capital",
+        "roiHint": "Earnings received after tax, against the capital invested"
       },
       "mockNotice": "The system isn't connected to live accounts yet. The portfolio below is sample data.",
       "range": {
@@ -2346,7 +2346,7 @@
         "backstop": "Backstop date",
         "backstopHint": "Anything still outstanding falls due in full on this date.",
         "costOfCapital": "Cost of this loan",
-        "costOfCapitalHint": "Total interest at {rate}% over {months} months",
+        "costOfCapitalHint": "Interest to your investors at {rate}% a year over {months} months; FundLok's fee is invoiced separately",
         "dailyRepayment": "Daily repayment",
         "dailyRepaymentHint": "Each business day. This period totals {total} to {date}.",
         "earlyPayoff": "Pay off early",
@@ -2445,14 +2445,14 @@
       "smeMockNotice": "Sample data. This screen isn't connected to your account yet, so none of these figures are real.",
       "smeSubtitle": "Every movement on your loan: what you received, what you have repaid, and the fees FundLok charged.",
       "smeSummary": {
-        "disbursed": "Disbursed to you",
-        "disbursedHint": "Loan principal paid into your account",
-        "fees": "Platform fees",
-        "feesHint": "Deducted from the disbursement, not invoiced",
+        "disbursed": "Received from investors",
+        "disbursedHint": "Investments paid straight into your account",
+        "fees": "FundLok fees",
+        "feesHint": "Invoiced separately, never taken from your investments",
         "pending": "In flight",
-        "pendingHint": "Payments not yet settled",
+        "pendingHint": "Being checked by FundLok, or invoices unpaid",
         "repaid": "Repaid so far",
-        "repaidHint": "Daily repayments plus any early repayment"
+        "repaidHint": "What you transferred to investors, their tax kept back"
       },
       "smeTitle": "Loan transactions",
       "status": {
@@ -2460,16 +2460,16 @@
         "failed": "Failed",
         "pending": "Pending"
       },
-      "subtitle": "Every movement of funds across your FundLok account.",
+      "subtitle": "Every investment you've transferred and every repayment you've received.",
       "summary": {
         "moneyIn": "Money In",
-        "moneyInHint": "Returns, repayments and deposits",
+        "moneyInHint": "Repayments received, after tax",
         "moneyOut": "Money out",
-        "moneyOutHint": "Investments, withdrawals and fees",
+        "moneyOutHint": "Investments transferred",
         "net": "Net position",
         "netHint": "Money in minus money out",
         "pending": "Pending",
-        "pendingHint": "Awaiting settlement"
+        "pendingHint": "Being checked by FundLok"
       },
       "table": {
         "amount": "Amount",

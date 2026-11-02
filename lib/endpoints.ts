@@ -72,6 +72,12 @@ export const PAYMENT_ACCOUNT_ENDPOINTS = {
 // Investing through a project's funding window (ADR-009): the investor holds an
 // amount, agrees to the investing terms, then pays the business directly.
 export const FUNDING_ENDPOINTS = {
+  // The investor's money in and out, and the portfolio month by month.
+  myTransactions: "/funding/me/transactions",
+  myAnalytics: "/funding/me/analytics",
+  // The business's money in and out, and its loan.
+  businessTransactions: "/funding/me/business-transactions",
+  businessAnalytics: "/funding/me/business-analytics",
   window: (listingId: string) => `/funding/listings/${listingId}/window`,
   // Reserves the amount and signs the acceptance in one call; needs an
   // Idempotency-Key header.
