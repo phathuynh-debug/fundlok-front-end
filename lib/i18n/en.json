@@ -675,24 +675,24 @@
         "groupLabel": "Show",
         "groups": {
           "ALL": "Everything",
+          "BUSINESS": "Business actions",
           "DECISIONS": "Approvals and denials",
           "INVESTOR": "Investor actions",
-          "VIEWS": "Receipt views",
-          "BUSINESS": "Business actions"
+          "VIEWS": "Receipt views"
         },
         "kinds": {
           "approvedMatch": "Approved: receipt matched",
           "notReceived": "Denied",
           "received": "Approved",
           "rejected": "Rejected: bank transaction reused",
-          "reserved": "Investor reserved",
-          "sentToReview": "Sent to review: didn't match",
-          "uploaded": "Receipt uploaded",
-          "viewed": "Receipt viewed",
           "repaymentApproved": "Repayment approved",
           "repaymentDenied": "Repayment receipt denied",
           "repaymentMarked": "Repayment marked paid",
-          "repaymentViewed": "Repayment receipt viewed"
+          "repaymentViewed": "Repayment receipt viewed",
+          "reserved": "Investor reserved",
+          "sentToReview": "Sent to review: didn't match",
+          "uploaded": "Receipt uploaded",
+          "viewed": "Receipt viewed"
         },
         "loadFailed": "Couldn't load the history.",
         "note": "Note",
@@ -742,6 +742,96 @@
       "needs": {
         "decision": "Decision needed",
         "receipt": "Receipt to check"
+      },
+      "preview": {
+        "dayIndex": "Day {index}",
+        "end": "Last day",
+        "endValue": "{date} ({count} working days)",
+        "firstDay": "Day 1 amount",
+        "heading": "Repayment schedule",
+        "headingPreview": "Repayment if approved today",
+        "hideDays": "Hide days",
+        "howHeading": "How it's worked out",
+        "ifApproved": "If approved now",
+        "showDays": "Show every day",
+        "split": "{gross} (investor receives {net})",
+        "start": "Day 1",
+        "steps": {
+          "daily": "Each day: ({principal} + {interest}) ÷ {count} = {daily}.",
+          "dailyWithLast": "Each day: ({principal} + {interest}) ÷ {count} = {daily}; the last day is {last}, with the leftover đồng.",
+          "dates": "Approved on {approved}; day 1 is {start} and the last day is {end}.",
+          "datesPreview": "Approved today, {approved}: the money is received and the loan works at once, so day 1 is the next working day, {start}. The last day is {end}.",
+          "days": "Repaid over {term} months × {perMonth} working days = {count} working days.",
+          "noTax": "The investor is an organisation: no tax is withheld.",
+          "principal": "Investment: {principal}.",
+          "rate": "Interest: {rate}% a year for {term} months, so {interest}.",
+          "return": "Investor return: {return}% over the whole {term}-month loan, which is {rate}% a year (never above the business's {loanRate}% a year), so the interest is {interest}.",
+          "stub": "First-period interest: the money arrived on {received}, {days} working days before day 1: {principal} × {rate}% × {days} ÷ {basis} = {stub}, paid with day 1.",
+          "tax": "Personal income tax: {tax}% of the interest only, {amount} in all. The business keeps it back and pays it to the tax office; the investor receives the rest."
+        },
+        "total": "Total to repay",
+        "transferShort": "receives {net}"
+      },
+      "repayments": {
+        "dayStatus": {
+          "DUE": "Due",
+          "MATCHED": "Confirmed",
+          "PRESUMED_PAID": "Marked paid",
+          "REPORTED_MISSED": "Reported missing"
+        },
+        "empty": "No repayment receipts yet.",
+        "emptyQueue": "No repayment receipt waits for a decision.",
+        "filters": {
+          "ALL": "All receipts",
+          "DECIDED": "Decided",
+          "NEEDS_ACTION": "Needs action"
+        },
+        "kind": {
+          "INSTALMENT": "Daily repayment",
+          "STUB": "First-period interest"
+        },
+        "reported": "The investor reported a day missing",
+        "rowLabel": "Review the repayment from {business} to {investor}",
+        "sheet": {
+          "daysHeading": "Days it pays ({count})",
+          "decideBody": "Look at the receipt: does it show this amount reaching the investor's account, with the memo?",
+          "decided": {
+            "MATCHED": "Approved: these days are paid.",
+            "REJECTED": "Denied: these days are due again, and the business was told why."
+          },
+          "from": "From (the business)",
+          "gross": "Tax included",
+          "grossValue": "{gross} (the business keeps back {tax} of tax)",
+          "hint": "Approving records these days as paid. Denying puts them back to due and tells the business your note, so it can pay and upload the right receipt.",
+          "loadFailed": "Couldn't load this receipt.",
+          "notePlaceholder": "Note (needed to deny: the business reads it)",
+          "own": "You are part of this repayment, so another admin has to decide it.",
+          "repaymentHeading": "The repayment",
+          "reported": "The investor reported one of these days as never arriving. Approving settles that report as paid.",
+          "subtitle": "A business's repayment to an investor",
+          "title": "{business} → {investor}",
+          "titleFallback": "Repayment receipt",
+          "to": "To (the investor)",
+          "toast": {
+            "APPROVED": "Repayment approved",
+            "DENIED": "Receipt denied"
+          },
+          "transferred": "Transferred"
+        },
+        "status": {
+          "AWAITING_FIELDS": "Receipt to check",
+          "MATCHED": "Approved",
+          "REJECTED": "Denied"
+        },
+        "table": {
+          "amount": "Transferred",
+          "business": "Business",
+          "days": "Days",
+          "daysValue": "{count} days from {first}",
+          "investor": "Investor",
+          "submitted": "Uploaded"
+        },
+        "unit": "receipts"
       },
       "roundChip": "Round: {name}",
       "rounds": {
@@ -808,6 +898,7 @@
       },
       "subtitle": "Funding rounds taking investment, and the transfers investors report for them. Staff read each receipt and confirm the money arrived.",
       "tabActivity": "Activity log",
+      "tabRepayments": "Repayments",
       "tabRounds": "Open rounds",
       "tabTransfers": "Transfers",
       "table": {
@@ -820,98 +911,7 @@
         "reserved": "Reserved",
         "status": "Status"
       },
-      "title": "Transactions",
-      "tabRepayments": "Repayments",
-      "repayments": {
-        "dayStatus": {
-          "DUE": "Due",
-          "MATCHED": "Confirmed",
-          "PRESUMED_PAID": "Marked paid",
-          "REPORTED_MISSED": "Reported missing"
-        },
-        "empty": "No repayment receipts yet.",
-        "emptyQueue": "No repayment receipt waits for a decision.",
-        "filters": {
-          "ALL": "All receipts",
-          "DECIDED": "Decided",
-          "NEEDS_ACTION": "Needs action"
-        },
-        "kind": {
-          "INSTALMENT": "Daily repayment",
-          "STUB": "First-period interest"
-        },
-        "reported": "The investor reported a day missing",
-        "rowLabel": "Review the repayment from {business} to {investor}",
-        "sheet": {
-          "daysHeading": "Days it pays ({count})",
-          "decideBody": "Look at the receipt: does it show this amount reaching the investor's account, with the memo?",
-          "decided": {
-            "MATCHED": "Approved: these days are paid.",
-            "REJECTED": "Denied: these days are due again, and the business was told why."
-          },
-          "from": "From (the business)",
-          "gross": "Tax included",
-          "grossValue": "{gross} (the business keeps back {tax} of tax)",
-          "hint": "Approving records these days as paid. Denying puts them back to due and tells the business your note, so it can pay and upload the right receipt.",
-          "loadFailed": "Couldn't load this receipt.",
-          "notePlaceholder": "Note (needed to deny: the business reads it)",
-          "own": "You are part of this repayment, so another admin has to decide it.",
-          "repaymentHeading": "The repayment",
-          "reported": "The investor reported one of these days as never arriving. Approving settles that report as paid.",
-          "subtitle": "A business's repayment to an investor",
-          "title": "{business} → {investor}",
-          "titleFallback": "Repayment receipt",
-          "to": "To (the investor)",
-          "toast": {
-            "APPROVED": "Repayment approved",
-            "DENIED": "Receipt denied"
-          },
-          "transferred": "Transferred"
-        },
-        "status": {
-          "AWAITING_FIELDS": "Receipt to check",
-          "MATCHED": "Approved",
-          "REJECTED": "Denied"
-        },
-        "table": {
-          "amount": "Transferred",
-          "business": "Business",
-          "days": "Days",
-          "daysValue": "{count} days from {first}",
-          "investor": "Investor",
-          "submitted": "Uploaded"
-        },
-        "unit": "receipts"
-      },
-      "preview": {
-        "dayIndex": "Day {index}",
-        "end": "Last day",
-        "endValue": "{date} ({count} working days)",
-        "firstDay": "Day 1 amount",
-        "heading": "Repayment schedule",
-        "headingPreview": "Repayment if approved today",
-        "hideDays": "Hide days",
-        "howHeading": "How it's worked out",
-        "ifApproved": "If approved now",
-        "showDays": "Show every day",
-        "split": "{gross} (investor receives {net})",
-        "start": "Day 1",
-        "steps": {
-          "daily": "Each day: ({principal} + {interest}) ÷ {count} = {daily}.",
-          "dailyWithLast": "Each day: ({principal} + {interest}) ÷ {count} = {daily}; the last day is {last}, with the leftover đồng.",
-          "dates": "Approved on {approved}; day 1 is {start} and the last day is {end}.",
-          "datesPreview": "Approved today, {approved}: the money is received and the loan works at once, so day 1 is the next working day, {start}. The last day is {end}.",
-          "days": "Repaid over {term} months × {perMonth} working days = {count} working days.",
-          "noTax": "The investor is an organisation: no tax is withheld.",
-          "principal": "Investment: {principal}.",
-          "rate": "Interest: {rate}% a year for {term} months, so {interest}.",
-          "return": "Investor return: {return}% over the whole {term}-month loan, which is {rate}% a year (never above the business's {loanRate}% a year), so the interest is {interest}.",
-          "stub": "First-period interest: the money arrived on {received}, {days} working days before day 1: {principal} × {rate}% × {days} ÷ {basis} = {stub}, paid with day 1.",
-          "tax": "Personal income tax: {tax}% of the interest only, {amount} in all. The business keeps it back and pays it to the tax office; the investor receives the rest."
-        },
-        "total": "Total to repay",
-        "transferShort": "receives {net}"
-      }
+      "title": "Transactions"
     },
     "userPreview": {
       "activeSessions": "Active Sessions",
@@ -2059,6 +2059,64 @@
       "industry": "Industry",
       "industryTaxId": "Industry: {industry} • Tax ID: {taxId}",
       "invalidFileType": "Invalid file type. Allowed: {extensions}",
+      "investment": {
+        "back": "Back to dashboard",
+        "dayIndex": "Day {index}",
+        "daysLeft": "{count} days left",
+        "daysPaid": "{paid} of {count} days paid",
+        "filterLabel": "Show tickets",
+        "filters": {
+          "all": "All ({count})",
+          "left": "Left ({count})",
+          "paid": "Paid ({count})"
+        },
+        "left": "Still to repay, tax included",
+        "noTickets": "No tickets here.",
+        "notFound": "We couldn't find this investment",
+        "notFoundHint": "It may belong to another business, or the link is out of date.",
+        "notReceived": "This investment has no repayment tickets yet: FundLok hasn't confirmed the money arrived.",
+        "pay": {
+          "accountName": "Account holder",
+          "accountNumber": "Account number",
+          "amount": "To transfer",
+          "amountLabel": "Amount",
+          "bank": "Bank",
+          "cancel": "Cancel",
+          "choose": "Choose file",
+          "errors": {
+            "DUPLICATE_FILE": "This receipt was already used. Upload the receipt of this transfer.",
+            "FILE_TOO_LARGE": "The file is over 10 MB.",
+            "NOT_DUE_YET": "These days aren't due yet.",
+            "UNSUPPORTED_TYPE": "Upload a PDF, PNG, JPEG or WEBP.",
+            "generic": "Something went wrong. Please try again."
+          },
+          "failed": "Couldn't record the repayment",
+          "heading": "Today's repayment",
+          "includes": "{count} working days: {dates}",
+          "noPayee": "The investor's receiving account isn't available yet. Contact FundLok before transferring.",
+          "none": "Nothing is due to this investor today.",
+          "overdue": "{count} earlier days are still unpaid and included here.",
+          "paidToast": "Repayment recorded",
+          "receiptBody": "After transferring, upload the receipt your bank app shows (PDF, PNG, JPEG or WEBP, up to 10 MB). It marks these days paid; the investor then has two working days to report a payment that didn't arrive.",
+          "receiptTitle": "Upload your transfer receipt",
+          "rejected": "FundLok couldn't confirm the receipt you uploaded for these days: “{reason}”. Upload a receipt that shows this transfer; if the money didn't go out, transfer it first.",
+          "remove": "Remove file",
+          "repay": "Repay",
+          "send": "Send receipt and mark {amount} paid",
+          "sending": "Sending…",
+          "transferHint": "From your business's account, transfer exactly this amount with this memo. The QR fills in all of it.",
+          "transferTitle": "Transfer to the investor's account",
+          "withStub": "includes the first-period interest"
+        },
+        "progressHeading": "Repayment progress",
+        "projectedNote": "Assuming the round closes on {date}. The real tickets are set when this investment starts repaying.",
+        "ticketsHeading": "Repayment tickets",
+        "today": "Today",
+        "total": "Total to repay, tax included",
+        "transferred": "Transferred to this investor",
+        "transferredValue": "{paid} of {total}",
+        "unavailable": "This investment's tickets aren't available right now."
+      },
       "lastUpdated": "Last updated",
       "legitInfoNotice": "Please provide legitimate, accurate information. We will review your submission once our checks are complete.",
       "lite": {
@@ -2261,65 +2319,7 @@
       "vatZipLabel": "Upload .zip containing all 48 VAT files (24 declarations + 24 confirmations)",
       "viewDocument": "View",
       "whereToFindThese": "Where to find these numbers",
-      "whyWeNeedThis": "Why we need this",
-      "investment": {
-        "back": "Back to dashboard",
-        "dayIndex": "Day {index}",
-        "daysLeft": "{count} days left",
-        "daysPaid": "{paid} of {count} days paid",
-        "filterLabel": "Show tickets",
-        "filters": {
-          "all": "All ({count})",
-          "left": "Left ({count})",
-          "paid": "Paid ({count})"
-        },
-        "left": "Still to repay, tax included",
-        "noTickets": "No tickets here.",
-        "notFound": "We couldn't find this investment",
-        "notFoundHint": "It may belong to another business, or the link is out of date.",
-        "notReceived": "This investment has no repayment tickets yet: FundLok hasn't confirmed the money arrived.",
-        "pay": {
-          "accountName": "Account holder",
-          "accountNumber": "Account number",
-          "amount": "To transfer",
-          "amountLabel": "Amount",
-          "bank": "Bank",
-          "cancel": "Cancel",
-          "choose": "Choose file",
-          "errors": {
-            "DUPLICATE_FILE": "This receipt was already used. Upload the receipt of this transfer.",
-            "FILE_TOO_LARGE": "The file is over 10 MB.",
-            "NOT_DUE_YET": "These days aren't due yet.",
-            "UNSUPPORTED_TYPE": "Upload a PDF, PNG, JPEG or WEBP.",
-            "generic": "Something went wrong. Please try again."
-          },
-          "failed": "Couldn't record the repayment",
-          "heading": "Today's repayment",
-          "includes": "{count} working days: {dates}",
-          "noPayee": "The investor's receiving account isn't available yet. Contact FundLok before transferring.",
-          "none": "Nothing is due to this investor today.",
-          "overdue": "{count} earlier days are still unpaid and included here.",
-          "paidToast": "Repayment recorded",
-          "receiptBody": "After transferring, upload the receipt your bank app shows (PDF, PNG, JPEG or WEBP, up to 10 MB). It marks these days paid; the investor then has two working days to report a payment that didn't arrive.",
-          "receiptTitle": "Upload your transfer receipt",
-          "remove": "Remove file",
-          "repay": "Repay",
-          "send": "Send receipt and mark {amount} paid",
-          "sending": "Sending…",
-          "transferHint": "From your business's account, transfer exactly this amount with this memo. The QR fills in all of it.",
-          "transferTitle": "Transfer to the investor's account",
-          "withStub": "includes the first-period interest",
-          "rejected": "FundLok couldn't confirm the receipt you uploaded for these days: “{reason}”. Upload a receipt that shows this transfer; if the money didn't go out, transfer it first."
-        },
-        "progressHeading": "Repayment progress",
-        "projectedNote": "Assuming the round closes on {date}. The real tickets are set when this investment starts repaying.",
-        "ticketsHeading": "Repayment tickets",
-        "today": "Today",
-        "total": "Total to repay, tax included",
-        "transferred": "Transferred to this investor",
-        "transferredValue": "{paid} of {total}",
-        "unavailable": "This investment's tickets aren't available right now."
-      }
+      "whyWeNeedThis": "Why we need this"
     },
     "smeAnalytics": {
       "charts": {
@@ -3096,8 +3096,8 @@
   },
   "notifications": {
     "actions": {
-      "verify": "Verify now",
-      "payAgain": "Pay again"
+      "payAgain": "Pay again",
+      "verify": "Verify now"
     },
     "alert": {
       "acknowledge": "Got it",
@@ -3111,13 +3111,13 @@
     "items": {
       "applicationApproved": "Your funding request has been approved.",
       "applicationRejected": "Your funding request was not approved.",
+      "repaymentReceiptRejected": "FundLok couldn't confirm your repayment of {amount} to investor {investor}: “{reason}”. Those days are due again.",
       "transferApproved": "FundLok approved a transfer of {amount} from investor {investor} (memo {memo}). If it hasn't reached your account, contact FundLok within 2 working days.",
       "transferConfirmed": "FundLok confirmed a transfer of {amount} from investor {investor} (memo {memo}) to your business.",
       "transferRepaying": "FundLok confirmed a transfer of {amount} from investor {investor} (memo {memo}). You repay this investor every working day, from the next working day.",
       "unknown": "You have an update on your account.",
       "verificationRequiredKyb": "Verify your business (KYB) so you can submit a funding request.",
-      "verificationRequiredKyc": "Verify your identity (KYC) so you can start investing.",
-      "repaymentReceiptRejected": "FundLok couldn't confirm your repayment of {amount} to investor {investor}: “{reason}”. Those days are due again."
+      "verificationRequiredKyc": "Verify your identity (KYC) so you can start investing."
     },
     "markAllRead": "Mark all as read",
     "title": "Notifications"
