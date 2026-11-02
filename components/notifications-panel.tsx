@@ -5,6 +5,7 @@ import { AnimatePresence, m } from "framer-motion";
 import {
   Banknote,
   Bell,
+  ReceiptText,
   BellOff,
   CircleCheck,
   CircleX,
@@ -74,7 +75,10 @@ const EVENT_PRESENTATION: Record<
     ) => Record<string, string | number>;
     tone: NotificationTone;
     icon: LucideIcon;
-    action?: NotificationAction;
+    /** Fixed, or built from the notification (a link to what it is about). */
+    action?:
+      | NotificationAction
+      | ((notification: AppNotification) => NotificationAction);
   }
 > = {
   APPLICATION_APPROVED: {
@@ -117,6 +121,22 @@ const EVENT_PRESENTATION: Record<
     }),
     tone: "positive",
     icon: Banknote,
+  },
+  // Staff could not confirm a repayment from the receipt the business sent:
+  // those days are due again, paid from the investment's page.
+  REPAYMENT_RECEIPT_REJECTED: {
+    messageKey: "notifications.items.repaymentReceiptRejected",
+    values: (notification, locale) => ({
+      amount: formatCurrency(Number(notification.data.amount_vnd ?? 0), locale),
+      investor: String(notification.data.investor ?? ""),
+      reason: String(notification.data.reason ?? ""),
+    }),
+    tone: "negative",
+    icon: ReceiptText,
+    action: (notification) => ({
+      labelKey: "notifications.actions.payAgain",
+      href: `/dashboard/repayments/${String(notification.data.tranche_id ?? "")}`,
+    }),
   },
 };
 
@@ -161,7 +181,10 @@ export function presentNotification(
       typeof messageKey === "function" ? messageKey(notification) : messageKey,
       presentation.values?.(notification, locale),
     ),
-    action: presentation.action,
+    action:
+      typeof presentation.action === "function"
+        ? presentation.action(notification)
+        : presentation.action,
   };
 }
 

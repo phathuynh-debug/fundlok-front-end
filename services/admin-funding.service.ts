@@ -117,11 +117,13 @@ export interface AdminReceiptDecisionPayload {
   reason: string | null;
 }
 
-/** DECISIONS: receipts checked or rejected, reviews settled. INVESTOR:
- *  reservations and uploads. VIEWS: who opened which receipt. */
+/** DECISIONS: receipts checked or rejected, reviews settled, investors' and
+ *  businesses' alike. INVESTOR: reservations and uploads. BUSINESS:
+ *  repayments marked paid. VIEWS: who opened which receipt. */
 export const ACTIVITY_GROUPS = [
   "DECISIONS",
   "INVESTOR",
+  "BUSINESS",
   "VIEWS",
   "ALL",
 ] as const;
@@ -160,6 +162,68 @@ export interface AdminFundingActivity {
   tranche_status: string | null;
   /** The note staff gave. */
   reason: string | null;
+}
+
+/** NEEDS_ACTION is the queue: a receipt waiting on staff. */
+export const REPAYMENT_FILTERS = ["NEEDS_ACTION", "DECIDED", "ALL"] as const;
+export type AdminRepaymentFilter = (typeof REPAYMENT_FILTERS)[number];
+
+export interface AdminRepaymentListParams {
+  status: AdminRepaymentFilter;
+  page: number;
+  page_size: number;
+}
+
+export interface AdminRepaymentAccount {
+  bank_name: string;
+  account_number: string;
+  account_name: string;
+}
+
+/** One day a business's receipt pays. */
+export interface AdminRepaymentDay {
+  repayment_day_id: string;
+  transfer_id: string;
+  kind: "INSTALMENT" | "STUB";
+  due_date: string;
+  principal_vnd: number;
+  interest_vnd: number;
+  gross_vnd: number;
+  tax_withheld_vnd: number;
+  net_vnd: number;
+  status: "DUE" | "PRESUMED_PAID" | "REPORTED_MISSED" | "MATCHED";
+  check_status: string;
+}
+
+// Mirrors backend AdminRepaymentReceiptOut: a receipt the business uploaded
+// for repaying one investor, and the days it pays.
+export interface AdminRepaymentReceipt {
+  /** The receipt file. */
+  id: string;
+  tranche_id: string;
+  window_id: string;
+  project_name: string;
+  /** The memo the business's transfer must carry. */
+  reference_code: string;
+  business: AdminActivityPerson;
+  investor: AdminActivityPerson;
+  submitted_at: string;
+  /** AWAITING_FIELDS: waits on staff; MATCHED: approved; REJECTED: denied. */
+  check_status: "AWAITING_FIELDS" | "MATCHED" | "REJECTED";
+  needs_action: boolean;
+  gross_vnd: number;
+  tax_withheld_vnd: number;
+  /** What the receipt should show: the amount transferred. */
+  net_vnd: number;
+  days: AdminRepaymentDay[];
+  /** The investor's account the money should reach. */
+  payee: AdminRepaymentAccount | null;
+  /** The business's account. */
+  payer: AdminRepaymentAccount | null;
+  original_filename: string | null;
+  content_type: string | null;
+  /** The investor reported one of these days as never arriving. */
+  open_report: boolean;
 }
 
 export const adminFundingService = {
@@ -207,6 +271,34 @@ export const adminFundingService = {
   decide(transferId: string, body: AdminReceiptDecisionPayload) {
     return apiClient.post<AdminInvestorTransfer>(
       ADMIN_ENDPOINTS.transferDecision(transferId),
+      body,
+    );
+  },
+
+  listRepayments(params: AdminRepaymentListParams) {
+    return apiClient.get<AdminTable<AdminRepaymentReceipt>>(
+      ADMIN_ENDPOINTS.fundingRepayments,
+      { params },
+    );
+  },
+
+  getRepayment(receiptId: string) {
+    return apiClient.get<AdminRepaymentReceipt>(
+      ADMIN_ENDPOINTS.fundingRepayment(receiptId),
+    );
+  },
+
+  // A 10-minute link; each call is audited, so it is fetched on demand.
+  getRepaymentReceiptUrl(receiptId: string) {
+    return apiClient.get<AdminReceiptUrl>(
+      ADMIN_ENDPOINTS.repaymentReceiptUrl(receiptId),
+    );
+  },
+
+  // Approve (the days are paid) or deny with a note (the days are due again).
+  decideRepayment(receiptId: string, body: AdminReceiptDecisionPayload) {
+    return apiClient.post<AdminRepaymentReceipt>(
+      ADMIN_ENDPOINTS.repaymentDecision(receiptId),
       body,
     );
   },

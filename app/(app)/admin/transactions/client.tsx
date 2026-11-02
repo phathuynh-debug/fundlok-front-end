@@ -16,24 +16,29 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ACTIVITY_GROUPS,
+  REPAYMENT_FILTERS,
   TRANSFER_FILTERS,
   type AdminActivityGroup,
   type AdminFundingRound,
+  type AdminRepaymentFilter,
   type AdminRoundFilter,
   type AdminTransferFilter,
 } from "@/services/admin-funding.service";
 import { AdminPageLoader } from "../_components/AdminDirectory";
 import { ActivityLog } from "./_components/ActivityLog";
 import { FundingRoundsTable } from "./_components/FundingRoundsTable";
+import { RepaymentQueue } from "./_components/RepaymentQueue";
 import { TransferQueue } from "./_components/TransferQueue";
 
-type Tab = "rounds" | "transfers" | "activity";
+type Tab = "rounds" | "transfers" | "repayments" | "activity";
 
 // The admin Transactions tab. "Open rounds" is every funding round taking
 // investment, with what it has raised and how many of its tickets wait on
 // staff. "Transfers" is every investor ticket: a receipt to read and a review
-// to decide come first. Clicking a round opens its transfers. "Activity log"
-// is the audit trail: who approved or denied which transfer, when and why.
+// to decide come first. Clicking a round opens its transfers. "Repayments" is
+// every receipt a business uploaded when it repaid an investor, waiting ones
+// first. "Activity log" is the audit trail: who approved or denied which
+// transfer or repayment, when and why.
 export default function AdminTransactionsClient() {
   const { user, isLoading } = useRequireAuth();
   const router = useRouter();
@@ -44,6 +49,8 @@ export default function AdminTransactionsClient() {
     useState<AdminTransferFilter>("ALL");
   // The round the transfer list is narrowed to, picked from the rounds table.
   const [round, setRound] = useState<{ id: string; name: string } | null>(null);
+  const [repaymentFilter, setRepaymentFilter] =
+    useState<AdminRepaymentFilter>("NEEDS_ACTION");
   const [activityGroup, setActivityGroup] =
     useState<AdminActivityGroup>("DECISIONS");
 
@@ -85,6 +92,9 @@ export default function AdminTransactionsClient() {
           </TabsTrigger>
           <TabsTrigger value="transfers">
             {t("admin.transactions.tabTransfers")}
+          </TabsTrigger>
+          <TabsTrigger value="repayments">
+            {t("admin.transactions.tabRepayments")}
           </TabsTrigger>
           <TabsTrigger value="activity">
             {t("admin.transactions.tabActivity")}
@@ -170,6 +180,36 @@ export default function AdminTransactionsClient() {
               status={transferFilter}
               windowId={round?.id}
             />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="repayments">
+          <div className="rounded-lg border bg-card">
+            <div className="flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-center">
+              <Select
+                value={repaymentFilter}
+                onValueChange={(value) =>
+                  setRepaymentFilter(value as AdminRepaymentFilter)
+                }
+              >
+                <SelectTrigger
+                  size="sm"
+                  className="w-full sm:w-52"
+                  aria-label={t("admin.table.status")}
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {REPAYMENT_FILTERS.map((filter) => (
+                    <SelectItem key={filter} value={filter}>
+                      {t(`admin.transactions.repayments.filters.${filter}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {/* Keyed by the filter so a change starts again on page 1. */}
+            <RepaymentQueue key={repaymentFilter} status={repaymentFilter} />
           </div>
         </TabsContent>
 

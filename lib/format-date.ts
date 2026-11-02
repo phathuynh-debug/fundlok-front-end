@@ -29,3 +29,10 @@ export function formatDateTime(value: DateInput, locale?: string): string {
   const min = String(d.getMinutes()).padStart(2, "0");
   return `${formatDate(d, locale)} ${hh}:${min}`;
 }
+
+// Today in Vietnam as YYYY-MM-DD, the form the API's due dates take.
+export function todayIct(): string {
+  return new Date().toLocaleDateString("en-CA", {
+    timeZone: "Asia/Ho_Chi_Minh",
+  });
+}

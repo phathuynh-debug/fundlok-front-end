@@ -95,12 +95,15 @@ export const FUNDING_ENDPOINTS = {
 // whole schedule.
 export const REPAYMENT_ENDPOINTS = {
   today: "/repayment/today",
-  markPaid: "/repayment/days/mark-paid",
   schedule: (trancheId: string) => `/repayment/tranches/${trancheId}/schedule`,
   reportMissing: (dayId: string) => `/repayment/days/${dayId}/report-missing`,
   // Before the loan forms: what a confirmed ticket's days would be.
   projection: (trancheId: string) =>
     `/repayment/tranches/${trancheId}/projection`,
+  // The business's side of one investment: what is due now, and paying it
+  // with the transfer receipt.
+  due: (trancheId: string) => `/repayment/tranches/${trancheId}/due`,
+  pay: (trancheId: string) => `/repayment/tranches/${trancheId}/pay`,
 } as const;
 
 export const PROJECT_ENDPOINTS = {
@@ -226,6 +229,14 @@ export const ADMIN_ENDPOINTS = {
     `/admin/funding/transfers/${transferId}/receipt-url`,
   transferDecision: (transferId: string) =>
     `/admin/funding/transfers/${transferId}/decision`,
+  // The receipts businesses upload when they repay an investor.
+  fundingRepayments: "/admin/funding/repayments",
+  fundingRepayment: (receiptId: string) =>
+    `/admin/funding/repayments/${receiptId}`,
+  repaymentReceiptUrl: (receiptId: string) =>
+    `/admin/funding/repayments/${receiptId}/receipt-url`,
+  repaymentDecision: (receiptId: string) =>
+    `/admin/funding/repayments/${receiptId}/decision`,
   // SYSTEM_ADMIN only. Creates an ADMIN account with no password and emails
   // the invitee a single-use link to choose one.
   inviteAdmin: "/admin/users/admins",

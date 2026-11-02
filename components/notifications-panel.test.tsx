@@ -259,6 +259,38 @@ describe("NotificationsPanel — transfer approved", () => {
   );
 });
 
+describe("NotificationsPanel — repayment receipt rejected", () => {
+  it("tells the business why, and links to the investment to pay again", async () => {
+    listResult.data = {
+      items: [
+        notification({
+          id: "r1",
+          event: "REPAYMENT_RECEIPT_REJECTED",
+          entity_type: "TRANCHE",
+          entity_id: "tr1",
+          data: {
+            tranche_id: "tr1",
+            memo: "FL8TKK1UAQ",
+            investor: "P. H***",
+            amount_vnd: 121_875,
+            reason: "Wrong amount",
+          },
+        }),
+      ],
+      unread: 1,
+    };
+    render(<NotificationsPanel />);
+    await userEvent.hover(screen.getAllByRole("button")[0]);
+
+    const link = await screen.findByRole("link", {
+      name: /notifications\.items\.repaymentReceiptRejected/,
+    });
+    expect(link).toHaveAttribute("href", "/dashboard/repayments/tr1");
+    expect(link.textContent).toContain('"reason":"Wrong amount"');
+    expect(link.textContent).toContain("121,875");
+  });
+});
+
 describe("NotificationsPanel — new-notification label", () => {
   afterEach(() => {
     vi.useRealTimers();

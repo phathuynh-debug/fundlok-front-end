@@ -677,7 +677,8 @@
           "ALL": "Tất cả",
           "DECISIONS": "Duyệt và từ chối",
           "INVESTOR": "Hoạt động của nhà đầu tư",
-          "VIEWS": "Lượt xem biên lai"
+          "VIEWS": "Lượt xem biên lai",
+          "BUSINESS": "Hoạt động của doanh nghiệp"
         },
         "kinds": {
           "approvedMatch": "Đã duyệt: biên lai khớp",
@@ -687,7 +688,11 @@
           "reserved": "Nhà đầu tư giữ chỗ",
           "sentToReview": "Chuyển xem xét: không khớp",
           "uploaded": "Đã tải lên biên lai",
-          "viewed": "Đã xem biên lai"
+          "viewed": "Đã xem biên lai",
+          "repaymentApproved": "Đã duyệt khoản trả nợ",
+          "repaymentDenied": "Đã từ chối biên lai trả nợ",
+          "repaymentMarked": "Đã đánh dấu trả nợ",
+          "repaymentViewed": "Đã xem biên lai trả nợ"
         },
         "loadFailed": "Không tải được lịch sử.",
         "note": "Ghi chú",
@@ -815,7 +820,69 @@
         "reserved": "Giữ chỗ lúc",
         "status": "Trạng thái"
       },
-      "title": "Giao dịch"
+      "title": "Giao dịch",
+      "tabRepayments": "Trả nợ",
+      "repayments": {
+        "dayStatus": {
+          "DUE": "Đến hạn",
+          "MATCHED": "Đã xác nhận",
+          "PRESUMED_PAID": "Đã đánh dấu đã trả",
+          "REPORTED_MISSED": "Bị báo chưa nhận"
+        },
+        "empty": "Chưa có biên lai trả nợ nào.",
+        "emptyQueue": "Không có biên lai trả nợ nào chờ xử lý.",
+        "filters": {
+          "ALL": "Tất cả biên lai",
+          "DECIDED": "Đã xử lý",
+          "NEEDS_ACTION": "Cần xử lý"
+        },
+        "kind": {
+          "INSTALMENT": "Trả hằng ngày",
+          "STUB": "Lãi kỳ đầu"
+        },
+        "reported": "Nhà đầu tư đã báo một ngày chưa nhận",
+        "rowLabel": "Xem khoản trả nợ từ {business} cho {investor}",
+        "sheet": {
+          "daysHeading": "Các ngày được trả ({count})",
+          "decideBody": "Xem biên lai: biên lai có cho thấy số tiền này đã vào tài khoản của nhà đầu tư, với đúng nội dung không?",
+          "decided": {
+            "MATCHED": "Đã duyệt: các ngày này đã được trả.",
+            "REJECTED": "Đã từ chối: các ngày này đến hạn lại, và doanh nghiệp đã được báo lý do."
+          },
+          "from": "Từ (doanh nghiệp)",
+          "gross": "Đã gồm thuế",
+          "grossValue": "{gross} (doanh nghiệp giữ lại {tax} tiền thuế)",
+          "hint": "Duyệt sẽ ghi nhận các ngày này đã trả. Từ chối sẽ đưa chúng về đến hạn và gửi ghi chú của bạn cho doanh nghiệp, để họ trả và tải lên đúng biên lai.",
+          "loadFailed": "Không tải được biên lai này.",
+          "notePlaceholder": "Ghi chú (bắt buộc khi từ chối: doanh nghiệp sẽ đọc)",
+          "own": "Bạn là một bên của khoản trả nợ này, nên cần quản trị viên khác quyết định.",
+          "repaymentHeading": "Khoản trả nợ",
+          "reported": "Nhà đầu tư đã báo một trong các ngày này chưa nhận được. Duyệt biên lai sẽ ghi nhận báo cáo đó là đã trả.",
+          "subtitle": "Khoản trả nợ của doanh nghiệp cho nhà đầu tư",
+          "title": "{business} → {investor}",
+          "titleFallback": "Biên lai trả nợ",
+          "to": "Đến (nhà đầu tư)",
+          "toast": {
+            "APPROVED": "Đã duyệt khoản trả nợ",
+            "DENIED": "Đã từ chối biên lai"
+          },
+          "transferred": "Đã chuyển"
+        },
+        "status": {
+          "AWAITING_FIELDS": "Cần kiểm tra biên lai",
+          "MATCHED": "Đã duyệt",
+          "REJECTED": "Đã từ chối"
+        },
+        "table": {
+          "amount": "Đã chuyển",
+          "business": "Doanh nghiệp",
+          "days": "Ngày",
+          "daysValue": "{count} ngày từ {first}",
+          "investor": "Nhà đầu tư",
+          "submitted": "Tải lên"
+        },
+        "unit": "biên lai"
+      }
     },
     "userPreview": {
       "activeSessions": "Phiên hoạt động",
@@ -1942,6 +2009,7 @@
         "none": "Chưa có khoản đầu tư",
         "noneHint": "Hồ sơ của bạn sẽ được giới thiệu tới nhà đầu tư sau khi bạn xem và ký đề nghị tài trợ. Việc có đầu tư hay không do nhà đầu tư quyết định.",
         "ofTarget": "đã xác nhận / mục tiêu {target}",
+        "openTickets": "Mở phiếu trả nợ của khoản đầu tư này",
         "repayingNote": "Đợt gọi vốn đã đóng. Việc trả nợ đã bắt đầu từ {date}.",
         "ticketStatus": {
           "ACTIVE": "Đang trả nợ",
@@ -1953,7 +2021,8 @@
           "UNDER_REVIEW": "Đang xem xét",
           "VOID": "Vô hiệu"
         },
-        "ticketsHeading": "Nhà đầu tư"
+        "ticketsHeading": "Nhà đầu tư",
+        "ticketsHint": "Chọn một nhà đầu tư để xem các phiếu trả nợ."
       },
       "howToObtainCic": "Cách lấy báo cáo CIC của bạn",
       "howToObtainIt": "Cách lấy hồ sơ",
@@ -2061,23 +2130,15 @@
       "readyToSend": "Sẵn sàng gửi",
       "registeredAddress": "Địa chỉ đăng ký",
       "repayments": {
+        "days": "{count} ngày làm việc: {dates}",
         "grossTotal": "Tổng phải trả (đã gồm thuế): {gross}",
         "heading": "Trả nợ hôm nay",
-        "hideQr": "Ẩn",
-        "hint": "Hãy chuyển riêng cho từng nhà đầu tư, đúng tài khoản và nội dung; mã QR tự điền cả hai. Nhà đầu tư có hai ngày làm việc để báo khoản chưa nhận được.",
+        "hint": "Trả cho từng nhà đầu tư trong trang khoản đầu tư của họ: tài khoản riêng của nhà đầu tư, mã QR đúng số tiền và nơi tải lên biên lai.",
         "inclTax": "Đã gồm thuế: {gross}",
-        "kind": {
-          "INSTALMENT": "Hằng ngày",
-          "STUB": "Lãi kỳ đầu"
-        },
-        "markFailed": "Không đánh dấu được",
-        "markPaid": "Đánh dấu đã trả ({count})",
-        "markedToast": "Đã đánh dấu đã trả",
         "memo": "Nội dung",
         "none": "Hôm nay không có khoản nào đến hạn.",
+        "pay": "Trả nợ",
         "qrHint": "Quét bằng ứng dụng ngân hàng: tài khoản, số tiền và nội dung sẽ tự điền.",
-        "select": "Chọn {name}",
-        "showQr": "QR",
         "status": {
           "DUE": "Đến hạn",
           "MATCHED": "Đã xác nhận",
@@ -2171,7 +2232,65 @@
       "vatZipLabel": "Tải lên tệp .zip chứa tất cả 48 tệp thuế GTGT (24 tờ khai + 24 xác nhận)",
       "viewDocument": "Xem",
       "whereToFindThese": "Tìm các số liệu này ở đâu",
-      "whyWeNeedThis": "Lý do cần hồ sơ"
+      "whyWeNeedThis": "Lý do cần hồ sơ",
+      "investment": {
+        "back": "Về bảng điều khiển",
+        "dayIndex": "Kỳ {index}",
+        "daysLeft": "Còn {count} ngày",
+        "daysPaid": "Đã trả {paid} / {count} ngày",
+        "filterLabel": "Hiển thị phiếu",
+        "filters": {
+          "all": "Tất cả ({count})",
+          "left": "Còn lại ({count})",
+          "paid": "Đã trả ({count})"
+        },
+        "left": "Còn phải trả (đã gồm thuế)",
+        "noTickets": "Không có phiếu nào.",
+        "notFound": "Không tìm thấy khoản đầu tư này",
+        "notFoundHint": "Khoản đầu tư có thể thuộc doanh nghiệp khác, hoặc đường dẫn đã cũ.",
+        "notReceived": "Khoản đầu tư này chưa có phiếu trả nợ: FundLok chưa xác nhận đã nhận được tiền.",
+        "pay": {
+          "accountName": "Chủ tài khoản",
+          "accountNumber": "Số tài khoản",
+          "amount": "Số tiền cần chuyển",
+          "amountLabel": "Số tiền",
+          "bank": "Ngân hàng",
+          "cancel": "Hủy",
+          "choose": "Chọn tệp",
+          "errors": {
+            "DUPLICATE_FILE": "Biên lai này đã được dùng. Hãy tải lên biên lai của lần chuyển khoản này.",
+            "FILE_TOO_LARGE": "Tệp lớn hơn 10 MB.",
+            "NOT_DUE_YET": "Các ngày này chưa đến hạn.",
+            "UNSUPPORTED_TYPE": "Hãy tải lên tệp PDF, PNG, JPEG hoặc WEBP.",
+            "generic": "Đã có lỗi xảy ra. Vui lòng thử lại."
+          },
+          "failed": "Không ghi nhận được khoản trả nợ",
+          "heading": "Trả nợ hôm nay",
+          "includes": "{count} ngày làm việc: {dates}",
+          "noPayee": "Chưa có tài khoản nhận của nhà đầu tư. Hãy liên hệ FundLok trước khi chuyển khoản.",
+          "none": "Hôm nay không có khoản nào đến hạn với nhà đầu tư này.",
+          "overdue": "Có {count} ngày trước đó chưa trả, đã được cộng vào đây.",
+          "paidToast": "Đã ghi nhận khoản trả nợ",
+          "receiptBody": "Sau khi chuyển khoản, hãy tải lên biên lai trong ứng dụng ngân hàng (PDF, PNG, JPEG hoặc WEBP, tối đa 10 MB). Các ngày này sẽ được đánh dấu đã trả; sau đó nhà đầu tư có hai ngày làm việc để báo khoản chưa nhận được.",
+          "receiptTitle": "Tải lên biên lai chuyển khoản",
+          "remove": "Bỏ tệp",
+          "repay": "Trả nợ",
+          "send": "Gửi biên lai và đánh dấu đã trả {amount}",
+          "sending": "Đang gửi…",
+          "transferHint": "Từ tài khoản doanh nghiệp, hãy chuyển đúng số tiền và nội dung này. Mã QR tự điền tất cả.",
+          "transferTitle": "Chuyển khoản vào tài khoản nhà đầu tư",
+          "withStub": "đã gồm lãi kỳ đầu",
+          "rejected": "FundLok chưa xác nhận được biên lai bạn tải lên cho các ngày này: “{reason}”. Hãy tải lên biên lai cho thấy lần chuyển khoản này; nếu tiền chưa được chuyển, hãy chuyển khoản trước."
+        },
+        "progressHeading": "Tiến độ trả nợ",
+        "projectedNote": "Giả định đợt gọi vốn đóng vào {date}. Phiếu thật được lập khi khoản đầu tư này bắt đầu trả nợ.",
+        "ticketsHeading": "Phiếu trả nợ",
+        "today": "Hôm nay",
+        "total": "Tổng phải trả (đã gồm thuế)",
+        "transferred": "Đã chuyển cho nhà đầu tư này",
+        "transferredValue": "{paid} / {total}",
+        "unavailable": "Hiện chưa xem được phiếu trả nợ của khoản đầu tư này."
+      }
     },
     "smeAnalytics": {
       "charts": {
@@ -2948,7 +3067,8 @@
   },
   "notifications": {
     "actions": {
-      "verify": "Xác minh ngay"
+      "verify": "Xác minh ngay",
+      "payAgain": "Trả lại"
     },
     "alert": {
       "acknowledge": "Đã xem",
@@ -2967,7 +3087,8 @@
       "transferRepaying": "FundLok đã xác nhận khoản chuyển {amount} từ nhà đầu tư {investor} (nội dung {memo}). Bạn trả nợ nhà đầu tư này mỗi ngày làm việc, bắt đầu từ ngày làm việc tiếp theo.",
       "unknown": "Tài khoản của bạn có cập nhật mới.",
       "verificationRequiredKyb": "Hãy xác minh doanh nghiệp (KYB) để có thể gửi hồ sơ đề nghị vay.",
-      "verificationRequiredKyc": "Hãy xác minh danh tính (KYC) để có thể bắt đầu đầu tư."
+      "verificationRequiredKyc": "Hãy xác minh danh tính (KYC) để có thể bắt đầu đầu tư.",
+      "repaymentReceiptRejected": "FundLok chưa xác nhận được khoản trả nợ {amount} cho nhà đầu tư {investor}: “{reason}”. Các ngày đó đến hạn lại."
     },
     "markAllRead": "Đánh dấu tất cả đã đọc",
     "title": "Thông báo"
@@ -3385,6 +3506,8 @@
     "rateTitle": "Bảng Lãi Suất Hỗ Trợ Vốn SME Tham Khảo – Giải Ngân Nhanh | FundLok",
     "registerDescription": "Tạo tài khoản FundLok để đăng ký nhận vốn cho doanh nghiệp hoặc đầu tư vào các cơ hội tín dụng tư nhân.",
     "registerTitle": "Tạo tài khoản: đăng ký nhận vốn hoặc đầu tư",
+    "repaymentDescription": "Xem các phiếu trả nợ của khoản đầu tư và trả khoản hôm nay.",
+    "repaymentTitle": "Trả nợ khoản đầu tư",
     "resetPasswordDescription": "Đặt mật khẩu mới cho tài khoản FundLok của bạn.",
     "resetPasswordTitle": "Đặt lại mật khẩu",
     "securityDescription": "Xem các lớp bảo vệ tài khoản, các thiết bị đang đăng nhập và hoạt động bảo mật gần đây.",

@@ -20,7 +20,14 @@ export type NotificationEvent =
    * CONFIRMED (received) or ATTESTED (older: two working days to dispute);
    * `data` also has `amount_vnd`, `memo`, `project` and the masked `investor`.
    */
-  | "INVESTMENT_TRANSFER_APPROVED";
+  | "INVESTMENT_TRANSFER_APPROVED"
+  /**
+   * To the business: staff denied the receipt it uploaded for a repayment, so
+   * those days are due again. `data` has `tranche_id` (the investment, whose
+   * page it pays from), `memo`, the masked `investor`, `amount_vnd` and the
+   * note staff gave (`reason`).
+   */
+  | "REPAYMENT_RECEIPT_REJECTED";
 
 export interface AppNotification {
   id: string;

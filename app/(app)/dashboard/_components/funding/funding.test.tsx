@@ -2,11 +2,14 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { FundingStatus } from "../loan-application/FundingStatus";
 import { TodaysRepayments } from "./TodaysRepayments";
+import { investmentProgress, ticketsByDay } from "./investment-days";
 import type { SmeRepaymentPlan, SmeRound } from "@/services/funding.service";
-import type { TodaysPayments } from "@/services/repayment.service";
+import type {
+  RepaymentRow,
+  TodaysPayments,
+} from "@/services/repayment.service";
 
 const closeMock = vi.fn();
-const markPaidMock = vi.fn();
 let rounds: SmeRound[] = [];
 let today: TodaysPayments | undefined;
 let plan: SmeRepaymentPlan | undefined;
@@ -18,7 +21,6 @@ vi.mock("@/hooks/use-funding", () => ({
 }));
 vi.mock("@/hooks/use-repayment", () => ({
   useTodaysPayments: () => ({ data: today, isLoading: false }),
-  useMarkDaysPaid: () => ({ mutate: markPaidMock, isPending: false }),
 }));
 vi.mock("@/hooks/use-toast", () => ({ useToast: () => ({ toast: vi.fn() }) }));
 vi.mock("@/lib/i18n", () => ({
@@ -79,7 +81,6 @@ const round = (over: Partial<SmeRound> = {}): SmeRound => ({
 
 beforeEach(() => {
   closeMock.mockReset();
-  markPaidMock.mockReset();
   rounds = [];
   today = undefined;
   plan = undefined;
@@ -102,8 +103,13 @@ describe("FundingStatus", () => {
       "dashboard.sme.funding.ticketStatus.CONFIRMED",
     );
     expect(tickets).not.toHaveTextContent("FLZT7CTIKE"); // a lapsed hold is no investment
-    // Staff approval means received: no confirm or dispute buttons.
+    // Staff approval means received: no confirm or dispute buttons. The
+    // received investment opens its own page of repayment tickets.
     expect(within(tickets).queryAllByRole("button")).toHaveLength(0);
+    expect(within(tickets).getByRole("link")).toHaveAttribute(
+      "href",
+      "/dashboard/repayments/tr-1",
+    );
   });
 
   it("lets the business close early only once the minimum is confirmed", () => {
@@ -173,42 +179,53 @@ describe("TodaysRepayments", () => {
     vietqr_payload: "000201010212...6304ABCD",
   };
 
-  it("lists one ticket per investor with its QR, and marks the chosen ones paid", () => {
+  it("lists each investor once, with what to transfer, and sends the business to pay from the investment's page", () => {
     today = {
       date: "2026-11-03",
-      rows: [row],
-      totals: { gross_vnd: 125_397, tax_withheld_vnd: 317, net_vnd: 125_080 },
+      rows: [
+        row,
+        {
+          ...row,
+          repayment_day_id: "d-0",
+          kind: "STUB",
+          principal_vnd: 0,
+          interest_vnd: 20_000,
+          gross_vnd: 20_000,
+          tax_withheld_vnd: 1_000,
+          net_vnd: 19_000,
+        },
+        {
+          ...row,
+          repayment_day_id: "d-9",
+          tranche_id: "tr-2",
+          investor_display: "N. A***",
+          reference_code: "FLZT7CTIKE",
+          status: "PRESUMED_PAID",
+        },
+      ],
+      totals: { gross_vnd: 270_794, tax_withheld_vnd: 1_634, net_vnd: 269_160 },
     };
     render(<TodaysRepayments />);
 
-    const ticket = screen.getByTestId("repayment-ticket");
-    expect(ticket).toHaveTextContent("19036789012");
-    // What to transfer, and the repayment tax included beneath it.
-    expect(ticket).toHaveTextContent("₫125,080");
-    expect(ticket).toHaveTextContent(
-      'dashboard.sme.repayments.inclTax:{"gross":"₫125,397"}',
-    );
-    // The tax is 5% of the interest (6,349), not of the whole 125,397.
-    expect(within(ticket).getByTestId("repayment-breakdown")).toHaveTextContent(
-      'dashboard.repaymentBreakdown.withTax:{"principal":"₫119,048","interest":"₫6,349","tax":"₫317"}',
-    );
-    expect(ticket).toHaveTextContent("FL8TKK1UAQ");
-    fireEvent.click(
-      screen.getByRole("button", { name: "dashboard.sme.repayments.showQr" }),
+    const [owing, marked] = screen.getAllByTestId("repayment-ticket");
+    // The day's instalment and its first-period interest are one transfer.
+    expect(owing).toHaveTextContent("₫144,080");
+    expect(owing).toHaveTextContent(
+      'dashboard.sme.repayments.inclTax:{"gross":"₫145,397"}',
     );
     expect(
-      screen.getByText("dashboard.sme.repayments.qrHint"),
-    ).toBeInTheDocument();
-
-    const mark = screen.getByRole("button", {
-      name: /dashboard\.sme\.repayments\.markPaid/,
-    });
-    expect(mark).toBeDisabled();
-    fireEvent.click(screen.getByRole("checkbox"));
-    fireEvent.click(mark);
-    const [{ repaymentDayIds, idempotencyKey }] = markPaidMock.mock.calls[0];
-    expect(repaymentDayIds).toEqual(["d-1"]);
-    expect(idempotencyKey).toEqual(expect.any(String));
+      within(owing).getByRole("link", { name: "dashboard.sme.repayments.pay" }),
+    ).toHaveAttribute("href", "/dashboard/repayments/tr-1");
+    // Marked paid already: nothing to pay, nothing to tick here.
+    expect(marked).toHaveTextContent(
+      "dashboard.sme.repayments.status.PRESUMED_PAID",
+    );
+    expect(within(marked).queryByRole("link")).toBeNull();
+    expect(screen.queryByRole("checkbox")).toBeNull();
+    // What is still to transfer, not what was already marked.
+    expect(screen.getByTestId("todays-repayments")).toHaveTextContent(
+      'dashboard.sme.repayments.total:{"net":"₫144,080"}',
+    );
   });
 });
 
@@ -324,5 +341,71 @@ describe("RepaymentPlan", () => {
     expect(days[0]).toHaveTextContent("dashboard.sme.plan.status.paid");
     expect(days[1]).toHaveTextContent("dashboard.sme.plan.status.missing");
     expect(days[2]).toHaveTextContent("dashboard.sme.plan.status.upcoming");
+  });
+});
+
+describe("investment days", () => {
+  const row = (over: Partial<RepaymentRow>): RepaymentRow => ({
+    repayment_day_id: "d-1",
+    tranche_id: "tr-1",
+    kind: "INSTALMENT",
+    investor_display: "P. H***",
+    due_date: "2020-01-02",
+    principal_vnd: 119_048,
+    interest_vnd: 2_975,
+    gross_vnd: 122_023,
+    tax_withheld_vnd: 148,
+    net_vnd: 121_875,
+    status: "DUE",
+    report_deadline: "2020-01-06T17:00:00Z",
+    payee: null,
+    reference_code: "FL8TKK1UAQ",
+    vietqr_payload: null,
+    ...over,
+  });
+  it("counts one ticket a day, the first-period interest in the first, and what is paid and left", () => {
+    const rows = [
+      row({
+        repayment_day_id: "s",
+        kind: "STUB",
+        principal_vnd: 0,
+        interest_vnd: 20_000,
+        gross_vnd: 20_000,
+        tax_withheld_vnd: 1_000,
+        net_vnd: 19_000,
+        status: "PRESUMED_PAID",
+      }),
+      row({ repayment_day_id: "d-1", status: "PRESUMED_PAID" }),
+      row({
+        repayment_day_id: "d-2",
+        due_date: "2020-01-03",
+        status: "REPORTED_MISSED",
+      }),
+      row({ repayment_day_id: "d-3", due_date: "2020-01-06" }),
+      row({ repayment_day_id: "d-4", due_date: "2099-01-07" }),
+    ];
+    const days = ticketsByDay(rows, "2026-11-02");
+
+    expect(days.map((day) => day.index)).toEqual([1, 2, 3, 4]);
+    expect(days.map((day) => day.status)).toEqual([
+      "paid",
+      "missing",
+      "due",
+      "upcoming",
+    ]);
+    expect(days[0].gross_vnd).toBe(142_023); // the instalment and the first-period interest
+    expect(days[0].net_vnd).toBe(140_875);
+    const progress = investmentProgress(days, "2026-11-02");
+    expect(progress).toMatchObject({
+      count: 4,
+      paidDays: 1,
+      leftDays: 3, // a day reported missing is not paid
+      paidNet: 140_875,
+      totalNet: 140_875 + 3 * 121_875,
+      leftGross: 3 * 122_023,
+      leftNet: 3 * 121_875,
+      overdue: 1, // 06/01/2020 passed unmarked; the reported day is with FundLok
+    });
+    expect(progress.next?.due_date).toBe("2020-01-06");
   });
 });

@@ -9,6 +9,7 @@ import {
 import type { ApiError } from "@/lib/types";
 import { adminKeys } from "@/hooks/use-admin";
 import { fundingKeys } from "@/hooks/use-funding";
+import { repaymentKeys } from "@/hooks/use-repayment";
 import type { AdminTable } from "@/services/admin.service";
 import {
   adminFundingService,
@@ -18,6 +19,8 @@ import {
   type AdminInvestorTransfer,
   type AdminReceiptDecisionPayload,
   type AdminReceiptUrl,
+  type AdminRepaymentListParams,
+  type AdminRepaymentReceipt,
   type AdminRoundFilter,
   type AdminTransferListParams,
 } from "@/services/admin-funding.service";
@@ -34,6 +37,12 @@ export const adminFundingKeys = {
     [...adminFundingKeys.all, "receipt-url", transferId] as const,
   activity: (params: AdminActivityParams) =>
     [...adminFundingKeys.all, "activity", params] as const,
+  repayments: (params: AdminRepaymentListParams) =>
+    [...adminFundingKeys.all, "repayments", params] as const,
+  repayment: (receiptId: string) =>
+    [...adminFundingKeys.all, "repayment", receiptId] as const,
+  repaymentReceiptUrl: (receiptId: string) =>
+    [...adminFundingKeys.all, "repayment-receipt-url", receiptId] as const,
 };
 
 export function useAdminFundingRounds(status: AdminRoundFilter) {
@@ -103,6 +112,59 @@ export function useDecideReceipt() {
       adminFundingService.decide(transferId, body),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: adminFundingKeys.all });
+      void queryClient.invalidateQueries({ queryKey: fundingKeys.all });
+    },
+  });
+}
+
+export function useAdminRepaymentReceipts(params: AdminRepaymentListParams) {
+  return useQuery<AdminTable<AdminRepaymentReceipt>, ApiError>({
+    queryKey: adminFundingKeys.repayments(params),
+    queryFn: () => adminFundingService.listRepayments(params),
+    staleTime: 30 * 1000,
+    retry: false,
+    placeholderData: keepPreviousData,
+  });
+}
+
+// The review panel reads its own copy, so it shows the receipt as it is now.
+export function useAdminRepaymentReceipt(receiptId: string | null) {
+  return useQuery<AdminRepaymentReceipt, ApiError>({
+    queryKey: adminFundingKeys.repayment(receiptId ?? ""),
+    queryFn: () => adminFundingService.getRepayment(receiptId as string),
+    enabled: Boolean(receiptId),
+    staleTime: 0,
+    retry: false,
+  });
+}
+
+// Fetched only when staff open the receipt: the link expires in 10 minutes
+// and every fetch is audited.
+export function useAdminRepaymentReceiptUrl(receiptId: string | null) {
+  return useQuery<AdminReceiptUrl, ApiError>({
+    queryKey: adminFundingKeys.repaymentReceiptUrl(receiptId ?? ""),
+    queryFn: () =>
+      adminFundingService.getRepaymentReceiptUrl(receiptId as string),
+    enabled: Boolean(receiptId),
+    staleTime: 0,
+    gcTime: 0,
+    retry: false,
+  });
+}
+
+// A decision settles or reopens the days: the business's views move too.
+export function useDecideRepaymentReceipt() {
+  const queryClient = useQueryClient();
+  return useMutation<
+    AdminRepaymentReceipt,
+    ApiError,
+    { receiptId: string; body: AdminReceiptDecisionPayload }
+  >({
+    mutationFn: ({ receiptId, body }) =>
+      adminFundingService.decideRepayment(receiptId, body),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: adminFundingKeys.all });
+      void queryClient.invalidateQueries({ queryKey: repaymentKeys.all });
       void queryClient.invalidateQueries({ queryKey: fundingKeys.all });
     },
   });

@@ -26,7 +26,7 @@ interface TransferDetailsProps {
   onReserveAgain?: () => void;
 }
 
-function CopyRow({
+export function CopyRow({
   label,
   value,
   display,

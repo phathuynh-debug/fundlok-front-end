@@ -9,20 +9,13 @@ import { useReportMissingDay } from "@/hooks/use-repayment";
 import { useToast } from "@/hooks/use-toast";
 import { apiErrorMessage } from "@/lib/api-error-message";
 import { formatCurrency } from "@/lib/format-currency";
-import { formatDate } from "@/lib/format-date";
+import { formatDate, todayIct } from "@/lib/format-date";
 import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import type { RepaymentRow } from "@/services/repayment.service";
 import { Breakdown } from "../funding/Breakdown";
 
 const K = "dashboard.investor.investments";
-
-/** Today in Vietnam, as the API's due dates are (YYYY-MM-DD). */
-function todayIct(): string {
-  return new Date().toLocaleDateString("en-CA", {
-    timeZone: "Asia/Ho_Chi_Minh",
-  });
-}
 
 // Every repayment day of one investment, in order. A day that is due or that
 // the business marked paid can be reported as never arrived; the business then

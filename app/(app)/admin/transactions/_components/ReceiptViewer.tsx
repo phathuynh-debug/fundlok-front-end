@@ -4,24 +4,37 @@ import { useState } from "react";
 import { ExternalLink, FileText, Loader2, Eye } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { useAdminReceiptUrl } from "@/hooks/use-admin-funding";
+import {
+  useAdminReceiptUrl,
+  useAdminRepaymentReceiptUrl,
+} from "@/hooks/use-admin-funding";
 import { useTranslations } from "@/lib/i18n";
 
-// The investor's receipt. Shown only when staff ask for it: every link is
-// audited (it carries a person's bank details) and lives for ten minutes, so
-// one fetched with the panel would be both noise in the log and often dead.
+// A receipt: an investor's for their investment (by its transfer), or a
+// business's for a repayment (by the receipt file). Shown only when staff ask
+// for it: every link is audited (it carries a person's bank details) and lives
+// for ten minutes, so one fetched with the panel would be both noise in the
+// log and often dead.
 export function ReceiptViewer({
   transferId,
+  repaymentReceiptId,
   filename,
 }: {
-  transferId: string;
+  transferId?: string;
+  repaymentReceiptId?: string;
   filename: string | null;
 }) {
   const { t } = useTranslations();
   const [shown, setShown] = useState(false);
-  const { data, isLoading, error } = useAdminReceiptUrl(
-    shown ? transferId : null,
+  const investment = useAdminReceiptUrl(
+    shown && transferId ? transferId : null,
   );
+  const repayment = useAdminRepaymentReceiptUrl(
+    shown && repaymentReceiptId ? repaymentReceiptId : null,
+  );
+  const { data, isLoading, error } = repaymentReceiptId
+    ? repayment
+    : investment;
 
   if (!shown) {
     return (

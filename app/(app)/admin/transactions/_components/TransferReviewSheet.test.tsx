@@ -22,6 +22,7 @@ vi.mock("@/hooks/use-admin-funding", () => ({
     isError: false,
   }),
   useAdminReceiptUrl: () => ({ data: undefined, isLoading: false }),
+  useAdminRepaymentReceiptUrl: () => ({ data: undefined, isLoading: false }),
   useDecideReceipt: () => ({ mutate: decideMock, isPending: false }),
   useAdminFundingActivity: () => ({
     data: { items: history, total: history.length, page: 1, page_size: 50 },

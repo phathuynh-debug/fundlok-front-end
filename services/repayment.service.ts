@@ -70,20 +70,29 @@ export interface ProjectedSchedule {
   totals: { gross_vnd: number; tax_withheld_vnd: number; net_vnd: number };
 }
 
+// Mirrors backend InvestmentDueOut: what the business owes one investor now,
+// as one transfer (every day due today or earlier and not yet marked paid).
+export interface InvestmentDue {
+  date: string;
+  tranche_id: string;
+  reference_code: string;
+  investor_display: string;
+  days: RepaymentRow[];
+  gross_vnd: number;
+  tax_withheld_vnd: number;
+  /** What to transfer: the QR's amount. */
+  net_vnd: number;
+  payee: RepaymentPayee | null;
+  /** VietQR for the whole amount; null when nothing is due. */
+  vietqr_payload: string | null;
+  /** Set when a day here is due again because staff denied its receipt. */
+  rejection: { reason: string; decided_at: string } | null;
+}
+
 export const repaymentService = {
   // GET /repayment/today — due today or earlier and not yet settled.
   getToday() {
     return apiClient.get<TodaysPayments>(REPAYMENT_ENDPOINTS.today);
-  },
-
-  // POST /repayment/days/mark-paid — DUE -> PRESUMED_PAID. Replaying the same
-  // key marks nothing twice.
-  markPaid(repaymentDayIds: string[], idempotencyKey: string) {
-    return apiClient.post<RepaymentRow[]>(
-      REPAYMENT_ENDPOINTS.markPaid,
-      { repayment_day_ids: repaymentDayIds },
-      { headers: { "Idempotency-Key": idempotencyKey } },
-    );
   },
 
   // POST /repayment/days/{id}/report-missing — the investor says a due day
@@ -100,6 +109,30 @@ export const repaymentService = {
   getProjection(trancheId: string) {
     return apiClient.get<ProjectedSchedule>(
       REPAYMENT_ENDPOINTS.projection(trancheId),
+    );
+  },
+
+  // GET /repayment/tranches/{id}/due — the business: what it owes this
+  // investor now.
+  getDue(trancheId: string) {
+    return apiClient.get<InvestmentDue>(REPAYMENT_ENDPOINTS.due(trancheId));
+  },
+
+  // POST /repayment/tranches/{id}/pay — the business's transfer receipt; the
+  // days are marked paid in the same step. Replaying the key repeats nothing.
+  payWithReceipt(
+    trancheId: string,
+    repaymentDayIds: string[],
+    file: File,
+    idempotencyKey: string,
+  ) {
+    const form = new FormData();
+    for (const id of repaymentDayIds) form.append("repayment_day_ids", id);
+    form.append("file", file);
+    return apiClient.post<RepaymentRow[]>(
+      REPAYMENT_ENDPOINTS.pay(trancheId),
+      form,
+      { headers: { "Idempotency-Key": idempotencyKey } },
     );
   },
 

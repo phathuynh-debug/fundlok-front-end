@@ -7,20 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useRepaymentPlan } from "@/hooks/use-funding";
 import { formatCurrency } from "@/lib/format-currency";
-import { formatDate } from "@/lib/format-date";
+import { formatDate, todayIct } from "@/lib/format-date";
 import { useTranslations } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import type { SmeRepaymentDay, SmeRound } from "@/services/funding.service";
 import { Breakdown } from "./Breakdown";
 
 const K = "dashboard.sme.plan";
-
-/** Today in Vietnam, as the API's due dates are (YYYY-MM-DD). */
-function todayIct(): string {
-  return new Date().toLocaleDateString("en-CA", {
-    timeZone: "Asia/Ho_Chi_Minh",
-  });
-}
 
 // The business's daily repayments to its investors, one ticket per working
 // day. Before the loan forms it is projected from the money confirmed so far
