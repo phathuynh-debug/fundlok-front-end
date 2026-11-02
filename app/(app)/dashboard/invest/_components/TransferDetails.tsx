@@ -2,7 +2,15 @@
 
 import { useEffect, useState } from "react";
 import QRCode from "react-qr-code";
-import { AlertCircle, Check, Clock, Copy, Loader2 } from "lucide-react";
+import {
+  AlertCircle,
+  Check,
+  Clock,
+  Copy,
+  Loader2,
+  RotateCcw,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { usePaymentInstructions } from "@/hooks/use-funding";
 import { formatCurrency } from "@/lib/format-currency";
 import { formatDateTime } from "@/lib/format-date";
@@ -14,6 +22,8 @@ interface TransferDetailsProps {
   trancheId: string;
   locale: string;
   t: (key: string, vars?: Record<string, string | number>) => string;
+  /** Once the hold lapses: set this ticket aside and reserve a new one. */
+  onReserveAgain?: () => void;
 }
 
 function CopyRow({
@@ -88,6 +98,7 @@ export function TransferDetails({
   trancheId,
   locale,
   t,
+  onReserveAgain,
 }: TransferDetailsProps) {
   const payment = usePaymentInstructions(trancheId);
   const [now, setNow] = useState(() => Date.now());
@@ -141,6 +152,17 @@ export function TransferDetails({
             <p className="text-xs leading-relaxed text-muted-foreground">
               {t(`${K}.expiredBody`)}
             </p>
+            {onReserveAgain && (
+              <Button
+                type="button"
+                size="sm"
+                className="mt-2 gap-2"
+                onClick={onReserveAgain}
+              >
+                <RotateCcw className="h-4 w-4" />
+                {t(`${K}.reserveAgain`)}
+              </Button>
+            )}
           </div>
         </div>
       ) : (

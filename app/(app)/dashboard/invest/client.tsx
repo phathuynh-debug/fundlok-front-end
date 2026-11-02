@@ -1,9 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { AlertCircle, ArrowLeft, Loader2, ShieldCheck } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowLeft,
+  Loader2,
+  RotateCcw,
+  ShieldCheck,
+} from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TruncatedFigure } from "@/components/truncated-figure";
@@ -28,6 +34,7 @@ import { cn } from "@/lib/utils";
 import {
   INVESTOR_TERMS_VERSION,
   LIVE_TRANCHE_STATUSES,
+  type Tranche,
 } from "@/services/funding.service";
 
 const K = "investConfirm";
@@ -38,6 +45,7 @@ const KNOWN_ERRORS = new Set([
   "CAPACITY_EXCEEDED",
   "WINDOW_NOT_OPEN",
   "ALREADY_HAS_LIVE_TRANCHE",
+  "HOLD_EXPIRED",
   "TERMS_OUTDATED",
   "BANK_ACCOUNT_REQUIRED",
   "ACCOUNT_NOT_APPROVED",
@@ -50,11 +58,14 @@ const STEPS = ["amount", "terms", "transfer"] as const;
 // (/dashboard/invest?projectId=…&amount=…): read and agree to the investing
 // terms, which reserves the amount, then transfer it straight to the
 // business's bank account. Opened with just ?projectId=…, it shows the
-// transfer details of the investor's ticket on that project.
+// transfer details of the investor's ticket on that project. When that
+// ticket's hold lapses, "Reserve again" brings the terms back for the same
+// amount, and agreeing makes a new ticket (the backend expires the old one).
 //
 // The proxy only lets a KYC-approved INVESTOR reach this route (unverified
 // ones go to /kyc?next=… first), and the backend checks again on reserve.
 export default function InvestClient() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const { t, locale } = useTranslations();
   const { toast } = useToast();
@@ -74,18 +85,42 @@ export default function InvestClient() {
   const fundingWindow = windowQuery.data ?? null;
   const tranches = useMyTranches(Boolean(fundingWindow));
   const reserve = useReserveTicket();
-  // One key per visit: a double click or a retry replays the same reservation
-  // instead of making a second one.
-  const [idempotencyKey] = useState(() => crypto.randomUUID());
+  // One key per reservation: a double click or a retry replays the same
+  // reservation instead of making a second one. Reserving again takes a new key.
+  const [idempotencyKey, setIdempotencyKey] = useState(() =>
+    crypto.randomUUID(),
+  );
   const [error, setError] = useState<string | null>(null);
+  // The lapsed ticket the investor chose to reserve again in place of. The
+  // backend may still list it as SIGNED until it expires it.
+  const [replacedId, setReplacedId] = useState<string | null>(null);
 
+  // Newest first, as the backend lists them.
+  const onWindow =
+    tranches.data?.filter((t) => t.window_id === fundingWindow?.id) ?? [];
   const ticket =
     reserve.data ??
-    tranches.data?.find(
+    onWindow.find(
       (tranche) =>
-        tranche.window_id === fundingWindow?.id &&
+        tranche.id !== replacedId &&
         LIVE_TRANCHE_STATUSES.includes(tranche.status),
     );
+  // Their latest ticket here lapsed before a transfer was reported.
+  const lapsed =
+    !ticket && onWindow[0]?.status === "EXPIRED" ? onWindow[0] : undefined;
+
+  const reserveAgain = (from: Tranche) => {
+    reserve.reset();
+    setError(null);
+    setIdempotencyKey(crypto.randomUUID());
+    setReplacedId(from.id);
+    router.replace(
+      `/dashboard/invest?projectId=${projectId}&amount=${from.amount_vnd}`,
+    );
+    // Reading the window releases the lapsed hold, so the bounds include it.
+    void windowQuery.refetch();
+    void tranches.refetch();
+  };
 
   const loading =
     isAuthLoading ||
@@ -120,6 +155,8 @@ export default function InvestClient() {
           });
           // Their ticket from another tab: show it instead of the terms.
           if (code === "ALREADY_HAS_LIVE_TRANCHE") void tranches.refetch();
+          // This key's reservation lapsed: agreeing again makes a new one.
+          if (code === "HOLD_EXPIRED") setIdempotencyKey(crypto.randomUUID());
         },
       },
     );
@@ -141,13 +178,23 @@ export default function InvestClient() {
     bounds !== null && amount >= bounds.min && amount <= bounds.max;
   const open = fundingWindow?.status === "OPEN";
   const step = ticket ? "transfer" : "terms";
-  const shownAmount = ticket?.amount_vnd ?? amount;
+  const shownAmount = ticket?.amount_vnd ?? (amount || lapsed?.amount_vnd || 0);
 
   let body: React.ReactNode;
   if (ticket) {
     body =
       ticket.status === "RESERVED" || ticket.status === "SIGNED" ? (
-        <TransferDetails trancheId={ticket.id} locale={locale} t={t} />
+        <TransferDetails
+          trancheId={ticket.id}
+          locale={locale}
+          t={t}
+          onReserveAgain={
+            // FULL may only be this lapsed hold; reading the window frees it.
+            open || fundingWindow?.status === "FULL"
+              ? () => reserveAgain(ticket)
+              : undefined
+          }
+        />
       ) : (
         <p className="rounded-xl border bg-muted/20 p-4 text-sm text-muted-foreground">
           {t(`${K}.confirming`)}
@@ -159,6 +206,24 @@ export default function InvestClient() {
     );
   } else if (needsBankAccount) {
     body = <BankAccountPrompt t={t} audience="investor" />;
+  } else if (lapsed && !amount) {
+    body = (
+      <Notice
+        title={t(`${K}.transfer.expiredTitle`)}
+        body={t(`${K}.transfer.expiredBody`)}
+        action={
+          <Button
+            type="button"
+            size="sm"
+            className="mt-2 gap-2"
+            onClick={() => reserveAgain(lapsed)}
+          >
+            <RotateCcw className="h-4 w-4" />
+            {t(`${K}.transfer.reserveAgain`)}
+          </Button>
+        }
+      />
+    );
   } else if (!amountInBounds) {
     body = (
       <Notice
@@ -288,13 +353,22 @@ export default function InvestClient() {
   );
 }
 
-function Notice({ title, body }: { title: string; body: string }) {
+function Notice({
+  title,
+  body,
+  action,
+}: {
+  title: string;
+  body: string;
+  action?: React.ReactNode;
+}) {
   return (
     <div className="flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
       <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
       <div className="space-y-1">
         <p className="font-semibold text-foreground">{title}</p>
         <p className="text-xs leading-relaxed text-muted-foreground">{body}</p>
+        {action}
       </div>
     </div>
   );

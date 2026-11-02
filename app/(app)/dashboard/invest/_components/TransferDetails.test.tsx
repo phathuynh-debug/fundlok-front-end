@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import type { PaymentInstructions } from "@/services/funding.service";
 import { TransferDetails } from "./TransferDetails";
 import { t } from "./test-t";
@@ -51,6 +51,34 @@ describe("TransferDetails", () => {
       screen.getByText("The time to transfer has passed"),
     ).toBeInTheDocument();
     expect(screen.queryByTestId("transfer-deadline")).toBeNull();
+  });
+
+  it("offers to reserve again once the time has passed", () => {
+    payment = { isLoading: false, data: instructions(-60 * 1000) };
+    const onReserveAgain = vi.fn();
+    render(
+      <TransferDetails
+        trancheId="tr-1"
+        locale="en"
+        t={t}
+        onReserveAgain={onReserveAgain}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Reserve again" }));
+    expect(onReserveAgain).toHaveBeenCalledOnce();
+  });
+
+  it("does not offer to reserve again while the hold is live", () => {
+    render(
+      <TransferDetails
+        trancheId="tr-1"
+        locale="en"
+        t={t}
+        onReserveAgain={vi.fn()}
+      />,
+    );
+    expect(screen.queryByRole("button", { name: "Reserve again" })).toBeNull();
   });
 
   it("says so when the details cannot load", () => {
