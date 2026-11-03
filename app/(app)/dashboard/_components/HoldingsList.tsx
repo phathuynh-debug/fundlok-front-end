@@ -310,7 +310,7 @@ export function HoldingsList({ holdings }: { holdings: Holding[] }) {
                 >
                   <div
                     className={cn(
-                      "h-full rounded-full transition-all duration-500",
+                      "h-full rounded-full transition-[width,background-color] ease-out duration-300",
                       // A full bar is only "good" when the money actually came
                       // back. Painting a backstop settlement or a write-down
                       // emerald would read as a successful outcome.

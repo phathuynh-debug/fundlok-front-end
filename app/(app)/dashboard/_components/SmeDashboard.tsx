@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { m } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -51,7 +52,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
       <m.div
         initial={{ y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35, ease: "easeOut" }}
+        transition={{ duration: 0.3, ease: EASE_OUT }}
         className="flex-1 p-4 md:p-8 pt-6"
       >
         <Card className="mx-auto flex max-w-2xl flex-col items-center gap-6 rounded-2xl border border-dashed bg-card p-8 text-center md:p-12">
@@ -100,13 +101,13 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
     <m.div
       initial={{ y: -12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: "easeOut" }}
+      transition={{ duration: 0.3, ease: EASE_OUT }}
       className="flex-1 space-y-6 md:space-y-8 p-4 md:p-8 pt-6 relative"
     >
       {/* Unified Responsive Hero Card */}
       <Card
         className={cn(
-          "overflow-hidden border bg-card shadow-sm relative transition-all duration-300",
+          "overflow-hidden border bg-card shadow-sm relative transition duration-300",
           theme.borderColor,
         )}
       >

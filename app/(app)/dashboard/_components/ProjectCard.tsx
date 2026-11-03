@@ -98,7 +98,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
   return (
     <Card
       className={cn(
-        "group/card relative overflow-hidden p-5 md:p-6 gap-0 rounded-2xl border border-border/70 shadow-xs transition-all duration-300 hover:shadow-lg hover:border-border hover:-translate-y-0.5",
+        "group/card relative overflow-hidden p-5 md:p-6 gap-0 rounded-2xl border border-border/70 shadow-xs transition duration-300 hover:shadow-lg hover:border-border hover:-translate-y-0.5",
         chrome.surface,
       )}
     >
@@ -390,7 +390,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
             </div>
             <div className="h-2 w-full rounded-full bg-zinc-200/70 dark:bg-zinc-800 overflow-hidden">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500"
+                className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-[width] ease-out duration-300"
                 style={{ width: `${Math.min(100, fundingProgressPct)}%` }}
               />
             </div>
@@ -427,7 +427,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
             asChild
             variant="outline"
             className={cn(
-              "group/details w-full flex-1 justify-between py-2.5 rounded-xl transition-all duration-200 hover:border-primary/50 hover:bg-muted/70 bg-muted/20 font-semibold cursor-pointer",
+              "group/details w-full flex-1 justify-between py-2.5 rounded-xl transition duration-200 hover:border-primary/50 hover:bg-muted/70 bg-muted/20 font-semibold cursor-pointer",
               CONTROL_IDLE,
             )}
           >

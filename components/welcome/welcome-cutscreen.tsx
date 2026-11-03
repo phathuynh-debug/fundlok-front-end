@@ -2,6 +2,7 @@
 
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { AnimatePresence, MotionConfig, m } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import {
   loadMotionFeatures,
@@ -203,7 +204,7 @@ export function WelcomeCutscreen({
                 aria-label={t("welcome.common.goToSlide", { n: dot + 1 })}
                 aria-current={dot === index ? "step" : undefined}
                 className={cn(
-                  "h-1.5 rounded-full transition-all duration-300",
+                  "h-1.5 rounded-full transition-[width,background-color] duration-300",
                   dot === index
                     ? "w-6 bg-brand"
                     : dot <= furthest
@@ -239,7 +240,7 @@ export function WelcomeCutscreen({
               initial="enter"
               animate="center"
               exit="exit"
-              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.35, ease: EASE_OUT }}
               drag="x"
               dragConstraints={{ left: 0, right: 0 }}
               dragElastic={0.18}

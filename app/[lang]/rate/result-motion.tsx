@@ -1,6 +1,7 @@
 "use client";
 
 import { m, type Variants } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 /* --------------------------------------------------------------------------
@@ -86,7 +87,7 @@ export function ResultBurst() {
           transition={{
             duration: 1,
             delay: piece.delay,
-            ease: "easeOut",
+            ease: EASE_OUT,
           }}
         />
       ))}

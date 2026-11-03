@@ -1,6 +1,7 @@
 "use client";
 
 import { m } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
 import {
   Activity,
   ArrowDown,
@@ -39,7 +40,7 @@ import { cn } from "@/lib/utils";
  * the cutscreen, which honours the app's reduce-motion setting.
  */
 
-const EASE = [0.16, 1, 0.3, 1] as const;
+const EASE = EASE_OUT;
 
 function Label({
   children,
@@ -517,7 +518,7 @@ function ReadyVisual() {
             strokeLinejoin="round"
             initial={{ pathLength: 0 }}
             animate={{ pathLength: 1 }}
-            transition={{ delay: 0.35, duration: 0.6, ease: "easeOut" }}
+            transition={{ delay: 0.35, duration: 0.6, ease: EASE_OUT }}
           />
         </svg>
       </m.div>
@@ -600,19 +601,26 @@ function Gauge({
     <div className="flex flex-col gap-2 text-left">
       <Label className="text-foreground">{label}</Label>
       <div className="relative h-3 w-full rounded-full bg-muted">
+        {/* The thumb rides a track-wide layer moved by transform; a looping
+            `left` would re-run layout on every frame for as long as the
+            welcome screen is open. */}
         <m.div
-          className={cn(
-            "absolute top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-background shadow-lg",
-            color,
-          )}
-          animate={{ left: keyframes }}
+          className="absolute inset-0"
+          animate={{ x: keyframes }}
           transition={{
             duration: 5,
             repeat: Infinity,
             repeatType: "mirror",
             ease: "easeInOut",
           }}
-        />
+        >
+          <div
+            className={cn(
+              "absolute left-0 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-background shadow-lg",
+              color,
+            )}
+          />
+        </m.div>
       </div>
       <div className="flex justify-between">
         <Label>{low}</Label>
@@ -665,8 +673,8 @@ function JourneyVisual() {
           transition={{ delay: 0.3, duration: 1.8, ease: "easeInOut" }}
         />
         <m.div
-          className="absolute -top-1 h-2.5 w-2.5 rounded-full bg-brand shadow-[0_0_12px_var(--brand)]"
-          animate={{ left: ["0%", "100%"] }}
+          className="absolute inset-0"
+          animate={{ x: ["0%", "100%"] }}
           transition={{
             delay: 2.2,
             duration: 2.4,
@@ -674,7 +682,9 @@ function JourneyVisual() {
             repeatDelay: 0.6,
             ease: "easeInOut",
           }}
-        />
+        >
+          <div className="absolute -top-1 left-0 h-2.5 w-2.5 rounded-full bg-brand shadow-[0_0_12px_var(--brand)]" />
+        </m.div>
       </div>
       {steps.map(({ icon: Icon, label }, index) => (
         <m.div
@@ -696,6 +706,11 @@ function JourneyVisual() {
 
 /* --------------------------------------------- investor: daily benefit */
 
+/** Bar fills as clip-path keyframes: a looping `width` re-runs layout every
+ *  frame; a clip only repaints, and keeps the rounded end. */
+const fills = (pcts: number[]) =>
+  pcts.map((pct) => `inset(0 ${100 - pct}% 0 0 round 9999px)`);
+
 function DailyBenefitVisual() {
   const { t } = useTranslations();
   const loop = {
@@ -710,8 +725,8 @@ function DailyBenefitVisual() {
         <Label className="text-foreground">{t("welcome.visuals.atRisk")}</Label>
         <div className="h-3 w-full rounded-full bg-muted">
           <m.div
-            className="h-full rounded-full bg-brand-blue"
-            animate={{ width: ["100%", "70%", "45%", "20%"] }}
+            className="h-full w-full rounded-full bg-brand-blue"
+            animate={{ clipPath: fills([100, 70, 45, 20]) }}
             transition={loop}
           />
         </div>
@@ -722,8 +737,8 @@ function DailyBenefitVisual() {
         </Label>
         <div className="h-3 w-full rounded-full bg-muted">
           <m.div
-            className="h-full rounded-full bg-brand"
-            animate={{ width: ["0%", "30%", "55%", "80%"] }}
+            className="h-full w-full rounded-full bg-brand"
+            animate={{ clipPath: fills([0, 30, 55, 80]) }}
             transition={loop}
           />
         </div>

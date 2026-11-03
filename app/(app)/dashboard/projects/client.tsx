@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { m, AnimatePresence } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { usePublicProjects } from "@/hooks/use-projects";
 import type { Project } from "@/services/projects.service";
@@ -137,7 +138,7 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
   );
 
   return (
-    <div className="bg-card text-card-foreground border border-border rounded-xl shadow-xs overflow-hidden transition-all duration-200 hover:shadow-md p-6 flex flex-col gap-6">
+    <div className="bg-card text-card-foreground border border-border rounded-xl shadow-xs overflow-hidden transition duration-200 hover:shadow-md p-6 flex flex-col gap-6">
       {/* Top Header Row */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
@@ -298,11 +299,11 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
 
       {/* Footer Actions Row */}
       <div className="flex flex-col sm:flex-row gap-3 pt-2">
-        <button className="flex-1 rounded-xl bg-slate-950 hover:bg-slate-900 dark:bg-emerald-400 dark:hover:bg-emerald-300 text-white dark:text-slate-950 py-3 text-sm font-semibold transition-all duration-300 shadow-xs active:scale-98 flex items-center justify-center gap-2 cursor-pointer">
+        <button className="flex-1 rounded-xl bg-slate-950 hover:bg-slate-900 dark:bg-emerald-400 dark:hover:bg-emerald-300 text-white dark:text-slate-950 py-3 text-sm font-semibold transition duration-150 shadow-xs active:scale-98 flex items-center justify-center gap-2 cursor-pointer">
           <ShoppingCart className="w-4 h-4 shrink-0" />
           <span>{t("dashboard.projects.secondary.viewAndPurchase")}</span>
         </button>
-        <button className="rounded-xl border border-border hover:bg-muted text-foreground px-6 py-3 text-sm font-semibold transition-all duration-300 active:scale-98 flex items-center justify-center gap-2 cursor-pointer">
+        <button className="rounded-xl border border-border hover:bg-muted text-foreground px-6 py-3 text-sm font-semibold transition duration-150 active:scale-98 flex items-center justify-center gap-2 cursor-pointer">
           <ArrowRightLeft className="w-4 h-4 shrink-0" />
           <span>{t("dashboard.projects.secondary.compare")}</span>
         </button>
@@ -459,7 +460,7 @@ export default function ProjectsClient() {
       <div className="p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-800/40 w-fit flex items-center gap-1">
         <button
           onClick={() => handleMarketToggle("primary")}
-          className={`px-4 py-2.5 rounded-lg text-xs font-semibold uppercase transition-all duration-200 flex items-center gap-2 cursor-pointer ${
+          className={`px-4 py-2.5 rounded-lg text-xs font-semibold uppercase transition duration-200 flex items-center gap-2 cursor-pointer ${
             marketType === "primary"
               ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
               : `${CONTROL_IDLE} bg-transparent border border-transparent`
@@ -470,7 +471,7 @@ export default function ProjectsClient() {
         </button>
         <button
           onClick={() => handleMarketToggle("secondary")}
-          className={`px-4 py-2.5 rounded-lg text-xs font-semibold uppercase transition-all duration-200 flex items-center gap-2 cursor-pointer ${
+          className={`px-4 py-2.5 rounded-lg text-xs font-semibold uppercase transition duration-200 flex items-center gap-2 cursor-pointer ${
             marketType === "secondary"
               ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
               : `${CONTROL_IDLE} bg-transparent border border-transparent`
@@ -503,7 +504,7 @@ export default function ProjectsClient() {
                 <Badge
                   key={industry}
                   variant={activeIndustry === industry ? "default" : "outline"}
-                  className={`cursor-pointer rounded-full transition-all ${
+                  className={`cursor-pointer rounded-full transition ${
                     activeIndustry === industry
                       ? "bg-primary text-primary-foreground hover:bg-primary/90"
                       : CONTROL_HOVER
@@ -539,7 +540,7 @@ export default function ProjectsClient() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
+                  transition={{ duration: 0.2, ease: EASE_OUT }}
                 >
                   <ProjectsSkeletonList />
                 </m.div>
@@ -571,7 +572,7 @@ export default function ProjectsClient() {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.25 }}
+                  transition={{ duration: 0.25, ease: EASE_OUT }}
                   className="text-center py-16 bg-muted/30 rounded-lg border border-dashed flex flex-col items-center justify-center p-6"
                 >
                   <Briefcase className="h-10 w-10 text-muted-foreground/60 mb-4" />
@@ -595,7 +596,7 @@ export default function ProjectsClient() {
           key="secondary-coming-soon"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.25 }}
+          transition={{ duration: 0.25, ease: EASE_OUT }}
           className="text-center py-16 bg-muted/30 rounded-lg border border-dashed flex flex-col items-center justify-center p-6"
         >
           <Clock className="h-10 w-10 text-muted-foreground/60 mb-4" />

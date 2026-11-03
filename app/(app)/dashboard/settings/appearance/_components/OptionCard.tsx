@@ -47,7 +47,7 @@ export function OptionCard({
       aria-describedby={description ? `${id}-description` : undefined}
       onClick={onSelect}
       className={cn(
-        "group relative flex w-full flex-col gap-3 rounded-xl border p-4 text-left transition-all",
+        "group relative flex w-full flex-col gap-3 rounded-xl border p-4 text-left transition",
         selected
           ? "border-primary bg-primary/5 ring-1 ring-primary/20"
           : cn("border-border bg-card", CONTROL_IDLE),
@@ -80,7 +80,7 @@ export function OptionCard({
         <span
           aria-hidden="true"
           className={cn(
-            "ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-all",
+            "ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition",
             selected
               ? "border-primary bg-primary text-primary-foreground"
               : "border-border",

@@ -285,13 +285,13 @@ export default function Mockup(props: MockupProps) {
               <div className="flex items-center gap-1.5 bg-zinc-950 border border-zinc-900 p-0.5 rounded-lg">
                 <button
                   onClick={() => setView("sme")}
-                  className={`text-xs tracking-wide px-3 py-1.5 rounded-md font-bold transition-all duration-300 cursor-pointer ${view === "sme" ? "bg-emerald-600 text-white shadow-md" : "text-zinc-400 hover:text-zinc-200"}`}
+                  className={`text-xs tracking-wide px-3 py-1.5 rounded-md font-bold transition duration-300 cursor-pointer ${view === "sme" ? "bg-emerald-600 text-white shadow-md" : "text-zinc-400 hover:text-zinc-200"}`}
                 >
                   {t("mockup.smePortal")}
                 </button>
                 <button
                   onClick={() => setView("investor")}
-                  className={`text-xs tracking-wide px-3 py-1.5 rounded-md font-bold transition-all duration-300 cursor-pointer ${view === "investor" ? "bg-emerald-600 text-white shadow-md" : "text-zinc-400 hover:text-zinc-200"}`}
+                  className={`text-xs tracking-wide px-3 py-1.5 rounded-md font-bold transition duration-300 cursor-pointer ${view === "investor" ? "bg-emerald-600 text-white shadow-md" : "text-zinc-400 hover:text-zinc-200"}`}
                 >
                   {t("mockup.investorPortal")}
                 </button>
@@ -392,7 +392,7 @@ export default function Mockup(props: MockupProps) {
 
                       <button
                         onClick={() => setSmeShowResults(true)}
-                        className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 transition-all text-xs font-sans font-semibold text-white shadow-lg shadow-emerald-900/20 cursor-pointer flex items-center justify-center gap-1.5"
+                        className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 transition text-xs font-sans font-semibold text-white shadow-lg shadow-emerald-900/20 cursor-pointer flex items-center justify-center gap-1.5"
                       >
                         {t("mockup.calculateSmeNew")}
                       </button>
@@ -432,7 +432,7 @@ export default function Mockup(props: MockupProps) {
                               cx="36"
                               cy="36"
                               r="30"
-                              className={`transition-all duration-500 ${
+                              className={`transition-[stroke,stroke-dashoffset] ease-out duration-500 ${
                                 isSmeIneligible
                                   ? "stroke-red-500"
                                   : businessScore >= 70
@@ -481,7 +481,7 @@ export default function Mockup(props: MockupProps) {
 
                       <button
                         onClick={() => setSmeShowResults(false)}
-                        className="w-full py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-sans font-semibold hover:bg-zinc-800 hover:border-zinc-700 active:scale-98 transition-all text-zinc-300 cursor-pointer"
+                        className="w-full py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-sans font-semibold hover:bg-zinc-800 hover:border-zinc-700 active:scale-98 transition text-zinc-300 cursor-pointer"
                       >
                         {t("mockup.adjustSme")}
                       </button>
@@ -555,7 +555,7 @@ export default function Mockup(props: MockupProps) {
 
                     <button
                       onClick={() => setInvShowResults(true)}
-                      className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 transition-all text-xs font-sans font-semibold text-white shadow-lg shadow-emerald-900/20 cursor-pointer flex items-center justify-center gap-1.5"
+                      className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 transition text-xs font-sans font-semibold text-white shadow-lg shadow-emerald-900/20 cursor-pointer flex items-center justify-center gap-1.5"
                     >
                       {t("mockup.calculateInvNew")}
                     </button>
@@ -599,7 +599,7 @@ export default function Mockup(props: MockupProps) {
                               )}
                             </span>
                             <div
-                              className={`w-full rounded-t-sm transition-all duration-300 ${isHighlighted ? "bg-emerald-400 shadow-[0_0_5px_#10b981]" : "bg-emerald-500/25"}`}
+                              className={`w-full rounded-t-sm transition-[height,background-color,box-shadow] ease-out duration-300 ${isHighlighted ? "bg-emerald-400 shadow-[0_0_5px_#10b981]" : "bg-emerald-500/25"}`}
                               style={{ height: `${heightPct}%` }}
                             />
                             <span
@@ -614,7 +614,7 @@ export default function Mockup(props: MockupProps) {
 
                     <button
                       onClick={() => setInvShowResults(false)}
-                      className="w-full py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-sans font-semibold hover:bg-zinc-800 hover:border-zinc-700 active:scale-98 transition-all text-zinc-300 cursor-pointer"
+                      className="w-full py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-sans font-semibold hover:bg-zinc-800 hover:border-zinc-700 active:scale-98 transition text-zinc-300 cursor-pointer"
                     >
                       {t("mockup.adjustInv")}
                     </button>
@@ -668,13 +668,13 @@ export default function Mockup(props: MockupProps) {
             <div className="flex bg-zinc-900 border border-zinc-800 p-0.5 rounded-lg">
               <button
                 onClick={() => setView("sme")}
-                className={`text-xs px-2.5 py-1 rounded-md transition-all duration-200 ${view === "sme" ? "bg-emerald-600 text-white font-bold" : "text-zinc-400"}`}
+                className={`text-xs px-2.5 py-1 rounded-md transition duration-200 ${view === "sme" ? "bg-emerald-600 text-white font-bold" : "text-zinc-400"}`}
               >
                 {t("mockup.smeShort")}
               </button>
               <button
                 onClick={() => setView("investor")}
-                className={`text-xs px-2.5 py-1 rounded-md transition-all duration-200 ${view === "investor" ? "bg-emerald-600 text-white font-bold" : "text-zinc-400"}`}
+                className={`text-xs px-2.5 py-1 rounded-md transition duration-200 ${view === "investor" ? "bg-emerald-600 text-white font-bold" : "text-zinc-400"}`}
               >
                 {t("mockup.invShort")}
               </button>
@@ -785,7 +785,7 @@ export default function Mockup(props: MockupProps) {
 
                     <button
                       onClick={() => setSmeShowResults(true)}
-                      className="w-full py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:scale-98 transition-all text-xs font-sans font-semibold text-white shadow-lg cursor-pointer flex items-center justify-center"
+                      className="w-full py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:scale-98 transition text-xs font-sans font-semibold text-white shadow-lg cursor-pointer flex items-center justify-center"
                     >
                       {t("mockup.calculateSmeNew")}
                     </button>
@@ -810,7 +810,7 @@ export default function Mockup(props: MockupProps) {
                               cx="28"
                               cy="28"
                               r="23"
-                              className={`transition-all duration-500 ${isSmeIneligible ? "stroke-red-500" : businessScore >= 70 ? "stroke-emerald-500" : "stroke-amber-500"}`}
+                              className={`transition-[stroke,stroke-dashoffset] ease-out duration-500 ${isSmeIneligible ? "stroke-red-500" : businessScore >= 70 ? "stroke-emerald-500" : "stroke-amber-500"}`}
                               strokeWidth="4"
                               fill="transparent"
                               strokeDasharray={144.4}
@@ -853,7 +853,7 @@ export default function Mockup(props: MockupProps) {
 
                     <button
                       onClick={() => setSmeShowResults(false)}
-                      className="w-full py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-sans font-semibold hover:bg-zinc-800 hover:border-zinc-700 active:scale-98 transition-all text-zinc-300 cursor-pointer"
+                      className="w-full py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-sans font-semibold hover:bg-zinc-800 hover:border-zinc-700 active:scale-98 transition text-zinc-300 cursor-pointer"
                     >
                       {t("mockup.adjustShort")}
                     </button>
@@ -922,7 +922,7 @@ export default function Mockup(props: MockupProps) {
 
                   <button
                     onClick={() => setInvShowResults(true)}
-                    className="w-full py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:scale-98 transition-all text-xs font-sans font-semibold text-white shadow-lg cursor-pointer flex items-center justify-center"
+                    className="w-full py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:scale-98 transition text-xs font-sans font-semibold text-white shadow-lg cursor-pointer flex items-center justify-center"
                   >
                     {t("mockup.calculateInvNew")}
                   </button>
@@ -958,7 +958,7 @@ export default function Mockup(props: MockupProps) {
                               )}
                             </span>
                             <div
-                              className={`w-full rounded-t-sm transition-all duration-300 ${isHighlighted ? "bg-emerald-400 shadow-[0_0_3px_#10b981]" : "bg-emerald-500/20"}`}
+                              className={`w-full rounded-t-sm transition-[height,background-color,box-shadow] ease-out duration-300 ${isHighlighted ? "bg-emerald-400 shadow-[0_0_3px_#10b981]" : "bg-emerald-500/20"}`}
                               style={{ height: `${heightPct}%` }}
                             />
                             <span
@@ -974,7 +974,7 @@ export default function Mockup(props: MockupProps) {
 
                   <button
                     onClick={() => setInvShowResults(false)}
-                    className="w-full py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-sans font-semibold hover:bg-zinc-800 hover:border-zinc-700 active:scale-98 transition-all text-zinc-300 cursor-pointer"
+                    className="w-full py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-sans font-semibold hover:bg-zinc-800 hover:border-zinc-700 active:scale-98 transition text-zinc-300 cursor-pointer"
                   >
                     {t("mockup.adjustShort")}
                   </button>

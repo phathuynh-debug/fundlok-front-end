@@ -9,6 +9,7 @@ import {
   useTransform,
   type MotionValue,
 } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
 import {
   Building2,
   Banknote,
@@ -1146,7 +1147,7 @@ export function InteractiveFlow() {
               key={`${role}-${activeStep}`}
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.28, ease: EASE_OUT }}
             >
               <ScrollDrivenStageDetail
                 s={step}
@@ -1190,7 +1191,7 @@ export function InteractiveFlow() {
                   type="button"
                   onClick={() => handleMobileStepChange(idx)}
                   aria-pressed={isActive}
-                  className={`flex items-center justify-between rounded-xl border px-3 py-2.5 text-left transition-all ${
+                  className={`flex items-center justify-between rounded-xl border px-3 py-2.5 text-left transition ${
                     isActive
                       ? "border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shadow-sm"
                       : isDone
@@ -1221,7 +1222,7 @@ export function InteractiveFlow() {
           <div className="mt-2.5 h-1 w-full overflow-hidden rounded-full bg-border/40">
             <div
               style={{ width: `${((activeStep + 1) / steps.length) * 100}%` }}
-              className="h-full bg-emerald-500 transition-all duration-300"
+              className="h-full bg-emerald-500 transition-[width] ease-out duration-300"
             />
           </div>
         </div>
@@ -1362,7 +1363,7 @@ export function InteractiveFlow() {
                     type="button"
                     onClick={() => handleMobileStepChange(dotIdx)}
                     aria-label={`Go to step ${dotIdx + 1}`}
-                    className={`h-2 rounded-full transition-all ${
+                    className={`h-2 rounded-full transition-[width,background-color] ${
                       dotIdx === activeStep
                         ? "w-6 bg-emerald-500"
                         : "w-2 bg-border hover:bg-muted-foreground"

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { m } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { GuillocheWaves } from "@/components/guilloche-waves";
 import Mockup from "@/components/mockup";
@@ -77,13 +78,13 @@ export function HeroInteractive({ strings }: HeroInteractiveProps) {
         <m.div
           initial={{ y: -20 }}
           animate={{ y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          transition={{ duration: 0.8, ease: EASE_OUT }}
           className="text-center px-4 flex flex-col items-center mb-2 md:mb-3 max-w-4xl mx-auto"
         >
           <m.h1
             initial={{ y: -10 }}
             animate={{ y: 0 }}
-            transition={{ duration: 0.8, delay: 0.15, ease: "easeOut" }}
+            transition={{ duration: 0.8, delay: 0.15, ease: EASE_OUT }}
             className="font-sans text-3xl sm:text-4xl md:text-[2.5rem] font-extrabold text-foreground leading-[1.15] mb-2.5 tracking-tight max-w-4xl"
           >
             {strings.heroTitle}
@@ -91,7 +92,7 @@ export function HeroInteractive({ strings }: HeroInteractiveProps) {
           <m.p
             initial={{ y: 10 }}
             animate={{ y: 0 }}
-            transition={{ duration: 0.8, delay: 0.35, ease: "easeOut" }}
+            transition={{ duration: 0.8, delay: 0.35, ease: EASE_OUT }}
             className="font-sans text-sm md:text-base text-muted-foreground leading-relaxed max-w-xl"
           >
             {strings.heroSubtitle}
@@ -102,19 +103,19 @@ export function HeroInteractive({ strings }: HeroInteractiveProps) {
           <m.div
             initial={{ y: 10 }}
             animate={{ y: 0 }}
-            transition={{ duration: 0.8, delay: 0.45, ease: "easeOut" }}
+            transition={{ duration: 0.8, delay: 0.45, ease: EASE_OUT }}
             className="mt-4 flex flex-wrap items-center justify-center gap-3"
           >
             <a
               href={localize("/login?mode=register")}
-              className="inline-flex items-center gap-2 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-5 py-2.5 text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"
+              className="inline-flex items-center gap-2 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-5 py-2.5 text-sm font-semibold transition duration-150 shadow-md hover:shadow-emerald-500/10 active:scale-95"
             >
               {strings.heroCtaPrimary}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </a>
             <Link
               href={localize("/rate")}
-              className="inline-flex items-center rounded-full border border-border bg-background/60 backdrop-blur-sm hover:border-emerald-500/50 hover:text-emerald-700 dark:hover:text-emerald-400 px-5 py-2.5 text-sm font-semibold text-foreground transition-all duration-300 active:scale-95"
+              className="inline-flex items-center rounded-full border border-border bg-background/60 backdrop-blur-sm hover:border-emerald-500/50 hover:text-emerald-700 dark:hover:text-emerald-400 px-5 py-2.5 text-sm font-semibold text-foreground transition duration-150 active:scale-95"
             >
               {strings.heroCtaSecondary}
             </Link>
@@ -128,7 +129,7 @@ export function HeroInteractive({ strings }: HeroInteractiveProps) {
         <m.div
           initial={{ scale: 0.96, y: 20 }}
           animate={{ scale: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.55, ease: "easeOut" }}
+          transition={{ duration: 0.8, delay: 0.55, ease: EASE_OUT }}
           className="w-full flex justify-center"
         >
           <Mockup

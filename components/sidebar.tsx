@@ -116,7 +116,7 @@ function NavLink({
       href={href}
       data-tour={tourId}
       className={cn(
-        "group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200",
+        "group flex items-center px-3 py-2 text-sm font-medium rounded-md transition duration-200",
         active ? "bg-primary/10 text-primary" : CONTROL_IDLE,
       )}
     >
@@ -188,7 +188,7 @@ export function Sidebar() {
                 type="button"
                 onClick={() => setShowSettings(true)}
                 className={cn(
-                  "group flex w-full items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200",
+                  "group flex w-full items-center px-3 py-2 text-sm font-medium rounded-md transition duration-200",
                   pathname.startsWith(SETTINGS_HREF)
                     ? "bg-primary/10 text-primary"
                     : CONTROL_IDLE,
@@ -264,7 +264,7 @@ export function Sidebar() {
               <button
                 type="button"
                 onClick={() => setShowSettings(false)}
-                className="group flex w-full items-center px-3 py-2 mb-1 text-sm font-semibold rounded-md text-foreground transition-all duration-200 hover:bg-muted"
+                className="group flex w-full items-center px-3 py-2 mb-1 text-sm font-semibold rounded-md text-foreground transition duration-200 hover:bg-muted"
               >
                 <ChevronLeft className="mr-2 h-5 w-5 shrink-0 text-muted-foreground transition-transform group-hover:-translate-x-0.5" />
                 {t("dashboard.sidebar.settings")}

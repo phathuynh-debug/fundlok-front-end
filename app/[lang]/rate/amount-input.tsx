@@ -133,7 +133,7 @@ export function AmountInput({
                 onBlur?.();
               }}
               className={cn(
-                "rounded-md border px-2.5 py-1 text-xs font-medium transition-all active:scale-[0.97] cursor-pointer",
+                "rounded-md border px-2.5 py-1 text-xs font-medium transition active:scale-[0.97] cursor-pointer",
                 isSelected
                   ? "border-primary bg-primary/15 text-primary font-semibold ring-1 ring-primary/30"
                   : "border-border/80 bg-background/60 text-muted-foreground hover:bg-muted hover:text-foreground hover:border-border",

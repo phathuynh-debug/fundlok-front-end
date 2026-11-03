@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { m } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
 import { ArrowRight } from "lucide-react";
 import SiteHeader from "@/components/site-header";
 import {
@@ -68,7 +69,7 @@ export default function FaqClient({ footer }: { footer: React.ReactNode }) {
         <m.div
           initial={{ y: -16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
+          transition={{ duration: 0.7, ease: EASE_OUT }}
           className="text-center pt-16 pb-8 px-6"
         >
           <p className="eyebrow mb-3">{t("faqPage.eyebrow")}</p>
@@ -84,7 +85,7 @@ export default function FaqClient({ footer }: { footer: React.ReactNode }) {
         <m.div
           initial={{ y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+          transition={{ duration: 0.6, delay: 0.2, ease: EASE_OUT }}
           className="flex flex-wrap items-center justify-center gap-3 px-6 mb-14"
         >
           {CATEGORIES.map((key) => (
@@ -93,7 +94,7 @@ export default function FaqClient({ footer }: { footer: React.ReactNode }) {
               type="button"
               onClick={() => scrollToCategory(key)}
               className={cn(
-                "rounded-full px-6 py-2.5 text-xs tracking-wider font-bold uppercase transition-all duration-300 cursor-pointer shadow-sm active:scale-95",
+                "rounded-full px-6 py-2.5 text-xs tracking-wider font-bold uppercase transition duration-150 cursor-pointer shadow-sm active:scale-95",
                 activeCategory === key
                   ? "bg-emerald-500 text-white dark:bg-emerald-400 dark:text-slate-950 shadow-emerald-500/25 shadow-md"
                   : "bg-white dark:bg-slate-900 border border-border/60 text-emerald-700 dark:text-emerald-400 hover:border-emerald-500/40 hover:shadow-md",
@@ -114,7 +115,7 @@ export default function FaqClient({ footer }: { footer: React.ReactNode }) {
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.55, ease: "easeOut" }}
+              transition={{ duration: 0.55, ease: EASE_OUT }}
             >
               <h2 className="font-sans text-2xl md:text-3xl font-extrabold leading-[1.25] tracking-tight text-foreground uppercase mb-2">
                 {t(`faqPage.${key}.title`)}:
@@ -144,7 +145,7 @@ export default function FaqClient({ footer }: { footer: React.ReactNode }) {
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.55, ease: "easeOut" }}
+            transition={{ duration: 0.55, ease: EASE_OUT }}
             className="rounded-3xl border border-emerald-500/25 bg-emerald-500/5 dark:bg-emerald-950/15 backdrop-blur-md p-8 md:p-10 text-center"
           >
             <h2 className="font-sans text-xl md:text-2xl font-extrabold tracking-tight text-foreground mb-2">
@@ -155,7 +156,7 @@ export default function FaqClient({ footer }: { footer: React.ReactNode }) {
             </p>
             <Link
               href={localize("/contact")}
-              className="inline-flex items-center gap-2 rounded-full bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-6 py-3 text-sm font-semibold text-white transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"
+              className="inline-flex items-center gap-2 rounded-full bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-6 py-3 text-sm font-semibold text-white transition duration-150 shadow-md hover:shadow-emerald-500/10 active:scale-95"
             >
               {t("faqPage.ctaButton")}
               <ArrowRight className="h-4 w-4" />

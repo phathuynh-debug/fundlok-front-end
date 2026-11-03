@@ -100,7 +100,7 @@ export function AdminHeader() {
                     href={item.href}
                     onClick={() => setOpen(false)}
                     className={cn(
-                      "group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200",
+                      "group flex items-center px-3 py-2 text-sm font-medium rounded-md transition duration-200",
                       active ? "bg-primary/10 text-primary" : CONTROL_IDLE,
                     )}
                   >
@@ -126,7 +126,7 @@ export function AdminHeader() {
                 }}
                 disabled={isLoggingOut}
                 className={cn(
-                  "group flex w-full items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 disabled:opacity-60 disabled:pointer-events-none",
+                  "group flex w-full items-center px-3 py-2 text-sm font-medium rounded-md transition duration-200 disabled:opacity-60 disabled:pointer-events-none",
                   CONTROL_IDLE,
                 )}
               >

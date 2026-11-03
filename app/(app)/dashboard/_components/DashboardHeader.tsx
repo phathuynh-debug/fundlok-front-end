@@ -219,7 +219,7 @@ export function DashboardHeader() {
                       href={item.href}
                       onClick={() => setOpen(false)}
                       className={cn(
-                        "flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
+                        "flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition duration-200",
                         isActive
                           ? "bg-primary/10 text-primary font-semibold"
                           : CONTROL_IDLE,

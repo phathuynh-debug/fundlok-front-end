@@ -153,6 +153,65 @@
 }
 
 /* --------------------------------------------------------------------------- */
+/* Motion tokens. The CSS twins of lib/motion.ts — change both together.        */
+/* --------------------------------------------------------------------------- */
+
+/* Tailwind's own `ease-out` / `ease-in-out` are too soft to read as deliberate,
+   so the utilities are re-pointed at stronger curves. Every `ease-out` class in
+   the app (and every tw-animate `animate-in` that sets one) picks these up.
+   - ease-out: entering / exiting UI. Starts fast, so it feels responsive.
+   - ease-in-out: something already on screen moving or resizing.
+   - ease-drawer: sheets and drawers sliding in from an edge (iOS-like).
+   Hover and colour changes keep the default `transition` curve. Never use
+   `ease-in` on UI: it delays the exact moment the user is watching. */
+@theme {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Reduced motion means gentler, not none: fades and colour changes stay
+   because they explain what changed; movement goes. tw-animate's enter/exit
+   keyframes read their translate/scale/rotate from these variables, so pinning
+   them to identity turns every popover, dialog and sheet into a plain fade.
+   Mirrors framer-motion's MotionConfig in components/appearance-provider.tsx:
+   the OS setting, or the in-app toggle (data-reduce-motion on <html>). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    --tw-enter-translate-x: 0 !important;
+    --tw-enter-translate-y: 0 !important;
+    --tw-enter-scale: 1 !important;
+    --tw-enter-rotate: 0 !important;
+    --tw-exit-translate-x: 0 !important;
+    --tw-exit-translate-y: 0 !important;
+    --tw-exit-scale: 1 !important;
+    --tw-exit-rotate: 0 !important;
+  }
+  .animate-bounce,
+  .animate-ping {
+    animation: none !important;
+  }
+}
+html[data-reduce-motion="1"] *,
+html[data-reduce-motion="1"] ::before,
+html[data-reduce-motion="1"] ::after {
+  --tw-enter-translate-x: 0 !important;
+  --tw-enter-translate-y: 0 !important;
+  --tw-enter-scale: 1 !important;
+  --tw-enter-rotate: 0 !important;
+  --tw-exit-translate-x: 0 !important;
+  --tw-exit-translate-y: 0 !important;
+  --tw-exit-scale: 1 !important;
+  --tw-exit-rotate: 0 !important;
+}
+html[data-reduce-motion="1"] .animate-bounce,
+html[data-reduce-motion="1"] .animate-ping {
+  animation: none !important;
+}
+
+/* --------------------------------------------------------------------------- */
 /* Shared typography roles. One element = one style, everywhere it appears.     */
 /* Uppercase letter-spacing is capped at 0.05em: wider tracking pulls           */
 /* Vietnamese tone marks away from their letters.                              */

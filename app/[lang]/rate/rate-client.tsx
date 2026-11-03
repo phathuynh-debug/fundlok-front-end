@@ -10,6 +10,7 @@ import {
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { m, useReducedMotion } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
 import { AlertCircle, Check, Copy, Loader2, Sparkles } from "lucide-react";
 import SiteHeader from "@/components/site-header";
 import { BackgroundBlobs } from "@/components/background-blobs";
@@ -580,7 +581,7 @@ export default function RateClient({ footer }: { footer: React.ReactNode }) {
                         markTouched(name);
                       }}
                       className={cn(
-                        "rounded-md border px-2.5 py-1 text-xs font-medium transition-all active:scale-[0.97] cursor-pointer",
+                        "rounded-md border px-2.5 py-1 text-xs font-medium transition active:scale-[0.97] cursor-pointer",
                         isSelected
                           ? "border-primary bg-primary/15 text-primary font-semibold ring-1 ring-primary/30"
                           : "border-border/80 bg-background/60 text-muted-foreground hover:bg-muted hover:text-foreground hover:border-border",
@@ -628,7 +629,7 @@ export default function RateClient({ footer }: { footer: React.ReactNode }) {
         <m.div
           initial={false}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
+          transition={{ duration: 0.7, ease: EASE_OUT }}
           className="mb-10 space-y-3 text-center"
         >
           <h1 className="text-4xl font-extrabold tracking-tight md:text-5xl">
@@ -647,7 +648,7 @@ export default function RateClient({ footer }: { footer: React.ReactNode }) {
         <m.div
           initial={false}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.08, ease: "easeOut" }}
+          transition={{ duration: 0.5, delay: 0.08, ease: EASE_OUT }}
           className="mx-auto mb-10 max-w-md space-y-2"
         >
           <p
@@ -724,7 +725,7 @@ export default function RateClient({ footer }: { footer: React.ReactNode }) {
               onSubmit={onSubmit}
               initial={false}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
+              transition={{ duration: 0.6, delay: 0.15, ease: EASE_OUT }}
               className="space-y-5 rounded-2xl border border-border bg-card p-6 shadow-xs"
             >
               <div className="space-y-1">
@@ -1128,7 +1129,7 @@ export default function RateClient({ footer }: { footer: React.ReactNode }) {
               ref={resultRef}
               initial={false}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.28, ease: "easeOut" }}
+              transition={{ duration: 0.6, delay: 0.28, ease: EASE_OUT }}
               className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-xs lg:sticky lg:top-24"
             >
               {estimate.isPending && <ResultSkeleton />}
@@ -1431,7 +1432,7 @@ export default function RateClient({ footer }: { footer: React.ReactNode }) {
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.55, ease: "easeOut" }}
+          transition={{ duration: 0.55, ease: EASE_OUT }}
         >
           <h2
             id="rate-faq-heading"

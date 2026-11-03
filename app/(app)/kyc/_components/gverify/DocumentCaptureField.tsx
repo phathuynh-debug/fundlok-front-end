@@ -36,7 +36,7 @@ export function DocumentCaptureField({
           if (!disabled) window.document.getElementById(inputId)?.click();
         }}
         className={cn(
-          "flex min-h-24 items-center justify-center gap-3 rounded-xl border border-dashed p-3 transition-all duration-200",
+          "flex min-h-24 items-center justify-center gap-3 rounded-xl border border-dashed p-3 transition duration-200",
           disabled && "cursor-wait opacity-60",
           !disabled && "cursor-pointer",
           doc.error &&

@@ -1,6 +1,7 @@
 "use client";
 
 import { m } from "framer-motion";
+import { EASE_IN_OUT, barReveal } from "@/lib/motion";
 import { CheckCircle2, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLoanApplicationContext } from "./LoanApplicationContext";
@@ -30,17 +31,21 @@ export function StepIndicator() {
         >
           <div className="mx-[18px] h-full relative overflow-hidden rounded-full">
             <m.div
-              className="h-full bg-black dark:bg-white absolute left-0 top-0"
-              initial={{ width: "0%" }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.5, ease: "easeInOut" }}
+              className="h-full w-full bg-black dark:bg-white absolute left-0 top-0"
+              {...barReveal(progress)}
+              transition={{ duration: 0.3, ease: EASE_IN_OUT }}
             />
+            {/* The glow rides a full-width layer translated by `progress`%
+                of the track — a transform, where animating `left` would
+                re-run layout every frame. */}
             <m.div
-              className="absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/30 dark:bg-white/30 blur-md"
-              initial={{ left: "0%" }}
-              animate={{ left: `${progress}%` }}
-              transition={{ duration: 0.5, ease: "easeInOut" }}
-            />
+              className="absolute inset-0"
+              initial={{ x: "0%" }}
+              animate={{ x: `${progress}%` }}
+              transition={{ duration: 0.3, ease: EASE_IN_OUT }}
+            >
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/30 dark:bg-white/30 blur-md" />
+            </m.div>
           </div>
         </div>
 
@@ -59,7 +64,7 @@ export function StepIndicator() {
                 onClick={() => goToStep(step)}
                 disabled={busy}
                 className={cn(
-                  "w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs transition-all duration-300 border-2 bg-background disabled:cursor-not-allowed",
+                  "w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs transition duration-300 border-2 bg-background disabled:cursor-not-allowed",
                   isActive
                     ? "bg-primary text-primary-foreground border-primary scale-110 shadow-lg ring-4 ring-primary/10"
                     : isCompleted

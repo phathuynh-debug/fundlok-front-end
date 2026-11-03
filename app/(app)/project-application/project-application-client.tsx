@@ -528,7 +528,7 @@ export default function ProjectApplicationClient() {
                 <div className="flex items-center gap-2">
                   <div
                     className={cn(
-                      "h-7 w-7 rounded-full flex items-center justify-center text-xs font-semibold transition-all duration-300",
+                      "h-7 w-7 rounded-full flex items-center justify-center text-xs font-semibold transition duration-300",
                       currentStep === step.id
                         ? "bg-emerald-600 text-white ring-4 ring-emerald-600/20 shadow-sm"
                         : currentStep > step.id
@@ -1042,7 +1042,7 @@ export default function ProjectApplicationClient() {
                               })
                             }
                             className={cn(
-                              "py-1.5 text-xs rounded-lg transition-all font-semibold cursor-pointer border text-center",
+                              "py-1.5 text-xs rounded-lg transition font-semibold cursor-pointer border text-center",
                               isSelected
                                 ? "bg-primary text-primary-foreground border-primary shadow-xs"
                                 : "border-border/60 bg-muted/30 text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -1304,7 +1304,7 @@ function InfoCard({ icon, title, text, isActive }: InfoCardProps) {
   return (
     <div
       className={cn(
-        "rounded-2xl border bg-background/80 p-4 shadow-sm backdrop-blur transition-all duration-300",
+        "rounded-2xl border bg-background/80 p-4 shadow-sm backdrop-blur transition duration-300",
         isActive
           ? "border-emerald-600 ring-2 ring-emerald-600/10 shadow-emerald-500/5 translate-y-[-2px] scale-[1.01]"
           : "border-border/60",

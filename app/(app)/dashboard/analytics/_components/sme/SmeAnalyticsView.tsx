@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { m } from "framer-motion";
+import { EASE_OUT, barReveal } from "@/lib/motion";
 import {
   FlaskConical,
   PiggyBank,
@@ -162,10 +163,9 @@ export function SmeAnalyticsView({
           aria-label={t("dashboard.smeAnalytics.progress.label")}
         >
           <m.div
-            className="h-full rounded-full bg-emerald-500"
-            initial={{ width: 0 }}
-            animate={{ width: `${summary.progress_pct}%` }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="h-full w-full rounded-full bg-emerald-500"
+            {...barReveal(summary.progress_pct)}
+            transition={{ duration: 0.3, ease: EASE_OUT }}
           />
         </div>
       </Card>

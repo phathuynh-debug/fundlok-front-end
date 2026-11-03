@@ -322,7 +322,7 @@ export default async function Page({ params }: { params: LangParams }) {
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={logo.alt}
-                        className="group flex items-center justify-center rounded-2xl border border-border/40 bg-card/60 dark:bg-white/[0.04] shadow-sm p-6 h-28 w-52 md:h-32 md:w-60 hover:-translate-y-1 hover:shadow-md hover:border-emerald-500/30 transition-all duration-300"
+                        className="group flex items-center justify-center rounded-2xl border border-border/40 bg-card/60 dark:bg-white/[0.04] shadow-sm p-6 h-28 w-52 md:h-32 md:w-60 hover:-translate-y-1 hover:shadow-md hover:border-emerald-500/30 transition duration-300"
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element -- plain file from public/, edge-cached; see components/logo.tsx */}
                         <img

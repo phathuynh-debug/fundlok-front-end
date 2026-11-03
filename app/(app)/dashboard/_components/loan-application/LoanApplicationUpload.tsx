@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { DocumentGuide } from "@/components/document-guide";
 import { DocumentGuideVideo } from "@/components/document-guide-video";
 import { m, AnimatePresence } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
 import { CheckCircle2, Loader2, AlertCircle, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -62,7 +63,7 @@ function LoanApplicationWizard() {
   return (
     <Card
       className={cn(
-        "p-6 md:p-8 border w-full shadow-md transition-all duration-300",
+        "p-6 md:p-8 border w-full shadow-md transition duration-300",
         theme.borderColor,
       )}
     >
@@ -106,7 +107,7 @@ function LoanApplicationWizard() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
+              transition={{ duration: 0.25, ease: EASE_OUT }}
             >
               {currentStep === reviewStep ? (
                 <ReviewStep />
@@ -249,7 +250,7 @@ function LoanApplicationWizard() {
                 onClick={handleSend}
                 disabled={isSending || isFinalizing || isSubmitted || !canSend}
                 className={cn(
-                  "text-white gap-2 font-medium px-6 h-10 rounded-lg transition-all border shadow-xs duration-300",
+                  "text-white gap-2 font-medium px-6 h-10 rounded-lg transition border shadow-xs duration-300",
                   isSubmitted
                     ? "bg-emerald-600 hover:bg-emerald-700 border-emerald-500"
                     : "bg-black hover:bg-black/90 dark:bg-white dark:text-black border-transparent",

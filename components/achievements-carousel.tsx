@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { m, AnimatePresence } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
 import {
   ChevronLeft,
   ChevronRight,
@@ -76,7 +77,7 @@ export function AchievementsCarousel({
         {/* Left navigation arrow button */}
         <button
           onClick={handlePrevAchievement}
-          className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-emerald-600/95 hover:bg-emerald-700 text-white flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 z-30 invisible md:visible"
+          className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-emerald-600/95 hover:bg-emerald-700 text-white flex items-center justify-center shadow-lg transition duration-150 hover:scale-105 active:scale-95 z-30 invisible md:visible"
           aria-label={t("achievements.previous")}
         >
           <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
@@ -105,7 +106,7 @@ export function AchievementsCarousel({
               initial="initial"
               animate="animate"
               exit="exit"
-              transition={{ duration: 0.3, ease: "easeInOut" }}
+              transition={{ duration: 0.3, ease: EASE_OUT }}
               className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center"
             >
               {/* Left Column: Image Showcase (lg:col-span-5) */}
@@ -145,7 +146,7 @@ export function AchievementsCarousel({
                           <button
                             key={idx}
                             onClick={() => setActiveImageIndex(idx)}
-                            className={`relative w-16 h-12 rounded-lg overflow-hidden border-2 transition-all ${
+                            className={`relative w-16 h-12 rounded-lg overflow-hidden border-2 transition ${
                               activeImageIndex === idx
                                 ? "border-emerald-500 scale-105 shadow-sm"
                                 : "border-transparent opacity-60 hover:opacity-100 hover:scale-102"
@@ -187,7 +188,7 @@ export function AchievementsCarousel({
                         href={currentAchievement.pdf}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500 text-amber-600 dark:text-amber-500 hover:text-white transition-all duration-300 text-xs font-semibold"
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500 text-amber-600 dark:text-amber-500 hover:text-white transition duration-300 text-xs font-semibold"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                         {currentLocale === "vi" ? "Mở PDF" : "Open PDF"}
@@ -227,7 +228,7 @@ export function AchievementsCarousel({
                       href={currentAchievement.pdf}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-emerald-500/15"
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white dark:text-slate-950 text-sm font-semibold transition duration-300 shadow-md hover:shadow-emerald-500/15"
                     >
                       <FileText className="w-4 h-4" />
                       {currentLocale === "vi"
@@ -244,7 +245,7 @@ export function AchievementsCarousel({
                           currentAchievement.images[activeImageIndex],
                         )
                       }
-                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-slate-900/50 hover:bg-zinc-100 dark:hover:bg-slate-800 text-zinc-700 dark:text-zinc-300 text-sm font-semibold transition-all duration-300"
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-slate-900/50 hover:bg-zinc-100 dark:hover:bg-slate-800 text-zinc-700 dark:text-zinc-300 text-sm font-semibold transition duration-300"
                     >
                       <Maximize2 className="w-4 h-4" />
                       {currentLocale === "vi"
@@ -261,7 +262,7 @@ export function AchievementsCarousel({
         {/* Right navigation arrow button */}
         <button
           onClick={handleNextAchievement}
-          className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-emerald-600/95 hover:bg-emerald-700 text-white flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 z-30 invisible md:visible"
+          className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-emerald-600/95 hover:bg-emerald-700 text-white flex items-center justify-center shadow-lg transition duration-150 hover:scale-105 active:scale-95 z-30 invisible md:visible"
           aria-label={t("achievements.next")}
         >
           <ChevronRight className="w-5 h-5" strokeWidth={2.5} />
@@ -272,7 +273,7 @@ export function AchievementsCarousel({
       <div className="flex items-center justify-center gap-6 mt-6 md:hidden">
         <button
           onClick={handlePrevAchievement}
-          className="w-10 h-10 rounded-full bg-emerald-600/95 hover:bg-emerald-700 text-white flex items-center justify-center shadow-md transition-all duration-300"
+          className="w-10 h-10 rounded-full bg-emerald-600/95 hover:bg-emerald-700 text-white flex items-center justify-center shadow-md transition duration-300"
           aria-label={t("achievements.previous")}
         >
           <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
@@ -282,7 +283,7 @@ export function AchievementsCarousel({
         </span>
         <button
           onClick={handleNextAchievement}
-          className="w-10 h-10 rounded-full bg-emerald-600/95 hover:bg-emerald-700 text-white flex items-center justify-center shadow-md transition-all duration-300"
+          className="w-10 h-10 rounded-full bg-emerald-600/95 hover:bg-emerald-700 text-white flex items-center justify-center shadow-md transition duration-300"
           aria-label={t("achievements.next")}
         >
           <ChevronRight className="w-5 h-5" strokeWidth={2.5} />
@@ -302,7 +303,7 @@ export function AchievementsCarousel({
             {/* Close Button */}
             <button
               onClick={() => setLightboxImage(null)}
-              className="absolute top-4 right-4 z-50 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all outline-none border border-white/15"
+              className="absolute top-4 right-4 z-50 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition outline-none border border-white/15"
               aria-label={t("achievements.closePhoto")}
             >
               <X className="w-6 h-6" />

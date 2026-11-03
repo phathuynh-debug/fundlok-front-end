@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { AnimatePresence, m } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
 import { LoginForm } from "@/components/login-form";
 import { RegistrationForm } from "@/components/registration-form";
 import { VerifyEmailNotice } from "@/components/verify-email-notice";
@@ -29,7 +30,7 @@ const formVariants = {
 
 const formTransition = {
   duration: 0.22,
-  ease: "easeOut" as const,
+  ease: EASE_OUT,
 };
 
 interface AuthFormSwitcherProps {

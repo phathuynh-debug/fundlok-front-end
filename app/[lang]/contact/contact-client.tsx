@@ -1,6 +1,7 @@
 "use client";
 
 import { m, useReducedMotion, type Variants } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
 import SiteHeader from "@/components/site-header";
 import { ContactForm } from "@/components/contact-form";
 import { BackgroundBlobs } from "@/components/background-blobs";
@@ -20,7 +21,7 @@ const cardsContainer: Variants = {
 
 const cardItem: Variants = {
   hidden: { y: 16 },
-  visible: { y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  visible: { y: 0, transition: { duration: 0.5, ease: EASE_OUT } },
 };
 
 export default function ContactClient({ footer }: { footer: React.ReactNode }) {
@@ -39,7 +40,7 @@ export default function ContactClient({ footer }: { footer: React.ReactNode }) {
             <m.div
               initial={reduceMotion ? false : { y: -16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
+              transition={{ duration: 0.7, ease: EASE_OUT }}
               className="space-y-3"
             >
               <p className="eyebrow">{t("contactPage.eyebrow")}</p>
@@ -86,7 +87,7 @@ export default function ContactClient({ footer }: { footer: React.ReactNode }) {
           <m.section
             initial={reduceMotion ? false : { y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.28, ease: "easeOut" }}
+            transition={{ duration: 0.6, delay: 0.28, ease: EASE_OUT }}
             className="rounded-2xl border border-border bg-card p-6 md:p-8"
           >
             <ContactForm />

@@ -3,6 +3,7 @@
 import Link from "next/link";
 // Image handled by Logo component
 import { m } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
 import { Shield, Zap, Users, TrendingUp } from "lucide-react";
 import type { ReactNode } from "react";
 import { LocaleSwitcher } from "@/components/locale-switcher";
@@ -21,7 +22,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
     <m.div
       initial={{ y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
+      transition={{ duration: 0.5, ease: EASE_OUT }}
       className="min-h-screen flex"
     >
       {/* Left Panel - Branding */}

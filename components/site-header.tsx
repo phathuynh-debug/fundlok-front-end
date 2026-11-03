@@ -63,7 +63,7 @@ export default function SiteHeader() {
         <ThemeToggle />
         <a
           href={localize("/login")}
-          className="whitespace-nowrap rounded-full bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-5 xl:px-6 py-2.5 text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"
+          className="whitespace-nowrap rounded-full bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-5 xl:px-6 py-2.5 text-sm font-semibold transition duration-150 shadow-md hover:shadow-emerald-500/10 active:scale-95"
         >
           {t("header.enterApp")}
         </a>
@@ -75,7 +75,7 @@ export default function SiteHeader() {
           href={localize("/login")}
           // A compact pill on one line: at w-full/py-3.5 the Vietnamese
           // label wrapped onto two lines and took a third of the header.
-          className="whitespace-nowrap text-center rounded-full bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-4 py-2 text-xs sm:text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"
+          className="whitespace-nowrap text-center rounded-full bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-4 py-2 text-xs sm:text-sm font-semibold transition duration-150 shadow-md hover:shadow-emerald-500/10 active:scale-95"
         >
           {t("header.enterApp")}
         </a>
@@ -124,7 +124,7 @@ export default function SiteHeader() {
               <SheetClose asChild>
                 <a
                   href={localize("/login")}
-                  className="w-full text-center rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-6 py-3.5 text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95"
+                  className="w-full text-center rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-6 py-3.5 text-sm font-semibold transition duration-150 shadow-md hover:shadow-emerald-500/10 active:scale-95"
                 >
                   {t("header.enterApp")}
                 </a>

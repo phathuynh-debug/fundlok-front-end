@@ -47,7 +47,7 @@ export function AccentPicker({
             aria-label={label}
             onClick={() => onChange(accent.id)}
             className={cn(
-              "group flex flex-col items-center gap-2 rounded-xl border p-3 transition-all",
+              "group flex flex-col items-center gap-2 rounded-xl border p-3 transition",
               selected
                 ? "border-primary bg-primary/5 ring-1 ring-primary/20"
                 : "border-border bg-card hover:bg-muted",

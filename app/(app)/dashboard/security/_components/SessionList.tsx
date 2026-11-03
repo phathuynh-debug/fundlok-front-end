@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, m } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
 import { ChevronDown, ChevronUp, Laptop, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -68,7 +69,7 @@ export function SessionList({
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, height: 0, marginTop: 0, marginBottom: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.2, ease: EASE_OUT }}
               className="flex flex-col gap-3 overflow-hidden py-4 sm:flex-row sm:items-center sm:justify-between"
             >
               <div className="flex items-start gap-3 min-w-0">

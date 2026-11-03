@@ -3,6 +3,7 @@
 import { useState, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
 import { m, AnimatePresence } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
 import { useMyProjects, usePublicProjects } from "@/hooks/use-projects";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { Badge } from "@/components/ui/badge";
@@ -219,12 +220,12 @@ export default function ProjectDetailsClient({
       <m.div
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.25, delay: 0.15 }}
+        transition={{ duration: 0.25, delay: 0.08, ease: EASE_OUT }}
         className="bg-muted/40 p-1 rounded-2xl grid w-full max-w-2xl mx-auto grid-cols-2 gap-1 border"
       >
         <button
           onClick={() => setActiveTab("risk")}
-          className={`py-2.5 px-4 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${
+          className={`py-2.5 px-4 rounded-xl text-sm font-semibold transition duration-200 cursor-pointer ${
             activeTab === "risk"
               ? "bg-background text-foreground shadow-sm"
               : CONTROL_IDLE
@@ -234,7 +235,7 @@ export default function ProjectDetailsClient({
         </button>
         <button
           onClick={() => setActiveTab("diligence")}
-          className={`py-2.5 px-4 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${
+          className={`py-2.5 px-4 rounded-xl text-sm font-semibold transition duration-200 cursor-pointer ${
             activeTab === "diligence"
               ? "bg-background text-foreground shadow-sm"
               : CONTROL_IDLE

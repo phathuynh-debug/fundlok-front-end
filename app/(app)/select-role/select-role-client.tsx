@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, m } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
 import {
   Building2,
   TrendingUp,
@@ -30,7 +31,7 @@ const containerVariants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.12, delayChildren: 0.05 },
+    transition: { staggerChildren: 0.06, delayChildren: 0.05 },
   },
 };
 
@@ -169,7 +170,7 @@ export function SelectRoleClient() {
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.96 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
+              transition={{ duration: 0.3, ease: EASE_OUT }}
               className="flex flex-col items-center justify-center gap-8 py-24 text-center"
             >
               <m.div

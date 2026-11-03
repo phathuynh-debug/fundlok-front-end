@@ -116,6 +116,13 @@ export function AppearanceProvider({
     document.cookie = `${REDUCE_MOTION_COOKIE_NAME}=${
       reduceMotion ? "1" : "0"
     }; path=/; max-age=31536000; samesite=lax`;
+    // The CSS half of the preference (globals.css): tw-animate keyframes and
+    // other CSS motion that MotionConfig below does not govern.
+    if (reduceMotion) {
+      document.documentElement.setAttribute("data-reduce-motion", "1");
+    } else {
+      document.documentElement.removeAttribute("data-reduce-motion");
+    }
   }, [reduceMotion]);
 
   // /login and the other signed-out entry pages keep the brand accent too. By

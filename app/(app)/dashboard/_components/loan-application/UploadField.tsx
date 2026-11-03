@@ -52,7 +52,7 @@ export function UploadField({
             document.getElementById(id)?.click();
         }}
         className={cn(
-          "border border-dashed rounded-xl p-4 flex flex-col sm:flex-row items-center justify-center gap-3 transition-all duration-200",
+          "border border-dashed rounded-xl p-4 flex flex-col sm:flex-row items-center justify-center gap-3 transition duration-200",
           status === "uploading" &&
             "border-primary/50 bg-accent/30 cursor-wait",
           status === "uploaded" &&
@@ -81,7 +81,7 @@ export function UploadField({
               </p>
               <div className="h-1.5 w-full rounded-full bg-border overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-primary transition-all duration-200"
+                  className="h-full rounded-full bg-primary transition-[width] ease-out duration-200"
                   style={{ width: `${progress}%` }}
                 />
               </div>

@@ -9,6 +9,7 @@ import {
   useReducedMotion,
   useTransform,
 } from "framer-motion";
+import { EASE_OUT, barReveal } from "@/lib/motion";
 import { CheckCircle2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { LoanApproval } from "@/services/projects.service";
@@ -80,10 +81,9 @@ export function ApprovalSummary({
             </p>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
               <m.div
-                className="h-full rounded-full bg-emerald-500"
-                initial={{ width: 0 }}
-                animate={{ width: `${approval.business_score}%` }}
-                transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+                className="h-full w-full rounded-full bg-emerald-500"
+                {...barReveal(approval.business_score)}
+                transition={{ duration: 0.9, ease: EASE_OUT }}
               />
             </div>
           </div>
@@ -163,7 +163,7 @@ function CountUp({ to, decimals }: { to: number; decimals: number }) {
     const controls = animate(value, to, {
       duration: 1.2,
       delay: 0.35,
-      ease: [0.22, 1, 0.36, 1],
+      ease: EASE_OUT,
     });
     return () => controls.stop();
   }, [reduce, to, value]);
@@ -279,7 +279,7 @@ export function ApprovalCelebration({
                       scale: [0.4, 1, 0.8],
                       rotate: p.rotate,
                     }}
-                    transition={{ duration: 1.3, delay: 0.15, ease: "easeOut" }}
+                    transition={{ duration: 1.3, delay: 0.15, ease: EASE_OUT }}
                   />
                 ))}
               <m.div

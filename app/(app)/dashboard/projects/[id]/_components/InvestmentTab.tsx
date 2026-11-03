@@ -157,11 +157,11 @@ export function InvestmentTab({
               data-testid="funding-progress"
             >
               <div
-                className="bg-foreground h-full transition-all duration-500 ease-out"
+                className="bg-foreground h-full transition-[width] duration-300 ease-out"
                 style={{ width: `${percent(confirmed)}%` }}
               />
               <div
-                className="bg-foreground/35 h-full transition-all duration-500 ease-out"
+                className="bg-foreground/35 h-full transition-[width] duration-300 ease-out"
                 style={{ width: `${percent(reserved)}%` }}
               />
             </div>

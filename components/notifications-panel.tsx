@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, m } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
 import {
   Banknote,
   Bell,
@@ -413,7 +414,7 @@ export function NotificationsPanel() {
               initial={{ opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -8 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
+              transition={{ duration: 0.25, ease: EASE_OUT }}
               className="relative whitespace-nowrap rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-lg"
             >
               <span className="absolute -left-1 top-1/2 size-2.5 -translate-y-1/2 rotate-45 bg-primary" />

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { m, useReducedMotion } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
 import { AlertCircle, Check, Loader2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -126,7 +127,7 @@ export function InvestorPanel({
     <m.div
       initial={false}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
+      transition={{ duration: 0.5, ease: EASE_OUT }}
       className="mx-auto max-w-xl space-y-5 rounded-2xl border border-border bg-card p-8 text-center shadow-xs"
     >
       <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full border border-border bg-muted/40">
@@ -324,7 +325,7 @@ function InvestorCalculator({ getSessionId }: { getSessionId: () => string }) {
         onSubmit={onCalculate}
         initial={false}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
+        transition={{ duration: 0.6, ease: EASE_OUT }}
         className="space-y-5 rounded-2xl border border-border bg-card p-6 shadow-xs"
         noValidate
       >
@@ -538,7 +539,7 @@ function InvestorCalculator({ getSessionId }: { getSessionId: () => string }) {
       <m.div
         initial={false}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.13, ease: "easeOut" }}
+        transition={{ duration: 0.6, delay: 0.13, ease: EASE_OUT }}
         className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-xs lg:sticky lg:top-24"
         aria-live="polite"
       >

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence, m } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
 import Link from "next/link";
 import { History, Search, SlidersHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -227,7 +228,7 @@ export default function TransactionsClient() {
                   key={status}
                   type="button"
                   onClick={() => setSelectedStatus(status)}
-                  className={`px-3 py-2 rounded-lg text-xs font-semibold uppercase transition-all duration-200 cursor-pointer ${
+                  className={`px-3 py-2 rounded-lg text-xs font-semibold uppercase transition duration-200 cursor-pointer ${
                     selectedStatus === status
                       ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
                       : `${CONTROL_IDLE} bg-transparent border border-transparent`
@@ -250,7 +251,7 @@ export default function TransactionsClient() {
               <Badge
                 key={type}
                 variant={selectedType === type ? "default" : "outline"}
-                className={`cursor-pointer rounded-full transition-all ${
+                className={`cursor-pointer rounded-full transition ${
                   selectedType === type
                     ? "bg-primary text-primary-foreground hover:bg-primary/90"
                     : CONTROL_HOVER
@@ -278,7 +279,7 @@ export default function TransactionsClient() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.2, ease: EASE_OUT }}
               >
                 <TransactionsTable transactions={filteredTransactions} />
               </m.div>
@@ -288,7 +289,7 @@ export default function TransactionsClient() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
+                transition={{ duration: 0.25, ease: EASE_OUT }}
                 className="text-center py-16 bg-muted/30 rounded-lg border border-dashed flex flex-col items-center justify-center p-6"
               >
                 <History className="h-10 w-10 text-muted-foreground/60 mb-4" />

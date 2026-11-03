@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { m } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Layers,
@@ -129,7 +130,7 @@ export function InvestorDashboard() {
         <m.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.3, ease: EASE_OUT }}
           className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/40 py-20 px-4 text-center"
         >
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground mb-4">
@@ -202,7 +203,7 @@ export function InvestorDashboard() {
           <m.div
             initial={{ y: 20, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.35, delay: 0.2 }}
+            transition={{ duration: 0.3, delay: 0.08, ease: EASE_OUT }}
             className="space-y-4"
           >
             <div className="flex flex-wrap items-center justify-between gap-3">

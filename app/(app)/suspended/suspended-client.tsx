@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { m } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
 import { LifeBuoy, LogOut, ShieldAlert } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -29,7 +30,7 @@ export function SuspendedClient() {
       <m.div
         initial={{ y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
+        transition={{ duration: 0.3, ease: EASE_OUT }}
         className="w-full max-w-lg space-y-6 rounded-2xl border border-border bg-card p-8 text-center text-card-foreground shadow-lg"
       >
         <div className="flex justify-end">

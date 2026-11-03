@@ -1,6 +1,7 @@
 "use client";
 
 import { m } from "framer-motion";
+import { EASE_OUT, barReveal } from "@/lib/motion";
 import { KeyRound, MonitorSmartphone, ShieldCheck } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { springItemVariants, staggerContainerVariants } from "@/lib/animations";
@@ -98,10 +99,9 @@ export function SecurityPostureCard({
             aria-label={t("dashboard.security.posture.scoreLabel")}
           >
             <m.div
-              className={cn("h-full rounded-full", styles.bar)}
-              initial={{ width: 0 }}
-              animate={{ width: `${score}%` }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
+              className={cn("h-full w-full rounded-full", styles.bar)}
+              {...barReveal(score)}
+              transition={{ duration: 0.3, ease: EASE_OUT }}
             />
           </div>
 

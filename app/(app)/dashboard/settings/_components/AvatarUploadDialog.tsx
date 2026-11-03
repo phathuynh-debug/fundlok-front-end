@@ -150,7 +150,7 @@ export function AvatarUploadDialog({
             <div className="w-full max-w-xs space-y-1.5">
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
                 <div
-                  className="h-full rounded-full bg-primary transition-all duration-200"
+                  className="h-full rounded-full bg-primary transition-[width] ease-out duration-200"
                   style={{ width: `${progress}%` }}
                 />
               </div>

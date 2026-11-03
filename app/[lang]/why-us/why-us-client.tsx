@@ -98,7 +98,8 @@ export default function WhyUsClient({ footer }: { footer: React.ReactNode }) {
     hidden: {},
     visible: {
       transition: {
-        staggerChildren: 0.15,
+        // 30-80ms reads as one gesture; longer makes the last item wait.
+        staggerChildren: 0.06,
       },
     },
   };
@@ -113,11 +114,7 @@ export default function WhyUsClient({ footer }: { footer: React.ReactNode }) {
     hidden: { y: 30 },
     visible: {
       y: 0,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 15,
-      },
+      transition: { type: "spring", duration: 0.5, bounce: 0.2 },
     },
   };
 
@@ -128,11 +125,7 @@ export default function WhyUsClient({ footer }: { footer: React.ReactNode }) {
     visible: {
       opacity: 1,
       y: 0,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 15,
-      },
+      transition: { type: "spring", duration: 0.5, bounce: 0.2 },
     },
   };
 
@@ -190,9 +183,9 @@ export default function WhyUsClient({ footer }: { footer: React.ReactNode }) {
 
           <m.div
             variants={aboveFoldItemVariants}
-            className="lg:col-span-5 bg-gradient-to-br from-emerald-500/10 via-zinc-500/5 to-transparent dark:from-emerald-500/5 dark:via-zinc-900/40 dark:to-transparent border border-border/10 p-8 rounded-2xl relative overflow-hidden backdrop-blur-sm group hover:border-emerald-500/20 transition-all duration-300"
+            className="lg:col-span-5 bg-gradient-to-br from-emerald-500/10 via-zinc-500/5 to-transparent dark:from-emerald-500/5 dark:via-zinc-900/40 dark:to-transparent border border-border/10 p-8 rounded-2xl relative overflow-hidden backdrop-blur-sm group hover:border-emerald-500/20 transition duration-300"
           >
-            <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl -z-10 group-hover:bg-emerald-500/20 transition-all duration-300" />
+            <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl -z-10 group-hover:bg-emerald-500/20 transition duration-300" />
             <div className="w-10 h-10 rounded-lg bg-emerald-500/15 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-6 font-bold text-lg">
               ★
             </div>
@@ -379,14 +372,14 @@ export default function WhyUsClient({ footer }: { footer: React.ReactNode }) {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a
                 href={localize("/login")}
-                className="w-full sm:w-auto rounded-full bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-8 py-3.5 text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-emerald-500/10 active:scale-95 flex items-center justify-center gap-2 group/btn"
+                className="w-full sm:w-auto rounded-full bg-emerald-500 hover:bg-emerald-600 text-white dark:bg-emerald-400 dark:hover:bg-emerald-300 dark:text-slate-950 px-8 py-3.5 text-sm font-semibold transition duration-150 shadow-md hover:shadow-emerald-500/10 active:scale-95 flex items-center justify-center gap-2 group/btn"
               >
                 {t("header.enterApp")}
                 <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" />
               </a>
               <Link
                 href={localize("/")}
-                className="w-full sm:w-auto rounded-full border border-border bg-transparent hover:bg-zinc-100 dark:hover:bg-slate-800 text-foreground px-8 py-3.5 text-sm font-semibold transition-all duration-300 active:scale-95"
+                className="w-full sm:w-auto rounded-full border border-border bg-transparent hover:bg-zinc-100 dark:hover:bg-slate-800 text-foreground px-8 py-3.5 text-sm font-semibold transition duration-150 active:scale-95"
               >
                 {t("common.backToHome")}
               </Link>

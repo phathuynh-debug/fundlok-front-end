@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { m } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
 import {
   ShieldCheck,
   Loader2,
@@ -118,7 +119,7 @@ export function MobileKycClient() {
       <m.div
         initial={{ y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
+        transition={{ duration: 0.3, ease: EASE_OUT }}
         className="w-full max-w-md space-y-6 rounded-2xl border border-border bg-card p-6 text-center text-card-foreground shadow-lg"
       >
         <div className="flex items-center justify-end">

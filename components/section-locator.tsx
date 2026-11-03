@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { m } from "framer-motion";
+import { EASE_OUT } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "@/lib/i18n";
 
@@ -50,7 +51,7 @@ export function SectionLocator() {
     <m.nav
       initial={{ opacity: 0, x: 12 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.6, delay: 1, ease: "easeOut" }}
+      transition={{ duration: 0.6, delay: 1, ease: EASE_OUT }}
       aria-label={t("common.pageSections")}
       // xl, not lg: between 1024 and 1280px the content runs nearly to the
       // edge and even the dots sat on top of it.
@@ -72,7 +73,7 @@ export function SectionLocator() {
                 // the active section sat on top of the process cards. The
                 // active dot already says where you are. The pill keeps a
                 // hovered label legible over text.
-                "whitespace-nowrap rounded-full bg-background/80 backdrop-blur-sm px-2 py-0.5 text-xs tracking-wider font-bold uppercase transition-all duration-300 select-none opacity-0 translate-x-1.5 group-hover:opacity-100 group-hover:translate-x-0 group-focus-visible:opacity-100 group-focus-visible:translate-x-0",
+                "whitespace-nowrap rounded-full bg-background/80 backdrop-blur-sm px-2 py-0.5 text-xs tracking-wider font-bold uppercase transition duration-300 select-none opacity-0 translate-x-1.5 group-hover:opacity-100 group-hover:translate-x-0 group-focus-visible:opacity-100 group-focus-visible:translate-x-0",
                 isActive
                   ? "text-emerald-600 dark:text-emerald-400"
                   : "text-zinc-500 dark:text-zinc-400",
@@ -82,7 +83,7 @@ export function SectionLocator() {
             </span>
             <span
               className={cn(
-                "rounded-full transition-all duration-300",
+                "rounded-full transition-[width,height,background-color,box-shadow] duration-300",
                 isActive
                   ? "w-2.5 h-2.5 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.55)]"
                   : "w-1.5 h-1.5 bg-zinc-400/70 dark:bg-zinc-600 group-hover:bg-zinc-500 dark:group-hover:bg-zinc-400",

@@ -274,7 +274,8 @@ export function TourOverlay({
         aria-hidden="true"
         className={cn(
           "pointer-events-auto absolute rounded-lg ring-2 ring-primary/70",
-          !reduceMotion && "transition-all duration-300 ease-out",
+          !reduceMotion &&
+            "transition-[top,left,width,height] duration-300 ease-in-out",
         )}
         style={{
           top: rect.top,
@@ -293,7 +294,7 @@ export function TourOverlay({
         tabIndex={-1}
         className={cn(
           "absolute w-80 max-w-[calc(100vw-1.5rem)] rounded-xl border border-border bg-card p-4 text-card-foreground shadow-xl outline-none",
-          !reduceMotion && "transition-all duration-300 ease-out",
+          !reduceMotion && "transition-[top,left] duration-300 ease-in-out",
         )}
         style={{ top, left }}
       >

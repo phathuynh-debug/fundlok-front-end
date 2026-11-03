@@ -13,6 +13,7 @@ import {
   DEFAULT_ACCENT,
   DEFAULT_RADIUS,
   RADIUS_COOKIE_NAME,
+  REDUCE_MOTION_COOKIE_NAME,
   type AccentId,
   type RadiusId,
 } from "@/lib/appearance";
@@ -138,8 +139,9 @@ function localBusinessSchema(seo: SeoStrings) {
 
 /**
  * A prerendered page cannot read the appearance cookies on the server, so it
- * ships the defaults and this swaps in the visitor's radius before the body
- * paints — the same attribute the dynamic layout renders server-side. Only the
+ * ships the defaults and this swaps in the visitor's radius and reduce-motion
+ * choice before the body paints — the same attributes the dynamic layout
+ * renders server-side. Only the
  * static layout uses it: the dynamic one would need a nonce for it, and has no
  * need.
  *
@@ -147,7 +149,7 @@ function localBusinessSchema(seo: SeoStrings) {
  * site, which keeps the brand colours whatever accent a signed-in user picked
  * for their dashboard; the accent stays at DEFAULT_ACCENT, rendered below.
  */
-const APPEARANCE_SCRIPT = `(function(){try{var c=document.cookie,r=document.documentElement,m;if((m=c.match(/(?:^|; )${RADIUS_COOKIE_NAME}=([a-z-]+)/)))r.setAttribute("data-radius",m[1]);}catch(e){}})();`;
+const APPEARANCE_SCRIPT = `(function(){try{var c=document.cookie,r=document.documentElement,m;if((m=c.match(/(?:^|; )${RADIUS_COOKIE_NAME}=([a-z-]+)/)))r.setAttribute("data-radius",m[1]);if(/(?:^|; )${REDUCE_MOTION_COOKIE_NAME}=1(?:;|$)/.test(c))r.setAttribute("data-reduce-motion","1");}catch(e){}})();`;
 
 export function RootDocument({
   locale,
@@ -189,6 +191,9 @@ export function RootDocument({
         brandAccent ? DEFAULT_ACCENT : (appearance?.accent ?? DEFAULT_ACCENT)
       }
       data-radius={appearance?.radius ?? DEFAULT_RADIUS}
+      // The in-app "reduce motion" toggle, for the CSS animations that
+      // framer-motion's MotionConfig cannot reach (globals.css).
+      data-reduce-motion={appearance?.reduceMotion ? "1" : undefined}
       suppressHydrationWarning
     >
       <body
