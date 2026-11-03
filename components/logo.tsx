@@ -10,12 +10,15 @@ type LogoProps = {
 // `/_next/image` cost a ~1.2s origin round trip on every view, because that
 // path carries a query string and Cloudflare therefore treats it as DYNAMIC
 // and never caches it at the edge. Served as a plain file from `public/` it
-// is edge-cacheable and lands in ~20ms. The WebPs are pre-sized at 512px wide
-// (3x headroom) by the conversion recorded in the perf commit.
-const LIGHT_SRC = "/logo/logo-light.webp";
-const DARK_SRC = "/logo/logo-dark.webp";
-const INTRINSIC_WIDTH = 512;
-const INTRINSIC_HEIGHT = 181;
+// is edge-cacheable and lands in ~20ms. These are 384px-wide copies of the
+// 512px masters (still >3x the ~113px it is painted at): the light mark is
+// preloaded at high priority on every page, so 29KB -> 16KB comes straight
+// off the critical path. The 512px masters stay for the welcome screen, which
+// paints the mark at up to 320px.
+const LIGHT_SRC = "/logo/logo-light-384.webp";
+const DARK_SRC = "/logo/logo-dark-384.webp";
+const INTRINSIC_WIDTH = 384;
+const INTRINSIC_HEIGHT = 136;
 
 export default function Logo({
   alt = "FundLok",
