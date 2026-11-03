@@ -349,6 +349,19 @@ async function routeRequest(request: NextRequest, refreshed: string[]) {
   ) {
     return pass();
   }
+  // Where the maintenance flag matters (see the gate below), start its lookup
+  // now so it runs alongside the session lookup instead of after it. It never
+  // rejects (failures resolve to null), so an early redirect that leaves it
+  // un-awaited is harmless.
+  const isMaintenancePage = pathname === MAINTENANCE_ROUTE;
+  const isBlockedDuringMaintenance = MAINTENANCE_BLOCKED_ROUTES.some(
+    (r) => pathname === r || pathname.startsWith(`${r}/`),
+  );
+  const maintenanceLookup =
+    isMaintenancePage || isBlockedDuringMaintenance
+      ? middlewareService.getMaintenance(request)
+      : null;
+
   let accessToken = request.cookies.get("access_token")?.value;
   let session = accessToken
     ? await middlewareService.getCurrentUser(request)
@@ -459,13 +472,10 @@ async function routeRequest(request: NextRequest, refreshed: string[]) {
   // but never reaches this branch — so browsing the site costs zero
   // maintenance lookups.
   // The lookup itself is cached in middleware.service.ts; see the note there
-  // for why prefetches can't simply be skipped instead.
-  const isMaintenancePage = pathname === MAINTENANCE_ROUTE;
-  const isBlockedDuringMaintenance = MAINTENANCE_BLOCKED_ROUTES.some(
-    (r) => pathname === r || pathname.startsWith(`${r}/`),
-  );
-  if (isMaintenancePage || isBlockedDuringMaintenance) {
-    const maintenance = await middlewareService.getMaintenance(request);
+  // for why prefetches can't simply be skipped instead. The lookup was
+  // started before the session lookup (maintenanceLookup, above).
+  if (maintenanceLookup) {
+    const maintenance = await maintenanceLookup;
     const maintenanceOn = !!maintenance?.enabled;
 
     if (maintenanceOn && isBlockedDuringMaintenance && !isSystemAdmin) {

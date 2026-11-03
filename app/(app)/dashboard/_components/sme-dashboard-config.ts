@@ -25,7 +25,6 @@ export interface IndustryTheme {
   pulseColor: string;
   glowColor: string;
   icon: LucideIcon;
-  animationClass: string;
   tagline: string;
   taglineVi: string;
   patternClass: string;
@@ -44,7 +43,6 @@ export const INDUSTRY_THEMES: Record<string, IndustryTheme> = {
     pulseColor: "bg-blue-500",
     glowColor: "bg-blue-500/20 blur-3xl",
     icon: Cpu,
-    animationClass: "animate-pulse duration-1000",
     tagline: "Scaling business infrastructure with smart, clean automation.",
     taglineVi: "Tối ưu hóa hạ tầng kinh doanh bằng tự động hóa thông minh.",
     patternClass:
@@ -62,7 +60,6 @@ export const INDUSTRY_THEMES: Record<string, IndustryTheme> = {
     pulseColor: "bg-purple-500",
     glowColor: "bg-purple-500/20 blur-3xl",
     icon: ShoppingBag,
-    animationClass: "hover:scale-105 transition-transform duration-300",
     tagline: "Connecting digital storefronts with global consumer demands.",
     taglineVi: "Kết nối cửa hàng trực tuyến với nhu cầu tiêu dùng toàn cầu.",
     patternClass:
@@ -80,7 +77,6 @@ export const INDUSTRY_THEMES: Record<string, IndustryTheme> = {
     pulseColor: "bg-teal-500",
     glowColor: "bg-teal-500/20 blur-3xl",
     icon: HeartPulse,
-    animationClass: "animate-bounce [animation-duration:3s]",
     tagline: "Empowering patient care and healthcare operational excellence.",
     taglineVi: "Nâng cao chất lượng chăm sóc và tối ưu hóa vận hành y tế.",
     patternClass:
@@ -98,7 +94,6 @@ export const INDUSTRY_THEMES: Record<string, IndustryTheme> = {
     pulseColor: "bg-amber-500",
     glowColor: "bg-amber-500/20 blur-3xl",
     icon: Factory,
-    animationClass: "hover:-translate-y-1 transition-transform duration-300",
     tagline:
       "Driving precise assembly lines and sustainable factory operations.",
     taglineVi: "Đẩy mạnh dây chuyền lắp ráp và vận hành nhà máy bền vững.",
@@ -117,7 +112,6 @@ export const INDUSTRY_THEMES: Record<string, IndustryTheme> = {
     pulseColor: "bg-rose-500",
     glowColor: "bg-rose-500/20 blur-3xl",
     icon: Utensils,
-    animationClass: "hover:rotate-6 transition-transform duration-300",
     tagline: "Serving quality culinary experiences and premium hospitality.",
     taglineVi: "Mang đến trải nghiệm ẩm thực chất lượng và dịch vụ tận tâm.",
     patternClass:
@@ -135,7 +129,6 @@ export const INDUSTRY_THEMES: Record<string, IndustryTheme> = {
     pulseColor: "bg-sky-500",
     glowColor: "bg-sky-500/20 blur-3xl",
     icon: Truck,
-    animationClass: "hover:translate-x-1 transition-transform duration-300",
     tagline: "Optimizing supply route links and speed of cargo delivery.",
     taglineVi:
       "Tối ưu hóa các tuyến đường cung ứng và tốc độ giao vận hàng hóa.",
@@ -154,7 +147,6 @@ export const INDUSTRY_THEMES: Record<string, IndustryTheme> = {
     pulseColor: "bg-stone-500",
     glowColor: "bg-stone-500/20 blur-3xl",
     icon: HardHat,
-    animationClass: "hover:shadow-lg transition-shadow duration-300",
     tagline: "Building strong foundations and sustainable modern architecture.",
     taglineVi: "Xây dựng nền móng vững chắc và kiến trúc hiện đại bền vững.",
     patternClass:
@@ -172,7 +164,6 @@ export const INDUSTRY_THEMES: Record<string, IndustryTheme> = {
     pulseColor: "bg-violet-500",
     glowColor: "bg-violet-500/20 blur-3xl",
     icon: Briefcase,
-    animationClass: "hover:scale-[1.02] transition-all duration-300",
     tagline: "Providing trusted consultancy and professional expertise.",
     taglineVi: "Cung cấp dịch vụ tư vấn uy tín và chuyên môn chuyên nghiệp.",
     patternClass:
@@ -190,7 +181,6 @@ export const INDUSTRY_THEMES: Record<string, IndustryTheme> = {
     pulseColor: "bg-green-500",
     glowColor: "bg-green-500/20 blur-3xl",
     icon: Sprout,
-    animationClass: "hover:-translate-y-1 transition-transform duration-300",
     tagline: "Growing the crops and livestock the food chain starts with.",
     taglineVi: "Nuôi trồng nông sản, khởi đầu của chuỗi cung ứng thực phẩm.",
     patternClass:
@@ -208,7 +198,6 @@ export const INDUSTRY_THEMES: Record<string, IndustryTheme> = {
     pulseColor: "bg-orange-500",
     glowColor: "bg-orange-500/20 blur-3xl",
     icon: Hammer,
-    animationClass: "hover:rotate-3 transition-transform duration-300",
     tagline: "Crafting durable furniture and finished wood products.",
     taglineVi: "Chế tác nội thất bền vững và sản phẩm gỗ hoàn thiện.",
     patternClass:
@@ -226,7 +215,6 @@ export const INDUSTRY_THEMES: Record<string, IndustryTheme> = {
     pulseColor: "bg-pink-500",
     glowColor: "bg-pink-500/20 blur-3xl",
     icon: Sparkles,
-    animationClass: "hover:scale-105 transition-transform duration-300",
     tagline: "Serving everyday grooming and personal care routines.",
     taglineVi: "Phục vụ nhu cầu chăm sóc cá nhân và sắc đẹp hằng ngày.",
     patternClass:
@@ -244,7 +232,6 @@ export const INDUSTRY_THEMES: Record<string, IndustryTheme> = {
     pulseColor: "bg-indigo-500",
     glowColor: "bg-indigo-500/20 blur-3xl",
     icon: GraduationCap,
-    animationClass: "hover:-translate-y-0.5 transition-transform duration-300",
     tagline: "Teaching the skills local employers are hiring for.",
     taglineVi: "Đào tạo kỹ năng mà doanh nghiệp địa phương đang cần.",
     patternClass:
@@ -264,7 +251,6 @@ export const DEFAULT_THEME: IndustryTheme = {
   pulseColor: "bg-zinc-500",
   glowColor: "bg-zinc-500/20 blur-3xl",
   icon: HelpCircle,
-  animationClass: "transition-all duration-300",
   tagline: "Managing SME funding requests and project profiles.",
   taglineVi: "Quản lý yêu cầu tài trợ và thông tin dự án SME.",
   patternClass:
