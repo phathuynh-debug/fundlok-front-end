@@ -21,6 +21,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { NotificationsPopover } from "@/components/notifications-panel";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { TourReplayButton } from "@/components/tour-replay-button";
 import { WelcomeReplayButton } from "@/components/welcome-replay-button";
@@ -160,6 +161,8 @@ export function DashboardHeader() {
           <LocaleSwitcher />
           <ThemeToggle />
           {hasWelcome && <WelcomeReplayButton />}
+          {/* The sidebar, and the bell on its user row, are hidden here. */}
+          <NotificationsPopover />
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button

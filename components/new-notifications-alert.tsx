@@ -33,8 +33,9 @@ import type { AppNotification } from "@/services/notifications.service";
  * notifications.
  *
  * The bell sits at the very bottom of the sidebar, below where anyone looks,
- * and on a phone the sidebar is not shown at all — so an approval could land
- * and go unnoticed. This brings the message itself to the centre of the page.
+ * and on a phone it is one small icon among the header's — so an approval
+ * could land and go unnoticed. This brings the message itself to the centre of
+ * the page.
  *
  * Mounted once by the dashboard layout, outside the sidebar, so it shows on
  * every screen size. It reads the bell's own query (same key, no second

@@ -1,8 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { NotificationsPanel } from "./notifications-panel";
+import {
+  NotificationsPanel,
+  NotificationsPopover,
+} from "./notifications-panel";
+import { useNotificationsRealtime } from "@/hooks/use-notifications-realtime";
 import type { NotificationList } from "@/services/notifications.service";
 
 vi.mock("@/lib/i18n", () => ({
@@ -359,5 +363,67 @@ describe("NotificationsPanel — new-notification label", () => {
     expect(
       screen.getByText('notifications.alert.titleMany:{"count":2}'),
     ).toBeInTheDocument();
+  });
+});
+
+describe("NotificationsPopover (header bell on a phone)", () => {
+  beforeEach(() => {
+    vi.mocked(useNotificationsRealtime).mockClear();
+  });
+
+  it("puts the unread count in the accessible name", () => {
+    render(<NotificationsPopover />);
+    expect(
+      screen.getByRole("button", {
+        name: 'notifications.ariaLabelUnread:{"count":1}',
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("opens the list on a tap, since a hover card never opens from touch", async () => {
+    render(<NotificationsPopover />);
+
+    expect(screen.queryByText("notifications.title")).toBeNull();
+    await userEvent.click(screen.getByRole("button"));
+    expect(await screen.findByText("notifications.title")).toBeInTheDocument();
+    expect(
+      screen.getByText("notifications.items.applicationApproved"),
+    ).toBeInTheDocument();
+  });
+
+  it("closes when a row's link is followed", async () => {
+    // The header outlives a client-side navigation, so the list would
+    // otherwise stay open over the page it led to.
+    listResult.data = {
+      items: [
+        notification({
+          id: "r1",
+          event: "VERIFICATION_REQUIRED",
+          entity_type: "USER",
+          entity_id: "u1",
+          data: { check: "KYC" },
+        }),
+      ],
+      unread: 1,
+    };
+    render(<NotificationsPopover />);
+    await userEvent.click(screen.getByRole("button"));
+
+    await userEvent.click(
+      await screen.findByRole("link", {
+        name: /notifications\.items\.verificationRequiredKyc/,
+      }),
+    );
+    await waitFor(() =>
+      expect(screen.queryByText("notifications.title")).toBeNull(),
+    );
+    expect(markRead).not.toHaveBeenCalled();
+  });
+
+  it("opens no realtime connection of its own", () => {
+    // The sidebar bell is mounted on a phone too (CSS hides it) and holds the
+    // one connection; a second would double every refresh.
+    render(<NotificationsPopover />);
+    expect(useNotificationsRealtime).not.toHaveBeenCalled();
   });
 });
