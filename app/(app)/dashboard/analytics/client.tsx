@@ -287,8 +287,10 @@ export default function AnalyticsClient() {
                 </ChartCard>
 
                 <ChartCard
-                  title={t("dashboard.analytics.charts.statusTitle")}
-                  description={t("dashboard.analytics.charts.statusDesc")}
+                  title={t("dashboard.analytics.charts.capitalStatusTitle")}
+                  description={t(
+                    "dashboard.analytics.charts.capitalStatusDesc",
+                  )}
                 >
                   <CapitalStatusChart
                     statusAllocation={capitalStatus}
