@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { AdminReviewFilter } from "@/services/admin.service";
-import { AdminPageLoader } from "../_components/AdminDirectory";
+import { AdminPageLoader } from "../_components/AdminPageLoader";
 import { KycReviewQueue, REVIEW_FILTERS } from "./_components/KycReviewQueue";
 import { KybReviewQueue } from "./_components/KybReviewQueue";
 

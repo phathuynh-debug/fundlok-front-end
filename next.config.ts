@@ -31,6 +31,25 @@ const nextConfig: NextConfig = {
     // time on qualities we never ask for. 75 is the `next/image` default.
     qualities: [75],
   },
+  webpack(config, { dev, isServer }) {
+    // Client production chunking only. The App Router gives every page,
+    // layout, error/not-found boundary and next/dynamic import its own chunk
+    // group, so a module a few of them share (lib/i18n, the lucide icon base,
+    // Radix primitives, Button) rarely adds up to webpack's default 20 kB
+    // `minSize` and is copied into each chunk instead: ~22 kB of duplicates on
+    // `/`. 10 kB lets those groups split out, which cut 6-13 kB gzip of
+    // first-load JS on every route measured for 4-7 more (parallel) requests;
+    // CSS output is unchanged. Not monotonic: 15 kB was worse than the default
+    // on /dashboard, so re-measure before moving it.
+    if (!dev && !isServer && config.optimization.splitChunks) {
+      config.optimization.splitChunks.minSize = 10000;
+    }
+    return config;
+  },
+  // Required alongside `webpack`: Turbopack-default commands (`next dev`)
+  // refuse to start when a `webpack` hook exists without a `turbopack` key.
+  // Turbopack ignores the hook above and needs no options of its own.
+  turbopack: {},
   async headers() {
     return [
       {

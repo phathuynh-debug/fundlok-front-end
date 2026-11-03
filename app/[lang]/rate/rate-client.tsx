@@ -12,7 +12,6 @@ import dynamic from "next/dynamic";
 import { m, useReducedMotion } from "framer-motion";
 import { AlertCircle, Check, Copy, Loader2, Sparkles } from "lucide-react";
 import SiteHeader from "@/components/site-header";
-import SiteFooter from "@/components/site-footer";
 import { BackgroundBlobs } from "@/components/background-blobs";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -294,7 +293,7 @@ const noSubscribe = () => () => {};
 const linkedToInvestor = () =>
   new URLSearchParams(window.location.search).get("for") === "investor";
 
-export default function RateClient() {
+export default function RateClient({ footer }: { footer: React.ReactNode }) {
   const linkedInvestor = useSyncExternalStore(
     noSubscribe,
     linkedToInvestor,
@@ -1459,7 +1458,8 @@ export default function RateClient() {
         </m.section>
       </div>
 
-      <SiteFooter />
+      {/* Server-rendered by page.tsx: see components/site-footer.tsx. */}
+      {footer}
     </div>
   );
 }

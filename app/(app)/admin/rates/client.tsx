@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { isAdminRole } from "@/services/authentication.service";
 import { useTranslations } from "@/lib/i18n";
-import { AdminPageLoader } from "../_components/AdminDirectory";
+import { AdminPageLoader } from "../_components/AdminPageLoader";
 import { RateInquiriesDirectory } from "./_components/RateInquiriesDirectory";
 import { InvestorLeadsDirectory } from "./_components/InvestorLeadsDirectory";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

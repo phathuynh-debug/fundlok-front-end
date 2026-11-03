@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { isAdminRole } from "@/services/authentication.service";
 import { useTranslations } from "@/lib/i18n";
-import { AdminDirectory, AdminPageLoader } from "../_components/AdminDirectory";
+import { AdminDirectory } from "../_components/AdminDirectory";
+import { AdminPageLoader } from "../_components/AdminPageLoader";
 import { InviteAdminDialog } from "./_components/InviteAdminDialog";
 
 export default function AdminUsersClient() {

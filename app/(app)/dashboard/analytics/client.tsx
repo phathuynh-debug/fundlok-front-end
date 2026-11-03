@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { m } from "framer-motion";
 import { BarChart3, PieChart, TableIcon } from "lucide-react";
@@ -12,12 +13,6 @@ import { pageTransitionProps } from "@/lib/animations";
 import { useTranslations } from "@/lib/i18n";
 import { AnalyticsKpiCards } from "./_components/AnalyticsKpiCards";
 import { AnalyticsTableView } from "./_components/AnalyticsTableView";
-import { CapitalFlowChart } from "./_components/CapitalFlowChart";
-import { CapitalStatusChart } from "./_components/CapitalStatusChart";
-import { IndustryAllocationChart } from "./_components/IndustryAllocationChart";
-import { IndustrySplitChart } from "./_components/IndustrySplitChart";
-import { MonthlyReturnsChart } from "./_components/MonthlyReturnsChart";
-import { SmeAnalyticsView } from "./_components/sme/SmeAnalyticsView";
 import {
   deriveKpis,
   sliceByRange,
@@ -32,6 +27,45 @@ import type {
 import { CONTROL_IDLE } from "@/lib/ui-tokens";
 
 const RANGES: RangeKey[] = ["3M", "6M", "12M"];
+
+// The charts are loaded after the page hydrates rather than with it: Recharts
+// is ~140 kB gzipped, more than the rest of this page, and none of it draws
+// before the analytics data arrives. AnalyticsClient starts these imports as
+// soon as it knows the role, so the chunk downloads alongside the data request
+// instead of in front of the whole page. Each placeholder keeps its chart's
+// height, so nothing below moves when it lands.
+const loadInvestorCharts = () => import("./_components/investor-charts");
+const loadSmeAnalyticsView = () => import("./_components/sme/SmeAnalyticsView");
+
+function ChartPlaceholder({ className }: { className: string }) {
+  return <Skeleton className={`w-full rounded-xl ${className}`} />;
+}
+
+const CapitalFlowChart = dynamic(
+  () => loadInvestorCharts().then((mod) => mod.CapitalFlowChart),
+  { ssr: false, loading: () => <ChartPlaceholder className="h-[300px]" /> },
+);
+const MonthlyReturnsChart = dynamic(
+  () => loadInvestorCharts().then((mod) => mod.MonthlyReturnsChart),
+  { ssr: false, loading: () => <ChartPlaceholder className="h-[300px]" /> },
+);
+const IndustryAllocationChart = dynamic(
+  () => loadInvestorCharts().then((mod) => mod.IndustryAllocationChart),
+  { ssr: false, loading: () => <ChartPlaceholder className="h-[300px]" /> },
+);
+const IndustrySplitChart = dynamic(
+  () => loadInvestorCharts().then((mod) => mod.IndustrySplitChart),
+  { ssr: false, loading: () => <ChartPlaceholder className="h-[220px]" /> },
+);
+const CapitalStatusChart = dynamic(
+  () => loadInvestorCharts().then((mod) => mod.CapitalStatusChart),
+  { ssr: false, loading: () => <ChartPlaceholder className="h-[220px]" /> },
+);
+// A business's screen, with its own two charts. Investors never load it.
+const SmeAnalyticsView = dynamic(
+  () => loadSmeAnalyticsView().then((mod) => mod.SmeAnalyticsView),
+  { ssr: false, loading: () => <AnalyticsSkeleton /> },
+);
 
 // Nothing yet. Module-level so their identity is stable across renders (the
 // useMemos below depend on them).
@@ -105,6 +139,14 @@ export default function AnalyticsClient() {
   // days it repaid them, on its own screen (one loan, not a portfolio).
   // Before any of that, the empty state below.
   const isInvestor = user?.role === "INVESTOR";
+
+  // Start fetching the role's charts now, not when the data has arrived and
+  // the first chart renders (see loadInvestorCharts above).
+  useEffect(() => {
+    if (isInvestor) void loadInvestorCharts();
+    if (isSme) void loadSmeAnalyticsView();
+  }, [isInvestor, isSme]);
+
   const analytics = useMyAnalytics(isInvestor);
   const loan = useBusinessAnalytics(isSme);
   const facility = isSme ? (loan.data?.facility ?? null) : null;

@@ -2,7 +2,6 @@
 
 import { m, useReducedMotion, type Variants } from "framer-motion";
 import SiteHeader from "@/components/site-header";
-import SiteFooter from "@/components/site-footer";
 import { ContactForm } from "@/components/contact-form";
 import { BackgroundBlobs } from "@/components/background-blobs";
 import { useTranslations } from "@/lib/i18n";
@@ -24,7 +23,7 @@ const cardItem: Variants = {
   visible: { y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
-export default function ContactClient() {
+export default function ContactClient({ footer }: { footer: React.ReactNode }) {
   const { t } = useTranslations();
   const reduceMotion = useReducedMotion();
 
@@ -95,7 +94,8 @@ export default function ContactClient() {
         </div>
       </div>
 
-      <SiteFooter />
+      {/* Server-rendered by page.tsx: see components/site-footer.tsx. */}
+      {footer}
     </div>
   );
 }

@@ -7,7 +7,7 @@ import type {
   AdminProjectRow,
   AdminUserRow,
 } from "@/services/admin.service";
-import { Loader2, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -392,20 +392,5 @@ export function AdminDirectory({ mode }: { mode: AdminMode }) {
         />
       )}
     </>
-  );
-}
-
-/** Shared loading state for the admin pages while the session resolves. */
-export function AdminPageLoader() {
-  const { t } = useTranslations();
-  return (
-    <div className="h-screen w-full flex items-center justify-center bg-background">
-      <div className="flex flex-col items-center gap-2">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="text-sm font-medium text-muted-foreground">
-          {t("admin.loading")}
-        </span>
-      </div>
-    </div>
   );
 }

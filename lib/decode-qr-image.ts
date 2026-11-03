@@ -1,5 +1,3 @@
-import jsQR from "jsqr";
-
 // Bank-app screenshots are often 1200×2600 or larger. Scanning a copy no
 // bigger than this keeps decoding fast without losing a full-screen QR.
 const MAX_SIDE = 1600;
@@ -9,6 +7,9 @@ const MAX_SIDE = 1600;
  * browser: the image is never uploaded. Returns null when no QR is found.
  */
 export async function decodeQrImage(file: File): Promise<string | null> {
+  // Fetched on the first scan, not with the settings page: the decoder is
+  // larger than the page itself, and most visits never pick an image.
+  const { default: jsQR } = await import("jsqr");
   const bitmap = await createImageBitmap(file);
   try {
     const scale = Math.min(1, MAX_SIDE / Math.max(bitmap.width, bitmap.height));

@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { AdminPaymentAccountFilter } from "@/services/admin.service";
-import { AdminPageLoader } from "../_components/AdminDirectory";
+import { AdminPageLoader } from "../_components/AdminPageLoader";
 import { BankAccountReviewItem } from "../_components/BankAccountReviewItem";
 
 const K = "admin.bankAccounts";

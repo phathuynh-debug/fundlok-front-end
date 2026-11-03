@@ -11,6 +11,7 @@ import {
 } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import RateClient from "./rate-client";
+import SiteFooter from "@/components/site-footer";
 
 export async function generateMetadata({
   params,
@@ -69,7 +70,7 @@ export default async function RatePage({ params }: { params: LangParams }) {
       <script type="application/ld+json" id="rate-faq-jsonld">
         {JSON.stringify(rateFaqSchema)}
       </script>
-      <RateClient />
+      <RateClient footer={<SiteFooter locale={locale} />} />
     </>
   );
 }

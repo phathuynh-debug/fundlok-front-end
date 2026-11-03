@@ -1,9 +1,20 @@
-"use client";
-
 import Link from "next/link";
 import type { SVGProps } from "react";
 import { Mail, ArrowRight } from "lucide-react";
-import { useTranslations } from "@/lib/i18n";
+import { createServerTranslator } from "@/lib/i18n/server";
+import { localizedHref } from "@/lib/locale-routing";
+import type { SeoLocale } from "@/lib/seo";
+
+/**
+ * The marketing footer. A server component: it is static links and copy, so it
+ * ships no JavaScript. Client pages take it as a `footer` slot from their
+ * server page.tsx rather than importing it — imported from a client module it
+ * would be bundled for the browser again, and `createServerTranslator` with
+ * both dictionaries along with it.
+ *
+ * `locale` is the page's own (the [lang] segment), which is also what the
+ * client `localize()` reads on these pages, so the links match the header's.
+ */
 
 const FacebookIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
@@ -69,8 +80,9 @@ const socialLinks = [
   },
 ];
 
-export default function SiteFooter() {
-  const { t, localize } = useTranslations();
+export default function SiteFooter({ locale }: { locale: SeoLocale }) {
+  const t = createServerTranslator(locale);
+  const localize = (href: string) => localizedHref(href, locale);
 
   return (
     <footer className="w-full border-t border-white/10 bg-[#0b1217] text-zinc-100">

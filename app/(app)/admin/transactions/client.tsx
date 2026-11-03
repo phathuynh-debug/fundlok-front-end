@@ -24,7 +24,7 @@ import {
   type AdminRoundFilter,
   type AdminTransferFilter,
 } from "@/services/admin-funding.service";
-import { AdminPageLoader } from "../_components/AdminDirectory";
+import { AdminPageLoader } from "../_components/AdminPageLoader";
 import { ActivityLog } from "./_components/ActivityLog";
 import { FundingRoundsTable } from "./_components/FundingRoundsTable";
 import { RepaymentQueue } from "./_components/RepaymentQueue";

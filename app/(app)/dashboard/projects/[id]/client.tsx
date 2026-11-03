@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
+import dynamic from "next/dynamic";
 import { m, AnimatePresence } from "framer-motion";
 import { useMyProjects, usePublicProjects } from "@/hooks/use-projects";
 import { useRequireAuth } from "@/hooks/use-authentication";
@@ -12,7 +13,6 @@ import Link from "next/link";
 import { InvestmentKpis } from "./_components/InvestmentKpis";
 import { RiskAssessmentTab } from "./_components/RiskAssessmentTab";
 import { DueDiligenceTab } from "./_components/DueDiligenceTab";
-import { OwnerProjectView } from "./_components/OwnerProjectView";
 import { ScoreLabel } from "./_components/ScoreLabel";
 import { useTranslations } from "@/lib/i18n";
 import { industryLabel } from "@/lib/industry-label";
@@ -27,6 +27,16 @@ import { cn } from "@/lib/utils";
 type TabType = "risk" | "diligence";
 
 const emptySubscribe = () => () => {};
+
+// An SME opening its own project. Its own chunk, because it brings the
+// loan-application flow, which an investor reading a listing never needs.
+const OwnerProjectView = dynamic(
+  () =>
+    import("./_components/OwnerProjectView").then(
+      (mod) => mod.OwnerProjectView,
+    ),
+  { loading: () => <ProjectDetailsSkeleton /> },
+);
 
 function ProjectDetailsSkeleton() {
   return (

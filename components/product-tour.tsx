@@ -9,10 +9,10 @@ import {
   useRef,
   useState,
 } from "react";
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useAppearance } from "@/components/appearance-provider";
-import { WelcomeCutscreen } from "@/components/welcome/welcome-cutscreen";
 import { welcomeSlidesForRole } from "@/lib/constants/welcome-slides";
 import {
   useFirstRunStatus,
@@ -41,6 +41,20 @@ import { cn } from "@/lib/utils";
  * hook holds the logic, the provider only distributes it.
  */
 const ProductTourContext = createContext<ProductTourState | null>(null);
+
+/**
+ * Loaded only when it opens: once on a first run, then on a replay. This
+ * provider wraps every dashboard page, and the cutscreen with its animated
+ * slides would otherwise ride along in all of their bundles. Still rendered on
+ * the server when a first run opens it (the session user is known there), so
+ * that first paint is unchanged; it is a full-screen overlay, so a replay has
+ * nothing to hold its place for the moment it loads.
+ */
+const WelcomeCutscreen = dynamic(() =>
+  import("@/components/welcome/welcome-cutscreen").then(
+    (mod) => mod.WelcomeCutscreen,
+  ),
+);
 
 export function useProductTourControls(): ProductTourState {
   const value = useContext(ProductTourContext);

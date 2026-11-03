@@ -489,7 +489,7 @@ export default async function Page({ params }: { params: LangParams }) {
           </section>
         </div>
 
-        <SiteFooter />
+        <SiteFooter locale={locale} />
       </div>
     </>
   );

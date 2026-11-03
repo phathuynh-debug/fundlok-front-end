@@ -16,7 +16,7 @@ import {
   ScrollText,
   KeyRound,
 } from "lucide-react";
-import { AdminPageLoader } from "./_components/AdminDirectory";
+import { AdminPageLoader } from "./_components/AdminPageLoader";
 import { RecentLeads } from "./_components/RecentLeads";
 import { useTranslations } from "@/lib/i18n";
 import { roleLabel } from "@/lib/enum-labels";

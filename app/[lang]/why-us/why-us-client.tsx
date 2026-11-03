@@ -18,7 +18,6 @@ import {
   Sparkles,
   Layers,
 } from "lucide-react";
-import SiteFooter from "@/components/site-footer";
 import { AchievementsCarousel } from "@/components/achievements-carousel";
 
 // Static, locale-keyed achievements shown on the Why Us page.
@@ -89,7 +88,7 @@ const achievementsData = {
   ],
 };
 
-export default function WhyUsClient() {
+export default function WhyUsClient({ footer }: { footer: React.ReactNode }) {
   const { t, locale, localize } = useTranslations();
   const currentLocale = locale === "vi" ? "vi" : "en";
 
@@ -396,7 +395,8 @@ export default function WhyUsClient() {
         </m.section>
       </div>
 
-      <SiteFooter />
+      {/* Server-rendered by page.tsx: see components/site-footer.tsx. */}
+      {footer}
     </div>
   );
 }

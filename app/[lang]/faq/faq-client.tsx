@@ -5,7 +5,6 @@ import Link from "next/link";
 import { m } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import SiteHeader from "@/components/site-header";
-import SiteFooter from "@/components/site-footer";
 import {
   Accordion,
   AccordionContent,
@@ -26,7 +25,7 @@ type CategoryKey = FaqCategory;
 
 const sectionId = (key: CategoryKey) => `faq-${key}`;
 
-export default function FaqClient() {
+export default function FaqClient({ footer }: { footer: React.ReactNode }) {
   const { t, localize, messages } = useTranslations();
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("general");
 
@@ -165,7 +164,8 @@ export default function FaqClient() {
         </div>
       </div>
 
-      <SiteFooter />
+      {/* Server-rendered by page.tsx: see components/site-footer.tsx. */}
+      {footer}
     </div>
   );
 }

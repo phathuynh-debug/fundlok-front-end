@@ -131,11 +131,13 @@ describe("AnalyticsClient", () => {
       screen.getByText("dashboard.analytics.emptyTitle"),
     ).toBeInTheDocument();
   });
-  it("shows the business its loan: owed, repaid, its revenue share and its score", () => {
+  it("shows the business its loan: owed, repaid, its revenue share and its score", async () => {
     role = "SME";
     render(<AnalyticsClient />);
 
-    const view = screen.getByTestId("sme-analytics");
+    // The business's view is its own chunk (see client.tsx), so it arrives
+    // a tick after the page.
+    const view = await screen.findByTestId("sme-analytics");
     // Repaid of the total, tax included, and what is left.
     expect(view).toHaveTextContent("₫124,999");
     expect(view).toHaveTextContent("₫10,252,976");
@@ -153,7 +155,7 @@ describe("AnalyticsClient", () => {
     expect(view).not.toHaveTextContent("dashboard.smeAnalytics.overCeiling");
   });
 
-  it("leaves out the revenue share and the score when the business has neither", () => {
+  it("leaves out the revenue share and the score when the business has neither", async () => {
     role = "SME";
     loan = {
       ...loan!,
@@ -163,7 +165,7 @@ describe("AnalyticsClient", () => {
     };
     render(<AnalyticsClient />);
 
-    const view = screen.getByTestId("sme-analytics");
+    const view = await screen.findByTestId("sme-analytics");
     expect(view).not.toHaveTextContent(
       "dashboard.smeAnalytics.charts.revenueShareTitle",
     );

@@ -7,7 +7,7 @@ import { Mail } from "lucide-react";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { useTranslations } from "@/lib/i18n";
 import { isAdminRole } from "@/services/authentication.service";
-import { AdminPageLoader } from "../_components/AdminDirectory";
+import { AdminPageLoader } from "../_components/AdminPageLoader";
 import { ComposeEmailCard } from "./_components/ComposeEmailCard";
 import { EmailPolicyCard } from "./_components/EmailPolicyCard";
 import { EmailSettingsCard } from "./_components/EmailSettingsCard";

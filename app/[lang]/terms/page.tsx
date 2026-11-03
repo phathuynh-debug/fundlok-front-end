@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { TermsClient } from "./terms-client";
+import { termsSectionsFor } from "./terms-content";
+import SiteFooter from "@/components/site-footer";
 import { SITE_URL } from "@/lib/site";
 import { createServerTranslator } from "@/lib/i18n/server";
 import {
@@ -69,7 +71,8 @@ const termsJsonLd = {
   },
 };
 
-export default function TermsPage() {
+export default async function TermsPage({ params }: { params: LangParams }) {
+  const locale = await pageLocale(params);
   return (
     <>
       <script
@@ -77,7 +80,10 @@ export default function TermsPage() {
         id="terms-jsonld"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(termsJsonLd) }}
       />
-      <TermsClient />
+      <TermsClient
+        sections={termsSectionsFor(locale)}
+        footer={<SiteFooter locale={locale} />}
+      />
     </>
   );
 }

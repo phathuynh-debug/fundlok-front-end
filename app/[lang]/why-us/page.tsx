@@ -9,6 +9,7 @@ import {
 } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import WhyUsClient from "./why-us-client";
+import SiteFooter from "@/components/site-footer";
 
 export async function generateMetadata({
   params,
@@ -111,7 +112,8 @@ const achievementsJsonLd = {
   ],
 };
 
-export default function WhyUsPage() {
+export default async function WhyUsPage({ params }: { params: LangParams }) {
+  const locale = await pageLocale(params);
   return (
     <>
       <script
@@ -119,7 +121,7 @@ export default function WhyUsPage() {
         id="achievements-schema"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(achievementsJsonLd) }}
       />
-      <WhyUsClient />
+      <WhyUsClient footer={<SiteFooter locale={locale} />} />
     </>
   );
 }

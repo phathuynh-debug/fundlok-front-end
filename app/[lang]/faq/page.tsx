@@ -12,6 +12,7 @@ import {
   type SeoLocale,
 } from "@/lib/seo";
 import FaqClient from "./faq-client";
+import SiteFooter from "@/components/site-footer";
 
 /**
  * Metadata and rich-result data are built from the SAME dictionary the page
@@ -96,7 +97,7 @@ export default async function FaqPage({ params }: { params: LangParams }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <FaqClient />
+      <FaqClient footer={<SiteFooter locale={locale} />} />
     </>
   );
 }

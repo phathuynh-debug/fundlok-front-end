@@ -8,6 +8,7 @@ import {
   type LangParams,
 } from "@/lib/seo";
 import ContactClient from "./contact-client";
+import SiteFooter from "@/components/site-footer";
 import { SITE_URL } from "@/lib/site";
 
 export async function generateMetadata({
@@ -63,13 +64,14 @@ const contactJsonLd = {
   },
 };
 
-export default function ContactPage() {
+export default async function ContactPage({ params }: { params: LangParams }) {
+  const locale = await pageLocale(params);
   return (
     <>
       <script type="application/ld+json" id="contact-jsonld">
         {JSON.stringify(contactJsonLd)}
       </script>
-      <ContactClient />
+      <ContactClient footer={<SiteFooter locale={locale} />} />
     </>
   );
 }
