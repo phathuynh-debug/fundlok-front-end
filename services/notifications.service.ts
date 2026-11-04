@@ -15,6 +15,12 @@ export type NotificationEvent =
   /** `data.check` is "KYC" (investor) or "KYB" (SME). */
   | "VERIFICATION_REQUIRED"
   /**
+   * To the business: an investor uploaded their transfer receipt for an
+   * investment in its round. `data` has `amount_vnd`, `memo`, `project` and
+   * the masked `investor`.
+   */
+  | "INVESTMENT_RECEIPT_SUBMITTED"
+  /**
    * To the business: staff approved an investor's transfer to its account.
    * `data.status` is ACTIVE (received, repaying from the next working day),
    * CONFIRMED (received) or ATTESTED (older: two working days to dispute);

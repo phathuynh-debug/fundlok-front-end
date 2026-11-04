@@ -690,6 +690,7 @@
           "repaymentDenied": "Repayment receipt denied",
           "repaymentMarked": "Repayment marked paid",
           "repaymentViewed": "Repayment receipt viewed",
+          "reportedMissing": "Reported not received",
           "reserved": "Investor reserved",
           "sentToReview": "Sent to review: didn't match",
           "uploaded": "Receipt uploaded",
@@ -2078,11 +2079,19 @@
         "ofTarget": "confirmed of {target}",
         "openTickets": "Open this investment's repayment tickets",
         "repayingNote": "Your round is closed. Repayments started on {date}.",
+        "report": "Not received",
+        "reportClosed": "The window to report this transfer has closed.",
+        "reportFailed": "Couldn't submit your report",
+        "reportPlaceholder": "What happened? e.g. checked our bank statement and nothing arrived under this memo",
+        "reportSend": "Report",
+        "reportedToast": "Reported: FundLok will check with the investor",
         "ticketStatus": {
           "ACTIVE": "Repaying",
           "ATTESTED": "Being confirmed by FundLok",
           "CONFIRMED": "Received",
           "EXPIRED": "Expired",
+          "RECEIPT_SUBMITTED": "Receipt uploaded",
+          "REPORTED_MISSING": "Reported not received",
           "RESERVED": "Reserved",
           "SIGNED": "Awaiting transfer",
           "UNDER_REVIEW": "Under review",
@@ -3136,7 +3145,8 @@
     "actions": {
       "confirmRepayment": "Check & confirm",
       "payAgain": "Pay again",
-      "verify": "Verify now"
+      "verify": "Verify now",
+      "viewRound": "Check & report"
     },
     "alert": {
       "acknowledge": "Got it",
@@ -3150,6 +3160,7 @@
     "items": {
       "applicationApproved": "Your funding request has been approved.",
       "applicationRejected": "Your funding request was not approved.",
+      "investmentReceiptSubmitted": "Investor {investor} uploaded a transfer receipt of {amount} (memo {memo}). Check your bank account or report if it hasn't arrived.",
       "repaymentReceiptConfirmed": "Investor {investor} confirmed receiving your repayment of {amount} (memo {memo}).",
       "repaymentReceiptRejected": "FundLok couldn't confirm your repayment of {amount} to investor {investor}: “{reason}”. Those days are due again.",
       "repaymentReceiptSubmitted": "{project} uploaded a receipt for a repayment of {amount} (memo {memo}). Check your bank account and confirm it arrived.",

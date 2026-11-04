@@ -105,6 +105,7 @@ export interface SmeTicket {
   reference_code: string;
   /** e.g. "N. A***" */
   investor_display: string;
+  receipt_submitted_at?: string | null;
   attested_at: string | null;
   confirm_deadline: string | null;
   review_cause: string | null;
@@ -217,6 +218,15 @@ export const fundingService = {
   closeEarly(windowId: string) {
     return apiClient.post<FundingWindow>(
       FUNDING_ENDPOINTS.closeEarly(windowId),
+    );
+  },
+
+  // POST /funding/tranches/{id}/report-missing — the business reports that an
+  // investor's transfer has not reached its account.
+  reportMissingTransfer(trancheId: string, statement: string | null) {
+    return apiClient.post<SmeTicket>(
+      FUNDING_ENDPOINTS.reportMissingTransfer(trancheId),
+      { statement },
     );
   },
 

@@ -690,6 +690,7 @@
           "repaymentDenied": "Đã từ chối biên lai trả nợ",
           "repaymentMarked": "Đã đánh dấu trả nợ",
           "repaymentViewed": "Đã xem biên lai trả nợ",
+          "reportedMissing": "Đã báo chưa nhận tiền",
           "reserved": "Nhà đầu tư giữ chỗ",
           "sentToReview": "Chuyển xem xét: không khớp",
           "uploaded": "Đã tải lên biên lai",
@@ -2078,11 +2079,19 @@
         "ofTarget": "đã xác nhận / mục tiêu {target}",
         "openTickets": "Mở phiếu trả nợ của khoản đầu tư này",
         "repayingNote": "Đợt gọi vốn đã đóng. Việc trả nợ đã bắt đầu từ {date}.",
+        "report": "Chưa nhận được",
+        "reportClosed": "Đã hết thời hạn báo chưa nhận được khoản chuyển này.",
+        "reportFailed": "Không thể gửi báo cáo",
+        "reportPlaceholder": "Chuyện gì đã xảy ra? VD: đã kiểm tra sao kê ngân hàng và chưa nhận được khoản nào với nội dung này",
+        "reportSend": "Báo cáo",
+        "reportedToast": "Đã báo cáo: FundLok sẽ kiểm tra với nhà đầu tư",
         "ticketStatus": {
           "ACTIVE": "Đang trả nợ",
           "ATTESTED": "FundLok đang xác nhận",
           "CONFIRMED": "Đã nhận",
           "EXPIRED": "Hết hạn",
+          "RECEIPT_SUBMITTED": "Đã tải biên lai",
+          "REPORTED_MISSING": "Đã báo chưa nhận tiền",
           "RESERVED": "Đã giữ chỗ",
           "SIGNED": "Chờ chuyển khoản",
           "UNDER_REVIEW": "Đang xem xét",
@@ -3136,7 +3145,8 @@
     "actions": {
       "confirmRepayment": "Kiểm tra & xác nhận",
       "payAgain": "Trả lại",
-      "verify": "Xác minh ngay"
+      "verify": "Xác minh ngay",
+      "viewRound": "Kiểm tra & báo cáo"
     },
     "alert": {
       "acknowledge": "Đã xem",
@@ -3150,6 +3160,7 @@
     "items": {
       "applicationApproved": "Hồ sơ đề nghị vay của bạn đã được duyệt.",
       "applicationRejected": "Hồ sơ đề nghị vay của bạn chưa được duyệt.",
+      "investmentReceiptSubmitted": "Nhà đầu tư {investor} đã tải lên biên lai chuyển khoản {amount} (nội dung {memo}). Hãy kiểm tra tài khoản ngân hàng hoặc báo cáo nếu chưa nhận được tiền.",
       "repaymentReceiptConfirmed": "Nhà đầu tư {investor} đã xác nhận nhận được khoản trả nợ {amount} của bạn (nội dung {memo}).",
       "repaymentReceiptRejected": "FundLok chưa xác nhận được khoản trả nợ {amount} cho nhà đầu tư {investor}: “{reason}”. Các ngày đó đến hạn lại.",
       "repaymentReceiptSubmitted": "{project} đã tải lên biên lai cho khoản trả nợ {amount} (nội dung {memo}). Hãy kiểm tra tài khoản ngân hàng và xác nhận đã nhận được.",

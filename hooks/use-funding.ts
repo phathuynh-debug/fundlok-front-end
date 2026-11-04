@@ -9,6 +9,7 @@ import {
   type ReserveRequest,
   type SmeRepaymentPlan,
   type SmeRound,
+  type SmeTicket,
   type Tranche,
 } from "@/services/funding.service";
 import type { ApiError } from "@/lib/types";
@@ -125,6 +126,15 @@ function useRoundMutation<TVars, TResult>(
 export function useCloseRoundEarly() {
   return useRoundMutation((windowId: string) =>
     fundingService.closeEarly(windowId),
+  );
+}
+
+export function useReportMissingTransfer() {
+  return useRoundMutation<
+    { trancheId: string; statement: string | null },
+    SmeTicket
+  >(({ trancheId, statement }) =>
+    fundingService.reportMissingTransfer(trancheId, statement),
   );
 }
 

@@ -10,6 +10,7 @@ import type {
 } from "@/services/repayment.service";
 
 const closeMock = vi.fn();
+const reportMissingMock = vi.fn();
 let rounds: SmeRound[] = [];
 let today: TodaysPayments | undefined;
 let plan: SmeRepaymentPlan | undefined;
@@ -17,6 +18,10 @@ let plan: SmeRepaymentPlan | undefined;
 vi.mock("@/hooks/use-funding", () => ({
   useMyRounds: () => ({ data: rounds, isLoading: false }),
   useCloseRoundEarly: () => ({ mutate: closeMock, isPending: false }),
+  useReportMissingTransfer: () => ({
+    mutate: reportMissingMock,
+    isPending: false,
+  }),
   useRepaymentPlan: () => ({ data: plan, isLoading: false }),
 }));
 vi.mock("@/hooks/use-repayment", () => ({
@@ -81,6 +86,7 @@ const round = (over: Partial<SmeRound> = {}): SmeRound => ({
 
 beforeEach(() => {
   closeMock.mockReset();
+  reportMissingMock.mockReset();
   rounds = [];
   today = undefined;
   plan = undefined;
@@ -109,6 +115,55 @@ describe("FundingStatus", () => {
     expect(within(tickets).getByRole("link")).toHaveAttribute(
       "href",
       "/dashboard/repayments/tr-1",
+    );
+  });
+
+  it("lets the business report a transfer as not received once the investor uploads a receipt", () => {
+    rounds = [
+      round({
+        tickets: [
+          {
+            id: "tr-sent",
+            amount_vnd: 15_000_000,
+            status: "SIGNED",
+            reference_code: "FL9SENT123",
+            investor_display: "N. A***",
+            receipt_submitted_at: "2026-11-04T08:00:00Z",
+            attested_at: null,
+            confirm_deadline: null,
+            review_cause: null,
+          },
+        ],
+      }),
+    ];
+    render(<FundingStatus projectId="p-1" t={t} />);
+
+    const tickets = screen.getByTestId("round-tickets");
+    expect(tickets).toHaveTextContent(
+      "dashboard.sme.funding.ticketStatus.RECEIPT_SUBMITTED",
+    );
+    fireEvent.click(
+      within(tickets).getByRole("button", {
+        name: "dashboard.sme.funding.report",
+      }),
+    );
+    fireEvent.change(
+      within(tickets).getByRole("textbox", {
+        name: "dashboard.sme.funding.reportPlaceholder",
+      }),
+      { target: { value: "No money arrived under FL9SENT123" } },
+    );
+    fireEvent.click(
+      within(tickets).getByRole("button", {
+        name: "dashboard.sme.funding.reportSend",
+      }),
+    );
+    expect(reportMissingMock).toHaveBeenCalledWith(
+      {
+        trancheId: "tr-sent",
+        statement: "No money arrived under FL9SENT123",
+      },
+      expect.anything(),
     );
   });
 

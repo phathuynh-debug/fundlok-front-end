@@ -113,6 +113,23 @@ const EVENT_PRESENTATION: Record<
     icon: ShieldCheck,
     action: { labelKey: "notifications.actions.verify", href: "/kyc" },
   },
+  // To the business: an investor uploaded their transfer receipt for an
+  // investment in its round; check the bank account or report it as not
+  // received on the dashboard.
+  INVESTMENT_RECEIPT_SUBMITTED: {
+    messageKey: "notifications.items.investmentReceiptSubmitted",
+    values: (notification, locale) => ({
+      amount: formatCurrency(Number(notification.data.amount_vnd ?? 0), locale),
+      memo: String(notification.data.memo ?? ""),
+      investor: String(notification.data.investor ?? ""),
+    }),
+    tone: "action",
+    icon: ReceiptText,
+    action: {
+      labelKey: "notifications.actions.viewRound",
+      href: "/dashboard",
+    },
+  },
   // To the business: staff approved an investor's transfer to its account.
   // ACTIVE: received, and the business repays that investor from the next
   // working day. CONFIRMED: received. ATTESTED (older approvals) still left two
@@ -131,6 +148,10 @@ const EVENT_PRESENTATION: Record<
     }),
     tone: "positive",
     icon: Banknote,
+    action: {
+      labelKey: "notifications.actions.viewRound",
+      href: "/dashboard",
+    },
   },
   // Staff could not confirm a repayment from the receipt the business sent:
   // those days are due again, paid from the investment's page.

@@ -94,6 +94,10 @@ export const FUNDING_ENDPOINTS = {
   repaymentPlan: (windowId: string) =>
     `/funding/me/rounds/${windowId}/repayment-plan`,
   closeEarly: (windowId: string) => `/funding/windows/${windowId}/close-early`,
+  // The business reports an investor's transfer as not received after a
+  // receipt was uploaded.
+  reportMissingTransfer: (trancheId: string) =>
+    `/funding/tranches/${trancheId}/report-missing`,
 } as const;
 
 // Daily repayment once a round has formed its loan: what the business owes each

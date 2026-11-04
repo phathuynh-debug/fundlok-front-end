@@ -33,6 +33,8 @@ export function activityKind(entry: AdminFundingActivity): {
       return { key: "repaymentDenied", tone: "deny" };
     case "REPAYMENT_DAYS_MARKED_PAID":
       return { key: "repaymentMarked", tone: "neutral" };
+    case "INVESTMENT_REPORTED_MISSING":
+      return { key: "reportedMissing", tone: "review" };
     case "REPAYMENT_RECEIPT_VIEWED":
       return { key: "repaymentViewed", tone: "neutral" };
     default:
