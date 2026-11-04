@@ -304,12 +304,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7
         with:
-          fetch-depth: 2
+          fetch-depth: 0
           token: ${{ secrets.VERCEL_AUTHOR_PAT || secrets.GITHUB_TOKEN }}
 
       - name: Check latest commit author
         id: check-author
         run: |
+          git fetch origin "$BASE_BRANCH"
+          REMOTE_TIP=$(git rev-parse "origin/$BASE_BRANCH")
+          if [ "$REMOTE_TIP" != "$GITHUB_SHA" ]; then
+            echo "::notice::Branch $BASE_BRANCH has already moved to $REMOTE_TIP (current run is $GITHUB_SHA). Skipping outdated deploy trigger."
+            echo "mismatch=skip" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           echo "Expected author email: $EXPECTED_EMAIL"
 
           # Get the email of the author of the latest commit
@@ -345,8 +353,18 @@ jobs:
           git add .vercel-trigger
           git commit -m "chore: ensure Vercel deployment author"
 
-          # 4. Push the branch (force push to ensure it matches current tip + trigger commit)
-          git push origin "$BRANCH_NAME" --force
+          # 4. Push the branch (force push with retry in case of transient GitHub commit_refs lock)
+          for attempt in 1 2 3; do
+            if git push origin "$BRANCH_NAME" --force; then
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "::error::Failed to push $BRANCH_NAME after 3 attempts."
+              exit 1
+            fi
+            echo "Push failed (attempt $attempt/3); retrying in 5s..."
+            sleep 5
+          done
 
           if [ -z "$EXISTING_PR" ]; then
             # 5. Create the pull request
