@@ -1,0 +1,21 @@
+{
+  "author": "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me)",
+  "name": "minimatch",
+  "description": "a glob matcher in javascript (vendored with GHSA-g3hv-75wg-m249 globParts/globstar amplification bounds)",
+  "version": "3.1.5-fundlok.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/isaacs/minimatch.git"
+  },
+  "main": "minimatch.js",
+  "files": [
+    "minimatch.js"
+  ],
+  "engines": {
+    "node": "*"
+  },
+  "dependencies": {
+    "brace-expansion": "^1.1.7"
+  },
+  "license": "ISC"
+}

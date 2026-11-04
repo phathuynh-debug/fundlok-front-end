@@ -126,6 +126,7 @@
     "vite": "7.3.7",
     "systeminformation": "5.33.16",
     "deepmerge": "file:./vendor/deepmerge",
+    "minimatch": "file:./vendor/minimatch",
     "@typescript-eslint/typescript-estree": {
       "minimatch": "11.0.4"
     },
