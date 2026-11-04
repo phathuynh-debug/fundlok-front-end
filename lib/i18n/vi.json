@@ -830,8 +830,16 @@
           "business": "Doanh nghiệp",
           "days": "Ngày",
           "daysValue": "{count} ngày từ {first}",
+          "flow": "Doanh nghiệp → Nhà đầu tư",
+          "grossTaxHint": "Gộp {gross} · thuế {tax}",
+          "invested": "Đầu tư {amount}",
+          "investment": "Khoản đầu tư",
           "investor": "Nhà đầu tư",
-          "submitted": "Tải lên"
+          "progress": "Tiến độ trả nợ",
+          "progressDays": "Đã trả {paid} / {total} ngày",
+          "receiptsCount": "{count} biên lai",
+          "submitted": "Tải lên",
+          "toggleInvestment": "Ẩn/hiện biên lai của khoản đầu tư {memo}"
         },
         "unit": "biên lai"
       },

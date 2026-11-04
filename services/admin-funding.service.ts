@@ -196,6 +196,7 @@ export interface AdminRepaymentDay {
   repayment_day_id: string;
   transfer_id: string;
   kind: "INSTALMENT" | "STUB";
+  day_index?: number;
   due_date: string;
   principal_vnd: number;
   interest_vnd: number;
@@ -216,6 +217,12 @@ export interface AdminRepaymentReceipt {
   project_name: string;
   /** The memo the business's transfer must carry. */
   reference_code: string;
+  /** The investor's principal in this ticket. */
+  tranche_amount_vnd?: number;
+  /** Working days marked paid or confirmed on this ticket. */
+  tranche_paid_days?: number;
+  /** Total working days in this ticket's schedule. */
+  tranche_total_days?: number;
   business: AdminActivityPerson;
   investor: AdminActivityPerson;
   submitted_at: string;

@@ -830,8 +830,16 @@
           "business": "Business",
           "days": "Days",
           "daysValue": "{count} days from {first}",
+          "flow": "Business → Investor",
+          "grossTaxHint": "{gross} gross · {tax} tax",
+          "invested": "Invested {amount}",
+          "investment": "Investment",
           "investor": "Investor",
-          "submitted": "Uploaded"
+          "progress": "Repayment progress",
+          "progressDays": "{paid} / {total} days paid",
+          "receiptsCount": "{count} receipt(s)",
+          "submitted": "Uploaded",
+          "toggleInvestment": "Toggle receipts for investment {memo}"
         },
         "unit": "receipts"
       },
