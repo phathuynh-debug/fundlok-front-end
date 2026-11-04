@@ -317,4 +317,32 @@ describe("TransferReviewSheet", () => {
     );
     expect(timeline).toHaveTextContent("Nothing on the statement");
   });
+
+  it("shows the business's missing-transfer report banner and statement when disputed", () => {
+    row = {
+      ...base,
+      status: "UNDER_REVIEW",
+      review_cause: "SME_DISPUTE",
+      dispute: {
+        id: "d-sme",
+        cause: "SME_DISPUTE",
+        status: "OPEN",
+        outcome: null,
+        statement: "Checked our Techcombank statement — nothing arrived under FL8TKK1UAQ",
+        created_at: "2026-11-02T06:00:00Z",
+      },
+    };
+    open();
+
+    expect(
+      screen.getByText("admin.transactions.needs.smeDispute"),
+    ).toBeInTheDocument();
+    const banner = screen.getByTestId("sme-dispute-banner");
+    expect(banner).toHaveTextContent(
+      "admin.transactions.sheet.smeDisputeHeading",
+    );
+    expect(banner).toHaveTextContent(
+      "Checked our Techcombank statement — nothing arrived under FL8TKK1UAQ",
+    );
+  });
 });

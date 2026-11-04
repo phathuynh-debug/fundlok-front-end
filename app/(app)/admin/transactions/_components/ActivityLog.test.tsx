@@ -59,6 +59,12 @@ describe("activityKind", () => {
       key: "repaymentConfirmed",
       tone: "approve",
     });
+    expect(
+      activityKind(entry({ action: "INVESTMENT_REPORTED_MISSING" })),
+    ).toEqual({
+      key: "reportedMissing",
+      tone: "review",
+    });
   });
 });
 

@@ -146,6 +146,20 @@ export function TransferStatusBadge({
 }) {
   const { t } = useTranslations();
   if (transfer.needs_action) {
+    const smeDisputed =
+      transfer.dispute?.status !== "DECIDED" &&
+      (transfer.dispute?.cause === "SME_DISPUTE" ||
+        transfer.review_cause === "SME_DISPUTE");
+    if (smeDisputed) {
+      return (
+        <Badge
+          variant="outline"
+          className="border-destructive/40 bg-destructive/10 text-destructive"
+        >
+          {t("admin.transactions.needs.smeDispute")}
+        </Badge>
+      );
+    }
     const toCheck = transfer.transfer?.check_status === "AWAITING_FIELDS";
     return (
       <Badge

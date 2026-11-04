@@ -121,6 +121,37 @@ export function TransferReviewSheet({
               </dl>
             </section>
 
+            {/* --- The business reported the money missing --- */}
+            {(data.dispute?.cause === "SME_DISPUTE" ||
+              data.review_cause === "SME_DISPUTE") && (
+              <section
+                data-testid="sme-dispute-banner"
+                className="flex items-start gap-2.5 rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-xs leading-relaxed text-foreground"
+              >
+                <AlertTriangle
+                  className="mt-px h-4 w-4 shrink-0 text-destructive"
+                  aria-hidden
+                />
+                <div className="min-w-0 space-y-1">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <p className="font-semibold text-destructive">
+                      {t("admin.transactions.sheet.smeDisputeHeading")}
+                    </p>
+                    {data.dispute?.created_at && (
+                      <span className="text-[11px] text-muted-foreground">
+                        {formatDateTime(data.dispute.created_at, locale)}
+                      </span>
+                    )}
+                  </div>
+                  {data.dispute?.statement && (
+                    <p className="break-words text-foreground">
+                      {data.dispute.statement}
+                    </p>
+                  )}
+                </div>
+              </section>
+            )}
+
             {/* --- What a matching receipt shows --- */}
             <section className="space-y-3">
               <h3 className="text-sm font-semibold">

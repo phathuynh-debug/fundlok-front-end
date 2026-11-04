@@ -72,6 +72,8 @@ export interface AdminTransferReview {
   cause: string;
   status: string;
   outcome: "RECEIVED" | "NOT_RECEIVED" | null;
+  statement?: string | null;
+  created_at?: string | null;
 }
 
 /** What a matching receipt shows. */

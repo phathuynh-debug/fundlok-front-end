@@ -667,6 +667,7 @@
         "byName": "Bởi {name}",
         "empty": {
           "ALL": "Chưa có gì được ghi lại.",
+          "BUSINESS": "Chưa có hoạt động nào của doanh nghiệp.",
           "DECISIONS": "Chưa có khoản chuyển nào được duyệt hoặc từ chối.",
           "INVESTOR": "Chưa có hoạt động nào của nhà đầu tư.",
           "VIEWS": "Chưa ai mở biên lai nào."
@@ -743,7 +744,8 @@
       },
       "needs": {
         "decision": "Cần quyết định",
-        "receipt": "Cần kiểm tra biên lai"
+        "receipt": "Cần kiểm tra biên lai",
+        "smeDispute": "Báo chưa nhận tiền"
       },
       "preview": {
         "dayIndex": "Kỳ {index}",
@@ -898,6 +900,7 @@
         "receiptHint": "Duyệt: tiền được ghi nhận là đã nhận và khoản đầu tư được tính vào đợt gọi vốn; doanh nghiệp không cần xác nhận thêm. Từ chối: biên lai bị từ chối và nhà đầu tư có thể tải lên biên lai đúng trước hạn chuyển khoản. Quyết định là cuối cùng và được ghi lại kèm tên bạn.",
         "reviewHint": "Duyệt: tiền đã đến và khoản đầu tư được tính vào đợt gọi vốn. Từ chối: tiền chưa đến; khoản đầu tư vô hiệu và chỗ của nó trong đợt được giải phóng. Quyết định là cuối cùng và được ghi lại kèm tên bạn.",
         "showReceipt": "Xem biên lai",
+        "smeDisputeHeading": "Doanh nghiệp báo chưa nhận được tiền",
         "subtitle": "Khoản chuyển của nhà đầu tư",
         "ticketHeading": "Khoản đầu tư",
         "title": "Khoản chuyển",

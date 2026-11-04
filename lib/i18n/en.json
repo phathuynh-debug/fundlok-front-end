@@ -667,6 +667,7 @@
         "byName": "By {name}",
         "empty": {
           "ALL": "Nothing recorded yet.",
+          "BUSINESS": "No business activity yet.",
           "DECISIONS": "No transfer has been approved or denied yet.",
           "INVESTOR": "No investor activity yet.",
           "VIEWS": "No one has opened a receipt yet."
@@ -743,7 +744,8 @@
       },
       "needs": {
         "decision": "Decision needed",
-        "receipt": "Receipt to check"
+        "receipt": "Receipt to check",
+        "smeDispute": "Reported not received"
       },
       "preview": {
         "dayIndex": "Day {index}",
@@ -898,6 +900,7 @@
         "receiptHint": "Approve: the money is received and the investment counts toward the round; the business has nothing to confirm. Deny: the receipt is rejected and the investor can upload the right one before the transfer deadline. Final, and recorded with your name.",
         "reviewHint": "Approve: the money arrived and the investment counts toward the round. Deny: it didn't; the investment is void and its place in the round is freed. Final, and recorded with your name.",
         "showReceipt": "Show receipt",
+        "smeDisputeHeading": "Business reported not received",
         "subtitle": "Investor transfer",
         "ticketHeading": "The investment",
         "title": "Transfer",
