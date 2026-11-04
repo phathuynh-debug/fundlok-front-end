@@ -9,7 +9,6 @@ import {
 import type { ApiError } from "@/lib/types";
 import { adminKeys } from "@/hooks/use-admin";
 import { fundingKeys } from "@/hooks/use-funding";
-import { repaymentKeys } from "@/hooks/use-repayment";
 import type { AdminTable } from "@/services/admin.service";
 import {
   adminFundingService,
@@ -164,24 +163,6 @@ export function useAdminRepaymentReceiptUrl(receiptId: string | null) {
     staleTime: 0,
     gcTime: 0,
     retry: false,
-  });
-}
-
-// A decision settles or reopens the days: the business's views move too.
-export function useDecideRepaymentReceipt() {
-  const queryClient = useQueryClient();
-  return useMutation<
-    AdminRepaymentReceipt,
-    ApiError,
-    { receiptId: string; body: AdminReceiptDecisionPayload }
-  >({
-    mutationFn: ({ receiptId, body }) =>
-      adminFundingService.decideRepayment(receiptId, body),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: adminFundingKeys.all });
-      void queryClient.invalidateQueries({ queryKey: repaymentKeys.all });
-      void queryClient.invalidateQueries({ queryKey: fundingKeys.all });
-    },
   });
 }
 

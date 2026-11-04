@@ -53,6 +53,12 @@ describe("activityKind", () => {
     expect(
       activityKind(entry({ action: "TRANSFER_RECEIPT_REJECTED" })).tone,
     ).toBe("deny");
+    expect(
+      activityKind(entry({ action: "REPAYMENT_RECEIPT_CONFIRMED" })),
+    ).toEqual({
+      key: "repaymentConfirmed",
+      tone: "approve",
+    });
   });
 });
 

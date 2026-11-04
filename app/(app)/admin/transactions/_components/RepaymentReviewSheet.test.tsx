@@ -1,16 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { RepaymentReviewSheet } from "./RepaymentReviewSheet";
 import type { AdminRepaymentReceipt } from "@/services/admin-funding.service";
 
-const decideMock = vi.fn();
 let row: AdminRepaymentReceipt;
-let me = { id: "admin-1" };
 
-vi.mock("@/hooks/use-toast", () => ({ useToast: () => ({ toast: vi.fn() }) }));
-vi.mock("@/hooks/use-authentication", () => ({
-  useCurrentUser: () => ({ data: me }),
-}));
 vi.mock("@/hooks/use-admin-funding", () => ({
   useAdminRepaymentReceipt: () => ({
     data: row,
@@ -19,7 +13,6 @@ vi.mock("@/hooks/use-admin-funding", () => ({
   }),
   useAdminRepaymentReceiptUrl: () => ({ data: undefined, isLoading: false }),
   useAdminReceiptUrl: () => ({ data: undefined, isLoading: false }),
-  useDecideRepaymentReceipt: () => ({ mutate: decideMock, isPending: false }),
   useAdminFundingActivity: () => ({
     data: { items: [], total: 0, page: 1, page_size: 50 },
     isLoading: false,
@@ -96,12 +89,10 @@ const open = () =>
 
 describe("RepaymentReviewSheet", () => {
   beforeEach(() => {
-    decideMock.mockReset();
     row = base;
-    me = { id: "admin-1" };
   });
 
-  it("shows what the receipt should show beside the days it pays, and approves", () => {
+  it("shows what the receipt should show beside the days it pays, as read-only", () => {
     open();
 
     const review = screen.getByTestId("repayment-review");
@@ -115,37 +106,14 @@ describe("RepaymentReviewSheet", () => {
         "listitem",
       ),
     ).toHaveLength(2);
-
-    fireEvent.click(
-      screen.getByRole("button", { name: "admin.transactions.sheet.approve" }),
-    );
-    expect(decideMock).toHaveBeenCalledWith(
-      { receiptId: "rc-1", body: { outcome: "APPROVED", reason: null } },
-      expect.anything(),
-    );
-  });
-
-  it("denies only with a note, since the business reads it", () => {
-    open();
-    const deny = screen.getByRole("button", {
-      name: "admin.transactions.sheet.deny",
-    });
-    expect(deny).toBeDisabled();
-
-    fireEvent.change(
-      screen.getByLabelText(
-        "admin.transactions.repayments.sheet.notePlaceholder",
-      ),
-      { target: { value: "The receipt shows 100,000" } },
-    );
-    fireEvent.click(deny);
-    expect(decideMock).toHaveBeenCalledWith(
-      {
-        receiptId: "rc-1",
-        body: { outcome: "DENIED", reason: "The receipt shows 100,000" },
-      },
-      expect.anything(),
-    );
+    expect(
+      screen.getByText("admin.transactions.repayments.sheet.awaitingInvestor"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", {
+        name: "admin.transactions.sheet.approve",
+      }),
+    ).toBeNull();
   });
 
   it("warns when the investor reported a day it pays as missing", () => {
@@ -157,31 +125,12 @@ describe("RepaymentReviewSheet", () => {
     );
   });
 
-  it("does not let staff decide a repayment they are part of", () => {
-    me = { id: "sme-1" };
-    open();
-
-    expect(
-      screen.getByText("admin.transactions.repayments.sheet.own"),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole("button", {
-        name: "admin.transactions.sheet.approve",
-      }),
-    ).toBeNull();
-  });
-
   it("says how a decided receipt went, with nothing left to do", () => {
-    row = { ...base, check_status: "REJECTED", needs_action: false };
+    row = { ...base, check_status: "MATCHED", needs_action: false };
     open();
 
     expect(
-      screen.getByText("admin.transactions.repayments.sheet.decided.REJECTED"),
+      screen.getByText("admin.transactions.repayments.sheet.decided.MATCHED"),
     ).toBeInTheDocument();
-    expect(
-      screen.queryByRole("button", {
-        name: "admin.transactions.sheet.approve",
-      }),
-    ).toBeNull();
   });
 });

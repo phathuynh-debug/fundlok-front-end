@@ -27,6 +27,8 @@ export function activityKind(entry: AdminFundingActivity): {
       return { key: "viewed", tone: "neutral" };
     case "REPAYMENT_RECEIPT_APPROVED":
       return { key: "repaymentApproved", tone: "approve" };
+    case "REPAYMENT_RECEIPT_CONFIRMED":
+      return { key: "repaymentConfirmed", tone: "approve" };
     case "REPAYMENT_RECEIPT_DENIED":
       return { key: "repaymentDenied", tone: "deny" };
     case "REPAYMENT_DAYS_MARKED_PAID":

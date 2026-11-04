@@ -295,6 +295,68 @@ describe("NotificationsPanel — repayment receipt rejected", () => {
   });
 });
 
+describe("NotificationsPanel — repayment receipt submitted & confirmed", () => {
+  it("tells the investor a business uploaded a receipt and links to the dashboard", async () => {
+    listResult.data = {
+      items: [
+        notification({
+          id: "rs1",
+          event: "REPAYMENT_RECEIPT_SUBMITTED",
+          entity_type: "TRANCHE",
+          entity_id: "tr1",
+          data: {
+            tranche_id: "tr1",
+            receipt_id: "rc1",
+            memo: "FL8TKK1UAQ",
+            project: "Delta Foods",
+            amount_vnd: 140_875,
+          },
+        }),
+      ],
+      unread: 1,
+    };
+    render(<NotificationsPanel />);
+    await userEvent.hover(screen.getAllByRole("button")[0]);
+
+    const link = await screen.findByRole("link", {
+      name: /notifications\.items\.repaymentReceiptSubmitted/,
+    });
+    expect(link).toHaveAttribute("href", "/dashboard");
+    expect(link.textContent).toContain('"project":"Delta Foods"');
+    expect(link.textContent).toContain('"memo":"FL8TKK1UAQ"');
+    expect(link.textContent).toContain("140,875");
+  });
+
+  it("tells the business the investor confirmed receiving the repayment", async () => {
+    listResult.data = {
+      items: [
+        notification({
+          id: "rc1",
+          event: "REPAYMENT_RECEIPT_CONFIRMED",
+          entity_type: "TRANCHE",
+          entity_id: "tr1",
+          data: {
+            tranche_id: "tr1",
+            memo: "FL8TKK1UAQ",
+            investor: "N. A***",
+            amount_vnd: 140_875,
+          },
+        }),
+      ],
+      unread: 1,
+    };
+    render(<NotificationsPanel />);
+    await userEvent.hover(screen.getAllByRole("button")[0]);
+
+    const message = await screen.findByText((text) =>
+      text.startsWith("notifications.items.repaymentReceiptConfirmed:"),
+    );
+    expect(message.textContent).toContain('"investor":"N. A***"');
+    expect(message.textContent).toContain('"memo":"FL8TKK1UAQ"');
+    expect(message.textContent).toContain("140,875");
+  });
+});
+
 describe("NotificationsPanel — new-notification label", () => {
   afterEach(() => {
     vi.useRealTimers();

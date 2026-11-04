@@ -686,6 +686,7 @@
           "received": "Approved",
           "rejected": "Rejected: bank transaction reused",
           "repaymentApproved": "Repayment approved",
+          "repaymentConfirmed": "Repayment confirmed by investor",
           "repaymentDenied": "Repayment receipt denied",
           "repaymentMarked": "Repayment marked paid",
           "repaymentViewed": "Repayment receipt viewed",
@@ -780,11 +781,11 @@
           "REPORTED_MISSED": "Reported missing"
         },
         "empty": "No repayment receipts yet.",
-        "emptyQueue": "No repayment receipt waits for a decision.",
+        "emptyQueue": "No repayment receipt is waiting for investor confirmation.",
         "filters": {
           "ALL": "All receipts",
-          "DECIDED": "Decided",
-          "NEEDS_ACTION": "Needs action"
+          "DECIDED": "Confirmed",
+          "NEEDS_ACTION": "Awaiting investor"
         },
         "kind": {
           "INSTALMENT": "Daily repayment",
@@ -793,10 +794,11 @@
         "reported": "The investor reported a day missing",
         "rowLabel": "Review the repayment from {business} to {investor}",
         "sheet": {
+          "awaitingInvestor": "Waiting for the investor to check their account and confirm this repayment arrived.",
           "daysHeading": "Days it pays ({count})",
           "decideBody": "Look at the receipt: does it show this amount reaching the investor's account, with the memo?",
           "decided": {
-            "MATCHED": "Approved: these days are paid.",
+            "MATCHED": "Confirmed: these days are paid.",
             "REJECTED": "Denied: these days are due again, and the business was told why."
           },
           "from": "From (the business)",
@@ -807,7 +809,7 @@
           "notePlaceholder": "Note (needed to deny: the business reads it)",
           "own": "You are part of this repayment, so another admin has to decide it.",
           "repaymentHeading": "The repayment",
-          "reported": "The investor reported one of these days as never arriving. Approving settles that report as paid.",
+          "reported": "The investor reported one of these days as never arriving. Confirming the receipt closes that report as paid.",
           "subtitle": "A business's repayment to an investor",
           "title": "{business} → {investor}",
           "titleFallback": "Repayment receipt",
@@ -819,8 +821,8 @@
           "transferred": "Transferred"
         },
         "status": {
-          "AWAITING_FIELDS": "Receipt to check",
-          "MATCHED": "Approved",
+          "AWAITING_FIELDS": "Awaiting investor",
+          "MATCHED": "Confirmed",
           "REJECTED": "Denied"
         },
         "table": {
@@ -1415,6 +1417,33 @@
           "stub": "First-period interest (in the first payment)",
           "total": "Projected total back to you, after tax",
           "totalGross": "Projected total, tax included"
+        },
+        "receipts": {
+          "alreadyConfirmed": "This repayment was already confirmed.",
+          "confirmAction": "Yes, received",
+          "confirmBody": "This records {amount} from {project} (memo {memo}) as received in your bank account and settles the days on this receipt. This cannot be undone.",
+          "confirmClosesReport": "Your open missing-payment report for these days will also be closed as paid.",
+          "confirmFailed": "Couldn't confirm the repayment",
+          "confirmTitle": "Confirm you received this repayment?",
+          "confirmedAt": "Confirmed {date}",
+          "confirmedToast": "Repayment confirmed",
+          "daysCount": "{count} days: {dates}",
+          "emptyAll": "No repayment receipts uploaded yet.",
+          "emptyAwaiting": "No repayment receipts are waiting for your confirmation right now.",
+          "fromAccount": "From",
+          "heading": "Repayments to confirm",
+          "hint": "When a business records a repayment to you, check your bank account and confirm once the money has arrived.",
+          "openReport": "You reported one of these days as missing. Confirming this repayment closes that report as paid.",
+          "receivedBtn": "Received",
+          "showAll": "Show confirmed",
+          "showAwaiting": "Only awaiting confirmation",
+          "status": {
+            "AWAITING_CONFIRMATION": "Awaiting your confirmation",
+            "CONFIRMED": "Confirmed",
+            "REJECTED": "Denied"
+          },
+          "toAccount": "To your account",
+          "uploadedAt": "Uploaded {date}"
         },
         "received": "Paid to you so far, after tax: {paid} of {total}",
         "report": "Not received",
@@ -3096,6 +3125,7 @@
   },
   "notifications": {
     "actions": {
+      "confirmRepayment": "Check & confirm",
       "payAgain": "Pay again",
       "verify": "Verify now"
     },
@@ -3111,7 +3141,9 @@
     "items": {
       "applicationApproved": "Your funding request has been approved.",
       "applicationRejected": "Your funding request was not approved.",
+      "repaymentReceiptConfirmed": "Investor {investor} confirmed receiving your repayment of {amount} (memo {memo}).",
       "repaymentReceiptRejected": "FundLok couldn't confirm your repayment of {amount} to investor {investor}: “{reason}”. Those days are due again.",
+      "repaymentReceiptSubmitted": "{project} uploaded a receipt for a repayment of {amount} (memo {memo}). Check your bank account and confirm it arrived.",
       "transferApproved": "FundLok approved a transfer of {amount} from investor {investor} (memo {memo}). If it hasn't reached your account, contact FundLok within 2 working days.",
       "transferConfirmed": "FundLok confirmed a transfer of {amount} from investor {investor} (memo {memo}) to your business.",
       "transferRepaying": "FundLok confirmed a transfer of {amount} from investor {investor} (memo {memo}). You repay this investor every working day, from the next working day.",

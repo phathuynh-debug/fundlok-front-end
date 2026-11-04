@@ -219,8 +219,11 @@ export interface AdminRepaymentReceipt {
   business: AdminActivityPerson;
   investor: AdminActivityPerson;
   submitted_at: string;
-  /** AWAITING_FIELDS: waits on staff; MATCHED: approved; REJECTED: denied. */
+  /** AWAITING_FIELDS: waits on the investor's confirmation; MATCHED: the
+   *  investor confirmed it (or staff approved it, before investors
+   *  confirmed); REJECTED: staff denied it, before investors confirmed. */
   check_status: "AWAITING_FIELDS" | "MATCHED" | "REJECTED";
+  /** Still waiting on the investor. Staff only read; they do not decide. */
   needs_action: boolean;
   gross_vnd: number;
   tax_withheld_vnd: number;
@@ -310,14 +313,6 @@ export const adminFundingService = {
   getRepaymentReceiptUrl(receiptId: string) {
     return apiClient.get<AdminReceiptUrl>(
       ADMIN_ENDPOINTS.repaymentReceiptUrl(receiptId),
-    );
-  },
-
-  // Approve (the days are paid) or deny with a note (the days are due again).
-  decideRepayment(receiptId: string, body: AdminReceiptDecisionPayload) {
-    return apiClient.post<AdminRepaymentReceipt>(
-      ADMIN_ENDPOINTS.repaymentDecision(receiptId),
-      body,
     );
   },
 };

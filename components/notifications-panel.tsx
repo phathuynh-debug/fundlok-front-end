@@ -148,6 +148,33 @@ const EVENT_PRESENTATION: Record<
       href: `/dashboard/repayments/${String(notification.data.tranche_id ?? "")}`,
     }),
   },
+  // To the investor: the business uploaded a repayment receipt; check the
+  // account and confirm it arrived on the dashboard.
+  REPAYMENT_RECEIPT_SUBMITTED: {
+    messageKey: "notifications.items.repaymentReceiptSubmitted",
+    values: (notification, locale) => ({
+      amount: formatCurrency(Number(notification.data.amount_vnd ?? 0), locale),
+      project: String(notification.data.project ?? ""),
+      memo: String(notification.data.memo ?? ""),
+    }),
+    tone: "action",
+    icon: ReceiptText,
+    action: {
+      labelKey: "notifications.actions.confirmRepayment",
+      href: "/dashboard",
+    },
+  },
+  // To the business: the investor confirmed the repayment reached them.
+  REPAYMENT_RECEIPT_CONFIRMED: {
+    messageKey: "notifications.items.repaymentReceiptConfirmed",
+    values: (notification, locale) => ({
+      amount: formatCurrency(Number(notification.data.amount_vnd ?? 0), locale),
+      investor: String(notification.data.investor ?? ""),
+      memo: String(notification.data.memo ?? ""),
+    }),
+    tone: "positive",
+    icon: Banknote,
+  },
 };
 
 export const TONE_CLASS: Record<NotificationTone, string> = {

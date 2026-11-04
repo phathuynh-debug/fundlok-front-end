@@ -686,6 +686,7 @@
           "received": "Đã duyệt",
           "rejected": "Từ chối: mã giao dịch đã dùng",
           "repaymentApproved": "Đã duyệt khoản trả nợ",
+          "repaymentConfirmed": "Nhà đầu tư đã xác nhận khoản trả nợ",
           "repaymentDenied": "Đã từ chối biên lai trả nợ",
           "repaymentMarked": "Đã đánh dấu trả nợ",
           "repaymentViewed": "Đã xem biên lai trả nợ",
@@ -780,11 +781,11 @@
           "REPORTED_MISSED": "Bị báo chưa nhận"
         },
         "empty": "Chưa có biên lai trả nợ nào.",
-        "emptyQueue": "Không có biên lai trả nợ nào chờ xử lý.",
+        "emptyQueue": "Không có biên lai trả nợ nào đang chờ nhà đầu tư xác nhận.",
         "filters": {
           "ALL": "Tất cả biên lai",
-          "DECIDED": "Đã xử lý",
-          "NEEDS_ACTION": "Cần xử lý"
+          "DECIDED": "Đã xác nhận",
+          "NEEDS_ACTION": "Chờ nhà đầu tư"
         },
         "kind": {
           "INSTALMENT": "Trả hằng ngày",
@@ -793,10 +794,11 @@
         "reported": "Nhà đầu tư đã báo một ngày chưa nhận",
         "rowLabel": "Xem khoản trả nợ từ {business} cho {investor}",
         "sheet": {
+          "awaitingInvestor": "Đang chờ nhà đầu tư kiểm tra tài khoản và xác nhận khoản trả nợ này đã đến.",
           "daysHeading": "Các ngày được trả ({count})",
           "decideBody": "Xem biên lai: biên lai có cho thấy số tiền này đã vào tài khoản của nhà đầu tư, với đúng nội dung không?",
           "decided": {
-            "MATCHED": "Đã duyệt: các ngày này đã được trả.",
+            "MATCHED": "Đã xác nhận: các ngày này đã được trả.",
             "REJECTED": "Đã từ chối: các ngày này đến hạn lại, và doanh nghiệp đã được báo lý do."
           },
           "from": "Từ (doanh nghiệp)",
@@ -807,7 +809,7 @@
           "notePlaceholder": "Ghi chú (bắt buộc khi từ chối: doanh nghiệp sẽ đọc)",
           "own": "Bạn là một bên của khoản trả nợ này, nên cần quản trị viên khác quyết định.",
           "repaymentHeading": "Khoản trả nợ",
-          "reported": "Nhà đầu tư đã báo một trong các ngày này chưa nhận được. Duyệt biên lai sẽ ghi nhận báo cáo đó là đã trả.",
+          "reported": "Nhà đầu tư đã báo một trong các ngày này chưa nhận được. Khi nhà đầu tư xác nhận biên lai, báo cáo đó sẽ đóng là đã trả.",
           "subtitle": "Khoản trả nợ của doanh nghiệp cho nhà đầu tư",
           "title": "{business} → {investor}",
           "titleFallback": "Biên lai trả nợ",
@@ -819,8 +821,8 @@
           "transferred": "Đã chuyển"
         },
         "status": {
-          "AWAITING_FIELDS": "Cần kiểm tra biên lai",
-          "MATCHED": "Đã duyệt",
+          "AWAITING_FIELDS": "Chờ nhà đầu tư",
+          "MATCHED": "Đã xác nhận",
           "REJECTED": "Đã từ chối"
         },
         "table": {
@@ -1415,6 +1417,33 @@
           "stub": "Lãi kỳ đầu (trong kỳ nhận đầu tiên)",
           "total": "Tổng dự kiến nhận về (đã trừ thuế)",
           "totalGross": "Tổng dự kiến (đã gồm thuế)"
+        },
+        "receipts": {
+          "alreadyConfirmed": "Khoản trả nợ này đã được xác nhận trước đó.",
+          "confirmAction": "Đã nhận tiền",
+          "confirmBody": "Thao tác này ghi nhận bạn đã nhận {amount} từ {project} (nội dung {memo}) vào tài khoản ngân hàng và tất toán các kỳ trên biên lai này. Không thể hoàn tác.",
+          "confirmClosesReport": "Báo cáo chưa nhận được tiền của bạn cho các ngày này cũng sẽ được đóng là đã trả.",
+          "confirmFailed": "Không xác nhận được khoản trả nợ",
+          "confirmTitle": "Xác nhận bạn đã nhận khoản trả nợ này?",
+          "confirmedAt": "Đã xác nhận {date}",
+          "confirmedToast": "Đã xác nhận nhận tiền",
+          "daysCount": "{count} ngày: {dates}",
+          "emptyAll": "Chưa có biên lai trả nợ nào được tải lên.",
+          "emptyAwaiting": "Hiện không có biên lai trả nợ nào chờ bạn xác nhận.",
+          "fromAccount": "Từ",
+          "heading": "Khoản trả nợ chờ xác nhận",
+          "hint": "Khi doanh nghiệp ghi nhận một khoản trả nợ gửi bạn, hãy kiểm tra tài khoản ngân hàng và xác nhận khi tiền đã vào tài khoản.",
+          "openReport": "Bạn đã báo một trong các ngày này chưa nhận được. Xác nhận khoản trả nợ này sẽ đóng báo cáo đó là đã trả.",
+          "receivedBtn": "Đã nhận được",
+          "showAll": "Xem đã xác nhận",
+          "showAwaiting": "Chỉ hiện khoản chờ xác nhận",
+          "status": {
+            "AWAITING_CONFIRMATION": "Chờ bạn xác nhận",
+            "CONFIRMED": "Đã xác nhận",
+            "REJECTED": "Đã từ chối"
+          },
+          "toAccount": "Vào tài khoản của bạn",
+          "uploadedAt": "Tải lên {date}"
         },
         "received": "Đã trả cho bạn (đã trừ thuế): {paid} / {total}",
         "report": "Chưa nhận được",
@@ -3096,6 +3125,7 @@
   },
   "notifications": {
     "actions": {
+      "confirmRepayment": "Kiểm tra & xác nhận",
       "payAgain": "Trả lại",
       "verify": "Xác minh ngay"
     },
@@ -3111,7 +3141,9 @@
     "items": {
       "applicationApproved": "Hồ sơ đề nghị vay của bạn đã được duyệt.",
       "applicationRejected": "Hồ sơ đề nghị vay của bạn chưa được duyệt.",
+      "repaymentReceiptConfirmed": "Nhà đầu tư {investor} đã xác nhận nhận được khoản trả nợ {amount} của bạn (nội dung {memo}).",
       "repaymentReceiptRejected": "FundLok chưa xác nhận được khoản trả nợ {amount} cho nhà đầu tư {investor}: “{reason}”. Các ngày đó đến hạn lại.",
+      "repaymentReceiptSubmitted": "{project} đã tải lên biên lai cho khoản trả nợ {amount} (nội dung {memo}). Hãy kiểm tra tài khoản ngân hàng và xác nhận đã nhận được.",
       "transferApproved": "FundLok đã duyệt khoản chuyển {amount} từ nhà đầu tư {investor} (nội dung {memo}). Nếu tiền chưa vào tài khoản của bạn, hãy liên hệ FundLok trong vòng 2 ngày làm việc.",
       "transferConfirmed": "FundLok đã xác nhận khoản chuyển {amount} từ nhà đầu tư {investor} (nội dung {memo}) cho doanh nghiệp của bạn.",
       "transferRepaying": "FundLok đã xác nhận khoản chuyển {amount} từ nhà đầu tư {investor} (nội dung {memo}). Bạn trả nợ nhà đầu tư này mỗi ngày làm việc, bắt đầu từ ngày làm việc tiếp theo.",

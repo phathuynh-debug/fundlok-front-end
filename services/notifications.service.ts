@@ -27,7 +27,18 @@ export type NotificationEvent =
    * page it pays from), `memo`, the masked `investor`, `amount_vnd` and the
    * note staff gave (`reason`).
    */
-  | "REPAYMENT_RECEIPT_REJECTED";
+  | "REPAYMENT_RECEIPT_REJECTED"
+  /**
+   * To the investor: the business uploaded the receipt for a repayment to them,
+   * so they check their bank account and confirm it arrived. `data` has
+   * `tranche_id`, `receipt_id`, `memo`, `project` and `amount_vnd`.
+   */
+  | "REPAYMENT_RECEIPT_SUBMITTED"
+  /**
+   * To the business: the investor confirmed a repayment reached them. `data`
+   * has `tranche_id`, `memo`, the masked `investor` and `amount_vnd`.
+   */
+  | "REPAYMENT_RECEIPT_CONFIRMED";
 
 export interface AppNotification {
   id: string;

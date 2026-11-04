@@ -1,20 +1,26 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { InvestmentCard, repaymentSummary } from "./InvestmentCard";
+import { RepaymentReceipts } from "./RepaymentReceipts";
 import type { Tranche } from "@/services/funding.service";
 import type {
   ProjectedSchedule,
+  RepaymentReceipt,
   RepaymentRow,
 } from "@/services/repayment.service";
 
 const reportMock = vi.fn();
+const confirmMock = vi.fn();
 let schedule: RepaymentRow[] | undefined;
 let projection: ProjectedSchedule | undefined;
+let receipts: RepaymentReceipt[] | undefined;
 
 vi.mock("@/hooks/use-repayment", () => ({
   useRepaymentSchedule: () => ({ data: schedule, isLoading: false }),
   useRepaymentProjection: () => ({ data: projection, isLoading: false }),
   useReportMissingDay: () => ({ mutate: reportMock, isPending: false }),
+  useRepaymentReceipts: () => ({ data: receipts, isLoading: false }),
+  useConfirmRepaymentReceipt: () => ({ mutate: confirmMock, isPending: false }),
 }));
 vi.mock("@/hooks/use-toast", () => ({ useToast: () => ({ toast: vi.fn() }) }));
 vi.mock("@/lib/i18n", () => ({
@@ -61,8 +67,10 @@ const day = (over: Partial<RepaymentRow>): RepaymentRow => ({
 
 beforeEach(() => {
   reportMock.mockReset();
+  confirmMock.mockReset();
   schedule = undefined;
   projection = undefined;
+  receipts = undefined;
 });
 
 describe("repaymentSummary", () => {
@@ -207,5 +215,92 @@ describe("InvestmentCard", () => {
     expect(
       within(screen.getByTestId("projected-days")).getAllByRole("listitem"),
     ).toHaveLength(3);
+  });
+});
+
+const receipt = (over: Partial<RepaymentReceipt> = {}): RepaymentReceipt => ({
+  id: "rc-1",
+  tranche_id: "tr-1",
+  reference_code: "FL8TKK1UAQ",
+  project_name: "CÔNG TY CỔ PHẦN FUNDLOK",
+  submitted_at: "2026-11-16T03:00:00Z",
+  status: "AWAITING_CONFIRMATION",
+  confirmed_at: null,
+  gross_vnd: 142_023,
+  tax_withheld_vnd: 1_148,
+  net_vnd: 140_875,
+  days: [
+    {
+      repayment_day_id: "d-0",
+      kind: "STUB",
+      due_date: "2026-11-16",
+      principal_vnd: 0,
+      interest_vnd: 20_000,
+      gross_vnd: 20_000,
+      tax_withheld_vnd: 1_000,
+      net_vnd: 19_000,
+      status: "PRESUMED_PAID",
+    },
+    {
+      repayment_day_id: "d-1",
+      kind: "INSTALMENT",
+      due_date: "2026-11-16",
+      principal_vnd: 119_048,
+      interest_vnd: 2_975,
+      gross_vnd: 122_023,
+      tax_withheld_vnd: 148,
+      net_vnd: 121_875,
+      status: "PRESUMED_PAID",
+    },
+  ],
+  payee: {
+    bank_name: "Techcombank",
+    account_number: "19036789012",
+    account_name: "HUYNH TAN PHAT",
+  },
+  payer: {
+    bank_name: "VietinBank",
+    account_number: "123123123123",
+    account_name: "CONG TY FUNDLOK",
+  },
+  original_filename: "receipt.png",
+  content_type: "image/png",
+  open_report: false,
+  ...over,
+});
+
+describe("RepaymentReceipts", () => {
+  it("lists each repayment awaiting confirmation and confirms when Received is clicked", () => {
+    receipts = [receipt()];
+    render(<RepaymentReceipts />);
+
+    const card = screen.getByTestId("repayment-receipt");
+    expect(card).toHaveTextContent("CÔNG TY CỔ PHẦN FUNDLOK");
+    expect(card).toHaveTextContent("FL8TKK1UAQ");
+    expect(card).toHaveTextContent("₫140,875");
+    expect(card).toHaveTextContent("19036789012");
+
+    // Click Received and confirm in the dialog.
+    fireEvent.click(
+      within(card).getByRole("button", {
+        name: "dashboard.investor.investments.receipts.receivedBtn",
+      }),
+    );
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "dashboard.investor.investments.receipts.confirmAction",
+      }),
+    );
+    expect(confirmMock).toHaveBeenCalledWith("rc-1", expect.anything());
+  });
+
+  it("notes when confirming closes an open missing-payment report", () => {
+    receipts = [receipt({ open_report: true })];
+    render(<RepaymentReceipts />);
+
+    const card = screen.getByTestId("repayment-receipt");
+    expect(card).toHaveTextContent(
+      "dashboard.investor.investments.receipts.openReport",
+    );
   });
 });

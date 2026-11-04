@@ -7,6 +7,8 @@ import {
   repaymentService,
   type InvestmentDue,
   type ProjectedSchedule,
+  type RepaymentReceipt,
+  type RepaymentReceiptFilter,
   type RepaymentRow,
   type TodaysPayments,
 } from "@/services/repayment.service";
@@ -19,6 +21,8 @@ export const repaymentKeys = {
   projection: (trancheId: string) =>
     [...repaymentKeys.all, "projection", trancheId] as const,
   due: (trancheId: string) => [...repaymentKeys.all, "due", trancheId] as const,
+  receipts: (status: RepaymentReceiptFilter) =>
+    [...repaymentKeys.all, "receipts", status] as const,
 };
 
 export function useTodaysPayments(enabled = true) {
@@ -54,6 +58,9 @@ export function useReportMissingDay(trancheId: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({
         queryKey: repaymentKeys.schedule(trancheId),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: repaymentKeys.all,
       });
     },
   });
@@ -101,5 +108,33 @@ export function useRepaymentProjection(trancheId: string, enabled = true) {
     enabled,
     staleTime: 5 * 60 * 1000,
     retry: false,
+  });
+}
+
+// The investor: receipts businesses uploaded for paying them, unconfirmed
+// ones by default.
+export function useRepaymentReceipts(
+  status: RepaymentReceiptFilter = "AWAITING",
+  enabled = true,
+) {
+  return useQuery<RepaymentReceipt[], ApiError>({
+    queryKey: repaymentKeys.receipts(status),
+    queryFn: () => repaymentService.getReceipts(status),
+    enabled,
+    staleTime: 30 * 1000,
+    retry: false,
+  });
+}
+
+// The investor received it: the days are settled, so the schedule, the
+// receipts and the portfolio figures all move.
+export function useConfirmRepaymentReceipt() {
+  const queryClient = useQueryClient();
+  return useMutation<RepaymentReceipt, ApiError, string>({
+    mutationFn: (receiptId) => repaymentService.confirmReceipt(receiptId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: repaymentKeys.all });
+      void queryClient.invalidateQueries({ queryKey: fundingKeys.all });
+    },
   });
 }

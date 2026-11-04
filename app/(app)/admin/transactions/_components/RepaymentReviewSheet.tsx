@@ -1,16 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import {
-  AlertTriangle,
-  CheckCircle2,
-  Info,
-  Loader2,
-  XCircle,
-} from "lucide-react";
+import { AlertTriangle, Info, Loader2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
@@ -19,37 +11,24 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
-import { Textarea } from "@/components/ui/textarea";
-import { useCurrentUser } from "@/hooks/use-authentication";
-import {
-  useAdminRepaymentReceipt,
-  useDecideRepaymentReceipt,
-} from "@/hooks/use-admin-funding";
-import { useToast } from "@/hooks/use-toast";
+import { useAdminRepaymentReceipt } from "@/hooks/use-admin-funding";
 import { useTranslations } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format-currency";
 import { formatDate, formatDateTime } from "@/lib/format-date";
 import { cn } from "@/lib/utils";
-import type {
-  AdminRepaymentAccount,
-  AdminRepaymentReceipt,
-} from "@/services/admin-funding.service";
+import type { AdminRepaymentAccount } from "@/services/admin-funding.service";
 import { personName } from "./activity";
 import { ReceiptViewer } from "./ReceiptViewer";
 import { RepaymentStatusBadge } from "./RepaymentStatusBadge";
 import { TransferHistory } from "./TransferHistory";
-import { transferErrorMessage } from "./transfer-errors";
 
 const K = "admin.transactions.repayments";
 
-// The review panel for one business's repayment receipt.
+// The read-only panel for one business's repayment receipt.
 //
-// Built around the question staff answer: did this money reach the investor?
-// So it shows what the receipt should show (the amount, the investor's
-// account, the memo) next to the receipt itself, and staff approve or deny
-// after looking. Approved, the days it pays are paid and settled; denied, they
-// are due again and the business is told why, so a denial needs a note. Staff
-// never decide a repayment they are part of.
+// The investor the receipt pays checks their own account and confirms the
+// money arrived; staff no longer approve or deny repayment receipts here, and
+// only decide a missed-day dispute if the investor reports one.
 export function RepaymentReviewSheet({
   receiptId,
   onOpenChange,
@@ -59,11 +38,7 @@ export function RepaymentReviewSheet({
 }) {
   const { t, locale } = useTranslations();
   const { data, isLoading, isError } = useAdminRepaymentReceipt(receiptId);
-  const { data: me } = useCurrentUser();
   const money = (vnd: number) => formatCurrency(vnd, locale);
-  const own = Boolean(
-    data && me && (data.business.id === me.id || data.investor.id === me.id),
-  );
 
   return (
     <Sheet open={receiptId !== null} onOpenChange={onOpenChange}>
@@ -219,18 +194,14 @@ export function RepaymentReviewSheet({
 
             <Separator />
 
-            {!data.needs_action ? (
-              <section className="flex items-start gap-2.5 rounded-xl border bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground">
-                <Info className="mt-px h-4 w-4 shrink-0" aria-hidden />
-                <p>{t(`${K}.sheet.decided.${data.check_status}`)}</p>
-              </section>
-            ) : own ? (
-              <p className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-foreground">
-                {t(`${K}.sheet.own`)}
+            <section className="flex items-start gap-2.5 rounded-xl border bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground">
+              <Info className="mt-px h-4 w-4 shrink-0" aria-hidden />
+              <p>
+                {data.needs_action
+                  ? t(`${K}.sheet.awaitingInvestor`)
+                  : t(`${K}.sheet.decided.${data.check_status}`)}
               </p>
-            ) : (
-              <DecisionForm key={data.id} receipt={data} />
-            )}
+            </section>
 
             <Separator />
 
@@ -257,82 +228,6 @@ function Account({ account }: { account: AdminRepaymentAccount | null }) {
         {account.account_name}
       </span>
     </>
-  );
-}
-
-// Approve or deny after looking at the receipt. Approving needs no note;
-// denying does, since the business reads it and pays again.
-function DecisionForm({ receipt }: { receipt: AdminRepaymentReceipt }) {
-  const { t, locale } = useTranslations();
-  const { toast } = useToast();
-  const decide = useDecideRepaymentReceipt();
-  const [reason, setReason] = useState("");
-  const note = reason.trim();
-
-  const send = (outcome: "APPROVED" | "DENIED") => {
-    decide.mutate(
-      { receiptId: receipt.id, body: { outcome, reason: note || null } },
-      {
-        onSuccess: () => toast({ title: t(`${K}.sheet.toast.${outcome}`) }),
-        onError: (error) =>
-          toast({
-            variant: "destructive",
-            title: t("admin.transactions.sheet.decideFailed"),
-            description: transferErrorMessage(error, t, locale),
-          }),
-      },
-    );
-  };
-
-  return (
-    <section className="space-y-3">
-      <div className="space-y-1">
-        <h3 className="text-sm font-semibold">
-          {t("admin.transactions.sheet.decideHeading")}
-        </h3>
-        <p className="text-xs leading-relaxed text-muted-foreground">
-          {t(`${K}.sheet.decideBody`)}
-        </p>
-      </div>
-      <Textarea
-        rows={2}
-        value={reason}
-        disabled={decide.isPending}
-        onChange={(event) => setReason(event.target.value)}
-        placeholder={t(`${K}.sheet.notePlaceholder`)}
-        aria-label={t(`${K}.sheet.notePlaceholder`)}
-      />
-      <div className="flex gap-2">
-        <Button
-          type="button"
-          size="sm"
-          className="flex-1 gap-2"
-          disabled={decide.isPending}
-          onClick={() => send("APPROVED")}
-        >
-          {decide.isPending ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <CheckCircle2 className="h-3.5 w-3.5" />
-          )}
-          {t("admin.transactions.sheet.approve")}
-        </Button>
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          className="flex-1 gap-2"
-          disabled={decide.isPending || !note}
-          onClick={() => send("DENIED")}
-        >
-          <XCircle className="h-3.5 w-3.5" />
-          {t("admin.transactions.sheet.deny")}
-        </Button>
-      </div>
-      <p className="text-[11px] leading-relaxed text-muted-foreground">
-        {t(`${K}.sheet.hint`)}
-      </p>
-    </section>
   );
 }
 
