@@ -1473,6 +1473,7 @@
           "VOID": "Vô hiệu"
         },
         "taxNote": "Số tiền đã trừ thuế TNCN 5% chỉ tính trên phần lãi (không tính trên tiền gốc bạn nhận lại), do doanh nghiệp khấu trừ thay bạn.",
+        "termMonths": "Kỳ hạn: {count} tháng",
         "waitingClose": "Tiền của bạn đã được xác nhận. Việc trả nợ hằng ngày bắt đầu từ ngày làm việc tiếp theo."
       },
       "investorBearsLoss": "Nhà đầu tư chịu khoản lỗ này.",

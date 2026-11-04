@@ -73,6 +73,8 @@ export interface Tranche {
   /** In the investor's own list: the project the ticket is in. */
   project_id?: string | null;
   project_name?: string | null;
+  /** Loan duration in months (from the project's funding window). */
+  term_months?: number | null;
 }
 
 /** What the receipt upload is checked for, client-side, before it is sent. */

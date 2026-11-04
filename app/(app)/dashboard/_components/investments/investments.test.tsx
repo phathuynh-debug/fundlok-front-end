@@ -43,6 +43,7 @@ const tranche = (over: Partial<Tranche> = {}): Tranche => ({
   receipt_submitted_at: "2026-11-02T05:51:00Z",
   project_id: "p-1",
   project_name: "CÔNG TY CỔ PHẦN FUNDLOK",
+  term_months: 3,
   ...over,
 });
 
@@ -110,6 +111,9 @@ describe("InvestmentCard", () => {
     ];
     render(<InvestmentCard tranche={tranche()} />);
 
+    expect(screen.getByTestId("investment-card")).toHaveTextContent(
+      'dashboard.investor.investments.termMonths:{"count":3}',
+    );
     expect(screen.getByTestId("investment-card")).toHaveTextContent(
       "dashboard.investor.investments.received",
     );

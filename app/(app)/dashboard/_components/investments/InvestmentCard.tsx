@@ -60,6 +60,12 @@ export function InvestmentCard({ tranche }: { tranche: Tranche }) {
           <p className="text-xs text-muted-foreground">
             {t(`${K}.memo`)}{" "}
             <span className="font-mono">{tranche.reference_code}</span>
+            {tranche.term_months != null && (
+              <>
+                {" · "}
+                {t(`${K}.termMonths`, { count: tranche.term_months })}
+              </>
+            )}
           </p>
         </div>
         <div className="flex items-center gap-2">

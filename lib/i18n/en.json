@@ -1473,6 +1473,7 @@
           "VOID": "Void"
         },
         "taxNote": "Amounts are after personal income tax of 5% on the interest part only (not on your money coming back), which the business withholds for you.",
+        "termMonths": "Term: {count} months",
         "waitingClose": "Your money is confirmed. Its daily repayments start from the next working day."
       },
       "investorBearsLoss": "The investor bears this loss.",
