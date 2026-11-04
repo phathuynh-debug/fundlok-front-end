@@ -101,7 +101,9 @@ export function RepaymentQueue({ status }: { status: AdminRepaymentFilter }) {
   const [openId, setOpenId] = useState<string | null>(null);
   // Investments start expanded so staff can see every receipt at a glance and
   // collapse any ticket they have already inspected.
-  const [collapsedIds, setCollapsedIds] = useState<Set<string>>(() => new Set());
+  const [collapsedIds, setCollapsedIds] = useState<Set<string>>(
+    () => new Set(),
+  );
 
   const { data, isLoading, isFetching } = useAdminRepaymentReceipts({
     status,

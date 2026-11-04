@@ -42,7 +42,11 @@ const receipt1: AdminRepaymentReceipt = {
   tranche_amount_vnd: 30_000_000,
   tranche_paid_days: 2,
   tranche_total_days: 60,
-  business: { id: "sme-1", full_name: "HUYNH TAN PHAT", email: "sme@fundlok.vn" },
+  business: {
+    id: "sme-1",
+    full_name: "HUYNH TAN PHAT",
+    email: "sme@fundlok.vn",
+  },
   investor: { id: "inv-1", full_name: "Phat Huynh", email: "inv@fundlok.vn" },
   submitted_at: "2026-11-04T08:22:00Z",
   check_status: "MATCHED",

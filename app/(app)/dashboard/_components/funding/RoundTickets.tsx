@@ -143,9 +143,7 @@ function TicketRow({ ticket }: { ticket: SmeTicket }) {
             {t(`${K}.report`)}
           </Button>
         )}
-        {received && (
-          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        )}
+        {received && <ChevronRight className="h-4 w-4 text-muted-foreground" />}
       </span>
     </>
   );

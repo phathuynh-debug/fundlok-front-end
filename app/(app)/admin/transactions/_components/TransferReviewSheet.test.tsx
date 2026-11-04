@@ -328,7 +328,8 @@ describe("TransferReviewSheet", () => {
         cause: "SME_DISPUTE",
         status: "OPEN",
         outcome: null,
-        statement: "Checked our Techcombank statement — nothing arrived under FL8TKK1UAQ",
+        statement:
+          "Checked our Techcombank statement — nothing arrived under FL8TKK1UAQ",
         created_at: "2026-11-02T06:00:00Z",
       },
     };
