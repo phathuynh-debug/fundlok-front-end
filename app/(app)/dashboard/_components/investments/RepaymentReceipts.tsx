@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { AlertTriangle, CheckCircle2, Loader2, ReceiptText } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Loader2,
+  ReceiptText,
+} from "lucide-react";
 
 import {
   AlertDialog,
@@ -79,7 +84,9 @@ export function RepaymentReceipts() {
           variant="ghost"
           className="h-7 px-2 text-xs"
           onClick={() =>
-            setFilter((current) => (current === "AWAITING" ? "ALL" : "AWAITING"))
+            setFilter((current) =>
+              current === "AWAITING" ? "ALL" : "AWAITING",
+            )
           }
         >
           {filter === "AWAITING" ? t(`${K}.showAll`) : t(`${K}.showAwaiting`)}
@@ -88,9 +95,7 @@ export function RepaymentReceipts() {
 
       {items.length === 0 ? (
         <p className="rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
-          {filter === "AWAITING"
-            ? t(`${K}.emptyAwaiting`)
-            : t(`${K}.emptyAll`)}
+          {filter === "AWAITING" ? t(`${K}.emptyAwaiting`) : t(`${K}.emptyAll`)}
         </p>
       ) : (
         <ul className="space-y-3" data-testid="repayment-receipts-list">
