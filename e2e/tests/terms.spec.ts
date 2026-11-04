@@ -30,7 +30,7 @@ test.describe("Terms of Service page and links", () => {
     await expect(searchInput).toBeVisible();
 
     // Type a query that matches specific terms
-    await searchInput.fill("custodial");
+    await searchInput.fill("FundLok");
     await expect(page.locator("#part-a")).toBeVisible();
 
     // Type a query that matches nothing
