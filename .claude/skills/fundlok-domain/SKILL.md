@@ -53,19 +53,19 @@ mechanics live in the backend repo's `fundlok-domain` skill.
 
 | Mechanic | What the UI may say |
 | --- | --- |
-| **Rate** | Starts from a reference rate (what commercial banks charge for unsecured lending) and moves with the business's internal score: stronger score → closer to the reference rate. **Capped at the statutory 20%/yr ceiling.** The quoted rate is **all-in — there is no second rate underneath it.** |
+| **Rate** | Starts from a reference rate (what commercial banks charge for unsecured lending) and moves with the business's internal score: stronger score → closer to the reference rate. **Capped at the statutory 20%/yr ceiling.** The rate covers all the interest; there is no second rate underneath it. **The only other charge to the SME is a one-time activation fee, invoiced separately. "All-in cost" means interest plus that fee** — never say the rate is all-in or that there is no other fee. |
 | **Score** | A **0–100 internal assessment** that moves the rate between the reference rate and the ceiling. It is a **reference input to a decision**, never a credit rating. See §4. |
 | **Total repayable** | **Set at signing.** A strong month never shrinks it. **If revenue drops and the term stretches, interest on the extra time is added, so the total goes up.** Nothing else changes it. |
 | **Term** | Declared by the SME — **1 to 6 months. Six is the maximum; we never write longer.** Same range the grading engine accepts (`LOAN_DURATIONS_MONTHS`). |
 | **Daily repayment** | A **fixed amount each business day** until the total is cleared — small, predictable, matched to a business that takes money in daily. |
-| **Relief (true-up)** | We check the daily amount against verified revenue at intervals. **If revenue fell short, the daily amount for that period drops and the term stretches until the shortfall is repaid. Interest runs on the new, longer term, so the total repayable goes up: less per day, for longer.** If revenue was strong, we never ask for more. Say it as: *if revenue drops, the term can stretch out and the daily repayment gets smaller.* Code: `stretchedTerm()` in `lib/facility-terms.ts`. |
+| **Relief (true-up)** | **The SME requests it** after a slow month, sending its verified revenue. FundLok does not scan revenue itself — never write "we check your revenue each month". **If revenue fell short, the daily amount for that period drops and the term stretches until the shortfall is repaid. Interest runs on the new, longer term, so the total repayable goes up: less per day, for longer.** If revenue was strong, we never ask for more. Say it as: *if revenue drops, the term can stretch out and the daily repayment gets smaller.* Code: `stretchedTerm()` in `lib/facility-terms.ts`. |
 | **Missed payment** | One missed day raises a **warning** — not punitive, **not a default**. It moves the facility to a **watchlist**, and it exists so the conversation happens on day one, not month six. |
 | **Extension** | If the total is not cleared by the declared term, the facility extends with a fee set so the annualised cost stays what it was at signing. **The investor's expected yield is restored, not increased — nobody profits from the delay.** |
 | **Backstop** | A hard deadline at **1.33 × the declared term** (3mo → ~4mo, 6mo → ~8mo) at which **everything still outstanding falls due in full**. It protects the investor by bounding exposure in time, and **the SME knows the date from the day they sign** — so show it. |
 | **Ending** | Four outcomes: repaid, repaid early, settled at the backstop, or written down. |
 | **Early repayment** | The benefit is **"no prepayment penalty"** — *not* "pay early, pay less". Paying early does **not** reduce the total. **Never sell it as a discount.** |
 | **Revenue evidence** | Tax records — VAT declarations and e-invoices. **The signed electronic original only.** Upload UI must reject PDFs, screenshots and spreadsheets, and say why: those can be edited and prove nothing. |
-| **Custody** | Funds sit with **custodial bank partners** (plural, unnamed). See §4. |
+| **Money flow** | **FundLok never holds customer money** (ADR-009, 28 Oct 2026). Investors transfer straight from their own bank account to the SME's own account; the SME repays each investor directly, every working day; FundLok's fees are invoiced separately and **never deducted** from principal or repayments. There is **no custodial bank, escrow, omnibus account, wallet or platform balance** — so no "deposit", "withdraw", "credited to your balance" or "paid out automatically". See §4. |
 | **Not financed** | Gambling, alcohol or tobacco as a primary business, weapons/defence. Not negotiable, regardless of the numbers. |
 
 ---
@@ -105,8 +105,8 @@ committing to something unsigned.
 | Never say | Always say | Because |
 | --- | --- | --- |
 | "chấm điểm doanh nghiệp / dòng tiền / tín dụng", "credit scoring", "credit rating" | **"Điểm doanh nghiệp và lãi suất tham khảo"** (business score and reference rate). Where a "we do not do this" list exists, add **"Không phải công ty xếp hạng tín nhiệm."** | We are not a credit rating company — a licensed activity. "Chấm điểm" reads as issuing a rating; "điểm tham khảo" reads as an input to the investor's own decision. |
-| "FundLok never holds funds" / "FundLok không bao giờ giữ tiền" | **"FundLok is not the owner of the funds, has no right to draw on them for its own purposes, and holds only instruction rights within conditions the bank enforces."** | The first is a claim that can be broken. The second describes a verifiable mechanism. |
-| Naming a specific custodial bank | **"custodial bank partners" / "đối tác ngân hàng lưu ký"** — plural and unnamed. | Nothing is signed. Naming a bank over-commits us and hands anyone a checkable, disprovable fact. |
+| Any custody model: "custodial bank partners", "instruction rights", escrow, a wallet or platform balance, "deposit", "withdraw" | **"FundLok never holds customer money. Investors transfer straight to the business's own bank account, and the business repays each investor directly."** / **"FundLok không giữ tiền của khách hàng. Nhà đầu tư chuyển thẳng vào tài khoản ngân hàng của doanh nghiệp, và doanh nghiệp trả trực tiếp cho từng nhà đầu tư."** | Since ADR-009 (28 Oct 2026) no money ever passes through FundLok, so "never holds" is now a verifiable fact, not a promise. The custodial-bank wording (Handbook v3 §5.12/§7.4) describes a model that was dropped. |
+| Saying fees are taken from the loan | **"Invoiced separately, never deducted from loan money."** | Fees go to FundLok's own account on their own invoice; netting them would mean FundLok touching customer money. |
 | Naming or debating the regulatory framework we build to | **"We operate as a technology and arranger platform within reviewed legal boundaries."** | Raising it invites a question we do not need to open. Route specifics to the CEO. |
 
 ---
@@ -121,7 +121,9 @@ Stop and ask if a string is about to do any of these.
   safety net. We do not offer one.
 - **Claim licensed status.** Not a bank, not a licensed lender. Watch for
   sentences that drift there, including reassurance copy.
-- **Name a custodial bank.**
+- **Describe a custody model** — a custodial bank, escrow, pooled account,
+  wallet, platform balance, deposits or withdrawals. Money moves only between
+  the investor's and the SME's own bank accounts.
 - **Use rating language** in any form (see §4).
 - **Say approval is certain**, that no documents are needed, that there is no
   risk, or that everyone qualifies.
@@ -140,7 +142,7 @@ Stop and ask if a string is about to do any of these.
 | --- | --- |
 | "Safe SME yield, guaranteed double-digit returns, backed by our reserve fund." | "Risk-graded SME financing with monitored repayment. Returns are targets, not guarantees, and the investor bears the credit risk." |
 | "No documents needed — approved in 24 hours, no collateral, no risk." | "A faster process built on documents you already have. No hard collateral, with risk managed through verified data, pricing and monitoring." |
-| "We hold your money safely at [named bank] and never touch it." | "Funds sit with our custodial bank partners. FundLok does not own them and cannot draw on them — we hold instruction rights within conditions the bank enforces." |
+| "Deposit into your secure escrow account and we pay out your returns automatically." | "You transfer straight to the business's own bank account, and it repays you directly every working day. The money never passes through FundLok." |
 
 ---
 
@@ -233,7 +235,10 @@ Before a string, label or screen ships:
 - [ ] No promised/guaranteed return, no principal protection, no "risk-free".
 - [ ] Returns shown as ranges or scenarios, never a bare point figure.
 - [ ] No rating/"chấm điểm" language — **in both `en.json` and `vi.json`**.
-- [ ] No named custodial bank; custody described as instruction rights.
+- [ ] No custody model (custodial bank, escrow, balance, deposit, withdraw);
+      money moves directly between the investor's and the SME's own banks.
+- [ ] Fees described as invoiced separately, never deducted; "all-in" means
+      interest plus the one-time activation fee.
 - [ ] No claim or implication of licensed/bank status.
 - [ ] No regulatory-framework discussion.
 - [ ] Investor-facing? All of §3 is present, backstop included.

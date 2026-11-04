@@ -1332,7 +1332,7 @@
       "open": "Biểu mẫu này là gì?",
       "steps": {
         "actions": {
-          "body": "Hãy xem lại toàn bộ ở bước cuối trước khi gửi. Chúng tôi phản hồi trong vòng 3-5 ngày làm việc kèm điểm doanh nghiệp, lãi suất trọn gói, số tiền cố định bạn sẽ trả mỗi ngày làm việc, và hạn tất toán cuối cùng — ngày mà mọi khoản còn lại đến hạn thanh toán đầy đủ. Việc gửi hồ sơ không đồng nghĩa được duyệt, và bạn không nợ gì cho đến khi ký.",
+          "body": "Hãy xem lại toàn bộ ở bước cuối trước khi gửi. Chúng tôi phản hồi trong vòng 3-5 ngày làm việc kèm điểm doanh nghiệp, lãi suất và phí kích hoạt một lần, số tiền cố định bạn sẽ trả mỗi ngày làm việc, và hạn tất toán cuối cùng — ngày mà mọi khoản còn lại đến hạn thanh toán đầy đủ. Việc gửi hồ sơ không đồng nghĩa được duyệt, và bạn không nợ gì cho đến khi ký.",
           "title": "Gửi hồ sơ, và điều gì diễn ra sau đó"
         },
         "documents": {
@@ -1965,7 +1965,7 @@
         "months": "{n} tháng",
         "perYear": "/ năm",
         "rate": "Lãi suất tham khảo",
-        "rateNote": "Đã bao gồm mọi chi phí, tính một lần trên số tiền vay.",
+        "rateNote": "Lãi tính một lần trên số tiền vay. Phí kích hoạt một lần được xuất hóa đơn riêng.",
         "score": "Điểm doanh nghiệp",
         "scorePending": "Điểm doanh nghiệp và lãi suất tham khảo sẽ được xác nhận trong đề nghị tài trợ.",
         "term": "Thời hạn",
@@ -2481,9 +2481,10 @@
       "methods": {
         "bankTransfer": "Chuyển khoản ngân hàng",
         "businessAccount": "Tài khoản doanh nghiệp",
-        "custodialAccount": "Tài khoản lưu ký",
+        "custodialAccount": "Chuyển khoản trực tiếp",
         "dailyRepayment": "Khoản trả hằng ngày",
         "deductedFromDisbursement": "Khấu trừ khi giải ngân",
+        "invoicedSeparately": "Xuất hóa đơn riêng",
         "platformFee": "Phí dịch vụ nền tảng"
       },
       "mockNotice": "Dữ liệu mẫu. Màn hình này chưa kết nối với tài khoản của bạn, nên các số liệu dưới đây không phải số liệu thật.",
@@ -2702,7 +2703,7 @@
       "a2": "Khoản vay ngân hàng thường trả góp cố định hằng tháng. FundLok dùng một khoản nhỏ cố định mỗi ngày làm việc, hợp với doanh nghiệp có tiền vào hằng ngày, và thời hạn có thể kéo dài khi doanh thu đã xác minh giảm (có tính lãi cho phần thời gian thêm).",
       "a3": "Không. FundLok không phải ngân hàng hay bên cho vay. Đây là nền tảng công nghệ thu xếp vốn giữa doanh nghiệp và nhà đầu tư, điều phối khoản trả nợ và hiển thị mọi giao dịch.",
       "a4": "Công nghệ đảm nhận phần việc lặp lại: đọc tài liệu, đối chiếu với chứng từ thuế, chuẩn bị đề nghị tài trợ, điều phối dòng tiền và theo dõi từng khoản trả hằng ngày. Con người rà soát các quyết định.",
-      "a5": "Tài khoản hỗ trợ xác thực hai lớp và passkey, kết nối được mã hóa, và tiền của nhà đầu tư được giữ tại các đối tác ngân hàng lưu ký, không phải tại FundLok.",
+      "a5": "Tài khoản hỗ trợ xác thực hai lớp và passkey, kết nối được mã hóa. FundLok không bao giờ giữ tiền của bạn: tiền chỉ đi giữa ngân hàng của bạn và ngân hàng của doanh nghiệp.",
       "a6": "Không. Mọi hồ sơ đều được thẩm định, và cả huy động vốn lẫn đầu tư đều có rủi ro. FundLok giúp quy trình rõ ràng hơn, nhưng không loại bỏ rủi ro kinh doanh hay rủi ro trả nợ. Doanh nghiệp có được cấp vốn hay không là do nhà đầu tư quyết định, FundLok không kiểm soát việc đó.",
       "a7": "Có. FundLok thu xếp nguồn vốn cho doanh nghiệp vừa và nhỏ tại Việt Nam. Nhà đầu tư là bên cấp vốn và hợp đồng tín dụng được ký giữa nhà đầu tư và doanh nghiệp. FundLok không phải ngân hàng, không phải bên cho vay, và không cho vay bằng tiền của mình. Doanh nghiệp chọn kỳ hạn từ 1 đến 6 tháng, hoàn trả một khoản cố định mỗi ngày làm việc, và tổng số tiền phải trả được ấn định khi ký. Nếu doanh thu đã xác minh giảm, thời hạn có thể kéo dài và khoản trả hằng ngày sẽ nhỏ hơn. Lãi được tính cho phần thời gian thêm, nên tổng số tiền sẽ tăng.",
       "q1": "FundLok là gì?",
@@ -2717,14 +2718,14 @@
     "investor": {
       "a1": "Bất kỳ ai hoàn tất đăng ký và xác minh danh tính đều có thể xem và cấp vốn cho các dự án. Bạn có thể bắt đầu từ 10.000.000 VND.",
       "a2": "Xem các dự án, đánh giá điểm doanh nghiệp, doanh thu đã xác minh, các khoản phí và hạn tất toán cuối cùng của từng doanh nghiệp, rồi chọn số tiền muốn góp.",
-      "a3": "Tiền được giữ tại các đối tác ngân hàng lưu ký. Dòng tiền chỉ đi theo hai hướng: tới tài khoản doanh nghiệp đã xác minh theo hợp đồng đã ký, hoặc quay về chính nhà đầu tư đã chuyển. FundLok không sở hữu và không có quyền sử dụng số tiền này cho mục đích riêng.",
-      "a4": "FundLok không sở hữu tiền của nhà đầu tư và không có quyền sử dụng số tiền đó: chúng tôi chỉ có quyền ra lệnh trong các điều kiện do ngân hàng lưu ký thực thi. Hợp đồng tín dụng là giữa nhà đầu tư và SME; FundLok không phải là một bên của hợp đồng, và nhà đầu tư chịu rủi ro tín dụng nếu doanh nghiệp không đạt kỳ vọng.",
-      "a5": "Khoản trả mỗi ngày làm việc được chia cho các nhà đầu tư của khoản vốn đó, theo tỷ lệ số tiền mỗi người góp, và hiển thị trong tài khoản của bạn. Bạn có thể rút số tiền đã được hoàn trả về tài khoản ngân hàng đã xác minh.",
+      "a3": "Đi thẳng từ tài khoản ngân hàng của bạn vào tài khoản đã xác minh của doanh nghiệp, theo hợp đồng vay đã ký. Tiền không bao giờ đi qua FundLok.",
+      "a4": "Không. FundLok không giữ tiền của khách hàng. Chúng tôi thu xếp, xác minh, ghi nhận và theo dõi từng khoản vay. Hợp đồng tín dụng được ký giữa bạn và doanh nghiệp, FundLok không phải là một bên, và nếu doanh nghiệp không đạt kỳ vọng, bạn là người chịu khoản lỗ.",
+      "a5": "Doanh nghiệp trả trực tiếp cho bạn mỗi ngày làm việc, vào tài khoản ngân hàng của bạn, theo tỷ lệ số vốn bạn góp. Nếu bạn đầu tư với tư cách cá nhân, doanh nghiệp khấu trừ trước 5% thuế trên phần lãi. Bảng điều khiển hiển thị số tiền đến hạn mỗi ngày, và nếu khoản nào không đến, bạn báo ngay tại đó.",
       "a6": "Tiến độ cấp vốn, khoản trả từng ngày làm việc, các loại phí, và mọi cảnh báo hay trạng thái theo dõi của doanh nghiệp bạn cấp vốn.",
       "q1": "Ai có thể đầu tư SME qua FundLok?",
       "q2": "Nhà đầu tư tham gia như thế nào?",
       "q3": "Tiền của nhà đầu tư đi về đâu?",
-      "q4": "Tiền của nhà đầu tư được giữ ở đâu và ai chịu rủi ro?",
+      "q4": "FundLok có giữ tiền của tôi không, và ai chịu rủi ro?",
       "q5": "Nhà đầu tư nhận lại tiền trả nợ ra sao?",
       "q6": "Nhà đầu tư có thể theo dõi gì trên FundLok?",
       "title": "Dành cho nhà đầu tư"
@@ -3110,7 +3111,7 @@
     "illustrationNote": "Chỉ mang tính minh họa. Đây là số liệu tham khảo, không phải đề nghị, không phải báo giá và không phải cam kết. Lãi suất và điểm doanh nghiệp thực tế được tính từ hồ sơ thuế đã xác minh.",
     "indicativeCheck": "Kiểm tra sơ bộ",
     "indicativeFit": "NẰM TRONG NGƯỠNG",
-    "indicativeRate": "Lãi suất trọn gói tham khảo",
+    "indicativeRate": "Lãi suất tham khảo",
     "indicativeStatus": "Mức độ phù hợp sơ bộ",
     "invShort": "NĐT",
     "investmentShort": "Khoản đầu tư",
@@ -3378,7 +3379,7 @@
       "cadence": "Tần suất tái đầu tư",
       "cadenceHint": "Yếu tố này ảnh hưởng đến con số nhiều hơn mọi thứ khác trên trang. Tiền nằm không giữa các khoản vay thì không sinh lời.",
       "cadenceOption": {
-        "daily": "Hàng ngày (tự động tái đầu tư)",
+        "daily": "Hằng ngày (nếu bạn tái đầu tư mỗi khoản nhận về)",
         "monthly": "Hàng tháng",
         "none": "Không (một khoản, giữ đến hết kỳ)",
         "quarterly": "Hàng quý",
@@ -3582,7 +3583,7 @@
     "rateDescription": "Tra cứu lãi suất tham khảo và ước tính chi phí vốn cho doanh nghiệp SME. Minh bạch chi phí, không phí ẩn, hỗ trợ dòng tiền linh hoạt cho doanh nghiệp Việt Nam.",
     "rateFaqA1": "Doanh nghiệp vừa và nhỏ đang hoạt động tại Việt Nam, có doanh thu được xác minh qua tờ khai thuế GTGT và hóa đơn điện tử bản gốc điện tử có chữ ký, và khai báo thời hạn cần vốn từ 1 đến 6 tháng. Nhà đầu tư là bên cấp vốn; FundLok là nền tảng công nghệ sắp xếp và hỗ trợ quy trình, không phải ngân hàng và không cho vay bằng nguồn vốn riêng.",
     "rateFaqA2": "Quy trình được số hóa toàn bộ: bạn nhập thông tin, tải chứng từ và nhận kết quả thẩm định trên cùng một nền tảng. Thời gian cụ thể phụ thuộc vào việc xác minh chứng từ thuế và dữ liệu doanh thu; hồ sơ đủ và rõ ràng sẽ được xử lý nhanh hơn. FundLok không cam kết một mức thời gian cố định cho mọi hồ sơ.",
-    "rateFaqA3": "Lãi suất tham khảo bắt đầu từ mức mà ngân hàng thương mại áp dụng cho vay không bảo đảm và di chuyển theo điểm doanh nghiệp: điểm càng tốt, lãi suất càng gần mức tham chiếu, với trần theo quy định 20%/năm. Mức được báo là toàn bộ chi phí — không có mức phí nào khác bên dưới. Tổng số tiền phải trả được ấn định khi ký và bạn trả một khoản cố định mỗi ngày làm việc; nếu doanh thu giảm, thời hạn có thể giãn và lãi của phần thời gian thêm làm tổng tăng lên.",
+    "rateFaqA3": "Lãi suất tham khảo bắt đầu từ mức mà ngân hàng thương mại áp dụng cho vay không bảo đảm và di chuyển theo điểm doanh nghiệp: điểm càng tốt, lãi suất càng gần mức tham chiếu, với trần theo quy định 20%/năm. Lãi suất bao gồm toàn bộ tiền lãi. Khoản phí duy nhất ngoài lãi là phí kích hoạt một lần, ghi rõ trong đề xuất và xuất hóa đơn riêng, nên tổng chi phí của bạn gồm tiền lãi và khoản phí này. Tổng số tiền phải trả được ấn định khi ký và bạn trả một khoản cố định mỗi ngày làm việc; nếu doanh thu giảm, thời hạn có thể giãn và lãi của phần thời gian thêm làm tổng tăng lên.",
     "rateFaqQ1": "Điều kiện để doanh nghiệp SME nhận vốn qua FundLok là gì?",
     "rateFaqQ2": "Thời gian thẩm định và giải ngân mất bao lâu?",
     "rateFaqQ3": "Cách tính lãi suất và phí dịch vụ như thế nào?",
@@ -3604,7 +3605,7 @@
     "suspendedTitle": "Tài khoản bị tạm khóa",
     "termsDescription": "Quy định, điều khoản pháp lý và cam kết minh bạch khi sử dụng nền tảng kết nối vốn doanh nghiệp SME tại FundLok.",
     "termsTitle": "Điều Khoản và Điều Kiện Sử Dụng Dịch Vụ | FundLok",
-    "transactionsDescription": "Xem mọi giao dịch trên tài khoản FundLok của bạn: khoản đầu tư, khoản hoàn trả, nạp tiền, rút tiền và phí.",
+    "transactionsDescription": "Xem mọi giao dịch trên tài khoản FundLok của bạn: khoản đầu tư, khoản hoàn trả và phí.",
     "transactionsTitle": "Giao dịch",
     "verifyEmailDescription": "Xác minh địa chỉ email để truy cập trang quản lý FundLok của bạn.",
     "verifyEmailTitle": "Xác minh email",
@@ -3656,8 +3657,8 @@
     "effectiveDate": "Ngày cập nhật: 22 tháng 9 năm 2026",
     "lastUpdated": "Ngày cập nhật: 22 tháng 9 năm 2026",
     "noResults": "Không tìm thấy điều khoản phù hợp với từ khóa tìm kiếm.",
-    "noticeBanner": "FundLok là nền tảng công nghệ và thu xếp vốn, hoạt động trong khuôn khổ pháp lý đã được rà soát. Tiền của nhà đầu tư được giữ tại các đối tác ngân hàng lưu ký: FundLok không sở hữu, không có quyền sử dụng số tiền này cho mục đích riêng và chỉ có quyền chỉ thị trong các điều kiện do ngân hàng thực thi. FundLok không phải ngân hàng và không cho vay bằng tiền của mình. Hợp đồng tín dụng được ký giữa nhà đầu tư và doanh nghiệp; nhà đầu tư chịu rủi ro tín dụng.",
-    "noticeTitle": "Cách FundLok vận hành và nơi giữ tiền",
+    "noticeBanner": "FundLok là nền tảng công nghệ và thu xếp vốn, hoạt động trong khuôn khổ pháp lý đã được rà soát. Chúng tôi không giữ tiền của khách hàng. Nhà đầu tư chuyển thẳng vào tài khoản ngân hàng của doanh nghiệp, và doanh nghiệp trả trực tiếp cho từng nhà đầu tư. Phí của FundLok được xuất hóa đơn riêng và không bao giờ trừ vào tiền vay. FundLok không phải ngân hàng và không cho vay bằng tiền của mình. Hợp đồng tín dụng được ký giữa nhà đầu tư và doanh nghiệp; nhà đầu tư chịu rủi ro tín dụng.",
+    "noticeTitle": "Cách FundLok vận hành và cách dòng tiền di chuyển",
     "searchPlaceholder": "Tìm kiếm điều khoản và quy định...",
     "sections": {
       "contact": "Thông tin liên hệ",
@@ -3712,7 +3713,7 @@
         "title": "Cấp vốn cho doanh nghiệp thật."
       },
       "journey": {
-        "body": "Chọn dự án, cam kết, giải ngân, rồi nhận tiền về mỗi ngày làm việc. Tiền được giữ tại các đối tác ngân hàng lưu ký.",
+        "body": "Chọn dự án, cam kết, chuyển vốn, rồi nhận tiền mỗi ngày làm việc. Tiền đi thẳng tới doanh nghiệp, không qua FundLok.",
         "title": "Từ dự án đến hoàn trả."
       },
       "riskRate": {

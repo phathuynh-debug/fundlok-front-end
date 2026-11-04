@@ -134,12 +134,12 @@ export const MOCK_SME_TRANSACTIONS: Transaction[] = [
     type: "FEE",
     status: "COMPLETED",
     created_at: "2026-04-02T10:31:00",
-    // Platform fee, deducted from the disbursement rather than invoiced —
-    // the omnibus flow in CLAUDE.md takes it on the way through.
+    // Activation fee: invoiced separately and paid into FundLok's own account.
+    // Never deducted from the disbursement (ADR-009: FundLok holds no money).
     amount: -12_000_000,
     currency: "VND",
     counterparty: "FundLok",
-    method_key: "deductedFromDisbursement",
+    method_key: "invoicedSeparately",
   },
   {
     id: "sme-txn-0001",

@@ -1332,7 +1332,7 @@
       "open": "What is this form?",
       "steps": {
         "actions": {
-          "body": "Review everything on the last stage before you send. We come back within 3-5 business days with your business score, the all-in rate, the fixed amount you would repay each business day, and the backstop date — the day anything still outstanding falls due in full. Sending an application is not an approval, and nothing is owed until you sign.",
+          "body": "Review everything on the last stage before you send. We come back within 3-5 business days with your business score, the rate and the one-time activation fee, the fixed amount you would repay each business day, and the backstop date — the day anything still outstanding falls due in full. Sending an application is not an approval, and nothing is owed until you sign.",
           "title": "Sending, and what follows"
         },
         "documents": {
@@ -1965,7 +1965,7 @@
         "months": "{n} months",
         "perYear": "/ year",
         "rate": "Reference rate",
-        "rateNote": "All-in and flat: interest is charged once on the amount borrowed.",
+        "rateNote": "Flat: interest is charged once on the amount borrowed. A one-time activation fee is invoiced separately.",
         "score": "Business score",
         "scorePending": "Your business score and reference rate will be confirmed in the offer.",
         "term": "Term",
@@ -2481,9 +2481,10 @@
       "methods": {
         "bankTransfer": "Bank transfer",
         "businessAccount": "Business account",
-        "custodialAccount": "Custodial account",
+        "custodialAccount": "Direct bank transfer",
         "dailyRepayment": "Daily repayment",
         "deductedFromDisbursement": "Deducted from disbursement",
+        "invoicedSeparately": "Invoiced separately",
         "platformFee": "Platform service fee"
       },
       "mockNotice": "Sample data. This screen isn't connected to your account yet, so none of these figures are real.",
@@ -2702,7 +2703,7 @@
       "a2": "A bank loan usually has a fixed monthly instalment. FundLok uses a small fixed amount each business day, matched to a business that takes money in daily, and the term can stretch if verified revenue drops (with interest on the extra time).",
       "a3": "No. FundLok is not a bank or a lender. It is a technology platform that arranges funding between SMEs and investors, routes repayments and shows every transaction.",
       "a4": "Technology does the repetitive work: reading documents, checking them against tax records, preparing offers, routing funds and tracking every daily repayment. People review the decisions.",
-      "a5": "Accounts support two-factor authentication and passkeys, connections are encrypted, and investor funds sit with custodial bank partners rather than with FundLok.",
+      "a5": "Accounts support two-factor authentication and passkeys, and connections are encrypted. FundLok never holds your money: it moves only between your bank and the business's.",
       "a6": "No. Every application is reviewed, and funding and investing both carry risk. FundLok makes the process clearer, but it does not remove business or repayment risk. Whether a business gets funded is up to investors, and FundLok does not control that.",
       "a7": "Yes. FundLok arranges funding for SMEs in Vietnam. Investors provide the capital and the credit agreement is between the investor and the business. FundLok is not a bank, is not a lender, and does not lend its own money. A business declares a term of 1 to 6 months, repays a fixed amount each business day, and the total repayable is set at signing. If verified revenue drops, the term can stretch out and the daily repayment gets smaller. Interest applies to the extra time, so the total goes up.",
       "q1": "What is FundLok?",
@@ -2717,14 +2718,14 @@
     "investor": {
       "a1": "Anyone who completes sign-up and identity verification can browse and fund listings. You can start from 10,000,000 VND.",
       "a2": "Browse listings, review each business's score, verified revenue, fees and backstop date, then choose how much to put in.",
-      "a3": "Funds sit with our custodial bank partners. Money moves in only two directions: to a verified SME account under a signed agreement, or back to the investor who sent it. FundLok does not own these funds and cannot draw on them for its own purposes.",
-      "a4": "FundLok does not own investor funds and cannot draw on them: we hold instruction rights within conditions the custodial bank enforces. The credit agreement is between the investor and the SME; FundLok is not a party to it, and the investor bears the credit risk if a business underperforms.",
-      "a5": "Each business day's repayments are split across the investors in that facility, in proportion to what each put in, and show in your account. You can withdraw repaid funds to your verified bank account.",
+      "a3": "Straight from your bank account to the business's verified account, under a signed loan agreement. The money never passes through FundLok.",
+      "a4": "No. FundLok never holds customer money. We arrange, verify, record and service each loan. The credit agreement is between you and the business, FundLok is not a party to it, and if the business underperforms, you bear the loss.",
+      "a5": "The business pays you directly every working day, into your own bank account, in proportion to what you put in. If you invest as an individual, it first withholds 5% tax on the interest. Your dashboard shows what's due each day, and if a payment doesn't arrive, you report it there.",
       "a6": "Funding progress, each business day's repayments, fees, and any warning or watchlist status on the businesses you fund.",
       "q1": "Who can invest in SMEs through FundLok?",
       "q2": "How do investors participate?",
       "q3": "Where do investor funds go?",
-      "q4": "How are investor funds held, and who bears the risk?",
+      "q4": "Does FundLok hold my money, and who bears the risk?",
       "q5": "How do investors receive repayments?",
       "q6": "What can investors track on FundLok?",
       "title": "For investors"
@@ -3110,7 +3111,7 @@
     "illustrationNote": "Illustration only. Indicative figures, not an offer, not a quote, and not a guarantee. Your actual rate and score come from verified tax records.",
     "indicativeCheck": "Indicative check",
     "indicativeFit": "LOOKS IN RANGE",
-    "indicativeRate": "Indicative all-in rate",
+    "indicativeRate": "Indicative rate",
     "indicativeStatus": "Indicative fit",
     "invShort": "NĐT",
     "investmentShort": "Investment",
@@ -3378,7 +3379,7 @@
       "cadence": "Reinvestment cadence",
       "cadenceHint": "This moves the number more than anything else on the page. Money that sits idle between loans earns nothing.",
       "cadenceOption": {
-        "daily": "Daily (auto-reinvest)",
+        "daily": "Daily (if you reinvest each repayment)",
         "monthly": "Monthly",
         "none": "None (one loan, held to the end)",
         "quarterly": "Quarterly",
@@ -3582,7 +3583,7 @@
     "rateDescription": "Look up reference rates and estimate your cost of capital as an SME. Transparent pricing, no hidden fees, flexible working-capital support for Vietnamese businesses.",
     "rateFaqA1": "A small or medium business operating in Vietnam with revenue that can be verified through VAT declarations and signed electronic-original e-invoices, declaring a funding term of 1 to 6 months. Investors provide the capital; FundLok is a technology platform that arranges and supports the process — not a bank, and it does not lend its own money.",
     "rateFaqA2": "The process is fully digital: you enter your details, upload documents and receive the assessment on the same platform. Actual timing depends on verifying the tax records and revenue data; complete, clear documents are processed faster. FundLok does not commit to a fixed timeframe for every application.",
-    "rateFaqA3": "The reference rate starts from what commercial banks charge for unsecured lending and moves with the business score: the stronger the score, the closer the rate is to the reference level, capped at the statutory 20%/year. The quoted rate is all-in — there is no second fee underneath it. The total repayable is set at signing and you repay a fixed amount each business day; if revenue drops, the term can stretch out and interest on the extra time raises the total.",
+    "rateFaqA3": "The reference rate starts from what commercial banks charge for unsecured lending and moves with the business score: the stronger the score, the closer the rate is to the reference level, capped at the statutory 20%/year. The rate covers all the interest. The only other charge is a one-time activation fee, shown in your offer and invoiced separately, so your all-in cost is the interest plus that fee. The total repayable is set at signing and you repay a fixed amount each business day; if revenue drops, the term can stretch out and interest on the extra time raises the total.",
     "rateFaqQ1": "What does an SME need to receive capital through FundLok?",
     "rateFaqQ2": "How long do assessment and disbursement take?",
     "rateFaqQ3": "How are the rate and service fees calculated?",
@@ -3604,7 +3605,7 @@
     "suspendedTitle": "Account suspended",
     "termsDescription": "The legal terms and transparency commitments that apply when using the FundLok SME funding platform.",
     "termsTitle": "Terms and Conditions of Service | FundLok",
-    "transactionsDescription": "Review every movement of funds across your FundLok account — investments, returns, deposits, withdrawals and fees.",
+    "transactionsDescription": "Review every transaction on your FundLok account: investments, repayments and fees.",
     "transactionsTitle": "Transactions",
     "verifyEmailDescription": "Verify your email address to access your FundLok dashboard.",
     "verifyEmailTitle": "Verify email",
@@ -3656,8 +3657,8 @@
     "effectiveDate": "Last updated: 22 September 2026",
     "lastUpdated": "Last updated: 22 September 2026",
     "noResults": "No clauses found matching your search term.",
-    "noticeBanner": "FundLok is a technology and arranger platform operating within reviewed legal boundaries. Investor funds sit with custodial bank partners: FundLok does not own them, has no right to draw on them for its own purposes, and holds only instruction rights within conditions the bank enforces. FundLok is not a bank and does not lend its own money. The credit agreement is between the investor and the SME, and the investor bears the credit risk.",
-    "noticeTitle": "How FundLok operates and where funds are held",
+    "noticeBanner": "FundLok is a technology and arranger platform operating within reviewed legal boundaries. We never hold customer money. Investors transfer straight to the business's own bank account, and the business repays each investor directly. Our fees are invoiced separately and never taken out of loan money. FundLok is not a bank and does not lend its own money. The credit agreement is between the investor and the business, and the investor bears the credit risk.",
+    "noticeTitle": "How FundLok works and how money moves",
     "searchPlaceholder": "Search terms and conditions...",
     "sections": {
       "contact": "Contact information",
@@ -3712,7 +3713,7 @@
         "title": "Fund real businesses."
       },
       "journey": {
-        "body": "Pick, commit, fund, then get paid every business day. Funds sit with our custodial bank partners.",
+        "body": "Pick, commit, fund, then get paid every business day. Your money goes straight to the business, never through FundLok.",
         "title": "From listing to repayment."
       },
       "riskRate": {
