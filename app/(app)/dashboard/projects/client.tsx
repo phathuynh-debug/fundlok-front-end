@@ -364,10 +364,17 @@ import {
 } from "@/lib/animations";
 import { CONTROL_HOVER, CONTROL_IDLE } from "@/lib/ui-tokens";
 
-// The secondary market is not open yet. While this is false its tab stays
-// visible, but selecting it shows a "coming soon" card instead of the sample
-// listings. Flip to true to bring the listings back.
+// The secondary market is not open yet. While this is false, selecting its tab
+// shows a "coming soon" card instead of the sample listings. Flip to true to
+// bring the listings back.
 const SECONDARY_MARKET_LIVE = false;
+
+// Hidden, not deleted: legal counsel's 16 Sep memo says a secondary market
+// breaks the "not securities" analysis, so investors must not see the tab until
+// that is cleared. While this is false the market toggle is not rendered and
+// the page shows the primary market only. All the secondary-market code and
+// copy stay in place; flip to true to show the tab again.
+const SECONDARY_MARKET_VISIBLE = false;
 
 export default function ProjectsClient() {
   const { user, isLoading: isAuthLoading } = useRequireAuth();
@@ -456,31 +463,33 @@ export default function ProjectsClient() {
         )}
       </div>
 
-      {/* Market Toggle Pill Selector */}
-      <div className="p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-800/40 w-fit flex items-center gap-1">
-        <button
-          onClick={() => handleMarketToggle("primary")}
-          className={`px-4 py-2.5 rounded-lg text-xs font-semibold uppercase transition duration-200 flex items-center gap-2 cursor-pointer ${
-            marketType === "primary"
-              ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
-              : `${CONTROL_IDLE} bg-transparent border border-transparent`
-          }`}
-        >
-          <Building2 className="w-3.5 h-3.5" />
-          <span>{t("dashboard.projects.primaryMarket")}</span>
-        </button>
-        <button
-          onClick={() => handleMarketToggle("secondary")}
-          className={`px-4 py-2.5 rounded-lg text-xs font-semibold uppercase transition duration-200 flex items-center gap-2 cursor-pointer ${
-            marketType === "secondary"
-              ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
-              : `${CONTROL_IDLE} bg-transparent border border-transparent`
-          }`}
-        >
-          <ShoppingCart className="w-3.5 h-3.5" />
-          <span>{t("dashboard.projects.secondaryMarket")}</span>
-        </button>
-      </div>
+      {/* Market Toggle Pill Selector (hidden, see SECONDARY_MARKET_VISIBLE) */}
+      {SECONDARY_MARKET_VISIBLE && (
+        <div className="p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-800/40 w-fit flex items-center gap-1">
+          <button
+            onClick={() => handleMarketToggle("primary")}
+            className={`px-4 py-2.5 rounded-lg text-xs font-semibold uppercase transition duration-200 flex items-center gap-2 cursor-pointer ${
+              marketType === "primary"
+                ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
+                : `${CONTROL_IDLE} bg-transparent border border-transparent`
+            }`}
+          >
+            <Building2 className="w-3.5 h-3.5" />
+            <span>{t("dashboard.projects.primaryMarket")}</span>
+          </button>
+          <button
+            onClick={() => handleMarketToggle("secondary")}
+            className={`px-4 py-2.5 rounded-lg text-xs font-semibold uppercase transition duration-200 flex items-center gap-2 cursor-pointer ${
+              marketType === "secondary"
+                ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
+                : `${CONTROL_IDLE} bg-transparent border border-transparent`
+            }`}
+          >
+            <ShoppingCart className="w-3.5 h-3.5" />
+            <span>{t("dashboard.projects.secondaryMarket")}</span>
+          </button>
+        </div>
+      )}
 
       {showListings ? (
         <>

@@ -36,11 +36,11 @@ import { CONTROL_HOVER, CONTROL_IDLE } from "@/lib/ui-tokens";
 // useMemos below depend on it).
 const NO_TRANSACTIONS: Transaction[] = [];
 
+// No DEPOSIT or WITHDRAWAL filter: FundLok holds no money (ADR-009), so there
+// is no platform balance to pay into or take out of.
 const TYPE_FILTERS: TransactionType[] = [
   "INVESTMENT",
   "RETURN",
-  "DEPOSIT",
-  "WITHDRAWAL",
   "REPAYMENT",
   "FEE",
 ];

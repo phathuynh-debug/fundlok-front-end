@@ -114,7 +114,7 @@ export function TermsClient({
           </div>
         </header>
 
-        {/* Mandatory Invariant / Custody Notice Banner */}
+        {/* Mandatory notice: how FundLok works and how money moves */}
         <aside
           aria-label={t("termsPage.noticeTitle")}
           className="mb-10 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 dark:bg-emerald-950/20 p-5 md:p-6 backdrop-blur-md"

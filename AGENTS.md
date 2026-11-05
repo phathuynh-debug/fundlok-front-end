@@ -53,9 +53,11 @@ The rules that get people in trouble:
   point figure, never "guaranteed", "risk-free" or "protected capital".
 - **Never use rating language** ("chấm điểm", "credit score") — in **either**
   `en.json` **or** `vi.json`. Say "điểm doanh nghiệp và lãi suất tham khảo".
-- **Never name a custodial bank** — "custodial bank partners", plural and
-  unnamed — and never say "FundLok never holds funds"; say we hold _instruction
-  rights within bank-enforced conditions_.
+- **FundLok never holds customer money** (ADR-009). Investors pay the SME's
+  own bank account directly and the SME repays each investor directly. Never
+  describe a custodial bank, escrow, wallet, platform balance, deposits or
+  withdrawals. Fees are invoiced separately, never deducted; "all-in" means
+  interest plus the one-time activation fee.
 - **Never imply we are a bank or a licensed lender**, and never discuss our
   regulatory framework externally.
 - **Investor listings must show** the score, the verified revenue behind it, how
