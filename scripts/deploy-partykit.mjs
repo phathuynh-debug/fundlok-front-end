@@ -4,30 +4,30 @@
 // (The PartyKit CLI cannot do this on a current Cloudflare account: it asks for
 // key-value-backed Durable Objects, which Cloudflare no longer creates.)
 //
-// Runs at the end of `npm run build`, so it rides on the Vercel production
-// deploy and reads its configuration from Vercel's own environment variables.
-// It never makes the frontend build fail: the relay is an enhancement and the
-// bell falls back to polling, so a problem here is logged loudly and the build
-// carries on.
+// Runs from the dedicated `deploy-partykit` job in `.github/workflows/frontend-ci.yml`
+// after all CI checks pass on `push` to `production` or `preview` (never inside
+// `next build` / Vercel Preview builds, so `CLOUDFLARE_API_TOKEN` is never
+// exposed to untrusted PR branches or dependency install scripts).
+// It never fails the workflow: the relay is an enhancement and the bell falls
+// back to polling, so a problem here is logged loudly and exits 0.
 //
-// Which relay a build deploys:
-//   Vercel Production build                 -> worker "fundlok-notifications"
-//   Vercel Preview build of the `preview`   -> worker "fundlok-notifications-staging"
-//     branch (staging)                         (its own Durable Objects and secrets)
-//   anything else (PR previews, local)      -> skipped
+// Which relay a push deploys:
+//   push to `production` branch             -> worker "fundlok-notifications"
+//   push to `preview` branch (staging)      -> worker "fundlok-notifications-staging"
+//                                              (its own Durable Objects and secrets)
+//   anything else (PRs, local)              -> skipped
 // The two workers share no state and no secrets, so staging can never reach
 // production rooms.
 //
-// Needs these in Vercel (Production for the first, Preview for the second; use
-// different hostnames and different secrets in each):
-//   NEXT_PUBLIC_PARTYKIT_HOST   the hostname the relay is served on, no scheme
-//                               (e.g. realtime.fundlok.com) -- also what the app
-//                               connects to, so there is one value, not two.
-//                               The domain must be a zone in the same Cloudflare
-//                               account; Wrangler attaches it and creates the
-//                               DNS record and certificate.
+// Required GitHub Actions secrets:
 //   CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN   ("Edit Cloudflare Workers")
-//   PARTYKIT_JWT_SECRET, PARTYKIT_PUBLISH_SECRET  same values as the backend's
+//   Production (`production` branch):
+//     PARTYKIT_HOST, PARTYKIT_JWT_SECRET, PARTYKIT_PUBLISH_SECRET
+//   Staging (`preview` branch):
+//     STAGING_PARTYKIT_HOST, STAGING_PARTYKIT_JWT_SECRET, STAGING_PARTYKIT_PUBLISH_SECRET
+//
+// Vercel only needs the public hostname `NEXT_PUBLIC_PARTYKIT_HOST` (no scheme,
+// e.g. realtime.fundlok.com).
 import { spawnSync } from "node:child_process";
 import { chmodSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -41,13 +41,20 @@ const partyDir = path.join(
 );
 const tag = "[partykit]";
 
-const isProduction = process.env.VERCEL_ENV === "production";
+const isProduction =
+  process.env.PARTYKIT_DEPLOY_TARGET === "production" ||
+  (process.env.GITHUB_EVENT_NAME === "push" &&
+    process.env.GITHUB_REF === "refs/heads/production") ||
+  process.env.VERCEL_ENV === "production";
 const isStaging =
-  process.env.VERCEL_ENV === "preview" &&
-  process.env.VERCEL_GIT_COMMIT_REF === "preview";
+  process.env.PARTYKIT_DEPLOY_TARGET === "staging" ||
+  (process.env.GITHUB_EVENT_NAME === "push" &&
+    process.env.GITHUB_REF === "refs/heads/preview") ||
+  (process.env.VERCEL_ENV === "preview" &&
+    process.env.VERCEL_GIT_COMMIT_REF === "preview");
 if (!isProduction && !isStaging) {
   console.log(
-    `${tag} skipped: only the production build and the "preview" branch deploy the relay`,
+    `${tag} skipped: only pushes to "production" and "preview" deploy the relay`,
   );
   process.exit(0);
 }
@@ -63,7 +70,7 @@ const required = [
 const missing = required.filter((name) => !process.env[name]);
 if (missing.length > 0) {
   console.warn(
-    `${tag} skipped (${target}): missing ${missing.join(", ")} in Vercel's ${isProduction ? "Production" : "Preview"} env`,
+    `${tag} skipped (${target}): missing ${missing.join(", ")} in deploy environment`,
   );
   process.exit(0);
 }
