@@ -470,12 +470,7 @@ function GoogleAccountBox({
   const { t, locale } = useTranslations();
 
   const connectButton = (label: string) => (
-    <Button
-      type="button"
-      variant="outline"
-      disabled={busy}
-      onClick={onConnect}
-    >
+    <Button type="button" variant="outline" disabled={busy} onClick={onConnect}>
       {connecting ? (
         <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
       ) : settings.configured ? (
