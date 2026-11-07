@@ -1,18 +1,25 @@
 import { apiClient } from "@/lib/api-client";
 import { ADMIN_EMAIL_ENDPOINTS } from "@/lib/endpoints";
 
-// Admin > Email: each admin's own Gmail connection (App Password), the
-// org-wide policy, and templated email composed in the console. Mirrors
-// app/admin/internal_email/schemas.py.
+// Admin > Email: each admin's own Gmail connection (Google OAuth, sent
+// through the Gmail API), the org-wide policy, and templated email composed in
+// the console. Mirrors app/admin/internal_email/schemas.py.
 
-// The signed-in admin's own connection. Never carries the password: only
-// whether one is stored.
+// The signed-in admin's own connection. Never carries the OAuth token: only
+// whether one is stored (`configured`).
 export interface EmailSettings {
+  // A Google account is connected and can send.
   configured: boolean;
   enabled: boolean;
+  // The connected Google account (from Google, never typed in). Also set when
+  // needs_reconnect, to say which account to reconnect.
   gmail_address: string | null;
   from_name: string | null;
-  has_app_password: boolean;
+  // An account was connected but Google no longer accepts it: access revoked
+  // in the Google account, or an App Password connection from before OAuth.
+  needs_reconnect: boolean;
+  // When the current Google token was granted.
+  connected_at: string | null;
   last_verified_at: string | null;
   updated_at: string | null;
   signature_name: string | null;
@@ -20,11 +27,10 @@ export interface EmailSettings {
   signature_phone: string | null;
 }
 
+// What the admin edits by hand. Turning `enabled` on needs a connected
+// account (400 EMAIL_NOT_CONFIGURED).
 export interface EmailSettingsPayload {
-  gmail_address: string;
   from_name: string;
-  // null keeps the stored password.
-  app_password: string | null;
   enabled: boolean;
   signature_name?: string | null;
   signature_title?: string | null;
@@ -57,6 +63,11 @@ export interface SendEmailPayload extends EmailContentPayload {
 export interface EmailPreview {
   subject: string;
   html: string;
+}
+
+// Where to send the browser to connect a Google account.
+export interface EmailOAuthStart {
+  authorization_url: string;
 }
 
 export interface EmailTestResult {
@@ -95,9 +106,10 @@ export interface EmailRecipient {
 // Per email. Each recipient gets their own copy, so nobody sees the others.
 export const MAX_RECIPIENTS = 50;
 
-// A send waits for Gmail: connect, login and DATA can each take up to the
-// backend's 20 s SMTP timeout. The client's default 20 s would give up first
-// and report a failure for an email that may still go out.
+// A send waits for Google: a token refresh, then one Gmail API call per
+// recipient, each with the backend's 20 s timeout (the whole loop capped at
+// 25 s). The client's default 20 s would give up first and report a failure
+// for an email that may still go out.
 const SEND_TIMEOUT_MS = 120_000;
 
 export const adminEmailService = {
@@ -112,9 +124,16 @@ export const adminEmailService = {
     );
   },
 
-  // Disconnects the account and deletes the stored password.
-  clearSettings() {
-    return apiClient.delete<EmailSettings>(ADMIN_EMAIL_ENDPOINTS.settings);
+  // Google's consent URL. Also sets the short-lived cookie that binds the
+  // flow to this browser, so the browser must go there itself.
+  startGoogleConnect() {
+    return apiClient.get<EmailOAuthStart>(ADMIN_EMAIL_ENDPOINTS.oauthAuthorize);
+  },
+
+  // Forgets the Google account (sender name and signature stay) and revokes
+  // its token at Google.
+  disconnect() {
+    return apiClient.post<EmailSettings>(ADMIN_EMAIL_ENDPOINTS.disconnect);
   },
 
   getPolicy() {

@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import {
+  AlertTriangle,
   CheckCircle2,
-  ExternalLink,
-  KeyRound,
   Loader2,
   Mail,
+  RefreshCw,
   Send,
   Unplug,
 } from "lucide-react";
@@ -27,10 +29,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import {
-  useClearEmailSettings,
+  adminEmailKeys,
+  useDisconnectGmail,
   useEmailSettings,
   useSaveEmailSettings,
   useSendTestEmail,
+  useStartGoogleConnect,
 } from "@/hooks/use-admin-email";
 import { useCurrentUser } from "@/hooks/use-authentication";
 import { useToast } from "@/hooks/use-toast";
@@ -38,18 +42,18 @@ import { formatDateTime } from "@/lib/format-date";
 import { useTranslations } from "@/lib/i18n";
 import type { EmailSettings } from "@/services/admin-email.service";
 import {
-  EMAIL_PATTERN,
   LINE_BREAK,
   emailErrorText,
   isUnknownOutcome,
+  oauthErrorText,
 } from "./email-errors";
 
-// Step 1 of Admin > Email: the signed-in admin's own Gmail account, which
-// their email goes out from. Each admin has their own; nobody else sees or
-// uses it. The app password is write-only: the server never returns it, so
-// the field starts empty and a blank field on save keeps the stored one.
-
-const APP_PASSWORDS_URL = "https://myaccount.google.com/apppasswords";
+// Step 1 of Admin > Email: the signed-in admin's own Google account, which
+// their email goes out from. Each admin connects their own with Google OAuth
+// ("Connect with Google"); the backend keeps only an encrypted refresh token
+// and sends through the Gmail API. The address comes from Google, so it is
+// shown, never typed. Sender name, signature and the sending switch are
+// edited here and saved separately from the connection.
 
 export function EmailSettingsCard() {
   const { t } = useTranslations();
@@ -61,6 +65,11 @@ export function EmailSettingsCard() {
 
   return (
     <section className="rounded-lg border bg-card p-6">
+      {/* useSearchParams needs a Suspense boundary in the App Router. */}
+      <Suspense fallback={null}>
+        <GoogleConnectResult />
+      </Suspense>
+
       <div className="flex flex-col gap-1">
         <h2 className="text-lg font-semibold text-foreground">
           {t("admin.email.settings.title")}
@@ -85,18 +94,15 @@ export function EmailSettingsCard() {
         // wipe edits that have not been saved yet.
         <SettingsForm
           key={JSON.stringify([
-            data.gmail_address,
             data.from_name,
             data.enabled,
-            data.configured,
             data.signature_name,
             data.signature_title,
             data.signature_phone,
           ])}
           settings={data}
-          // Not connected yet: start from the admin's own account, since the
-          // email is meant to come from them.
-          defaultAddress={user?.email ?? ""}
+          // No row yet: start from the admin's own name, since the email is
+          // meant to come from them.
           defaultName={user?.full_name ?? ""}
         />
       )}
@@ -104,9 +110,48 @@ export function EmailSettingsCard() {
   );
 }
 
+// Google sends the browser back to /api/admin/email/oauth/callback, which
+// redirects here with ?connected=true or ?error=<code>. Say how it went
+// once, then drop the parameters so a reload does not say it again.
+function GoogleConnectResult() {
+  const { t } = useTranslations();
+  const { toast } = useToast();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const params = useSearchParams();
+  const connected = params.get("connected") === "true";
+  const error = params.get("error");
+  // React's development double-run of effects must not toast twice.
+  const handled = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!connected && !error) return;
+    const outcome = connected ? "connected" : `error:${error}`;
+    if (handled.current === outcome) return;
+    handled.current = outcome;
+
+    if (connected) {
+      toast({
+        title: t("admin.email.oauth.connected"),
+        description: t("admin.email.oauth.connectedBody"),
+      });
+      // The page may have been restored from the back/forward cache with the
+      // old answer; read the connection again.
+      void queryClient.invalidateQueries({ queryKey: adminEmailKeys.all });
+    } else if (error) {
+      toast({
+        variant: "destructive",
+        title: t("admin.email.oauth.errorTitle"),
+        description: oauthErrorText(error, t),
+      });
+    }
+    router.replace("/admin/email", { scroll: false });
+  }, [connected, error, toast, t, router, queryClient]);
+
+  return null;
+}
+
 interface FieldErrors {
-  address?: string;
-  password?: string;
   fromName?: string;
   signatureName?: string;
   signatureTitle?: string;
@@ -115,23 +160,23 @@ interface FieldErrors {
 
 function SettingsForm({
   settings,
-  defaultAddress,
   defaultName,
 }: {
   settings: EmailSettings;
-  defaultAddress: string;
   defaultName: string;
 }) {
   const { t, locale } = useTranslations();
   const { toast } = useToast();
   const { mutateAsync: save, isPending: saving } = useSaveEmailSettings();
-  const { mutateAsync: clear, isPending: clearing } = useClearEmailSettings();
+  const { mutateAsync: disconnect, isPending: disconnecting } =
+    useDisconnectGmail();
   const { mutateAsync: sendTest, isPending: testing } = useSendTestEmail();
+  const { mutateAsync: startConnect, isPending: starting } =
+    useStartGoogleConnect();
+  // Stays true once the browser is on its way to Google, so the button does
+  // not come back to life in the moment before the page unloads.
+  const [redirecting, setRedirecting] = useState(false);
 
-  const [address, setAddress] = useState(
-    settings.gmail_address ?? defaultAddress,
-  );
-  const [password, setPassword] = useState("");
   const [fromName, setFromName] = useState(settings.from_name ?? defaultName);
   const [enabled, setEnabled] = useState(settings.enabled);
   const [signatureName, setSignatureName] = useState(
@@ -144,20 +189,31 @@ function SettingsForm({
     settings.signature_phone ?? "",
   );
   const [errors, setErrors] = useState<FieldErrors>({});
-  const [confirmClear, setConfirmClear] = useState(false);
+  const [confirmDisconnect, setConfirmDisconnect] = useState(false);
 
-  const busy = saving || clearing || testing;
+  const connecting = starting || redirecting;
+  const busy = saving || disconnecting || testing || connecting;
+  // The server refuses to turn sending ON without an account; leaving it on
+  // (after Google revoked access) is allowed, so only block the off → on move.
+  const canTurnOn = settings.configured || settings.enabled;
+
+  const handleConnect = async () => {
+    try {
+      const { authorization_url } = await startConnect();
+      setRedirecting(true);
+      window.location.assign(authorization_url);
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: t("admin.email.settings.connectFailedTitle"),
+        description: emailErrorText(err, t, locale),
+      });
+    }
+  };
 
   const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const compactPassword = password.replace(/\s+/g, "");
     const next: FieldErrors = {};
-    if (!EMAIL_PATTERN.test(address.trim())) {
-      next.address = t("admin.email.settings.addressInvalid");
-    }
-    if (compactPassword && !/^[A-Za-z0-9]{16}$/.test(compactPassword)) {
-      next.password = t("admin.email.settings.passwordInvalid");
-    }
     if (!fromName.trim()) {
       next.fromName = t("admin.email.settings.fromNameRequired");
     } else if (LINE_BREAK.test(fromName.trim())) {
@@ -177,16 +233,12 @@ function SettingsForm({
 
     try {
       await save({
-        gmail_address: address.trim(),
         from_name: fromName.trim(),
-        app_password: compactPassword || null,
         enabled,
         signature_name: signatureName.trim() || null,
         signature_title: signatureTitle.trim() || null,
         signature_phone: signaturePhone.trim() || null,
       });
-      // Saved; the server will never send it back, so do not keep it here.
-      setPassword("");
       toast({ title: t("admin.email.settings.saved") });
     } catch (err) {
       toast({
@@ -217,10 +269,10 @@ function SettingsForm({
     }
   };
 
-  const handleClear = async () => {
-    setConfirmClear(false);
+  const handleDisconnect = async () => {
+    setConfirmDisconnect(false);
     try {
-      await clear();
+      await disconnect();
       toast({ title: t("admin.email.settings.disconnected") });
     } catch (err) {
       toast({
@@ -245,89 +297,15 @@ function SettingsForm({
         </span>
       </div>
 
+      <GoogleAccountBox
+        settings={settings}
+        busy={busy}
+        connecting={connecting}
+        onConnect={handleConnect}
+        onDisconnect={() => setConfirmDisconnect(true)}
+      />
+
       <div className="grid gap-5 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="email-address">
-            {t("admin.email.settings.addressLabel")}
-          </Label>
-          <div className="relative">
-            <Mail
-              className="absolute left-3 top-3 h-4 w-4 text-muted-foreground"
-              aria-hidden
-            />
-            <Input
-              id="email-address"
-              type="email"
-              autoComplete="off"
-              className="pl-10"
-              placeholder={t("admin.email.settings.addressPlaceholder")}
-              value={address}
-              aria-invalid={!!errors.address}
-              aria-describedby={
-                errors.address ? "email-address-error" : undefined
-              }
-              onChange={(event) => setAddress(event.target.value)}
-            />
-          </div>
-          {errors.address && (
-            <p id="email-address-error" className="text-xs text-destructive">
-              {errors.address}
-            </p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="email-password">
-            {t("admin.email.settings.passwordLabel")}
-          </Label>
-          <div className="relative">
-            <KeyRound
-              className="absolute left-3 top-3 h-4 w-4 text-muted-foreground"
-              aria-hidden
-            />
-            <Input
-              id="email-password"
-              type="password"
-              // Not the admin's own password. "off" (not "new-password",
-              // which invites the browser to generate one) and the
-              // password-manager opt-outs ask them not to fill or save it;
-              // a browser may still offer to save, and the admin should
-              // decline.
-              autoComplete="off"
-              data-1p-ignore
-              data-lpignore="true"
-              data-bwignore
-              spellCheck={false}
-              maxLength={64}
-              className="pl-10"
-              placeholder={
-                settings.has_app_password
-                  ? t("admin.email.settings.passwordSavedPlaceholder")
-                  : t("admin.email.settings.passwordPlaceholder")
-              }
-              value={password}
-              aria-invalid={!!errors.password}
-              aria-describedby="email-password-help"
-              onChange={(event) => setPassword(event.target.value)}
-            />
-          </div>
-          {errors.password && (
-            <p className="text-xs text-destructive">{errors.password}</p>
-          )}
-          <p id="email-password-help" className="text-xs text-muted-foreground">
-            {t("admin.email.settings.passwordHelp")}{" "}
-            <a
-              href={APP_PASSWORDS_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-medium text-foreground underline underline-offset-2"
-            >
-              {t("admin.email.settings.passwordHelpLink")}
-              <ExternalLink className="h-3 w-3" aria-hidden />
-            </a>
-          </p>
-        </div>
-
         <div className="space-y-2">
           <Label htmlFor="email-from-name">
             {t("admin.email.settings.fromNameLabel")}
@@ -414,12 +392,15 @@ function SettingsForm({
             {t("admin.email.settings.enabledLabel")}
           </Label>
           <p className="text-xs text-muted-foreground">
-            {t("admin.email.settings.enabledHelp")}
+            {canTurnOn
+              ? t("admin.email.settings.enabledHelp")
+              : t("admin.email.settings.enabledNeedsAccount")}
           </p>
         </div>
         <Switch
           id="email-enabled"
           checked={enabled}
+          disabled={!canTurnOn && !enabled}
           onCheckedChange={setEnabled}
         />
       </div>
@@ -446,21 +427,9 @@ function SettingsForm({
             ? t("admin.email.settings.sendingTest")
             : t("admin.email.settings.sendTest")}
         </Button>
-        {settings.gmail_address && (
-          <Button
-            type="button"
-            variant="ghost"
-            className="text-destructive hover:text-destructive"
-            disabled={busy}
-            onClick={() => setConfirmClear(true)}
-          >
-            <Unplug className="h-4 w-4" aria-hidden />
-            {t("admin.email.settings.disconnect")}
-          </Button>
-        )}
       </div>
 
-      <AlertDialog open={confirmClear} onOpenChange={setConfirmClear}>
+      <AlertDialog open={confirmDisconnect} onOpenChange={setConfirmDisconnect}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
@@ -472,7 +441,7 @@ function SettingsForm({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleClear}>
+            <AlertDialogAction onClick={handleDisconnect}>
               {t("admin.email.settings.disconnectConfirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -482,9 +451,133 @@ function SettingsForm({
   );
 }
 
+// The Google account itself: who is connected and the Connect / Reconnect /
+// Disconnect actions. Three states: connected, connection lost (Google
+// revoked access, or an App Password connection from before OAuth), none.
+function GoogleAccountBox({
+  settings,
+  busy,
+  connecting,
+  onConnect,
+  onDisconnect,
+}: {
+  settings: EmailSettings;
+  busy: boolean;
+  connecting: boolean;
+  onConnect: () => void;
+  onDisconnect: () => void;
+}) {
+  const { t, locale } = useTranslations();
+
+  const connectButton = (label: string) => (
+    <Button
+      type="button"
+      variant="outline"
+      disabled={busy}
+      onClick={onConnect}
+    >
+      {connecting ? (
+        <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+      ) : settings.configured ? (
+        <RefreshCw className="h-4 w-4" aria-hidden />
+      ) : (
+        <GoogleIcon />
+      )}
+      {connecting ? t("admin.email.settings.connecting") : label}
+    </Button>
+  );
+
+  return (
+    <div className="space-y-2">
+      <Label>{t("admin.email.settings.accountLabel")}</Label>
+      <div className="flex flex-col gap-4 rounded-md border p-4 sm:flex-row sm:items-center sm:justify-between">
+        {settings.configured && settings.gmail_address ? (
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border bg-background">
+              <GoogleIcon />
+            </span>
+            <div className="min-w-0">
+              <p className="text-xs text-muted-foreground">
+                {t("admin.email.settings.connectedAs")}
+              </p>
+              <p className="flex items-center gap-1.5 truncate font-medium text-foreground">
+                <Mail
+                  className="h-4 w-4 shrink-0 text-muted-foreground"
+                  aria-hidden
+                />
+                <span className="truncate">{settings.gmail_address}</span>
+              </p>
+              {settings.connected_at && (
+                <p className="text-xs text-muted-foreground">
+                  {t("admin.email.settings.connectedSince").replace(
+                    "{date}",
+                    formatDateTime(settings.connected_at, locale),
+                  )}
+                </p>
+              )}
+            </div>
+          </div>
+        ) : settings.needs_reconnect && settings.gmail_address ? (
+          <p
+            role="status"
+            className="flex items-start gap-2 text-sm text-amber-700 dark:text-amber-400"
+          >
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+            <span>
+              {t("admin.email.settings.needsReconnect").replace(
+                "{email}",
+                settings.gmail_address,
+              )}
+            </span>
+          </p>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            {t("admin.email.settings.notConnectedHelp")}
+          </p>
+        )}
+
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          {settings.configured ? (
+            <>
+              {connectButton(t("admin.email.settings.reconnect"))}
+              <Button
+                type="button"
+                variant="ghost"
+                className="text-destructive hover:text-destructive"
+                disabled={busy}
+                onClick={onDisconnect}
+              >
+                <Unplug className="h-4 w-4" aria-hidden />
+                {t("admin.email.settings.disconnect")}
+              </Button>
+            </>
+          ) : (
+            connectButton(
+              settings.needs_reconnect
+                ? t("admin.email.settings.reconnect")
+                : t("admin.email.settings.connect"),
+            )
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function StatusBadge({ settings }: { settings: EmailSettings }) {
   const { t } = useTranslations();
   if (!settings.configured) {
+    if (settings.needs_reconnect) {
+      return (
+        <Badge
+          variant="outline"
+          className="gap-1 border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+        >
+          <AlertTriangle className="h-3.5 w-3.5" aria-hidden />
+          {t("admin.email.settings.statusNeedsReconnect")}
+        </Badge>
+      );
+    }
     return (
       <Badge variant="secondary">
         {t("admin.email.settings.statusNotConnected")}
@@ -509,5 +602,34 @@ function StatusBadge({ settings }: { settings: EmailSettings }) {
       <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
       {t("admin.email.settings.statusOn")}
     </Badge>
+  );
+}
+
+// Google's "G", as on the sign-in button (components/login-form.tsx).
+function GoogleIcon() {
+  return (
+    <svg
+      className="h-4 w-4"
+      viewBox="0 0 533.5 544.3"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+    >
+      <path
+        fill="#4285F4"
+        d="M533.5 278.4c0-18.5-1.5-37.3-4.7-55.3H272v104.8h147.5c-6.3 34.1-25.1 62.9-53.6 82.2v68.2h86.6c50.7-46.7 80-115.4 80-199.9z"
+      />
+      <path
+        fill="#34A853"
+        d="M272 544.3c72.6 0 133.6-23.9 178.2-64.8l-86.6-68.2c-24.1 16.2-55 25.8-91.6 25.8-70 0-129.3-47.2-150.5-110.5H32.3v69.5C76.9 489.5 167.6 544.3 272 544.3z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M121.5 325c-10.7-32-10.7-66.2 0-98.2V157.3H32.3c-43 85.4-43 187.2 0 272.6l89.2-69.9z"
+      />
+      <path
+        fill="#EA4335"
+        d="M272 109.7c38.8 0 73.6 13.4 101 39l75.7-75.7C405.8 28.2 349.6 0 272 0 167.6 0 76.9 54.8 32.3 137.8l89.2 69.5c21.2-63.3 80.5-110.5 150.5-110.5z"
+      />
+    </svg>
   );
 }

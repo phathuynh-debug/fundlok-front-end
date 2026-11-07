@@ -6,18 +6,46 @@ import type { ApiError } from "@/lib/types";
 // SOME_RECIPIENTS_REFUSED. Each has copy under admin.email.errors.<code> in
 // both dictionaries.
 const KNOWN_CODES = new Set([
-  "APP_PASSWORD_REQUIRED",
   "EMAIL_ENCRYPTION_UNAVAILABLE",
   "EMAIL_NOT_CONFIGURED",
   "EMAIL_DISABLED",
   "RECIPIENT_DOMAIN_NOT_ALLOWED",
   "EMAIL_RATE_LIMITED",
-  "GMAIL_AUTH_FAILED",
+  "GMAIL_API_DISABLED",
+  "GMAIL_OAUTH_NOT_CONFIGURED",
+  "GMAIL_RECONNECT_REQUIRED",
   "GMAIL_RECIPIENT_REFUSED",
   "GMAIL_UNAVAILABLE",
-  "APP_PASSWORD_UNREADABLE",
   "SOME_RECIPIENTS_REFUSED",
+  // Only on send-log rows from before Google OAuth (App Password logins).
+  "GMAIL_AUTH_FAILED",
 ]);
+
+// The ?error= values the backend's OAuth callback redirects back with
+// (service.OAUTH_* in app/admin/internal_email/service.py). Each has copy
+// under admin.email.oauth.errors.<code>; anything else reads as "failed".
+const OAUTH_ERRORS = new Set([
+  "cancelled",
+  "invalid_state",
+  "not_admin",
+  "scope_missing",
+  "email_unverified",
+  "domain_not_allowed",
+  "no_refresh_token",
+  "not_configured",
+  "encryption_unavailable",
+  "failed",
+]);
+
+/** Copy for the ?error= the OAuth callback came back with. */
+export function oauthErrorText(
+  code: string,
+  t: (key: string) => string,
+): string {
+  return t(
+    `admin.email.oauth.errors.${OAUTH_ERRORS.has(code) ? code : "failed"}`,
+  );
+}
 
 /** Translated copy for a known failure code, else the usual fallback. */
 export function emailErrorText(

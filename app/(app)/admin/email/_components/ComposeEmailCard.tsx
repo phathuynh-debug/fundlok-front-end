@@ -291,7 +291,11 @@ export function ComposeEmailCard() {
           role="status"
           className="mt-4 rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-foreground"
         >
-          {t("admin.email.compose.notReady")}
+          {/* Connected but paused (a first connect starts paused) needs only
+              the switch, not another connect. */}
+          {settings.configured
+            ? t("admin.email.compose.notReadyPaused")
+            : t("admin.email.compose.notReady")}
         </p>
       )}
 
