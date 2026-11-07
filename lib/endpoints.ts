@@ -265,7 +265,16 @@ export const ADMIN_ENDPOINTS = {
 // admin and changeable by SYSTEM_ADMIN only.
 // Spec: backend docs/specs/admin/internal-email.md.
 export const ADMIN_EMAIL_ENDPOINTS = {
+  // GET your own connection; PUT sender name, signature and the sending
+  // switch. The Google account itself is connected through oauthAuthorize.
   settings: "/admin/email/settings",
+  // Google's consent URL for connecting your Gmail account (Google OAuth).
+  // Google sends the browser back to /api/admin/email/oauth/callback, which
+  // the backend answers with a redirect to /admin/email?connected=true or
+  // ?error=<code>.
+  oauthAuthorize: "/admin/email/oauth/authorize",
+  // Forgets your Google account and revokes its token at Google.
+  disconnect: "/admin/email/disconnect",
   // Allowed recipient domains for every admin. PUT is SYSTEM_ADMIN only.
   policy: "/admin/email/policy",
   // Sends the test template to the signed-in admin's own address.

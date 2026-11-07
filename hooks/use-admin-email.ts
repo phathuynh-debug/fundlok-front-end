@@ -6,6 +6,7 @@ import { useCurrentUser } from "@/hooks/use-authentication";
 import {
   adminEmailService,
   type EmailContentPayload,
+  type EmailOAuthStart,
   type EmailPolicy,
   type EmailPreview,
   type EmailRecipient,
@@ -61,11 +62,19 @@ export function useSaveEmailSettings() {
   });
 }
 
-export function useClearEmailSettings() {
+// Google's consent URL; the caller sends the browser there. Google brings it
+// back to /admin/email?connected=true (or ?error=…), which refetches settings.
+export function useStartGoogleConnect() {
+  return useMutation<EmailOAuthStart, ApiError, void>({
+    mutationFn: () => adminEmailService.startGoogleConnect(),
+  });
+}
+
+export function useDisconnectGmail() {
   const queryClient = useQueryClient();
   const userId = useAdminId();
   return useMutation<EmailSettings, ApiError, void>({
-    mutationFn: () => adminEmailService.clearSettings(),
+    mutationFn: () => adminEmailService.disconnect(),
     onSuccess: (settings) => {
       if (userId)
         queryClient.setQueryData(adminEmailKeys.settings(userId), settings);
