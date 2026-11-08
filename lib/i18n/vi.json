@@ -485,8 +485,8 @@
         "cic_report": "Báo cáo CIC",
         "e_invoice_data": "Dữ liệu hóa đơn điện tử",
         "legal_charter": "Điều lệ công ty",
-        "tax_filings": "Hồ sơ thuế",
-        "sme_service_agreement": "Hợp đồng dịch vụ đã ký số"
+        "sme_service_agreement": "Hợp đồng dịch vụ đã ký số",
+        "tax_filings": "Hồ sơ thuế"
       },
       "documentUnavailable": "Không thể mở hồ sơ này.",
       "documentsHeading": "Hồ sơ",
@@ -687,6 +687,7 @@
     "table": {
       "allRoles": "Tất cả vai trò",
       "allStatuses": "Tất cả trạng thái",
+      "consent": "Đồng ý",
       "created": "Ngày tạo",
       "email": "Email",
       "industry": "Ngành",
@@ -700,8 +701,7 @@
       "role": "Vai trò",
       "searchProjects": "Tìm dự án…",
       "searchUsers": "Tìm người dùng…",
-      "status": "Trạng thái",
-      "consent": "Đồng ý"
+      "status": "Trạng thái"
     },
     "title": "Tổng quan quản trị",
     "transactions": {
@@ -1044,6 +1044,32 @@
     "welcome": "Chào mừng trở lại, {name}."
   },
   "auth": {
+    "consent": {
+      "accept": "Chấp nhận và tiếp tục",
+      "accepted": "Cảm ơn bạn. Chấp nhận của bạn đã được ghi nhận.",
+      "accepting": "Đang xác nhận…",
+      "article3SeeAbove": "Điều 3 được hiển thị đầy đủ ở phía trên.",
+      "codeLabel": "Mã xác nhận",
+      "codeSent": "Chúng tôi đã gửi mã 6 chữ số đến {email}. Mã hết hạn sau 10 phút.",
+      "confirmHelp": "Đánh dấu từng ô. Cần cả ba ô để sử dụng FundLok.",
+      "confirmTitle": "Xác nhận của bạn",
+      "disclosuresTitle": "Đọc trước khi chấp nhận: thông tin công bố (Điều 3)",
+      "errorTitle": "Chưa thể tiếp tục",
+      "errors": {
+        "CONSENT_CODE_EXPIRED": "Mã đã hết hạn hoặc đã được dùng. Hãy gửi mã mới.",
+        "CONSENT_CODE_INVALID": "Mã chưa đúng. Hãy kiểm tra email và thử lại.",
+        "CONSENT_CODE_RATE_LIMITED": "Bạn đã yêu cầu quá nhiều mã. Vui lòng đợi một lát rồi thử lại.",
+        "CONSENT_VERSION_CHANGED": "Điều khoản vừa được cập nhật. Hãy tải lại trang để đọc phiên bản mới."
+      },
+      "fullTermsTitle": "Toàn văn Điều khoản Dịch vụ",
+      "resend": "Gửi mã mới",
+      "resendIn": "Gửi mã mới sau {seconds} giây",
+      "sendCode": "Gửi mã đến email của tôi",
+      "sending": "Đang gửi…",
+      "signOut": "Đăng xuất",
+      "subtitle": "Trước khi sử dụng FundLok, hãy đọc và chấp nhận các điều khoản này: đánh dấu ba ô, sau đó nhập mã chúng tôi gửi qua email.",
+      "title": "Điều khoản Dịch vụ và Đồng ý xử lý dữ liệu"
+    },
     "footer": {
       "copyright": "© 2026 FundLok. Bảo lưu mọi quyền.",
       "helpPrefix": "Cần hỗ trợ?",
@@ -1213,32 +1239,6 @@
       "verifyFailedGeneric": "Hiện chưa thể xác minh email của bạn. Vui lòng thử lại.",
       "verifyingDescription": "Vui lòng chờ trong giây lát, chúng tôi đang xác nhận liên kết xác minh của bạn.",
       "verifyingTitle": "Đang xác minh email..."
-    },
-    "consent": {
-      "accept": "Chấp nhận và tiếp tục",
-      "accepted": "Cảm ơn bạn. Chấp nhận của bạn đã được ghi nhận.",
-      "accepting": "Đang xác nhận…",
-      "article3SeeAbove": "Điều 3 được hiển thị đầy đủ ở phía trên.",
-      "codeLabel": "Mã xác nhận",
-      "codeSent": "Chúng tôi đã gửi mã 6 chữ số đến {email}. Mã hết hạn sau 10 phút.",
-      "confirmHelp": "Đánh dấu từng ô. Cần cả ba ô để sử dụng FundLok.",
-      "confirmTitle": "Xác nhận của bạn",
-      "disclosuresTitle": "Đọc trước khi chấp nhận: thông tin công bố (Điều 3)",
-      "errorTitle": "Chưa thể tiếp tục",
-      "errors": {
-        "CONSENT_CODE_EXPIRED": "Mã đã hết hạn hoặc đã được dùng. Hãy gửi mã mới.",
-        "CONSENT_CODE_INVALID": "Mã chưa đúng. Hãy kiểm tra email và thử lại.",
-        "CONSENT_CODE_RATE_LIMITED": "Bạn đã yêu cầu quá nhiều mã. Vui lòng đợi một lát rồi thử lại.",
-        "CONSENT_VERSION_CHANGED": "Điều khoản vừa được cập nhật. Hãy tải lại trang để đọc phiên bản mới."
-      },
-      "fullTermsTitle": "Toàn văn Điều khoản Dịch vụ",
-      "resend": "Gửi mã mới",
-      "resendIn": "Gửi mã mới sau {seconds} giây",
-      "sendCode": "Gửi mã đến email của tôi",
-      "sending": "Đang gửi…",
-      "signOut": "Đăng xuất",
-      "subtitle": "Trước khi sử dụng FundLok, hãy đọc và chấp nhận các điều khoản này: đánh dấu ba ô, sau đó nhập mã chúng tôi gửi qua email.",
-      "title": "Điều khoản Dịch vụ và Đồng ý xử lý dữ liệu"
     }
   },
   "common": {
@@ -2019,6 +2019,29 @@
       "verifiedMember": "Thành viên đã xác thực"
     },
     "sme": {
+      "agreement": {
+        "blanksNote": "Dòng chấm là thông tin FundLok chưa có, ví dụ tài khoản ngân hàng đang chờ duyệt. Hãy bổ sung trong tài khoản của bạn, rồi quay lại bước này để lấy hợp đồng đã cập nhật trước khi ký.",
+        "checking": "Đang kiểm tra chữ ký số…",
+        "download": "Tải hợp đồng (PDF)",
+        "error": {
+          "REQUIRED": "Vui lòng tải lên hợp đồng dịch vụ đã ký trước khi gửi hồ sơ.",
+          "UNSIGNED": "Tệp PDF này chưa có chữ ký số. Vui lòng ký hợp đồng bằng chữ ký số của doanh nghiệp và tải lên bản đã ký."
+        },
+        "how1": "Kiểm tra thông tin trong bản xem trước: tên doanh nghiệp, mã số doanh nghiệp, địa chỉ, người đại diện theo pháp luật và tài khoản ngân hàng.",
+        "how2": "Tải bản PDF và ký bằng chữ ký số của doanh nghiệp (USB Token, hoặc ký số từ xa của nhà cung cấp chứng thư số).",
+        "how3": "Tải bản PDF đã ký lên tại đây. Bản in ra rồi scan sẽ không được chấp nhận vì không có chữ ký số.",
+        "howTitle": "Cách ký",
+        "loadFailed": "Chưa thể tạo hợp đồng của bạn.",
+        "loading": "Đang chuẩn bị hợp đồng…",
+        "previewLabel": "Bản xem trước, đã điền thông tin của bạn",
+        "rateNote": "Số tiền và thời hạn trong Phụ lục là theo hồ sơ bạn đã đăng ký. Lãi suất do FundLok đề xuất sau khi thẩm định hồ sơ.",
+        "refusedTitle": "Chưa thể sử dụng hợp đồng đã ký",
+        "retry": "Thử lại",
+        "signedLabel": "Hợp đồng dịch vụ đã ký số (PDF)",
+        "stepLabel": "Ký hợp đồng",
+        "subtitle": "Hợp đồng giữa doanh nghiệp và FundLok cho hồ sơ này, đã điền sẵn thông tin đã xác minh của doanh nghiệp. Vui lòng xem lại, ký bằng chữ ký số của doanh nghiệp, rồi tải lên bản PDF đã ký.",
+        "title": "Hợp đồng dịch vụ dành cho Doanh nghiệp"
+      },
       "annualFinancialStatement": "Báo cáo tài chính năm – Mẫu B02-DN (Báo cáo tài chính hàng năm, năm ngoái)",
       "applicationSubmitted": "Đã gửi hồ sơ",
       "applicationSubmittedDescription": "Hồ sơ vay và tài liệu của bạn đã được tải lên thành công.",
@@ -2439,30 +2462,7 @@
       "vatZipLabel": "Tải lên tệp .zip chứa tất cả 48 tệp thuế GTGT (24 tờ khai + 24 xác nhận)",
       "viewDocument": "Xem",
       "whereToFindThese": "Tìm các số liệu này ở đâu",
-      "whyWeNeedThis": "Lý do cần hồ sơ",
-      "agreement": {
-        "stepLabel": "Ký hợp đồng",
-        "title": "Hợp đồng dịch vụ dành cho Doanh nghiệp",
-        "subtitle": "Hợp đồng giữa doanh nghiệp và FundLok cho hồ sơ này, đã điền sẵn thông tin đã xác minh của doanh nghiệp. Vui lòng xem lại, ký bằng chữ ký số của doanh nghiệp, rồi tải lên bản PDF đã ký.",
-        "previewLabel": "Bản xem trước, đã điền thông tin của bạn",
-        "download": "Tải hợp đồng (PDF)",
-        "loading": "Đang chuẩn bị hợp đồng…",
-        "loadFailed": "Chưa thể tạo hợp đồng của bạn.",
-        "retry": "Thử lại",
-        "howTitle": "Cách ký",
-        "how1": "Kiểm tra thông tin trong bản xem trước: tên doanh nghiệp, mã số doanh nghiệp, địa chỉ, người đại diện theo pháp luật và tài khoản ngân hàng.",
-        "how2": "Tải bản PDF và ký bằng chữ ký số của doanh nghiệp (USB Token, hoặc ký số từ xa của nhà cung cấp chứng thư số).",
-        "how3": "Tải bản PDF đã ký lên tại đây. Bản in ra rồi scan sẽ không được chấp nhận vì không có chữ ký số.",
-        "signedLabel": "Hợp đồng dịch vụ đã ký số (PDF)",
-        "checking": "Đang kiểm tra chữ ký số…",
-        "blanksNote": "Dòng chấm là thông tin FundLok chưa có, ví dụ tài khoản ngân hàng đang chờ duyệt. Hãy bổ sung trong tài khoản của bạn, rồi quay lại bước này để lấy hợp đồng đã cập nhật trước khi ký.",
-        "rateNote": "Số tiền và thời hạn trong Phụ lục là theo hồ sơ bạn đã đăng ký. Lãi suất do FundLok đề xuất sau khi thẩm định hồ sơ.",
-        "refusedTitle": "Chưa thể sử dụng hợp đồng đã ký",
-        "error": {
-          "UNSIGNED": "Tệp PDF này chưa có chữ ký số. Vui lòng ký hợp đồng bằng chữ ký số của doanh nghiệp và tải lên bản đã ký.",
-          "REQUIRED": "Vui lòng tải lên hợp đồng dịch vụ đã ký trước khi gửi hồ sơ."
-        }
-      }
+      "whyWeNeedThis": "Lý do cần hồ sơ"
     },
     "smeAnalytics": {
       "charts": {
@@ -2983,9 +2983,9 @@
         "e_invoice_data": "Dữ liệu hóa đơn điện tử (12 tháng)",
         "financial_report": "Báo cáo tài chính",
         "legal_charter": "Điều lệ công ty",
+        "sme_service_agreement": "Hợp đồng dịch vụ đã ký số",
         "tax_filings": "Hồ sơ thuế (tờ khai GTGT và báo cáo cuối năm)",
-        "vat_tax_zip": "Tờ khai thuế GTGT",
-        "sme_service_agreement": "Hợp đồng dịch vụ đã ký số"
+        "vat_tax_zip": "Tờ khai thuế GTGT"
       },
       "filesPrivate": "Bản gốc của tài liệu được giữ kín vì chứa thông tin thuế, hóa đơn và tín dụng của doanh nghiệp; chỉ đội ngũ FundLok xem xét các tài liệu này.",
       "noDocuments": "Dự án này chưa có tài liệu nào được xem xét.",

@@ -485,8 +485,8 @@
         "cic_report": "CIC report",
         "e_invoice_data": "E-invoice data",
         "legal_charter": "Company charter",
-        "tax_filings": "Tax filings",
-        "sme_service_agreement": "Signed service agreement"
+        "sme_service_agreement": "Signed service agreement",
+        "tax_filings": "Tax filings"
       },
       "documentUnavailable": "This document could not be opened.",
       "documentsHeading": "Documents",
@@ -687,6 +687,7 @@
     "table": {
       "allRoles": "All roles",
       "allStatuses": "All statuses",
+      "consent": "Consent",
       "created": "Created",
       "email": "Email",
       "industry": "Industry",
@@ -700,8 +701,7 @@
       "role": "Role",
       "searchProjects": "Search projects…",
       "searchUsers": "Search users…",
-      "status": "Status",
-      "consent": "Consent"
+      "status": "Status"
     },
     "title": "Admin overview",
     "transactions": {
@@ -1044,6 +1044,32 @@
     "welcome": "Welcome back, {name}."
   },
   "auth": {
+    "consent": {
+      "accept": "Accept and continue",
+      "accepted": "Thank you. Your acceptance is recorded.",
+      "accepting": "Accepting…",
+      "article3SeeAbove": "Article 3 is shown in full above.",
+      "codeLabel": "Confirmation code",
+      "codeSent": "We sent a 6-digit code to {email}. It expires in 10 minutes.",
+      "confirmHelp": "Tick each box. All three are needed to use FundLok.",
+      "confirmTitle": "Your confirmation",
+      "disclosuresTitle": "Read before you accept: key disclosures (Article 3)",
+      "errorTitle": "Could not continue",
+      "errors": {
+        "CONSENT_CODE_EXPIRED": "That code has expired or was already used. Send a new code.",
+        "CONSENT_CODE_INVALID": "That code is not right. Check the email and try again.",
+        "CONSENT_CODE_RATE_LIMITED": "Too many codes requested. Wait a moment, then try again.",
+        "CONSENT_VERSION_CHANGED": "The terms were just updated. Reload the page to read the current version."
+      },
+      "fullTermsTitle": "Full Terms & Services",
+      "resend": "Send a new code",
+      "resendIn": "New code in {seconds}s",
+      "sendCode": "Send code to my email",
+      "sending": "Sending…",
+      "signOut": "Sign out",
+      "subtitle": "Before you use FundLok, read these terms and accept them: tick the three boxes, then enter the code we email you.",
+      "title": "Terms & Services and data consent"
+    },
     "footer": {
       "copyright": "© 2026 FundLok. All rights reserved.",
       "helpPrefix": "Need help?",
@@ -1213,32 +1239,6 @@
       "verifyFailedGeneric": "We couldn't verify your email right now. Please try again.",
       "verifyingDescription": "Please wait while we confirm your verification link.",
       "verifyingTitle": "Verifying email..."
-    },
-    "consent": {
-      "accept": "Accept and continue",
-      "accepted": "Thank you. Your acceptance is recorded.",
-      "accepting": "Accepting…",
-      "article3SeeAbove": "Article 3 is shown in full above.",
-      "codeLabel": "Confirmation code",
-      "codeSent": "We sent a 6-digit code to {email}. It expires in 10 minutes.",
-      "confirmHelp": "Tick each box. All three are needed to use FundLok.",
-      "confirmTitle": "Your confirmation",
-      "disclosuresTitle": "Read before you accept: key disclosures (Article 3)",
-      "errorTitle": "Could not continue",
-      "errors": {
-        "CONSENT_CODE_EXPIRED": "That code has expired or was already used. Send a new code.",
-        "CONSENT_CODE_INVALID": "That code is not right. Check the email and try again.",
-        "CONSENT_CODE_RATE_LIMITED": "Too many codes requested. Wait a moment, then try again.",
-        "CONSENT_VERSION_CHANGED": "The terms were just updated. Reload the page to read the current version."
-      },
-      "fullTermsTitle": "Full Terms & Services",
-      "resend": "Send a new code",
-      "resendIn": "New code in {seconds}s",
-      "sendCode": "Send code to my email",
-      "sending": "Sending…",
-      "signOut": "Sign out",
-      "subtitle": "Before you use FundLok, read these terms and accept them: tick the three boxes, then enter the code we email you.",
-      "title": "Terms & Services and data consent"
     }
   },
   "common": {
@@ -2019,6 +2019,29 @@
       "verifiedMember": "Verified member"
     },
     "sme": {
+      "agreement": {
+        "blanksNote": "A dotted line marks a detail FundLok doesn't have yet, such as a bank account still waiting for approval. Complete it in your account, then come back to this step for an updated agreement before you sign.",
+        "checking": "Checking the digital signature…",
+        "download": "Download PDF",
+        "error": {
+          "REQUIRED": "Upload the signed service agreement before you send your application.",
+          "UNSIGNED": "This PDF has no digital signature. Sign the agreement with your company's digital signature and upload the signed copy."
+        },
+        "how1": "Check the details in the preview: company name, enterprise code, address, legal representative and bank account.",
+        "how2": "Download the PDF and sign it with your company's digital signature (a USB token, or remote signing from your certificate provider).",
+        "how3": "Upload the signed PDF here. A printed and scanned copy won't work: it has no digital signature.",
+        "howTitle": "How to sign",
+        "loadFailed": "We couldn't prepare your agreement.",
+        "loading": "Preparing your agreement…",
+        "previewLabel": "Preview, filled in with your details",
+        "rateNote": "The amount and term in the Annex are the ones you applied for. The interest rate is proposed by FundLok after we assess your application.",
+        "refusedTitle": "We couldn't use the signed agreement",
+        "retry": "Try again",
+        "signedLabel": "Signed service agreement (PDF)",
+        "stepLabel": "Sign agreement",
+        "subtitle": "Your agreement with FundLok for this application, already filled in with your company's verified details. Review it, sign it with your company's digital signature, then upload the signed PDF.",
+        "title": "SME Service Agreement"
+      },
       "annualFinancialStatement": "Annual Financial Statement – Form B02-DN (Báo cáo tài chính hàng năm, last year)",
       "applicationSubmitted": "Application submitted",
       "applicationSubmittedDescription": "Your loan application and documents have been uploaded successfully.",
@@ -2439,30 +2462,7 @@
       "vatZipLabel": "Upload .zip containing all 48 VAT files (24 declarations + 24 confirmations)",
       "viewDocument": "View",
       "whereToFindThese": "Where to find these numbers",
-      "whyWeNeedThis": "Why we need this",
-      "agreement": {
-        "stepLabel": "Sign agreement",
-        "title": "SME Service Agreement",
-        "subtitle": "Your agreement with FundLok for this application, already filled in with your company's verified details. Review it, sign it with your company's digital signature, then upload the signed PDF.",
-        "previewLabel": "Preview, filled in with your details",
-        "download": "Download PDF",
-        "loading": "Preparing your agreement…",
-        "loadFailed": "We couldn't prepare your agreement.",
-        "retry": "Try again",
-        "howTitle": "How to sign",
-        "how1": "Check the details in the preview: company name, enterprise code, address, legal representative and bank account.",
-        "how2": "Download the PDF and sign it with your company's digital signature (a USB token, or remote signing from your certificate provider).",
-        "how3": "Upload the signed PDF here. A printed and scanned copy won't work: it has no digital signature.",
-        "signedLabel": "Signed service agreement (PDF)",
-        "checking": "Checking the digital signature…",
-        "blanksNote": "A dotted line marks a detail FundLok doesn't have yet, such as a bank account still waiting for approval. Complete it in your account, then come back to this step for an updated agreement before you sign.",
-        "rateNote": "The amount and term in the Annex are the ones you applied for. The interest rate is proposed by FundLok after we assess your application.",
-        "refusedTitle": "We couldn't use the signed agreement",
-        "error": {
-          "UNSIGNED": "This PDF has no digital signature. Sign the agreement with your company's digital signature and upload the signed copy.",
-          "REQUIRED": "Upload the signed service agreement before you send your application."
-        }
-      }
+      "whyWeNeedThis": "Why we need this"
     },
     "smeAnalytics": {
       "charts": {
@@ -2983,9 +2983,9 @@
         "e_invoice_data": "E-invoice data (12 months)",
         "financial_report": "Financial statements",
         "legal_charter": "Company charter",
+        "sme_service_agreement": "Signed service agreement",
         "tax_filings": "Tax filings (VAT declarations and year-end statements)",
-        "vat_tax_zip": "VAT declarations",
-        "sme_service_agreement": "Signed service agreement"
+        "vat_tax_zip": "VAT declarations"
       },
       "filesPrivate": "The files themselves stay private: they hold the business's tax, invoice and credit details, so only the FundLok team reviews them.",
       "noDocuments": "No documents have been reviewed for this project yet.",
