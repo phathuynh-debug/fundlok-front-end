@@ -174,6 +174,12 @@ export const LOANS_ENDPOINTS = {
    */
   figures: (applicationId: string) =>
     `/loans/applications/${applicationId}/figures`,
+  /**
+   * The SME Service Agreement as a PDF, filled in with the SME's verified
+   * details and the application's amount and term. The owning SME only.
+   */
+  serviceAgreement: (applicationId: string) =>
+    `/loans/applications/${applicationId}/service-agreement`,
 } as const;
 
 export const RATE_CALCULATOR_ENDPOINTS = {

@@ -42,6 +42,21 @@ function extractMessage(data: unknown): string | undefined {
 
 const REFRESH_PATH = "/auth/refresh";
 
+/** `attachment; filename="a.pdf"` (or filename*=UTF-8''a.pdf) -> "a.pdf". */
+export function filenameFromDisposition(header: string): string | null {
+  const encoded = /filename\*\s*=\s*(?:UTF-8|utf-8)''([^;]+)/.exec(header);
+  if (encoded) {
+    try {
+      return decodeURIComponent(encoded[1].trim());
+    } catch {
+      // Malformed escape: fall through to the plain parameter.
+    }
+  }
+  const plain = /filename\s*=\s*("([^"]*)"|[^;]+)/.exec(header);
+  const name = (plain?.[2] ?? plain?.[1])?.trim();
+  return name || null;
+}
+
 /**
  * Endpoints where a 401 is the ANSWER, not an expired session.
  *
@@ -209,6 +224,29 @@ class ApiClient {
         : config;
     const response = await this.axiosInstance.post<T>(url, data, finalConfig);
     return response.data;
+  }
+
+  /**
+   * A file the API serves (a generated PDF, say), with the name its
+   * Content-Disposition gives it. Through this client rather than a plain link
+   * so an expired access token is refreshed first, the same as for any call.
+   */
+  public async getFile(
+    url: string,
+    config?: AxiosRequestConfig,
+  ): Promise<{ blob: Blob; filename: string | null }> {
+    const response = await this.axiosInstance.get<Blob>(url, {
+      ...config,
+      responseType: "blob",
+    });
+    const disposition = response.headers?.["content-disposition"];
+    return {
+      blob: response.data,
+      filename:
+        typeof disposition === "string"
+          ? filenameFromDisposition(disposition)
+          : null,
+    };
   }
 
   public async put<T>(

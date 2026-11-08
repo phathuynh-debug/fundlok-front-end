@@ -485,7 +485,8 @@
         "cic_report": "CIC report",
         "e_invoice_data": "E-invoice data",
         "legal_charter": "Company charter",
-        "tax_filings": "Tax filings"
+        "tax_filings": "Tax filings",
+        "sme_service_agreement": "Signed service agreement"
       },
       "documentUnavailable": "This document could not be opened.",
       "documentsHeading": "Documents",
@@ -2438,7 +2439,30 @@
       "vatZipLabel": "Upload .zip containing all 48 VAT files (24 declarations + 24 confirmations)",
       "viewDocument": "View",
       "whereToFindThese": "Where to find these numbers",
-      "whyWeNeedThis": "Why we need this"
+      "whyWeNeedThis": "Why we need this",
+      "agreement": {
+        "stepLabel": "Sign agreement",
+        "title": "SME Service Agreement",
+        "subtitle": "Your agreement with FundLok for this application, already filled in with your company's verified details. Review it, sign it with your company's digital signature, then upload the signed PDF.",
+        "previewLabel": "Preview, filled in with your details",
+        "download": "Download PDF",
+        "loading": "Preparing your agreement…",
+        "loadFailed": "We couldn't prepare your agreement.",
+        "retry": "Try again",
+        "howTitle": "How to sign",
+        "how1": "Check the details in the preview: company name, enterprise code, address, legal representative and bank account.",
+        "how2": "Download the PDF and sign it with your company's digital signature (a USB token, or remote signing from your certificate provider).",
+        "how3": "Upload the signed PDF here. A printed and scanned copy won't work: it has no digital signature.",
+        "signedLabel": "Signed service agreement (PDF)",
+        "checking": "Checking the digital signature…",
+        "blanksNote": "A dotted line marks a detail FundLok doesn't have yet, such as a bank account still waiting for approval. Complete it in your account, then come back to this step for an updated agreement before you sign.",
+        "rateNote": "The amount and term in the Annex are the ones you applied for. The interest rate is proposed by FundLok after we assess your application.",
+        "refusedTitle": "We couldn't use the signed agreement",
+        "error": {
+          "UNSIGNED": "This PDF has no digital signature. Sign the agreement with your company's digital signature and upload the signed copy.",
+          "REQUIRED": "Upload the signed service agreement before you send your application."
+        }
+      }
     },
     "smeAnalytics": {
       "charts": {
@@ -2960,7 +2984,8 @@
         "financial_report": "Financial statements",
         "legal_charter": "Company charter",
         "tax_filings": "Tax filings (VAT declarations and year-end statements)",
-        "vat_tax_zip": "VAT declarations"
+        "vat_tax_zip": "VAT declarations",
+        "sme_service_agreement": "Signed service agreement"
       },
       "filesPrivate": "The files themselves stay private: they hold the business's tax, invoice and credit details, so only the FundLok team reviews them.",
       "noDocuments": "No documents have been reviewed for this project yet.",

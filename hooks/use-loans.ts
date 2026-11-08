@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ApiError } from "@/lib/types";
 import {
   loansService,
@@ -11,6 +11,12 @@ import {
   type RateEstimatePayload,
 } from "@/services/loans.service";
 import { projectKeys } from "@/hooks/use-projects";
+
+export const loanKeys = {
+  all: ["loans"] as const,
+  serviceAgreement: (applicationId: string) =>
+    [...loanKeys.all, "service-agreement", applicationId] as const,
+};
 
 export function useSubmitLoanApplication() {
   const queryClient = useQueryClient();
@@ -58,5 +64,24 @@ export function useRateEstimate() {
   return useMutation<RateEstimate, ApiError, RateEstimatePayload>({
     mutationFn: (payload) => publicRateService.estimate(payload),
     retry: false,
+  });
+}
+
+/**
+ * The SME Service Agreement for one application, as the PDF the SME reviews,
+ * downloads and signs. Generated on the server from what FundLok holds (the
+ * verified business, the approved bank account, the application's amount and
+ * term), so it is fetched fresh each time the step opens rather than cached:
+ * a bank account approved in the meantime must show up in it.
+ */
+export function useServiceAgreement(applicationId: string, enabled = true) {
+  return useQuery<{ blob: Blob; filename: string | null }, ApiError>({
+    queryKey: loanKeys.serviceAgreement(applicationId),
+    queryFn: () => loansService.getServiceAgreement(applicationId),
+    enabled: enabled && !!applicationId,
+    staleTime: 0,
+    gcTime: 0,
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 }

@@ -485,7 +485,8 @@
         "cic_report": "Báo cáo CIC",
         "e_invoice_data": "Dữ liệu hóa đơn điện tử",
         "legal_charter": "Điều lệ công ty",
-        "tax_filings": "Hồ sơ thuế"
+        "tax_filings": "Hồ sơ thuế",
+        "sme_service_agreement": "Hợp đồng dịch vụ đã ký số"
       },
       "documentUnavailable": "Không thể mở hồ sơ này.",
       "documentsHeading": "Hồ sơ",
@@ -2438,7 +2439,30 @@
       "vatZipLabel": "Tải lên tệp .zip chứa tất cả 48 tệp thuế GTGT (24 tờ khai + 24 xác nhận)",
       "viewDocument": "Xem",
       "whereToFindThese": "Tìm các số liệu này ở đâu",
-      "whyWeNeedThis": "Lý do cần hồ sơ"
+      "whyWeNeedThis": "Lý do cần hồ sơ",
+      "agreement": {
+        "stepLabel": "Ký hợp đồng",
+        "title": "Hợp đồng dịch vụ dành cho Doanh nghiệp",
+        "subtitle": "Hợp đồng giữa doanh nghiệp và FundLok cho hồ sơ này, đã điền sẵn thông tin đã xác minh của doanh nghiệp. Vui lòng xem lại, ký bằng chữ ký số của doanh nghiệp, rồi tải lên bản PDF đã ký.",
+        "previewLabel": "Bản xem trước, đã điền thông tin của bạn",
+        "download": "Tải hợp đồng (PDF)",
+        "loading": "Đang chuẩn bị hợp đồng…",
+        "loadFailed": "Chưa thể tạo hợp đồng của bạn.",
+        "retry": "Thử lại",
+        "howTitle": "Cách ký",
+        "how1": "Kiểm tra thông tin trong bản xem trước: tên doanh nghiệp, mã số doanh nghiệp, địa chỉ, người đại diện theo pháp luật và tài khoản ngân hàng.",
+        "how2": "Tải bản PDF và ký bằng chữ ký số của doanh nghiệp (USB Token, hoặc ký số từ xa của nhà cung cấp chứng thư số).",
+        "how3": "Tải bản PDF đã ký lên tại đây. Bản in ra rồi scan sẽ không được chấp nhận vì không có chữ ký số.",
+        "signedLabel": "Hợp đồng dịch vụ đã ký số (PDF)",
+        "checking": "Đang kiểm tra chữ ký số…",
+        "blanksNote": "Dòng chấm là thông tin FundLok chưa có, ví dụ tài khoản ngân hàng đang chờ duyệt. Hãy bổ sung trong tài khoản của bạn, rồi quay lại bước này để lấy hợp đồng đã cập nhật trước khi ký.",
+        "rateNote": "Số tiền và thời hạn trong Phụ lục là theo hồ sơ bạn đã đăng ký. Lãi suất do FundLok đề xuất sau khi thẩm định hồ sơ.",
+        "refusedTitle": "Chưa thể sử dụng hợp đồng đã ký",
+        "error": {
+          "UNSIGNED": "Tệp PDF này chưa có chữ ký số. Vui lòng ký hợp đồng bằng chữ ký số của doanh nghiệp và tải lên bản đã ký.",
+          "REQUIRED": "Vui lòng tải lên hợp đồng dịch vụ đã ký trước khi gửi hồ sơ."
+        }
+      }
     },
     "smeAnalytics": {
       "charts": {
@@ -2960,7 +2984,8 @@
         "financial_report": "Báo cáo tài chính",
         "legal_charter": "Điều lệ công ty",
         "tax_filings": "Hồ sơ thuế (tờ khai GTGT và báo cáo cuối năm)",
-        "vat_tax_zip": "Tờ khai thuế GTGT"
+        "vat_tax_zip": "Tờ khai thuế GTGT",
+        "sme_service_agreement": "Hợp đồng dịch vụ đã ký số"
       },
       "filesPrivate": "Bản gốc của tài liệu được giữ kín vì chứa thông tin thuế, hóa đơn và tín dụng của doanh nghiệp; chỉ đội ngũ FundLok xem xét các tài liệu này.",
       "noDocuments": "Dự án này chưa có tài liệu nào được xem xét.",

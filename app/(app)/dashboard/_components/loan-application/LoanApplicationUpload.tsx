@@ -19,6 +19,8 @@ import { UploadField } from "./UploadField";
 import { RevenueCostsStep } from "./RevenueCostsStep";
 import { DocumentInfoPanel } from "./DocumentInfoPanel";
 import { ReviewStep } from "./ReviewStep";
+import { ServiceAgreementStep } from "./ServiceAgreementStep";
+import { AGREEMENT_STEP } from "./useLoanApplication";
 
 interface LoanApplicationUploadProps {
   loanApplicationId: string;
@@ -111,6 +113,10 @@ function LoanApplicationWizard() {
             >
               {currentStep === reviewStep ? (
                 <ReviewStep />
+              ) : currentStep === AGREEMENT_STEP ? (
+                /* The agreement needs the width for its preview, so it
+                   takes the whole card rather than the split layout. */
+                <ServiceAgreementStep />
               ) : (
                 /* --- Document collection steps (split layout) --- */
                 <div className="grid gap-0 md:grid-cols-[1fr_auto_1fr] items-stretch">

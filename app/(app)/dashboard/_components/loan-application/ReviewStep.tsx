@@ -17,6 +17,7 @@ const DOCUMENT_LABEL_KEYS: Record<DocumentKey, string> = {
   eInvoiceData: "dashboard.sme.eInvoiceData",
   taxFilings: "dashboard.sme.taxFilings",
   cicReport: "dashboard.sme.cicCreditReport",
+  serviceAgreement: "dashboard.sme.agreement.signedLabel",
 };
 
 // The final wizard step: lists every document with its status and an overall

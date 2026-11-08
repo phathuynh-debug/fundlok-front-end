@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { AxiosError, type InternalAxiosRequestConfig } from "axios";
-import ApiClient from "./api-client";
+import ApiClient, { filenameFromDisposition } from "./api-client";
 
 const MFA_DETAIL =
   "Admin accounts must sign in with a second factor. Set up an authenticator app or a passkey, then sign in again with it.";
@@ -99,5 +99,28 @@ describe("ApiClient, admin second factor", () => {
       client.get("/admin/users", { adapter: refuse(403) }),
     ).rejects.toMatchObject({ status: 403, code: undefined });
     expect(replace).not.toHaveBeenCalled();
+  });
+});
+
+describe("filenameFromDisposition", () => {
+  it("reads the name the API gives a file", () => {
+    expect(
+      filenameFromDisposition(
+        'attachment; filename="FundLok-hop-dong-dich-vu-0319900123-sme-agreement-v0.3.pdf"',
+      ),
+    ).toBe("FundLok-hop-dong-dich-vu-0319900123-sme-agreement-v0.3.pdf");
+    expect(filenameFromDisposition("inline; filename=a.pdf")).toBe("a.pdf");
+  });
+
+  it("prefers the UTF-8 name when both are given", () => {
+    expect(
+      filenameFromDisposition(
+        "attachment; filename=\"hop-dong.pdf\"; filename*=UTF-8''h%E1%BB%A3p-%C4%91%E1%BB%93ng.pdf",
+      ),
+    ).toBe("hợp-đồng.pdf");
+  });
+
+  it("has no name when none is given", () => {
+    expect(filenameFromDisposition("inline")).toBeNull();
   });
 });

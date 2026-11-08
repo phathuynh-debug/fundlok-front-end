@@ -13,7 +13,10 @@ export type LoanDocumentType =
   | "financial_report"
   | "e_invoice_data"
   | "cic_report"
-  | "tax_filings";
+  | "tax_filings"
+  // The SME Service Agreement (Contract 2) back from the SME, signed with the
+  // enterprise's digital signature. Shown to staff, never to investors.
+  | "sme_service_agreement";
 
 export interface InitUploadPayload {
   loan_application_id: string;
@@ -158,6 +161,8 @@ export const DOCUMENT_TYPE_RULES: Record<
   // The year-end statement XML (B02 package), or the .zip of the tax folder
   // holding it with the monthly VAT declarations.
   tax_filings: { extensions: ["zip", "xml"], maxSizeMb: 100 },
+  // A PDF: what Vietnamese enterprise digital signatures sign.
+  sme_service_agreement: { extensions: ["pdf"], maxSizeMb: 25 },
 };
 
 const CONTENT_TYPES_BY_EXTENSION: Record<string, string[]> = {

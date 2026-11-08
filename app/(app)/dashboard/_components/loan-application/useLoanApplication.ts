@@ -33,6 +33,7 @@ import {
 } from "./lite-grading-fields";
 import { figureFilesRead, figuresFromFiles } from "./figures-from-files";
 import { priorYearRevenue } from "./prior-year-revenue";
+import { fileHasDigitalSignature } from "./agreement-signature";
 
 // Step 2 takes two files and every figure on it is read out of them: the
 // e-invoice zip (revenue, customers) and the tax filings (costs, and, through
@@ -43,7 +44,8 @@ export type DocumentKey =
   | "companyRegistration"
   | "eInvoiceData"
   | "taxFilings"
-  | "cicReport";
+  | "cicReport"
+  | "serviceAgreement";
 
 export type FigureValues = Record<LiteFigureKey, string>;
 export type FigureErrors = Record<LiteFigureKey, FigureError>;
@@ -74,6 +76,7 @@ export const DOCUMENT_TYPES: Record<DocumentKey, LoanDocumentType> = {
   eInvoiceData: "e_invoice_data",
   taxFilings: "tax_filings",
   cicReport: "cic_report",
+  serviceAgreement: "sme_service_agreement",
 };
 
 // Step 2 takes BOTH files and figures: the files are the evidence and the
@@ -82,19 +85,23 @@ const STEP_DOCUMENTS: Record<number, DocumentKey[]> = {
   1: ["companyCharter", "companyRegistration"],
   2: ["eInvoiceData", "taxFilings"],
   3: ["cicReport"],
+  4: ["serviceAgreement"],
 };
 
 const ALL_DOCUMENT_KEYS = Object.keys(DOCUMENT_TYPES) as DocumentKey[];
 
-// 1 legal · 2 revenue and costs (e-invoices + tax filings) · 3 CIC · 4 review
-// and send. Revenue and costs used to be two steps, each with a file of its
-// own. The second file also answers the first step's last question (the year
-// of revenue before the invoices), so they are asked together.
-const REVIEW_STEP = 4;
-const TOTAL_STEPS = 4;
+// 1 legal · 2 revenue and costs (e-invoices + tax filings) · 3 CIC · 4 the
+// SME Service Agreement, signed · 5 review and send. Revenue and costs used to
+// be two steps, each with a file of its own. The second file also answers the
+// first step's last question (the year of revenue before the invoices), so
+// they are asked together. The agreement comes last before review because it
+// is filled from what the earlier steps and KYB established.
+const REVIEW_STEP = 5;
+const TOTAL_STEPS = 5;
 export const EINVOICE_STEP = 2;
 export const TAX_FILINGS_STEP = 2;
 export const CIC_STEP = 3;
+export const AGREEMENT_STEP = 4;
 
 const emptyUpload = (): DocumentUpload => ({
   file: null,
@@ -157,6 +164,8 @@ export function useLoanApplication({
     useState<EInvoicePreview | null>(null);
   const [taxFilingsPreview, setTaxFilingsPreview] =
     useState<TaxFilingsPreview | null>(null);
+  // True while a picked agreement is being checked for a digital signature.
+  const [isCheckingAgreement, setIsCheckingAgreement] = useState(false);
 
   const [documents, setDocuments] = useState<DocumentUploads>(
     () =>
@@ -234,6 +243,27 @@ export function useLoanApplication({
     if (key === "eInvoiceData") void readEInvoices(file);
     if (key === "taxFilings") void readTaxFilings(file);
     if (key === "cicReport") void readCic(file);
+    if (key === "serviceAgreement") void checkAgreementSigned(file);
+  };
+
+  // The likeliest mistake on the agreement step is sending the PDF back as it
+  // was downloaded. Caught here, the moment it is picked; the backend checks
+  // the stored copy again at Send.
+  const checkAgreementSigned = async (file: File) => {
+    setIsCheckingAgreement(true);
+    try {
+      if (!(await fileHasDigitalSignature(file))) {
+        updateDocument("serviceAgreement", {
+          status: "error",
+          errorKind: "validation",
+          error: t("dashboard.sme.agreement.error.UNSIGNED"),
+        });
+      }
+    } catch {
+      // Could not read it here: leave it to the backend's check at Send.
+    } finally {
+      setIsCheckingAgreement(false);
+    }
   };
 
   // Reads the zip on the server as soon as it is picked and fills step 2 from
@@ -308,6 +338,7 @@ export function useLoanApplication({
       ["EINVOICE_", "dashboard.sme.eInvoiceError."],
       ["TAXFILINGS_", "dashboard.sme.taxFilingsError."],
       ["CIC_", "dashboard.sme.cicError."],
+      ["SERVICE_AGREEMENT_", "dashboard.sme.agreement.error."],
     ];
     for (const [prefix, base] of prefixes) {
       if (code?.startsWith(prefix)) {
@@ -467,7 +498,9 @@ export function useLoanApplication({
           ? ({ key: "taxFilings", step: TAX_FILINGS_STEP } as const)
           : code?.startsWith("CIC_")
             ? ({ key: "cicReport", step: CIC_STEP } as const)
-            : null;
+            : code?.startsWith("SERVICE_AGREEMENT_")
+              ? ({ key: "serviceAgreement", step: AGREEMENT_STEP } as const)
+              : null;
       if (refused) {
         const reason = evidenceErrorCopy(code, message);
         updateDocument(refused.key, {
@@ -478,7 +511,10 @@ export function useLoanApplication({
         setCurrentStep(refused.step);
         toast({
           variant: "destructive",
-          title: t("dashboard.sme.eInvoiceRefusedTitle"),
+          title:
+            refused.key === "serviceAgreement"
+              ? t("dashboard.sme.agreement.refusedTitle")
+              : t("dashboard.sme.eInvoiceRefusedTitle"),
           description: reason,
         });
         return;
@@ -528,6 +564,7 @@ export function useLoanApplication({
     if (step === EINVOICE_STEP && previewEInvoice.isPending) return false;
     if (step === TAX_FILINGS_STEP && previewTaxFilings.isPending) return false;
     if (step === CIC_STEP && previewCic.isPending) return false;
+    if (step === AGREEMENT_STEP && isCheckingAgreement) return false;
     return (
       (!hasDocs || areStepDocumentsReady(step)) &&
       (!hasFigures || isFigureStepValid(step))
@@ -622,6 +659,8 @@ export function useLoanApplication({
     isReadingTaxFilings: previewTaxFilings.isPending,
     cicPreview,
     isReadingCic: previewCic.isPending,
+    isCheckingAgreement,
+    loanApplicationId,
     figures,
     figureErrors,
     // Whether, and why not, the year before the invoices could be worked out.

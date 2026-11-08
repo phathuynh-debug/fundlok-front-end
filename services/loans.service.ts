@@ -32,6 +32,11 @@ export const loansService = {
     );
   },
 
+  /** The filled-in SME Service Agreement PDF, to preview and download. */
+  async getServiceAgreement(applicationId: string) {
+    return apiClient.getFile(LOANS_ENDPOINTS.serviceAgreement(applicationId));
+  },
+
   async saveFigures(
     applicationId: string,
     payload: LoanApplicationFiguresPayload,

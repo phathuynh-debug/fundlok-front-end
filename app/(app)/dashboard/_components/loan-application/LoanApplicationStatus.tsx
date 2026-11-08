@@ -36,6 +36,10 @@ const DOCUMENT_LABELS: Record<LoanDocumentType, { en: string; vi: string }> = {
     en: "Financial statements & VAT filings",
     vi: "Báo cáo tài chính & tờ khai thuế GTGT",
   },
+  sme_service_agreement: {
+    en: "Signed service agreement",
+    vi: "Hợp đồng dịch vụ đã ký số",
+  },
 };
 
 const DOCUMENT_ORDER = Object.keys(DOCUMENT_LABELS) as LoanDocumentType[];
@@ -56,6 +60,7 @@ const EXPECTED_DOCUMENT_TYPES: LoanDocumentType[] = [
   "e_invoice_data",
   "tax_filings",
   "cic_report",
+  "sme_service_agreement",
 ];
 
 // DAILY is the only repayment a facility has. The others are kept so
