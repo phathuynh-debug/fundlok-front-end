@@ -86,6 +86,22 @@
         "headingLabel": "Heading (optional)",
         "notReady": "Connect your Google account in step 1 and turn sending on to send email.",
         "notReadyPaused": "Sending is paused. Turn on \"Sending on\" in step 1 and press Save, then you can send.",
+        "presets": {
+          "hint": "Fills in the subject, heading, message and button. You can still edit everything before sending.",
+          "investor_onboarding": "Investor onboarding",
+          "investor_onboardingHint": "Welcome email: verify identity (KYC) and explore investment opportunities.",
+          "label": "Predefined content",
+          "language": "Email language",
+          "languages": {
+            "en": "English",
+            "vi": "Tiếng Việt"
+          },
+          "replace": "Replace",
+          "replaceBody": "The subject, heading, message and button will be replaced with the predefined content. Recipients stay as they are.",
+          "replaceTitle": "Replace what you've written?",
+          "sme_onboarding": "SME onboarding",
+          "sme_onboardingHint": "Welcome email: verify the business (KYB) and post a fundraising project."
+        },
         "preview": "Preview",
         "previewDescription": "Exactly what recipients will see. Nothing has been sent.",
         "previewTitle": "Preview",

@@ -10,6 +10,8 @@ import {
   Link,
   List,
   ListOrdered,
+  Building2,
+  UserRound,
 } from "lucide-react";
 
 import {
@@ -41,6 +43,13 @@ import {
   type EmailTemplate,
 } from "@/services/admin-email.service";
 import { EmailPreviewDialog } from "./EmailPreviewDialog";
+import {
+  EMAIL_PRESET_IDS,
+  EMAIL_PRESET_LANGUAGES,
+  emailPresetContent,
+  type EmailPresetId,
+  type EmailPresetLanguage,
+} from "./email-presets";
 import { RecipientsField } from "./RecipientsField";
 import {
   EMAIL_PATTERN,
@@ -62,6 +71,11 @@ const TEMPLATES: EmailTemplate[] = [
   "announcement",
   "action_required",
 ];
+
+const PRESET_ICONS: Record<EmailPresetId, typeof Building2> = {
+  sme_onboarding: Building2,
+  investor_onboarding: UserRound,
+};
 
 interface FieldErrors {
   to?: string;
@@ -93,6 +107,14 @@ export function ComposeEmailCard() {
   const [preview, setPreview] = useState<EmailPreview | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  // The language of the predefined content, not of the console.
+  const [presetLanguage, setPresetLanguage] = useState<EmailPresetLanguage>(
+    locale === "en" ? "en" : "vi",
+  );
+  // A preset waiting on "Replace what you've written?".
+  const [pendingPreset, setPendingPreset] = useState<EmailPresetId | null>(
+    null,
+  );
 
   const ready = !!settings?.configured && settings.enabled;
 
@@ -122,6 +144,34 @@ export function ComposeEmailCard() {
   const handleBulletList = () => execCommand("insertUnorderedList");
   const handleNumberedList = () => execCommand("insertOrderedList");
 
+  const bodyIsEmpty = () =>
+    bodyTextareaRef.current
+      ? !(bodyTextareaRef.current.textContent ?? "").trim()
+      : !body.replace(/<[^>]+>/g, "").trim();
+
+  // Fills the content fields; recipients and the template are left alone.
+  const applyPreset = (id: EmailPresetId) => {
+    const preset = emailPresetContent(id, presetLanguage);
+    setSubject(preset.subject);
+    setHeading(preset.heading);
+    setBody(preset.body);
+    if (bodyTextareaRef.current) {
+      bodyTextareaRef.current.innerHTML = preset.body;
+    }
+    setButtonLabel(preset.buttonLabel);
+    setButtonUrl(preset.buttonUrl);
+    setErrors(({ to }) => (to ? { to } : {}));
+  };
+
+  // Ask before overwriting anything the admin has written.
+  const handlePreset = (id: EmailPresetId) => {
+    const hasContent =
+      [subject, heading, buttonLabel, buttonUrl].some((v) => v.trim()) ||
+      !bodyIsEmpty();
+    if (hasContent) setPendingPreset(id);
+    else applyPreset(id);
+  };
+
   // Content checks shared by Preview and Send; Send also checks recipients.
   const contentErrors = (): FieldErrors => {
     const next: FieldErrors = {};
@@ -133,10 +183,7 @@ export function ComposeEmailCard() {
     if (LINE_BREAK.test(heading.trim())) {
       next.heading = t("admin.email.errors.singleLine");
     }
-    const isBodyEmpty = bodyTextareaRef.current
-      ? bodyTextareaRef.current.innerText.trim().length === 0
-      : !body.replace(/<[^>]+>/g, "").trim();
-    if (isBodyEmpty) next.body = t("admin.email.compose.bodyRequired");
+    if (bodyIsEmpty()) next.body = t("admin.email.compose.bodyRequired");
     const label = buttonLabel.trim();
     const url = buttonUrl.trim();
     if (LINE_BREAK.test(label)) {
@@ -356,6 +403,78 @@ export function ComposeEmailCard() {
               );
             })}
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="text-sm font-medium text-foreground">
+              {t("admin.email.compose.presets.label")}
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">
+                {t("admin.email.compose.presets.language")}
+              </span>
+              <div
+                role="radiogroup"
+                aria-label={t("admin.email.compose.presets.language")}
+                className="inline-flex rounded-md border bg-muted/30 p-0.5"
+              >
+                {EMAIL_PRESET_LANGUAGES.map((lang) => {
+                  const selected = presetLanguage === lang;
+                  return (
+                    <button
+                      key={lang}
+                      type="button"
+                      role="radio"
+                      aria-checked={selected}
+                      onClick={() => setPresetLanguage(lang)}
+                      className={cn(
+                        "rounded px-2.5 py-1 text-xs font-medium transition-colors",
+                        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                        selected
+                          ? "bg-background text-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground",
+                      )}
+                    >
+                      {t(`admin.email.compose.presets.languages.${lang}`)}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {EMAIL_PRESET_IDS.map((id) => {
+              const Icon = PRESET_ICONS[id];
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => handlePreset(id)}
+                  className={cn(
+                    "flex items-start gap-3 rounded-md border border-dashed border-border p-3 text-left transition-colors hover:border-primary hover:bg-muted/50",
+                    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                  )}
+                >
+                  <Icon
+                    className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground"
+                    aria-hidden
+                  />
+                  <span className="flex flex-col gap-1">
+                    <span className="text-sm font-semibold text-foreground">
+                      {t(`admin.email.compose.presets.${id}`)}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {t(`admin.email.compose.presets.${id}Hint`)}
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {t("admin.email.compose.presets.hint")}
+          </p>
         </div>
 
         <div className="grid gap-5 md:grid-cols-2">
@@ -579,6 +698,35 @@ export function ComposeEmailCard() {
             <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction onClick={handleSend}>
               {t("admin.email.compose.confirmSend")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={pendingPreset !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingPreset(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("admin.email.compose.presets.replaceTitle")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("admin.email.compose.presets.replaceBody")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (pendingPreset) applyPreset(pendingPreset);
+                setPendingPreset(null);
+              }}
+            >
+              {t("admin.email.compose.presets.replace")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
