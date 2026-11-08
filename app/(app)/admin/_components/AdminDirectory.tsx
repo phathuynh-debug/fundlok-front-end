@@ -95,12 +95,47 @@ const buildUserColumns = (
     ),
   },
   {
+    key: "consent",
+    header: t("admin.table.consent"),
+    render: (u) => <ConsentBadge state={u.consent_status} t={t} />,
+  },
+  {
     key: "joined",
     header: t("admin.table.joined"),
     cellClassName: "text-muted-foreground",
     render: (u) => formatDate(u.created_at, locale),
   },
 ];
+
+// The Terms & data consent column: accepted, still owed, or not asked
+// (admins). Nothing at all from a backend that predates consent.
+function ConsentBadge({
+  state,
+  t,
+}: {
+  state: AdminUserRow["consent_status"];
+  t: TranslateFn;
+}) {
+  if (!state) return null;
+  if (state === "NOT_APPLICABLE") {
+    return <span className="text-muted-foreground">—</span>;
+  }
+  return state === "ACCEPTED" ? (
+    <Badge
+      variant="outline"
+      className="border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+    >
+      {t("admin.consent.accepted")}
+    </Badge>
+  ) : (
+    <Badge
+      variant="outline"
+      className="border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+    >
+      {t("admin.consent.required")}
+    </Badge>
+  );
+}
 
 const buildProjectColumns = (
   t: TranslateFn,

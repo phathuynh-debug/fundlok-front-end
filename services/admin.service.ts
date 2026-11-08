@@ -18,6 +18,10 @@ export interface AdminStats {
 }
 
 // A row in the users table (mode=users).
+// Whether a user accepted the current Terms & Services and data consent
+// (backend app/consent). NOT_APPLICABLE: admins, who are never asked.
+export type AdminConsentState = "ACCEPTED" | "REQUIRED" | "NOT_APPLICABLE";
+
 export interface AdminUserRow {
   id: string;
   email: string;
@@ -27,6 +31,29 @@ export interface AdminUserRow {
   email_verified?: boolean;
   avatar_url?: string | null;
   created_at?: string | null;
+  // Optional: a backend that predates consent omits them.
+  consent_status?: AdminConsentState;
+  consent_accepted_at?: string | null;
+}
+
+// One acceptance record, as stored (user_consents).
+export interface AdminConsentRecord {
+  id: string;
+  version: string;
+  // {"TERMS": true, "DATA_PROCESSING": true, "DATA_SHARING_TPV": true}
+  consents: Record<string, boolean>;
+  verified_by: string;
+  ip_address: string | null;
+  user_agent: string | null;
+  created_at: string;
+}
+
+export interface AdminUserConsent {
+  status: AdminConsentState;
+  current_version: string;
+  accepted_at: string | null;
+  // Newest first, older Terms versions included.
+  records: AdminConsentRecord[];
 }
 
 // A row in the projects table (mode=projects).
@@ -438,6 +465,8 @@ export interface AdminUserFullDetail {
   // Associated Entities
   projects: AdminUserProjectRef[];
   investments: AdminUserInvestmentSummary;
+  // Terms & Services and data consent. Optional: an older backend omits it.
+  consent?: AdminUserConsent | null;
 }
 
 export interface AdminUserStatusPayload {

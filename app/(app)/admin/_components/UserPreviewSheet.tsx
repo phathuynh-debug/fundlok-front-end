@@ -44,6 +44,7 @@ import { cn } from "@/lib/utils";
 import type { AdminUserRow, AdminUserStatus } from "@/services/admin.service";
 import { apiErrorMessage } from "@/lib/api-error-message";
 import { UserBankAccounts } from "./UserBankAccounts";
+import { UserConsentSection } from "./UserConsentSection";
 
 // Account status, changed from the users table.
 //
@@ -419,6 +420,18 @@ export function UserPreviewSheet({
                     t={t}
                   />
                 </div>
+
+                {/* 3b. Terms & data consent (absent from an older backend) */}
+                {detail.consent && (
+                  <>
+                    <Separator />
+                    <UserConsentSection
+                      consent={detail.consent}
+                      locale={locale}
+                      t={t}
+                    />
+                  </>
+                )}
 
                 <Separator />
 

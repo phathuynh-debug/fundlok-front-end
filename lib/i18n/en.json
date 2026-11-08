@@ -47,6 +47,27 @@
       "subtitle": "The bank accounts SMEs and investors saved. Only an approved account lists an SME's project or lets an investor invest.",
       "title": "Bank accounts"
     },
+    "consent": {
+      "accepted": "Accepted",
+      "acceptedOn": "Accepted {date}",
+      "boxDataProcessing": "Personal data processing (Art. 10.1–10.2)",
+      "boxDataSharing": "Sharing identity data with TPV Datatrust for eKYC (Art. 10.3)",
+      "boxTerms": "Terms & Services and the Article 3 disclosures",
+      "currentVersion": "Version required now",
+      "device": "Device",
+      "earlierRecords": "Earlier records ({count})",
+      "emailOtp": "Code sent by email",
+      "ipAddress": "IP address",
+      "noRecords": "No acceptance on record yet. They will be asked at their next visit.",
+      "notApplicable": "Not asked (admin)",
+      "notApplicableHelp": "Admins are FundLok staff and are not asked to accept the user Terms.",
+      "notTicked": "Not ticked",
+      "required": "Not accepted",
+      "status": "Current Terms",
+      "ticked": "Ticked",
+      "title": "Terms & data consent",
+      "verifiedBy": "Confirmed by"
+    },
     "email": {
       "compose": {
         "allowedDomains": "Allowed domains: {list}.",
@@ -678,7 +699,8 @@
       "role": "Role",
       "searchProjects": "Search projects…",
       "searchUsers": "Search users…",
-      "status": "Status"
+      "status": "Status",
+      "consent": "Consent"
     },
     "title": "Admin overview",
     "transactions": {

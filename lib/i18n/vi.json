@@ -47,6 +47,27 @@
       "subtitle": "Tài khoản ngân hàng doanh nghiệp và nhà đầu tư đã lưu. Chỉ tài khoản đã duyệt mới cho phép niêm yết dự án của doanh nghiệp hoặc cho nhà đầu tư đầu tư.",
       "title": "Tài khoản ngân hàng"
     },
+    "consent": {
+      "accepted": "Đã đồng ý",
+      "acceptedOn": "Đồng ý lúc {date}",
+      "boxDataProcessing": "Xử lý dữ liệu cá nhân (Điều 10.1–10.2)",
+      "boxDataSharing": "Chia sẻ dữ liệu định danh với TPV Datatrust để eKYC (Điều 10.3)",
+      "boxTerms": "Điều khoản Dịch vụ và thông tin công bố tại Điều 3",
+      "currentVersion": "Phiên bản đang yêu cầu",
+      "device": "Thiết bị",
+      "earlierRecords": "Các bản ghi trước ({count})",
+      "emailOtp": "Mã gửi qua email",
+      "ipAddress": "Địa chỉ IP",
+      "noRecords": "Chưa có bản ghi đồng ý. Người dùng sẽ được yêu cầu ở lần truy cập tới.",
+      "notApplicable": "Không áp dụng (quản trị)",
+      "notApplicableHelp": "Quản trị viên là nhân sự FundLok nên không cần chấp nhận Điều khoản người dùng.",
+      "notTicked": "Chưa đánh dấu",
+      "required": "Chưa đồng ý",
+      "status": "Điều khoản hiện hành",
+      "ticked": "Đã đánh dấu",
+      "title": "Điều khoản & đồng ý dữ liệu",
+      "verifiedBy": "Xác nhận bằng"
+    },
     "email": {
       "compose": {
         "allowedDomains": "Tên miền được phép: {list}.",
@@ -678,7 +699,8 @@
       "role": "Vai trò",
       "searchProjects": "Tìm dự án…",
       "searchUsers": "Tìm người dùng…",
-      "status": "Trạng thái"
+      "status": "Trạng thái",
+      "consent": "Đồng ý"
     },
     "title": "Tổng quan quản trị",
     "transactions": {
