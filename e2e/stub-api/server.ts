@@ -190,6 +190,67 @@ const fundingTickets = new Map<
 /** Must match services/funding.service.ts and the backend's constant. */
 const STUB_TERMS_VERSION = "2026-10-30";
 
+/** The backend's Investor Service Agreement VERSION (printed on the PDF). */
+const STUB_AGREEMENT_VERSION = "investor-agreement-v0.3";
+
+/**
+ * The signed Investor Service Agreement each investor (by stub_scope and
+ * account) uploaded before their first reservation. A test starts from a
+ * returning investor, who signed it before, by setting the
+ * stub_agreement_signed cookie.
+ */
+const investorAgreements = new Map<
+  string,
+  { signedAt: string; fileName: string; content: Buffer }
+>();
+
+/** A one-page PDF standing in for the agreement FundLok fills in. */
+const STUB_AGREEMENT_PDF = Buffer.from(
+  "%PDF-1.4\n1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n" +
+    "2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj\n" +
+    "3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] >> endobj\n" +
+    "trailer << /Root 1 0 R >>\n%%EOF\n",
+);
+
+function signedAgreement(req: IncomingMessage, key: string) {
+  return (
+    investorAgreements.get(verificationScope(req, key)) ??
+    (readCookie(req, "stub_agreement_signed")
+      ? {
+          signedAt: "2026-11-01T03:00:00.000Z",
+          fileName: "hop-dong-da-ky.pdf",
+          content: STUB_AGREEMENT_PDF,
+        }
+      : null)
+  );
+}
+
+async function readRaw(req: IncomingMessage): Promise<Buffer> {
+  const chunks: Buffer[] = [];
+  for await (const chunk of req) chunks.push(chunk as Buffer);
+  return Buffer.concat(chunks);
+}
+
+function pdfResponse(res: ServerResponse, content: Buffer, filename: string) {
+  res.writeHead(200, {
+    "content-type": "application/pdf",
+    "content-disposition": `inline; filename="${filename}"`,
+    "cache-control": "no-store",
+  });
+  res.end(content);
+}
+
+/** Party B of the stub investor, as filled from a verified profile. */
+const STUB_PARTY_B = {
+  holder_type: "INDIVIDUAL",
+  name: "NGUYEN VAN AN",
+  id_number: "079203001234",
+  address: null,
+  bank_account_number: "0123456789",
+  bank_account_name: "NGUYEN VAN AN",
+  bank_name: "Vietcombank",
+};
+
 /**
  * The funding window of an OPEN stub listing, over the listing's own figures
  * (what has been funded counts as confirmed). Null for any other listing.
@@ -1620,7 +1681,111 @@ const server = createServer(async (req, res) => {
 
   // --- Funding windows (ADR-009) -------------------------------------------
   // Reserving checks what the backend checks that a test can reach: the terms
-  // were agreed in their current version, and the amount is within the window.
+  // were agreed in their current version, a signed Investor Service Agreement
+  // was uploaded first, and the amount is within the window.
+  if (path === "/funding/me/investor-agreement" && method === "GET") {
+    const signed = signedAgreement(req, key);
+    return json(res, 200, {
+      version: STUB_AGREEMENT_VERSION,
+      required: signed === null,
+      signed_at: signed?.signedAt ?? null,
+      signed_version: signed ? STUB_AGREEMENT_VERSION : null,
+      file_name: signed?.fileName ?? null,
+      replaceable:
+        signed !== null &&
+        (fundingTickets.get(verificationScope(req, key)) ?? []).length === 0,
+      party_b: STUB_PARTY_B,
+    });
+  }
+  if (path === "/funding/me/investor-agreement/document" && method === "GET") {
+    return pdfResponse(
+      res,
+      STUB_AGREEMENT_PDF,
+      `FundLok-hop-dong-dich-vu-nha-dau-tu-${STUB_AGREEMENT_VERSION}.pdf`,
+    );
+  }
+  if (path === "/funding/me/investor-agreement/signed" && method === "GET") {
+    const signed = signedAgreement(req, key);
+    return signed
+      ? pdfResponse(res, signed.content, signed.fileName)
+      : detail(res, 404, "No signed agreement");
+  }
+  if (path === "/funding/me/investor-agreement" && method === "POST") {
+    // Multipart: the same presence checks the backend makes on the raw bytes.
+    const raw = await readRaw(req);
+    const text = raw.toString("latin1");
+    if (!text.includes(`name="version"\r\n\r\n${STUB_AGREEMENT_VERSION}`)) {
+      return json(
+        res,
+        409,
+        { detail: "The Investor Service Agreement has changed" },
+        { "x-error-code": "INVESTOR_AGREEMENT_OUTDATED" },
+      );
+    }
+    if (!text.includes("%PDF-")) {
+      return json(
+        res,
+        415,
+        { detail: "Upload the signed agreement as a PDF" },
+        { "x-error-code": "UNSUPPORTED_TYPE" },
+      );
+    }
+    if (!/\/ByteRange\s*\[/.test(text)) {
+      return json(
+        res,
+        422,
+        { detail: "The agreement has no digital signature" },
+        { "x-error-code": "INVESTOR_AGREEMENT_UNSIGNED" },
+      );
+    }
+    const fileName = /filename="([^"]*)"/.exec(text)?.[1] ?? "signed.pdf";
+    const start = text.indexOf("%PDF-");
+    const end = text.indexOf("\r\n--", start);
+    const signed = {
+      signedAt: new Date().toISOString(),
+      fileName,
+      content: raw.subarray(start, end === -1 ? undefined : end),
+    };
+    investorAgreements.set(verificationScope(req, key), signed);
+    return json(res, 201, {
+      version: STUB_AGREEMENT_VERSION,
+      required: false,
+      signed_at: signed.signedAt,
+      signed_version: STUB_AGREEMENT_VERSION,
+      file_name: fileName,
+      replaceable: true,
+      party_b: STUB_PARTY_B,
+    });
+  }
+  const confirmationMatch =
+    /^\/funding\/windows\/([^/]+)\/investment-confirmation$/.exec(path);
+  if (confirmationMatch && method === "GET") {
+    const project = STUB_PUBLIC_PROJECTS.find(
+      (p) =>
+        stubFundingWindow(stubListing(p)?.id ?? "")?.id ===
+        confirmationMatch[1],
+    );
+    const fundingWindow = project
+      ? stubFundingWindow(stubListing(project)?.id ?? "")
+      : null;
+    if (!project || !fundingWindow) {
+      return detail(res, 404, "Window not found");
+    }
+    const amount = Number(url.searchParams.get("amount_vnd") ?? 0);
+    return json(res, 200, {
+      listing_id: fundingWindow.listing_id,
+      listing_ref: fundingWindow.listing_id.split("-")[0].toUpperCase(),
+      sme_name: project.legal_name,
+      amount_vnd: amount,
+      annual_rate_pct: fundingWindow.annual_rate_pct,
+      term_months: fundingWindow.term_months,
+      service_fee_vnd: Math.floor(
+        (amount * 250 * fundingWindow.term_months) / (10_000 * 12),
+      ),
+      service_fee_bps_per_year: 250,
+      expected_disbursement_date: new Date().toISOString().slice(0, 10),
+    });
+  }
   const windowMatch = /^\/funding\/listings\/([^/]+)\/window$/.exec(path);
   if (windowMatch && method === "GET") {
     const fundingWindow = stubFundingWindow(windowMatch[1]);
@@ -1656,6 +1821,17 @@ const server = createServer(async (req, res) => {
         409,
         { detail: "The investing terms have changed" },
         { "x-error-code": "TERMS_OUTDATED" },
+      );
+    }
+    if (signedAgreement(req, key) === null) {
+      return json(
+        res,
+        409,
+        {
+          detail:
+            "Sign the Investor Service Agreement and upload the signed copy first",
+        },
+        { "x-error-code": "INVESTOR_AGREEMENT_REQUIRED" },
       );
     }
     const amount = Number(body.amount_vnd);

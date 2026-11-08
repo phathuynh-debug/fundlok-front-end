@@ -2891,12 +2891,51 @@
     "whyUs": "VÌ SAO CHỌN CHÚNG TÔI"
   },
   "investConfirm": {
+    "agreement": {
+      "blanksNote": "Dòng chấm là thông tin FundLok chưa có trong hồ sơ của bạn, ví dụ địa chỉ. Bạn vẫn có thể ký; nếu cần, hãy bổ sung trong tài khoản rồi quay lại để lấy hợp đồng đã cập nhật trước khi ký.",
+      "choose": "Chọn tệp PDF đã ký",
+      "download": "Tải hợp đồng (PDF)",
+      "errors": {
+        "FILE_TOO_LARGE": "Tệp lớn hơn 10 MB.",
+        "INVESTOR_AGREEMENT_IN_USE": "Hợp đồng đã ký của bạn đã áp dụng cho một khoản đầu tư nên không thể thay bằng tệp khác.",
+        "INVESTOR_AGREEMENT_OUTDATED": "Hợp đồng vừa được cập nhật. Hãy tải lại trang, tải bản mới và ký lại.",
+        "INVESTOR_AGREEMENT_UNSIGNED": "Tệp PDF này chưa có chữ ký số. Hãy ký hợp đồng bằng chữ ký số rồi tải bản đã ký lên.",
+        "UNSUPPORTED_TYPE": "Hãy tải lên hợp đồng đã ký dưới dạng tệp PDF.",
+        "generic": "Đã có lỗi xảy ra. Vui lòng thử lại sau."
+      },
+      "failed": "Không tải lên được hợp đồng",
+      "how1": "Kiểm tra thông tin Bên B trong bản xem trước: họ tên hoặc tên tổ chức, số định danh hoặc mã số doanh nghiệp, địa chỉ và tài khoản ngân hàng.",
+      "how2": "Tải bản PDF và ký bằng chữ ký số của bạn (ký số từ xa của nhà cung cấp chứng thư số, hoặc USB Token).",
+      "how3": "Tải bản PDF đã ký lên tại đây. Bản in ra rồi scan sẽ không được chấp nhận vì không có chữ ký số.",
+      "howTitle": "Cách ký",
+      "intro": "Đây là khoản đầu tư đầu tiên của bạn. Trước khi cam kết, hãy ký Hợp đồng dịch vụ giữa bạn và FundLok bằng chữ ký số: tải bản PDF đã điền thông tin của bạn, ký số, rồi tải bản đã ký lên. Bạn chỉ ký hợp đồng này một lần; mỗi khoản đầu tư sau chỉ ký một Xác nhận đầu tư.",
+      "keepSigned": "Giữ bản đã ký trước đó",
+      "loadFailed": "Không tải được Hợp đồng dịch vụ dành cho Nhà đầu tư.",
+      "loading": "Đang chuẩn bị hợp đồng…",
+      "previewLabel": "Bản xem trước, đã điền thông tin của bạn",
+      "remove": "Bỏ tệp đã chọn",
+      "retry": "Thử lại",
+      "signedLabel": "Hợp đồng đã ký số (PDF, tối đa 10 MB)",
+      "title": "Hợp đồng dịch vụ dành cho Nhà đầu tư",
+      "upload": "Tải lên hợp đồng đã ký",
+      "uploaded": "Đã nhận hợp đồng đã ký số",
+      "uploading": "Đang kiểm tra chữ ký số…",
+      "version": "Phiên bản hợp đồng {version}"
+    },
     "amountLabel": "Số tiền đầu tư",
     "amountOutOfRangeBody": "Đợt gọi vốn này nhận từ {min} đến {max} cho mỗi nhà đầu tư. Hãy quay lại trang dự án để chọn số tiền.",
     "amountOutOfRangeTitle": "Hãy chọn số tiền trong khoảng cho phép",
     "back": "Quay lại thị trường",
     "backToProject": "Quay lại dự án",
     "closes": "Đóng đợt gọi vốn",
+    "confirmation": {
+      "amountValue": "{amount} VND",
+      "feeValue": "P × 2,5% × M / 12 = {fee} VND + VAT",
+      "intro": "Bạn ký xác nhận này cùng với khoản cam kết. Xác nhận chỉ có hiệu lực khi hợp đồng vay tương ứng có hiệu lực.",
+      "loadFailed": "Không tải được Xác nhận đầu tư. Vui lòng thử lại.",
+      "rateTermValue": "{rate}%/năm, {months} tháng",
+      "title": "Xác nhận đầu tư (Phụ lục)"
+    },
     "confirming": "Khoản chuyển của bạn đã được báo và đang được xác nhận.",
     "errors": {
       "ACCOUNT_NOT_APPROVED": "Bạn cần một tài khoản ngân hàng đã được duyệt, tại ngân hàng có trong danh sách, để đầu tư.",
@@ -2905,6 +2944,7 @@
       "BELOW_MIN_TICKET": "Số tiền thấp hơn mức tối thiểu của đợt gọi vốn này.",
       "CAPACITY_EXCEEDED": "Số tiền vượt quá phần còn mở của đợt gọi vốn này.",
       "HOLD_EXPIRED": "Lượt giữ chỗ đó đã hết thời gian chuyển khoản. Hãy đồng ý lại để giữ chỗ mới.",
+      "INVESTOR_AGREEMENT_REQUIRED": "Hãy ký số Hợp đồng dịch vụ dành cho Nhà đầu tư và tải bản đã ký lên trước khoản đầu tư đầu tiên.",
       "INVESTOR_FEE_UNPAID": "Bạn có hóa đơn FundLok chưa thanh toán. Hãy thanh toán trước khi đầu tư tiếp.",
       "TERMS_OUTDATED": "Điều khoản đầu tư vừa được cập nhật. Hãy tải lại trang, đọc lại và đồng ý.",
       "WINDOW_NOT_OPEN": "Đợt gọi vốn này đã ngừng nhận đầu tư.",
@@ -2937,7 +2977,18 @@
     "received": "FundLok đã kiểm tra khoản chuyển: doanh nghiệp đã nhận khoản đầu tư của bạn. Việc trả nợ hằng ngày bắt đầu từ ngày làm việc tiếp theo.",
     "repaying": "Khoản đầu tư của bạn đã nằm trong khoản vay và đang được trả hằng ngày. Xem lịch trả nợ trên trang tổng quan.",
     "reserveFailed": "Không giữ chỗ được khoản đầu tư",
+    "signedAgreement": {
+      "body": "Bạn đã ký số và tải lên Hợp đồng dịch vụ dành cho Nhà đầu tư ngày {date} (phiên bản {version}). Lần này bạn chỉ ký Xác nhận đầu tư (Phụ lục) bên dưới.",
+      "dialogTitle": "Hợp đồng dịch vụ đã ký",
+      "download": "Tải bản đã ký",
+      "loadFailed": "Không mở được hợp đồng đã ký. Vui lòng thử lại.",
+      "replace": "Thay bằng tệp khác",
+      "stamp": "Tải lên ngày {date} · {file} · phiên bản {version}",
+      "title": "Hợp đồng dịch vụ bạn đã ký áp dụng cho khoản này",
+      "view": "Xem hợp đồng đã ký"
+    },
     "steps": {
+      "agreement": "Hợp đồng dịch vụ",
       "amount": "Số tiền",
       "terms": "Điều khoản",
       "transfer": "Chuyển khoản"
@@ -2946,6 +2997,7 @@
     "termValue": "{months} tháng",
     "terms": {
       "agree": "Tôi đã đọc và đồng ý với điều khoản đầu tư của FundLok. Tôi hiểu rằng khoản đầu tư không được bảo đảm và tôi có thể mất một phần hoặc toàn bộ số tiền.",
+      "agreeWithConfirmation": "Tôi đã đọc và đồng ý với điều khoản đầu tư của FundLok và ký Xác nhận đầu tư (Phụ lục) cho khoản này. Tôi hiểu rằng khoản đầu tư không được bảo đảm và tôi có thể mất một phần hoặc toàn bộ số tiền.",
       "intro": "Hãy đọc kỹ trước khi giữ chỗ. Khi đồng ý, bạn ký điện tử các điều khoản này cùng với lượt giữ chỗ.",
       "rules": {
         "direct": "Bạn cho {business} vay trực tiếp, theo hợp đồng vay riêng giữa bạn và doanh nghiệp, với kỳ hạn {months} tháng.",

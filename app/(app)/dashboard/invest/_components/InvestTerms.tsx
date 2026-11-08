@@ -35,6 +35,8 @@ interface InvestTermsProps {
   fundingWindow: FundingWindow;
   isPending: boolean;
   onAgree: () => void;
+  /** What ticking the box agrees to, when it is more than the terms. */
+  agreeLabel?: string;
   locale: string;
   t: (key: string, vars?: Record<string, string | number>) => string;
 }
@@ -50,6 +52,7 @@ export function InvestTerms({
   fundingWindow,
   isPending,
   onAgree,
+  agreeLabel,
   locale,
   t,
 }: InvestTermsProps) {
@@ -104,7 +107,7 @@ export function InvestTerms({
           htmlFor="agree-terms"
           className="text-sm font-medium leading-relaxed text-foreground"
         >
-          {t(`${K}.agree`)}
+          {agreeLabel ?? t(`${K}.agree`)}
         </Label>
       </div>
 

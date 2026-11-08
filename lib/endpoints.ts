@@ -91,6 +91,17 @@ export const FUNDING_ENDPOINTS = {
   // Reserves the amount and signs the acceptance in one call; needs an
   // Idempotency-Key header.
   reserve: (windowId: string) => `/funding/windows/${windowId}/reservations`,
+  // The Investor Service Agreement (Contract 4): GET whether it must still be
+  // signed before committing, POST the digitally signed PDF (multipart `file`
+  // and `version`). The PDF to sign, filled in with the investor's details,
+  // and the signed copy they uploaded.
+  investorAgreement: "/funding/me/investor-agreement",
+  investorAgreementDocument: "/funding/me/investor-agreement/document",
+  investorAgreementSigned: "/funding/me/investor-agreement/signed",
+  // The Investment Confirmation (the agreement's Annex) for an amount on a
+  // window, as it will be signed: ?amount_vnd=
+  investmentConfirmation: (windowId: string) =>
+    `/funding/windows/${windowId}/investment-confirmation`,
   // The business's account, the exact amount, the memo and the VietQR.
   payment: (trancheId: string) => `/funding/tranches/${trancheId}/payment`,
   myTranches: "/funding/me/tranches",

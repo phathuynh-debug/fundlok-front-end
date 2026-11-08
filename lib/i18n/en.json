@@ -2891,12 +2891,51 @@
     "whyUs": "WHY US"
   },
   "investConfirm": {
+    "agreement": {
+      "blanksNote": "A dotted line marks a detail FundLok doesn't have on your profile yet, such as an address. You can still sign; if needed, complete it in your account and come back for an updated agreement before you sign.",
+      "choose": "Choose the signed PDF",
+      "download": "Download PDF",
+      "errors": {
+        "FILE_TOO_LARGE": "The file is larger than 10 MB.",
+        "INVESTOR_AGREEMENT_IN_USE": "Your signed agreement already covers an investment, so it can't be replaced with another file.",
+        "INVESTOR_AGREEMENT_OUTDATED": "The agreement has just been updated. Reload the page, download the new version and sign it again.",
+        "INVESTOR_AGREEMENT_UNSIGNED": "This PDF has no digital signature. Sign the agreement with your digital signature and upload the signed copy.",
+        "UNSUPPORTED_TYPE": "Upload the signed agreement as a PDF file.",
+        "generic": "Something went wrong. Please try again later."
+      },
+      "failed": "The agreement could not be uploaded",
+      "how1": "Check Party B's details in the preview: your name or organisation, ID number or enterprise code, address and bank account.",
+      "how2": "Download the PDF and sign it with your digital signature (remote signing from your certificate provider, or a USB token).",
+      "how3": "Upload the signed PDF here. A printed and scanned copy won't work: it has no digital signature.",
+      "howTitle": "How to sign",
+      "intro": "This is your first investment. Before you commit, sign the service agreement between you and FundLok with your digital signature: download the PDF filled in with your details, sign it digitally, then upload the signed copy. You sign it only once; each later investment signs just an Investment Confirmation.",
+      "keepSigned": "Keep the copy signed before",
+      "loadFailed": "The Investor Service Agreement could not be loaded.",
+      "loading": "Preparing the agreement…",
+      "previewLabel": "Preview, filled in with your details",
+      "remove": "Remove the chosen file",
+      "retry": "Try again",
+      "signedLabel": "Digitally signed agreement (PDF, up to 10 MB)",
+      "title": "Investor Service Agreement",
+      "upload": "Upload the signed agreement",
+      "uploaded": "Signed agreement received",
+      "uploading": "Checking the digital signature…",
+      "version": "Agreement version {version}"
+    },
     "amountLabel": "Investment amount",
     "amountOutOfRangeBody": "This round takes between {min} and {max} per investor. Go back to the project to choose an amount.",
     "amountOutOfRangeTitle": "Choose an amount within the range",
     "back": "Back to marketplace",
     "backToProject": "Back to project",
     "closes": "Round closes",
+    "confirmation": {
+      "amountValue": "{amount} VND",
+      "feeValue": "P × 2.5% × M / 12 = {fee} VND + VAT",
+      "intro": "You sign this confirmation together with your commitment. It takes effect only if the matching loan contract takes effect.",
+      "loadFailed": "The Investment Confirmation could not be loaded. Please try again.",
+      "rateTermValue": "{rate}% a year, {months} months",
+      "title": "Investment Confirmation (Annex)"
+    },
     "confirming": "Your transfer has been reported and is being confirmed.",
     "errors": {
       "ACCOUNT_NOT_APPROVED": "You need an approved bank account, at a bank on our list, to invest.",
@@ -2905,6 +2944,7 @@
       "BELOW_MIN_TICKET": "The amount is below this round's minimum.",
       "CAPACITY_EXCEEDED": "The amount is more than what is still open in this round.",
       "HOLD_EXPIRED": "The time to transfer for that reservation has passed. Agree again to reserve a new one.",
+      "INVESTOR_AGREEMENT_REQUIRED": "Sign the Investor Service Agreement digitally and upload the signed copy before your first investment.",
       "INVESTOR_FEE_UNPAID": "You have an unpaid FundLok invoice. Pay it before investing again.",
       "TERMS_OUTDATED": "The investing terms have just changed. Reload the page, read them again and agree.",
       "WINDOW_NOT_OPEN": "This round is no longer taking investments.",
@@ -2937,7 +2977,18 @@
     "received": "FundLok checked your transfer: the business has received your investment. Its daily repayments start from the next working day.",
     "repaying": "Your investment is in the loan and being repaid daily. See the schedule on your dashboard.",
     "reserveFailed": "Couldn't reserve your investment",
+    "signedAgreement": {
+      "body": "You signed the Investor Service Agreement digitally and uploaded it on {date} (version {version}). This time you sign only the Investment Confirmation (Annex) below.",
+      "dialogTitle": "Your signed service agreement",
+      "download": "Download the signed copy",
+      "loadFailed": "The signed agreement could not be opened. Please try again.",
+      "replace": "Replace with another file",
+      "stamp": "Uploaded on {date} · {file} · version {version}",
+      "title": "The service agreement you signed applies to this investment",
+      "view": "View the signed agreement"
+    },
     "steps": {
+      "agreement": "Service agreement",
       "amount": "Amount",
       "terms": "Terms",
       "transfer": "Transfer"
@@ -2946,6 +2997,7 @@
     "termValue": "{months} months",
     "terms": {
       "agree": "I have read and agree to FundLok's investing terms. I understand that my investment is not guaranteed and that I can lose some or all of it.",
+      "agreeWithConfirmation": "I have read and agree to FundLok's investing terms, and I sign the Investment Confirmation (Annex) for this investment. I understand that my investment is not guaranteed and that I can lose some or all of it.",
       "intro": "Read these before you reserve. Agreeing signs them electronically, together with your reservation.",
       "rules": {
         "direct": "You lend directly to {business}, under your own loan contract with it, for a term of {months} months.",
