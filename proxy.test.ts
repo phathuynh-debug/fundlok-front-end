@@ -264,3 +264,87 @@ describe("the brand-accent header", () => {
     expect(forwarded.get(BRAND_ACCENT_HEADER)).toBeNull();
   });
 });
+
+describe("the consent gate", () => {
+  // Contract 1: an SME or investor accepts the Terms & Services and data
+  // consent at /consent before anything else on the platform.
+  const signedIn = (path: string, user: Record<string, unknown>) => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn<typeof fetch>()
+        .mockImplementation(() => Promise.resolve(Response.json(user))),
+    );
+    return proxy(
+      new NextRequest(`https://www.fundlok.com${path}`, {
+        headers: { cookie: "access_token=opaque-token" },
+      }),
+    );
+  };
+  const investor = {
+    id: "u-1",
+    email: "an@example.com",
+    full_name: "An",
+    role: "INVESTOR",
+    email_verified: true,
+  };
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("sends a user who has not accepted to /consent, remembering the page", async () => {
+    const response = await signedIn("/dashboard/portfolio?tab=active", {
+      ...investor,
+      consent_required: true,
+    });
+    const location = new URL(response.headers.get("location") ?? "");
+    expect(location.pathname).toBe("/consent");
+    expect(location.searchParams.get("next")).toBe("/dashboard/portfolio?tab=active");
+  });
+
+  it("comes before choosing a role", async () => {
+    const response = await signedIn("/select-role", {
+      ...investor,
+      role: null,
+      consent_required: true,
+    });
+    expect(new URL(response.headers.get("location") ?? "").pathname).toBe("/consent");
+  });
+
+  it("lets the user stay on /consent while they still have to accept", async () => {
+    const response = await signedIn("/consent", { ...investor, consent_required: true });
+    expect(response.headers.get("location")).toBeNull();
+  });
+
+  it("keeps a new account with no role on /consent, not bounced to /select-role", async () => {
+    const response = await signedIn("/consent", {
+      ...investor,
+      role: null,
+      consent_required: true,
+    });
+    expect(response.headers.get("location")).toBeNull();
+  });
+
+  it("sends a user who has accepted on to where they were going", async () => {
+    const response = await signedIn("/consent?next=/dashboard/portfolio", {
+      ...investor,
+      consent_required: false,
+    });
+    expect(new URL(response.headers.get("location") ?? "").pathname).toBe("/dashboard/portfolio");
+  });
+
+  it("never asks an admin", async () => {
+    const response = await signedIn("/admin", {
+      ...investor,
+      role: "ADMIN",
+      consent_required: true,
+    });
+    expect(response.headers.get("location")).toBeNull();
+  });
+
+  it("lets everyone through when the backend predates consent", async () => {
+    const response = await signedIn("/dashboard/portfolio", investor);
+    expect(response.headers.get("location")).toBeNull();
+  });
+});

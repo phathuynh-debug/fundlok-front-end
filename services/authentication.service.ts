@@ -28,6 +28,9 @@ export interface User {
   role?: UserRole | null;
   status?: UserStatus;
   email_verified?: boolean;
+  // True until the user accepts the current Terms & Services and data
+  // consent at /consent. Always false for admins.
+  consent_required?: boolean;
   // False for OAuth-only accounts, which set a first password instead of
   // changing one — the change-password dialog uses this to decide whether to
   // ask for the current password.

@@ -1116,7 +1116,7 @@
       "submitting": "Đang tạo tài khoản...",
       "successDescription": "Tài khoản của bạn đã sẵn sàng. Vui lòng đăng nhập để tiếp tục.",
       "successTitle": "Đã tạo tài khoản",
-      "termsNotice": "Bằng việc tạo tài khoản, bạn đồng ý với {termsLink} của FundLok.",
+      "termsNotice": "Sau khi tạo tài khoản, bạn sẽ đọc và chấp nhận {termsLink} của FundLok trước khi bắt đầu.",
       "validationErrorTitle": "Vui lòng kiểm tra các ô được đánh dấu"
     },
     "resetPassword": {
@@ -1190,6 +1190,32 @@
       "verifyFailedGeneric": "Hiện chưa thể xác minh email của bạn. Vui lòng thử lại.",
       "verifyingDescription": "Vui lòng chờ trong giây lát, chúng tôi đang xác nhận liên kết xác minh của bạn.",
       "verifyingTitle": "Đang xác minh email..."
+    },
+    "consent": {
+      "accept": "Chấp nhận và tiếp tục",
+      "accepted": "Cảm ơn bạn. Chấp nhận của bạn đã được ghi nhận.",
+      "accepting": "Đang xác nhận…",
+      "article3SeeAbove": "Điều 3 được hiển thị đầy đủ ở phía trên.",
+      "codeLabel": "Mã xác nhận",
+      "codeSent": "Chúng tôi đã gửi mã 6 chữ số đến {email}. Mã hết hạn sau 10 phút.",
+      "confirmHelp": "Đánh dấu từng ô. Cần cả ba ô để sử dụng FundLok.",
+      "confirmTitle": "Xác nhận của bạn",
+      "disclosuresTitle": "Đọc trước khi chấp nhận: thông tin công bố (Điều 3)",
+      "errorTitle": "Chưa thể tiếp tục",
+      "errors": {
+        "CONSENT_CODE_EXPIRED": "Mã đã hết hạn hoặc đã được dùng. Hãy gửi mã mới.",
+        "CONSENT_CODE_INVALID": "Mã chưa đúng. Hãy kiểm tra email và thử lại.",
+        "CONSENT_CODE_RATE_LIMITED": "Bạn đã yêu cầu quá nhiều mã. Vui lòng đợi một lát rồi thử lại.",
+        "CONSENT_VERSION_CHANGED": "Điều khoản vừa được cập nhật. Hãy tải lại trang để đọc phiên bản mới."
+      },
+      "fullTermsTitle": "Toàn văn Điều khoản Dịch vụ",
+      "resend": "Gửi mã mới",
+      "resendIn": "Gửi mã mới sau {seconds} giây",
+      "sendCode": "Gửi mã đến email của tôi",
+      "sending": "Đang gửi…",
+      "signOut": "Đăng xuất",
+      "subtitle": "Trước khi sử dụng FundLok, hãy đọc và chấp nhận các điều khoản này: đánh dấu ba ô, sau đó nhập mã chúng tôi gửi qua email.",
+      "title": "Điều khoản Dịch vụ và Đồng ý xử lý dữ liệu"
     }
   },
   "common": {

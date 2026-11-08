@@ -10,6 +10,10 @@ const API_BASE_URL = process.env.API_URL || "http://127.0.0.1:8000";
 export type CurrentUser = {
   role?: string;
   email_verified?: boolean;
+  // True until an SME or investor accepts the current Terms & Services and
+  // data consent (backend docs/specs/consent/). Absent from a backend that
+  // predates it, which the consent gate reads as "nothing to accept".
+  consent_required?: boolean;
 };
 
 // Upper bounds on each proxy → FastAPI hop. Every page under /dashboard,

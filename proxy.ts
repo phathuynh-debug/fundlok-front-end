@@ -32,6 +32,7 @@ const PROTECTED_ROUTES = [
   "/admin",
   "/select-role",
   "/kyc",
+  "/consent",
 ];
 
 // Routes that should redirect based on whether the user already has projects.
@@ -43,6 +44,9 @@ const DASHBOARD_ROUTE = "/dashboard";
 const ADMIN_ROUTE = "/admin";
 // Where users without a role pick one (SME / Investor) before continuing.
 const SELECT_ROLE_ROUTE = "/select-role";
+// Where every SME and investor accepts the Terms & Services and data consent
+// (Contract 1) before anything else, role selection included.
+const CONSENT_ROUTE = "/consent";
 // On-demand identity/business verification screen. No longer a blanket entry
 // gate — reached only when a user hits a verification-gated action route.
 const KYC_ROUTE = "/kyc";
@@ -122,6 +126,7 @@ function isHandledRoute(pathname: string) {
     pathname === "/login" ||
     pathname === "/verify-email" ||
     pathname === SELECT_ROLE_ROUTE ||
+    pathname === CONSENT_ROUTE ||
     pathname === SUSPENDED_ROUTE ||
     pathname.startsWith(KYC_ROUTE) ||
     pathname.startsWith("/dashboard") ||
@@ -565,9 +570,30 @@ async function routeRequest(request: NextRequest, refreshed: string[]) {
     return NextResponse.redirect(new URL("/verify-email", request.url));
   }
 
-  // Send authenticated users without a role to the select-role screen — but
-  // only once their email is verified, so this never fights the verify-email
-  // gate above (an unverified roleless user stays on /verify-email).
+  const needsConsent =
+    isAuthenticated &&
+    !!currentUser &&
+    !canAccessAdmin &&
+    currentUser.email_verified !== false &&
+    currentUser.consent_required === true;
+  if (needsConsent) {
+    if (pathname !== CONSENT_ROUTE) {
+      const consentUrl = new URL(CONSENT_ROUTE, request.url);
+      if (!AUTH_ROUTES.includes(pathname)) {
+        consentUrl.searchParams.set("next", pathname + request.nextUrl.search);
+      }
+      return NextResponse.redirect(consentUrl);
+    }
+    // On /consent with nothing else allowed first: the gates below (a new
+    // account has no role yet) would otherwise send them straight back out.
+    return pass();
+  }
+  // Nothing to accept: don't strand anyone on /consent.
+  if (isAuthenticated && currentUser && !needsConsent && pathname === CONSENT_ROUTE) {
+    const next = safeNextPath(request.nextUrl.searchParams.get("next"));
+    return NextResponse.redirect(new URL(next ?? authRedirectTarget, request.url));
+  }
+
   if (
     isAuthenticated &&
     currentUser &&

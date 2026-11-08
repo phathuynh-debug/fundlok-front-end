@@ -1116,7 +1116,7 @@
       "submitting": "Creating account...",
       "successDescription": "Your account is ready. Please sign in to continue.",
       "successTitle": "Account created",
-      "termsNotice": "By creating an account, you agree to FundLok's {termsLink}.",
+      "termsNotice": "After you create your account, you'll read and accept FundLok's {termsLink} before you start.",
       "validationErrorTitle": "Check the highlighted fields"
     },
     "resetPassword": {
@@ -1190,6 +1190,32 @@
       "verifyFailedGeneric": "We couldn't verify your email right now. Please try again.",
       "verifyingDescription": "Please wait while we confirm your verification link.",
       "verifyingTitle": "Verifying email..."
+    },
+    "consent": {
+      "accept": "Accept and continue",
+      "accepted": "Thank you. Your acceptance is recorded.",
+      "accepting": "Accepting…",
+      "article3SeeAbove": "Article 3 is shown in full above.",
+      "codeLabel": "Confirmation code",
+      "codeSent": "We sent a 6-digit code to {email}. It expires in 10 minutes.",
+      "confirmHelp": "Tick each box. All three are needed to use FundLok.",
+      "confirmTitle": "Your confirmation",
+      "disclosuresTitle": "Read before you accept: key disclosures (Article 3)",
+      "errorTitle": "Could not continue",
+      "errors": {
+        "CONSENT_CODE_EXPIRED": "That code has expired or was already used. Send a new code.",
+        "CONSENT_CODE_INVALID": "That code is not right. Check the email and try again.",
+        "CONSENT_CODE_RATE_LIMITED": "Too many codes requested. Wait a moment, then try again.",
+        "CONSENT_VERSION_CHANGED": "The terms were just updated. Reload the page to read the current version."
+      },
+      "fullTermsTitle": "Full Terms & Services",
+      "resend": "Send a new code",
+      "resendIn": "New code in {seconds}s",
+      "sendCode": "Send code to my email",
+      "sending": "Sending…",
+      "signOut": "Sign out",
+      "subtitle": "Before you use FundLok, read these terms and accept them: tick the three boxes, then enter the code we email you.",
+      "title": "Terms & Services and data consent"
     }
   },
   "common": {

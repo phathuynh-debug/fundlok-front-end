@@ -40,6 +40,15 @@ export const AUTH_ENDPOINTS = {
   passkeyLoginVerify: "/auth/passkeys/login/verify",
 } as const;
 
+// Accepting the Terms & Services and data consent at sign-up (Contract 1):
+// three tick boxes and an emailed one-time code.
+export const CONSENT_ENDPOINTS = {
+  status: "/consent/status",
+  // Emails a 6-digit code to the account's own address.
+  code: "/consent/code",
+  accept: "/consent/accept",
+} as const;
+
 export const USER_ENDPOINTS = {
   me: "/users/me",
   // Sets the role for a user who registered/logged in without one.
