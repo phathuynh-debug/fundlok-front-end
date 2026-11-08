@@ -588,7 +588,13 @@ export function ComposeEmailCard() {
               const text = e.clipboardData?.getData("text/plain") || "";
               document.execCommand("insertText", false, text);
             }}
-            className="min-h-[128px] w-full rounded-b-md border border-t-0 bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 empty:before:content-[attr(data-placeholder)] empty:before:text-muted-foreground"
+            className={cn(
+              "min-h-[128px] w-full rounded-b-md border border-t-0 bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 empty:before:content-[attr(data-placeholder)] empty:before:text-muted-foreground",
+              // Tailwind's preflight strips list markers and indent, so the
+              // list buttons' output looked like plain lines. Put them back,
+              // close to how the email renders lists.
+              "[&_ul]:list-disc [&_ol]:list-decimal [&_ol]:pl-6 [&_ul]:pl-6 [&_li]:my-0.5 [&_a]:text-primary [&_a]:underline",
+            )}
           />
           {errors.body && (
             <p className="text-xs text-destructive">{errors.body}</p>
