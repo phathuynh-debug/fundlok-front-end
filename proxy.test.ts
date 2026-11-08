@@ -300,7 +300,9 @@ describe("the consent gate", () => {
     });
     const location = new URL(response.headers.get("location") ?? "");
     expect(location.pathname).toBe("/consent");
-    expect(location.searchParams.get("next")).toBe("/dashboard/portfolio?tab=active");
+    expect(location.searchParams.get("next")).toBe(
+      "/dashboard/portfolio?tab=active",
+    );
   });
 
   it("comes before choosing a role", async () => {
@@ -309,11 +311,16 @@ describe("the consent gate", () => {
       role: null,
       consent_required: true,
     });
-    expect(new URL(response.headers.get("location") ?? "").pathname).toBe("/consent");
+    expect(new URL(response.headers.get("location") ?? "").pathname).toBe(
+      "/consent",
+    );
   });
 
   it("lets the user stay on /consent while they still have to accept", async () => {
-    const response = await signedIn("/consent", { ...investor, consent_required: true });
+    const response = await signedIn("/consent", {
+      ...investor,
+      consent_required: true,
+    });
     expect(response.headers.get("location")).toBeNull();
   });
 
@@ -331,7 +338,9 @@ describe("the consent gate", () => {
       ...investor,
       consent_required: false,
     });
-    expect(new URL(response.headers.get("location") ?? "").pathname).toBe("/dashboard/portfolio");
+    expect(new URL(response.headers.get("location") ?? "").pathname).toBe(
+      "/dashboard/portfolio",
+    );
   });
 
   it("never asks an admin", async () => {

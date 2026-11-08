@@ -42,8 +42,8 @@ export const TERMS_ARTICLES: TermsArticle[] = [
     title: { vi: "Điều 1. Về FundLok", en: "Article 1. About FundLok" },
     paragraphs: [
       {
-        vi: "Nền tảng FundLok do Công ty Cổ phần FundLok (mã số doanh nghiệp 1501167629; trụ sở chính: Thửa đất số 31, Tờ bản đồ số 121, khóm Thuận Tiến B, phường Bình Minh, tỉnh Vĩnh Long, Việt Nam) (\"FundLok\") vận hành. FundLok là nền tảng công nghệ kết nối doanh nghiệp nhỏ và vừa cần vốn lưu động (\"Doanh nghiệp\") với nhà đầu tư cá nhân và tổ chức (\"Nhà đầu tư\").",
-        en: "The FundLok platform is operated by FundLok Joint-Stock Company (enterprise code 1501167629; head office: Land Parcel No. 31, Cadastral Map Sheet No. 121, Thuan Tien B Quarter, Binh Minh Ward, Vinh Long Province, Vietnam) (\"FundLok\"). FundLok is a technology platform that connects small and medium enterprises needing working capital (\"SMEs\") with individual and institutional investors (\"Investors\").",
+        vi: 'Nền tảng FundLok do Công ty Cổ phần FundLok (mã số doanh nghiệp 1501167629; trụ sở chính: Thửa đất số 31, Tờ bản đồ số 121, khóm Thuận Tiến B, phường Bình Minh, tỉnh Vĩnh Long, Việt Nam) ("FundLok") vận hành. FundLok là nền tảng công nghệ kết nối doanh nghiệp nhỏ và vừa cần vốn lưu động ("Doanh nghiệp") với nhà đầu tư cá nhân và tổ chức ("Nhà đầu tư").',
+        en: 'The FundLok platform is operated by FundLok Joint-Stock Company (enterprise code 1501167629; head office: Land Parcel No. 31, Cadastral Map Sheet No. 121, Thuan Tien B Quarter, Binh Minh Ward, Vinh Long Province, Vietnam) ("FundLok"). FundLok is a technology platform that connects small and medium enterprises needing working capital ("SMEs") with individual and institutional investors ("Investors").',
       },
       {
         vi: "FundLok không phải là tổ chức tín dụng. FundLok không cho vay, không đi vay, không nhận tiền gửi, không giữ tiền của khách hàng và không bảo lãnh cho bất kỳ khoản vay nào.",
@@ -53,7 +53,10 @@ export const TERMS_ARTICLES: TermsArticle[] = [
   },
   {
     id: "2",
-    title: { vi: "Điều 2. Phạm vi và chấp nhận", en: "Article 2. Scope and acceptance" },
+    title: {
+      vi: "Điều 2. Phạm vi và chấp nhận",
+      en: "Article 2. Scope and acceptance",
+    },
     paragraphs: [
       {
         vi: "2.1. Điều khoản này áp dụng cho mọi người dùng nền tảng. Dịch vụ cụ thể được điều chỉnh thêm bởi Hợp đồng dịch vụ dành cho Doanh nghiệp hoặc Hợp đồng dịch vụ dành cho Nhà đầu tư.",
@@ -97,8 +100,8 @@ export const TERMS_ARTICLES: TermsArticle[] = [
         en: "3.4. How a listing works. (a) Investors commit and sign during a commitment window of up to 12 days; no money moves yet. The disbursement day is 14 days after the listing date. (b) The SME may cancel its offer until the acceptance deadline, 1 day before the disbursement date. If the SME does not respond: commitments of 50% of the target or more count as accepted; below 50% count as cancelled. (c) If the SME accepts, every Investor transfers on the same disbursement day, before 3 pm, using the VietQR the platform provides. (d) If an Investor does not transfer, the loan goes ahead and the shortfall reopens at once for new Investors, who transfer as soon as they commit.",
       },
       {
-        vi: "3.5. Bằng chứng giao dịch. FundLok không có kết nối với ngân hàng. Khi giải ngân, Nhà đầu tư tải ảnh chụp lệnh chuyển và Doanh nghiệp tải ảnh chụp tiền đến; hai ảnh khớp nhau thì khoản giải ngân được xác nhận; nếu Doanh nghiệp không tải ảnh trong 24 giờ, khoản giải ngân được coi là đã nhận. Khi trả nợ, Doanh nghiệp tải ảnh chụp lệnh chuyển; Nhà đầu tư bấm \"Đã nhận\" hoặc \"Chưa nhận\"; sau 24 giờ không phản hồi, khoản trả nợ được coi là đã nhận.",
-        en: "3.5. Evidence. FundLok has no connection to any bank. On disbursement, the Investor uploads a screenshot of the transfer and the SME uploads a screenshot of the money arriving; when both match, the disbursement is confirmed; if the SME does not upload within 24 hours, the disbursement counts as received. On repayment, the SME uploads a screenshot of the transfer; the Investor presses \"Received\" or \"Not received\"; with no response within 24 hours, the repayment counts as received.",
+        vi: '3.5. Bằng chứng giao dịch. FundLok không có kết nối với ngân hàng. Khi giải ngân, Nhà đầu tư tải ảnh chụp lệnh chuyển và Doanh nghiệp tải ảnh chụp tiền đến; hai ảnh khớp nhau thì khoản giải ngân được xác nhận; nếu Doanh nghiệp không tải ảnh trong 24 giờ, khoản giải ngân được coi là đã nhận. Khi trả nợ, Doanh nghiệp tải ảnh chụp lệnh chuyển; Nhà đầu tư bấm "Đã nhận" hoặc "Chưa nhận"; sau 24 giờ không phản hồi, khoản trả nợ được coi là đã nhận.',
+        en: '3.5. Evidence. FundLok has no connection to any bank. On disbursement, the Investor uploads a screenshot of the transfer and the SME uploads a screenshot of the money arriving; when both match, the disbursement is confirmed; if the SME does not upload within 24 hours, the disbursement counts as received. On repayment, the SME uploads a screenshot of the transfer; the Investor presses "Received" or "Not received"; with no response within 24 hours, the repayment counts as received.',
       },
       {
         vi: "3.6. Phí. Doanh nghiệp trả phí kích hoạt 3% trên số tiền giải ngân được xác nhận. Nhà đầu tư trả phí dịch vụ 2,5%/năm, xuất hóa đơn hằng tháng. Phí không bao giờ bị khấu trừ vào tiền gốc hoặc tiền trả nợ.",
@@ -171,7 +174,10 @@ export const TERMS_ARTICLES: TermsArticle[] = [
   },
   {
     id: "7",
-    title: { vi: "Điều 7. Sửa đổi Điều khoản", en: "Article 7. Changes to these Terms" },
+    title: {
+      vi: "Điều 7. Sửa đổi Điều khoản",
+      en: "Article 7. Changes to these Terms",
+    },
     paragraphs: [
       {
         vi: "FundLok thông báo trước ít nhất [30] ngày khi sửa đổi Điều khoản này. Sửa đổi không làm thay đổi hợp đồng cho vay hay hợp đồng dịch vụ đã ký.",
@@ -181,7 +187,10 @@ export const TERMS_ARTICLES: TermsArticle[] = [
   },
   {
     id: "8",
-    title: { vi: "Điều 8. Tạm ngừng và chấm dứt", en: "Article 8. Suspension and termination" },
+    title: {
+      vi: "Điều 8. Tạm ngừng và chấm dứt",
+      en: "Article 8. Suspension and termination",
+    },
     paragraphs: [
       {
         vi: "Người dùng có thể đóng tài khoản khi không còn khoản vay, cam kết hoặc phí chưa thanh toán. FundLok có thể chấm dứt tài khoản khi người dùng vi phạm nghiêm trọng, sau khi thông báo. Nghĩa vụ phát sinh trước khi chấm dứt vẫn tiếp tục.",

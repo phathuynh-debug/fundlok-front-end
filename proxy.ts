@@ -589,9 +589,16 @@ async function routeRequest(request: NextRequest, refreshed: string[]) {
     return pass();
   }
   // Nothing to accept: don't strand anyone on /consent.
-  if (isAuthenticated && currentUser && !needsConsent && pathname === CONSENT_ROUTE) {
+  if (
+    isAuthenticated &&
+    currentUser &&
+    !needsConsent &&
+    pathname === CONSENT_ROUTE
+  ) {
     const next = safeNextPath(request.nextUrl.searchParams.get("next"));
-    return NextResponse.redirect(new URL(next ?? authRedirectTarget, request.url));
+    return NextResponse.redirect(
+      new URL(next ?? authRedirectTarget, request.url),
+    );
   }
 
   if (

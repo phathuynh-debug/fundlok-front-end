@@ -34,8 +34,7 @@ export function ServiceAgreementStep() {
     useLoanApplicationContext();
   const agreement = useServiceAgreement(loanApplicationId);
   const url = useObjectUrl(agreement.data?.blob ?? null);
-  const filename =
-    agreement.data?.filename ?? "FundLok-hop-dong-dich-vu.pdf";
+  const filename = agreement.data?.filename ?? "FundLok-hop-dong-dich-vu.pdf";
 
   return (
     <div className="space-y-5 p-2 md:p-4">
@@ -81,10 +80,7 @@ export function ServiceAgreementStep() {
           <div className="flex h-[420px] items-center justify-center sm:h-[560px]">
             {agreement.isError ? (
               <div className="flex flex-col items-center gap-3 px-6 text-center">
-                <AlertCircle
-                  className="h-6 w-6 text-destructive"
-                  aria-hidden
-                />
+                <AlertCircle className="h-6 w-6 text-destructive" aria-hidden />
                 <p className="text-sm text-foreground">
                   {t("dashboard.sme.agreement.loadFailed")}
                 </p>

@@ -13,7 +13,10 @@ import type {
 // acceptance record as stored: version, the three boxes, how it was
 // confirmed, IP and device. Read-only; records are never edited.
 
-type TranslateFn = (key: string, vars?: Record<string, string | number>) => string;
+type TranslateFn = (
+  key: string,
+  vars?: Record<string, string | number>,
+) => string;
 
 // The three boxes, in the order the sign-up screen shows them.
 const BOXES = [
@@ -166,7 +169,9 @@ function ConsentRecord({
                   aria-label={t("admin.consent.notTicked")}
                 />
               )}
-              <span className={ticked ? "text-foreground" : "text-muted-foreground"}>
+              <span
+                className={ticked ? "text-foreground" : "text-muted-foreground"}
+              >
                 {t(box.label)}
               </span>
             </li>
@@ -175,16 +180,24 @@ function ConsentRecord({
       </ul>
 
       <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
-        <dt className="text-muted-foreground">{t("admin.consent.verifiedBy")}</dt>
+        <dt className="text-muted-foreground">
+          {t("admin.consent.verifiedBy")}
+        </dt>
         <dd className="text-foreground">
           {record.verified_by === "EMAIL_OTP"
             ? t("admin.consent.emailOtp")
             : record.verified_by}
         </dd>
-        <dt className="text-muted-foreground">{t("admin.consent.ipAddress")}</dt>
-        <dd className="font-mono text-foreground">{record.ip_address ?? "—"}</dd>
+        <dt className="text-muted-foreground">
+          {t("admin.consent.ipAddress")}
+        </dt>
+        <dd className="font-mono text-foreground">
+          {record.ip_address ?? "—"}
+        </dd>
         <dt className="text-muted-foreground">{t("admin.consent.device")}</dt>
-        <dd className="break-all text-foreground">{record.user_agent ?? "—"}</dd>
+        <dd className="break-all text-foreground">
+          {record.user_agent ?? "—"}
+        </dd>
       </dl>
     </div>
   );

@@ -255,7 +255,10 @@ export function ConsentClient() {
                   checked={ticked[box]}
                   disabled={accepting}
                   onCheckedChange={(value) =>
-                    setTicked((current) => ({ ...current, [box]: value === true }))
+                    setTicked((current) => ({
+                      ...current,
+                      [box]: value === true,
+                    }))
                   }
                 />
                 <Label
@@ -286,7 +289,9 @@ export function ConsentClient() {
                 ) : (
                   <Mail className="h-4 w-4" aria-hidden />
                 )}
-                {sending ? t("auth.consent.sending") : t("auth.consent.sendCode")}
+                {sending
+                  ? t("auth.consent.sending")
+                  : t("auth.consent.sendCode")}
               </Button>
             ) : (
               <>
