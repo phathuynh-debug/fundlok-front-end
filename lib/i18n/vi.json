@@ -86,6 +86,22 @@
         "headingLabel": "Tiêu đề lớn (không bắt buộc)",
         "notReady": "Hãy kết nối tài khoản Google ở bước 1 và bật gửi email để có thể gửi.",
         "notReadyPaused": "Đang tạm dừng gửi. Hãy bật \"Bật gửi email\" ở bước 1 rồi bấm Lưu để có thể gửi.",
+        "presets": {
+          "hint": "Điền sẵn chủ đề, tiêu đề lớn, nội dung và nút. Bạn vẫn có thể chỉnh sửa trước khi gửi.",
+          "investor_onboarding": "Chào mừng nhà đầu tư",
+          "investor_onboardingHint": "Email chào mừng: xác minh danh tính (KYC) và khám phá cơ hội đầu tư.",
+          "label": "Nội dung soạn sẵn",
+          "language": "Ngôn ngữ email",
+          "languages": {
+            "en": "English",
+            "vi": "Tiếng Việt"
+          },
+          "replace": "Thay thế",
+          "replaceBody": "Chủ đề, tiêu đề lớn, nội dung và nút sẽ được thay bằng nội dung soạn sẵn. Danh sách người nhận được giữ nguyên.",
+          "replaceTitle": "Thay thế nội dung đã viết?",
+          "sme_onboarding": "Chào mừng doanh nghiệp (SME)",
+          "sme_onboardingHint": "Email chào mừng: xác minh doanh nghiệp (KYB) và đăng dự án gọi vốn."
+        },
         "preview": "Xem trước",
         "previewDescription": "Đúng như người nhận sẽ thấy. Chưa có gì được gửi.",
         "previewTitle": "Xem trước",
