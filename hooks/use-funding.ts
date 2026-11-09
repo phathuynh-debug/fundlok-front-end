@@ -4,11 +4,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   fundingService,
   type FundingWindow,
+  type InvestmentConfirmation,
+  type InvestorAgreementStatus,
   type PaymentInstructions,
   type ReceiptResult,
   type ReserveRequest,
   type SmeRepaymentPlan,
   type SmeRound,
+  type SignedInvestmentConfirmation,
   type SmeTicket,
   type Tranche,
 } from "@/services/funding.service";
@@ -21,9 +24,25 @@ export const fundingKeys = {
   myTranches: () => [...fundingKeys.all, "my-tranches"] as const,
   payment: (trancheId: string) =>
     [...fundingKeys.all, "payment", trancheId] as const,
+  trancheConfirmation: (trancheId: string) =>
+    [...fundingKeys.all, "confirmation", trancheId] as const,
+  trancheConfirmationPdf: (trancheId: string) =>
+    [...fundingKeys.all, "confirmation", trancheId, "pdf"] as const,
   myRounds: () => [...fundingKeys.all, "my-rounds"] as const,
   repaymentPlan: (windowId: string) =>
     [...fundingKeys.all, "repayment-plan", windowId] as const,
+  investorAgreement: () => [...fundingKeys.all, "investor-agreement"] as const,
+  investorAgreementPdf: (trancheId: string) =>
+    [...fundingKeys.all, "investor-agreement", "pdf", trancheId] as const,
+  signedInvestorAgreement: (signedAt: string) =>
+    [...fundingKeys.all, "investor-agreement", "signed", signedAt] as const,
+  investmentConfirmation: (windowId: string, amountVnd: number) =>
+    [
+      ...fundingKeys.all,
+      "investment-confirmation",
+      windowId,
+      amountVnd,
+    ] as const,
 };
 
 // The project's funding window, by its listing. Null id: nothing to fetch (the
@@ -44,6 +63,114 @@ export function useMyTranches(enabled = true) {
     queryFn: () => fundingService.listMyTranches(),
     enabled,
     staleTime: 30 * 1000,
+    retry: false,
+  });
+}
+
+// Whether the investor must still sign and upload the Investor Service
+// Agreement before committing, and Party B as signed or as the PDF fills it.
+export function useInvestorAgreement(enabled = true) {
+  return useQuery<InvestorAgreementStatus, ApiError>({
+    queryKey: fundingKeys.investorAgreement(),
+    queryFn: () => fundingService.getInvestorAgreement(),
+    enabled,
+    staleTime: 60 * 1000,
+    retry: false,
+  });
+}
+
+// The agreement as a PDF filled in with the investor's details and the Annex
+// of the commitment it is signed with, to preview, download and sign.
+// Generated on each request, so never cached.
+export function useInvestorAgreementPdf(trancheId: string, enabled = true) {
+  return useQuery<{ blob: Blob; filename: string | null }, ApiError>({
+    queryKey: fundingKeys.investorAgreementPdf(trancheId),
+    queryFn: () => fundingService.getInvestorAgreementPdf(trancheId),
+    enabled: enabled && Boolean(trancheId),
+    staleTime: 0,
+    gcTime: 0,
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+}
+
+// The signed copy the investor uploaded, by when it was uploaded (a
+// replacement is a different file).
+export function useSignedInvestorAgreement(
+  signedAt: string | null,
+  enabled = true,
+) {
+  return useQuery<{ blob: Blob; filename: string | null }, ApiError>({
+    queryKey: fundingKeys.signedInvestorAgreement(signedAt ?? ""),
+    queryFn: () => fundingService.getSignedInvestorAgreement(),
+    enabled: enabled && Boolean(signedAt),
+    staleTime: Infinity,
+    retry: false,
+  });
+}
+
+// Uploading the digitally signed agreement, signed with a commitment: the
+// answer is the new status, and that commitment's payment details and Annex
+// are now there to read.
+export function useUploadInvestorAgreement() {
+  const queryClient = useQueryClient();
+  return useMutation<
+    InvestorAgreementStatus,
+    ApiError,
+    { file: File; version: string; trancheId: string }
+  >({
+    mutationFn: ({ file, version, trancheId }) =>
+      fundingService.uploadSignedInvestorAgreement(file, version, trancheId),
+    onSuccess: (status, { trancheId }) => {
+      queryClient.setQueryData(fundingKeys.investorAgreement(), status);
+      void queryClient.invalidateQueries({
+        queryKey: fundingKeys.payment(trancheId),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: fundingKeys.trancheConfirmation(trancheId),
+      });
+    },
+  });
+}
+
+// The Investment Confirmation (the agreement's Annex) for this amount on this
+// window, filled in as the backend will sign it.
+export function useInvestmentConfirmation(
+  windowId: string | null,
+  amountVnd: number,
+) {
+  return useQuery<InvestmentConfirmation, ApiError>({
+    queryKey: fundingKeys.investmentConfirmation(windowId ?? "", amountVnd),
+    queryFn: () =>
+      fundingService.getInvestmentConfirmation(windowId as string, amountVnd),
+    enabled: Boolean(windowId) && amountVnd > 0,
+    staleTime: 60 * 1000,
+    retry: false,
+  });
+}
+
+// The Investment Confirmation kept for a ticket. It never changes once made.
+export function useTrancheConfirmation(trancheId: string | null) {
+  return useQuery<SignedInvestmentConfirmation, ApiError>({
+    queryKey: fundingKeys.trancheConfirmation(trancheId ?? ""),
+    queryFn: () => fundingService.getTrancheConfirmation(trancheId as string),
+    enabled: Boolean(trancheId),
+    staleTime: Infinity,
+    retry: false,
+  });
+}
+
+// Its filled-in PDF, to view and download.
+export function useTrancheConfirmationPdf(
+  trancheId: string | null,
+  enabled = true,
+) {
+  return useQuery<{ blob: Blob; filename: string | null }, ApiError>({
+    queryKey: fundingKeys.trancheConfirmationPdf(trancheId ?? ""),
+    queryFn: () =>
+      fundingService.getTrancheConfirmationPdf(trancheId as string),
+    enabled: enabled && Boolean(trancheId),
+    staleTime: Infinity,
     retry: false,
   });
 }
@@ -76,6 +203,11 @@ export function useReserveTicket() {
       // The window's reserved and capacity figures moved.
       queryClient.invalidateQueries({
         queryKey: [...fundingKeys.all, "window"],
+      });
+      // A first commitment is now waiting for the agreement to be signed.
+      void queryClient.invalidateQueries({
+        queryKey: fundingKeys.investorAgreement(),
+        exact: true,
       });
     },
   });

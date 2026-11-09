@@ -18,12 +18,18 @@ import { useHasBankAccount } from "@/hooks/use-payment-accounts";
 import { usePublicProjects } from "@/hooks/use-projects";
 import {
   useFundingWindow,
+  useInvestmentConfirmation,
+  useInvestorAgreement,
   useMyTranches,
   useReserveTicket,
 } from "@/hooks/use-funding";
 import { useToast } from "@/hooks/use-toast";
 import { BankAccountPrompt } from "../_components/BankAccountPrompt";
+import { InvestmentConfirmationTable } from "./_components/InvestmentConfirmationTable";
+import { InvestorAgreementStep } from "./_components/InvestorAgreementStep";
 import { InvestTerms } from "./_components/InvestTerms";
+import { SignedAgreementNotice } from "./_components/SignedAgreementNotice";
+import { SignedConfirmationCard } from "./_components/SignedConfirmationCard";
 import { ReceiptUpload } from "./_components/ReceiptUpload";
 import { TransferDetails } from "./_components/TransferDetails";
 import { useTranslations } from "@/lib/i18n";
@@ -51,14 +57,31 @@ const KNOWN_ERRORS = new Set([
   "BANK_ACCOUNT_REQUIRED",
   "ACCOUNT_NOT_APPROVED",
   "INVESTOR_FEE_UNPAID",
+  "INVESTOR_AGREEMENT_REQUIRED",
 ]);
 
-const STEPS = ["amount", "terms", "transfer"] as const;
+type Step = "amount" | "agreement" | "terms" | "transfer";
+const STEPS: readonly Step[] = ["amount", "terms", "transfer"];
+// The investor's first commitment: agreeing makes the commitment (code, held
+// amount, no money moved), then the Investor Service Agreement, filled in with
+// that commitment's Annex, is signed and uploaded before the transfer.
+const FIRST_STEPS: readonly Step[] = [
+  "amount",
+  "terms",
+  "agreement",
+  "transfer",
+];
 
 // Investing in one project, after the amount was chosen on its page
 // (/dashboard/invest?projectId=…&amount=…): read and agree to the investing
 // terms, which reserves the amount, then transfer it straight to the
-// business's bank account. Opened with just ?projectId=…, it shows the
+// business's bank account. At the first commitment, agreeing makes the
+// commitment (its code, the amount held, no money moved); the investor then
+// signs the Investor Service Agreement (Contract 4) like an SME signs its own:
+// download the PDF filled in with their details and this commitment's Annex,
+// sign it digitally, upload it. Only then does the backend give the payment
+// details. Later commitments show a reminder of the agreement signed and keep
+// their own Annex, shown above the transfer details. Opened with just ?projectId=…, it shows the
 // transfer details of the investor's ticket on that project. When that
 // ticket's hold lapses, "Reserve again" brings the terms back for the same
 // amount, and agreeing makes a new ticket (the backend expires the old one).
@@ -85,6 +108,7 @@ export default function InvestClient() {
   const windowQuery = useFundingWindow(listingId);
   const fundingWindow = windowQuery.data ?? null;
   const tranches = useMyTranches(Boolean(fundingWindow));
+  const agreement = useInvestorAgreement(Boolean(fundingWindow));
   const reserve = useReserveTicket();
   // One key per reservation: a double click or a retry replays the same
   // reservation instead of making a second one. Reserving again takes a new key.
@@ -95,6 +119,9 @@ export default function InvestClient() {
   // The lapsed ticket the investor chose to reserve again in place of. The
   // backend may still list it as SIGNED until it expires it.
   const [replacedId, setReplacedId] = useState<string | null>(null);
+  // The investor uploaded their signed agreement on this visit: the agreement
+  // step stays in the step list, as the step they went through.
+  const [signedHere, setSignedHere] = useState(false);
 
   // Newest first, as the backend lists them.
   const onWindow =
@@ -113,6 +140,20 @@ export default function InvestClient() {
   const lapsed =
     !ticket && onWindow[0]?.status === "EXPIRED" ? onWindow[0] : undefined;
 
+  const bounds = fundingWindow ? ticketBounds(fundingWindow) : null;
+  const amountInBounds =
+    bounds !== null && amount >= bounds.min && amount <= bounds.max;
+  const open = fundingWindow?.status === "OPEN";
+  // True until the investor has signed the current agreement version.
+  const needsAgreement = agreement.data?.required === true;
+  // What this commitment signs, for the amount chosen on the project page.
+  const confirmation = useInvestmentConfirmation(
+    fundingWindow && open && amountInBounds && !ticket
+      ? fundingWindow.id
+      : null,
+    amount,
+  );
+
   const reserveAgain = (from: Tranche) => {
     reserve.reset();
     setError(null);
@@ -130,7 +171,7 @@ export default function InvestClient() {
     isAuthLoading ||
     projects.isLoading ||
     (Boolean(listingId) && windowQuery.isLoading) ||
-    (Boolean(fundingWindow) && tranches.isLoading);
+    (Boolean(fundingWindow) && (tranches.isLoading || agreement.isLoading));
 
   const handleAgree = () => {
     if (!fundingWindow) return;
@@ -161,6 +202,9 @@ export default function InvestClient() {
           if (code === "ALREADY_HAS_LIVE_TRANCHE") void tranches.refetch();
           // This key's reservation lapsed: agreeing again makes a new one.
           if (code === "HOLD_EXPIRED") setIdempotencyKey(crypto.randomUUID());
+          // The backend wants a signed agreement (a new version came out):
+          // the status brings the agreement step back.
+          if (code === "INVESTOR_AGREEMENT_REQUIRED") void agreement.refetch();
         },
       },
     );
@@ -177,18 +221,55 @@ export default function InvestClient() {
   const backHref = project
     ? `/dashboard/projects/${project.id}`
     : "/dashboard/projects";
-  const bounds = fundingWindow ? ticketBounds(fundingWindow) : null;
-  const amountInBounds =
-    bounds !== null && amount >= bounds.min && amount <= bounds.max;
-  const open = fundingWindow?.status === "OPEN";
-  const step = ticket ? "transfer" : "terms";
+  // A held ticket of an investor who has not signed yet: sign before paying.
+  const signsAgreement =
+    needsAgreement &&
+    !!ticket &&
+    (ticket.status === "RESERVED" || ticket.status === "SIGNED") &&
+    !ticket.receipt_submitted_at;
+  const step: Step = !ticket
+    ? "terms"
+    : signsAgreement
+      ? "agreement"
+      : "transfer";
+  const steps = needsAgreement || signedHere ? FIRST_STEPS : STEPS;
+  const errorLine = error && (
+    <p role="alert" className="text-sm font-medium text-destructive">
+      {error}
+    </p>
+  );
   const shownAmount = ticket?.amount_vnd ?? (amount || lapsed?.amount_vnd || 0);
 
   let body: React.ReactNode;
-  if (ticket) {
+  if (ticket && signsAgreement && agreement.data) {
+    body = (
+      <InvestorAgreementStep
+        key={ticket.id}
+        version={agreement.data.version}
+        trancheId={ticket.id}
+        referenceCode={ticket.reference_code}
+        holdExpiresAt={ticket.hold_expires_at}
+        onSigned={() => {
+          setSignedHere(true);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+        locale={locale}
+        t={t}
+      />
+    );
+  } else if (ticket) {
     const awaitingTransfer =
       ticket.status === "RESERVED" || ticket.status === "SIGNED";
-    body =
+    // The Annex confirmed with this ticket, above everything about paying.
+    const confirmationCard = (
+      <SignedConfirmationCard
+        key={`confirmation-${ticket.id}`}
+        trancheId={ticket.id}
+        locale={locale}
+        t={t}
+      />
+    );
+    const ticketBody =
       awaitingTransfer && !ticket.receipt_submitted_at ? (
         <>
           <TransferDetails
@@ -228,6 +309,12 @@ export default function InvestClient() {
               : t(`${K}.confirming`)}
         </p>
       );
+    body = (
+      <>
+        {confirmationCard}
+        {ticketBody}
+      </>
+    );
   } else if (!project || !fundingWindow || !open) {
     body = (
       <Notice title={t(`${K}.notOpenTitle`)} body={t(`${K}.notOpenBody`)} />
@@ -272,23 +359,66 @@ export default function InvestClient() {
         })}
       />
     );
+  } else if (!agreement.data) {
+    body = (
+      <Notice
+        title={t(`${K}.agreement.loadFailed`)}
+        body={t(`${K}.errors.generic`)}
+        action={
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="mt-2"
+            onClick={() => void agreement.refetch()}
+          >
+            {t(`${K}.agreement.retry`)}
+          </Button>
+        }
+      />
+    );
   } else {
     body = (
       <>
-        <InvestTerms
-          amount={amount}
-          businessName={project.legal_name}
-          fundingWindow={fundingWindow}
-          isPending={reserve.isPending}
-          onAgree={handleAgree}
+        {agreement.data.signed_at ? (
+          <SignedAgreementNotice
+            signedAt={agreement.data.signed_at}
+            version={agreement.data.signed_version ?? agreement.data.version}
+            fileName={agreement.data.file_name}
+            signatureCheck={agreement.data.signature_check}
+            locale={locale}
+            t={t}
+          />
+        ) : (
+          // First commitment: what comes after agreeing, before any payment.
+          <div
+            className="rounded-xl border border-primary/30 bg-primary/5 p-4 text-sm leading-relaxed text-foreground"
+            data-testid="agreement-sign-next"
+          >
+            {t(`${K}.agreement.signNext`)}
+          </div>
+        )}
+        <InvestmentConfirmationTable
+          confirmation={confirmation.data}
+          isLoading={confirmation.isLoading}
+          onRetry={() => void confirmation.refetch()}
           locale={locale}
           t={t}
         />
-        {error && (
-          <p role="alert" className="text-sm font-medium text-destructive">
-            {error}
-          </p>
+        {/* The Annex is part of what is signed: no agreeing before it shows. */}
+        {confirmation.data && (
+          <InvestTerms
+            amount={amount}
+            businessName={project.legal_name}
+            fundingWindow={fundingWindow}
+            isPending={reserve.isPending}
+            onAgree={handleAgree}
+            agreeLabel={t(`${K}.terms.agreeWithConfirmation`)}
+            locale={locale}
+            t={t}
+          />
         )}
+        {errorLine}
       </>
     );
   }
@@ -326,8 +456,8 @@ export default function InvestClient() {
 
         {/* Where the investor is: the amount was chosen on the project page. */}
         <ol className="flex flex-wrap items-center gap-x-2 gap-y-2 text-xs font-semibold">
-          {STEPS.map((name, i) => {
-            const current = STEPS.indexOf(step);
+          {steps.map((name, i) => {
+            const current = steps.indexOf(step);
             return (
               <li
                 key={name}
@@ -348,7 +478,7 @@ export default function InvestClient() {
                   {i + 1}
                 </span>
                 {t(`${K}.steps.${name}`)}
-                {i < STEPS.length - 1 && (
+                {i < steps.length - 1 && (
                   <span
                     className="hidden h-px w-6 bg-border sm:block"
                     aria-hidden

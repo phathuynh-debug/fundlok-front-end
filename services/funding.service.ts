@@ -155,6 +155,100 @@ export interface ReserveRequest {
   terms_version: string;
 }
 
+/** The signed agreement upload, checked client-side before it is sent. */
+export const AGREEMENT_MAX_BYTES = 10 * 1024 * 1024;
+
+// Mirrors backend PartyBOut: the investor as the agreement names them. A null
+// prints as a dotted blank.
+export interface AgreementPartyB {
+  holder_type: "INDIVIDUAL" | "ENTITY" | null;
+  name: string | null;
+  /** Personal ID number, or enterprise code. */
+  id_number: string | null;
+  address: string | null;
+  bank_account_number: string | null;
+  bank_account_name: string | null;
+  bank_name: string | null;
+}
+
+// Mirrors backend SignatureCheckOut: NEAC's verdict on the signed copy.
+export interface AgreementSignatureCheck {
+  verified_by: string;
+  checked_at: string;
+  /** The certificate's name, e.g. "CÔNG TY CỔ PHẦN FUNDLOK". */
+  signer_name: string | null;
+  /** As on the certificate, e.g. "MST:1501167629" or "CCCD:079…". */
+  signer_id: string | null;
+  /** The CA, e.g. "FPT Certification Authority SHA256". */
+  issuer_name: string | null;
+  signed_time: string | null;
+  name_matches: boolean;
+}
+
+// Mirrors backend InvestorAgreementOut.
+export interface InvestorAgreementStatus {
+  /** The version the platform asks for now, printed on the PDF to sign. */
+  version: string;
+  /**
+   * True until the investor uploads a digitally signed copy of `version`.
+   * Meanwhile a commitment is still made (with its code), but its payment
+   * details wait: the agreement is signed with it first.
+   */
+  required: boolean;
+  /** When the signed copy of the current version was uploaded. */
+  signed_at: string | null;
+  /** Their latest signed version, of any version. */
+  signed_version: string | null;
+  /** The signed copy's file name as uploaded. */
+  file_name: string | null;
+  /** The commitment it was signed with (its Annex is filled in the PDF). */
+  tranche_id: string | null;
+  /** NEAC's verdict on the signed copy, when it was checked on upload. */
+  signature_check: AgreementSignatureCheck | null;
+  /** As signed once signed; else as the PDF fills it in now. */
+  party_b: AgreementPartyB;
+}
+
+// Mirrors backend InvestmentConfirmationOut: the Annex for one commitment.
+export interface InvestmentConfirmation {
+  listing_id: string;
+  /** The listing id's first block, upper-case, as printed. */
+  listing_ref: string;
+  sme_name: string;
+  amount_vnd: number;
+  /** Decimal string, e.g. "16.000". */
+  annual_rate_pct: string;
+  term_months: number;
+  /** P × 2.5% × M / 12, before VAT. */
+  service_fee_vnd: number;
+  service_fee_bps_per_year: number;
+  /** ISO date (YYYY-MM-DD). */
+  expected_disbursement_date: string;
+}
+
+// Mirrors backend SignedInvestmentConfirmationOut: one ticket's Annex, as
+// filled in and confirmed when the investor agreed to it.
+export interface SignedInvestmentConfirmation {
+  id: string;
+  tranche_id: string;
+  /** The ticket's reference code, also its transfer memo. */
+  reference_code: string;
+  listing_id: string;
+  listing_ref: string;
+  sme_name: string;
+  amount_vnd: number;
+  /** Decimal string, e.g. "16.000". */
+  annual_rate_pct: string;
+  term_months: number;
+  /** P × 2.5% × M / 12, before VAT. */
+  service_fee_vnd: number;
+  service_fee_bps_per_year: number;
+  /** ISO date (YYYY-MM-DD). */
+  expected_disbursement_date: string;
+  confirmed_at: string;
+  agreement_version: string;
+}
+
 // Mirrors backend PaymentOut: where to send the money, straight to the business.
 export interface PaymentInstructions {
   bank_name: string;
@@ -180,6 +274,73 @@ export const fundingService = {
     return apiClient.post<Tranche>(FUNDING_ENDPOINTS.reserve(windowId), body, {
       headers: { "Idempotency-Key": idempotencyKey },
     });
+  },
+
+  // GET /funding/me/investor-agreement — whether the next commitment signs the
+  // Investor Service Agreement too, and Party B.
+  getInvestorAgreement() {
+    return apiClient.get<InvestorAgreementStatus>(
+      FUNDING_ENDPOINTS.investorAgreement,
+    );
+  },
+
+  // GET /funding/me/investor-agreement/document — the agreement as a PDF,
+  // filled in with the investor's details and the Annex of the commitment it
+  // is signed with, to sign digitally.
+  getInvestorAgreementPdf(trancheId: string) {
+    return apiClient.getFile(FUNDING_ENDPOINTS.investorAgreementDocument, {
+      params: { tranche_id: trancheId },
+    });
+  },
+
+  // GET /funding/me/investor-agreement/signed — the signed copy they uploaded.
+  getSignedInvestorAgreement() {
+    return apiClient.getFile(FUNDING_ENDPOINTS.investorAgreementSigned);
+  },
+
+  // POST /funding/me/investor-agreement — the digitally signed PDF, the
+  // version printed on the copy they downloaded, and the commitment it was
+  // signed with. Opens that commitment's payment details.
+  uploadSignedInvestorAgreement(
+    file: File,
+    version: string,
+    trancheId: string,
+  ) {
+    const form = new FormData();
+    form.append("file", file);
+    form.append("version", version);
+    form.append("tranche_id", trancheId);
+    return apiClient.post<InvestorAgreementStatus>(
+      FUNDING_ENDPOINTS.investorAgreement,
+      form,
+      // The backend verifies the signature with NEAC (up to 45 s): wait longer
+      // than that, so a slow check is not reported as a failure here.
+      { timeout: 60_000 },
+    );
+  },
+
+  // GET /funding/windows/{id}/investment-confirmation — the Annex for this
+  // amount on this window, as it will be signed.
+  getInvestmentConfirmation(windowId: string, amountVnd: number) {
+    return apiClient.get<InvestmentConfirmation>(
+      FUNDING_ENDPOINTS.investmentConfirmation(windowId),
+      { params: { amount_vnd: amountVnd } },
+    );
+  },
+
+  // GET /funding/tranches/{id}/investment-confirmation — the Annex kept for
+  // the caller's own ticket (404 for tickets from before they were kept).
+  getTrancheConfirmation(trancheId: string) {
+    return apiClient.get<SignedInvestmentConfirmation>(
+      FUNDING_ENDPOINTS.trancheConfirmation(trancheId),
+    );
+  },
+
+  // GET /funding/tranches/{id}/investment-confirmation/document — its PDF.
+  getTrancheConfirmationPdf(trancheId: string) {
+    return apiClient.getFile(
+      FUNDING_ENDPOINTS.trancheConfirmationDocument(trancheId),
+    );
   },
 
   // GET /funding/tranches/{id}/payment — the caller's own ticket only.
