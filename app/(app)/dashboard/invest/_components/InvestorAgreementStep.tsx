@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import {
   AlertCircle,
+  Clock,
   Download,
   FileSignature,
   FileUp,
@@ -18,6 +19,7 @@ import {
 } from "@/hooks/use-funding";
 import { useObjectUrl } from "@/hooks/use-object-url";
 import { useToast } from "@/hooks/use-toast";
+import { formatDateTime } from "@/lib/format-date";
 import {
   AGREEMENT_MAX_BYTES,
   type InvestorAgreementStatus,
@@ -31,7 +33,8 @@ const HOW_TO_SIGN = [`${K}.how1`, `${K}.how2`, `${K}.how3`] as const;
 const KNOWN_ERRORS = new Set([
   "INVESTOR_AGREEMENT_UNSIGNED",
   "INVESTOR_AGREEMENT_OUTDATED",
-  "INVESTOR_AGREEMENT_IN_USE",
+  "INVESTOR_AGREEMENT_ALREADY_SIGNED",
+  "HOLD_EXPIRED",
   "UNSUPPORTED_TYPE",
   "FILE_TOO_LARGE",
 ]);
@@ -39,10 +42,14 @@ const KNOWN_ERRORS = new Set([
 interface InvestorAgreementStepProps {
   /** The version the platform asks for, printed on the PDF to sign. */
   version: string;
-  /** The signed copy was accepted: on to the terms. */
+  /** The commitment it is signed with: its code and Annex fill the PDF. */
+  trancheId: string;
+  referenceCode: string;
+  /** Sign and upload before this, or the commitment's hold lapses. */
+  holdExpiresAt: string;
+  /** The signed copy was accepted: on to the transfer. */
   onSigned: (status: InvestorAgreementStatus) => void;
-  /** Replacing a signed copy: keep the one already uploaded instead. */
-  onCancel?: () => void;
+  locale: string;
   t: (key: string, vars?: Record<string, string | number>) => string;
 }
 
@@ -53,21 +60,26 @@ function sizeLabel(bytes: number): string {
 }
 
 /**
- * The investor's first commitment: the Investor Service Agreement (Contract
- * 4), signed the way an SME signs its service agreement. The backend fills the
- * PDF in from the verified profile and the approved bank account; the investor
- * previews it, downloads the same file, signs it with their digital signature
- * and uploads the signed copy. The backend refuses a PDF with no digital
- * signature in it, and refuses the first commitment until a signed copy is in.
+ * The investor's first commitment, made and holding its amount (no money has
+ * moved): now the Investor Service Agreement (Contract 4), signed the way an
+ * SME signs its service agreement. The backend fills the PDF in from the
+ * verified profile, the approved bank account and this commitment's code and
+ * Annex; the investor previews it, downloads the same file, signs it with
+ * their digital signature and uploads the signed copy. The backend refuses a
+ * PDF with no digital signature in it, and gives no payment details until a
+ * signed copy is in.
  */
 export function InvestorAgreementStep({
   version,
+  trancheId,
+  referenceCode,
+  holdExpiresAt,
   onSigned,
-  onCancel,
+  locale,
   t,
 }: InvestorAgreementStepProps) {
   const { toast } = useToast();
-  const pdf = useInvestorAgreementPdf();
+  const pdf = useInvestorAgreementPdf(trancheId);
   const url = useObjectUrl(pdf.data?.blob ?? null);
   const filename =
     pdf.data?.filename ?? "FundLok-hop-dong-dich-vu-nha-dau-tu.pdf";
@@ -97,7 +109,7 @@ export function InvestorAgreementStep({
     if (!file) return;
     setError(null);
     upload.mutate(
-      { file, version },
+      { file, version, trancheId },
       {
         onSuccess: (status) => {
           toast({ title: t(`${K}.uploaded`) });
@@ -130,6 +142,20 @@ export function InvestorAgreementStep({
           {t(`${K}.title`)}
         </h2>
         <p className="text-sm text-muted-foreground">{t(`${K}.intro`)}</p>
+      </div>
+
+      {/* The commitment exists, no money has moved: sign before the hold ends. */}
+      <div
+        className="flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm"
+        data-testid="investor-agreement-held"
+      >
+        <Clock className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
+        <p className="leading-relaxed text-foreground">
+          {t(`${K}.held`, {
+            ref: referenceCode,
+            deadline: formatDateTime(holdExpiresAt, locale),
+          })}
+        </p>
       </div>
 
       {/* The agreement as the investor will sign it. */}
@@ -278,18 +304,6 @@ export function InvestorAgreementStep({
             </>
           )}
         </Button>
-        {onCancel && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="w-full"
-            disabled={upload.isPending}
-            onClick={onCancel}
-          >
-            {t(`${K}.keepSigned`)}
-          </Button>
-        )}
       </div>
 
       <div className="space-y-1 text-xs leading-relaxed text-muted-foreground">

@@ -32,8 +32,8 @@ export const fundingKeys = {
   repaymentPlan: (windowId: string) =>
     [...fundingKeys.all, "repayment-plan", windowId] as const,
   investorAgreement: () => [...fundingKeys.all, "investor-agreement"] as const,
-  investorAgreementPdf: () =>
-    [...fundingKeys.all, "investor-agreement", "pdf"] as const,
+  investorAgreementPdf: (trancheId: string) =>
+    [...fundingKeys.all, "investor-agreement", "pdf", trancheId] as const,
   signedInvestorAgreement: (signedAt: string) =>
     [...fundingKeys.all, "investor-agreement", "signed", signedAt] as const,
   investmentConfirmation: (windowId: string, amountVnd: number) =>
@@ -79,13 +79,14 @@ export function useInvestorAgreement(enabled = true) {
   });
 }
 
-// The agreement as a PDF filled in with the investor's details, to preview,
-// download and sign. Generated on each request, so never cached.
-export function useInvestorAgreementPdf(enabled = true) {
+// The agreement as a PDF filled in with the investor's details and the Annex
+// of the commitment it is signed with, to preview, download and sign.
+// Generated on each request, so never cached.
+export function useInvestorAgreementPdf(trancheId: string, enabled = true) {
   return useQuery<{ blob: Blob; filename: string | null }, ApiError>({
-    queryKey: fundingKeys.investorAgreementPdf(),
-    queryFn: () => fundingService.getInvestorAgreementPdf(),
-    enabled,
+    queryKey: fundingKeys.investorAgreementPdf(trancheId),
+    queryFn: () => fundingService.getInvestorAgreementPdf(trancheId),
+    enabled: enabled && Boolean(trancheId),
     staleTime: 0,
     gcTime: 0,
     retry: false,
@@ -108,18 +109,26 @@ export function useSignedInvestorAgreement(
   });
 }
 
-// Uploading the digitally signed agreement: the answer is the new status.
+// Uploading the digitally signed agreement, signed with a commitment: the
+// answer is the new status, and that commitment's payment details and Annex
+// are now there to read.
 export function useUploadInvestorAgreement() {
   const queryClient = useQueryClient();
   return useMutation<
     InvestorAgreementStatus,
     ApiError,
-    { file: File; version: string }
+    { file: File; version: string; trancheId: string }
   >({
-    mutationFn: ({ file, version }) =>
-      fundingService.uploadSignedInvestorAgreement(file, version),
-    onSuccess: (status) => {
+    mutationFn: ({ file, version, trancheId }) =>
+      fundingService.uploadSignedInvestorAgreement(file, version, trancheId),
+    onSuccess: (status, { trancheId }) => {
       queryClient.setQueryData(fundingKeys.investorAgreement(), status);
+      void queryClient.invalidateQueries({
+        queryKey: fundingKeys.payment(trancheId),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: fundingKeys.trancheConfirmation(trancheId),
+      });
     },
   });
 }
@@ -195,8 +204,7 @@ export function useReserveTicket() {
       queryClient.invalidateQueries({
         queryKey: [...fundingKeys.all, "window"],
       });
-      // Committing under the signed agreement means it can no longer be
-      // replaced.
+      // A first commitment is now waiting for the agreement to be signed.
       void queryClient.invalidateQueries({
         queryKey: fundingKeys.investorAgreement(),
         exact: true,

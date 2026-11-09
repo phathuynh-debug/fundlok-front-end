@@ -21,8 +21,6 @@ interface SignedAgreementNoticeProps {
   signedAt: string;
   version: string;
   fileName: string | null;
-  /** Set while the signed copy may still be swapped for another file. */
-  onReplace?: () => void;
   locale: string;
   t: (key: string, vars?: Record<string, string | number>) => string;
 }
@@ -30,14 +28,12 @@ interface SignedAgreementNoticeProps {
 /**
  * The investor has signed the Investor Service Agreement: it applies to this
  * commitment, which signs only its Investment Confirmation. The signed copy
- * they uploaded opens from here, exactly as uploaded; until a commitment is
- * made under it, it can be replaced.
+ * they uploaded opens from here, exactly as uploaded.
  */
 export function SignedAgreementNotice({
   signedAt,
   version,
   fileName,
-  onReplace,
   locale,
   t,
 }: SignedAgreementNoticeProps) {
@@ -111,16 +107,6 @@ export function SignedAgreementNotice({
               )}
             </DialogContent>
           </Dialog>
-          {onReplace && (
-            <Button
-              type="button"
-              variant="link"
-              className="h-auto p-0 text-xs font-semibold text-muted-foreground"
-              onClick={onReplace}
-            >
-              {t(`${K}.replace`)}
-            </Button>
-          )}
         </div>
       </div>
     </div>

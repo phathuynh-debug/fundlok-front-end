@@ -175,7 +175,11 @@ export interface AgreementPartyB {
 export interface InvestorAgreementStatus {
   /** The version the platform asks for now, printed on the PDF to sign. */
   version: string;
-  /** True until the investor uploads a digitally signed copy of `version`. */
+  /**
+   * True until the investor uploads a digitally signed copy of `version`.
+   * Meanwhile a commitment is still made (with its code), but its payment
+   * details wait: the agreement is signed with it first.
+   */
   required: boolean;
   /** When the signed copy of the current version was uploaded. */
   signed_at: string | null;
@@ -183,8 +187,8 @@ export interface InvestorAgreementStatus {
   signed_version: string | null;
   /** The signed copy's file name as uploaded. */
   file_name: string | null;
-  /** The signed copy may still be swapped: nothing committed under it yet. */
-  replaceable: boolean;
+  /** The commitment it was signed with (its Annex is filled in the PDF). */
+  tranche_id: string | null;
   /** As signed once signed; else as the PDF fills it in now. */
   party_b: AgreementPartyB;
 }
@@ -265,9 +269,12 @@ export const fundingService = {
   },
 
   // GET /funding/me/investor-agreement/document — the agreement as a PDF,
-  // filled in with the investor's details, to sign digitally.
-  getInvestorAgreementPdf() {
-    return apiClient.getFile(FUNDING_ENDPOINTS.investorAgreementDocument);
+  // filled in with the investor's details and the Annex of the commitment it
+  // is signed with, to sign digitally.
+  getInvestorAgreementPdf(trancheId: string) {
+    return apiClient.getFile(FUNDING_ENDPOINTS.investorAgreementDocument, {
+      params: { tranche_id: trancheId },
+    });
   },
 
   // GET /funding/me/investor-agreement/signed — the signed copy they uploaded.
@@ -275,12 +282,18 @@ export const fundingService = {
     return apiClient.getFile(FUNDING_ENDPOINTS.investorAgreementSigned);
   },
 
-  // POST /funding/me/investor-agreement — the digitally signed PDF, and the
-  // version printed on the copy they downloaded.
-  uploadSignedInvestorAgreement(file: File, version: string) {
+  // POST /funding/me/investor-agreement — the digitally signed PDF, the
+  // version printed on the copy they downloaded, and the commitment it was
+  // signed with. Opens that commitment's payment details.
+  uploadSignedInvestorAgreement(
+    file: File,
+    version: string,
+    trancheId: string,
+  ) {
     const form = new FormData();
     form.append("file", file);
     form.append("version", version);
+    form.append("tranche_id", trancheId);
     return apiClient.post<InvestorAgreementStatus>(
       FUNDING_ENDPOINTS.investorAgreement,
       form,

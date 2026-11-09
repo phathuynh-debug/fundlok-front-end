@@ -201,7 +201,12 @@ const STUB_AGREEMENT_VERSION = "investor-agreement-v0.3";
  */
 const investorAgreements = new Map<
   string,
-  { signedAt: string; fileName: string; content: Buffer }
+  {
+    signedAt: string;
+    fileName: string;
+    trancheId: string | null;
+    content: Buffer;
+  }
 >();
 
 /** A one-page PDF standing in for the agreement FundLok fills in. */
@@ -214,6 +219,32 @@ const STUB_AGREEMENT_PDF = Buffer.from(
 
 /** Each ticket's Investment Confirmation, by stub_scope, account and ticket. */
 const trancheConfirmations = new Map<string, Record<string, unknown>>();
+
+/** A ticket's Investment Confirmation, filled in from its window. */
+function keepConfirmation(
+  scope: string,
+  ticket: { id: string; reference_code: string; amount_vnd: number },
+  fundingWindow: NonNullable<ReturnType<typeof stubFundingWindow>>,
+) {
+  trancheConfirmations.set(`${scope}.${ticket.id}`, {
+    id: "61000000-0000-0000-0000-000000000001",
+    tranche_id: ticket.id,
+    reference_code: ticket.reference_code,
+    listing_id: fundingWindow.listing_id,
+    listing_ref: fundingWindow.listing_id.split("-")[0].toUpperCase(),
+    sme_name: stubProjectName(fundingWindow.listing_id),
+    amount_vnd: ticket.amount_vnd,
+    annual_rate_pct: fundingWindow.annual_rate_pct,
+    term_months: fundingWindow.term_months,
+    service_fee_vnd: Math.floor(
+      (ticket.amount_vnd * 250 * fundingWindow.term_months) / (10_000 * 12),
+    ),
+    service_fee_bps_per_year: 250,
+    expected_disbursement_date: new Date().toISOString().slice(0, 10),
+    confirmed_at: new Date().toISOString(),
+    agreement_version: STUB_AGREEMENT_VERSION,
+  });
+}
 
 /** The legal name of the public stub project a listing belongs to. */
 function stubProjectName(listingId: string): string {
@@ -230,6 +261,7 @@ function signedAgreement(req: IncomingMessage, key: string) {
       ? {
           signedAt: "2026-11-01T03:00:00.000Z",
           fileName: "hop-dong-da-ky.pdf",
+          trancheId: null,
           content: STUB_AGREEMENT_PDF,
         }
       : null)
@@ -1702,9 +1734,7 @@ const server = createServer(async (req, res) => {
       signed_at: signed?.signedAt ?? null,
       signed_version: signed ? STUB_AGREEMENT_VERSION : null,
       file_name: signed?.fileName ?? null,
-      replaceable:
-        signed !== null &&
-        (fundingTickets.get(verificationScope(req, key)) ?? []).length === 0,
+      tranche_id: signed?.trancheId ?? null,
       party_b: STUB_PARTY_B,
     });
   }
@@ -1749,22 +1779,35 @@ const server = createServer(async (req, res) => {
         { "x-error-code": "INVESTOR_AGREEMENT_UNSIGNED" },
       );
     }
+    // Signed with the investor's own held commitment.
+    const trancheId = /name="tranche_id"\r\n\r\n([^\r]+)/.exec(text)?.[1];
+    const scope = verificationScope(req, key);
+    const ticket = (fundingTickets.get(scope) ?? []).find(
+      (t) => t.id === trancheId,
+    );
+    if (!ticket) return detail(res, 404, "Ticket not found");
     const fileName = /filename="([^"]*)"/.exec(text)?.[1] ?? "signed.pdf";
     const start = text.indexOf("%PDF-");
     const end = text.indexOf("\r\n--", start);
     const signed = {
       signedAt: new Date().toISOString(),
       fileName,
+      trancheId: ticket.id,
       content: raw.subarray(start, end === -1 ? undefined : end),
     };
-    investorAgreements.set(verificationScope(req, key), signed);
+    investorAgreements.set(scope, signed);
+    // That commitment's Annex, as filled in the agreement just signed.
+    const fundingWindow = STUB_PUBLIC_PROJECTS.map((p) =>
+      stubFundingWindow(stubListing(p)?.id ?? ""),
+    ).find((w) => w?.id === ticket.window_id);
+    if (fundingWindow) keepConfirmation(scope, ticket, fundingWindow);
     return json(res, 201, {
       version: STUB_AGREEMENT_VERSION,
       required: false,
       signed_at: signed.signedAt,
       signed_version: STUB_AGREEMENT_VERSION,
       file_name: fileName,
-      replaceable: true,
+      tranche_id: ticket.id,
       party_b: STUB_PARTY_B,
     });
   }
@@ -1834,17 +1877,6 @@ const server = createServer(async (req, res) => {
         { "x-error-code": "TERMS_OUTDATED" },
       );
     }
-    if (signedAgreement(req, key) === null) {
-      return json(
-        res,
-        409,
-        {
-          detail:
-            "Sign the Investor Service Agreement and upload the signed copy first",
-        },
-        { "x-error-code": "INVESTOR_AGREEMENT_REQUIRED" },
-      );
-    }
     const amount = Number(body.amount_vnd);
     if (amount < fundingWindow.min_ticket_vnd) {
       return json(
@@ -1874,25 +1906,10 @@ const server = createServer(async (req, res) => {
       attested_at: null,
     };
     fundingTickets.set(scope, [ticket]);
-    // The Investment Confirmation kept when agreeing, before paying.
-    trancheConfirmations.set(`${scope}.${ticket.id}`, {
-      id: "61000000-0000-0000-0000-000000000001",
-      tranche_id: ticket.id,
-      reference_code: ticket.reference_code,
-      listing_id: fundingWindow.listing_id,
-      listing_ref: fundingWindow.listing_id.split("-")[0].toUpperCase(),
-      sme_name: stubProjectName(fundingWindow.listing_id),
-      amount_vnd: amount,
-      annual_rate_pct: fundingWindow.annual_rate_pct,
-      term_months: fundingWindow.term_months,
-      service_fee_vnd: Math.floor(
-        (amount * 250 * fundingWindow.term_months) / (10_000 * 12),
-      ),
-      service_fee_bps_per_year: 250,
-      expected_disbursement_date: new Date().toISOString().slice(0, 10),
-      confirmed_at: new Date().toISOString(),
-      agreement_version: STUB_AGREEMENT_VERSION,
-    });
+    // With the agreement signed, the Annex is kept now; at the first commitment
+    // it is kept when the agreement (filled in with it) is uploaded.
+    if (signedAgreement(req, key))
+      keepConfirmation(scope, ticket, fundingWindow);
     return json(res, 201, ticket);
   }
   const confirmationDocMatch =
@@ -1920,6 +1937,15 @@ const server = createServer(async (req, res) => {
       (t) => t.id === paymentMatch[1],
     );
     if (!ticket) return detail(res, 404, "Tranche not found");
+    // No payment details until the investor's agreement is signed.
+    if (signedAgreement(req, key) === null) {
+      return json(
+        res,
+        409,
+        { detail: "Sign the Investor Service Agreement with this commitment" },
+        { "x-error-code": "INVESTOR_AGREEMENT_REQUIRED" },
+      );
+    }
     return json(res, 200, {
       bank_name: "Techcombank",
       bank_bin: "970407",

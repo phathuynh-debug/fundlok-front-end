@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { formatDate } from "@/lib/format-date";
+import { formatDate, formatDateTime } from "@/lib/format-date";
 import type {
   InvestmentConfirmation,
   InvestorAgreementStatus,
@@ -56,7 +56,7 @@ const signedStatus: InvestorAgreementStatus = {
   signed_at: "2026-11-08T08:30:00Z",
   signed_version: VERSION,
   file_name: "hop-dong-da-ky.pdf",
-  replaceable: true,
+  tranche_id: "tr-1",
   party_b: {
     holder_type: "INDIVIDUAL",
     name: "NGUYEN VAN A",
@@ -66,6 +66,15 @@ const signedStatus: InvestorAgreementStatus = {
     bank_account_name: "NGUYEN VAN A",
     bank_name: "Vietcombank",
   },
+};
+
+const stepProps = {
+  version: VERSION,
+  trancheId: "tr-1",
+  referenceCode: "FLAB12CD34",
+  holdExpiresAt: "2026-11-09T05:00:00Z",
+  locale: "en",
+  t,
 };
 
 describe("InvestorAgreementStep", () => {
@@ -80,9 +89,7 @@ describe("InvestorAgreementStep", () => {
   });
 
   it("previews the filled-in PDF and offers the same file to download", () => {
-    render(
-      <InvestorAgreementStep version={VERSION} onSigned={vi.fn()} t={t} />,
-    );
+    render(<InvestorAgreementStep {...stepProps} onSigned={vi.fn()} />);
 
     expect(screen.getByTestId("investor-agreement-preview")).toHaveAttribute(
       "src",
@@ -98,9 +105,7 @@ describe("InvestorAgreementStep", () => {
 
   it("uploads the signed PDF with the version it was downloaded as", () => {
     const onSigned = vi.fn();
-    render(
-      <InvestorAgreementStep version={VERSION} onSigned={onSigned} t={t} />,
-    );
+    render(<InvestorAgreementStep {...stepProps} onSigned={onSigned} />);
     const send = screen.getByRole("button", {
       name: "Upload the signed agreement",
     });
@@ -114,16 +119,19 @@ describe("InvestorAgreementStep", () => {
     fireEvent.click(send);
 
     expect(mutate).toHaveBeenCalledOnce();
-    expect(mutate.mock.calls[0][0]).toEqual({ file: signed, version: VERSION });
+    // Signed with this commitment: its id goes with the file.
+    expect(mutate.mock.calls[0][0]).toEqual({
+      file: signed,
+      version: VERSION,
+      trancheId: "tr-1",
+    });
     // The backend took it: on to the terms.
     act(() => mutate.mock.calls[0][1].onSuccess(signedStatus));
     expect(onSigned).toHaveBeenCalledWith(signedStatus);
   });
 
   it("refuses anything but a PDF before sending it", () => {
-    render(
-      <InvestorAgreementStep version={VERSION} onSigned={vi.fn()} t={t} />,
-    );
+    render(<InvestorAgreementStep {...stepProps} onSigned={vi.fn()} />);
 
     fireEvent.change(screen.getByTestId("investor-agreement-input"), {
       target: { files: [file("scan.png", "image/png")] },
@@ -138,9 +146,7 @@ describe("InvestorAgreementStep", () => {
   });
 
   it("says when the PDF came back without a digital signature", () => {
-    render(
-      <InvestorAgreementStep version={VERSION} onSigned={vi.fn()} t={t} />,
-    );
+    render(<InvestorAgreementStep {...stepProps} onSigned={vi.fn()} />);
     fireEvent.change(screen.getByTestId("investor-agreement-input"), {
       target: { files: [file("unsigned.pdf", "application/pdf")] },
     });
@@ -157,20 +163,12 @@ describe("InvestorAgreementStep", () => {
     );
   });
 
-  it("lets an investor replacing their copy keep the one signed before", async () => {
-    const onCancel = vi.fn();
-    render(
-      <InvestorAgreementStep
-        version={VERSION}
-        onSigned={vi.fn()}
-        onCancel={onCancel}
-        t={t}
-      />,
+  it("says the commitment is held, nothing paid, and by when to sign", () => {
+    render(<InvestorAgreementStep {...stepProps} onSigned={vi.fn()} />);
+
+    expect(screen.getByTestId("investor-agreement-held")).toHaveTextContent(
+      `Commitment FLAB12CD34 is held; no money has moved. Sign and upload the agreement before ${formatDateTime("2026-11-09T05:00:00Z", "en")}`,
     );
-    await userEvent.click(
-      screen.getByRole("button", { name: "Keep the copy signed before" }),
-    );
-    expect(onCancel).toHaveBeenCalledOnce();
   });
 });
 
@@ -259,9 +257,6 @@ describe("SignedAgreementNotice", () => {
     );
     // Nothing is fetched until they ask to see it.
     expect(signedQuery).toHaveBeenLastCalledWith(signedAt, false);
-    expect(
-      screen.queryByRole("button", { name: "Replace with another file" }),
-    ).not.toBeInTheDocument();
 
     await userEvent.click(
       screen.getByRole("button", { name: "View the signed agreement" }),
@@ -274,24 +269,6 @@ describe("SignedAgreementNotice", () => {
     expect(dialog).toHaveTextContent(
       `Uploaded on ${date} · hop-dong-da-ky.pdf · version ${VERSION}`,
     );
-  });
-
-  it("offers to replace the signed copy while nothing is committed under it", async () => {
-    const onReplace = vi.fn();
-    render(
-      <SignedAgreementNotice
-        signedAt={signedAt}
-        version={VERSION}
-        fileName="hop-dong-da-ky.pdf"
-        onReplace={onReplace}
-        locale="en"
-        t={t}
-      />,
-    );
-    await userEvent.click(
-      screen.getByRole("button", { name: "Replace with another file" }),
-    );
-    expect(onReplace).toHaveBeenCalledOnce();
   });
 });
 

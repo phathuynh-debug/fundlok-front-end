@@ -62,25 +62,26 @@ const KNOWN_ERRORS = new Set([
 
 type Step = "amount" | "agreement" | "terms" | "transfer";
 const STEPS: readonly Step[] = ["amount", "terms", "transfer"];
-// Before the investor's first commitment: sign the Investor Service Agreement
-// digitally and upload it, on a step of its own before the terms.
+// The investor's first commitment: agreeing makes the commitment (code, held
+// amount, no money moved), then the Investor Service Agreement, filled in with
+// that commitment's Annex, is signed and uploaded before the transfer.
 const FIRST_STEPS: readonly Step[] = [
   "amount",
-  "agreement",
   "terms",
+  "agreement",
   "transfer",
 ];
 
 // Investing in one project, after the amount was chosen on its page
 // (/dashboard/invest?projectId=…&amount=…): read and agree to the investing
 // terms, which reserves the amount, then transfer it straight to the
-// business's bank account. Before the first commitment the investor signs the
-// Investor Service Agreement (Contract 4) like an SME signs its own: download
-// the PDF filled in with their details, sign it digitally, upload it. Every
-// commitment then shows a reminder of the agreement signed, with the signed
-// copy a click away, and signs only its Investment Confirmation (the Annex),
-// shown above the terms. The backend refuses a first commitment without the
-// signed copy. Opened with just ?projectId=…, it shows the
+// business's bank account. At the first commitment, agreeing makes the
+// commitment (its code, the amount held, no money moved); the investor then
+// signs the Investor Service Agreement (Contract 4) like an SME signs its own:
+// download the PDF filled in with their details and this commitment's Annex,
+// sign it digitally, upload it. Only then does the backend give the payment
+// details. Later commitments show a reminder of the agreement signed and keep
+// their own Annex, shown above the transfer details. Opened with just ?projectId=…, it shows the
 // transfer details of the investor's ticket on that project. When that
 // ticket's hold lapses, "Reserve again" brings the terms back for the same
 // amount, and agreeing makes a new ticket (the backend expires the old one).
@@ -121,8 +122,6 @@ export default function InvestClient() {
   // The investor uploaded their signed agreement on this visit: the agreement
   // step stays in the step list, as the step they went through.
   const [signedHere, setSignedHere] = useState(false);
-  // Swapping the signed copy for another file (allowed until committed).
-  const [replacing, setReplacing] = useState(false);
 
   // Newest first, as the backend lists them.
   const onWindow =
@@ -222,12 +221,18 @@ export default function InvestClient() {
   const backHref = project
     ? `/dashboard/projects/${project.id}`
     : "/dashboard/projects";
-  const step: Step = ticket
-    ? "transfer"
-    : needsAgreement || replacing
+  // A held ticket of an investor who has not signed yet: sign before paying.
+  const signsAgreement =
+    needsAgreement &&
+    !!ticket &&
+    (ticket.status === "RESERVED" || ticket.status === "SIGNED") &&
+    !ticket.receipt_submitted_at;
+  const step: Step = !ticket
+    ? "terms"
+    : signsAgreement
       ? "agreement"
-      : "terms";
-  const steps = needsAgreement || signedHere || replacing ? FIRST_STEPS : STEPS;
+      : "transfer";
+  const steps = needsAgreement || signedHere ? FIRST_STEPS : STEPS;
   const errorLine = error && (
     <p role="alert" className="text-sm font-medium text-destructive">
       {error}
@@ -236,7 +241,23 @@ export default function InvestClient() {
   const shownAmount = ticket?.amount_vnd ?? (amount || lapsed?.amount_vnd || 0);
 
   let body: React.ReactNode;
-  if (ticket) {
+  if (ticket && signsAgreement && agreement.data) {
+    body = (
+      <InvestorAgreementStep
+        key={ticket.id}
+        version={agreement.data.version}
+        trancheId={ticket.id}
+        referenceCode={ticket.reference_code}
+        holdExpiresAt={ticket.hold_expires_at}
+        onSigned={() => {
+          setSignedHere(true);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+        locale={locale}
+        t={t}
+      />
+    );
+  } else if (ticket) {
     const awaitingTransfer =
       ticket.status === "RESERVED" || ticket.status === "SIGNED";
     // The Annex confirmed with this ticket, above everything about paying.
@@ -356,37 +377,25 @@ export default function InvestClient() {
         }
       />
     );
-  } else if (needsAgreement || replacing) {
-    body = (
-      <>
-        <InvestorAgreementStep
-          version={agreement.data.version}
-          onSigned={() => {
-            setSignedHere(true);
-            setReplacing(false);
-            setError(null);
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }}
-          onCancel={replacing ? () => setReplacing(false) : undefined}
-          t={t}
-        />
-        {errorLine}
-      </>
-    );
   } else {
     body = (
       <>
-        {agreement.data.signed_at && (
+        {agreement.data.signed_at ? (
           <SignedAgreementNotice
             signedAt={agreement.data.signed_at}
             version={agreement.data.signed_version ?? agreement.data.version}
             fileName={agreement.data.file_name}
-            onReplace={
-              agreement.data.replaceable ? () => setReplacing(true) : undefined
-            }
             locale={locale}
             t={t}
           />
+        ) : (
+          // First commitment: what comes after agreeing, before any payment.
+          <div
+            className="rounded-xl border border-primary/30 bg-primary/5 p-4 text-sm leading-relaxed text-foreground"
+            data-testid="agreement-sign-next"
+          >
+            {t(`${K}.agreement.signNext`)}
+          </div>
         )}
         <InvestmentConfirmationTable
           confirmation={confirmation.data}
