@@ -3,6 +3,9 @@ import type { FundingWindow } from "@/services/funding.service";
 import type { PaymentAccount } from "@/services/payment-accounts.service";
 import { ADMIN_ENDPOINTS } from "@/lib/endpoints";
 
+// NEAC is given 45 s server-side; this leaves room for the upload to it.
+const NEAC_CHECK_TIMEOUT_MS = 60_000;
+
 // Which table the BFF /admin/overview endpoint should return alongside stats.
 export type AdminMode = "users" | "projects";
 
@@ -313,6 +316,52 @@ export interface AdminApplicationDocument {
   // PENDING = presigned but never confirmed in storage; UPLOADED = HEAD-checked.
   status: string;
   uploaded_at: string | null;
+  /**
+   * Only on the SME's signed Service Agreement (sme_service_agreement): the
+   * newest NEAC check, or null until staff have checked it once. Optional:
+   * other document types and older responses omit it.
+   */
+  signature_check?: AdminSignatureCheck | null;
+}
+
+// The SME's signed Service Agreement (loan wizard step 4), checked with NEAC
+// (neac.gov.vn), the national e-signature authority. Three separate answers:
+// NEAC's own verdict on the signature, whether the file is this application's
+// agreement, and whether the signer's tax code is the company's. The SME was
+// not held up by any of it; this is for staff to read before approving.
+// Spec: backend app/loans/agreement/neac_check.py.
+export interface AdminSignatureCheck {
+  /**
+   * VERIFIED: NEAC accepts the signature. INVALID: NEAC found a signature and
+   * does not accept it (see `problems`). NO_SIGNATURE: NEAC found none.
+   * UNAVAILABLE: NEAC could not be reached, check again later.
+   */
+  status: "VERIFIED" | "INVALID" | "NO_SIGNATURE" | "UNAVAILABLE";
+  checked_at: string;
+  /** The PDF carries this application's reference and the agreement version. */
+  right_document: boolean;
+  /** As the agreement prints it: the application id's first block. */
+  application_ref: string;
+  agreement_version: string;
+  /** The signer's tax code (MST) on the certificate is the company's. */
+  signer_matches: boolean;
+  name_matches: boolean;
+  expected_tax_code: string | null;
+  expected_name: string | null;
+  /** KYB: the approved business verification. PROJECT: the tax ID typed on the project. */
+  expected_source: "KYB" | "PROJECT";
+  signer_name: string | null;
+  /** As the certificate carries it, e.g. "MST:0312345678". */
+  signer_id: string | null;
+  issuer_name: string | null;
+  /** NEAC's own wording, Vietnamese. */
+  signed_time: string | null;
+  certificate_validity: string | null;
+  ocsp: string | null;
+  crl: string | null;
+  /** NEAC's reasons, Vietnamese, as it states them. Empty when it accepts. */
+  problems: string[];
+  neac_message: string | null;
 }
 
 // What the grading engine produced. `status` is the run's lifecycle
@@ -660,6 +709,17 @@ export const adminService = {
   getDocumentUrl(documentId: string) {
     return apiClient.get<AdminDocumentUrl>(
       ADMIN_ENDPOINTS.documentUrl(documentId),
+    );
+  },
+
+  // Admin only. Sends the stored signed Service Agreement to NEAC and records
+  // the verdict (it is what the panel shows from then on). NEAC can take up to
+  // 45 s to answer, longer than the client's default timeout.
+  checkDocumentSignature(documentId: string) {
+    return apiClient.post<AdminSignatureCheck>(
+      ADMIN_ENDPOINTS.documentNeacCheck(documentId),
+      undefined,
+      { timeout: NEAC_CHECK_TIMEOUT_MS },
     );
   },
 

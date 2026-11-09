@@ -272,6 +272,9 @@ export const ADMIN_ENDPOINTS = {
   inviteAdmin: "/admin/users/admins",
   // A 10-minute read URL for one uploaded application document.
   documentUrl: (id: string) => `/admin/documents/${id}/url`,
+  // POST: check the SME's signed Service Agreement with NEAC (neac.gov.vn)
+  // and record the verdict. sme_service_agreement documents only.
+  documentNeacCheck: (id: string) => `/admin/documents/${id}/neac-check`,
 } as const;
 
 // Admin > Email. Every admin connects their own Gmail account (the app

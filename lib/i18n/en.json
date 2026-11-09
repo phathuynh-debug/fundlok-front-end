@@ -523,6 +523,43 @@
         "variable_cost_excl_cogs_y1": "Variable costs (step 2)"
       },
       "missingInputs": "Missing for a score:",
+      "neac": {
+        "check": "Check with NEAC",
+        "checkedAt": "Checked {time} on neac.gov.vn",
+        "checking": "Sending the file to NEAC, this can take up to 45 seconds…",
+        "failed": "Could not run the check right now.",
+        "fields": {
+          "issuer": "Certificate issuer",
+          "revocation": "Revocation",
+          "signedTime": "Signed",
+          "signer": "Signer",
+          "validity": "Certificate validity"
+        },
+        "nameMismatch": "The name on the certificate differs from the company's ({name}). Review the signer.",
+        "overall": {
+          "review": "Needs review",
+          "unavailable": "Not checked yet",
+          "verified": "Verified"
+        },
+        "problemsHeading": "NEAC reports:",
+        "recheck": "Check again with NEAC",
+        "rightDocument": "The agreement FundLok issued for this application (reference {ref}, version {version})",
+        "signature": {
+          "INVALID": "NEAC does not accept this signature",
+          "NO_SIGNATURE": "NEAC found no digital signature in the file",
+          "UNAVAILABLE": "NEAC did not respond, check again later",
+          "VERIFIED": "NEAC confirms the signature is valid and the document unchanged since signing"
+        },
+        "signerMatches": "Signed by the company: tax code {taxCode}",
+        "signerMismatch": "Not signed by the company: the certificate carries {signerId}, the company's tax code is {taxCode}",
+        "signerUnknown": "Signer not yet matched against tax code {taxCode}",
+        "source": {
+          "KYB": "from the business verification",
+          "PROJECT": "from the tax ID on the project; the business is not verified yet"
+        },
+        "title": "Digital signature (checked with NEAC)",
+        "wrongDocument": "Reference {ref} and version {version} not found in the file: it may not be the agreement FundLok issued for this application"
+      },
       "noApplications": "No funding requests yet.",
       "noKyb": "This company has not started business verification yet.",
       "noOwner": "No owner account is linked to this business.",

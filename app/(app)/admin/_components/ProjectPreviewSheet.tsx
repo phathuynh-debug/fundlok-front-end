@@ -29,6 +29,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { DocumentViewerDialog } from "./DocumentViewerDialog";
+import { NeacCheckPanel } from "./NeacCheckPanel";
 import { ProjectFunding } from "./ProjectFunding";
 import { UserPreviewSheet } from "./UserPreviewSheet";
 import { KybReviewSheet } from "../kyc-reviews/_components/KybReviewSheet";
@@ -406,6 +407,8 @@ export function ProjectPreviewSheet({
                         documents={application.documents}
                         missingDocuments={application.missing_documents}
                         registrationFromKyb={!!data.kyb?.is_approved}
+                        projectId={projectId}
+                        locale={locale}
                         t={t}
                         onOpen={setViewerDocument}
                       />
@@ -727,6 +730,8 @@ function DocumentList({
   documents,
   missingDocuments,
   registrationFromKyb,
+  projectId,
+  locale,
   t,
   onOpen,
 }: {
@@ -734,6 +739,8 @@ function DocumentList({
   /** The API's own list — authoritative; computed here only when absent. */
   missingDocuments?: string[];
   registrationFromKyb: boolean;
+  projectId: string | null;
+  locale: string;
   t: (key: string) => string;
   onOpen: (document: AdminApplicationDocument) => void;
 }) {
@@ -789,6 +796,15 @@ function DocumentList({
             <Eye className="ml-auto h-3.5 w-3.5 shrink-0" aria-hidden />
           )}
         </button>
+        {/* The signed Service Agreement: NEAC's verdict, under its row. */}
+        {document.document_type === "sme_service_agreement" && (
+          <NeacCheckPanel
+            document={document}
+            projectId={projectId}
+            locale={locale}
+            t={t}
+          />
+        )}
       </li>
     );
   };

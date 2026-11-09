@@ -29,6 +29,7 @@ import {
   type AdminPaymentAccountFilter,
   type AdminProjectDetail,
   type AdminReviewListParams,
+  type AdminSignatureCheck,
   type AdminTable,
   type AdminUserDetail,
   type AdminUserFullDetail,
@@ -170,6 +171,23 @@ export function useResolveKybVerification(projectId: string | null) {
   const queryClient = useQueryClient();
   return useMutation<AdminKybVerification, ApiError, DecisionInput>({
     mutationFn: ({ id, body }) => adminService.resolveKybVerification(id, body),
+    onSuccess: () => {
+      if (projectId) {
+        void queryClient.invalidateQueries({
+          queryKey: adminKeys.projectDetail(projectId),
+        });
+      }
+    },
+  });
+}
+
+// Checks the SME's signed Service Agreement with NEAC. The verdict is recorded
+// server-side and comes back on the project detail from then on, so the
+// detail is refetched rather than patched.
+export function useCheckDocumentSignature(projectId: string | null) {
+  const queryClient = useQueryClient();
+  return useMutation<AdminSignatureCheck, ApiError, string>({
+    mutationFn: (documentId) => adminService.checkDocumentSignature(documentId),
     onSuccess: () => {
       if (projectId) {
         void queryClient.invalidateQueries({

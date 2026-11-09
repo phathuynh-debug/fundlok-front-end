@@ -523,6 +523,43 @@
         "variable_cost_excl_cogs_y1": "Chi phí biến đổi (bước 2)"
       },
       "missingInputs": "Còn thiếu để tính điểm:",
+      "neac": {
+        "check": "Kiểm tra với NEAC",
+        "checkedAt": "Kiểm tra lúc {time} trên neac.gov.vn",
+        "checking": "Đang gửi tệp cho NEAC kiểm tra, có thể mất đến 45 giây…",
+        "failed": "Không thể kiểm tra lúc này.",
+        "fields": {
+          "issuer": "Tổ chức cấp chứng thư",
+          "revocation": "Tình trạng thu hồi",
+          "signedTime": "Thời điểm ký",
+          "signer": "Người ký",
+          "validity": "Hiệu lực chứng thư"
+        },
+        "nameMismatch": "Tên trên chứng thư khác tên doanh nghiệp ({name}). Hãy xem lại người ký.",
+        "overall": {
+          "review": "Cần xem lại",
+          "unavailable": "Chưa kiểm tra được",
+          "verified": "Đã xác minh"
+        },
+        "problemsHeading": "NEAC ghi nhận:",
+        "recheck": "Kiểm tra lại với NEAC",
+        "rightDocument": "Đúng hợp đồng FundLok cấp cho đề nghị này (mã hồ sơ {ref}, phiên bản {version})",
+        "signature": {
+          "INVALID": "NEAC không công nhận chữ ký số này",
+          "NO_SIGNATURE": "NEAC không tìm thấy chữ ký số nào trong tệp",
+          "UNAVAILABLE": "NEAC không phản hồi, hãy kiểm tra lại sau",
+          "VERIFIED": "NEAC xác nhận chữ ký số hợp lệ và tài liệu không bị thay đổi sau khi ký"
+        },
+        "signerMatches": "Người ký đúng là doanh nghiệp: MST {taxCode}",
+        "signerMismatch": "Người ký không phải doanh nghiệp: chứng thư mang {signerId}, còn doanh nghiệp có MST {taxCode}",
+        "signerUnknown": "Chưa đối chiếu được người ký với MST {taxCode}",
+        "source": {
+          "KYB": "theo xác minh doanh nghiệp",
+          "PROJECT": "theo mã số thuế khai trên hồ sơ, doanh nghiệp chưa được xác minh"
+        },
+        "title": "Chữ ký số (kiểm tra qua NEAC)",
+        "wrongDocument": "Không thấy mã hồ sơ {ref} và phiên bản {version} trong tệp: có thể đây không phải hợp đồng FundLok cấp cho đề nghị này"
+      },
       "noApplications": "Chưa có đề nghị vay nào.",
       "noKyb": "Doanh nghiệp này chưa bắt đầu xác minh.",
       "noOwner": "Doanh nghiệp này chưa gắn với tài khoản chủ sở hữu nào.",
