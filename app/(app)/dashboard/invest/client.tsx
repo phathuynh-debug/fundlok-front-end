@@ -29,6 +29,7 @@ import { InvestmentConfirmationTable } from "./_components/InvestmentConfirmatio
 import { InvestorAgreementStep } from "./_components/InvestorAgreementStep";
 import { InvestTerms } from "./_components/InvestTerms";
 import { SignedAgreementNotice } from "./_components/SignedAgreementNotice";
+import { SignedConfirmationCard } from "./_components/SignedConfirmationCard";
 import { ReceiptUpload } from "./_components/ReceiptUpload";
 import { TransferDetails } from "./_components/TransferDetails";
 import { useTranslations } from "@/lib/i18n";
@@ -238,7 +239,16 @@ export default function InvestClient() {
   if (ticket) {
     const awaitingTransfer =
       ticket.status === "RESERVED" || ticket.status === "SIGNED";
-    body =
+    // The Annex confirmed with this ticket, above everything about paying.
+    const confirmationCard = (
+      <SignedConfirmationCard
+        key={`confirmation-${ticket.id}`}
+        trancheId={ticket.id}
+        locale={locale}
+        t={t}
+      />
+    );
+    const ticketBody =
       awaitingTransfer && !ticket.receipt_submitted_at ? (
         <>
           <TransferDetails
@@ -278,6 +288,12 @@ export default function InvestClient() {
               : t(`${K}.confirming`)}
         </p>
       );
+    body = (
+      <>
+        {confirmationCard}
+        {ticketBody}
+      </>
+    );
   } else if (!project || !fundingWindow || !open) {
     body = (
       <Notice title={t(`${K}.notOpenTitle`)} body={t(`${K}.notOpenBody`)} />

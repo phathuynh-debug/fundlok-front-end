@@ -104,6 +104,12 @@ export const FUNDING_ENDPOINTS = {
     `/funding/windows/${windowId}/investment-confirmation`,
   // The business's account, the exact amount, the memo and the VietQR.
   payment: (trancheId: string) => `/funding/tranches/${trancheId}/payment`,
+  // The Investment Confirmation (Annex) kept when the investor agreed to this
+  // ticket: its values, and the filled-in PDF.
+  trancheConfirmation: (trancheId: string) =>
+    `/funding/tranches/${trancheId}/investment-confirmation`,
+  trancheConfirmationDocument: (trancheId: string) =>
+    `/funding/tranches/${trancheId}/investment-confirmation/document`,
   myTranches: "/funding/me/tranches",
   // The investor's bank receipt for their transfer (multipart `file`).
   receipt: (trancheId: string) => `/funding/tranches/${trancheId}/receipt`,

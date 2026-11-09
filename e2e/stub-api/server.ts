@@ -212,6 +212,17 @@ const STUB_AGREEMENT_PDF = Buffer.from(
     "trailer << /Root 1 0 R >>\n%%EOF\n",
 );
 
+/** Each ticket's Investment Confirmation, by stub_scope, account and ticket. */
+const trancheConfirmations = new Map<string, Record<string, unknown>>();
+
+/** The legal name of the public stub project a listing belongs to. */
+function stubProjectName(listingId: string): string {
+  return (
+    STUB_PUBLIC_PROJECTS.find((p) => stubListing(p)?.id === listingId)
+      ?.legal_name ?? ""
+  );
+}
+
 function signedAgreement(req: IncomingMessage, key: string) {
   return (
     investorAgreements.get(verificationScope(req, key)) ??
@@ -1863,7 +1874,45 @@ const server = createServer(async (req, res) => {
       attested_at: null,
     };
     fundingTickets.set(scope, [ticket]);
+    // The Investment Confirmation kept when agreeing, before paying.
+    trancheConfirmations.set(`${scope}.${ticket.id}`, {
+      id: "61000000-0000-0000-0000-000000000001",
+      tranche_id: ticket.id,
+      reference_code: ticket.reference_code,
+      listing_id: fundingWindow.listing_id,
+      listing_ref: fundingWindow.listing_id.split("-")[0].toUpperCase(),
+      sme_name: stubProjectName(fundingWindow.listing_id),
+      amount_vnd: amount,
+      annual_rate_pct: fundingWindow.annual_rate_pct,
+      term_months: fundingWindow.term_months,
+      service_fee_vnd: Math.floor(
+        (amount * 250 * fundingWindow.term_months) / (10_000 * 12),
+      ),
+      service_fee_bps_per_year: 250,
+      expected_disbursement_date: new Date().toISOString().slice(0, 10),
+      confirmed_at: new Date().toISOString(),
+      agreement_version: STUB_AGREEMENT_VERSION,
+    });
     return json(res, 201, ticket);
+  }
+  const confirmationDocMatch =
+    /^\/funding\/tranches\/([^/]+)\/investment-confirmation(\/document)?$/.exec(
+      path,
+    );
+  if (confirmationDocMatch && method === "GET") {
+    const confirmation = trancheConfirmations.get(
+      `${verificationScope(req, key)}.${confirmationDocMatch[1]}`,
+    );
+    if (!confirmation) {
+      return detail(res, 404, "No investment confirmation for this ticket");
+    }
+    return confirmationDocMatch[2]
+      ? pdfResponse(
+          res,
+          STUB_AGREEMENT_PDF,
+          `FundLok-xac-nhan-dau-tu-${confirmation.reference_code}.pdf`,
+        )
+      : json(res, 200, confirmation);
   }
   const paymentMatch = /^\/funding\/tranches\/([^/]+)\/payment$/.exec(path);
   if (paymentMatch && method === "GET") {

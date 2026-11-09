@@ -2987,6 +2987,16 @@
       "title": "Hợp đồng dịch vụ bạn đã ký áp dụng cho khoản này",
       "view": "Xem hợp đồng đã ký"
     },
+    "signedConfirmation": {
+      "dates": "Ngày giải ngân dự kiến {date} · Đã xác nhận lúc {at}",
+      "dialogDescription": "Mã cam kết {ref} · Phụ lục của Hợp đồng dịch vụ phiên bản {version}",
+      "download": "Tải PDF",
+      "loadFailed": "Không tải được bản PDF của Xác nhận đầu tư.",
+      "summary": "Mã khoản gọi vốn {listing} · {sme} · {amount} VND",
+      "terms": "{rate}%/năm · {months} tháng · phí dịch vụ dự kiến {fee} VND + VAT",
+      "title": "Xác nhận đầu tư (Phụ lục) đã ký",
+      "view": "Xem"
+    },
     "steps": {
       "agreement": "Hợp đồng dịch vụ",
       "amount": "Số tiền",

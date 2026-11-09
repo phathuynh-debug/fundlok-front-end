@@ -5,10 +5,12 @@ import { formatDate } from "@/lib/format-date";
 import type {
   InvestmentConfirmation,
   InvestorAgreementStatus,
+  SignedInvestmentConfirmation,
 } from "@/services/funding.service";
 import { InvestmentConfirmationTable } from "./InvestmentConfirmationTable";
 import { InvestorAgreementStep } from "./InvestorAgreementStep";
 import { SignedAgreementNotice } from "./SignedAgreementNotice";
+import { SignedConfirmationCard } from "./SignedConfirmationCard";
 import { t } from "./test-t";
 
 const VERSION = "investor-agreement-v0.3";
@@ -22,11 +24,19 @@ let pdf: {
   refetch: () => void;
 };
 const signedQuery = vi.fn();
+let trancheConfirmation: {
+  data?: SignedInvestmentConfirmation;
+  isSuccess: boolean;
+};
+const confirmationPdfQuery = vi.fn();
 vi.mock("@/hooks/use-funding", () => ({
   useInvestorAgreementPdf: () => pdf,
   useUploadInvestorAgreement: () => upload,
   useSignedInvestorAgreement: (signedAt: string | null, enabled: boolean) =>
     signedQuery(signedAt, enabled),
+  useTrancheConfirmation: () => trancheConfirmation,
+  useTrancheConfirmationPdf: (trancheId: string, enabled: boolean) =>
+    confirmationPdfQuery(trancheId, enabled),
 }));
 vi.mock("@/hooks/use-object-url", () => ({
   useObjectUrl: (blob: Blob | null) => (blob ? "blob:agreement" : null),
@@ -282,5 +292,72 @@ describe("SignedAgreementNotice", () => {
       screen.getByRole("button", { name: "Replace with another file" }),
     );
     expect(onReplace).toHaveBeenCalledOnce();
+  });
+});
+
+describe("SignedConfirmationCard", () => {
+  const confirmed: SignedInvestmentConfirmation = {
+    id: "c-1",
+    tranche_id: "tr-1",
+    reference_code: "FLAB12CD34",
+    listing_id: "d2951dcd-0000-4000-8000-000000000001",
+    listing_ref: "D2951DCD",
+    sme_name: "Công ty TNHH Vận Tải Sông Hàn",
+    amount_vnd: 10_000_000,
+    annual_rate_pct: "13.752",
+    term_months: 6,
+    service_fee_vnd: 125_000,
+    service_fee_bps_per_year: 250,
+    expected_disbursement_date: "2026-11-09",
+    confirmed_at: "2026-11-09T03:05:00Z",
+    agreement_version: VERSION,
+  };
+
+  beforeEach(() => {
+    confirmationPdfQuery.mockReset();
+    confirmationPdfQuery.mockImplementation(
+      (_id: string, enabled: boolean) => ({
+        data: enabled
+          ? { blob: PDF_BLOB, filename: "FundLok-xac-nhan-dau-tu.pdf" }
+          : undefined,
+        isError: false,
+      }),
+    );
+  });
+
+  it("shows the filled-in Annex of this ticket, with its PDF to view and save", async () => {
+    trancheConfirmation = { data: confirmed, isSuccess: true };
+    render(<SignedConfirmationCard trancheId="tr-1" locale="en" t={t} />);
+
+    const card = screen.getByTestId("signed-confirmation");
+    expect(card).toHaveTextContent(
+      "Listing D2951DCD · Công ty TNHH Vận Tải Sông Hàn · 10.000.000 VND",
+    );
+    expect(card).toHaveTextContent(
+      "13,752% a year · 6 months · expected service fee 125.000 VND + VAT",
+    );
+    expect(card).toHaveTextContent(
+      `Expected disbursement ${formatDate("2026-11-09T00:00:00", "en")}`,
+    );
+    expect(screen.getByRole("link", { name: "Download PDF" })).toHaveAttribute(
+      "download",
+      "FundLok-xac-nhan-dau-tu.pdf",
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: "View" }));
+    expect(
+      within(screen.getByRole("dialog")).getByTestId(
+        "signed-confirmation-preview",
+      ),
+    ).toHaveAttribute("src", "blob:agreement#view=FitH");
+  });
+
+  it("shows nothing for a ticket from before confirmations were kept", () => {
+    trancheConfirmation = { data: undefined, isSuccess: false };
+    const { container } = render(
+      <SignedConfirmationCard trancheId="tr-old" locale="en" t={t} />,
+    );
+    expect(container).toBeEmptyDOMElement();
+    expect(confirmationPdfQuery).toHaveBeenLastCalledWith("tr-old", false);
   });
 });

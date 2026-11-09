@@ -137,6 +137,17 @@ test("invest, sign the service agreement and the terms, then see the business's 
   await page.getByLabel(t("investConfirm.terms.agreeWithConfirmation")).check();
   await agree.click();
 
+  // Before paying: the Annex confirmed with this ticket, filled in.
+  const confirmation = page.getByTestId("signed-confirmation");
+  await expect(confirmation).toBeVisible();
+  await expect(confirmation).toContainText(project.legal_name);
+  await expect(confirmation).toContainText("20.000.000 VND");
+  await expect(
+    confirmation.getByRole("link", {
+      name: t("investConfirm.signedConfirmation.download"),
+    }),
+  ).toHaveAttribute("download", /FLAB12CD34/);
+
   const transfer = page.getByTestId("transfer-details");
   await expect(transfer).toBeVisible();
   await expect(transfer).toContainText("19036789012");

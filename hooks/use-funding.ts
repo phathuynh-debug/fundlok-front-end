@@ -11,6 +11,7 @@ import {
   type ReserveRequest,
   type SmeRepaymentPlan,
   type SmeRound,
+  type SignedInvestmentConfirmation,
   type SmeTicket,
   type Tranche,
 } from "@/services/funding.service";
@@ -23,6 +24,10 @@ export const fundingKeys = {
   myTranches: () => [...fundingKeys.all, "my-tranches"] as const,
   payment: (trancheId: string) =>
     [...fundingKeys.all, "payment", trancheId] as const,
+  trancheConfirmation: (trancheId: string) =>
+    [...fundingKeys.all, "confirmation", trancheId] as const,
+  trancheConfirmationPdf: (trancheId: string) =>
+    [...fundingKeys.all, "confirmation", trancheId, "pdf"] as const,
   myRounds: () => [...fundingKeys.all, "my-rounds"] as const,
   repaymentPlan: (windowId: string) =>
     [...fundingKeys.all, "repayment-plan", windowId] as const,
@@ -131,6 +136,32 @@ export function useInvestmentConfirmation(
       fundingService.getInvestmentConfirmation(windowId as string, amountVnd),
     enabled: Boolean(windowId) && amountVnd > 0,
     staleTime: 60 * 1000,
+    retry: false,
+  });
+}
+
+// The Investment Confirmation kept for a ticket. It never changes once made.
+export function useTrancheConfirmation(trancheId: string | null) {
+  return useQuery<SignedInvestmentConfirmation, ApiError>({
+    queryKey: fundingKeys.trancheConfirmation(trancheId ?? ""),
+    queryFn: () => fundingService.getTrancheConfirmation(trancheId as string),
+    enabled: Boolean(trancheId),
+    staleTime: Infinity,
+    retry: false,
+  });
+}
+
+// Its filled-in PDF, to view and download.
+export function useTrancheConfirmationPdf(
+  trancheId: string | null,
+  enabled = true,
+) {
+  return useQuery<{ blob: Blob; filename: string | null }, ApiError>({
+    queryKey: fundingKeys.trancheConfirmationPdf(trancheId ?? ""),
+    queryFn: () =>
+      fundingService.getTrancheConfirmationPdf(trancheId as string),
+    enabled: enabled && Boolean(trancheId),
+    staleTime: Infinity,
     retry: false,
   });
 }

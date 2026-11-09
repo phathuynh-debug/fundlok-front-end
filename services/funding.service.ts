@@ -206,6 +206,29 @@ export interface InvestmentConfirmation {
   expected_disbursement_date: string;
 }
 
+// Mirrors backend SignedInvestmentConfirmationOut: one ticket's Annex, as
+// filled in and confirmed when the investor agreed to it.
+export interface SignedInvestmentConfirmation {
+  id: string;
+  tranche_id: string;
+  /** The ticket's reference code, also its transfer memo. */
+  reference_code: string;
+  listing_id: string;
+  listing_ref: string;
+  sme_name: string;
+  amount_vnd: number;
+  /** Decimal string, e.g. "16.000". */
+  annual_rate_pct: string;
+  term_months: number;
+  /** P × 2.5% × M / 12, before VAT. */
+  service_fee_vnd: number;
+  service_fee_bps_per_year: number;
+  /** ISO date (YYYY-MM-DD). */
+  expected_disbursement_date: string;
+  confirmed_at: string;
+  agreement_version: string;
+}
+
 // Mirrors backend PaymentOut: where to send the money, straight to the business.
 export interface PaymentInstructions {
   bank_name: string;
@@ -270,6 +293,21 @@ export const fundingService = {
     return apiClient.get<InvestmentConfirmation>(
       FUNDING_ENDPOINTS.investmentConfirmation(windowId),
       { params: { amount_vnd: amountVnd } },
+    );
+  },
+
+  // GET /funding/tranches/{id}/investment-confirmation — the Annex kept for
+  // the caller's own ticket (404 for tickets from before they were kept).
+  getTrancheConfirmation(trancheId: string) {
+    return apiClient.get<SignedInvestmentConfirmation>(
+      FUNDING_ENDPOINTS.trancheConfirmation(trancheId),
+    );
+  },
+
+  // GET /funding/tranches/{id}/investment-confirmation/document — its PDF.
+  getTrancheConfirmationPdf(trancheId: string) {
+    return apiClient.getFile(
+      FUNDING_ENDPOINTS.trancheConfirmationDocument(trancheId),
     );
   },
 

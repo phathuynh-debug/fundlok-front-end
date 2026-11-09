@@ -2987,6 +2987,16 @@
       "title": "The service agreement you signed applies to this investment",
       "view": "View the signed agreement"
     },
+    "signedConfirmation": {
+      "dates": "Expected disbursement {date} · Confirmed at {at}",
+      "dialogDescription": "Commitment {ref} · Annex to the service agreement, version {version}",
+      "download": "Download PDF",
+      "loadFailed": "The Investment Confirmation PDF could not be loaded.",
+      "summary": "Listing {listing} · {sme} · {amount} VND",
+      "terms": "{rate}% a year · {months} months · expected service fee {fee} VND + VAT",
+      "title": "Signed Investment Confirmation (Annex)",
+      "view": "View"
+    },
     "steps": {
       "agreement": "Service agreement",
       "amount": "Amount",
