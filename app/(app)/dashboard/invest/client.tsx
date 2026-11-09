@@ -385,6 +385,7 @@ export default function InvestClient() {
             signedAt={agreement.data.signed_at}
             version={agreement.data.signed_version ?? agreement.data.version}
             fileName={agreement.data.file_name}
+            signatureCheck={agreement.data.signature_check}
             locale={locale}
             t={t}
           />

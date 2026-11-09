@@ -2900,7 +2900,11 @@
         "HOLD_EXPIRED": "Lượt giữ chỗ của khoản cam kết này đã hết hạn. Hãy giữ chỗ lại và ký hợp đồng với khoản cam kết mới.",
         "INVESTOR_AGREEMENT_ALREADY_SIGNED": "Bạn đã ký hợp đồng này rồi. Hãy tải lại trang để tiếp tục chuyển khoản.",
         "INVESTOR_AGREEMENT_OUTDATED": "Hợp đồng vừa được cập nhật. Hãy tải lại trang, tải bản mới và ký lại.",
+        "INVESTOR_AGREEMENT_SIGNATURE_INVALID": "NEAC không xác nhận chữ ký số này là hợp lệ.",
+        "INVESTOR_AGREEMENT_SIGNER_MISMATCH": "Chữ ký số hợp lệ nhưng không phải của bạn: số định danh hoặc mã số doanh nghiệp trên chứng thư số khác với hồ sơ đã xác minh.",
         "INVESTOR_AGREEMENT_UNSIGNED": "Tệp PDF này chưa có chữ ký số. Hãy ký hợp đồng bằng chữ ký số rồi tải bản đã ký lên.",
+        "INVESTOR_AGREEMENT_WRONG_DOCUMENT": "Đây không phải hợp đồng của khoản cam kết này. Hãy tải hợp đồng ở bước này, ký số và tải đúng tệp đó lên.",
+        "NEAC_UNAVAILABLE": "Hiện chưa kiểm tra được chữ ký số với NEAC. Vui lòng thử lại sau ít phút.",
         "UNSUPPORTED_TYPE": "Hãy tải lên hợp đồng đã ký dưới dạng tệp PDF.",
         "generic": "Đã có lỗi xảy ra. Vui lòng thử lại sau."
       },
@@ -2913,6 +2917,7 @@
       "intro": "Đây là khoản đầu tư đầu tiên của bạn. Trước khi chuyển tiền, hãy ký Hợp đồng dịch vụ giữa bạn và FundLok bằng chữ ký số: tải bản PDF đã điền thông tin của bạn và Xác nhận đầu tư (Phụ lục) của khoản cam kết này, ký số, rồi tải bản đã ký lên. Bạn chỉ ký hợp đồng này một lần; mỗi khoản đầu tư sau chỉ cần xác nhận Phụ lục trên nền tảng.",
       "loadFailed": "Không tải được Hợp đồng dịch vụ dành cho Nhà đầu tư.",
       "loading": "Đang chuẩn bị hợp đồng…",
+      "neacNote": "FundLok kiểm tra bản đã ký qua dịch vụ kiểm tra văn bản ký số của Trung tâm Chứng thực điện tử quốc gia (NEAC): chữ ký hợp lệ, văn bản không bị thay đổi, chứng thư số chưa bị thu hồi và đúng là chữ ký của bạn. Việc kiểm tra mất vài giây.",
       "previewLabel": "Bản xem trước, đã điền thông tin của bạn",
       "remove": "Bỏ tệp đã chọn",
       "retry": "Thử lại",
@@ -2921,7 +2926,7 @@
       "title": "Hợp đồng dịch vụ dành cho Nhà đầu tư",
       "upload": "Tải lên hợp đồng đã ký",
       "uploaded": "Đã nhận hợp đồng đã ký số",
-      "uploading": "Đang kiểm tra chữ ký số…",
+      "uploading": "Đang kiểm tra chữ ký số với NEAC…",
       "version": "Phiên bản hợp đồng {version}"
     },
     "amountLabel": "Số tiền đầu tư",
@@ -2984,6 +2989,7 @@
       "dialogTitle": "Hợp đồng dịch vụ đã ký",
       "download": "Tải bản đã ký",
       "loadFailed": "Không mở được hợp đồng đã ký. Vui lòng thử lại.",
+      "neacVerified": "Đã xác minh với NEAC: chữ ký số hợp lệ của {signer} ({id}), cấp bởi {issuer}.",
       "stamp": "Tải lên ngày {date} · {file} · phiên bản {version}",
       "title": "Hợp đồng dịch vụ bạn đã ký áp dụng cho khoản này",
       "view": "Xem hợp đồng đã ký"

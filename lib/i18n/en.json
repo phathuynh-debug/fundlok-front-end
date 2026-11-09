@@ -2900,7 +2900,11 @@
         "HOLD_EXPIRED": "This commitment's hold has lapsed. Hold the amount again and sign the agreement with the new commitment.",
         "INVESTOR_AGREEMENT_ALREADY_SIGNED": "You have already signed this agreement. Reload the page to continue to the transfer.",
         "INVESTOR_AGREEMENT_OUTDATED": "The agreement has just been updated. Reload the page, download the new version and sign it again.",
+        "INVESTOR_AGREEMENT_SIGNATURE_INVALID": "NEAC does not confirm this digital signature as valid.",
+        "INVESTOR_AGREEMENT_SIGNER_MISMATCH": "The digital signature is valid but not yours: the ID number or enterprise code on the certificate differs from your verified profile.",
         "INVESTOR_AGREEMENT_UNSIGNED": "This PDF has no digital signature. Sign the agreement with your digital signature and upload the signed copy.",
+        "INVESTOR_AGREEMENT_WRONG_DOCUMENT": "This is not the agreement for this commitment. Download the agreement from this step, sign it digitally and upload that file.",
+        "NEAC_UNAVAILABLE": "The digital signature could not be checked with NEAC right now. Please try again in a few minutes.",
         "UNSUPPORTED_TYPE": "Upload the signed agreement as a PDF file.",
         "generic": "Something went wrong. Please try again later."
       },
@@ -2913,6 +2917,7 @@
       "intro": "This is your first investment. Before you send any money, sign the service agreement between you and FundLok with your digital signature: download the PDF filled in with your details and this commitment's Investment Confirmation (Annex), sign it digitally, then upload the signed copy. You sign it only once; each later investment just confirms its Annex on the platform.",
       "loadFailed": "The Investor Service Agreement could not be loaded.",
       "loading": "Preparing the agreement…",
+      "neacNote": "FundLok checks the signed copy with the digital-signature verification of the National Electronic Authentication Centre (NEAC): a valid signature, an unchanged document, a certificate not revoked, and the signature being yours. The check takes a few seconds.",
       "previewLabel": "Preview, filled in with your details",
       "remove": "Remove the chosen file",
       "retry": "Try again",
@@ -2921,7 +2926,7 @@
       "title": "Investor Service Agreement",
       "upload": "Upload the signed agreement",
       "uploaded": "Signed agreement received",
-      "uploading": "Checking the digital signature…",
+      "uploading": "Checking the digital signature with NEAC…",
       "version": "Agreement version {version}"
     },
     "amountLabel": "Investment amount",
@@ -2984,6 +2989,7 @@
       "dialogTitle": "Your signed service agreement",
       "download": "Download the signed copy",
       "loadFailed": "The signed agreement could not be opened. Please try again.",
+      "neacVerified": "Verified with NEAC: a valid digital signature by {signer} ({id}), issued by {issuer}.",
       "stamp": "Uploaded on {date} · {file} · version {version}",
       "title": "The service agreement you signed applies to this investment",
       "view": "View the signed agreement"

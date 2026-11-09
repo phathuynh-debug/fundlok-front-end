@@ -171,6 +171,20 @@ export interface AgreementPartyB {
   bank_name: string | null;
 }
 
+// Mirrors backend SignatureCheckOut: NEAC's verdict on the signed copy.
+export interface AgreementSignatureCheck {
+  verified_by: string;
+  checked_at: string;
+  /** The certificate's name, e.g. "CÔNG TY CỔ PHẦN FUNDLOK". */
+  signer_name: string | null;
+  /** As on the certificate, e.g. "MST:1501167629" or "CCCD:079…". */
+  signer_id: string | null;
+  /** The CA, e.g. "FPT Certification Authority SHA256". */
+  issuer_name: string | null;
+  signed_time: string | null;
+  name_matches: boolean;
+}
+
 // Mirrors backend InvestorAgreementOut.
 export interface InvestorAgreementStatus {
   /** The version the platform asks for now, printed on the PDF to sign. */
@@ -189,6 +203,8 @@ export interface InvestorAgreementStatus {
   file_name: string | null;
   /** The commitment it was signed with (its Annex is filled in the PDF). */
   tranche_id: string | null;
+  /** NEAC's verdict on the signed copy, when it was checked on upload. */
+  signature_check: AgreementSignatureCheck | null;
   /** As signed once signed; else as the PDF fills it in now. */
   party_b: AgreementPartyB;
 }
@@ -297,6 +313,9 @@ export const fundingService = {
     return apiClient.post<InvestorAgreementStatus>(
       FUNDING_ENDPOINTS.investorAgreement,
       form,
+      // The backend verifies the signature with NEAC (up to 45 s): wait longer
+      // than that, so a slow check is not reported as a failure here.
+      { timeout: 60_000 },
     );
   },
 

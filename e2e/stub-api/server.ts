@@ -220,6 +220,19 @@ const STUB_AGREEMENT_PDF = Buffer.from(
 /** Each ticket's Investment Confirmation, by stub_scope, account and ticket. */
 const trancheConfirmations = new Map<string, Record<string, unknown>>();
 
+/** NEAC's verdict as the backend keeps it (the stub never calls NEAC). */
+function stubSignatureCheck(checkedAt: string) {
+  return {
+    verified_by: "NEAC",
+    checked_at: checkedAt,
+    signer_name: STUB_PARTY_B.name,
+    signer_id: `CCCD:${STUB_PARTY_B.id_number}`,
+    issuer_name: "FPT Certification Authority SHA256",
+    signed_time: null,
+    name_matches: true,
+  };
+}
+
 /** A ticket's Investment Confirmation, filled in from its window. */
 function keepConfirmation(
   scope: string,
@@ -1735,6 +1748,7 @@ const server = createServer(async (req, res) => {
       signed_version: signed ? STUB_AGREEMENT_VERSION : null,
       file_name: signed?.fileName ?? null,
       tranche_id: signed?.trancheId ?? null,
+      signature_check: signed ? stubSignatureCheck(signed.signedAt) : null,
       party_b: STUB_PARTY_B,
     });
   }
@@ -1808,6 +1822,7 @@ const server = createServer(async (req, res) => {
       signed_version: STUB_AGREEMENT_VERSION,
       file_name: fileName,
       tranche_id: ticket.id,
+      signature_check: stubSignatureCheck(signed.signedAt),
       party_b: STUB_PARTY_B,
     });
   }

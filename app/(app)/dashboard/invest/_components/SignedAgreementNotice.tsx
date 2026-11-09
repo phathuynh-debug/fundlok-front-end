@@ -14,6 +14,7 @@ import {
 import { useSignedInvestorAgreement } from "@/hooks/use-funding";
 import { useObjectUrl } from "@/hooks/use-object-url";
 import { formatDate } from "@/lib/format-date";
+import type { AgreementSignatureCheck } from "@/services/funding.service";
 
 const K = "investConfirm.signedAgreement";
 
@@ -21,6 +22,8 @@ interface SignedAgreementNoticeProps {
   signedAt: string;
   version: string;
   fileName: string | null;
+  /** NEAC's verdict on the signed copy, when there is one. */
+  signatureCheck?: AgreementSignatureCheck | null;
   locale: string;
   t: (key: string, vars?: Record<string, string | number>) => string;
 }
@@ -34,6 +37,7 @@ export function SignedAgreementNotice({
   signedAt,
   version,
   fileName,
+  signatureCheck,
   locale,
   t,
 }: SignedAgreementNoticeProps) {
@@ -59,6 +63,18 @@ export function SignedAgreementNotice({
         <p className="text-xs leading-relaxed text-muted-foreground">
           {t(`${K}.body`, vars)}
         </p>
+        {signatureCheck && (
+          <p
+            className="text-xs font-medium text-emerald-700 dark:text-emerald-400"
+            data-testid="signed-agreement-neac"
+          >
+            {t(`${K}.neacVerified`, {
+              signer: signatureCheck.signer_name ?? "",
+              id: signatureCheck.signer_id ?? "",
+              issuer: signatureCheck.issuer_name ?? "",
+            })}
+          </p>
+        )}
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>

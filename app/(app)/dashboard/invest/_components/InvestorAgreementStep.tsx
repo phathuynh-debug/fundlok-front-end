@@ -32,6 +32,10 @@ const HOW_TO_SIGN = [`${K}.how1`, `${K}.how2`, `${K}.how3`] as const;
 // Upload failures the investor can act on, by X-Error-Code.
 const KNOWN_ERRORS = new Set([
   "INVESTOR_AGREEMENT_UNSIGNED",
+  "INVESTOR_AGREEMENT_WRONG_DOCUMENT",
+  "INVESTOR_AGREEMENT_SIGNATURE_INVALID",
+  "INVESTOR_AGREEMENT_SIGNER_MISMATCH",
+  "NEAC_UNAVAILABLE",
   "INVESTOR_AGREEMENT_OUTDATED",
   "INVESTOR_AGREEMENT_ALREADY_SIGNED",
   "HOLD_EXPIRED",
@@ -117,9 +121,16 @@ export function InvestorAgreementStep({
         },
         onError: (failure) => {
           const code = failure.code ?? "";
-          const message = KNOWN_ERRORS.has(code)
+          let message = KNOWN_ERRORS.has(code)
             ? t(`${K}.errors.${code}`)
             : t(`${K}.errors.generic`);
+          // NEAC's own reason, in its words ("NEAC: Chữ ký: Không hợp lệ; …").
+          if (
+            code === "INVESTOR_AGREEMENT_SIGNATURE_INVALID" &&
+            failure.message
+          ) {
+            message = `${message} ${failure.message}`;
+          }
           setError(message);
           toast({
             variant: "destructive",
@@ -307,6 +318,7 @@ export function InvestorAgreementStep({
       </div>
 
       <div className="space-y-1 text-xs leading-relaxed text-muted-foreground">
+        <p>{t(`${K}.neacNote`)}</p>
         <p>{t(`${K}.blanksNote`)}</p>
         <p>{t(`${K}.version`, { version })}</p>
       </div>

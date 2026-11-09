@@ -57,6 +57,15 @@ const signedStatus: InvestorAgreementStatus = {
   signed_version: VERSION,
   file_name: "hop-dong-da-ky.pdf",
   tranche_id: "tr-1",
+  signature_check: {
+    verified_by: "NEAC",
+    checked_at: "2026-11-09T03:31:18Z",
+    signer_name: "NGUYEN VAN A",
+    signer_id: "CCCD:079203001234",
+    issuer_name: "FPT Certification Authority SHA256",
+    signed_time: "Ngày 09 tháng 11 năm 2026, 10:30:00 [UTC+07:00]",
+    name_matches: true,
+  },
   party_b: {
     holder_type: "INDIVIDUAL",
     name: "NGUYEN VAN A",
@@ -163,6 +172,27 @@ describe("InvestorAgreementStep", () => {
     );
   });
 
+  it("shows NEAC's own reason when it does not accept the signature", () => {
+    render(<InvestorAgreementStep {...stepProps} onSigned={vi.fn()} />);
+    fireEvent.change(screen.getByTestId("investor-agreement-input"), {
+      target: { files: [file("signed.pdf", "application/pdf")] },
+    });
+    fireEvent.click(
+      screen.getByRole("button", { name: "Upload the signed agreement" }),
+    );
+
+    act(() =>
+      mutate.mock.calls[0][1].onError({
+        code: "INVESTOR_AGREEMENT_SIGNATURE_INVALID",
+        message: "NEAC: Chữ ký: Không hợp lệ",
+      }),
+    );
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "NEAC does not confirm this digital signature as valid. NEAC: Chữ ký: Không hợp lệ",
+    );
+  });
+
   it("says the commitment is held, nothing paid, and by when to sign", () => {
     render(<InvestorAgreementStep {...stepProps} onSigned={vi.fn()} />);
 
@@ -247,11 +277,15 @@ describe("SignedAgreementNotice", () => {
         signedAt={signedAt}
         version={VERSION}
         fileName="hop-dong-da-ky.pdf"
+        signatureCheck={signedStatus.signature_check}
         locale="en"
         t={t}
       />,
     );
     const date = formatDate(signedAt, "en");
+    expect(screen.getByTestId("signed-agreement-neac")).toHaveTextContent(
+      "Verified with NEAC: a valid digital signature by NGUYEN VAN A (CCCD:079203001234), issued by FPT Certification Authority SHA256.",
+    );
     expect(screen.getByTestId("signed-agreement-notice")).toHaveTextContent(
       `uploaded it on ${date} (version ${VERSION})`,
     );
