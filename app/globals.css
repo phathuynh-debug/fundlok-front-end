@@ -211,6 +211,28 @@ html[data-reduce-motion="1"] .animate-ping {
   animation: none !important;
 }
 
+/* Marketing page-to-page transition (app/[lang]/template.tsx). The old page
+   holds still and the new one fades in over it. Every marketing page has an
+   opaque, full-height bg-background wrapper, so this is a true crossfade with
+   no dip in brightness, and the sticky header, the same pixels on both pages,
+   does not flicker. Fading both halves out/in would dim everything mid-way.
+   Opacity only, so it stays under reduced motion (see above). */
+::view-transition-old(.page-fade) {
+  animation: none;
+}
+::view-transition-new(.page-fade) {
+  animation: 600ms ease both page-fade-in;
+}
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+/* The transition overlay would otherwise swallow clicks for its 600ms. */
+::view-transition {
+  pointer-events: none;
+}
+
 /* --------------------------------------------------------------------------- */
 /* Shared typography roles. One element = one style, everywhere it appears.     */
 /* Uppercase letter-spacing is capped at 0.05em: wider tracking pulls           */
