@@ -33,6 +33,7 @@ import {
   usePreviewEmail,
   useSendEmail,
 } from "@/hooks/use-admin-email";
+import { useCurrentUser } from "@/hooks/use-authentication";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
 import { CONTROL_IDLE } from "@/lib/ui-tokens";
@@ -90,6 +91,7 @@ export function ComposeEmailCard() {
   const { t, locale } = useTranslations();
   const { toast } = useToast();
   const { data: settings } = useEmailSettings();
+  const { data: user } = useCurrentUser();
   const { data: policy } = useEmailPolicy();
   const allowedDomains = policy?.allowed_domains ?? [];
   const { mutateAsync: renderPreview, isPending: previewing } =
@@ -117,7 +119,13 @@ export function ComposeEmailCard() {
     null,
   );
 
-  const ready = !!settings?.configured && settings.enabled;
+  const emailMismatch = Boolean(
+    settings?.gmail_address &&
+    user?.email &&
+    settings.gmail_address.trim().toLowerCase() !==
+      user.email.trim().toLowerCase(),
+  );
+  const ready = !!settings?.configured && settings.enabled && !emailMismatch;
 
   const bodyTextareaRef = useRef<HTMLDivElement>(null);
 
@@ -337,13 +345,19 @@ export function ComposeEmailCard() {
       {settings && !ready && (
         <p
           role="status"
-          className="mt-4 rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-foreground"
+          className={
+            emailMismatch
+              ? "mt-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive"
+              : "mt-4 rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-foreground"
+          }
         >
           {/* Connected but paused (a first connect starts paused) needs only
               the switch, not another connect. */}
-          {settings.configured
-            ? t("admin.email.compose.notReadyPaused")
-            : t("admin.email.compose.notReady")}
+          {emailMismatch
+            ? t("admin.email.compose.notReadyEmailMismatch")
+            : settings.configured
+              ? t("admin.email.compose.notReadyPaused")
+              : t("admin.email.compose.notReady")}
         </p>
       )}
 

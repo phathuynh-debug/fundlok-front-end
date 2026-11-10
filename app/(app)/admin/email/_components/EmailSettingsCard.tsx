@@ -104,6 +104,7 @@ export function EmailSettingsCard() {
           // No row yet: start from the admin's own name, since the email is
           // meant to come from them.
           defaultName={user?.full_name ?? ""}
+          accountEmail={user?.email ?? null}
         />
       )}
     </section>
@@ -158,12 +159,23 @@ interface FieldErrors {
   signaturePhone?: string;
 }
 
+function maskEmailAddress(email: string): string {
+  const [localPart, domain] = email.split("@");
+  if (!localPart || !domain) return "***";
+  if (localPart.length <= 2) {
+    return `${localPart[0] ?? "*"}***@${domain}`;
+  }
+  return `${localPart[0]}***${localPart[localPart.length - 1]}@${domain}`;
+}
+
 function SettingsForm({
   settings,
   defaultName,
+  accountEmail,
 }: {
   settings: EmailSettings;
   defaultName: string;
+  accountEmail: string | null;
 }) {
   const { t, locale } = useTranslations();
   const { toast } = useToast();
@@ -191,11 +203,18 @@ function SettingsForm({
   const [errors, setErrors] = useState<FieldErrors>({});
   const [confirmDisconnect, setConfirmDisconnect] = useState(false);
 
+  const emailMismatch = Boolean(
+    settings.gmail_address &&
+    accountEmail &&
+    settings.gmail_address.trim().toLowerCase() !==
+      accountEmail.trim().toLowerCase(),
+  );
+
   const connecting = starting || redirecting;
   const busy = saving || disconnecting || testing || connecting;
-  // The server refuses to turn sending ON without an account; leaving it on
-  // (after Google revoked access) is allowed, so only block the off → on move.
-  const canTurnOn = settings.configured || settings.enabled;
+  // The server refuses to turn sending ON without an account or when the
+  // connected email does not match the signed-in admin's account email.
+  const canTurnOn = (settings.configured || settings.enabled) && !emailMismatch;
 
   const handleConnect = async () => {
     try {
@@ -286,7 +305,7 @@ function SettingsForm({
   return (
     <form onSubmit={handleSave} noValidate className="mt-6 flex flex-col gap-5">
       <div className="flex flex-wrap items-center gap-3">
-        <StatusBadge settings={settings} />
+        <StatusBadge settings={settings} emailMismatch={emailMismatch} />
         <span className="text-xs text-muted-foreground">
           {settings.last_verified_at
             ? t("admin.email.settings.lastVerified").replace(
@@ -299,6 +318,8 @@ function SettingsForm({
 
       <GoogleAccountBox
         settings={settings}
+        accountEmail={accountEmail}
+        emailMismatch={emailMismatch}
         busy={busy}
         connecting={connecting}
         onConnect={handleConnect}
@@ -415,7 +436,7 @@ function SettingsForm({
         <Button
           type="button"
           variant="outline"
-          disabled={busy || !settings.configured}
+          disabled={busy || !settings.configured || emailMismatch}
           onClick={handleTest}
         >
           {testing ? (
@@ -456,18 +477,27 @@ function SettingsForm({
 // revoked access, or an App Password connection from before OAuth), none.
 function GoogleAccountBox({
   settings,
+  accountEmail,
+  emailMismatch,
   busy,
   connecting,
   onConnect,
   onDisconnect,
 }: {
   settings: EmailSettings;
+  accountEmail: string | null;
+  emailMismatch: boolean;
   busy: boolean;
   connecting: boolean;
   onConnect: () => void;
   onDisconnect: () => void;
 }) {
   const { t, locale } = useTranslations();
+  const displayGmailAddress = settings.gmail_address
+    ? emailMismatch
+      ? maskEmailAddress(settings.gmail_address)
+      : settings.gmail_address
+    : null;
 
   const connectButton = (label: string) => (
     <Button type="button" variant="outline" disabled={busy} onClick={onConnect}>
@@ -485,8 +515,14 @@ function GoogleAccountBox({
   return (
     <div className="space-y-2">
       <Label>{t("admin.email.settings.accountLabel")}</Label>
-      <div className="flex flex-col gap-4 rounded-md border p-4 sm:flex-row sm:items-center sm:justify-between">
-        {settings.configured && settings.gmail_address ? (
+      <div
+        className={
+          emailMismatch
+            ? "flex flex-col gap-4 rounded-md border border-destructive/40 bg-destructive/5 p-4 sm:flex-row sm:items-center sm:justify-between"
+            : "flex flex-col gap-4 rounded-md border p-4 sm:flex-row sm:items-center sm:justify-between"
+        }
+      >
+        {settings.configured && displayGmailAddress ? (
           <div className="flex min-w-0 items-center gap-3">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border bg-background">
               <GoogleIcon />
@@ -500,7 +536,7 @@ function GoogleAccountBox({
                   className="h-4 w-4 shrink-0 text-muted-foreground"
                   aria-hidden
                 />
-                <span className="truncate">{settings.gmail_address}</span>
+                <span className="truncate">{displayGmailAddress}</span>
               </p>
               {settings.connected_at && (
                 <p className="text-xs text-muted-foreground">
@@ -512,7 +548,7 @@ function GoogleAccountBox({
               )}
             </div>
           </div>
-        ) : settings.needs_reconnect && settings.gmail_address ? (
+        ) : settings.needs_reconnect && displayGmailAddress ? (
           <p
             role="status"
             className="flex items-start gap-2 text-sm text-amber-700 dark:text-amber-400"
@@ -521,7 +557,7 @@ function GoogleAccountBox({
             <span>
               {t("admin.email.settings.needsReconnect").replace(
                 "{email}",
-                settings.gmail_address,
+                displayGmailAddress,
               )}
             </span>
           </p>
@@ -555,12 +591,43 @@ function GoogleAccountBox({
           )}
         </div>
       </div>
+
+      {emailMismatch && displayGmailAddress && accountEmail && (
+        <p
+          role="alert"
+          className="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive"
+        >
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+          <span>
+            {t("admin.email.settings.emailMismatchWarning")
+              .replace("{connectedEmail}", displayGmailAddress)
+              .replaceAll("{accountEmail}", accountEmail)}
+          </span>
+        </p>
+      )}
     </div>
   );
 }
 
-function StatusBadge({ settings }: { settings: EmailSettings }) {
+function StatusBadge({
+  settings,
+  emailMismatch,
+}: {
+  settings: EmailSettings;
+  emailMismatch: boolean;
+}) {
   const { t } = useTranslations();
+  if (emailMismatch) {
+    return (
+      <Badge
+        variant="outline"
+        className="gap-1 border-destructive/40 bg-destructive/10 text-destructive"
+      >
+        <AlertTriangle className="h-3.5 w-3.5" aria-hidden />
+        {t("admin.email.settings.statusEmailMismatch")}
+      </Badge>
+    );
+  }
   if (!settings.configured) {
     if (settings.needs_reconnect) {
       return (

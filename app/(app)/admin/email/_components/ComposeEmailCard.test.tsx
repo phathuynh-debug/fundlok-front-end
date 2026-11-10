@@ -15,6 +15,12 @@ vi.mock("@/hooks/use-toast", () => ({
   useToast: () => ({ toast: vi.fn() }),
 }));
 
+vi.mock("@/hooks/use-authentication", () => ({
+  useCurrentUser: () => ({
+    data: { id: "admin-1", email: "a@fundlok.com", full_name: "Admin" },
+  }),
+}));
+
 vi.mock("@/hooks/use-admin-email", () => ({
   useEmailSettings: () => ({
     data: { configured: true, enabled: true, gmail_address: "a@fundlok.com" },
