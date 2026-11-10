@@ -90,6 +90,12 @@ export function rootMetadata(locale: SeoLocale, seo: SeoStrings): Metadata {
       title: siteTitle,
       description: siteDescription,
     },
+    // Zalo Platform domain ownership (developers.zalo.me > Fundlok app >
+    // "Xác thực domain"). Zalo reads it from the homepage <head>; the same
+    // token is also served as public/zalo_verifier<token>.html.
+    other: {
+      "zalo-platform-site-verification": "PTM0TxYdDtTabBTzuESW9JxGZGVIfbPVE30u",
+    },
     // No `icons` here on purpose. app/favicon.ico, app/icon.png and
     // app/apple-icon.png are picked up by Next's file conventions, which emit
     // the <link> tags with a content hash (/icon.png?<hash>). Hard-coding
