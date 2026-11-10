@@ -13,7 +13,7 @@ import { useTranslations } from "@/lib/i18n";
 export function AdminPageLoader() {
   const { t } = useTranslations();
   return (
-    <div className="h-screen w-full flex items-center justify-center bg-background">
+    <div className="min-h-[60vh] w-full flex items-center justify-center">
       <div className="flex flex-col items-center gap-2">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
         <span className="text-sm font-medium text-muted-foreground">

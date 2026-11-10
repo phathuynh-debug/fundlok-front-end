@@ -51,7 +51,7 @@ export function AdminHeader() {
             <Button
               variant="ghost"
               size="icon"
-              className="h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground"
+              className="h-9 w-9 shrink-0 text-muted-foreground"
               aria-label={t("common.toggleMenu")}
             >
               <Menu className="h-5 w-5" />

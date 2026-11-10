@@ -6,7 +6,7 @@ import { useRequireAuth } from "@/hooks/use-authentication";
 import { useAuditLogs } from "@/hooks/use-admin";
 import type { AuditLog, AuditUserRef } from "@/services/admin.service";
 import { isAdminRole } from "@/services/authentication.service";
-import { Loader2, ScrollText } from "lucide-react";
+import { ScrollText } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { AdminPageLoader } from "../_components/AdminPageLoader";
 import { DataTable, type Column } from "../_components/DataTable";
 import { useTranslations } from "@/lib/i18n";
 import { enumLabel } from "@/lib/enum-labels";
@@ -158,16 +159,7 @@ export default function AdminAuditLogsClient() {
   }, [isLoading, user, router]);
 
   if (isLoading || !user || !isAdminRole(user.role)) {
-    return (
-      <div className="h-screen w-full flex items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-2">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <span className="text-sm font-medium text-muted-foreground">
-            {t("admin.loading")}
-          </span>
-        </div>
-      </div>
-    );
+    return <AdminPageLoader />;
   }
 
   const columns = buildColumns(t, locale);

@@ -26,6 +26,7 @@ import { InvestorLeadDetailSheet } from "./InvestorLeadDetailSheet";
 import { useInvestorLeads } from "@/hooks/use-rates";
 import { useTranslations } from "@/lib/i18n";
 import { formatCompactCurrency } from "@/lib/format-currency";
+import { formatDateTime } from "@/lib/format-date";
 import type {
   InvestorLeadAdminItem,
   InvestorRiskTier,
@@ -88,11 +89,7 @@ export function InvestorLeadsDirectory() {
     return { signed, capital };
   }, [items]);
 
-  const dateTime = (iso: string) =>
-    new Intl.DateTimeFormat(locale === "vi" ? "vi-VN" : "en-GB", {
-      dateStyle: "short",
-      timeStyle: "short",
-    }).format(new Date(iso));
+  const dateTime = (iso: string) => formatDateTime(iso, locale) || "—";
 
   const columns: Column<InvestorLeadAdminItem>[] = [
     {

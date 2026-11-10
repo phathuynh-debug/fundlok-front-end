@@ -34,7 +34,7 @@ import { cn } from "@/lib/utils";
 const PAGE_SIZE = 15;
 
 export function RateInquiriesDirectory() {
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const [page, setPage] = useState(1);
   const [industryFilter, setIndustryFilter] = useState<string>("ALL");
   const [tierFilter, setTierFilter] = useState<string>("ALL");
@@ -171,7 +171,8 @@ export function RateInquiriesDirectory() {
       header: t("admin.ratesTable.revenueL12m"),
       cellClassName: "text-xs font-semibold text-foreground whitespace-nowrap",
       render: (item) =>
-        item.revenue_l12m_formatted || formatCurrency(item.revenue_l12m),
+        item.revenue_l12m_formatted ||
+        formatCurrency(item.revenue_l12m, locale),
     },
     {
       key: "yoy_growth",
@@ -200,7 +201,7 @@ export function RateInquiriesDirectory() {
       cellClassName: "whitespace-nowrap text-xs font-bold text-foreground",
       render: (item) =>
         item.loan_ask_display ||
-        `${formatCompactCurrency(item.requested_amount)} / ${item.tenor_months} mos`,
+        `${formatCompactCurrency(item.requested_amount, locale)} / ${item.tenor_months} mos`,
     },
     {
       key: "rate",
@@ -239,7 +240,7 @@ export function RateInquiriesDirectory() {
         return (
           <Badge
             variant="outline"
-            className="bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20 text-xs font-semibold"
+            className="bg-muted text-muted-foreground border-border text-xs font-semibold"
           >
             {item.tier_display || "Tier C"}
           </Badge>
@@ -325,7 +326,7 @@ export function RateInquiriesDirectory() {
           </div>
           <p className="text-2xl font-bold tracking-tight text-foreground">
             {stats.totalDemand > 0
-              ? formatCompactCurrency(stats.totalDemand)
+              ? formatCompactCurrency(stats.totalDemand, locale)
               : "—"}
           </p>
           <p className="text-xs text-muted-foreground">

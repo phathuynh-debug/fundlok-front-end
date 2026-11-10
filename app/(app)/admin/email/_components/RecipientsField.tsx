@@ -10,6 +10,7 @@ import { useLoadFundlokRecipients } from "@/hooks/use-admin-email";
 import { useToast } from "@/hooks/use-toast";
 import { apiErrorMessage } from "@/lib/api-error-message";
 import { useTranslations } from "@/lib/i18n";
+import { CONTROL_IDLE } from "@/lib/ui-tokens";
 import { cn } from "@/lib/utils";
 import { MAX_RECIPIENTS } from "@/services/admin-email.service";
 import { EMAIL_PATTERN, parseList } from "./email-errors";
@@ -177,7 +178,7 @@ export function RecipientsField({
                   "{email}",
                   email,
                 )}
-                className="rounded-full p-0.5 text-muted-foreground hover:text-foreground"
+                className={cn("rounded-full p-0.5", CONTROL_IDLE)}
               >
                 <X className="h-3 w-3" aria-hidden />
               </button>

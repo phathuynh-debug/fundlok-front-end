@@ -84,6 +84,7 @@
         "confirmTitle": "Gửi email này?",
         "description": "Chọn mẫu, viết nội dung dạng văn bản, xem trước rồi gửi.",
         "headingLabel": "Tiêu đề lớn (không bắt buộc)",
+        "includeSignature": "Bao gồm chữ ký email của tôi",
         "notReady": "Hãy kết nối tài khoản Google ở bước 1 và bật gửi email để có thể gửi.",
         "notReadyPaused": "Đang tạm dừng gửi. Hãy bật \"Bật gửi email\" ở bước 1 rồi bấm Lưu để có thể gửi.",
         "presets": {
@@ -614,6 +615,12 @@
     "projectsPage": {
       "subtitle": "Xem hồ sơ doanh nghiệp và tình trạng phê duyệt.",
       "title": "Dự án"
+    },
+    "quickActions": {
+      "auditLogs": "Lịch sử hoạt động",
+      "kycReviews": "Xét duyệt danh tính",
+      "rates": "Lãi suất & định phí",
+      "security": "Bảo mật & phiên đăng nhập"
     },
     "ratesDetail": {
       "businessProfileTitle": "Hồ sơ & Quy mô doanh nghiệp",

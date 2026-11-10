@@ -6,6 +6,8 @@ import { X } from "lucide-react";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { isAdminRole } from "@/services/authentication.service";
 import { useTranslations } from "@/lib/i18n";
+import { CONTROL_IDLE } from "@/lib/ui-tokens";
+import { cn } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -166,7 +168,10 @@ export default function AdminTransactionsClient() {
                   <button
                     type="button"
                     onClick={() => setRound(null)}
-                    className="shrink-0 cursor-pointer rounded p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+                    className={cn(
+                      "shrink-0 cursor-pointer rounded p-0.5",
+                      CONTROL_IDLE,
+                    )}
                     aria-label={t("admin.transactions.clearRound")}
                   >
                     <X className="h-3.5 w-3.5" />
