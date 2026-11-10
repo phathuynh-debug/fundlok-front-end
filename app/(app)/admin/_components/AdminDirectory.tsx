@@ -57,6 +57,8 @@ const buildUserColumns = (
   {
     key: "name",
     header: t("admin.table.name"),
+    sortValue: (u) => u.full_name || u.email,
+    filterValue: (u) => u.full_name || "",
     render: (u) => (
       <div className="flex items-center gap-3">
         <Avatar className="h-8 w-8 shrink-0">
@@ -83,11 +85,13 @@ const buildUserColumns = (
   {
     key: "role",
     header: t("admin.table.role"),
+    filterType: "select",
     render: (u) => <Badge variant="outline">{roleLabel(t, u.role)}</Badge>,
   },
   {
     key: "status",
     header: t("admin.table.status"),
+    filterType: "select",
     render: (u) => (
       <Badge variant={statusVariant(u.status)}>
         {enumLabel(t, "userStatus", u.status)}
@@ -97,12 +101,14 @@ const buildUserColumns = (
   {
     key: "consent",
     header: t("admin.table.consent"),
+    filterType: "select",
     render: (u) => <ConsentBadge state={u.consent_status} t={t} />,
   },
   {
     key: "joined",
     header: t("admin.table.joined"),
     cellClassName: "text-muted-foreground",
+    sortValue: (u) => u.created_at,
     render: (u) => formatDate(u.created_at, locale),
   },
 ];
@@ -151,11 +157,13 @@ const buildProjectColumns = (
     key: "industry",
     header: t("admin.table.industry"),
     cellClassName: "text-muted-foreground",
+    filterType: "select",
     render: (p) => industryLabel(p.industry, t) || "—",
   },
   {
     key: "status",
     header: t("admin.table.status"),
+    filterType: "select",
     render: (p) => (
       <Badge variant={statusVariant(p.status)}>
         {enumLabel(t, "projectStatus", p.status)}
@@ -166,6 +174,7 @@ const buildProjectColumns = (
     key: "created",
     header: t("admin.table.created"),
     cellClassName: "text-muted-foreground",
+    sortValue: (p) => p.created_at,
     render: (p) => formatDate(p.created_at, locale),
   },
 ];

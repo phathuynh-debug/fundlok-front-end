@@ -152,6 +152,7 @@ export function RateInquiriesDirectory() {
     {
       key: "industry",
       header: t("admin.ratesTable.industry"),
+      filterType: "select",
       render: (item) => (
         <span className="inline-flex items-center rounded-md bg-muted px-2 py-1 text-xs font-medium text-foreground">
           {item.industry_display || item.industry}
@@ -162,6 +163,7 @@ export function RateInquiriesDirectory() {
       key: "tenure_staff",
       header: t("admin.ratesTable.tenureStaff"),
       cellClassName: "text-xs text-muted-foreground whitespace-nowrap",
+      sortValue: (item) => item.operating_months,
       render: (item) =>
         item.tenure_staff_display ||
         `${item.operating_months} mos / ${item.employee_count} staff`,
@@ -170,6 +172,7 @@ export function RateInquiriesDirectory() {
       key: "revenue",
       header: t("admin.ratesTable.revenueL12m"),
       cellClassName: "text-xs font-semibold text-foreground whitespace-nowrap",
+      sortValue: (item) => item.revenue_l12m,
       render: (item) =>
         item.revenue_l12m_formatted ||
         formatCurrency(item.revenue_l12m, locale),
@@ -178,6 +181,7 @@ export function RateInquiriesDirectory() {
       key: "yoy_growth",
       header: t("admin.ratesTable.yoyGrowth"),
       cellClassName: "whitespace-nowrap",
+      sortValue: (item) => item.yoy_growth_pct,
       render: (item) => {
         const isPositive = (item.yoy_growth_pct ?? 0) >= 0;
         return (
@@ -199,6 +203,7 @@ export function RateInquiriesDirectory() {
       key: "loan_ask",
       header: t("admin.ratesTable.loanAsk"),
       cellClassName: "whitespace-nowrap text-xs font-bold text-foreground",
+      sortValue: (item) => item.requested_amount,
       render: (item) =>
         item.loan_ask_display ||
         `${formatCompactCurrency(item.requested_amount, locale)} / ${item.tenor_months} mos`,
@@ -207,6 +212,7 @@ export function RateInquiriesDirectory() {
       key: "rate",
       header: t("admin.ratesTable.calculatedRate"),
       cellClassName: "whitespace-nowrap text-xs font-medium text-primary",
+      sortValue: (item) => item.estimated_rate_min,
       render: (item) =>
         item.calculated_rate_display ||
         `${item.estimated_rate_min}% - ${item.estimated_rate_max}% / mo`,
@@ -215,6 +221,7 @@ export function RateInquiriesDirectory() {
       key: "tier",
       header: t("admin.ratesTable.tier"),
       cellClassName: "whitespace-nowrap",
+      filterType: "select",
       render: (item) => {
         const tier = (item.risk_tier ?? "").toUpperCase();
         if (tier.includes("A")) {

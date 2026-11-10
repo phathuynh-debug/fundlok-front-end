@@ -3872,6 +3872,20 @@
     "signOutBtn": "Sign out",
     "title": "Your account has been suspended"
   },
+  "tableControls": {
+    "clear": "Clear",
+    "clearAll": "Reset all",
+    "filterBy": "Filter {column}",
+    "filterPlaceholder": "Search {column}…",
+    "noMatchingRows": "No rows match the active column filters.",
+    "noOptions": "No filterable values",
+    "selectedCount": "{count} selected",
+    "sortAsc": "Sort ascending",
+    "sortBy": "Sort by {column}",
+    "sortDesc": "Sort descending",
+    "sortedAsc": "{column} (↑)",
+    "sortedDesc": "{column} (↓)"
+  },
   "termsPage": {
     "backToHome": "Back to home",
     "badge": "Legal documents",

@@ -66,24 +66,28 @@ export function TransferQueue({
       key: "project",
       header: t("admin.transactions.table.project"),
       cellClassName: "max-w-48 truncate text-xs",
+      filterType: "select",
       render: (row) => row.project_name,
     },
     {
       key: "amount",
       header: t("admin.transactions.table.amount"),
       cellClassName: "whitespace-nowrap text-xs font-semibold tabular-nums",
+      sortValue: (row) => row.amount_vnd,
       render: (row) => formatCurrency(row.amount_vnd, locale),
     },
     {
       key: "memo",
       header: t("admin.transactions.table.memo"),
       cellClassName: "whitespace-nowrap font-mono text-xs",
+      sortValue: (row) => row.reference_code,
       render: (row) => row.reference_code,
     },
     {
       key: "receipt",
       header: t("admin.transactions.table.receipt"),
       cellClassName: "whitespace-nowrap text-xs text-muted-foreground",
+      sortValue: (row) => row.receipt_submitted_at,
       render: (row) =>
         row.receipt_submitted_at
           ? formatDateTime(row.receipt_submitted_at, locale)
@@ -94,6 +98,7 @@ export function TransferQueue({
     {
       key: "status",
       header: t("admin.transactions.table.status"),
+      filterType: "select",
       render: (row) => <TransferStatusBadge transfer={row} />,
     },
   ];

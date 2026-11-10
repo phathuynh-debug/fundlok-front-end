@@ -3872,6 +3872,20 @@
     "signOutBtn": "Đăng xuất",
     "title": "Tài khoản của bạn đã bị tạm khóa"
   },
+  "tableControls": {
+    "clear": "Xóa",
+    "clearAll": "Đặt lại",
+    "filterBy": "Lọc {column}",
+    "filterPlaceholder": "Tìm trong {column}…",
+    "noMatchingRows": "Không có dòng nào khớp bộ lọc cột đang chọn.",
+    "noOptions": "Không có giá trị để lọc",
+    "selectedCount": "Đã chọn {count}",
+    "sortAsc": "Sắp xếp tăng dần",
+    "sortBy": "Sắp xếp theo {column}",
+    "sortDesc": "Sắp xếp giảm dần",
+    "sortedAsc": "{column} (↑)",
+    "sortedDesc": "{column} (↓)"
+  },
   "termsPage": {
     "backToHome": "Quay lại trang chủ",
     "badge": "Văn bản pháp lý",

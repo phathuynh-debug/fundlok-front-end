@@ -75,11 +75,13 @@ const buildColumns = (t: TranslateFn, locale: string): Column<AuditLog>[] => [
     key: "time",
     header: t("admin.auditLogs.time"),
     cellClassName: "text-muted-foreground whitespace-nowrap",
+    sortValue: (log) => log.created_at,
     render: (log) => formatDateTime(log.created_at, locale),
   },
   {
     key: "action",
     header: t("admin.auditLogs.action"),
+    filterType: "select",
     render: (log) =>
       log.action ? (
         // The raw code stays on hover: it is what an operator searches for.
@@ -93,6 +95,11 @@ const buildColumns = (t: TranslateFn, locale: string): Column<AuditLog>[] => [
   {
     key: "entity",
     header: t("admin.auditLogs.entity"),
+    filterType: "select",
+    filterValue: (log) =>
+      log.entity_type ? enumLabel(t, "auditEntity", log.entity_type) : "",
+    sortValue: (log) =>
+      log.entity_type ? enumLabel(t, "auditEntity", log.entity_type) : "",
     render: (log) => (
       <div className="flex flex-col">
         <span className="font-medium text-foreground" title={log.entity_type}>
@@ -119,12 +126,15 @@ const buildColumns = (t: TranslateFn, locale: string): Column<AuditLog>[] => [
   {
     key: "actor",
     header: t("admin.auditLogs.actor"),
+    sortValue: (log) =>
+      log.actor?.full_name || log.actor?.email || log.actor_id,
     render: (log) => <UserCell user={log.actor} fallbackId={log.actor_id} />,
   },
   {
     key: "ip",
     header: t("admin.auditLogs.ip"),
     cellClassName: "font-mono text-xs text-muted-foreground whitespace-nowrap",
+    sortValue: (log) => log.ip_address,
     render: (log) => log.ip_address || "—",
   },
 ];

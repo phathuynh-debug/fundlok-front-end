@@ -43,12 +43,14 @@ export function ActivityLog({ group }: { group: AdminActivityGroup }) {
     {
       key: "action",
       header: t("admin.transactions.activity.action"),
+      filterType: "select",
       render: (row) => <ActivityBadge entry={row} />,
     },
     {
       key: "ticket",
       header: t("admin.transactions.activity.ticket"),
       cellClassName: "whitespace-nowrap text-xs",
+      sortValue: (row) => row.amount_vnd ?? row.reference_code,
       render: (row) => (
         <div className="space-y-0.5">
           <p className="font-mono text-foreground">

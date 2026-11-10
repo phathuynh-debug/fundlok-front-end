@@ -122,6 +122,7 @@ export function InvestorLeadsDirectory() {
       key: "amount",
       header: t("admin.investorLeads.col.amount"),
       cellClassName: "whitespace-nowrap text-xs font-semibold",
+      sortValue: (item) => item.amount_vnd,
       render: (item) =>
         `${formatCompactCurrency(item.amount_vnd, locale)} / ${item.commitment_months} ${t("admin.investorLeads.months")}`,
     },
@@ -129,6 +130,7 @@ export function InvestorLeadsDirectory() {
       key: "tier",
       header: t("admin.investorLeads.col.tier"),
       cellClassName: "whitespace-nowrap text-xs",
+      filterType: "select",
       render: (item) => t(`ratePage.investor.tier.${item.risk_tier}`),
     },
     {
@@ -136,12 +138,14 @@ export function InvestorLeadsDirectory() {
       header: t("admin.investorLeads.col.netApy"),
       cellClassName:
         "whitespace-nowrap font-mono text-xs font-medium text-primary",
+      sortValue: (item) => item.net_apy_pct,
       render: (item) => `${item.net_apy_pct.toFixed(2)}%`,
     },
     {
       key: "status",
       header: t("admin.investorLeads.col.status"),
       cellClassName: "whitespace-nowrap",
+      filterType: "select",
       render: (item) =>
         item.signed_up_at ? (
           <Badge
