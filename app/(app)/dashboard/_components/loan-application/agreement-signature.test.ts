@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { bytesHaveDigitalSignature } from "./agreement-signature";
+import {
+  bytesHaveDigitalSignature,
+  countDigitalSignatures,
+} from "./agreement-signature";
 
 const bytes = (s: string) => new TextEncoder().encode(s);
 
@@ -22,5 +25,20 @@ describe("bytesHaveDigitalSignature", () => {
     expect(bytesHaveDigitalSignature(bytes("PK\u0003\u0004" + SIGNATURE))).toBe(
       false,
     );
+  });
+});
+
+describe("countDigitalSignatures", () => {
+  it("counts each signature a signing tool appended", () => {
+    expect(countDigitalSignatures(bytes(UNSIGNED))).toBe(0);
+    expect(countDigitalSignatures(bytes(UNSIGNED + SIGNATURE))).toBe(1);
+    // The Standing Offer: the enterprise's signature, then the guarantor's.
+    expect(
+      countDigitalSignatures(bytes(UNSIGNED + SIGNATURE + SIGNATURE)),
+    ).toBe(2);
+  });
+
+  it("counts nothing in something that is not a PDF", () => {
+    expect(countDigitalSignatures(bytes("PK\u0003\u0004" + SIGNATURE))).toBe(0);
   });
 });

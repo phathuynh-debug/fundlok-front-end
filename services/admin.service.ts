@@ -324,11 +324,13 @@ export interface AdminApplicationDocument {
   signature_check?: AdminSignatureCheck | null;
 }
 
-// The SME's signed Service Agreement (loan wizard step 4), checked with NEAC
-// (neac.gov.vn), the national e-signature authority. Three separate answers:
-// NEAC's own verdict on the signature, whether the file is this application's
-// agreement, and whether the signer's tax code is the company's. The SME was
-// not held up by any of it; this is for staff to read before approving.
+// A signed listing document (the SME Service Agreement or the Standing Offer,
+// both signed after approval), checked with NEAC (neac.gov.vn), the national
+// e-signature authority. Separate answers: NEAC's own verdict on the
+// signature, whether the file is this application's document, whether its
+// numbers are the approved ones (check code), whether the signer's tax code is
+// the company's, and on the Standing Offer the Personal Guarantor's own
+// signature. Checked when the SME uploads it; staff can check again.
 // Spec: backend app/loans/agreement/neac_check.py.
 export interface AdminSignatureCheck {
   /**
@@ -362,6 +364,26 @@ export interface AdminSignatureCheck {
   /** NEAC's reasons, Vietnamese, as it states them. Empty when it accepts. */
   problems: string[];
   neac_message: string | null;
+  /** sme_service_agreement | sme_standing_offer (absent on older checks). */
+  document_type?: string | null;
+  /**
+   * The copy carries the check code the document would carry today: the
+   * approved terms, assessment and parties' details are what was signed.
+   * null: the copy has no check code (signed before codes were printed).
+   */
+  terms_match?: boolean | null;
+  check_code?: string | null;
+  /** The Standing Offer: the Personal Guarantor signs too. */
+  guarantor_required?: boolean;
+  /** A separate valid signature by the guarantor (their eKYC ID). */
+  guarantor_matches?: boolean | null;
+  guarantor_expected_id?: string | null;
+  guarantor_expected_name?: string | null;
+  /** As the guarantor's certificate carries it. */
+  guarantor_name?: string | null;
+  guarantor_id?: string | null;
+  guarantor_name_matches?: boolean;
+  guarantor_problems?: string[];
 }
 
 // What the grading engine produced. `status` is the run's lifecycle

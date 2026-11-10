@@ -64,10 +64,10 @@ const financialsHeading = (page: Page) =>
   page.getByRole("heading", { name: t("dashboard.sme.lite.financialsTitle") });
 
 /**
- * 1 legal · 2 revenue and costs · 3 CIC · 4 the SME Service Agreement · 5
- * review (TOTAL_STEPS in useLoanApplication.ts).
+ * 1 legal · 2 revenue and costs · 3 CIC · 4 review (TOTAL_STEPS in
+ * useLoanApplication.ts). The listing documents are signed after approval.
  */
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 4;
 
 /** The wizard's "Step n of 5" line. */
 const stepIndicator = (page: Page, current: number) =>
@@ -621,29 +621,6 @@ test.describe("the CIC step", () => {
       buffer: Buffer.from(body),
     });
 
-  /** Step 4's heading (an h4, so by role rather than the indicator's text). */
-  const agreementHeading = (page: Page) =>
-    page.getByRole("heading", { name: t("dashboard.sme.agreement.title") });
-
-  /**
-   * Step 4: send back the agreement, signed. The browser only checks that the
-   * PDF carries a signature dictionary (a /ByteRange, see
-   * agreement-signature.ts); the backend checks the stored copy at Send.
-   */
-  async function signAgreement(page: Page) {
-    await expect(agreementHeading(page)).toBeVisible();
-    await page.locator("input#serviceAgreement").setInputFiles({
-      name: "sme-service-agreement-signed.pdf",
-      mimeType: "application/pdf",
-      buffer: Buffer.from(
-        "%PDF-1.7\n/Type /Sig /ByteRange [0 10 20 30]\n%%EOF",
-      ),
-    });
-    await expect(
-      page.getByText(t("dashboard.sme.agreement.checking")),
-    ).not.toBeVisible();
-  }
-
   test("explains what the report is and how to get it", async ({ page }) => {
     await advanceToCicStep(page);
 
@@ -686,7 +663,10 @@ test.describe("the CIC step", () => {
     await expect(page.locator("input#cicReport")).toBeAttached();
   });
 
-  test("advances to the service agreement once the report is read", async ({
+  // Nothing is signed in the wizard: the Service Agreement and the Standing
+  // Offer carry the approved terms, so they are signed after approval, on
+  // the status screen (ListingSigning).
+  test("goes straight to the review once the report is read", async ({
     page,
   }) => {
     await advanceToCicStep(page);
@@ -696,7 +676,10 @@ test.describe("the CIC step", () => {
 
     await expect(page.locator("input#cicReport")).not.toBeAttached();
     await expect(stepIndicator(page, 4)).toBeVisible();
-    await expect(agreementHeading(page)).toBeVisible();
+    await expect(
+      page.getByText(t("dashboard.sme.lite.reviewFiguresTitle")),
+    ).toBeVisible();
+    await expect(page.locator("input#serviceAgreement")).toHaveCount(0);
   });
 
   test("the review reads back the figures the files gave, and goes back to change the files", async ({
@@ -706,9 +689,7 @@ test.describe("the CIC step", () => {
     await pickReport(page);
     await expect(page.getByText("629", { exact: true })).toBeVisible();
     await next(page);
-    await signAgreement(page);
-    await next(page);
-    await expect(stepIndicator(page, 5)).toBeVisible();
+    await expect(stepIndicator(page, 4)).toBeVisible();
 
     // Read back before sending, as what the files said, not what was entered.
     await expect(

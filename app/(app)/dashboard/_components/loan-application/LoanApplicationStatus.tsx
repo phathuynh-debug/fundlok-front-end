@@ -8,9 +8,11 @@ import type { ProjectLoanApplication } from "@/services/projects.service";
 import type { LoanDocumentType } from "@/services/uploads.service";
 import type { IndustryTheme } from "../sme-dashboard-config";
 import { formatDate } from "@/lib/format-date";
+import { useListingDocuments } from "@/hooks/use-loans";
 import { ApprovalCelebration, ApprovalSummary } from "./ApprovalSummary";
 import { BankAccountPrompt } from "../BankAccountPrompt";
 import { FundingStatus } from "./FundingStatus";
+import { ListingSigning } from "./ListingSigning";
 
 interface LoanApplicationStatusProps {
   loanApplication: ProjectLoanApplication;
@@ -40,9 +42,22 @@ const DOCUMENT_LABELS: Record<LoanDocumentType, { en: string; vi: string }> = {
     en: "Signed service agreement",
     vi: "Hợp đồng dịch vụ đã ký số",
   },
+  sme_standing_offer: {
+    en: "Signed standing offer",
+    vi: "Đề nghị giao kết hợp đồng cho vay đã ký số",
+  },
 };
 
-const DOCUMENT_ORDER = Object.keys(DOCUMENT_LABELS) as LoanDocumentType[];
+// Signed after approval and shown in ListingSigning, not as application
+// evidence: listing them here as well would say the same thing twice.
+const SIGNED_AFTER_APPROVAL: LoanDocumentType[] = [
+  "sme_service_agreement",
+  "sme_standing_offer",
+];
+
+const DOCUMENT_ORDER = (
+  Object.keys(DOCUMENT_LABELS) as LoanDocumentType[]
+).filter((type) => !SIGNED_AFTER_APPROVAL.includes(type));
 
 /**
  * What the wizard actually asks for today (`DOCUMENT_TYPES` in
@@ -60,7 +75,6 @@ const EXPECTED_DOCUMENT_TYPES: LoanDocumentType[] = [
   "e_invoice_data",
   "tax_filings",
   "cic_report",
-  "sme_service_agreement",
 ];
 
 // DAILY is the only repayment a facility has. The others are kept so
@@ -105,6 +119,19 @@ const DECIDED_PRESENTATION: Record<
     subtitleKey: "dashboard.sme.statusApprovedSubtitle",
     badgeKey: "dashboard.sme.statusApprovedBadge",
     noteKey: "dashboard.sme.statusApprovedNote",
+    finalStep: "done",
+    reasonClass: "border-emerald-500/30 bg-emerald-500/5",
+    badgeClass: "border-emerald-500/30 bg-emerald-500/10",
+    badgeTextClass: "text-emerald-700 dark:text-emerald-300",
+    dotClass: "bg-emerald-500",
+  },
+  // Approved and both listing documents signed: the listing is live. Not a
+  // backend status (the project's, read through ListingSigning's query).
+  PUBLISHED: {
+    titleKey: "dashboard.sme.statusPublishedTitle",
+    subtitleKey: "dashboard.sme.statusPublishedSubtitle",
+    badgeKey: "dashboard.sme.statusPublishedBadge",
+    noteKey: "dashboard.sme.statusPublishedNote",
     finalStep: "done",
     reasonClass: "border-emerald-500/30 bg-emerald-500/5",
     badgeClass: "border-emerald-500/30 bg-emerald-500/10",
@@ -179,9 +206,15 @@ export function LoanApplicationStatus({
   // two-approval gate); it arrives as `approval`, and the applicant sees the
   // approved presentation from then on.
   const approval = loanApplication.approval ?? null;
+  // Whether the approved request's listing is live yet: signing the two
+  // listing documents is what publishes it (ListingSigning shares this query).
+  const listingDocuments = useListingDocuments(loanApplication.id, !!approval);
+  const published = !!approval && !!listingDocuments.data?.published;
   const decided =
     DECIDED_PRESENTATION[loanApplication.status] ??
-    (approval ? DECIDED_PRESENTATION.APPROVED : null);
+    (approval
+      ? DECIDED_PRESENTATION[published ? "PUBLISHED" : "APPROVED"]
+      : null);
   // "Still missing — send these for a re-review" belongs to a refusal. An
   // approval required the documents, and the registration is normally the
   // verified certificate rather than an upload, so listing it there would
@@ -192,19 +225,27 @@ export function LoanApplicationStatus({
   // an empty reason box is worse than no reason box.
   const decisionNote = loanApplication.decision_note?.trim() || null;
 
-  // Three-stage tracker. Undecided: submission done, review running, decision
-  // still ahead. Decided: the third node carries the verdict.
-  const steps = [
-    { label: t("dashboard.sme.statusStepSubmitted"), state: "done" as const },
+  // Four-stage tracker. Undecided: submission done, review running, decision
+  // and signing still ahead. Decided: the third node carries the verdict, and
+  // on an approval the fourth is signing the listing documents, done once
+  // they are signed and the listing is published. A refusal ends at three.
+  const steps: { label: string; state: StepState }[] = [
+    { label: t("dashboard.sme.statusStepSubmitted"), state: "done" },
     {
       label: t("dashboard.sme.statusStepReview"),
-      state: decided ? ("done" as const) : ("active" as const),
+      state: decided ? "done" : "active",
     },
     {
       label: t("dashboard.sme.statusStepDecision"),
-      state: decided ? decided.finalStep : ("pending" as const),
+      state: decided ? decided.finalStep : "pending",
     },
   ];
+  if (decided?.finalStep !== "rejected") {
+    steps.push({
+      label: t("dashboard.sme.statusStepSign"),
+      state: published ? "done" : approval ? "active" : "pending",
+    });
+  }
 
   return (
     <Card className="w-full overflow-hidden border-border/70 shadow-sm">
@@ -331,6 +372,13 @@ export function LoanApplicationStatus({
               applicationId={loanApplication.id}
               approval={approval}
               companyName={companyName}
+              t={t}
+            />
+            {/* The two documents the approved terms go into; signing them
+                publishes the listing. */}
+            <ListingSigning
+              applicationId={loanApplication.id}
+              locale={locale}
               t={t}
             />
           </>

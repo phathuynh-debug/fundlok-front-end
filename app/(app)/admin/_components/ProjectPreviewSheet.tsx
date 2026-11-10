@@ -796,8 +796,10 @@ function DocumentList({
             <Eye className="ml-auto h-3.5 w-3.5 shrink-0" aria-hidden />
           )}
         </button>
-        {/* The signed Service Agreement: NEAC's verdict, under its row. */}
-        {document.document_type === "sme_service_agreement" && (
+        {/* The signed listing documents (Service Agreement, Standing Offer):
+            NEAC's verdict, under their rows. */}
+        {(document.document_type === "sme_service_agreement" ||
+          document.document_type === "sme_standing_offer") && (
           <NeacCheckPanel
             document={document}
             projectId={projectId}

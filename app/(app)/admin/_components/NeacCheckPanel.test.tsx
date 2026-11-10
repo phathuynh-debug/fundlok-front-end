@@ -207,6 +207,70 @@ describe("NeacCheckPanel", () => {
     expect(screen.queryByText("Verified")).not.toBeInTheDocument();
   });
 
+  describe("the Standing Offer", () => {
+    const offer = (signature_check: AdminSignatureCheck) => ({
+      ...agreement(signature_check),
+      document_type: "sme_standing_offer",
+      original_filename: "de-nghi-da-ky.pdf",
+    });
+    const offerVerified: AdminSignatureCheck = {
+      ...verified,
+      agreement_version: "standing-offer-v0.3.1",
+      document_type: "sme_standing_offer",
+      terms_match: true,
+      check_code: "F56A-7205-F9C1",
+      guarantor_required: true,
+      guarantor_matches: true,
+      guarantor_expected_id: "079123456789",
+      guarantor_expected_name: "TRAN VAN OWNER",
+      guarantor_name: "TRAN VAN OWNER",
+      guarantor_id: "CCCD:079123456789",
+      guarantor_name_matches: true,
+      guarantor_problems: [],
+    };
+
+    it("shows both signatures and the check code as verified", () => {
+      renderPanel(offer(offerVerified));
+
+      expect(screen.getByText("Verified")).toBeInTheDocument();
+      // NEAC, document, company, guarantor, check code.
+      expect(marks()).toEqual(["ok", "ok", "ok", "ok", "ok"]);
+      expect(
+        screen.getByText(
+          /Signed by the Personal Guarantor too: ID 079123456789/,
+        ),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/Carries today's check code F56A-7205-F9C1/),
+      ).toBeInTheDocument();
+      expect(screen.getByText("Personal Guarantor")).toBeInTheDocument();
+    });
+
+    it("needs review without the guarantor's own signature", () => {
+      renderPanel(
+        offer({
+          ...offerVerified,
+          guarantor_matches: false,
+          guarantor_name: null,
+          guarantor_id: null,
+        }),
+      );
+
+      expect(screen.getByText("Needs review")).toBeInTheDocument();
+      expect(marks()).toEqual(["ok", "ok", "ok", "fail", "ok"]);
+      expect(
+        screen.getByText(/No valid signature of the Personal Guarantor/),
+      ).toBeInTheDocument();
+    });
+
+    it("needs review when the copy no longer carries today's check code", () => {
+      renderPanel(offer({ ...offerVerified, terms_match: false }));
+
+      expect(screen.getByText("Needs review")).toBeInTheDocument();
+      expect(marks()).toEqual(["ok", "ok", "ok", "ok", "fail"]);
+    });
+  });
+
   it("does nothing for an upload that never landed", () => {
     renderPanel(agreement(null, "PENDING"));
 
