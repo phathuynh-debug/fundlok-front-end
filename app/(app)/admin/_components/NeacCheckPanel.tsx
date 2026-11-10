@@ -155,10 +155,27 @@ function CheckDetails({
         </CheckItem>
         <CheckItem mark={signerMark}>
           {signerText}{" "}
-          <span className="text-muted-foreground">
-            ({tr(`source.${result.expected_source}`)})
-          </span>
+          {result.expected_source && (
+            <span className="text-muted-foreground">
+              ({tr(`source.${result.expected_source}`)})
+            </span>
+          )}
         </CheckItem>
+        {result.guarantor_required && (
+          <CheckItem mark={guarantorOf(result)}>
+            {guarantorText(result, tr)}
+          </CheckItem>
+        )}
+        {typeof result.terms_match === "boolean" && (
+          <CheckItem mark={result.terms_match ? "ok" : "fail"}>
+            {tr(result.terms_match ? "termsMatch" : "termsMismatch", {
+              code: result.check_code ?? "—",
+            })}
+          </CheckItem>
+        )}
+        {result.terms_match === null && result.check_code && (
+          <CheckItem mark="unknown">{tr("termsNoCode")}</CheckItem>
+        )}
       </ul>
 
       {result.signer_name && !result.name_matches && (
@@ -167,6 +184,17 @@ function CheckDetails({
           {tr("nameMismatch", { name: result.expected_name ?? "—" })}
         </p>
       )}
+
+      {result.guarantor_required &&
+        result.guarantor_name &&
+        !result.guarantor_name_matches && (
+          <p className="flex items-start gap-1.5 text-amber-700 dark:text-amber-400">
+            <AlertTriangle className="mt-px h-3.5 w-3.5 shrink-0" aria-hidden />
+            {tr("guarantorNameMismatch", {
+              name: result.guarantor_expected_name ?? "—",
+            })}
+          </p>
+        )}
 
       {result.problems.length > 0 && (
         <div className="space-y-0.5 text-destructive">
@@ -196,7 +224,29 @@ function CheckDetails({
             {result.certificate_validity}
           </Field>
           <Field label={tr("fields.revocation")}>{revocation}</Field>
+          {result.guarantor_required && result.guarantor_name && (
+            <Field label={tr("fields.guarantor")}>
+              {result.guarantor_name}
+              {result.guarantor_id && (
+                <span className="text-muted-foreground">
+                  {" "}
+                  · {result.guarantor_id}
+                </span>
+              )}
+            </Field>
+          )}
         </dl>
+      )}
+
+      {(result.guarantor_problems?.length ?? 0) > 0 && (
+        <div className="space-y-0.5 text-destructive">
+          <p className="font-medium">{tr("guarantorProblemsHeading")}</p>
+          <ul className="list-disc space-y-0.5 pl-4">
+            {result.guarantor_problems!.map((problem) => (
+              <li key={problem}>{problem}</li>
+            ))}
+          </ul>
+        </div>
       )}
 
       <p className="text-[11px] text-muted-foreground">
@@ -288,6 +338,24 @@ function signerOf(result: AdminSignatureCheck): Mark {
   return result.signer_matches ? "ok" : "fail";
 }
 
+// The Standing Offer's second signer. Unknown until NEAC has answered.
+function guarantorOf(result: AdminSignatureCheck): Mark {
+  if (result.status === "UNAVAILABLE") return "unknown";
+  return result.guarantor_matches ? "ok" : "fail";
+}
+
+function guarantorText(
+  result: AdminSignatureCheck,
+  tr: (key: string, vars?: Record<string, string>) => string,
+): string {
+  const id = result.guarantor_expected_id ?? "—";
+  if (!result.guarantor_expected_id) return tr("guarantorUnverified");
+  if (result.status === "UNAVAILABLE") return tr("guarantorUnknown", { id });
+  return result.guarantor_matches
+    ? tr("guarantorMatches", { id })
+    : tr("guarantorMissing", { id });
+}
+
 function overallOf(
   result: AdminSignatureCheck,
 ): "verified" | "review" | "unavailable" {
@@ -295,7 +363,9 @@ function overallOf(
   const allOk =
     result.status === "VERIFIED" &&
     result.right_document &&
-    result.signer_matches;
+    result.signer_matches &&
+    (!result.guarantor_required || result.guarantor_matches === true) &&
+    result.terms_match !== false;
   return allOk ? "verified" : "review";
 }
 

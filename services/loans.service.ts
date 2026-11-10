@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/api-client";
-import { LOANS_ENDPOINTS } from "@/lib/endpoints";
+import { LOANS_ENDPOINTS, type ListingDocumentKind } from "@/lib/endpoints";
 
 export interface LoanApplicationSubmitResponse {
   id: string;
@@ -25,6 +25,45 @@ export interface LoanApplicationFiguresPayload {
   conc_top3_pct: number | null;
 }
 
+/**
+ * What the automatic check on upload established: NEAC accepted the
+ * signatures and they are the right signers', and the signed copy carries the
+ * approved numbers (its check code matches).
+ */
+export interface ListingDocumentChecks {
+  checked_at: string | null;
+  verified_by: string | null;
+  terms_match: boolean;
+  signers: { role: "SME" | "GUARANTOR"; name: string | null }[];
+}
+
+/** One of the two documents the SME signs after approval. */
+export interface SignedListingDocument {
+  signed: boolean;
+  signed_at: string | null;
+  file_name: string | null;
+  checks: ListingDocumentChecks | null;
+}
+
+/**
+ * Where signing stands (GET /loans/applications/{id}/listing-documents).
+ *
+ * `ready`: approved with locked terms, so both documents carry them and can be
+ * signed. `published`: the project is live; signing both is what publishes
+ * it. `guarantor_verified`: the signing user has a verified identity (eKYC),
+ * which the Standing Offer's Personal Guarantor signature is checked against.
+ */
+export interface ListingDocuments {
+  ready: boolean;
+  published: boolean;
+  guarantor_verified: boolean;
+  service_agreement: SignedListingDocument;
+  standing_offer: SignedListingDocument;
+}
+
+/** The signed PDF's upload limit (the backend's, 25 MB). */
+export const SIGNED_DOCUMENT_MAX_BYTES = 25 * 1024 * 1024;
+
 export const loansService = {
   async submitApplication(applicationId: string) {
     return apiClient.post<LoanApplicationSubmitResponse>(
@@ -35,6 +74,43 @@ export const loansService = {
   /** The filled-in SME Service Agreement PDF, to preview and download. */
   async getServiceAgreement(applicationId: string) {
     return apiClient.getFile(LOANS_ENDPOINTS.serviceAgreement(applicationId));
+  },
+
+  /** The filled-in Standing Offer PDF, once the request is approved. */
+  async getStandingOffer(applicationId: string) {
+    return apiClient.getFile(LOANS_ENDPOINTS.standingOffer(applicationId));
+  },
+
+  async getListingDocuments(applicationId: string) {
+    return apiClient.get<ListingDocuments>(
+      LOANS_ENDPOINTS.listingDocuments(applicationId),
+    );
+  },
+
+  /** The signed copy of one document. The backend checks it with NEAC. */
+  async uploadSignedListingDocument(
+    applicationId: string,
+    kind: ListingDocumentKind,
+    file: File,
+  ) {
+    const form = new FormData();
+    form.append("file", file);
+    return apiClient.post<ListingDocuments>(
+      LOANS_ENDPOINTS.signListingDocument(applicationId, kind),
+      form,
+      // The backend verifies the signatures with NEAC (up to 45 s): wait
+      // longer than that, so a slow check is not reported as a failure here.
+      { timeout: 60_000 },
+    );
+  },
+
+  async getSignedListingDocument(
+    applicationId: string,
+    kind: ListingDocumentKind,
+  ) {
+    return apiClient.getFile(
+      LOANS_ENDPOINTS.signedListingDocument(applicationId, kind),
+    );
   },
 
   async saveFigures(

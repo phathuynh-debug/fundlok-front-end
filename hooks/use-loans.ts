@@ -2,8 +2,10 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ApiError } from "@/lib/types";
+import type { ListingDocumentKind } from "@/lib/endpoints";
 import {
   loansService,
+  type ListingDocuments,
   type LoanApplicationFiguresPayload,
   type LoanApplicationSubmitResponse,
   publicRateService,
@@ -11,11 +13,29 @@ import {
   type RateEstimatePayload,
 } from "@/services/loans.service";
 import { projectKeys } from "@/hooks/use-projects";
+import { fundingKeys } from "@/hooks/use-funding";
 
 export const loanKeys = {
   all: ["loans"] as const,
   serviceAgreement: (applicationId: string) =>
     [...loanKeys.all, "service-agreement", applicationId] as const,
+  standingOffer: (applicationId: string) =>
+    [...loanKeys.all, "standing-offer", applicationId] as const,
+  listingDocuments: (applicationId: string) =>
+    [...loanKeys.all, "listing-documents", applicationId] as const,
+  signedListingDocument: (
+    applicationId: string,
+    kind: ListingDocumentKind,
+    signedAt: string,
+  ) =>
+    [
+      ...loanKeys.all,
+      "listing-documents",
+      applicationId,
+      kind,
+      "signed",
+      signedAt,
+    ] as const,
 };
 
 export function useSubmitLoanApplication() {
@@ -83,5 +103,83 @@ export function useServiceAgreement(applicationId: string, enabled = true) {
     gcTime: 0,
     retry: false,
     refetchOnWindowFocus: false,
+  });
+}
+
+/**
+ * The Standing Offer to Conclude Loan Contracts for an approved application,
+ * as the PDF the SME and its Personal Guarantor review, download and sign.
+ * Generated on the server each time, like the Service Agreement, so never
+ * cached.
+ */
+export function useStandingOffer(applicationId: string, enabled = true) {
+  return useQuery<{ blob: Blob; filename: string | null }, ApiError>({
+    queryKey: loanKeys.standingOffer(applicationId),
+    queryFn: () => loansService.getStandingOffer(applicationId),
+    enabled: enabled && !!applicationId,
+    staleTime: 0,
+    gcTime: 0,
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+}
+
+/** Where signing the two listing documents stands on an application. */
+export function useListingDocuments(applicationId: string, enabled = true) {
+  return useQuery<ListingDocuments, ApiError>({
+    queryKey: loanKeys.listingDocuments(applicationId),
+    queryFn: () => loansService.getListingDocuments(applicationId),
+    enabled: enabled && !!applicationId,
+    staleTime: 30 * 1000,
+    retry: false,
+  });
+}
+
+/**
+ * Uploading one signed document. The answer is the new signing status; when
+ * it says the project is now published, the dashboard's project and its
+ * funding round are refetched so the SME sees the listing go live.
+ */
+export function useSignListingDocument(applicationId: string) {
+  const queryClient = useQueryClient();
+  return useMutation<
+    ListingDocuments,
+    ApiError,
+    { kind: ListingDocumentKind; file: File }
+  >({
+    mutationFn: ({ kind, file }) =>
+      loansService.uploadSignedListingDocument(applicationId, kind, file),
+    onSuccess: (status) => {
+      queryClient.setQueryData(
+        loanKeys.listingDocuments(applicationId),
+        status,
+      );
+      if (status.published) {
+        void queryClient.invalidateQueries({ queryKey: projectKeys.mine() });
+        void queryClient.invalidateQueries({
+          queryKey: fundingKeys.myRounds(),
+        });
+      }
+    },
+  });
+}
+
+/** The signed copy on file, by when it was signed (it never changes after). */
+export function useSignedListingDocument(
+  applicationId: string,
+  kind: ListingDocumentKind,
+  signedAt: string | null,
+  enabled = true,
+) {
+  return useQuery<{ blob: Blob; filename: string | null }, ApiError>({
+    queryKey: loanKeys.signedListingDocument(
+      applicationId,
+      kind,
+      signedAt ?? "",
+    ),
+    queryFn: () => loansService.getSignedListingDocument(applicationId, kind),
+    enabled: enabled && !!applicationId && !!signedAt,
+    staleTime: Infinity,
+    retry: false,
   });
 }

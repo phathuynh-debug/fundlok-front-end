@@ -14,7 +14,6 @@ const STEP_FOR_DOCUMENT: Record<DocumentKey, number> = {
   eInvoiceData: 2,
   taxFilings: 2,
   cicReport: 3,
-  serviceAgreement: 4,
 };
 
 // The whole loan-application wizard shares one state object: the hook's state +
@@ -79,7 +78,6 @@ export function LoanApplicationProvider({
     if (step === 2)
       return locale === "vi" ? "Doanh thu & chi phí" : "Revenue & costs";
     if (step === 3) return "CIC";
-    if (step === 4) return t("dashboard.sme.agreement.stepLabel");
     return t("dashboard.sme.reviewStepLabel");
   };
 

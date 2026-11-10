@@ -193,11 +193,31 @@ export const LOANS_ENDPOINTS = {
     `/loans/applications/${applicationId}/figures`,
   /**
    * The SME Service Agreement as a PDF, filled in with the SME's verified
-   * details and the application's amount and term. The owning SME only.
+   * details and the application's amount, term and (once approved) rate. The
+   * owning SME only.
    */
   serviceAgreement: (applicationId: string) =>
     `/loans/applications/${applicationId}/service-agreement`,
+  /**
+   * The Standing Offer to Conclude Loan Contracts as a PDF, filled in with the
+   * SME, its Personal Guarantor and the approved terms. 409 SIGNING_NOT_OPEN
+   * until FundLok approves the request. The owning SME only.
+   */
+  standingOffer: (applicationId: string) =>
+    `/loans/applications/${applicationId}/standing-offer`,
+  /** GET: where signing the two listing documents stands. */
+  listingDocuments: (applicationId: string) =>
+    `/loans/applications/${applicationId}/listing-documents`,
+  /** POST (multipart `file`): the signed copy, checked with NEAC. */
+  signListingDocument: (applicationId: string, kind: ListingDocumentKind) =>
+    `/loans/applications/${applicationId}/listing-documents/${kind}`,
+  /** GET: the signed copy on file, exactly as uploaded. */
+  signedListingDocument: (applicationId: string, kind: ListingDocumentKind) =>
+    `/loans/applications/${applicationId}/listing-documents/${kind}/signed`,
 } as const;
+
+/** The two documents an SME signs after approval. */
+export type ListingDocumentKind = "service-agreement" | "standing-offer";
 
 export const RATE_CALCULATOR_ENDPOINTS = {
   calculate: "/api/v1/rates/calculate",
