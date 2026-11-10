@@ -66,16 +66,16 @@ export async function generateMetadata({
 // attribute these recognitions to FundLok.
 const achievements = [
   {
-    name: "Top 3 Project to Facilitate Investments",
-    awarder: "Sustainability in Action 2024, Australian Government",
-    description:
-      "Recognized as a top-3 fintech project by the Australian Government for facilitating sustainable cross-border investments and ESG-aligned SME funding.",
-  },
-  {
     name: "Seed Stage Start-up Incubation in FinTech Industry 2025",
     awarder: "Startup and Innovation Hub Ho Chi Minh City (SIHUB)",
     description:
       "Selected for SIHUB's premium incubation program, receiving strategic mentorship, regulatory sandbox guidance, and network access to top regional venture capitals.",
+  },
+  {
+    name: "Top 3 Project to Facilitate Investments",
+    awarder: "Sustainability in Action 2024, Australian Government",
+    description:
+      "Recognized as a top-3 fintech project by the Australian Government for facilitating sustainable cross-border investments and ESG-aligned SME funding.",
   },
   {
     name: "Top 10 Potential Project Global",

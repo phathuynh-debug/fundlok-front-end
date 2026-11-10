@@ -24,14 +24,6 @@ import { AchievementsCarousel } from "@/components/achievements-carousel";
 const achievementsData = {
   en: [
     {
-      title: "Top 3 Project to Facilitate Investments",
-      subtitle: "Sustainability in Action 2024 - Australian Government",
-      category: "Government Recognition",
-      description:
-        "FundLok was recognized as a top-3 fintech project by the Australian Government for facilitating sustainable cross-border investments and ESG-aligned SME funding.",
-      images: ["/achivements/sustainability-action-landscape.webp"],
-    },
-    {
       title: "Seed Stage Start-up Incubation in FinTech Industry 2025",
       subtitle: "Startup and Innovation Hub Ho Chi Minh City (SIHUB)",
       category: "Incubation & Acceleration",
@@ -45,6 +37,14 @@ const achievementsData = {
       ],
     },
     {
+      title: "Top 3 Project to Facilitate Investments",
+      subtitle: "Sustainability in Action 2024 - Australian Government",
+      category: "Government Recognition",
+      description:
+        "FundLok was recognized as a top-3 fintech project by the Australian Government for facilitating sustainable cross-border investments and ESG-aligned SME funding.",
+      images: ["/achivements/sustainability-action-landscape.webp"],
+    },
+    {
       title: "Top 10 Potential Project Global",
       subtitle: "International Blockchain Olympiad 2023",
       category: "Global Innovation",
@@ -55,14 +55,6 @@ const achievementsData = {
     },
   ],
   vi: [
-    {
-      title: "Top 3 Dự án Thúc đẩy Đầu tư",
-      subtitle: "Sustainability in Action 2024 - Chính phủ Úc",
-      category: "Ghi nhận từ Chính phủ",
-      description:
-        "FundLok được ghi nhận là một trong 3 dự án FinTech xuất sắc nhất bởi Chính phủ Úc trong việc thúc đẩy đầu tư bền vững và hỗ trợ vốn SME theo tiêu chuẩn ESG.",
-      images: ["/achivements/sustainability-action-landscape.webp"],
-    },
     {
       title: "Ươm tạo Khởi nghiệp Giai đoạn Hạt giống ngành FinTech 2025",
       subtitle: "Trung tâm Khởi nghiệp và Đổi mới sáng tạo TP.HCM (SIHUB)",
@@ -75,6 +67,14 @@ const achievementsData = {
         "/achivements/sihub-pitching-1.webp",
         "/achivements/sihub-pitching-2.webp",
       ],
+    },
+    {
+      title: "Top 3 Dự án Thúc đẩy Đầu tư",
+      subtitle: "Sustainability in Action 2024 - Chính phủ Úc",
+      category: "Ghi nhận từ Chính phủ",
+      description:
+        "FundLok được ghi nhận là một trong 3 dự án FinTech xuất sắc nhất bởi Chính phủ Úc trong việc thúc đẩy đầu tư bền vững và hỗ trợ vốn SME theo tiêu chuẩn ESG.",
+      images: ["/achivements/sustainability-action-landscape.webp"],
     },
     {
       title: "Top 10 Dự án Tiềm năng Toàn cầu",
