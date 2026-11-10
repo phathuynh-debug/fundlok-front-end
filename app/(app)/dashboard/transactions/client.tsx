@@ -161,7 +161,7 @@ export default function TransactionsClient() {
         </div>
 
         {transactions.length > 0 && (
-          <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-600 px-3 py-1.5 rounded-full text-xs font-semibold w-fit border border-emerald-500/20">
+          <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-full text-xs font-semibold w-fit border border-emerald-500/20">
             <History className="h-4 w-4" />
             <span>
               {t("dashboard.transactions.count", {
@@ -222,7 +222,7 @@ export default function TransactionsClient() {
               />
             </div>
 
-            <div className="p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-800/40 w-fit flex items-center gap-1">
+            <div className="p-1 rounded-xl bg-muted/50 border border-border/60 w-fit flex items-center gap-1">
               {(["ALL", ...STATUS_FILTERS] as const).map((status) => (
                 <button
                   key={status}
@@ -230,7 +230,7 @@ export default function TransactionsClient() {
                   onClick={() => setSelectedStatus(status)}
                   className={`px-3 py-2 rounded-lg text-xs font-semibold uppercase transition duration-200 cursor-pointer ${
                     selectedStatus === status
-                      ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
+                      ? "bg-card text-foreground shadow-xs border border-border/40"
                       : `${CONTROL_IDLE} bg-transparent border border-transparent`
                   }`}
                 >

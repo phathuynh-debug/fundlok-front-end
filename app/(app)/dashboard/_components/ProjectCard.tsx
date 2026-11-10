@@ -149,7 +149,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                     conclusion from it. */}
                 <Badge
                   variant="outline"
-                  className="bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-zinc-300 dark:border-zinc-700 text-xs font-semibold rounded-full px-2.5 py-0.5"
+                  className="bg-muted text-foreground border-border text-xs font-semibold rounded-full px-2.5 py-0.5"
                 >
                   {businessScore === null
                     ? t("dashboard.projectCard.pendingGrading")
@@ -350,12 +350,12 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
 
         {/* Funding Progress Bar (Investor View with active loan) */}
         {role === "INVESTOR" && !listing && (
-          <p className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/50 text-xs text-muted-foreground">
+          <p className="p-3.5 rounded-xl bg-muted/30 border border-border/60 text-xs text-muted-foreground">
             {t("dashboard.projectCard.notOpenYet")}
           </p>
         )}
         {role === "INVESTOR" && listing && (
-          <div className="space-y-2 p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/50">
+          <div className="space-y-2 p-3.5 rounded-xl bg-muted/30 border border-border/60">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
               <div className="flex items-center gap-1.5">
                 <span className="font-bold text-foreground">
@@ -388,7 +388,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                 )}
               </div>
             </div>
-            <div className="h-2 w-full rounded-full bg-zinc-200/70 dark:bg-zinc-800 overflow-hidden">
+            <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-[width] ease-out duration-300"
                 style={{ width: `${Math.min(100, fundingProgressPct)}%` }}
@@ -400,7 +400,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
         {/* Trust Highlights Tags (Investor View) */}
         {role === "INVESTOR" && (
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800/80 px-2.5 py-1 rounded-md border border-zinc-200/70 dark:border-zinc-700/60">
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground/80 bg-muted/50 px-2.5 py-1 rounded-md border border-border/60">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
               {/* Was "Asset-Backed" — untrue and unsayable: we finance
                   without hard collateral, and the tag implied a security
@@ -408,7 +408,7 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                   verified revenue. */}
               {t("dashboard.projectCard.verifiedRevenue")}
             </span>
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800/80 px-2.5 py-1 rounded-md border border-zinc-200/70 dark:border-zinc-700/60">
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground/80 bg-muted/50 px-2.5 py-1 rounded-md border border-border/60">
               <TrendingUp className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
               {/* Repayment is a fixed amount every business day, not a
                   monthly amortising schedule (Handbook §5.4). */}

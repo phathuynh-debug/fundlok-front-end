@@ -5,6 +5,7 @@ import { ArrowDownLeft, Banknote, Clock, Receipt } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
 import { staggerContainerVariants, springItemVariants } from "@/lib/animations";
 import { formatCurrency } from "@/lib/format-currency";
+import { TruncatedFigure } from "@/components/truncated-figure";
 import type { SmeTransactionSummary } from "./mock-sme-transactions";
 
 // The investor tiles are money-in / money-out / net / pending. Net is
@@ -59,13 +60,13 @@ export function SmeTransactionSummaryCards({
       variants={staggerContainerVariants}
       initial="hidden"
       animate="show"
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+      className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"
     >
       {cards.map((card) => (
         <m.div
           key={card.key}
           variants={springItemVariants}
-          className="bg-card text-card-foreground border border-border rounded-xl shadow-xs p-5 space-y-1"
+          className="min-w-0 bg-card text-card-foreground border border-border rounded-xl shadow-xs p-5 space-y-1"
         >
           <div className="flex items-center justify-between gap-2">
             <span className="stat-label">{card.label}</span>
@@ -75,12 +76,11 @@ export function SmeTransactionSummaryCards({
             />
           </div>
           {/* Ten-digit VND figures: one line, clipped at the card edge rather
-              than overflowing it. */}
-          <div
-            className={`truncate whitespace-nowrap text-xl font-black ${card.valueClassName}`}
-          >
-            {card.value}
-          </div>
+              than overflowing it, with a tooltip when truncated. */}
+          <TruncatedFigure
+            value={card.value}
+            className={`text-xl font-black ${card.valueClassName}`}
+          />
           <p className="text-xs text-muted-foreground">{card.hint}</p>
         </m.div>
       ))}

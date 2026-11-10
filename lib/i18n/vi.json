@@ -84,6 +84,7 @@
         "confirmTitle": "Gửi email này?",
         "description": "Chọn mẫu, viết nội dung dạng văn bản, xem trước rồi gửi.",
         "headingLabel": "Tiêu đề lớn (không bắt buộc)",
+        "includeSignature": "Bao gồm chữ ký email của tôi",
         "notReady": "Hãy kết nối tài khoản Google ở bước 1 và bật gửi email để có thể gửi.",
         "notReadyPaused": "Đang tạm dừng gửi. Hãy bật \"Bật gửi email\" ở bước 1 rồi bấm Lưu để có thể gửi.",
         "presets": {
@@ -614,6 +615,12 @@
     "projectsPage": {
       "subtitle": "Xem hồ sơ doanh nghiệp và tình trạng phê duyệt.",
       "title": "Dự án"
+    },
+    "quickActions": {
+      "auditLogs": "Lịch sử hoạt động",
+      "kycReviews": "Xét duyệt danh tính",
+      "rates": "Lãi suất & định phí",
+      "security": "Bảo mật & phiên đăng nhập"
     },
     "ratesDetail": {
       "businessProfileTitle": "Hồ sơ & Quy mô doanh nghiệp",
@@ -3864,6 +3871,20 @@
     "contactHint": "Nếu bạn cho rằng đây là nhầm lẫn, vui lòng liên hệ với chúng tôi để được kiểm tra. Hãy cung cấp địa chỉ email của tài khoản.",
     "signOutBtn": "Đăng xuất",
     "title": "Tài khoản của bạn đã bị tạm khóa"
+  },
+  "tableControls": {
+    "clear": "Xóa",
+    "clearAll": "Đặt lại",
+    "filterBy": "Lọc {column}",
+    "filterPlaceholder": "Tìm trong {column}…",
+    "noMatchingRows": "Không có dòng nào khớp bộ lọc cột đang chọn.",
+    "noOptions": "Không có giá trị để lọc",
+    "selectedCount": "Đã chọn {count}",
+    "sortAsc": "Sắp xếp tăng dần",
+    "sortBy": "Sắp xếp theo {column}",
+    "sortDesc": "Sắp xếp giảm dần",
+    "sortedAsc": "{column} (↑)",
+    "sortedDesc": "{column} (↓)"
   },
   "termsPage": {
     "backToHome": "Quay lại trang chủ",

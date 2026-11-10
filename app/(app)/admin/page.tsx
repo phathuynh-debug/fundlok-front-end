@@ -67,7 +67,7 @@ export default function AdminPage() {
         <Link
           href="/admin/users"
           className={cn(
-            "rounded-lg border bg-card p-5 transition-colors",
+            "min-w-0 rounded-lg border bg-card p-5 transition-colors",
             CONTROL_HOVER,
           )}
         >
@@ -97,7 +97,7 @@ export default function AdminPage() {
         <Link
           href="/admin/projects"
           className={cn(
-            "rounded-lg border bg-card p-5 transition-colors",
+            "min-w-0 rounded-lg border bg-card p-5 transition-colors",
             CONTROL_HOVER,
           )}
         >
@@ -124,16 +124,16 @@ export default function AdminPage() {
           </div>
         </Link>
 
-        <div className="rounded-lg border bg-card p-5">
+        <div className="min-w-0 rounded-lg border bg-card p-5">
           <div className="flex items-center gap-2 text-muted-foreground">
             <ShieldCheck className="h-4 w-4" />
             <span className="text-sm font-medium">{t("admin.stats.role")}</span>
           </div>
           <div className="mt-2 flex items-baseline justify-between gap-2">
-            <p className="text-2xl font-bold text-foreground">
+            <p className="text-2xl font-bold text-foreground truncate">
               {roleLabel(t, user.role)}
             </p>
-            <span className="text-xs font-mono text-muted-foreground">
+            <span className="text-xs font-mono text-muted-foreground shrink-0">
               {user.role}
             </span>
           </div>
@@ -157,9 +157,7 @@ export default function AdminPage() {
               {t("admin.sidebar.kycReviews")}
             </p>
             <p className="text-xs text-muted-foreground truncate">
-              {locale === "vi"
-                ? "Xét duyệt danh tính"
-                : "Identity verification"}
+              {t("admin.quickActions.kycReviews")}
             </p>
           </div>
         </Link>
@@ -179,9 +177,7 @@ export default function AdminPage() {
               {t("admin.sidebar.rates")}
             </p>
             <p className="text-xs text-muted-foreground truncate">
-              {locale === "vi"
-                ? "Lãi suất & định phí"
-                : "Rate inquiries & model"}
+              {t("admin.quickActions.rates")}
             </p>
           </div>
         </Link>
@@ -201,7 +197,7 @@ export default function AdminPage() {
               {t("admin.sidebar.auditLogs")}
             </p>
             <p className="text-xs text-muted-foreground truncate">
-              {locale === "vi" ? "Lịch sử hoạt động" : "System activity trace"}
+              {t("admin.quickActions.auditLogs")}
             </p>
           </div>
         </Link>
@@ -221,9 +217,7 @@ export default function AdminPage() {
               {t("admin.sidebar.security")}
             </p>
             <p className="text-xs text-muted-foreground truncate">
-              {locale === "vi"
-                ? "Bảo mật & phiên đăng nhập"
-                : "Sessions & security"}
+              {t("admin.quickActions.security")}
             </p>
           </div>
         </Link>

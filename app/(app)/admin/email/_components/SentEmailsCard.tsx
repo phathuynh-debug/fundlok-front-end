@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -16,10 +16,18 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  ActiveTableFiltersBar,
+  InteractiveTableHead,
+  compareSortableValues,
+  isColumnFilterActive,
+  type ColumnFilterOption,
+  type ColumnFiltersState,
+  type SortState,
+} from "@/components/ui/interactive-table-head";
 import { useSentEmails } from "@/hooks/use-admin-email";
 import { useCurrentUser } from "@/hooks/use-authentication";
 import { formatDateTime } from "@/lib/format-date";
@@ -67,14 +75,197 @@ export function SentEmailsCard() {
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
+  const [sortState, setSortState] = useState<SortState | null>(null);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>({});
 
-  const total = data?.length ?? 0;
+  const templateLabel = (email: InternalEmail) =>
+    email.template === "test"
+      ? t("admin.email.sent.test")
+      : t(`admin.email.compose.templates.${email.template}`);
+
+  const statusLabel = (email: InternalEmail) =>
+    t(`admin.email.sent.statuses.${email.status}`);
+
+  const templateOptions = useMemo<ColumnFilterOption[]>(() => {
+    const counts = new Map<string, number>();
+    for (const email of data ?? []) {
+      const label = templateLabel(email);
+      counts.set(label, (counts.get(label) ?? 0) + 1);
+    }
+    return Array.from(counts.entries()).map(([value, count]) => ({
+      value,
+      label: value,
+      count,
+    }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, t]);
+
+  const statusOptions = useMemo<ColumnFilterOption[]>(() => {
+    const counts = new Map<string, number>();
+    for (const email of data ?? []) {
+      const label = statusLabel(email);
+      counts.set(label, (counts.get(label) ?? 0) + 1);
+    }
+    return Array.from(counts.entries()).map(([value, count]) => ({
+      value,
+      label: value,
+      count,
+    }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, t]);
+
+  const columnsMeta = useMemo(
+    () => [
+      { key: "when", header: t("admin.email.sent.when") },
+      { key: "subject", header: t("admin.email.sent.subject") },
+      { key: "to", header: t("admin.email.sent.to") },
+      { key: "template", header: t("admin.email.sent.template") },
+      { key: "status", header: t("admin.email.sent.status") },
+    ],
+    [t],
+  );
+
+  const hasActiveFilters = useMemo(
+    () => Object.values(columnFilters).some((val) => isColumnFilterActive(val)),
+    [columnFilters],
+  );
+
+  const processedData = useMemo(() => {
+    let result = data ?? [];
+
+    if (hasActiveFilters) {
+      result = result.filter((email) => {
+        const whenFilter = columnFilters.when;
+        if (
+          typeof whenFilter === "string" &&
+          whenFilter.trim() &&
+          !formatDateTime(email.created_at, locale)
+            .toLowerCase()
+            .includes(whenFilter.trim().toLowerCase())
+        ) {
+          return false;
+        }
+
+        const subjectFilter = columnFilters.subject;
+        if (
+          typeof subjectFilter === "string" &&
+          subjectFilter.trim() &&
+          !`${email.subject} ${email.from_address}`
+            .toLowerCase()
+            .includes(subjectFilter.trim().toLowerCase())
+        ) {
+          return false;
+        }
+
+        const toFilter = columnFilters.to;
+        if (
+          typeof toFilter === "string" &&
+          toFilter.trim() &&
+          !email.recipients
+            .join(", ")
+            .toLowerCase()
+            .includes(toFilter.trim().toLowerCase())
+        ) {
+          return false;
+        }
+
+        const templateFilter = columnFilters.template;
+        if (
+          Array.isArray(templateFilter) &&
+          templateFilter.length > 0 &&
+          !templateFilter.includes(templateLabel(email))
+        ) {
+          return false;
+        }
+
+        const statusFilter = columnFilters.status;
+        if (
+          Array.isArray(statusFilter) &&
+          statusFilter.length > 0 &&
+          !statusFilter.includes(statusLabel(email))
+        ) {
+          return false;
+        }
+
+        return true;
+      });
+    }
+
+    if (sortState) {
+      result = [...result].sort((a, b) => {
+        switch (sortState.key) {
+          case "when":
+            return compareSortableValues(
+              a.created_at,
+              b.created_at,
+              sortState.direction,
+              locale,
+            );
+          case "subject":
+            return compareSortableValues(
+              a.subject,
+              b.subject,
+              sortState.direction,
+              locale,
+            );
+          case "to":
+            return compareSortableValues(
+              a.recipients[0],
+              b.recipients[0],
+              sortState.direction,
+              locale,
+            );
+          case "template":
+            return compareSortableValues(
+              templateLabel(a),
+              templateLabel(b),
+              sortState.direction,
+              locale,
+            );
+          case "status":
+            return compareSortableValues(
+              statusLabel(a),
+              statusLabel(b),
+              sortState.direction,
+              locale,
+            );
+          default:
+            return 0;
+        }
+      });
+    }
+
+    return result;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, columnFilters, hasActiveFilters, sortState, locale, t]);
+
+  const setColumnFilter = (
+    key: string,
+    next: string | string[] | undefined,
+  ) => {
+    setColumnFilters((prev) => {
+      const copy = { ...prev };
+      if (!isColumnFilterActive(next)) {
+        delete copy[key];
+      } else if (next !== undefined) {
+        copy[key] = next;
+      }
+      return copy;
+    });
+    setPage(1);
+  };
+
+  const resetAll = () => {
+    setSortState(null);
+    setColumnFilters({});
+    setPage(1);
+  };
+
+  const total = processedData.length;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const currentPage = Math.min(Math.max(1, page), totalPages);
   const startIndex = (currentPage - 1) * pageSize;
-  const paginatedData = data
-    ? data.slice(startIndex, startIndex + pageSize)
-    : [];
+  const paginatedData = processedData.slice(startIndex, startIndex + pageSize);
 
   return (
     <section className="rounded-lg border bg-card p-6">
@@ -99,60 +290,131 @@ export function SentEmailsCard() {
       ) : (
         <div className="mt-4 flex flex-col gap-3">
           <div className="overflow-x-auto">
+            <ActiveTableFiltersBar
+              columns={columnsMeta}
+              sortState={sortState}
+              columnFilters={columnFilters}
+              onClearSort={() => setSortState(null)}
+              onClearFilter={(key) => setColumnFilter(key, undefined)}
+              onResetAll={resetAll}
+            />
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t("admin.email.sent.when")}</TableHead>
-                  <TableHead>{t("admin.email.sent.subject")}</TableHead>
-                  <TableHead>{t("admin.email.sent.to")}</TableHead>
-                  <TableHead className="hidden xl:table-cell">
-                    {t("admin.email.sent.template")}
-                  </TableHead>
-                  <TableHead>{t("admin.email.sent.status")}</TableHead>
+                  <InteractiveTableHead
+                    columnKey="when"
+                    header={t("admin.email.sent.when")}
+                    sortState={sortState}
+                    onSortChange={setSortState}
+                    filterType="text"
+                    filterValue={columnFilters.when}
+                    onFilterChange={(next) => setColumnFilter("when", next)}
+                  />
+                  <InteractiveTableHead
+                    columnKey="subject"
+                    header={t("admin.email.sent.subject")}
+                    sortState={sortState}
+                    onSortChange={setSortState}
+                    filterType="text"
+                    filterValue={columnFilters.subject}
+                    onFilterChange={(next) => setColumnFilter("subject", next)}
+                  />
+                  <InteractiveTableHead
+                    columnKey="to"
+                    header={t("admin.email.sent.to")}
+                    sortState={sortState}
+                    onSortChange={setSortState}
+                    filterType="text"
+                    filterValue={columnFilters.to}
+                    onFilterChange={(next) => setColumnFilter("to", next)}
+                  />
+                  <InteractiveTableHead
+                    columnKey="template"
+                    header={t("admin.email.sent.template")}
+                    headClassName="hidden xl:table-cell"
+                    sortState={sortState}
+                    onSortChange={setSortState}
+                    filterType="select"
+                    filterValue={columnFilters.template}
+                    filterOptions={templateOptions}
+                    onFilterChange={(next) => setColumnFilter("template", next)}
+                  />
+                  <InteractiveTableHead
+                    columnKey="status"
+                    header={t("admin.email.sent.status")}
+                    sortState={sortState}
+                    onSortChange={setSortState}
+                    filterType="select"
+                    filterValue={columnFilters.status}
+                    filterOptions={statusOptions}
+                    onFilterChange={(next) => setColumnFilter("status", next)}
+                  />
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedData.map((email) => (
-                  <TableRow key={email.id}>
-                    <TableCell className="whitespace-nowrap text-muted-foreground">
-                      {formatDateTime(email.created_at, locale)}
-                    </TableCell>
-                    <TableCell className="max-w-[14rem]">
-                      <span className="block truncate font-medium text-foreground">
-                        {email.subject}
-                      </span>
-                      {seesEveryone && (
-                        <span className="block truncate text-xs text-muted-foreground">
-                          {t("admin.email.sent.fromLine").replace(
-                            "{address}",
-                            email.from_address,
-                          )}
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell className="max-w-[14rem]">
-                      <span className="block truncate">
-                        {email.recipients[0]}
-                      </span>
-                      {email.recipients.length > 1 && (
-                        <span className="text-xs text-muted-foreground">
-                          {t("admin.email.sent.andMore").replace(
-                            "{count}",
-                            String(email.recipients.length - 1),
-                          )}
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell className="hidden whitespace-nowrap xl:table-cell">
-                      {email.template === "test"
-                        ? t("admin.email.sent.test")
-                        : t(`admin.email.compose.templates.${email.template}`)}
-                    </TableCell>
-                    <TableCell>
-                      <StatusCell email={email} />
+                {paginatedData.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={5}
+                      className="h-24 text-center text-sm text-muted-foreground"
+                    >
+                      <div className="flex flex-col items-center gap-2">
+                        <span>{t("tableControls.noMatchingRows")}</span>
+                        <button
+                          type="button"
+                          onClick={resetAll}
+                          className="text-xs font-medium text-primary hover:underline cursor-pointer"
+                        >
+                          {t("tableControls.clearAll")}
+                        </button>
+                      </div>
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  paginatedData.map((email) => (
+                    <TableRow key={email.id}>
+                      <TableCell className="whitespace-nowrap text-muted-foreground">
+                        {formatDateTime(email.created_at, locale)}
+                      </TableCell>
+                      <TableCell className="max-w-[14rem]">
+                        <span className="block truncate font-medium text-foreground">
+                          {email.subject}
+                        </span>
+                        {seesEveryone && (
+                          <span className="block truncate text-xs text-muted-foreground">
+                            {t("admin.email.sent.fromLine").replace(
+                              "{address}",
+                              email.from_address,
+                            )}
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell className="max-w-[14rem]">
+                        <span className="block truncate">
+                          {email.recipients[0]}
+                        </span>
+                        {email.recipients.length > 1 && (
+                          <span className="text-xs text-muted-foreground">
+                            {t("admin.email.sent.andMore").replace(
+                              "{count}",
+                              String(email.recipients.length - 1),
+                            )}
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell className="hidden whitespace-nowrap xl:table-cell">
+                        {email.template === "test"
+                          ? t("admin.email.sent.test")
+                          : t(
+                              `admin.email.compose.templates.${email.template}`,
+                            )}
+                      </TableCell>
+                      <TableCell>
+                        <StatusCell email={email} />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>

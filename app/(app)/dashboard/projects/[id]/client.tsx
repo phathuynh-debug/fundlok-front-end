@@ -41,7 +41,7 @@ const OwnerProjectView = dynamic(
 
 function ProjectDetailsSkeleton() {
   return (
-    <div className="flex-1 space-y-8 p-4 md:p-8 pt-6 max-w-5xl mx-auto animate-pulse">
+    <div className="flex-1 space-y-6 md:space-y-8 max-w-5xl mx-auto animate-pulse">
       {/* Back button */}
       <div>
         <Skeleton className="h-8 w-44 rounded-md" />
@@ -123,7 +123,7 @@ export default function ProjectDetailsClient({
   // figures, which an investor could take for a real listing.
   if (!project) {
     return (
-      <div className="flex-1 space-y-6 p-4 md:p-8 pt-6 max-w-5xl mx-auto">
+      <div className="flex-1 space-y-6 max-w-5xl mx-auto">
         <Button
           variant="ghost"
           size="sm"
@@ -151,7 +151,7 @@ export default function ProjectDetailsClient({
   return (
     <m.div
       {...pageTransitionProps}
-      className="flex-1 space-y-8 p-4 md:p-8 pt-6 max-w-5xl mx-auto"
+      className="flex-1 space-y-6 md:space-y-8 max-w-5xl mx-auto"
     >
       {/* Back button */}
       <div>

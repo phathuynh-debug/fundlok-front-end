@@ -10,10 +10,18 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  ActiveTableFiltersBar,
+  InteractiveTableHead,
+  compareSortableValues,
+  isColumnFilterActive,
+  type ColumnFilterOption,
+  type ColumnFiltersState,
+  type SortState,
+} from "@/components/ui/interactive-table-head";
 import { useAdminRepaymentReceipts } from "@/hooks/use-admin-funding";
 import { useTranslations } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format-currency";
@@ -116,6 +124,171 @@ export function RepaymentQueue({ status }: { status: AdminRepaymentFilter }) {
     [data?.items],
   );
 
+  const [sortState, setSortState] = useState<SortState | null>(null);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>({});
+
+  const groupStatusLabel = React.useCallback(
+    (group: InvestmentRepaymentGroup) => {
+      const r = group.summary_receipt;
+      if (r.needs_action) return t(`${K}.needsAction`);
+      if (r.open_report) return t(`${K}.reported`);
+      return t(`${K}.status.${r.check_status}`);
+    },
+    [t],
+  );
+
+  const statusOptions = useMemo<ColumnFilterOption[]>(() => {
+    const counts = new Map<string, number>();
+    for (const group of groups) {
+      const label = groupStatusLabel(group);
+      counts.set(label, (counts.get(label) ?? 0) + 1);
+    }
+    return Array.from(counts.entries()).map(([value, count]) => ({
+      value,
+      label: value,
+      count,
+    }));
+  }, [groups, groupStatusLabel]);
+
+  const columnsMeta = useMemo(
+    () => [
+      { key: "investment", header: t(`${K}.table.investment`) },
+      { key: "flow", header: t(`${K}.table.flow`) },
+      { key: "progress", header: t(`${K}.table.progress`) },
+      { key: "amount", header: t(`${K}.table.amount`) },
+      { key: "status", header: t("admin.transactions.table.status") },
+    ],
+    [t],
+  );
+
+  const hasActiveFilters = useMemo(
+    () => Object.values(columnFilters).some((val) => isColumnFilterActive(val)),
+    [columnFilters],
+  );
+
+  const displayedGroups = useMemo(() => {
+    let result = groups;
+
+    if (hasActiveFilters) {
+      result = result.filter((group) => {
+        const invFilter = columnFilters.investment;
+        if (
+          typeof invFilter === "string" &&
+          invFilter.trim() &&
+          !`${group.project_name} ${group.reference_code}`
+            .toLowerCase()
+            .includes(invFilter.trim().toLowerCase())
+        ) {
+          return false;
+        }
+
+        const flowFilter = columnFilters.flow;
+        if (
+          typeof flowFilter === "string" &&
+          flowFilter.trim() &&
+          !`${personName(group.business)} ${group.business.email ?? ""} ${personName(group.investor)} ${group.investor.email ?? ""}`
+            .toLowerCase()
+            .includes(flowFilter.trim().toLowerCase())
+        ) {
+          return false;
+        }
+
+        const statusFilter = columnFilters.status;
+        if (
+          Array.isArray(statusFilter) &&
+          statusFilter.length > 0 &&
+          !statusFilter.includes(groupStatusLabel(group))
+        ) {
+          return false;
+        }
+
+        return true;
+      });
+    }
+
+    if (sortState) {
+      result = [...result].sort((a, b) => {
+        switch (sortState.key) {
+          case "investment":
+            return compareSortableValues(
+              a.project_name,
+              b.project_name,
+              sortState.direction,
+              locale,
+            );
+          case "flow":
+            return compareSortableValues(
+              personName(a.business),
+              personName(b.business),
+              sortState.direction,
+              locale,
+            );
+          case "progress": {
+            const pctA =
+              a.tranche_total_days > 0
+                ? a.tranche_paid_days / a.tranche_total_days
+                : 0;
+            const pctB =
+              b.tranche_total_days > 0
+                ? b.tranche_paid_days / b.tranche_total_days
+                : 0;
+            return compareSortableValues(
+              pctA,
+              pctB,
+              sortState.direction,
+              locale,
+            );
+          }
+          case "amount":
+            return compareSortableValues(
+              a.total_net_vnd,
+              b.total_net_vnd,
+              sortState.direction,
+              locale,
+            );
+          case "status":
+            return compareSortableValues(
+              groupStatusLabel(a),
+              groupStatusLabel(b),
+              sortState.direction,
+              locale,
+            );
+          default:
+            return 0;
+        }
+      });
+    }
+
+    return result;
+  }, [
+    groups,
+    columnFilters,
+    hasActiveFilters,
+    sortState,
+    locale,
+    groupStatusLabel,
+  ]);
+
+  const setColumnFilter = (
+    key: string,
+    next: string | string[] | undefined,
+  ) => {
+    setColumnFilters((prev) => {
+      const copy = { ...prev };
+      if (!isColumnFilterActive(next)) {
+        delete copy[key];
+      } else if (next !== undefined) {
+        copy[key] = next;
+      }
+      return copy;
+    });
+  };
+
+  const resetAll = () => {
+    setSortState(null);
+    setColumnFilters({});
+  };
+
   const money = (vnd: number) => formatCurrency(vnd, locale);
 
   const toggleGroup = (trancheId: string) => {
@@ -152,14 +325,60 @@ export function RepaymentQueue({ status }: { status: AdminRepaymentFilter }) {
           </div>
         )}
 
+        <ActiveTableFiltersBar
+          columns={columnsMeta}
+          sortState={sortState}
+          columnFilters={columnFilters}
+          onClearSort={() => setSortState(null)}
+          onClearFilter={(key) => setColumnFilter(key, undefined)}
+          onResetAll={resetAll}
+        />
+
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t(`${K}.table.investment`)}</TableHead>
-              <TableHead>{t(`${K}.table.flow`)}</TableHead>
-              <TableHead>{t(`${K}.table.progress`)}</TableHead>
-              <TableHead>{t(`${K}.table.amount`)}</TableHead>
-              <TableHead>{t("admin.transactions.table.status")}</TableHead>
+              <InteractiveTableHead
+                columnKey="investment"
+                header={t(`${K}.table.investment`)}
+                sortState={sortState}
+                onSortChange={setSortState}
+                filterType="text"
+                filterValue={columnFilters.investment}
+                onFilterChange={(next) => setColumnFilter("investment", next)}
+              />
+              <InteractiveTableHead
+                columnKey="flow"
+                header={t(`${K}.table.flow`)}
+                sortState={sortState}
+                onSortChange={setSortState}
+                filterType="text"
+                filterValue={columnFilters.flow}
+                onFilterChange={(next) => setColumnFilter("flow", next)}
+              />
+              <InteractiveTableHead
+                columnKey="progress"
+                header={t(`${K}.table.progress`)}
+                sortState={sortState}
+                onSortChange={setSortState}
+                filterable={false}
+              />
+              <InteractiveTableHead
+                columnKey="amount"
+                header={t(`${K}.table.amount`)}
+                sortState={sortState}
+                onSortChange={setSortState}
+                filterable={false}
+              />
+              <InteractiveTableHead
+                columnKey="status"
+                header={t("admin.transactions.table.status")}
+                sortState={sortState}
+                onSortChange={setSortState}
+                filterType="select"
+                filterValue={columnFilters.status}
+                filterOptions={statusOptions}
+                onFilterChange={(next) => setColumnFilter("status", next)}
+              />
             </TableRow>
           </TableHeader>
 
@@ -170,17 +389,30 @@ export function RepaymentQueue({ status }: { status: AdminRepaymentFilter }) {
                   <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" />
                 </TableCell>
               </TableRow>
-            ) : groups.length === 0 ? (
+            ) : displayedGroups.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={5}
                   className="h-32 text-center text-sm text-muted-foreground"
                 >
-                  {emptyMessage}
+                  {groups.length > 0 && hasActiveFilters ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <span>{t("tableControls.noMatchingRows")}</span>
+                      <button
+                        type="button"
+                        onClick={resetAll}
+                        className="text-xs font-medium text-primary hover:underline cursor-pointer"
+                      >
+                        {t("tableControls.clearAll")}
+                      </button>
+                    </div>
+                  ) : (
+                    emptyMessage
+                  )}
                 </TableCell>
               </TableRow>
             ) : (
-              groups.map((group) => {
+              displayedGroups.map((group) => {
                 const expanded = !collapsedIds.has(group.tranche_id);
                 const progressPct =
                   group.tranche_total_days > 0

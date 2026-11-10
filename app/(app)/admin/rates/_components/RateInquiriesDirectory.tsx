@@ -34,7 +34,7 @@ import { cn } from "@/lib/utils";
 const PAGE_SIZE = 15;
 
 export function RateInquiriesDirectory() {
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const [page, setPage] = useState(1);
   const [industryFilter, setIndustryFilter] = useState<string>("ALL");
   const [tierFilter, setTierFilter] = useState<string>("ALL");
@@ -152,6 +152,7 @@ export function RateInquiriesDirectory() {
     {
       key: "industry",
       header: t("admin.ratesTable.industry"),
+      filterType: "select",
       render: (item) => (
         <span className="inline-flex items-center rounded-md bg-muted px-2 py-1 text-xs font-medium text-foreground">
           {item.industry_display || item.industry}
@@ -162,6 +163,7 @@ export function RateInquiriesDirectory() {
       key: "tenure_staff",
       header: t("admin.ratesTable.tenureStaff"),
       cellClassName: "text-xs text-muted-foreground whitespace-nowrap",
+      sortValue: (item) => item.operating_months,
       render: (item) =>
         item.tenure_staff_display ||
         `${item.operating_months} mos / ${item.employee_count} staff`,
@@ -170,13 +172,16 @@ export function RateInquiriesDirectory() {
       key: "revenue",
       header: t("admin.ratesTable.revenueL12m"),
       cellClassName: "text-xs font-semibold text-foreground whitespace-nowrap",
+      sortValue: (item) => item.revenue_l12m,
       render: (item) =>
-        item.revenue_l12m_formatted || formatCurrency(item.revenue_l12m),
+        item.revenue_l12m_formatted ||
+        formatCurrency(item.revenue_l12m, locale),
     },
     {
       key: "yoy_growth",
       header: t("admin.ratesTable.yoyGrowth"),
       cellClassName: "whitespace-nowrap",
+      sortValue: (item) => item.yoy_growth_pct,
       render: (item) => {
         const isPositive = (item.yoy_growth_pct ?? 0) >= 0;
         return (
@@ -198,14 +203,16 @@ export function RateInquiriesDirectory() {
       key: "loan_ask",
       header: t("admin.ratesTable.loanAsk"),
       cellClassName: "whitespace-nowrap text-xs font-bold text-foreground",
+      sortValue: (item) => item.requested_amount,
       render: (item) =>
         item.loan_ask_display ||
-        `${formatCompactCurrency(item.requested_amount)} / ${item.tenor_months} mos`,
+        `${formatCompactCurrency(item.requested_amount, locale)} / ${item.tenor_months} mos`,
     },
     {
       key: "rate",
       header: t("admin.ratesTable.calculatedRate"),
       cellClassName: "whitespace-nowrap text-xs font-medium text-primary",
+      sortValue: (item) => item.estimated_rate_min,
       render: (item) =>
         item.calculated_rate_display ||
         `${item.estimated_rate_min}% - ${item.estimated_rate_max}% / mo`,
@@ -214,6 +221,7 @@ export function RateInquiriesDirectory() {
       key: "tier",
       header: t("admin.ratesTable.tier"),
       cellClassName: "whitespace-nowrap",
+      filterType: "select",
       render: (item) => {
         const tier = (item.risk_tier ?? "").toUpperCase();
         if (tier.includes("A")) {
@@ -239,7 +247,7 @@ export function RateInquiriesDirectory() {
         return (
           <Badge
             variant="outline"
-            className="bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20 text-xs font-semibold"
+            className="bg-muted text-muted-foreground border-border text-xs font-semibold"
           >
             {item.tier_display || "Tier C"}
           </Badge>
@@ -325,7 +333,7 @@ export function RateInquiriesDirectory() {
           </div>
           <p className="text-2xl font-bold tracking-tight text-foreground">
             {stats.totalDemand > 0
-              ? formatCompactCurrency(stats.totalDemand)
+              ? formatCompactCurrency(stats.totalDemand, locale)
               : "—"}
           </p>
           <p className="text-xs text-muted-foreground">

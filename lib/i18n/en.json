@@ -84,6 +84,7 @@
         "confirmTitle": "Send this email?",
         "description": "Pick a template, write plain text, preview it, then send.",
         "headingLabel": "Heading (optional)",
+        "includeSignature": "Include my email signature",
         "notReady": "Connect your Google account in step 1 and turn sending on to send email.",
         "notReadyPaused": "Sending is paused. Turn on \"Sending on\" in step 1 and press Save, then you can send.",
         "presets": {
@@ -614,6 +615,12 @@
     "projectsPage": {
       "subtitle": "Review company applications and their approvals.",
       "title": "Projects"
+    },
+    "quickActions": {
+      "auditLogs": "System activity trace",
+      "kycReviews": "Identity verification",
+      "rates": "Rate inquiries & model",
+      "security": "Sessions & security"
     },
     "ratesDetail": {
       "businessProfileTitle": "Business Profile & Scale",
@@ -3864,6 +3871,20 @@
     "contactHint": "If you think this is a mistake, contact our team and we will look into it. Please include the email address on the account.",
     "signOutBtn": "Sign out",
     "title": "Your account has been suspended"
+  },
+  "tableControls": {
+    "clear": "Clear",
+    "clearAll": "Reset all",
+    "filterBy": "Filter {column}",
+    "filterPlaceholder": "Search {column}…",
+    "noMatchingRows": "No rows match the active column filters.",
+    "noOptions": "No filterable values",
+    "selectedCount": "{count} selected",
+    "sortAsc": "Sort ascending",
+    "sortBy": "Sort by {column}",
+    "sortDesc": "Sort descending",
+    "sortedAsc": "{column} (↑)",
+    "sortedDesc": "{column} (↓)"
   },
   "termsPage": {
     "backToHome": "Back to home",

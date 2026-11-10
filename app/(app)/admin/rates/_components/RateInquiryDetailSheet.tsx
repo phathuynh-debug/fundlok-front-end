@@ -37,7 +37,7 @@ export function RateInquiryDetailSheet({
   open,
   onOpenChange,
 }: RateInquiryDetailSheetProps) {
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const [copiedId, setCopiedId] = useState(false);
 
   if (!inquiry) return null;
@@ -69,8 +69,8 @@ export function RateInquiryDetailSheet({
       );
     }
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-slate-500/10 px-2.5 py-0.5 text-xs font-semibold text-slate-600 dark:text-slate-400 border border-slate-500/20">
-        <span className="h-1.5 w-1.5 rounded-full bg-slate-500" />
+      <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold text-muted-foreground border border-border">
+        <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground" />
         {inquiry.tier_display || "Tier C"}
       </span>
     );
@@ -91,7 +91,7 @@ export function RateInquiryDetailSheet({
               variant="ghost"
               size="sm"
               onClick={copyInquiryId}
-              className="h-8 gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+              className="h-8 gap-1.5 text-xs text-muted-foreground"
             >
               {copiedId ? (
                 <>
@@ -169,7 +169,7 @@ export function RateInquiryDetailSheet({
                   {t("admin.ratesTable.loanAsk")}
                 </span>
                 <p className="font-bold text-foreground text-sm">
-                  {formatCurrency(inquiry.requested_amount)}
+                  {formatCurrency(inquiry.requested_amount, locale)}
                 </p>
                 <p className="text-xs text-muted-foreground">
                   {inquiry.tenor_months} {t("ratePage.months")}
@@ -196,7 +196,10 @@ export function RateInquiryDetailSheet({
                 <p className="font-bold text-foreground text-sm">
                   {inquiry.calculated_monthly_payment_formatted ||
                     (inquiry.calculated_monthly_payment
-                      ? formatCurrency(inquiry.calculated_monthly_payment)
+                      ? formatCurrency(
+                          inquiry.calculated_monthly_payment,
+                          locale,
+                        )
                       : "—")}
                 </p>
                 <p className="text-xs text-muted-foreground">
@@ -253,7 +256,7 @@ export function RateInquiryDetailSheet({
                 </span>
                 <span className="font-bold text-sm">
                   {inquiry.revenue_l12m_formatted ||
-                    formatCurrency(inquiry.revenue_l12m)}
+                    formatCurrency(inquiry.revenue_l12m, locale)}
                 </span>
               </div>
               <div>
@@ -261,7 +264,7 @@ export function RateInquiryDetailSheet({
                   {t("ratePage.revenuePrior")}
                 </span>
                 <span className="font-medium text-sm">
-                  {formatCurrency(inquiry.revenue_prev_12m)}
+                  {formatCurrency(inquiry.revenue_prev_12m, locale)}
                 </span>
               </div>
               <div>
@@ -285,7 +288,7 @@ export function RateInquiryDetailSheet({
                   {t("ratePage.cogs")}
                 </span>
                 <span className="font-medium text-sm">
-                  {formatCurrency(inquiry.cogs_l12m)}
+                  {formatCurrency(inquiry.cogs_l12m, locale)}
                 </span>
               </div>
               <div>
@@ -293,7 +296,7 @@ export function RateInquiryDetailSheet({
                   {t("ratePage.fixedCost")}
                 </span>
                 <span className="font-medium text-sm">
-                  {formatCurrency(inquiry.fixed_costs_l12m)}
+                  {formatCurrency(inquiry.fixed_costs_l12m, locale)}
                 </span>
               </div>
               <div>
@@ -301,7 +304,7 @@ export function RateInquiryDetailSheet({
                   {t("ratePage.variableCost")}
                 </span>
                 <span className="font-medium text-sm">
-                  {formatCurrency(inquiry.variable_costs_l12m)}
+                  {formatCurrency(inquiry.variable_costs_l12m, locale)}
                 </span>
               </div>
             </div>
@@ -371,7 +374,7 @@ export function RateInquiryDetailSheet({
                   </span>
                   <span className="font-medium text-sm">
                     {inquiry.peak_month_revenue
-                      ? formatCurrency(inquiry.peak_month_revenue)
+                      ? formatCurrency(inquiry.peak_month_revenue, locale)
                       : "—"}
                   </span>
                 </div>
@@ -381,7 +384,7 @@ export function RateInquiryDetailSheet({
                   </span>
                   <span className="font-medium text-sm">
                     {inquiry.lowest_month_revenue
-                      ? formatCurrency(inquiry.lowest_month_revenue)
+                      ? formatCurrency(inquiry.lowest_month_revenue, locale)
                       : "—"}
                   </span>
                 </div>

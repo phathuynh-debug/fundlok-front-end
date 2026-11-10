@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "@/lib/i18n";
+import { AdminPageLoader } from "../_components/AdminPageLoader";
 import { VerificationModeCard } from "./_components/VerificationModeCard";
 
 export default function AdminSystemClient() {
@@ -43,16 +44,7 @@ export default function AdminSystemClient() {
   }, [isLoading, user, router]);
 
   if (isLoading || !user || user.role !== "SYSTEM_ADMIN") {
-    return (
-      <div className="h-screen w-full flex items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-2">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <span className="text-sm font-medium text-muted-foreground">
-            {t("admin.loading")}
-          </span>
-        </div>
-      </div>
-    );
+    return <AdminPageLoader />;
   }
 
   return (

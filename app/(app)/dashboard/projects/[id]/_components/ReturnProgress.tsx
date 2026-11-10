@@ -23,7 +23,7 @@ export function ReturnProgress() {
             <span>29.0%</span>
           </div>
           <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-            <div className="h-full bg-slate-900" style={{ width: "29%" }}></div>
+            <div className="h-full bg-primary" style={{ width: "29%" }}></div>
           </div>
         </div>
 

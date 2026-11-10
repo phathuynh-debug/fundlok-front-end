@@ -26,6 +26,7 @@ import { InvestorLeadDetailSheet } from "./InvestorLeadDetailSheet";
 import { useInvestorLeads } from "@/hooks/use-rates";
 import { useTranslations } from "@/lib/i18n";
 import { formatCompactCurrency } from "@/lib/format-currency";
+import { formatDateTime } from "@/lib/format-date";
 import type {
   InvestorLeadAdminItem,
   InvestorRiskTier,
@@ -88,11 +89,7 @@ export function InvestorLeadsDirectory() {
     return { signed, capital };
   }, [items]);
 
-  const dateTime = (iso: string) =>
-    new Intl.DateTimeFormat(locale === "vi" ? "vi-VN" : "en-GB", {
-      dateStyle: "short",
-      timeStyle: "short",
-    }).format(new Date(iso));
+  const dateTime = (iso: string) => formatDateTime(iso, locale) || "—";
 
   const columns: Column<InvestorLeadAdminItem>[] = [
     {
@@ -125,6 +122,7 @@ export function InvestorLeadsDirectory() {
       key: "amount",
       header: t("admin.investorLeads.col.amount"),
       cellClassName: "whitespace-nowrap text-xs font-semibold",
+      sortValue: (item) => item.amount_vnd,
       render: (item) =>
         `${formatCompactCurrency(item.amount_vnd, locale)} / ${item.commitment_months} ${t("admin.investorLeads.months")}`,
     },
@@ -132,6 +130,7 @@ export function InvestorLeadsDirectory() {
       key: "tier",
       header: t("admin.investorLeads.col.tier"),
       cellClassName: "whitespace-nowrap text-xs",
+      filterType: "select",
       render: (item) => t(`ratePage.investor.tier.${item.risk_tier}`),
     },
     {
@@ -139,12 +138,14 @@ export function InvestorLeadsDirectory() {
       header: t("admin.investorLeads.col.netApy"),
       cellClassName:
         "whitespace-nowrap font-mono text-xs font-medium text-primary",
+      sortValue: (item) => item.net_apy_pct,
       render: (item) => `${item.net_apy_pct.toFixed(2)}%`,
     },
     {
       key: "status",
       header: t("admin.investorLeads.col.status"),
       cellClassName: "whitespace-nowrap",
+      filterType: "select",
       render: (item) =>
         item.signed_up_at ? (
           <Badge

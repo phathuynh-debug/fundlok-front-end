@@ -82,6 +82,7 @@ export function KycReviewQueue({ status }: { status: AdminReviewFilter }) {
       key: "conflicts",
       header: t("admin.kycReviews.table.conflicts"),
       cellClassName: "text-xs",
+      sortValue: (row) => row.conflicts.length,
       render: (row) =>
         !row.provider_checked && row.conflicts.length === 0 ? (
           <span className="text-muted-foreground">
@@ -103,6 +104,7 @@ export function KycReviewQueue({ status }: { status: AdminReviewFilter }) {
     {
       key: "status",
       header: t("admin.kycReviews.table.status"),
+      filterType: "select",
       render: (row) => <ReviewStatusBadge status={row.status} />,
     },
   ];

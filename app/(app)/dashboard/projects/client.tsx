@@ -148,7 +148,7 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
             </h3>
             <Badge
               variant="outline"
-              className="bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10px] uppercase font-semibold tracking-wider rounded-md border-zinc-200 dark:border-zinc-700"
+              className="bg-muted text-muted-foreground text-[10px] uppercase font-semibold tracking-wider rounded-md border-border/60"
             >
               {industryLabel(listing.industry, t)}
             </Badge>
@@ -177,7 +177,7 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
               score carries the assessment; the investor draws the conclusion. */}
           <Badge
             variant="outline"
-            className="bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-zinc-300 dark:border-zinc-700 text-[10px] uppercase font-semibold tracking-wider rounded-full px-2.5 py-0.5"
+            className="bg-muted text-foreground border-border text-[10px] uppercase font-semibold tracking-wider rounded-full px-2.5 py-0.5"
           >
             {t("dashboard.projects.secondary.score", { score: listing.score })}
           </Badge>
@@ -268,12 +268,12 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
       </div>
 
       {/* Gray Details Boxes Block */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl bg-zinc-50 dark:bg-slate-900/50 border border-zinc-200/50 dark:border-zinc-800/40">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl bg-muted/30 border border-border/60">
         <div className="space-y-1">
           <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">
             {t("dashboard.projects.secondary.paymentHistory")}
           </h4>
-          <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+          <p className="text-xs font-semibold text-foreground/80">
             {t("dashboard.projects.secondary.consecutivePayments", {
               count: listing.consecutivePayments,
             })}
@@ -289,7 +289,7 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
           <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">
             {t("dashboard.projects.secondary.dailyRepayment")}
           </h4>
-          <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+          <p className="text-xs font-semibold text-foreground/80">
             {t("dashboard.projects.secondary.dailyRepaymentTerms", {
               amount: formatCurrency(listing.dailyRepaymentVnd, locale),
             })}
@@ -299,7 +299,7 @@ function SecondaryMarketCard({ listing }: { listing: SecondaryMarketListing }) {
 
       {/* Footer Actions Row */}
       <div className="flex flex-col sm:flex-row gap-3 pt-2">
-        <button className="flex-1 rounded-xl bg-slate-950 hover:bg-slate-900 dark:bg-emerald-400 dark:hover:bg-emerald-300 text-white dark:text-slate-950 py-3 text-sm font-semibold transition duration-150 shadow-xs active:scale-98 flex items-center justify-center gap-2 cursor-pointer">
+        <button className="flex-1 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground py-3 text-sm font-semibold transition duration-150 shadow-xs active:scale-98 flex items-center justify-center gap-2 cursor-pointer">
           <ShoppingCart className="w-4 h-4 shrink-0" />
           <span>{t("dashboard.projects.secondary.viewAndPurchase")}</span>
         </button>
@@ -447,7 +447,7 @@ export default function ProjectsClient() {
           </p>
         </div>
         {showListings && (
-          <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-600 px-3 py-1.5 rounded-full text-xs font-semibold w-fit border border-emerald-500/20">
+          <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-full text-xs font-semibold w-fit border border-emerald-500/20">
             <Briefcase className="h-4 w-4" />
             <span>
               {marketType === "primary"
@@ -465,12 +465,12 @@ export default function ProjectsClient() {
 
       {/* Market Toggle Pill Selector (hidden, see SECONDARY_MARKET_VISIBLE) */}
       {SECONDARY_MARKET_VISIBLE && (
-        <div className="p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-800/40 w-fit flex items-center gap-1">
+        <div className="p-1 rounded-xl bg-muted/50 border border-border/60 w-fit flex items-center gap-1">
           <button
             onClick={() => handleMarketToggle("primary")}
             className={`px-4 py-2.5 rounded-lg text-xs font-semibold uppercase transition duration-200 flex items-center gap-2 cursor-pointer ${
               marketType === "primary"
-                ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
+                ? "bg-card text-foreground shadow-xs border border-border/40"
                 : `${CONTROL_IDLE} bg-transparent border border-transparent`
             }`}
           >
@@ -481,7 +481,7 @@ export default function ProjectsClient() {
             onClick={() => handleMarketToggle("secondary")}
             className={`px-4 py-2.5 rounded-lg text-xs font-semibold uppercase transition duration-200 flex items-center gap-2 cursor-pointer ${
               marketType === "secondary"
-                ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10"
+                ? "bg-card text-foreground shadow-xs border border-border/40"
                 : `${CONTROL_IDLE} bg-transparent border border-transparent`
             }`}
           >

@@ -11,6 +11,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useTranslations } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format-currency";
+import { formatDateTime } from "@/lib/format-date";
 import type { InvestorLeadAdminItem } from "@/services/rates.service";
 
 /**
@@ -32,12 +33,7 @@ export function InvestorLeadDetailSheet({
   if (!lead) return null;
 
   const when = (iso: string | null) =>
-    iso
-      ? new Intl.DateTimeFormat(locale === "vi" ? "vi-VN" : "en-GB", {
-          dateStyle: "medium",
-          timeStyle: "short",
-        }).format(new Date(iso))
-      : "—";
+    iso ? formatDateTime(iso, locale) || "—" : "—";
   const pct = (value: number | null) =>
     value === null ? "—" : `${value.toFixed(2)}%`;
 

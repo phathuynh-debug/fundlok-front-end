@@ -31,7 +31,7 @@ export function StepIndicator() {
         >
           <div className="mx-[18px] h-full relative overflow-hidden rounded-full">
             <m.div
-              className="h-full w-full bg-black dark:bg-white absolute left-0 top-0"
+              className="h-full w-full bg-primary absolute left-0 top-0"
               {...barReveal(progress)}
               transition={{ duration: 0.3, ease: EASE_IN_OUT }}
             />
@@ -44,7 +44,7 @@ export function StepIndicator() {
               animate={{ x: `${progress}%` }}
               transition={{ duration: 0.3, ease: EASE_IN_OUT }}
             >
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/30 dark:bg-white/30 blur-md" />
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary/30 blur-md" />
             </m.div>
           </div>
         </div>

@@ -62,12 +62,14 @@ export function KybReviewQueue({ status }: { status: AdminReviewFilter }) {
       key: "document_type",
       header: t("admin.kybReviews.table.documentType"),
       cellClassName: "text-xs",
+      filterType: "select",
       render: (row) => documentTypeLabel(t, row.document_type),
     },
     {
       key: "check",
       header: t("admin.kybReviews.table.check"),
       cellClassName: "text-xs text-muted-foreground",
+      filterType: "select",
       render: (row) =>
         row.provider_checked
           ? t("admin.kybReviews.checkProvider")
@@ -76,6 +78,7 @@ export function KybReviewQueue({ status }: { status: AdminReviewFilter }) {
     {
       key: "status",
       header: t("admin.kybReviews.table.status"),
+      filterType: "select",
       render: (row) => <ReviewStatusBadge status={row.status} />,
     },
   ];

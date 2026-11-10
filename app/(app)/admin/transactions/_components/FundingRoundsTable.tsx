@@ -58,6 +58,7 @@ export function FundingRoundsTable({
     {
       key: "status",
       header: t("admin.transactions.rounds.status"),
+      filterType: "select",
       render: (row) => (
         <Badge variant="secondary">
           {enumLabel(t, "fundingWindowStatus", row.status)}
@@ -68,6 +69,7 @@ export function FundingRoundsTable({
       key: "raised",
       header: t("admin.transactions.rounds.raised"),
       cellClassName: "min-w-44 text-xs",
+      sortValue: (row) => row.confirmed_vnd,
       render: (row) => (
         <div className="space-y-1.5">
           <p className="tabular-nums text-foreground">
@@ -93,23 +95,27 @@ export function FundingRoundsTable({
       key: "reserved",
       header: t("admin.transactions.rounds.reserved"),
       cellClassName: "whitespace-nowrap text-xs tabular-nums",
+      sortValue: (row) => row.reserved_vnd,
       render: (row) => money(row.reserved_vnd),
     },
     {
       key: "open",
       header: t("admin.transactions.rounds.open"),
       cellClassName: "whitespace-nowrap text-xs tabular-nums",
+      sortValue: (row) => row.capacity_vnd,
       render: (row) => money(row.capacity_vnd),
     },
     {
       key: "tickets",
       header: t("admin.transactions.rounds.tickets"),
       cellClassName: "text-xs tabular-nums",
+      sortValue: (row) => row.tranche_count,
       render: (row) => row.tranche_count,
     },
     {
       key: "needs_action",
       header: t("admin.transactions.rounds.needsAction"),
+      sortValue: (row) => row.needs_action,
       render: (row) =>
         row.needs_action > 0 ? (
           <Badge
@@ -126,6 +132,7 @@ export function FundingRoundsTable({
       key: "closes",
       header: t("admin.transactions.rounds.closes"),
       cellClassName: "whitespace-nowrap text-xs text-muted-foreground",
+      sortValue: (row) => row.window_end,
       render: (row) => (
         <div className="space-y-0.5">
           <p className="text-foreground">

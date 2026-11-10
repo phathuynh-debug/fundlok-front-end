@@ -34,7 +34,7 @@ export function OwnerProjectView({
   return (
     <m.div
       {...pageTransitionProps}
-      className="flex-1 space-y-8 p-4 md:p-8 pt-6 max-w-5xl mx-auto"
+      className="flex-1 space-y-6 md:space-y-8 max-w-5xl mx-auto"
     >
       <div>
         <Button

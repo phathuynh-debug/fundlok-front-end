@@ -236,7 +236,7 @@ export default function AnalyticsClient() {
           {/* One filter row above everything it scopes -- the range applies to
                 the KPIs and every chart at once, never per-card. */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div className="p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-800/40 w-fit flex items-center gap-1">
+            <div className="p-1 rounded-xl bg-muted/50 border border-border/60 w-fit flex items-center gap-1">
               {RANGES.map((option) => (
                 <button
                   key={option}
@@ -245,7 +245,7 @@ export default function AnalyticsClient() {
                   aria-pressed={range === option}
                   className={`px-3 py-1.5 rounded-lg text-xs transition duration-200 cursor-pointer ${
                     range === option
-                      ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10 font-semibold"
+                      ? "bg-card text-foreground shadow-xs border border-border/40 font-semibold"
                       : `${CONTROL_IDLE} bg-transparent border border-transparent font-medium`
                   }`}
                 >
@@ -254,7 +254,7 @@ export default function AnalyticsClient() {
               ))}
             </div>
 
-            <div className="p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900/80 border border-zinc-200/50 dark:border-zinc-800/40 w-fit flex items-center gap-1">
+            <div className="p-1 rounded-xl bg-muted/50 border border-border/60 w-fit flex items-center gap-1">
               {(
                 [
                   {
@@ -276,7 +276,7 @@ export default function AnalyticsClient() {
                   aria-pressed={view === key}
                   className={`px-3 py-1.5 rounded-lg text-xs transition duration-200 cursor-pointer flex items-center gap-1.5 ${
                     view === key
-                      ? "bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs border border-border/10 font-semibold"
+                      ? "bg-card text-foreground shadow-xs border border-border/40 font-semibold"
                       : `${CONTROL_IDLE} bg-transparent border border-transparent font-medium`
                   }`}
                 >

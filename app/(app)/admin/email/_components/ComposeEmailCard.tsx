@@ -35,6 +35,7 @@ import {
 } from "@/hooks/use-admin-email";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
+import { CONTROL_IDLE } from "@/lib/ui-tokens";
 import { cn } from "@/lib/utils";
 import {
   MAX_RECIPIENTS,
@@ -433,7 +434,7 @@ export function ComposeEmailCard() {
                         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
                         selected
                           ? "bg-background text-foreground shadow-sm"
-                          : "text-muted-foreground hover:text-foreground",
+                          : CONTROL_IDLE,
                       )}
                     >
                       {t(`admin.email.compose.presets.languages.${lang}`)}
@@ -515,7 +516,12 @@ export function ComposeEmailCard() {
             {t("admin.email.compose.bodyLabel")}
           </Label>
 
-          <div className="flex items-center gap-1 border border-b-0 rounded-t-md bg-muted/30 px-2 py-1">
+          <div
+            className={cn(
+              "flex items-center gap-1 border border-b-0 rounded-t-md bg-muted/30 px-2 py-1",
+              errors.body && "border-destructive",
+            )}
+          >
             <Button
               type="button"
               variant="ghost"
@@ -594,6 +600,7 @@ export function ComposeEmailCard() {
               // list buttons' output looked like plain lines. Put them back,
               // close to how the email renders lists.
               "[&_ul]:list-disc [&_ol]:list-decimal [&_ol]:pl-6 [&_ul]:pl-6 [&_li]:my-0.5 [&_a]:text-primary [&_a]:underline",
+              errors.body && "border-destructive",
             )}
           />
           {errors.body && (
@@ -606,13 +613,13 @@ export function ComposeEmailCard() {
               id="include-signature"
               checked={includeSignature}
               onChange={(e) => setIncludeSignature(e.target.checked)}
-              className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+              className="h-4 w-4 rounded border-input accent-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             />
             <label
               htmlFor="include-signature"
               className="text-sm text-muted-foreground"
             >
-              Include my email signature
+              {t("admin.email.compose.includeSignature")}
             </label>
           </div>
         </div>
