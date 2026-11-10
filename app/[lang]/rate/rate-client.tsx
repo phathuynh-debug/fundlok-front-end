@@ -880,9 +880,9 @@ export default function RateClient({ footer }: { footer: React.ReactNode }) {
                 <button
                   type="button"
                   onClick={handleFillSampleData}
-                  className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline cursor-pointer"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-700 shadow-xs transition-all hover:border-emerald-500/50 hover:bg-emerald-500/20 active:scale-[0.98] dark:border-emerald-400/30 dark:bg-emerald-400/10 dark:text-emerald-300 dark:hover:border-emerald-400/50 dark:hover:bg-emerald-400/20 cursor-pointer"
                 >
-                  <Sparkles className="h-3.5 w-3.5 text-primary" />
+                  <Sparkles className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
                   <span>
                     {t("ratePage.fillSample") ||
                       (locale === "vi"
