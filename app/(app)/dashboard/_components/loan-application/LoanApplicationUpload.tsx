@@ -7,6 +7,7 @@ import { m, AnimatePresence } from "framer-motion";
 import { EASE_OUT } from "@/lib/motion";
 import { CheckCircle2, Loader2, AlertCircle, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { formatDate } from "@/lib/format-date";
 import { cn } from "@/lib/utils";
 import type { IndustryTheme } from "../sme-dashboard-config";
 import {
@@ -246,7 +247,7 @@ function LoanApplicationWizard() {
               <Button
                 type="button"
                 onClick={goToNextStep}
-                className="bg-black hover:bg-black/90 dark:bg-white dark:text-black text-white px-6 h-10 font-semibold shadow-xs"
+                className="px-6 h-10 font-semibold shadow-xs"
               >
                 {t("dashboard.sme.nextBtn")}
               </Button>
@@ -256,10 +257,10 @@ function LoanApplicationWizard() {
                 onClick={handleSend}
                 disabled={isSending || isFinalizing || isSubmitted || !canSend}
                 className={cn(
-                  "text-white gap-2 font-medium px-6 h-10 rounded-lg transition border shadow-xs duration-300",
+                  "gap-2 font-medium px-6 h-10 rounded-lg transition border shadow-xs duration-300",
                   isSubmitted
-                    ? "bg-emerald-600 hover:bg-emerald-700 border-emerald-500"
-                    : "bg-black hover:bg-black/90 dark:bg-white dark:text-black border-transparent",
+                    ? "bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-500"
+                    : "border-transparent",
                 )}
               >
                 {isSubmitted ? (
@@ -376,12 +377,8 @@ function CicReadout() {
       t("dashboard.sme.cicNote.DEBT_ISSUES"),
   ].filter(Boolean) as string[];
 
-  const formatDate = (iso: string | null) =>
-    iso
-      ? new Date(`${iso}T00:00:00`).toLocaleDateString(
-          locale === "vi" ? "vi-VN" : "en-GB",
-        )
-      : "—";
+  const formatScoredDate = (iso: string | null) =>
+    iso ? formatDate(`${iso}T00:00:00`, locale) || "—" : "—";
   const million = (n: number | null) =>
     n === null
       ? "—"
@@ -411,7 +408,7 @@ function CicReadout() {
             String(cicPreview.percentile),
           ),
     ],
-    [t("dashboard.sme.cicScoredOn"), formatDate(cicPreview.scored_on)],
+    [t("dashboard.sme.cicScoredOn"), formatScoredDate(cicPreview.scored_on)],
     [
       t("dashboard.sme.cicTotalDebt"),
       million(cicPreview.debt_total_vnd_million),

@@ -20,7 +20,7 @@ import type { Project } from "@/services/projects.service";
 import { useTranslations } from "@/lib/i18n";
 import { industryLabel } from "@/lib/industry-label";
 import { cn } from "@/lib/utils";
-import { getIndustryTheme } from "./sme-dashboard-config";
+import { getIndustryChrome, getIndustryTheme } from "./sme-dashboard-config";
 import { formatDate, formatDateTime } from "@/lib/format-date";
 import { enumLabel } from "@/lib/enum-labels";
 import { useVerificationGate } from "@/hooks/use-verification-gate";
@@ -53,7 +53,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
         initial={{ y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: EASE_OUT }}
-        className="flex-1 p-4 md:p-8 pt-6"
+        className="flex-1"
       >
         <Card className="mx-auto flex max-w-2xl flex-col items-center gap-6 rounded-2xl border border-dashed bg-card p-8 text-center md:p-12">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
@@ -89,6 +89,7 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
   }
 
   const theme = getIndustryTheme(project.industry);
+  const chrome = getIndustryChrome(project.industry, "hero");
 
   const createdDate = project.created_at
     ? new Date(project.created_at)
@@ -102,15 +103,26 @@ export function SmeDashboard({ projects }: SmeDashboardProps) {
       initial={{ y: -12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: EASE_OUT }}
-      className="flex-1 space-y-6 md:space-y-8 p-4 md:p-8 pt-6 relative"
+      className="flex-1 space-y-6 md:space-y-8 relative"
     >
       {/* Unified Responsive Hero Card */}
       <Card
         className={cn(
           "overflow-hidden border bg-card shadow-sm relative transition duration-300",
-          theme.borderColor,
+          chrome.surface,
         )}
       >
+        <div
+          aria-hidden="true"
+          className={cn("pointer-events-none absolute inset-0", chrome.pattern)}
+        />
+        <div
+          aria-hidden="true"
+          className={cn(
+            "pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full",
+            chrome.glow,
+          )}
+        />
         <div className="grid gap-6 p-6 md:p-8 lg:grid-cols-[1.35fr_0.65fr] items-stretch relative z-10">
           {/* Left Column: Project Profile Details */}
           <div className="min-w-0 space-y-6 flex flex-col justify-between">

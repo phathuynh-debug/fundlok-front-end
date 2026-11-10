@@ -13,6 +13,12 @@
       "skillPath": "skills/improve-animations/SKILL.md",
       "computedHash": "f6652a3bb94950baa33c684cc0966c838eb65cf22ebb5769a4f51ea205c254fe"
     },
+    "improve-ui": {
+      "source": "ibelick/ui-skills",
+      "sourceType": "github",
+      "skillPath": "skills/improve-ui/SKILL.md",
+      "computedHash": "60ffe2cfab2fe0fde3fb483dec28c48dacbff361df7096648a3f794c7c519110"
+    },
     "minimalist-ui": {
       "source": "Leonxlnx/taste-skill",
       "sourceType": "github",

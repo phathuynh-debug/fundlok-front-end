@@ -11,6 +11,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { TruncatedFigure } from "@/components/truncated-figure";
 import { springItemVariants, staggerContainerVariants } from "@/lib/animations";
 import { formatCurrency } from "@/lib/format-currency";
 import { formatDate } from "@/lib/format-date";
@@ -177,19 +178,22 @@ export function SmeAnalyticsView({
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5 gap-4"
       >
         {tiles.map((tile) => (
-          <m.div key={tile.key} variants={springItemVariants}>
-            <Card className="h-full p-5 gap-1.5">
+          <m.div
+            key={tile.key}
+            variants={springItemVariants}
+            className="min-w-0"
+          >
+            <Card className="h-full min-w-0 p-5 gap-1.5">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <tile.icon className="h-4 w-4 shrink-0" />
                 <span className="text-xs font-medium">{tile.label}</span>
               </div>
-              <span
+              <TruncatedFigure
+                value={tile.value}
                 className={cn(
-                  "truncate whitespace-nowrap text-xl font-bold tracking-tight text-foreground",
+                  "text-xl font-bold tracking-tight text-foreground",
                 )}
-              >
-                {tile.value}
-              </span>
+              />
               <span className="text-xs text-muted-foreground">{tile.hint}</span>
             </Card>
           </m.div>

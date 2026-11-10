@@ -28,6 +28,7 @@ import { useCurrentUser } from "@/hooks/use-authentication";
 import { useUpdateProfile } from "@/hooks/use-users";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "@/lib/i18n";
+import { formatDate } from "@/lib/format-date";
 import { roleLabel } from "@/lib/enum-labels";
 import { getInitials } from "@/lib/utils";
 import {
@@ -74,11 +75,7 @@ export function ProfileClient() {
 
   // Member Since — formatted from the user's created_at timestamp.
   const memberSince = user?.created_at
-    ? new Date(user.created_at).toLocaleDateString(locale, {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
+    ? formatDate(user.created_at, locale) || "—"
     : "—";
 
   // --- Edit form (full_name + phone + bio via PATCH /users/me) ---
