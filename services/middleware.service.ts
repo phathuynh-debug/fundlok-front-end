@@ -14,6 +14,9 @@ export type CurrentUser = {
   // data consent (backend docs/specs/consent/). Absent from a backend that
   // predates it, which the consent gate reads as "nothing to accept".
   consent_required?: boolean;
+  // True while a new account still has to prove a phone number at
+  // /verify-phone (backend docs/specs/users/phone-verification.md).
+  phone_verification_required?: boolean;
 };
 
 // Upper bounds on each proxy → FastAPI hop. Every page under /dashboard,

@@ -46,6 +46,11 @@ export function landingRouteFor(user?: User | null) {
   if (isAdminRole(user?.role)) {
     return "/admin";
   }
+  // Before the role: a new account proves a phone number first, whichever
+  // way it signed up (password or Google).
+  if (user?.phone_verification_required) {
+    return "/verify-phone";
+  }
   if (!user?.role) {
     return "/select-role";
   }
