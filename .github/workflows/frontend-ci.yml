@@ -259,27 +259,34 @@ jobs:
       # System deps live outside the cached browser directory, so they are
       # installed on every run, cache hit or not.
       #
-      # Ubuntu's apt mirrors occasionally fail DNS on hosted runners
-      # ("Temporary failure resolving 'security.ubuntu.com'"). Unbounded, apt
-      # crawls through every package and eats the whole job budget, so each
-      # attempt is capped and the install is retried a few times.
+      # Ubuntu's apt mirrors are sometimes unresolvable from hosted runners
+      # ("Temporary failure resolving 'security.ubuntu.com'"), for hours at a
+      # time. The runner image already ships nearly everything Chromium needs
+      # (apt only adds a handful of font packages), so an unreachable mirror
+      # must not fail the job: try apt briefly, then let an actual browser
+      # launch decide whether the runner is usable.
       - name: Install browser system dependencies
-        timeout-minutes: 10
+        timeout-minutes: 8
         run: |
-          sudo tee /etc/apt/apt.conf.d/80-ci-network >/dev/null <<'EOF'
-          Acquire::Retries "3";
-          Acquire::http::Timeout "15";
-          Acquire::https::Timeout "15";
-          EOF
-          for attempt in 1 2 3; do
-            if timeout 180 npx playwright install-deps chromium; then
-              exit 0
-            fi
-            echo "::warning::install-deps attempt ${attempt} failed; retrying"
-            sleep $((attempt * 15))
-          done
-          echo "::error::Could not install browser system dependencies after 3 attempts"
-          exit 1
+          # Run as root under `timeout` so a timed-out attempt takes apt-get
+          # down with it instead of leaving it holding the apt lock.
+          install_deps() {
+            sudo env "PATH=$PATH" timeout --kill-after=10 120 \
+              npx playwright install-deps chromium
+          }
+          if install_deps || { sleep 10; install_deps; }; then
+            exit 0
+          fi
+          echo "::warning::apt mirrors unreachable; checking whether Chromium launches without the extra packages"
+          node -e "
+            const { chromium } = require('@playwright/test');
+            chromium.launch().then(async (b) => {
+              const page = await b.newPage();
+              await page.setContent('<p>ok</p>');
+              await b.close();
+              console.log('Chromium launches; continuing without apt packages');
+            }).catch((e) => { console.error(e); process.exit(1); });
+          "
 
       # Built here rather than inside playwright.config.ts so a build failure
       # is reported as a build failure, not as a webServer timeout.
