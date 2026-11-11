@@ -96,12 +96,20 @@ export const FUNDING_ENDPOINTS = {
   // Idempotency-Key header.
   reserve: (windowId: string) => `/funding/windows/${windowId}/reservations`,
   // The Investor Service Agreement (Contract 4): GET whether it must still be
-  // signed before committing, POST the digitally signed PDF (multipart `file`
-  // and `version`). The PDF to sign, filled in with the investor's details,
-  // and the signed copy they uploaded.
+  // confirmed with the next commitment; POST {version, tranche_id, code} to
+  // confirm it with the one-time code (the investor's signature). The PDF to
+  // read, filled in with the investor's details, and the copy kept once
+  // confirmed.
   investorAgreement: "/funding/me/investor-agreement",
+  // POST {version, tranche_id}: sends the one-time code by Zalo to the phone
+  // number on the investor's account.
+  investorAgreementCode: "/funding/me/investor-agreement/code",
   investorAgreementDocument: "/funding/me/investor-agreement/document",
   investorAgreementSigned: "/funding/me/investor-agreement/signed",
+  // The Loan Contract (Contract 5) the business and its guarantor signed for
+  // this listing, as a PDF: read before committing. 404 when it has none.
+  windowLoanContract: (windowId: string) =>
+    `/funding/windows/${windowId}/loan-contract`,
   // The Investment Confirmation (the agreement's Annex) for an amount on a
   // window, as it will be signed: ?amount_vnd=
   investmentConfirmation: (windowId: string) =>

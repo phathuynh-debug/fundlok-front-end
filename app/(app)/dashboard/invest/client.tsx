@@ -29,6 +29,7 @@ import { InvestmentConfirmationTable } from "./_components/InvestmentConfirmatio
 import { InvestorAgreementStep } from "./_components/InvestorAgreementStep";
 import { InvestTerms } from "./_components/InvestTerms";
 import { SignedAgreementNotice } from "./_components/SignedAgreementNotice";
+import { SignedLoanContractCard } from "./_components/SignedLoanContractCard";
 import { SignedConfirmationCard } from "./_components/SignedConfirmationCard";
 import { ReceiptUpload } from "./_components/ReceiptUpload";
 import { TransferDetails } from "./_components/TransferDetails";
@@ -249,6 +250,7 @@ export default function InvestClient() {
         trancheId={ticket.id}
         referenceCode={ticket.reference_code}
         holdExpiresAt={ticket.hold_expires_at}
+        phone={agreement.data.phone}
         onSigned={() => {
           setSignedHere(true);
           window.scrollTo({ top: 0, behavior: "smooth" });
@@ -398,6 +400,8 @@ export default function InvestClient() {
             {t(`${K}.agreement.signNext`)}
           </div>
         )}
+        {/* The contract this commitment concludes, as the business signed it. */}
+        <SignedLoanContractCard windowId={fundingWindow.id} t={t} />
         <InvestmentConfirmationTable
           confirmation={confirmation.data}
           isLoading={confirmation.isLoading}

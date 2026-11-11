@@ -5,6 +5,7 @@ import {
   fundingService,
   type FundingWindow,
   type InvestmentConfirmation,
+  type AgreementCodeSent,
   type InvestorAgreementStatus,
   type PaymentInstructions,
   type ReceiptResult,
@@ -36,6 +37,8 @@ export const fundingKeys = {
     [...fundingKeys.all, "investor-agreement", "pdf", trancheId] as const,
   signedInvestorAgreement: (signedAt: string) =>
     [...fundingKeys.all, "investor-agreement", "signed", signedAt] as const,
+  windowLoanContract: (windowId: string) =>
+    [...fundingKeys.all, "loan-contract", windowId] as const,
   investmentConfirmation: (windowId: string, amountVnd: number) =>
     [
       ...fundingKeys.all,
@@ -67,8 +70,9 @@ export function useMyTranches(enabled = true) {
   });
 }
 
-// Whether the investor must still sign and upload the Investor Service
-// Agreement before committing, and Party B as signed or as the PDF fills it.
+// Whether the investor must still confirm the Investor Service Agreement with
+// their next commitment, the number the code goes to, and Party B as
+// confirmed or as the PDF fills it.
 export function useInvestorAgreement(enabled = true) {
   return useQuery<InvestorAgreementStatus, ApiError>({
     queryKey: fundingKeys.investorAgreement(),
@@ -80,7 +84,7 @@ export function useInvestorAgreement(enabled = true) {
 }
 
 // The agreement as a PDF filled in with the investor's details and the Annex
-// of the commitment it is signed with, to preview, download and sign.
+// of the commitment it is confirmed with, to read and download.
 // Generated on each request, so never cached.
 export function useInvestorAgreementPdf(trancheId: string, enabled = true) {
   return useQuery<{ blob: Blob; filename: string | null }, ApiError>({
@@ -94,8 +98,7 @@ export function useInvestorAgreementPdf(trancheId: string, enabled = true) {
   });
 }
 
-// The signed copy the investor uploaded, by when it was uploaded (a
-// replacement is a different file).
+// The copy kept when the investor confirmed, by when they did.
 export function useSignedInvestorAgreement(
   signedAt: string | null,
   enabled = true,
@@ -109,18 +112,43 @@ export function useSignedInvestorAgreement(
   });
 }
 
-// Uploading the digitally signed agreement, signed with a commitment: the
-// answer is the new status, and that commitment's payment details and Annex
-// are now there to read.
-export function useUploadInvestorAgreement() {
+// Asking for the one-time code that confirms the agreement with a commitment.
+export function useSendInvestorAgreementCode() {
+  return useMutation<
+    AgreementCodeSent,
+    ApiError,
+    { version: string; trancheId: string }
+  >({
+    mutationFn: ({ version, trancheId }) =>
+      fundingService.sendInvestorAgreementCode(version, trancheId),
+  });
+}
+
+// The Loan Contract the business signed for this listing, to read before
+// committing. A listing without one answers 404: nothing to show.
+export function useWindowLoanContract(windowId: string, enabled = true) {
+  return useQuery<{ blob: Blob; filename: string | null }, ApiError>({
+    queryKey: fundingKeys.windowLoanContract(windowId),
+    queryFn: () => fundingService.getWindowLoanContract(windowId),
+    enabled: enabled && Boolean(windowId),
+    staleTime: Infinity,
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+}
+
+// Confirming the agreement with a commitment by the one-time code: the answer
+// is the new status, and that commitment's payment details and Annex are now
+// there to read.
+export function useSignInvestorAgreement() {
   const queryClient = useQueryClient();
   return useMutation<
     InvestorAgreementStatus,
     ApiError,
-    { file: File; version: string; trancheId: string }
+    { version: string; trancheId: string; code: string }
   >({
-    mutationFn: ({ file, version, trancheId }) =>
-      fundingService.uploadSignedInvestorAgreement(file, version, trancheId),
+    mutationFn: ({ version, trancheId, code }) =>
+      fundingService.signInvestorAgreement(version, trancheId, code),
     onSuccess: (status, { trancheId }) => {
       queryClient.setQueryData(fundingKeys.investorAgreement(), status);
       void queryClient.invalidateQueries({

@@ -1,83 +1,98 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { REGEXP_ONLY_DIGITS } from "input-otp";
 import {
   AlertCircle,
   Clock,
   Download,
   FileSignature,
-  FileUp,
   Loader2,
+  MessageSquareText,
   RefreshCw,
-  Upload,
-  X,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import { Label } from "@/components/ui/label";
 import {
   useInvestorAgreementPdf,
-  useUploadInvestorAgreement,
+  useSendInvestorAgreementCode,
+  useSignInvestorAgreement,
 } from "@/hooks/use-funding";
 import { useObjectUrl } from "@/hooks/use-object-url";
 import { useToast } from "@/hooks/use-toast";
 import { formatDateTime } from "@/lib/format-date";
-import {
-  AGREEMENT_MAX_BYTES,
-  type InvestorAgreementStatus,
+import type { ApiError } from "@/lib/types";
+import type {
+  AgreementCodeSent,
+  InvestorAgreementStatus,
 } from "@/services/funding.service";
 
 const K = "investConfirm.agreement";
 
-const HOW_TO_SIGN = [`${K}.how1`, `${K}.how2`, `${K}.how3`] as const;
+const CODE_LENGTH = 6;
 
-// Upload failures the investor can act on, by X-Error-Code.
+// Failures the investor can act on, by X-Error-Code.
 const KNOWN_ERRORS = new Set([
-  "INVESTOR_AGREEMENT_UNSIGNED",
-  "INVESTOR_AGREEMENT_WRONG_DOCUMENT",
-  "INVESTOR_AGREEMENT_SIGNATURE_INVALID",
-  "INVESTOR_AGREEMENT_SIGNER_MISMATCH",
-  "NEAC_UNAVAILABLE",
+  "CODE_INCORRECT",
+  "CODE_EXPIRED",
+  "CODE_TOO_MANY_ATTEMPTS",
+  "CODE_COOLDOWN",
+  "CODE_DAILY_LIMIT",
+  "CODE_NOT_SENT",
+  "CODE_UNAVAILABLE",
+  "PHONE_REQUIRED",
+  "PHONE_NO_ZALO",
   "INVESTOR_AGREEMENT_OUTDATED",
   "INVESTOR_AGREEMENT_ALREADY_SIGNED",
   "HOLD_EXPIRED",
-  "UNSUPPORTED_TYPE",
-  "FILE_TOO_LARGE",
 ]);
 
+// A code that can no longer be entered: only a new one helps.
+const SPENT = new Set(["CODE_EXPIRED", "CODE_TOO_MANY_ATTEMPTS"]);
+
 interface InvestorAgreementStepProps {
-  /** The version the platform asks for, printed on the PDF to sign. */
+  /** The version the platform asks for, printed on the PDF. */
   version: string;
-  /** The commitment it is signed with: its code and Annex fill the PDF. */
+  /** The commitment it is confirmed with: its code and Annex fill the PDF. */
   trancheId: string;
   referenceCode: string;
-  /** Sign and upload before this, or the commitment's hold lapses. */
+  /** Confirm before this, or the commitment's hold lapses. */
   holdExpiresAt: string;
-  /** The signed copy was accepted: on to the transfer. */
+  /**
+   * The number the code goes to by Zalo, masked ("0703***489"); null when the
+   * account has no Vietnamese mobile number yet.
+   */
+  phone: string | null;
+  /** The agreement was confirmed: on to the transfer. */
   onSigned: (status: InvestorAgreementStatus) => void;
   locale: string;
   t: (key: string, vars?: Record<string, string | number>) => string;
 }
 
-function sizeLabel(bytes: number): string {
-  return bytes < 1024 * 1024
-    ? `${Math.max(1, Math.round(bytes / 1024))} KB`
-    : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
 /**
  * The investor's first commitment, made and holding its amount (no money has
- * moved): now the Investor Service Agreement (Contract 4), signed the way an
- * SME signs its service agreement. The backend fills the PDF in from the
- * verified profile, the approved bank account and this commitment's code and
- * Annex; the investor previews it, downloads the same file, signs it with
- * their digital signature and uploads the signed copy. The backend refuses a
- * PDF with no digital signature in it, and gives no payment details until a
- * signed copy is in.
+ * moved): now the Investor Service Agreement (Contract 4). The backend fills
+ * the PDF in from the verified profile, the approved bank account and this
+ * commitment's code and Annex; the investor reads it here, ticks that they
+ * agree, asks for a one-time code on their phone by Zalo and enters it. The
+ * code is their signature: the backend keeps the agreement as they read it
+ * with the time and the number the code went to, and gives no payment details
+ * until then.
  */
 export function InvestorAgreementStep({
   version,
   trancheId,
   referenceCode,
   holdExpiresAt,
+  phone,
   onSigned,
   locale,
   t,
@@ -87,60 +102,72 @@ export function InvestorAgreementStep({
   const url = useObjectUrl(pdf.data?.blob ?? null);
   const filename =
     pdf.data?.filename ?? "FundLok-hop-dong-dich-vu-nha-dau-tu.pdf";
-  const upload = useUploadInvestorAgreement();
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [file, setFile] = useState<File | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const sendCode = useSendInvestorAgreementCode();
+  const sign = useSignInvestorAgreement();
+  const [agreed, setAgreed] = useState(false);
+  const [sent, setSent] = useState<AgreementCodeSent | null>(null);
+  const [code, setCode] = useState("");
+  // Seconds until another code may be requested; set from each send's answer.
+  const [resendIn, setResendIn] = useState(0);
+  const [errorCode, setErrorCode] = useState<string | null>(null);
 
-  const choose = (picked: File | undefined) => {
-    setError(null);
-    if (!picked) return;
-    const isPdf =
-      picked.type === "application/pdf" ||
-      picked.name.toLowerCase().endsWith(".pdf");
-    if (!isPdf) {
-      setError(t(`${K}.errors.UNSUPPORTED_TYPE`));
-      return;
-    }
-    if (picked.size > AGREEMENT_MAX_BYTES) {
-      setError(t(`${K}.errors.FILE_TOO_LARGE`));
-      return;
-    }
-    setFile(picked);
+  // Count down to the next allowed resend. The state update runs in the
+  // timer's callback, never in the effect body.
+  useEffect(() => {
+    if (resendIn <= 0) return;
+    const id = window.setTimeout(() => setResendIn((s) => s - 1), 1000);
+    return () => window.clearTimeout(id);
+  }, [resendIn]);
+
+  const messageFor = (failure: ApiError) =>
+    t(
+      `${K}.errors.${KNOWN_ERRORS.has(failure.code ?? "") ? failure.code : "generic"}`,
+    );
+
+  const fail = (failure: ApiError, title: string) => {
+    setErrorCode(
+      KNOWN_ERRORS.has(failure.code ?? "") ? failure.code! : "generic",
+    );
+    toast({ variant: "destructive", title, description: messageFor(failure) });
   };
 
-  const send = () => {
-    if (!file) return;
-    setError(null);
-    upload.mutate(
-      { file, version, trancheId },
+  const requestCode = () => {
+    setErrorCode(null);
+    sendCode.mutate(
+      { version, trancheId },
+      {
+        onSuccess: (answer) => {
+          setSent(answer);
+          setCode("");
+          setResendIn(answer.resend_in);
+        },
+        onError: (failure) => fail(failure, t(`${K}.sendFailed`)),
+      },
+    );
+  };
+
+  const confirm = (value: string) => {
+    if (value.length !== CODE_LENGTH || sign.isPending || sign.isSuccess) {
+      return;
+    }
+    setErrorCode(null);
+    sign.mutate(
+      { version, trancheId, code: value },
       {
         onSuccess: (status) => {
-          toast({ title: t(`${K}.uploaded`) });
+          toast({ title: t(`${K}.confirmed`) });
           onSigned(status);
         },
         onError: (failure) => {
-          const code = failure.code ?? "";
-          let message = KNOWN_ERRORS.has(code)
-            ? t(`${K}.errors.${code}`)
-            : t(`${K}.errors.generic`);
-          // NEAC's own reason, in its words ("NEAC: Chữ ký: Không hợp lệ; …").
-          if (
-            code === "INVESTOR_AGREEMENT_SIGNATURE_INVALID" &&
-            failure.message
-          ) {
-            message = `${message} ${failure.message}`;
-          }
-          setError(message);
-          toast({
-            variant: "destructive",
-            title: t(`${K}.failed`),
-            description: message,
-          });
+          setCode("");
+          fail(failure, t(`${K}.failed`));
         },
       },
     );
   };
+
+  const spent = errorCode !== null && SPENT.has(errorCode);
+  const busy = sign.isPending || sign.isSuccess;
 
   return (
     <section className="space-y-5" aria-labelledby="investor-agreement-title">
@@ -155,7 +182,7 @@ export function InvestorAgreementStep({
         <p className="text-sm text-muted-foreground">{t(`${K}.intro`)}</p>
       </div>
 
-      {/* The commitment exists, no money has moved: sign before the hold ends. */}
+      {/* The commitment exists, no money has moved: confirm before the hold ends. */}
       <div
         className="flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm"
         data-testid="investor-agreement-held"
@@ -169,7 +196,7 @@ export function InvestorAgreementStep({
         </p>
       </div>
 
-      {/* The agreement as the investor will sign it. */}
+      {/* The agreement as the investor confirms it. */}
       <div className="flex min-w-0 flex-col overflow-hidden rounded-xl border bg-muted/30">
         <div className="flex items-center justify-between gap-3 border-b px-3 py-2">
           <span className="truncate text-xs font-semibold text-muted-foreground">
@@ -228,97 +255,162 @@ export function InvestorAgreementStep({
         </div>
       </div>
 
-      {/* How to sign it, and where it comes back. */}
-      <div className="space-y-2 rounded-xl border bg-muted/20 p-4">
-        <h3 className="text-sm font-bold text-foreground">
-          {t(`${K}.howTitle`)}
+      {/* Confirming: the code sent to their phone is their signature. */}
+      <div
+        className="space-y-4 rounded-xl border p-4"
+        data-testid="investor-agreement-confirm"
+      >
+        <h3 className="flex items-center gap-2 text-sm font-bold text-foreground">
+          <ShieldCheck className="h-4 w-4 text-muted-foreground" aria-hidden />
+          {t(`${K}.confirmTitle`)}
         </h3>
-        <ol className="space-y-2 text-sm leading-relaxed text-muted-foreground">
-          {HOW_TO_SIGN.map((key, i) => (
-            <li key={key} className="flex items-start gap-2">
-              <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-foreground/10 text-[10px] font-bold text-foreground">
-                {i + 1}
-              </span>
-              <span>{t(key)}</span>
-            </li>
-          ))}
-        </ol>
-      </div>
 
-      <div className="space-y-3 rounded-xl border p-4">
-        <p className="text-sm font-semibold text-foreground">
-          {t(`${K}.signedLabel`)}
-        </p>
-        <input
-          ref={inputRef}
-          type="file"
-          accept="application/pdf,.pdf"
-          className="sr-only"
-          data-testid="investor-agreement-input"
-          onChange={(e) => {
-            choose(e.target.files?.[0]);
-            e.target.value = "";
-          }}
-        />
-        {file ? (
-          <div className="flex items-center gap-3 rounded-lg border bg-muted/30 px-3 py-2 text-sm">
-            <FileUp className="h-4 w-4 shrink-0 text-muted-foreground" />
-            <span className="min-w-0 flex-1 truncate font-medium text-foreground">
-              {file.name}
-            </span>
-            <span className="shrink-0 text-xs text-muted-foreground">
-              {sizeLabel(file.size)}
-            </span>
+        {!phone ? (
+          <div
+            className="flex items-start gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm"
+            data-testid="investor-agreement-no-phone"
+          >
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+            <p className="leading-relaxed text-foreground">
+              {t(`${K}.noPhone`)}{" "}
+              <Link
+                href="/dashboard/settings/profile"
+                className="font-semibold underline underline-offset-2"
+              >
+                {t(`${K}.noPhoneLink`)}
+              </Link>
+            </p>
+          </div>
+        ) : !sent ? (
+          <>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              {t(`${K}.confirmIntro`, { phone })}
+            </p>
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="agree-investor-agreement"
+                checked={agreed}
+                onCheckedChange={(value) => setAgreed(value === true)}
+                disabled={sendCode.isPending}
+                className="mt-0.5"
+              />
+              <Label
+                htmlFor="agree-investor-agreement"
+                className="text-sm font-medium leading-relaxed text-foreground"
+              >
+                {t(`${K}.agree`)}
+              </Label>
+            </div>
             <Button
               type="button"
-              size="icon"
-              variant="ghost"
-              className="h-7 w-7 shrink-0"
-              aria-label={t(`${K}.remove`)}
-              disabled={upload.isPending}
-              onClick={() => setFile(null)}
+              className="h-11 w-full gap-2 font-semibold"
+              disabled={!agreed || !url || sendCode.isPending}
+              onClick={requestCode}
             >
-              <X className="h-4 w-4" />
+              {sendCode.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  {t(`${K}.sending`)}
+                </>
+              ) : (
+                <>
+                  <MessageSquareText className="h-4 w-4" />
+                  {t(`${K}.sendCode`)}
+                </>
+              )}
             </Button>
-          </div>
+          </>
         ) : (
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full gap-2 border-dashed"
-            onClick={() => inputRef.current?.click()}
-          >
-            <FileUp className="h-4 w-4" />
-            {t(`${K}.choose`)}
-          </Button>
+          <>
+            <div className="space-y-1 text-center">
+              <p className="text-sm text-foreground">
+                {t(
+                  sent.channel === "zalo"
+                    ? `${K}.codeSentZalo`
+                    : `${K}.codeSentLog`,
+                  { phone: sent.phone },
+                )}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {t(`${K}.codeExpiry`, {
+                  minutes: Math.round(sent.expires_in / 60),
+                })}
+              </p>
+            </div>
+            <InputOTP
+              maxLength={CODE_LENGTH}
+              value={code}
+              onChange={(value) => {
+                setCode(value);
+                setErrorCode(null);
+              }}
+              onComplete={confirm}
+              pattern={REGEXP_ONLY_DIGITS}
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              autoFocus
+              disabled={spent || busy}
+              aria-label={t(`${K}.codeLabel`)}
+              containerClassName="justify-center"
+            >
+              <InputOTPGroup>
+                {Array.from({ length: CODE_LENGTH }, (_, i) => (
+                  <InputOTPSlot
+                    key={i}
+                    index={i}
+                    aria-invalid={!!errorCode}
+                    className="h-12 w-11 text-lg"
+                  />
+                ))}
+              </InputOTPGroup>
+            </InputOTP>
+            <Button
+              type="button"
+              className="h-11 w-full gap-2 font-semibold"
+              disabled={code.length !== CODE_LENGTH || spent || busy}
+              onClick={() => confirm(code)}
+            >
+              {busy ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  {t(`${K}.confirming`)}
+                </>
+              ) : (
+                <>
+                  <FileSignature className="h-4 w-4" />
+                  {t(`${K}.confirm`)}
+                </>
+              )}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11 w-full"
+              disabled={resendIn > 0 || sendCode.isPending || busy}
+              onClick={requestCode}
+            >
+              {sendCode.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  {t(`${K}.sending`)}
+                </>
+              ) : resendIn > 0 ? (
+                t(`${K}.resendIn`, { seconds: resendIn })
+              ) : (
+                t(`${K}.resend`)
+              )}
+            </Button>
+          </>
         )}
-        {error && (
+        {errorCode && (
           <p role="alert" className="text-sm font-medium text-destructive">
-            {error}
+            {t(`${K}.errors.${errorCode}`)}
           </p>
         )}
-        <Button
-          type="button"
-          className="h-11 w-full gap-2 font-semibold"
-          disabled={!file || upload.isPending}
-          onClick={send}
-        >
-          {upload.isPending ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              {t(`${K}.uploading`)}
-            </>
-          ) : (
-            <>
-              <Upload className="h-4 w-4" />
-              {t(`${K}.upload`)}
-            </>
-          )}
-        </Button>
       </div>
 
       <div className="space-y-1 text-xs leading-relaxed text-muted-foreground">
-        <p>{t(`${K}.neacNote`)}</p>
+        <p>{t(`${K}.recordNote`)}</p>
         <p>{t(`${K}.blanksNote`)}</p>
         <p>{t(`${K}.version`, { version })}</p>
       </div>

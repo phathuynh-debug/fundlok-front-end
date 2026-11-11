@@ -155,9 +155,6 @@ export interface ReserveRequest {
   terms_version: string;
 }
 
-/** The signed agreement upload, checked client-side before it is sent. */
-export const AGREEMENT_MAX_BYTES = 10 * 1024 * 1024;
-
 // Mirrors backend PartyBOut: the investor as the agreement names them. A null
 // prints as a dotted blank.
 export interface AgreementPartyB {
@@ -171,10 +168,14 @@ export interface AgreementPartyB {
   bank_name: string | null;
 }
 
-// Mirrors backend SignatureCheckOut: NEAC's verdict on the signed copy.
+// Mirrors backend SignatureCheckOut: how the agreement on file was confirmed.
+// "ZALO_OTP": with a one-time code sent to `phone`. "NEAC": an agreement of
+// the earlier version, an uploaded digitally signed copy NEAC verified.
 export interface AgreementSignatureCheck {
-  verified_by: string;
+  verified_by: "ZALO_OTP" | "NEAC" | (string & {});
   checked_at: string;
+  /** ZALO_OTP: the number the code went to, masked, e.g. "0703***489". */
+  phone: string | null;
   /** The certificate's name, e.g. "CÔNG TY CỔ PHẦN FUNDLOK". */
   signer_name: string | null;
   /** As on the certificate, e.g. "MST:1501167629" or "CCCD:079…". */
@@ -190,23 +191,40 @@ export interface InvestorAgreementStatus {
   /** The version the platform asks for now, printed on the PDF to sign. */
   version: string;
   /**
-   * True until the investor uploads a digitally signed copy of `version`.
+   * True until the investor confirms `version` with a one-time code.
    * Meanwhile a commitment is still made (with its code), but its payment
-   * details wait: the agreement is signed with it first.
+   * details wait: the agreement is confirmed with it first.
    */
   required: boolean;
-  /** When the signed copy of the current version was uploaded. */
+  /**
+   * The number the confirmation code is sent to by Zalo, masked
+   * ("0703***489"): the account's phone. Null when the account has no
+   * Vietnamese mobile number.
+   */
+  phone: string | null;
+  /** When the current version was confirmed. */
   signed_at: string | null;
   /** Their latest signed version, of any version. */
   signed_version: string | null;
-  /** The signed copy's file name as uploaded. */
+  /** The confirmed copy's file name. */
   file_name: string | null;
   /** The commitment it was signed with (its Annex is filled in the PDF). */
   tranche_id: string | null;
-  /** NEAC's verdict on the signed copy, when it was checked on upload. */
+  /** How it was confirmed. */
   signature_check: AgreementSignatureCheck | null;
   /** As signed once signed; else as the PDF fills it in now. */
   party_b: AgreementPartyB;
+}
+
+// Mirrors backend AgreementCodeOut: where the confirmation code went.
+export interface AgreementCodeSent {
+  /** Masked, e.g. "0703***489". */
+  phone: string;
+  channel: "zalo" | "log";
+  /** Seconds the code is good for. */
+  expires_in: number;
+  /** Seconds until another code may be requested. */
+  resend_in: number;
 }
 
 // Mirrors backend InvestmentConfirmationOut: the Annex for one commitment.
@@ -286,37 +304,43 @@ export const fundingService = {
 
   // GET /funding/me/investor-agreement/document — the agreement as a PDF,
   // filled in with the investor's details and the Annex of the commitment it
-  // is signed with, to sign digitally.
+  // is confirmed with, to read before confirming.
   getInvestorAgreementPdf(trancheId: string) {
     return apiClient.getFile(FUNDING_ENDPOINTS.investorAgreementDocument, {
       params: { tranche_id: trancheId },
     });
   },
 
-  // GET /funding/me/investor-agreement/signed — the signed copy they uploaded.
+  // GET /funding/me/investor-agreement/signed — the copy kept when they
+  // confirmed.
   getSignedInvestorAgreement() {
     return apiClient.getFile(FUNDING_ENDPOINTS.investorAgreementSigned);
   },
 
-  // POST /funding/me/investor-agreement — the digitally signed PDF, the
-  // version printed on the copy they downloaded, and the commitment it was
-  // signed with. Opens that commitment's payment details.
-  uploadSignedInvestorAgreement(
-    file: File,
-    version: string,
-    trancheId: string,
-  ) {
-    const form = new FormData();
-    form.append("file", file);
-    form.append("version", version);
-    form.append("tranche_id", trancheId);
+  // POST /funding/me/investor-agreement/code — send the one-time code that
+  // confirms the agreement with this commitment, by Zalo to the account's
+  // phone.
+  sendInvestorAgreementCode(version: string, trancheId: string) {
+    return apiClient.post<AgreementCodeSent>(
+      FUNDING_ENDPOINTS.investorAgreementCode,
+      { version, tranche_id: trancheId },
+    );
+  },
+
+  // POST /funding/me/investor-agreement — confirm the agreement with this
+  // commitment by the one-time code: the investor's signature. Opens that
+  // commitment's payment details.
+  signInvestorAgreement(version: string, trancheId: string, code: string) {
     return apiClient.post<InvestorAgreementStatus>(
       FUNDING_ENDPOINTS.investorAgreement,
-      form,
-      // The backend verifies the signature with NEAC (up to 45 s): wait longer
-      // than that, so a slow check is not reported as a failure here.
-      { timeout: 60_000 },
+      { version, tranche_id: trancheId, code },
     );
+  },
+
+  // GET /funding/windows/{id}/loan-contract — the Loan Contract the business
+  // and its guarantor signed for this listing. 404 when the listing has none.
+  getWindowLoanContract(windowId: string) {
+    return apiClient.getFile(FUNDING_ENDPOINTS.windowLoanContract(windowId));
   },
 
   // GET /funding/windows/{id}/investment-confirmation — the Annex for this

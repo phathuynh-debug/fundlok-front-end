@@ -666,3 +666,10 @@ export const STUB_KYC_REVIEWS = [
   STUB_KYC_REVIEW_TO_APPROVE,
   STUB_KYC_REVIEW_TO_REJECT,
 ];
+
+/**
+ * The one-time code the stub "sends by Zalo" to confirm the Investor Service
+ * Agreement, and the (masked) number on the stub investor's account.
+ */
+export const STUB_AGREEMENT_CODE = "246810";
+export const STUB_AGREEMENT_PHONE = "0912***678";

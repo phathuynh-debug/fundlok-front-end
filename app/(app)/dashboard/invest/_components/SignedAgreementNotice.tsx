@@ -22,16 +22,16 @@ interface SignedAgreementNoticeProps {
   signedAt: string;
   version: string;
   fileName: string | null;
-  /** NEAC's verdict on the signed copy, when there is one. */
+  /** How it was confirmed: a one-time code, or (earlier version) NEAC. */
   signatureCheck?: AgreementSignatureCheck | null;
   locale: string;
   t: (key: string, vars?: Record<string, string | number>) => string;
 }
 
 /**
- * The investor has signed the Investor Service Agreement: it applies to this
- * commitment, which signs only its Investment Confirmation. The signed copy
- * they uploaded opens from here, exactly as uploaded.
+ * The investor has confirmed the Investor Service Agreement: it applies to
+ * this commitment, which confirms only its Investment Confirmation. The copy
+ * kept when they confirmed opens from here.
  */
 export function SignedAgreementNotice({
   signedAt,
@@ -63,17 +63,26 @@ export function SignedAgreementNotice({
         <p className="text-xs leading-relaxed text-muted-foreground">
           {t(`${K}.body`, vars)}
         </p>
-        {signatureCheck && (
+        {signatureCheck?.verified_by === "ZALO_OTP" ? (
           <p
             className="text-xs font-medium text-emerald-700 dark:text-emerald-400"
-            data-testid="signed-agreement-neac"
+            data-testid="signed-agreement-otp"
           >
-            {t(`${K}.neacVerified`, {
-              signer: signatureCheck.signer_name ?? "",
-              id: signatureCheck.signer_id ?? "",
-              issuer: signatureCheck.issuer_name ?? "",
-            })}
+            {t(`${K}.otpConfirmed`, { phone: signatureCheck.phone ?? "" })}
           </p>
+        ) : (
+          signatureCheck && (
+            <p
+              className="text-xs font-medium text-emerald-700 dark:text-emerald-400"
+              data-testid="signed-agreement-neac"
+            >
+              {t(`${K}.neacVerified`, {
+                signer: signatureCheck.signer_name ?? "",
+                id: signatureCheck.signer_id ?? "",
+                issuer: signatureCheck.issuer_name ?? "",
+              })}
+            </p>
+          )
         )}
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
           <Dialog open={open} onOpenChange={setOpen}>

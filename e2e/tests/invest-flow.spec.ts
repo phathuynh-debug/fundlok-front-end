@@ -1,7 +1,11 @@
 import { test, expect } from "@playwright/test";
 
 import { formatCurrency } from "../../lib/format-currency";
-import { STUB_PUBLIC_PROJECTS } from "../stub-api/fixtures";
+import {
+  STUB_AGREEMENT_CODE,
+  STUB_AGREEMENT_PHONE,
+  STUB_PUBLIC_PROJECTS,
+} from "../stub-api/fixtures";
 import { signInAs } from "../support/auth";
 import { normalizeSpaces, t } from "../support/i18n";
 
@@ -9,24 +13,14 @@ import { normalizeSpaces, t } from "../support/i18n";
 // within the window's range on the project page, agrees to the investing
 // terms, and is shown the business's own bank account to transfer to. At their
 // first investment, agreeing makes the commitment (code, amount held, no money
-// moved); they then sign the Investor Service Agreement (Contract 4), filled in
-// with that commitment's Annex, digitally and upload it before any transfer
-// details. Later commitments keep their own Annex and pay straight away. The
+// moved); they then confirm the Investor Service Agreement (Contract 4), filled
+// in with that commitment's Annex, with a one-time code sent to their phone,
+// before any transfer details. Later commitments keep their own Annex and pay straight away. The
 // stub's window is the first project's listing: 80M target, 20M confirmed,
 // 10M minimum ticket, so 10M to 60M can be invested.
 
 const project = STUB_PUBLIC_PROJECTS[0];
 const amount = 20_000_000;
-
-/** A PDF carrying a signature dictionary, as a digital-signing tool leaves it. */
-const signedPdf = (name = "hop-dong-da-ky.pdf") => ({
-  name,
-  mimeType: "application/pdf",
-  buffer: Buffer.from(
-    "%PDF-1.7\n1 0 obj << /Type /Catalog >> endobj\n" +
-      "9 0 obj << /Type /Sig /ByteRange [0 120 4216 380] /Contents <3082> >> endobj\n%%EOF\n",
-  ),
-});
 
 test.beforeEach(async ({ context }) => {
   await signInAs(context, "investor");
@@ -104,8 +98,12 @@ test("invest, sign the service agreement and the terms, then see the business's 
   await expect(page).toHaveURL(
     new RegExp(`/dashboard/invest\\?amount=${amount}&projectId=${project.id}`),
   );
-  // First investment: the terms first, saying what comes after agreeing.
+  // First investment: the terms first, saying what comes after agreeing, with
+  // the Loan Contract the business signed there to read.
   await expect(page.getByTestId("investing-terms")).toBeVisible();
+  await expect(page.getByTestId("signed-loan-contract")).toContainText(
+    t("investConfirm.loanContract.title"),
+  );
   await expect(page.getByTestId("agreement-sign-next")).toBeVisible();
   await expect(page.getByTestId("investment-confirmation-table")).toContainText(
     project.legal_name,
@@ -122,8 +120,9 @@ test("invest, sign the service agreement and the terms, then see the business's 
   await page.getByLabel(t("investConfirm.terms.agreeWithConfirmation")).check();
   await agree.click();
 
-  // The commitment exists with its code, no money moved: sign the agreement,
-  // filled in with this commitment's Annex, before any transfer details.
+  // The commitment exists with its code, no money moved: confirm the
+  // agreement, filled in with this commitment's Annex, with the code sent to
+  // the investor's phone, before any transfer details.
   await expect(page.getByTestId("investor-agreement-held")).toContainText(
     "FLAB12CD34",
   );
@@ -133,11 +132,19 @@ test("invest, sign the service agreement and the terms, then see the business's 
     page.getByRole("link", { name: t("investConfirm.agreement.download") }),
   ).toHaveAttribute("download", /FundLok-hop-dong-dich-vu-nha-dau-tu/);
   const send = page.getByRole("button", {
-    name: t("investConfirm.agreement.upload"),
+    name: t("investConfirm.agreement.sendCode"),
   });
+  // No code is sent until the investor has ticked that they agree.
   await expect(send).toBeDisabled();
-  await page.getByTestId("investor-agreement-input").setInputFiles(signedPdf());
+  await page.getByLabel(t("investConfirm.agreement.agree")).check();
   await send.click();
+  await expect(page.getByTestId("investor-agreement-confirm")).toContainText(
+    STUB_AGREEMENT_PHONE,
+  );
+  // The sixth digit sends it.
+  await page
+    .getByLabel(t("investConfirm.agreement.codeLabel"))
+    .pressSequentially(STUB_AGREEMENT_CODE);
 
   // Before paying: the Annex confirmed with this ticket, filled in.
   const confirmation = page.getByTestId("signed-confirmation");
@@ -202,7 +209,7 @@ test("a returning investor is reminded of the signed agreement, not asked again"
   ).toBeVisible();
 });
 
-test("the agreement sent back unsigned is refused, and no transfer details are shown", async ({
+test("a wrong code confirms nothing, and no transfer details are shown", async ({
   page,
 }) => {
   await page.goto(`/dashboard/invest?amount=${amount}&projectId=${project.id}`);
@@ -218,19 +225,16 @@ test("the agreement sent back unsigned is refused, and no transfer details are s
     .click();
   await expect(page.getByTestId("investor-agreement-preview")).toBeVisible();
 
-  await page.getByTestId("investor-agreement-input").setInputFiles({
-    name: "chua-ky.pdf",
-    mimeType: "application/pdf",
-    buffer: Buffer.from(
-      "%PDF-1.7\n1 0 obj << /Type /Catalog >> endobj\n%%EOF\n",
-    ),
-  });
+  await page.getByLabel(t("investConfirm.agreement.agree")).check();
   await page
-    .getByRole("button", { name: t("investConfirm.agreement.upload") })
+    .getByRole("button", { name: t("investConfirm.agreement.sendCode") })
     .click();
+  await page
+    .getByLabel(t("investConfirm.agreement.codeLabel"))
+    .pressSequentially("000000");
 
   await expect(page.getByRole("alert").first()).toContainText(
-    t("investConfirm.agreement.errors.INVESTOR_AGREEMENT_UNSIGNED"),
+    t("investConfirm.agreement.errors.CODE_INCORRECT"),
   );
   await expect(page.getByTestId("transfer-details")).toHaveCount(0);
 });

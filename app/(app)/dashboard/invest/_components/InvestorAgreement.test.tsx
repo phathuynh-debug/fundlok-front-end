@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { formatDate, formatDateTime } from "@/lib/format-date";
 import type {
@@ -11,13 +11,26 @@ import { InvestmentConfirmationTable } from "./InvestmentConfirmationTable";
 import { InvestorAgreementStep } from "./InvestorAgreementStep";
 import { SignedAgreementNotice } from "./SignedAgreementNotice";
 import { SignedConfirmationCard } from "./SignedConfirmationCard";
+import { SignedLoanContractCard } from "./SignedLoanContractCard";
 import { t } from "./test-t";
 
-const VERSION = "investor-agreement-v0.3";
+// input-otp asks the document which element is under the caret; jsdom has no
+// layout, so there is never one.
+document.elementFromPoint = () => null;
+
+const VERSION = "investor-agreement-v0.3.1";
 const PDF_BLOB = new Blob(["%PDF-1.3"], { type: "application/pdf" });
 
-const mutate = vi.fn();
-let upload: { mutate: typeof mutate; isPending: boolean };
+const sendMutate = vi.fn();
+const signMutate = vi.fn();
+let sendCode: { mutate: typeof sendMutate; isPending: boolean };
+let sign: { mutate: typeof signMutate; isPending: boolean; isSuccess: boolean };
+let loanContract: {
+  data?: { blob: Blob; filename: string | null };
+  isError: boolean;
+  error?: { status: number };
+  refetch: () => void;
+};
 let pdf: {
   data?: { blob: Blob; filename: string | null };
   isError: boolean;
@@ -31,7 +44,9 @@ let trancheConfirmation: {
 const confirmationPdfQuery = vi.fn();
 vi.mock("@/hooks/use-funding", () => ({
   useInvestorAgreementPdf: () => pdf,
-  useUploadInvestorAgreement: () => upload,
+  useSendInvestorAgreementCode: () => sendCode,
+  useSignInvestorAgreement: () => sign,
+  useWindowLoanContract: () => loanContract,
   useSignedInvestorAgreement: (signedAt: string | null, enabled: boolean) =>
     signedQuery(signedAt, enabled),
   useTrancheConfirmation: () => trancheConfirmation,
@@ -47,24 +62,23 @@ vi.mock("@/lib/i18n", () => ({
   useTranslations: () => ({ locale: "en", setLocale: vi.fn(), t }),
 }));
 
-const file = (name: string, type: string, size = 2048) =>
-  new File([new Uint8Array(size)], name, { type });
-
 const signedStatus: InvestorAgreementStatus = {
   version: VERSION,
   required: false,
+  phone: "0703***489",
   signed_at: "2026-11-08T08:30:00Z",
   signed_version: VERSION,
-  file_name: "hop-dong-da-ky.pdf",
+  file_name: "FundLok-hop-dong-dich-vu-nha-dau-tu.pdf",
   tranche_id: "tr-1",
   signature_check: {
-    verified_by: "NEAC",
+    verified_by: "ZALO_OTP",
     checked_at: "2026-11-09T03:31:18Z",
-    signer_name: "NGUYEN VAN A",
-    signer_id: "CCCD:079203001234",
-    issuer_name: "FPT Certification Authority SHA256",
-    signed_time: "Ngày 09 tháng 11 năm 2026, 10:30:00 [UTC+07:00]",
-    name_matches: true,
+    phone: "0703***489",
+    signer_name: null,
+    signer_id: null,
+    issuer_name: null,
+    signed_time: null,
+    name_matches: false,
   },
   party_b: {
     holder_type: "INDIVIDUAL",
@@ -82,20 +96,41 @@ const stepProps = {
   trancheId: "tr-1",
   referenceCode: "FLAB12CD34",
   holdExpiresAt: "2026-11-09T05:00:00Z",
+  phone: "0703***489" as string | null,
   locale: "en",
   t,
 };
 
+const CODE_SENT = {
+  phone: "0703***489",
+  channel: "zalo" as const,
+  expires_in: 300,
+  resend_in: 60,
+};
+
 describe("InvestorAgreementStep", () => {
   beforeEach(() => {
-    mutate.mockReset();
-    upload = { mutate, isPending: false };
+    sendMutate.mockReset();
+    signMutate.mockReset();
+    sendCode = { mutate: sendMutate, isPending: false };
+    sign = { mutate: signMutate, isPending: false, isSuccess: false };
     pdf = {
       data: { blob: PDF_BLOB, filename: "FundLok-hop-dong.pdf" },
       isError: false,
       refetch: vi.fn(),
     };
   });
+
+  /** Tick the agreement, ask for the code, and have the backend send it. */
+  const askForCode = async () => {
+    await userEvent.click(screen.getByRole("checkbox"));
+    await userEvent.click(
+      screen.getByRole("button", {
+        name: "Send the confirmation code by Zalo",
+      }),
+    );
+    act(() => sendMutate.mock.calls.at(-1)![1].onSuccess(CODE_SENT));
+  };
 
   it("previews the filled-in PDF and offers the same file to download", () => {
     render(<InvestorAgreementStep {...stepProps} onSigned={vi.fn()} />);
@@ -112,93 +147,175 @@ describe("InvestorAgreementStep", () => {
     ).toBeInTheDocument();
   });
 
-  it("uploads the signed PDF with the version it was downloaded as", () => {
-    const onSigned = vi.fn();
-    render(<InvestorAgreementStep {...stepProps} onSigned={onSigned} />);
+  it("sends the code only once the investor has ticked that they agree", async () => {
+    render(<InvestorAgreementStep {...stepProps} onSigned={vi.fn()} />);
     const send = screen.getByRole("button", {
-      name: "Upload the signed agreement",
+      name: "Send the confirmation code by Zalo",
     });
+    // Where the code will go is said before asking for it.
+    expect(screen.getByTestId("investor-agreement-confirm")).toHaveTextContent(
+      "FundLok will send a 6-digit code by Zalo to 0703***489",
+    );
     expect(send).toBeDisabled();
 
-    const signed = file("hop-dong-da-ky.pdf", "application/pdf");
-    fireEvent.change(screen.getByTestId("investor-agreement-input"), {
-      target: { files: [signed] },
-    });
-    expect(screen.getByText("hop-dong-da-ky.pdf")).toBeInTheDocument();
-    fireEvent.click(send);
+    await userEvent.click(screen.getByRole("checkbox"));
+    await userEvent.click(send);
 
-    expect(mutate).toHaveBeenCalledOnce();
-    // Signed with this commitment: its id goes with the file.
-    expect(mutate.mock.calls[0][0]).toEqual({
-      file: signed,
+    expect(sendMutate).toHaveBeenCalledOnce();
+    // For this commitment and the version shown.
+    expect(sendMutate.mock.calls[0][0]).toEqual({
       version: VERSION,
       trancheId: "tr-1",
     });
-    // The backend took it: on to the terms.
-    act(() => mutate.mock.calls[0][1].onSuccess(signedStatus));
+  });
+
+  it("confirms the agreement with the code the investor enters", async () => {
+    const onSigned = vi.fn();
+    render(<InvestorAgreementStep {...stepProps} onSigned={onSigned} />);
+    await askForCode();
+    expect(screen.getByTestId("investor-agreement-confirm")).toHaveTextContent(
+      "The confirmation code was sent by Zalo to 0703***489.",
+    );
+    // No second code for a minute.
+    expect(
+      screen.getByRole("button", { name: "Send a new code in 60s" }),
+    ).toBeDisabled();
+
+    await userEvent.type(screen.getByRole("textbox"), "482913");
+
+    expect(signMutate).toHaveBeenCalledOnce();
+    expect(signMutate.mock.calls[0][0]).toEqual({
+      version: VERSION,
+      trancheId: "tr-1",
+      code: "482913",
+    });
+    // The backend took it: on to the transfer.
+    act(() => signMutate.mock.calls[0][1].onSuccess(signedStatus));
     expect(onSigned).toHaveBeenCalledWith(signedStatus);
   });
 
-  it("refuses anything but a PDF before sending it", () => {
+  it("says when the code is wrong and lets them try again", async () => {
     render(<InvestorAgreementStep {...stepProps} onSigned={vi.fn()} />);
+    await askForCode();
+    await userEvent.type(screen.getByRole("textbox"), "000000");
 
-    fireEvent.change(screen.getByTestId("investor-agreement-input"), {
-      target: { files: [file("scan.png", "image/png")] },
-    });
+    act(() => signMutate.mock.calls[0][1].onError({ code: "CODE_INCORRECT" }));
 
     expect(screen.getByRole("alert")).toHaveTextContent(
-      "Upload the signed agreement as a PDF file.",
+      "That code is not right. Check it and enter it again.",
     );
-    expect(
-      screen.getByRole("button", { name: "Upload the signed agreement" }),
-    ).toBeDisabled();
+    expect(screen.getByRole("textbox")).toBeEnabled();
+    expect(screen.getByRole("textbox")).toHaveValue("");
   });
 
-  it("says when the PDF came back without a digital signature", () => {
+  it("stops taking a dead code: only a new one helps", async () => {
     render(<InvestorAgreementStep {...stepProps} onSigned={vi.fn()} />);
-    fireEvent.change(screen.getByTestId("investor-agreement-input"), {
-      target: { files: [file("unsigned.pdf", "application/pdf")] },
-    });
-    fireEvent.click(
-      screen.getByRole("button", { name: "Upload the signed agreement" }),
-    );
+    await askForCode();
+    await userEvent.type(screen.getByRole("textbox"), "000000");
 
     act(() =>
-      mutate.mock.calls[0][1].onError({ code: "INVESTOR_AGREEMENT_UNSIGNED" }),
+      signMutate.mock.calls[0][1].onError({ code: "CODE_TOO_MANY_ATTEMPTS" }),
     );
 
     expect(screen.getByRole("alert")).toHaveTextContent(
-      "This PDF has no digital signature.",
+      "Too many incorrect attempts. Request a new code.",
     );
+    expect(screen.getByRole("textbox")).toBeDisabled();
   });
 
-  it("shows NEAC's own reason when it does not accept the signature", () => {
+  it("says why the code could not be sent", async () => {
     render(<InvestorAgreementStep {...stepProps} onSigned={vi.fn()} />);
-    fireEvent.change(screen.getByTestId("investor-agreement-input"), {
-      target: { files: [file("signed.pdf", "application/pdf")] },
-    });
-    fireEvent.click(
-      screen.getByRole("button", { name: "Upload the signed agreement" }),
-    );
-
-    act(() =>
-      mutate.mock.calls[0][1].onError({
-        code: "INVESTOR_AGREEMENT_SIGNATURE_INVALID",
-        message: "NEAC: Chữ ký: Không hợp lệ",
+    await userEvent.click(screen.getByRole("checkbox"));
+    await userEvent.click(
+      screen.getByRole("button", {
+        name: "Send the confirmation code by Zalo",
       }),
     );
 
+    act(() => sendMutate.mock.calls[0][1].onError({ code: "PHONE_NO_ZALO" }));
+
     expect(screen.getByRole("alert")).toHaveTextContent(
-      "NEAC does not confirm this digital signature as valid. NEAC: Chữ ký: Không hợp lệ",
+      "Your phone number has no Zalo account that can receive the code.",
     );
   });
 
-  it("says the commitment is held, nothing paid, and by when to sign", () => {
+  it("asks for a phone number when the account has none", () => {
+    render(
+      <InvestorAgreementStep {...stepProps} phone={null} onSigned={vi.fn()} />,
+    );
+
+    expect(screen.getByTestId("investor-agreement-no-phone")).toHaveTextContent(
+      "Your account has no Vietnamese mobile number",
+    );
+    expect(
+      screen.getByRole("link", { name: "Add a phone number in your profile" }),
+    ).toHaveAttribute("href", "/dashboard/settings/profile");
+    expect(
+      screen.queryByRole("button", {
+        name: "Send the confirmation code by Zalo",
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("says the commitment is held, nothing paid, and by when to confirm", () => {
     render(<InvestorAgreementStep {...stepProps} onSigned={vi.fn()} />);
 
     expect(screen.getByTestId("investor-agreement-held")).toHaveTextContent(
-      `Commitment FLAB12CD34 is held; no money has moved. Sign and upload the agreement before ${formatDateTime("2026-11-09T05:00:00Z", "en")}`,
+      `Commitment FLAB12CD34 is on hold and no money has moved. Read and confirm the agreement before ${formatDateTime("2026-11-09T05:00:00Z", "en")}`,
     );
+  });
+});
+
+describe("SignedLoanContractCard", () => {
+  beforeEach(() => {
+    loanContract = {
+      data: { blob: PDF_BLOB, filename: "FundLok-loan-contract-da-ky.pdf" },
+      isError: false,
+      refetch: vi.fn(),
+    };
+  });
+
+  it("offers the Loan Contract the business signed, to read before agreeing", async () => {
+    render(<SignedLoanContractCard windowId="w-1" t={t} />);
+
+    const card = screen.getByTestId("signed-loan-contract");
+    expect(card).toHaveTextContent("Loan Contract signed by the business");
+    expect(
+      within(card).getByRole("link", { name: "Download (PDF)" }),
+    ).toHaveAttribute("download", "FundLok-loan-contract-da-ky.pdf");
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "View the Loan Contract" }),
+    );
+    expect(
+      within(screen.getByRole("dialog")).getByTestId(
+        "signed-loan-contract-preview",
+      ),
+    ).toHaveAttribute("src", "blob:agreement#view=FitH");
+  });
+
+  it("shows nothing for a listing with no signed Loan Contract", () => {
+    loanContract = {
+      isError: true,
+      error: { status: 404 },
+      refetch: vi.fn(),
+    };
+    const { container } = render(
+      <SignedLoanContractCard windowId="w-old" t={t} />,
+    );
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it("offers a retry when it could not be loaded", async () => {
+    const refetch = vi.fn();
+    loanContract = { isError: true, error: { status: 500 }, refetch };
+    render(<SignedLoanContractCard windowId="w-1" t={t} />);
+
+    expect(screen.getByTestId("signed-loan-contract")).toHaveTextContent(
+      "The Loan Contract could not be loaded.",
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Retry" }));
+    expect(refetch).toHaveBeenCalledOnce();
   });
 });
 
@@ -265,35 +382,63 @@ describe("SignedAgreementNotice", () => {
     signedQuery.mockReset();
     signedQuery.mockImplementation((_at: string, enabled: boolean) => ({
       data: enabled
-        ? { blob: PDF_BLOB, filename: "hop-dong-da-ky.pdf" }
+        ? {
+            blob: PDF_BLOB,
+            filename: "FundLok-hop-dong-dich-vu-nha-dau-tu.pdf",
+          }
         : undefined,
       isError: false,
     }));
   });
 
-  it("reminds the investor of the agreement signed and opens the signed copy", async () => {
+  it("still shows NEAC's verdict on an agreement of the earlier version", () => {
+    render(
+      <SignedAgreementNotice
+        signedAt={signedAt}
+        version="investor-agreement-v0.3"
+        fileName="hop-dong-da-ky.pdf"
+        signatureCheck={{
+          verified_by: "NEAC",
+          checked_at: "2026-11-09T03:31:18Z",
+          phone: null,
+          signer_name: "NGUYEN VAN A",
+          signer_id: "CCCD:079203001234",
+          issuer_name: "FPT Certification Authority SHA256",
+          signed_time: null,
+          name_matches: true,
+        }}
+        locale="en"
+        t={t}
+      />,
+    );
+    expect(screen.getByTestId("signed-agreement-neac")).toHaveTextContent(
+      "Verified with NEAC: a valid digital signature by NGUYEN VAN A (CCCD:079203001234), issued by FPT Certification Authority SHA256.",
+    );
+  });
+
+  it("reminds the investor of the agreement confirmed and opens the copy kept", async () => {
     render(
       <SignedAgreementNotice
         signedAt={signedAt}
         version={VERSION}
-        fileName="hop-dong-da-ky.pdf"
+        fileName="FundLok-hop-dong-dich-vu-nha-dau-tu.pdf"
         signatureCheck={signedStatus.signature_check}
         locale="en"
         t={t}
       />,
     );
     const date = formatDate(signedAt, "en");
-    expect(screen.getByTestId("signed-agreement-neac")).toHaveTextContent(
-      "Verified with NEAC: a valid digital signature by NGUYEN VAN A (CCCD:079203001234), issued by FPT Certification Authority SHA256.",
+    expect(screen.getByTestId("signed-agreement-otp")).toHaveTextContent(
+      "Confirmed with a code sent by Zalo to 0703***489.",
     );
     expect(screen.getByTestId("signed-agreement-notice")).toHaveTextContent(
-      `uploaded it on ${date} (version ${VERSION})`,
+      `You confirmed the Investor Service Agreement on ${date} (version ${VERSION})`,
     );
     // Nothing is fetched until they ask to see it.
     expect(signedQuery).toHaveBeenLastCalledWith(signedAt, false);
 
     await userEvent.click(
-      screen.getByRole("button", { name: "View the signed agreement" }),
+      screen.getByRole("button", { name: "View the confirmed agreement" }),
     );
     const dialog = screen.getByRole("dialog");
     expect(signedQuery).toHaveBeenLastCalledWith(signedAt, true);
@@ -301,7 +446,7 @@ describe("SignedAgreementNotice", () => {
       within(dialog).getByTestId("signed-agreement-preview"),
     ).toHaveAttribute("src", "blob:agreement#view=FitH");
     expect(dialog).toHaveTextContent(
-      `Uploaded on ${date} · hop-dong-da-ky.pdf · version ${VERSION}`,
+      `Confirmed on ${date} · FundLok-hop-dong-dich-vu-nha-dau-tu.pdf · version ${VERSION}`,
     );
   });
 });

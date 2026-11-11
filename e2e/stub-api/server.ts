@@ -30,6 +30,8 @@ import { createServer, type IncomingMessage, type ServerResponse } from "http";
 import {
   STUB_ADMIN_STATS,
   STUB_ADMIN_USERS,
+  STUB_AGREEMENT_CODE,
+  STUB_AGREEMENT_PHONE,
   STUB_AUDIT_LOGS,
   STUB_KYC_REVIEWS,
   STUB_PASSWORD,
@@ -191,12 +193,12 @@ const fundingTickets = new Map<
 const STUB_TERMS_VERSION = "2026-10-30";
 
 /** The backend's Investor Service Agreement VERSION (printed on the PDF). */
-const STUB_AGREEMENT_VERSION = "investor-agreement-v0.3";
+const STUB_AGREEMENT_VERSION = "investor-agreement-v0.3.1";
 
 /**
- * The signed Investor Service Agreement each investor (by stub_scope and
- * account) uploaded before their first reservation. A test starts from a
- * returning investor, who signed it before, by setting the
+ * The Investor Service Agreement each investor (by stub_scope and account)
+ * confirmed with a one-time code at their first commitment. A test starts
+ * from a returning investor, who confirmed it before, by setting the
  * stub_agreement_signed cookie.
  */
 const investorAgreements = new Map<
@@ -220,16 +222,17 @@ const STUB_AGREEMENT_PDF = Buffer.from(
 /** Each ticket's Investment Confirmation, by stub_scope, account and ticket. */
 const trancheConfirmations = new Map<string, Record<string, unknown>>();
 
-/** NEAC's verdict as the backend keeps it (the stub never calls NEAC). */
+/** How the agreement was confirmed, as the backend keeps it. */
 function stubSignatureCheck(checkedAt: string) {
   return {
-    verified_by: "NEAC",
+    verified_by: "ZALO_OTP",
     checked_at: checkedAt,
-    signer_name: STUB_PARTY_B.name,
-    signer_id: `CCCD:${STUB_PARTY_B.id_number}`,
-    issuer_name: "FPT Certification Authority SHA256",
+    phone: STUB_AGREEMENT_PHONE,
+    signer_name: null,
+    signer_id: null,
+    issuer_name: null,
     signed_time: null,
-    name_matches: true,
+    name_matches: false,
   };
 }
 
@@ -273,18 +276,12 @@ function signedAgreement(req: IncomingMessage, key: string) {
     (readCookie(req, "stub_agreement_signed")
       ? {
           signedAt: "2026-11-01T03:00:00.000Z",
-          fileName: "hop-dong-da-ky.pdf",
+          fileName: `FundLok-hop-dong-dich-vu-nha-dau-tu-${STUB_AGREEMENT_VERSION}.pdf`,
           trancheId: null,
           content: STUB_AGREEMENT_PDF,
         }
       : null)
   );
-}
-
-async function readRaw(req: IncomingMessage): Promise<Buffer> {
-  const chunks: Buffer[] = [];
-  for await (const chunk of req) chunks.push(chunk as Buffer);
-  return Buffer.concat(chunks);
 }
 
 function pdfResponse(res: ServerResponse, content: Buffer, filename: string) {
@@ -1737,13 +1734,15 @@ const server = createServer(async (req, res) => {
 
   // --- Funding windows (ADR-009) -------------------------------------------
   // Reserving checks what the backend checks that a test can reach: the terms
-  // were agreed in their current version, a signed Investor Service Agreement
-  // was uploaded first, and the amount is within the window.
+  // were agreed in their current version and the amount is within the window.
+  // Payment details wait for the Investor Service Agreement, confirmed with a
+  // one-time code.
   if (path === "/funding/me/investor-agreement" && method === "GET") {
     const signed = signedAgreement(req, key);
     return json(res, 200, {
       version: STUB_AGREEMENT_VERSION,
       required: signed === null,
+      phone: STUB_AGREEMENT_PHONE,
       signed_at: signed?.signedAt ?? null,
       signed_version: signed ? STUB_AGREEMENT_VERSION : null,
       file_name: signed?.fileName ?? null,
@@ -1765,52 +1764,55 @@ const server = createServer(async (req, res) => {
       ? pdfResponse(res, signed.content, signed.fileName)
       : detail(res, 404, "No signed agreement");
   }
-  if (path === "/funding/me/investor-agreement" && method === "POST") {
-    // Multipart: the same presence checks the backend makes on the raw bytes.
-    const raw = await readRaw(req);
-    const text = raw.toString("latin1");
-    if (!text.includes(`name="version"\r\n\r\n${STUB_AGREEMENT_VERSION}`)) {
-      return json(
-        res,
-        409,
-        { detail: "The Investor Service Agreement has changed" },
-        { "x-error-code": "INVESTOR_AGREEMENT_OUTDATED" },
-      );
-    }
-    if (!text.includes("%PDF-")) {
-      return json(
-        res,
-        415,
-        { detail: "Upload the signed agreement as a PDF" },
-        { "x-error-code": "UNSUPPORTED_TYPE" },
-      );
-    }
-    if (!/\/ByteRange\s*\[/.test(text)) {
-      return json(
-        res,
-        422,
-        { detail: "The agreement has no digital signature" },
-        { "x-error-code": "INVESTOR_AGREEMENT_UNSIGNED" },
-      );
-    }
-    // Signed with the investor's own held commitment.
-    const trancheId = /name="tranche_id"\r\n\r\n([^\r]+)/.exec(text)?.[1];
+  const outdated = () =>
+    json(
+      res,
+      409,
+      { detail: "The Investor Service Agreement has changed" },
+      { "x-error-code": "INVESTOR_AGREEMENT_OUTDATED" },
+    );
+  if (path === "/funding/me/investor-agreement/code" && method === "POST") {
+    const body = await readBody(req);
+    if (body.version !== STUB_AGREEMENT_VERSION) return outdated();
     const scope = verificationScope(req, key);
     const ticket = (fundingTickets.get(scope) ?? []).find(
-      (t) => t.id === trancheId,
+      (t) => t.id === body.tranche_id,
     );
     if (!ticket) return detail(res, 404, "Ticket not found");
-    const fileName = /filename="([^"]*)"/.exec(text)?.[1] ?? "signed.pdf";
-    const start = text.indexOf("%PDF-");
-    const end = text.indexOf("\r\n--", start);
+    // "Sent": every code is STUB_AGREEMENT_CODE.
+    return json(res, 200, {
+      phone: STUB_AGREEMENT_PHONE,
+      channel: "zalo",
+      expires_in: 300,
+      resend_in: 60,
+    });
+  }
+  if (path === "/funding/me/investor-agreement" && method === "POST") {
+    const body = await readBody(req);
+    if (body.version !== STUB_AGREEMENT_VERSION) return outdated();
+    // Confirmed with the investor's own held commitment.
+    const scope = verificationScope(req, key);
+    const ticket = (fundingTickets.get(scope) ?? []).find(
+      (t) => t.id === body.tranche_id,
+    );
+    if (!ticket) return detail(res, 404, "Ticket not found");
+    if (body.code !== STUB_AGREEMENT_CODE) {
+      return json(
+        res,
+        400,
+        { detail: "Incorrect code" },
+        { "x-error-code": "CODE_INCORRECT" },
+      );
+    }
+    const fileName = `FundLok-hop-dong-dich-vu-nha-dau-tu-${ticket.reference_code}-${STUB_AGREEMENT_VERSION}.pdf`;
     const signed = {
       signedAt: new Date().toISOString(),
       fileName,
       trancheId: ticket.id,
-      content: raw.subarray(start, end === -1 ? undefined : end),
+      content: STUB_AGREEMENT_PDF,
     };
     investorAgreements.set(scope, signed);
-    // That commitment's Annex, as filled in the agreement just signed.
+    // That commitment's Annex, as filled in the agreement just confirmed.
     const fundingWindow = STUB_PUBLIC_PROJECTS.map((p) =>
       stubFundingWindow(stubListing(p)?.id ?? ""),
     ).find((w) => w?.id === ticket.window_id);
@@ -1818,6 +1820,7 @@ const server = createServer(async (req, res) => {
     return json(res, 201, {
       version: STUB_AGREEMENT_VERSION,
       required: false,
+      phone: STUB_AGREEMENT_PHONE,
       signed_at: signed.signedAt,
       signed_version: STUB_AGREEMENT_VERSION,
       file_name: fileName,
@@ -1825,6 +1828,17 @@ const server = createServer(async (req, res) => {
       signature_check: stubSignatureCheck(signed.signedAt),
       party_b: STUB_PARTY_B,
     });
+  }
+  // The Loan Contract the business signed for the listing behind this window.
+  if (
+    /^\/funding\/windows\/[^/]+\/loan-contract$/.test(path) &&
+    method === "GET"
+  ) {
+    return pdfResponse(
+      res,
+      STUB_AGREEMENT_PDF,
+      "FundLok-loan-contract-da-ky.pdf",
+    );
   }
   const confirmationMatch =
     /^\/funding\/windows\/([^/]+)\/investment-confirmation$/.exec(path);
@@ -1922,7 +1936,7 @@ const server = createServer(async (req, res) => {
     };
     fundingTickets.set(scope, [ticket]);
     // With the agreement signed, the Annex is kept now; at the first commitment
-    // it is kept when the agreement (filled in with it) is uploaded.
+    // it is kept when the agreement (filled in with it) is confirmed.
     if (signedAgreement(req, key))
       keepConfirmation(scope, ticket, fundingWindow);
     return json(res, 201, ticket);
@@ -1957,7 +1971,9 @@ const server = createServer(async (req, res) => {
       return json(
         res,
         409,
-        { detail: "Sign the Investor Service Agreement with this commitment" },
+        {
+          detail: "Confirm the Investor Service Agreement with this commitment",
+        },
         { "x-error-code": "INVESTOR_AGREEMENT_REQUIRED" },
       );
     }
