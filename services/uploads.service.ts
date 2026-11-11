@@ -14,14 +14,15 @@ export type LoanDocumentType =
   | "e_invoice_data"
   | "cic_report"
   | "tax_filings"
-  // The two documents the SME signs after approval (ListingSigning), uploaded
+  // The three documents the SME signs after approval (ListingSigning), uploaded
   // through /loans/applications/{id}/listing-documents/{kind}, never the
   // wizard's presigned upload: the SME Service Agreement (Contract 2), with
-  // the enterprise's digital signature, and the Standing Offer (Contract 3),
-  // with the enterprise's and the Personal Guarantor's. Shown to staff, never
-  // to investors.
+  // the enterprise's digital signature, and the Standing Offer (Contract 3)
+  // and the Loan Contract template (Contract 5), each with the enterprise's
+  // and the Personal Guarantor's. Shown to staff, never to investors.
   | "sme_service_agreement"
-  | "sme_standing_offer";
+  | "sme_standing_offer"
+  | "sme_loan_contract";
 
 export interface InitUploadPayload {
   loan_application_id: string;
@@ -169,6 +170,7 @@ export const DOCUMENT_TYPE_RULES: Record<
   // PDFs: what Vietnamese digital signatures sign.
   sme_service_agreement: { extensions: ["pdf"], maxSizeMb: 25 },
   sme_standing_offer: { extensions: ["pdf"], maxSizeMb: 25 },
+  sme_loan_contract: { extensions: ["pdf"], maxSizeMb: 25 },
 };
 
 const CONTENT_TYPES_BY_EXTENSION: Record<string, string[]> = {

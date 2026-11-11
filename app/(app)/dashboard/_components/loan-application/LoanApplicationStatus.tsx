@@ -46,6 +46,10 @@ const DOCUMENT_LABELS: Record<LoanDocumentType, { en: string; vi: string }> = {
     en: "Signed standing offer",
     vi: "Đề nghị giao kết hợp đồng cho vay đã ký số",
   },
+  sme_loan_contract: {
+    en: "Signed loan contract template",
+    vi: "Mẫu hợp đồng cho vay đã ký số",
+  },
 };
 
 // Signed after approval and shown in ListingSigning, not as application
@@ -53,6 +57,7 @@ const DOCUMENT_LABELS: Record<LoanDocumentType, { en: string; vi: string }> = {
 const SIGNED_AFTER_APPROVAL: LoanDocumentType[] = [
   "sme_service_agreement",
   "sme_standing_offer",
+  "sme_loan_contract",
 ];
 
 const DOCUMENT_ORDER = (
