@@ -1316,6 +1316,40 @@
       "verifyFailedGeneric": "We couldn't verify your email right now. Please try again.",
       "verifyingDescription": "Please wait while we confirm your verification link.",
       "verifyingTitle": "Verifying email..."
+    },
+    "verifyPhone": {
+      "title": "Verify your phone number",
+      "description": "We'll send a 6-digit code to the Zalo account on your Vietnamese mobile number. You need a verified number to finish setting up your account.",
+      "phoneLabel": "Mobile number",
+      "phonePlaceholder": "0912 345 678",
+      "phoneHint": "Vietnamese mobile numbers only.",
+      "sendBtn": "Send code",
+      "codeTitle": "Enter your code",
+      "codeSentZalo": "We've sent a 6-digit code to your Zalo at {phone}. Check your Zalo messages.",
+      "codeSentLog": "Development mode: the code for {phone} is in the backend log.",
+      "codeExpiry": "The code expires in {minutes} minutes.",
+      "codeLabel": "Verification code",
+      "verifyBtn": "Verify",
+      "resendBtn": "Resend code",
+      "resendIn": "Resend code in {seconds}s",
+      "changeNumber": "Use a different number",
+      "sentToast": "Code sent",
+      "verifiedTitle": "Phone number verified",
+      "verifiedDescription": "Next, choose how you'll use FundLok.",
+      "logoutBtn": "Sign out",
+      "loadingScreen": "Loading verification screen...",
+      "errors": {
+        "codeExpired": "This code has expired. Request a new one.",
+        "generic": "Something went wrong. Please try again.",
+        "incorrectCode": "That code is incorrect. Check the message and try again.",
+        "noZalo": "This number has no Zalo account that can receive the code. Use the number your Zalo account is registered with.",
+        "phoneInvalid": "Enter a Vietnamese mobile number, for example 0912 345 678.",
+        "phoneTaken": "This phone number is already used by another account. Sign in to that account, or use a different number.",
+        "sendFailed": "We couldn't send the code. Please try again.",
+        "tooManyAttempts": "Too many incorrect attempts. Request a new code.",
+        "tooManyRequests": "Please wait before requesting another code.",
+        "unavailable": "Phone verification is temporarily unavailable. Please try again later."
+      }
     }
   },
   "common": {
@@ -3923,6 +3957,8 @@
     "transactionsDescription": "Review every transaction on your FundLok account: investments, repayments and fees.",
     "transactionsTitle": "Transactions",
     "verifyEmailDescription": "Verify your email address to access your FundLok dashboard.",
+    "verifyPhoneTitle": "Verify phone number",
+    "verifyPhoneDescription": "Verify your mobile number to finish setting up your FundLok account.",
     "verifyEmailTitle": "Verify email",
     "whyUsDescription": "Why small and medium businesses in Vietnam choose FundLok: a fully digital process, fast assessment, data security and long-term growth support.",
     "whyUsTitle": "Flexible Capital Solutions for SMEs | Why Choose FundLok?"

@@ -357,3 +357,95 @@ describe("the consent gate", () => {
     expect(response.headers.get("location")).toBeNull();
   });
 });
+
+describe("the phone gate", () => {
+  // A new account after its email link (or a Google sign-up): no role yet,
+  // and the backend says it must prove a phone number first.
+  const NEW_ACCOUNT = {
+    id: "u-2",
+    email: "new@example.com",
+    full_name: "Trần Thị Bình",
+    role: null,
+    email_verified: true,
+    phone_verification_required: true,
+  };
+
+  const signedInAs = async (user: object, path: string) => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn<typeof fetch>().mockResolvedValue(Response.json(user)),
+    );
+    return proxy(
+      new NextRequest(`https://www.fundlok.com${path}`, {
+        headers: { cookie: "access_token=opaque-token" },
+      }),
+    );
+  };
+
+  const redirectedTo = (response: Response) => {
+    const location = response.headers.get("location");
+    return location ? new URL(location).pathname : null;
+  };
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("sends a gated account to /verify-phone from anywhere", async () => {
+    for (const path of ["/dashboard", "/select-role", "/login", "/"]) {
+      expect(redirectedTo(await signedInAs(NEW_ACCOUNT, path)), path).toBe(
+        "/verify-phone",
+      );
+    }
+  });
+
+  it("lets a gated account stay on /verify-phone", async () => {
+    expect(
+      redirectedTo(await signedInAs(NEW_ACCOUNT, "/verify-phone")),
+    ).toBeNull();
+  });
+
+  it("keeps the email gate first", async () => {
+    const unverified = { ...NEW_ACCOUNT, email_verified: false };
+    expect(redirectedTo(await signedInAs(unverified, "/verify-phone"))).toBe(
+      "/verify-email",
+    );
+  });
+
+  it("moves a verified account on to choosing a role", async () => {
+    const verified = { ...NEW_ACCOUNT, phone_verification_required: false };
+    expect(redirectedTo(await signedInAs(verified, "/verify-phone"))).toBe(
+      "/select-role",
+    );
+    expect(redirectedTo(await signedInAs(verified, "/dashboard"))).toBe(
+      "/select-role",
+    );
+  });
+
+  it("never gates an account that already has a role", async () => {
+    const investor = {
+      ...NEW_ACCOUNT,
+      role: "INVESTOR",
+      phone_verification_required: false,
+    };
+    expect(redirectedTo(await signedInAs(investor, "/dashboard"))).toBeNull();
+    expect(redirectedTo(await signedInAs(investor, "/verify-phone"))).toBe(
+      "/dashboard",
+    );
+  });
+
+  it("gates nobody when the backend does not send the flag", async () => {
+    const older: Partial<typeof NEW_ACCOUNT> = { ...NEW_ACCOUNT };
+    delete older.phone_verification_required;
+    expect(redirectedTo(await signedInAs(older, "/dashboard"))).toBe(
+      "/select-role",
+    );
+  });
+
+  it("sends a signed-out visitor to sign in", async () => {
+    const response = await proxy(
+      new NextRequest("https://www.fundlok.com/verify-phone"),
+    );
+    expect(redirectedTo(response)).toBe("/login");
+  });
+});

@@ -3,6 +3,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   usersService,
+  type SendPhoneCodeRequest,
+  type SendPhoneCodeResponse,
   type SetPasswordRequest,
   type SetPasswordResponse,
   type UpdateProfileRequest,
@@ -78,6 +80,28 @@ export function useSetPassword() {
     mutationFn: (payload) => usersService.setPassword(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authKeys.currentUser() });
+    },
+  });
+}
+
+// POST /users/me/phone/send-code. Nothing to cache: the response only says
+// where the code went and when another may be requested.
+export function useSendPhoneCode() {
+  return useMutation<SendPhoneCodeResponse, ApiError, SendPhoneCodeRequest>({
+    mutationFn: (payload) => usersService.sendPhoneCode(payload),
+  });
+}
+
+// POST /users/me/phone/verify. The response is the refreshed user, so seed it
+// — phone_verification_required flips to false and the proxy lets the user on
+// to /select-role.
+export function useVerifyPhoneCode() {
+  const queryClient = useQueryClient();
+
+  return useMutation<User, ApiError, string>({
+    mutationFn: (code) => usersService.verifyPhoneCode(code),
+    onSuccess: (user) => {
+      queryClient.setQueryData(authKeys.currentUser(), user);
     },
   });
 }

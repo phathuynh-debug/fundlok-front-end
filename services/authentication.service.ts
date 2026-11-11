@@ -31,6 +31,14 @@ export interface User {
   // True until the user accepts the current Terms & Services and data
   // consent at /consent. Always false for admins.
   consent_required?: boolean;
+  /** True once `phone` has been proven by a one-time code. */
+  phone_verified?: boolean;
+  /**
+   * The onboarding gate: a new account (password or Google sign-up) must
+   * verify a phone number before choosing a role. Computed by the backend, so
+   * the proxy and the login redirect route on this flag alone.
+   */
+  phone_verification_required?: boolean;
   // False for OAuth-only accounts, which set a first password instead of
   // changing one — the change-password dialog uses this to decide whether to
   // ask for the current password.

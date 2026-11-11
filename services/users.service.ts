@@ -67,6 +67,24 @@ export interface ChangePasswordResponse {
   sessions_revoked: number;
 }
 
+// Mirrors backend PhoneCodeSendRequest / PhoneCodeSentOut
+// (POST /users/me/phone/send-code). Vietnamese mobiles only.
+export interface SendPhoneCodeRequest {
+  phone: string;
+  turnstile_token?: string | null;
+}
+
+export interface SendPhoneCodeResponse {
+  /** Canonical +84 form of the number the code went to. */
+  phone: string;
+  /** "zalo"; "log" only in backend development (PHONE_OTP_CHANNEL=log). */
+  channel: "zalo" | "log";
+  /** Seconds until the code stops working. */
+  expires_in: number;
+  /** Seconds until another code may be requested. */
+  resend_in: number;
+}
+
 export interface SecurityPreferences {
   signin_alerts_enabled: boolean;
 }
@@ -114,6 +132,20 @@ export const usersService = {
       USER_ENDPOINTS.securityPreferences,
       payload,
     );
+  },
+
+  // POST /users/me/phone/send-code — texts (or calls) a 6-digit code.
+  sendPhoneCode(payload: SendPhoneCodeRequest) {
+    return apiClient.post<SendPhoneCodeResponse>(
+      USER_ENDPOINTS.phoneSendCode,
+      payload,
+    );
+  },
+
+  // POST /users/me/phone/verify — returns the refreshed user (user_me_payload)
+  // with phone_verified set.
+  verifyPhoneCode(code: string) {
+    return apiClient.post<User>(USER_ENDPOINTS.phoneVerify, { code });
   },
 
   setPassword(payload: SetPasswordRequest) {

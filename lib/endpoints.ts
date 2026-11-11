@@ -65,6 +65,10 @@ export const USER_ENDPOINTS = {
   // over. See app/users/router.py.
   changePassword: "/users/me/password/change",
   securityPreferences: "/users/me/security-preferences",
+  // Phone verification by one-time code sent by Zalo ZNS. A new
+  // account proves a number here before it may choose a role.
+  phoneSendCode: "/users/me/phone/send-code",
+  phoneVerify: "/users/me/phone/verify",
 } as const;
 
 // Bank accounts a user pays from or is paid into (HANDOFF-04 Epic 0). Saved

@@ -1316,6 +1316,40 @@
       "verifyFailedGeneric": "Hiện chưa thể xác minh email của bạn. Vui lòng thử lại.",
       "verifyingDescription": "Vui lòng chờ trong giây lát, chúng tôi đang xác nhận liên kết xác minh của bạn.",
       "verifyingTitle": "Đang xác minh email..."
+    },
+    "verifyPhone": {
+      "title": "Xác minh số điện thoại",
+      "description": "Chúng tôi sẽ gửi mã gồm 6 chữ số đến tài khoản Zalo của số di động Việt Nam của bạn. Bạn cần xác minh số điện thoại để hoàn tất thiết lập tài khoản.",
+      "phoneLabel": "Số điện thoại di động",
+      "phonePlaceholder": "0912 345 678",
+      "phoneHint": "Chỉ hỗ trợ số di động Việt Nam.",
+      "sendBtn": "Gửi mã",
+      "codeTitle": "Nhập mã xác minh",
+      "codeSentZalo": "Chúng tôi đã gửi mã gồm 6 chữ số qua Zalo đến {phone}. Vui lòng kiểm tra tin nhắn Zalo.",
+      "codeSentLog": "Chế độ phát triển: mã cho {phone} nằm trong nhật ký máy chủ.",
+      "codeExpiry": "Mã có hiệu lực trong {minutes} phút.",
+      "codeLabel": "Mã xác minh",
+      "verifyBtn": "Xác minh",
+      "resendBtn": "Gửi lại mã",
+      "resendIn": "Gửi lại mã sau {seconds} giây",
+      "changeNumber": "Dùng số khác",
+      "sentToast": "Đã gửi mã",
+      "verifiedTitle": "Đã xác minh số điện thoại",
+      "verifiedDescription": "Tiếp theo, hãy chọn cách bạn sử dụng FundLok.",
+      "logoutBtn": "Đăng xuất",
+      "loadingScreen": "Đang tải màn hình xác minh...",
+      "errors": {
+        "codeExpired": "Mã đã hết hạn. Vui lòng yêu cầu mã mới.",
+        "generic": "Đã có lỗi xảy ra. Vui lòng thử lại.",
+        "incorrectCode": "Mã không đúng. Vui lòng kiểm tra tin nhắn và thử lại.",
+        "noZalo": "Số này không có tài khoản Zalo có thể nhận mã. Vui lòng dùng số điện thoại đã đăng ký Zalo.",
+        "phoneInvalid": "Vui lòng nhập số di động Việt Nam, ví dụ 0912 345 678.",
+        "phoneTaken": "Số điện thoại này đã được dùng cho một tài khoản khác. Hãy đăng nhập vào tài khoản đó hoặc dùng số khác.",
+        "sendFailed": "Không thể gửi mã. Vui lòng thử lại.",
+        "tooManyAttempts": "Bạn đã nhập sai quá nhiều lần. Vui lòng yêu cầu mã mới.",
+        "tooManyRequests": "Vui lòng đợi trước khi yêu cầu mã mới.",
+        "unavailable": "Xác minh số điện thoại tạm thời không khả dụng. Vui lòng thử lại sau."
+      }
     }
   },
   "common": {
@@ -3923,6 +3957,8 @@
     "transactionsDescription": "Xem mọi giao dịch trên tài khoản FundLok của bạn: khoản đầu tư, khoản hoàn trả và phí.",
     "transactionsTitle": "Giao dịch",
     "verifyEmailDescription": "Xác minh địa chỉ email để truy cập trang quản lý FundLok của bạn.",
+    "verifyPhoneTitle": "Xác minh số điện thoại",
+    "verifyPhoneDescription": "Xác minh số điện thoại di động để hoàn tất thiết lập tài khoản FundLok của bạn.",
     "verifyEmailTitle": "Xác minh email",
     "whyUsDescription": "Tìm hiểu lý do các doanh nghiệp vừa và nhỏ (SME) tại Việt Nam tin chọn FundLok: quy trình số hóa 100%, thẩm định nhanh, bảo mật dữ liệu và đồng hành tăng trưởng.",
     "whyUsTitle": "Giải Pháp Vốn Linh Hoạt Cho Doanh Nghiệp SME | Vì Sao Chọn FundLok?"
