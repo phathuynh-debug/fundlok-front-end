@@ -775,6 +775,7 @@
       "noProjects": "Không tìm thấy dự án.",
       "noResults": "Không tìm thấy kết quả.",
       "noUsers": "Không tìm thấy người dùng.",
+      "refresh": "Làm mới",
       "role": "Vai trò",
       "searchProjects": "Tìm dự án…",
       "searchUsers": "Tìm người dùng…",
@@ -1394,6 +1395,7 @@
     "pageSections": "Các phần của trang",
     "processing": "Đang xử lý...",
     "projectApplication": "Đơn đăng ký dự án",
+    "refresh": "Làm mới",
     "searchPlaceholder": "Tìm dự án theo tên hoặc ngành...",
     "sidebar": {
       "description": "Hiển thị thanh bên trên thiết bị di động.",

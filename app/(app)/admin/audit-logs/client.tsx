@@ -6,7 +6,8 @@ import { useRequireAuth } from "@/hooks/use-authentication";
 import { useAuditLogs } from "@/hooks/use-admin";
 import type { AuditLog, AuditUserRef } from "@/services/admin.service";
 import { isAdminRole } from "@/services/authentication.service";
-import { ScrollText } from "lucide-react";
+import { RefreshCw, ScrollText } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -21,6 +22,7 @@ import { DataTable, type Column } from "../_components/DataTable";
 import { useTranslations } from "@/lib/i18n";
 import { enumLabel } from "@/lib/enum-labels";
 import { formatDateTime as formatLocaleDateTime } from "@/lib/format-date";
+import { cn } from "@/lib/utils";
 
 const LIMIT_OPTIONS = [50, 100, 200, 500];
 
@@ -159,6 +161,7 @@ export default function AdminAuditLogsClient() {
     data: logs = [],
     isLoading: isLogsLoading,
     isFetching,
+    refetch,
   } = useAuditLogs({ entity_type: entityType || undefined, limit }, isAdmin);
 
   // Fallback guard: middleware blocks non-admins server-side.
@@ -190,28 +193,44 @@ export default function AdminAuditLogsClient() {
 
       <div className="rounded-lg border bg-card">
         {/* Filters */}
-        <div className="flex flex-col gap-2 border-b p-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
-          <Input
-            value={entityInput}
-            onChange={(e) => setEntityInput(e.target.value)}
-            placeholder={t("admin.auditLogs.entityPlaceholder")}
-            className="w-full sm:w-48"
-          />
-          <Select
-            value={String(limit)}
-            onValueChange={(v) => setLimit(Number(v))}
+        <div className="flex flex-col gap-2 border-b p-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+            <Input
+              value={entityInput}
+              onChange={(e) => setEntityInput(e.target.value)}
+              placeholder={t("admin.auditLogs.entityPlaceholder")}
+              className="w-full sm:w-48"
+            />
+            <Select
+              value={String(limit)}
+              onValueChange={(v) => setLimit(Number(v))}
+            >
+              <SelectTrigger size="sm" className="w-full sm:w-32">
+                <SelectValue placeholder={t("admin.auditLogs.limit")} />
+              </SelectTrigger>
+              <SelectContent>
+                {LIMIT_OPTIONS.map((n) => (
+                  <SelectItem key={n} value={String(n)}>
+                    {t("admin.auditLogs.limit")} {n}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => void refetch()}
+            disabled={isFetching}
+            className="gap-1.5 px-3 text-xs self-end sm:self-auto"
           >
-            <SelectTrigger size="sm" className="w-full sm:w-32">
-              <SelectValue placeholder={t("admin.auditLogs.limit")} />
-            </SelectTrigger>
-            <SelectContent>
-              {LIMIT_OPTIONS.map((n) => (
-                <SelectItem key={n} value={String(n)}>
-                  {t("admin.auditLogs.limit")} {n}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            <RefreshCw
+              className={cn("h-3.5 w-3.5", isFetching && "animate-spin")}
+            />
+            <span>{t("admin.table.refresh")}</span>
+          </Button>
         </div>
 
         <DataTable<AuditLog>

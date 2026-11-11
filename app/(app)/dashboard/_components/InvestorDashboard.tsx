@@ -10,6 +10,7 @@ import {
   TrendingDown,
   Banknote,
   Percent,
+  RefreshCw,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -107,14 +108,30 @@ export function InvestorDashboard() {
   return (
     <m.div {...pageTransitionProps} className="flex-1 space-y-6 md:space-y-8">
       {/* Header */}
-      <m.div {...fadeInUpProps}>
-        <h2 className="text-3xl font-bold tracking-tight">
-          {t("dashboard.investor.title")}
-        </h2>
-        <p className="text-sm text-muted-foreground mt-2">
-          {t("dashboard.investor.subtitle")}
-        </p>
-      </m.div>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <m.div {...fadeInUpProps}>
+          <h2 className="text-3xl font-bold tracking-tight">
+            {t("dashboard.investor.title")}
+          </h2>
+          <p className="text-sm text-muted-foreground mt-2">
+            {t("dashboard.investor.subtitle")}
+          </p>
+        </m.div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => void tranches.refetch?.()}
+          disabled={Boolean(tranches.isFetching)}
+          className="h-8 gap-1.5 text-xs font-medium cursor-pointer self-start sm:self-center"
+          aria-label={t("common.refresh")}
+        >
+          <RefreshCw
+            className={`h-3.5 w-3.5 ${tranches.isFetching ? "animate-spin" : ""}`}
+          />
+          <span>{t("common.refresh")}</span>
+        </Button>
+      </div>
 
       {/* Sample-data notice — only shown while there is sample data to explain */}
       {holdings.length > 0 && (
@@ -209,11 +226,27 @@ export function InvestorDashboard() {
                   count: holdings.length,
                 })}
               </h3>
-              <Button asChild variant="outline" size="sm">
-                <Link href="/dashboard/projects">
-                  {t("dashboard.investor.browseProjects")}
-                </Link>
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => void tranches.refetch?.()}
+                  disabled={Boolean(tranches.isFetching)}
+                  className="h-8 gap-1.5 text-xs font-medium cursor-pointer"
+                  aria-label={t("common.refresh")}
+                >
+                  <RefreshCw
+                    className={`h-3.5 w-3.5 ${tranches.isFetching ? "animate-spin" : ""}`}
+                  />
+                  <span>{t("common.refresh")}</span>
+                </Button>
+                <Button asChild variant="outline" size="sm">
+                  <Link href="/dashboard/projects">
+                    {t("dashboard.investor.browseProjects")}
+                  </Link>
+                </Button>
+              </div>
             </div>
             <HoldingsList holdings={holdings} />
           </m.div>

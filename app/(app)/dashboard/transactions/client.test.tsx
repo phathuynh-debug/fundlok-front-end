@@ -1,11 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import TransactionsClient from "./client";
 import type { Transaction } from "@/services/portfolio.service";
 
 let role = "INVESTOR";
 let rows: Transaction[] | undefined;
 let businessRows: Transaction[] | undefined;
+const myTransactionsRefetch = vi.fn();
 
 vi.mock("@/hooks/use-authentication", () => ({
   useRequireAuth: () => ({ user: { id: "u-1", role }, isLoading: false }),
@@ -14,10 +15,14 @@ vi.mock("@/hooks/use-portfolio", () => ({
   useMyTransactions: (enabled: boolean) => ({
     data: enabled ? rows : undefined,
     isLoading: false,
+    isFetching: false,
+    refetch: myTransactionsRefetch,
   }),
   useBusinessTransactions: (enabled: boolean) => ({
     data: enabled ? businessRows : undefined,
     isLoading: false,
+    isFetching: false,
+    refetch: vi.fn(),
   }),
 }));
 vi.mock("@/lib/i18n", () => ({
@@ -127,5 +132,17 @@ describe("TransactionsClient", () => {
     expect(
       screen.getByText("dashboard.transactions.smeEmptyTitle"),
     ).toBeInTheDocument();
+  });
+
+  it("calls refetch when the refresh button is clicked", () => {
+    myTransactionsRefetch.mockClear();
+    render(<TransactionsClient />);
+
+    const refreshButtons = screen.getAllByRole("button", {
+      name: "common.refresh",
+    });
+    expect(refreshButtons.length).toBeGreaterThan(0);
+    fireEvent.click(refreshButtons[0]);
+    expect(myTransactionsRefetch).toHaveBeenCalled();
   });
 });

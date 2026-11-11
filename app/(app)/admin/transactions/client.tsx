@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { X } from "lucide-react";
+import { useIsFetching, useQueryClient } from "@tanstack/react-query";
+import { RefreshCw, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { adminFundingKeys } from "@/hooks/use-admin-funding";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { isAdminRole } from "@/services/authentication.service";
 import { useTranslations } from "@/lib/i18n";
@@ -105,7 +108,7 @@ export default function AdminTransactionsClient() {
 
         <TabsContent value="rounds">
           <div className="rounded-lg border bg-card">
-            <div className="flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-center">
+            <div className="flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
               <Select
                 value={roundFilter}
                 onValueChange={(value) =>
@@ -128,6 +131,7 @@ export default function AdminTransactionsClient() {
                   </SelectItem>
                 </SelectContent>
               </Select>
+              <RefetchButton queryKey={adminFundingKeys.rounds(roundFilter)} />
             </div>
             <FundingRoundsTable status={roundFilter} onOpen={openRound} />
           </div>
@@ -135,49 +139,54 @@ export default function AdminTransactionsClient() {
 
         <TabsContent value="transfers">
           <div className="rounded-lg border bg-card">
-            <div className="flex flex-col gap-2 border-b p-4 sm:flex-row sm:flex-wrap sm:items-center">
-              <Select
-                value={transferFilter}
-                onValueChange={(value) =>
-                  setTransferFilter(value as AdminTransferFilter)
-                }
-              >
-                <SelectTrigger
-                  size="sm"
-                  className="w-full sm:w-52"
-                  aria-label={t("admin.table.status")}
+            <div className="flex flex-col gap-2 border-b p-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+              <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+                <Select
+                  value={transferFilter}
+                  onValueChange={(value) =>
+                    setTransferFilter(value as AdminTransferFilter)
+                  }
                 >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {TRANSFER_FILTERS.map((filter) => (
-                    <SelectItem key={filter} value={filter}>
-                      {t(`admin.transactions.filters.${filter}`)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {round && (
-                <span className="inline-flex max-w-full items-center gap-1.5 rounded-md border bg-muted/40 py-1 pl-2.5 pr-1 text-xs text-foreground">
-                  <span className="truncate">
-                    {t("admin.transactions.roundChip").replace(
-                      "{name}",
-                      round.name,
-                    )}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setRound(null)}
-                    className={cn(
-                      "shrink-0 cursor-pointer rounded p-0.5",
-                      CONTROL_IDLE,
-                    )}
-                    aria-label={t("admin.transactions.clearRound")}
+                  <SelectTrigger
+                    size="sm"
+                    className="w-full sm:w-52"
+                    aria-label={t("admin.table.status")}
                   >
-                    <X className="h-3.5 w-3.5" />
-                  </button>
-                </span>
-              )}
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TRANSFER_FILTERS.map((filter) => (
+                      <SelectItem key={filter} value={filter}>
+                        {t(`admin.transactions.filters.${filter}`)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {round && (
+                  <span className="inline-flex max-w-full items-center gap-1.5 rounded-md border bg-muted/40 py-1 pl-2.5 pr-1 text-xs text-foreground">
+                    <span className="truncate">
+                      {t("admin.transactions.roundChip").replace(
+                        "{name}",
+                        round.name,
+                      )}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setRound(null)}
+                      className={cn(
+                        "shrink-0 cursor-pointer rounded p-0.5",
+                        CONTROL_IDLE,
+                      )}
+                      aria-label={t("admin.transactions.clearRound")}
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </span>
+                )}
+              </div>
+              <RefetchButton
+                queryKey={[...adminFundingKeys.all, "transfers"]}
+              />
             </div>
             {/* Keyed by the filters so a change starts again on page 1. */}
             <TransferQueue
@@ -190,7 +199,7 @@ export default function AdminTransactionsClient() {
 
         <TabsContent value="repayments">
           <div className="rounded-lg border bg-card">
-            <div className="flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-center">
+            <div className="flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
               <Select
                 value={repaymentFilter}
                 onValueChange={(value) =>
@@ -212,6 +221,9 @@ export default function AdminTransactionsClient() {
                   ))}
                 </SelectContent>
               </Select>
+              <RefetchButton
+                queryKey={[...adminFundingKeys.all, "repayments"]}
+              />
             </div>
             {/* Keyed by the filter so a change starts again on page 1. */}
             <RepaymentQueue key={repaymentFilter} status={repaymentFilter} />
@@ -220,7 +232,7 @@ export default function AdminTransactionsClient() {
 
         <TabsContent value="activity">
           <div className="rounded-lg border bg-card">
-            <div className="flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-center">
+            <div className="flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
               <Select
                 value={activityGroup}
                 onValueChange={(value) =>
@@ -242,11 +254,32 @@ export default function AdminTransactionsClient() {
                   ))}
                 </SelectContent>
               </Select>
+              <RefetchButton queryKey={[...adminFundingKeys.all, "activity"]} />
             </div>
             <ActivityLog key={activityGroup} group={activityGroup} />
           </div>
         </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+function RefetchButton({ queryKey }: { queryKey: readonly unknown[] }) {
+  const { t } = useTranslations();
+  const queryClient = useQueryClient();
+  const isFetching = useIsFetching({ queryKey }) > 0;
+
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      onClick={() => void queryClient.refetchQueries({ queryKey })}
+      disabled={isFetching}
+      className="gap-1.5 px-3 text-xs self-end sm:self-auto"
+    >
+      <RefreshCw className={cn("h-3.5 w-3.5", isFetching && "animate-spin")} />
+      <span>{t("admin.table.refresh")}</span>
+    </Button>
   );
 }

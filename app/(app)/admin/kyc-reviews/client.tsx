@@ -2,11 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { UserCheck } from "lucide-react";
+import { useIsFetching, useQueryClient } from "@tanstack/react-query";
+import { RefreshCw, UserCheck } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { adminKeys } from "@/hooks/use-admin";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { useVerificationMode } from "@/hooks/use-gverify";
 import { isAdminRole } from "@/services/authentication.service";
 import { useTranslations } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -25,11 +29,17 @@ export default function AdminKycReviewsClient() {
   const { user, isLoading } = useRequireAuth();
   const router = useRouter();
   const { t } = useTranslations();
+  const queryClient = useQueryClient();
   const isAdmin = !isLoading && !!user && isAdminRole(user.role);
   const { data: mode } = useVerificationMode(isAdmin);
   const [kind, setKind] = useState<ReviewKind>("kyc");
   // Every status by default: the attempts needing action are sorted first.
   const [status, setStatus] = useState<AdminReviewFilter>("ALL");
+  const activeQueryKey =
+    kind === "kyc"
+      ? [...adminKeys.kycAll(), "list"]
+      : [...adminKeys.kybAll(), "list"];
+  const isFetching = useIsFetching({ queryKey: activeQueryKey }) > 0;
 
   useEffect(() => {
     if (!isLoading && user && !isAdminRole(user.role)) {
@@ -68,47 +78,65 @@ export default function AdminKycReviewsClient() {
       )}
 
       <div className="rounded-lg border bg-card">
-        <div className="flex flex-col gap-2 border-b p-4 sm:flex-row sm:flex-wrap sm:items-center">
-          <Select
-            value={kind}
-            onValueChange={(value) => setKind(value as ReviewKind)}
-          >
-            <SelectTrigger
-              size="sm"
-              className="w-full sm:w-48"
-              aria-label={t("admin.kycReviews.kindLabel")}
+        <div className="flex flex-col gap-2 border-b p-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+            <Select
+              value={kind}
+              onValueChange={(value) => setKind(value as ReviewKind)}
             >
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="kyc">
-                {t("admin.kycReviews.kindKyc")}
-              </SelectItem>
-              <SelectItem value="kyb">
-                {t("admin.kycReviews.kindKyb")}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select
-            value={status}
-            onValueChange={(value) => setStatus(value as AdminReviewFilter)}
-          >
-            <SelectTrigger
-              size="sm"
-              className="w-full sm:w-44"
-              aria-label={t("admin.table.status")}
-            >
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {REVIEW_FILTERS.map((filter) => (
-                <SelectItem key={filter} value={filter}>
-                  {t(`admin.kycReviews.filters.${filter}`)}
+              <SelectTrigger
+                size="sm"
+                className="w-full sm:w-48"
+                aria-label={t("admin.kycReviews.kindLabel")}
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="kyc">
+                  {t("admin.kycReviews.kindKyc")}
                 </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+                <SelectItem value="kyb">
+                  {t("admin.kycReviews.kindKyb")}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={status}
+              onValueChange={(value) => setStatus(value as AdminReviewFilter)}
+            >
+              <SelectTrigger
+                size="sm"
+                className="w-full sm:w-44"
+                aria-label={t("admin.table.status")}
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {REVIEW_FILTERS.map((filter) => (
+                  <SelectItem key={filter} value={filter}>
+                    {t(`admin.kycReviews.filters.${filter}`)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              void queryClient.refetchQueries({ queryKey: activeQueryKey })
+            }
+            disabled={isFetching}
+            className="gap-1.5 px-3 text-xs self-end sm:self-auto"
+          >
+            <RefreshCw
+              className={cn("h-3.5 w-3.5", isFetching && "animate-spin")}
+            />
+            <span>{t("admin.table.refresh")}</span>
+          </Button>
         </div>
 
         {/* Keyed by the filter so a change starts again on page 1. */}

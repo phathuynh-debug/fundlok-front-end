@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { AnimatePresence, m } from "framer-motion";
 import { EASE_OUT } from "@/lib/motion";
-import { ChevronDown, ChevronUp, Laptop, MapPin } from "lucide-react";
+import { ChevronDown, ChevronUp, Laptop, MapPin, RefreshCw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -20,6 +20,8 @@ export function SessionList({
   revokingId,
   isRevokingAll,
   initialCount = DEFAULT_INITIAL_SESSIONS,
+  onRefetch,
+  isFetching,
 }: {
   sessions: DeviceSession[];
   onRevoke: (sessionId: string) => void;
@@ -28,6 +30,8 @@ export function SessionList({
   revokingId?: string | null;
   isRevokingAll?: boolean;
   initialCount?: number;
+  onRefetch?: () => void;
+  isFetching?: boolean;
 }) {
   const { locale, t } = useTranslations();
   const [visibleCount, setVisibleCount] = useState(initialCount);
@@ -49,15 +53,33 @@ export function SessionList({
             {t("dashboard.security.sessions.subtitle")}
           </p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={revocable === 0 || isRevokingAll}
-          onClick={onRevokeAll}
-          className="shrink-0"
-        >
-          {t("dashboard.security.sessions.revokeAll")}
-        </Button>
+        <div className="flex items-center gap-2">
+          {onRefetch && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onRefetch}
+              disabled={Boolean(isFetching)}
+              className="h-8 gap-1.5 text-xs font-medium cursor-pointer"
+              aria-label={t("common.refresh")}
+            >
+              <RefreshCw
+                className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`}
+              />
+              <span>{t("common.refresh")}</span>
+            </Button>
+          )}
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={revocable === 0 || isRevokingAll}
+            onClick={onRevokeAll}
+            className="shrink-0"
+          >
+            {t("dashboard.security.sessions.revokeAll")}
+          </Button>
+        </div>
       </div>
 
       <ul className="divide-y divide-border border-t border-border">

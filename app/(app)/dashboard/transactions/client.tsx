@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { AnimatePresence, m } from "framer-motion";
 import { EASE_OUT } from "@/lib/motion";
 import Link from "next/link";
-import { History, Search, SlidersHorizontal } from "lucide-react";
+import { History, RefreshCw, Search, SlidersHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -160,16 +160,32 @@ export default function TransactionsClient() {
           </p>
         </div>
 
-        {transactions.length > 0 && (
-          <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-full text-xs font-semibold w-fit border border-emerald-500/20">
-            <History className="h-4 w-4" />
-            <span>
-              {t("dashboard.transactions.count", {
-                count: transactions.length,
-              })}
-            </span>
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {transactions.length > 0 && (
+            <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-full text-xs font-semibold w-fit border border-emerald-500/20">
+              <History className="h-4 w-4" />
+              <span>
+                {t("dashboard.transactions.count", {
+                  count: transactions.length,
+                })}
+              </span>
+            </div>
+          )}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => void ledger.refetch?.()}
+            disabled={Boolean(ledger.isFetching)}
+            className="h-8 gap-1.5 text-xs font-medium cursor-pointer"
+            aria-label={t("common.refresh")}
+          >
+            <RefreshCw
+              className={`h-3.5 w-3.5 ${ledger.isFetching ? "animate-spin" : ""}`}
+            />
+            <span>{t("common.refresh")}</span>
+          </Button>
+        </div>
       </div>
 
       {isAuthLoading || ((isSme || isInvestor) && ledger.isLoading) ? (
@@ -222,23 +238,40 @@ export default function TransactionsClient() {
               />
             </div>
 
-            <div className="p-1 rounded-xl bg-muted/50 border border-border/60 w-fit flex items-center gap-1">
-              {(["ALL", ...STATUS_FILTERS] as const).map((status) => (
-                <button
-                  key={status}
-                  type="button"
-                  onClick={() => setSelectedStatus(status)}
-                  className={`px-3 py-2 rounded-lg text-xs font-semibold uppercase transition duration-200 cursor-pointer ${
-                    selectedStatus === status
-                      ? "bg-card text-foreground shadow-xs border border-border/40"
-                      : `${CONTROL_IDLE} bg-transparent border border-transparent`
-                  }`}
-                >
-                  {status === "ALL"
-                    ? t("common.all")
-                    : t(STATUS_LABEL_KEYS[status])}
-                </button>
-              ))}
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="p-1 rounded-xl bg-muted/50 border border-border/60 w-fit flex items-center gap-1">
+                {(["ALL", ...STATUS_FILTERS] as const).map((status) => (
+                  <button
+                    key={status}
+                    type="button"
+                    onClick={() => setSelectedStatus(status)}
+                    className={`px-3 py-2 rounded-lg text-xs font-semibold uppercase transition duration-200 cursor-pointer ${
+                      selectedStatus === status
+                        ? "bg-card text-foreground shadow-xs border border-border/40"
+                        : `${CONTROL_IDLE} bg-transparent border border-transparent`
+                    }`}
+                  >
+                    {status === "ALL"
+                      ? t("common.all")
+                      : t(STATUS_LABEL_KEYS[status])}
+                  </button>
+                ))}
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => void ledger.refetch?.()}
+                disabled={Boolean(ledger.isFetching)}
+                className="h-9 gap-1.5 text-xs font-medium cursor-pointer"
+                aria-label={t("common.refresh")}
+              >
+                <RefreshCw
+                  className={`h-3.5 w-3.5 ${ledger.isFetching ? "animate-spin" : ""}`}
+                />
+                <span>{t("common.refresh")}</span>
+              </Button>
             </div>
           </div>
 
@@ -265,11 +298,27 @@ export default function TransactionsClient() {
             ))}
           </div>
 
-          <div className="text-xs font-semibold text-muted-foreground tracking-wide">
-            {t("dashboard.transactions.showing", {
-              shown: filteredTransactions.length,
-              total: transactions.length,
-            })}
+          <div className="flex items-center justify-between gap-2">
+            <div className="text-xs font-semibold text-muted-foreground tracking-wide">
+              {t("dashboard.transactions.showing", {
+                shown: filteredTransactions.length,
+                total: transactions.length,
+              })}
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => void ledger.refetch?.()}
+              disabled={Boolean(ledger.isFetching)}
+              className="h-7 gap-1 px-2.5 text-xs font-medium cursor-pointer"
+              aria-label={t("common.refresh")}
+            >
+              <RefreshCw
+                className={`h-3 w-3 ${ledger.isFetching ? "animate-spin" : ""}`}
+              />
+              <span>{t("common.refresh")}</span>
+            </Button>
           </div>
 
           <AnimatePresence mode="wait">

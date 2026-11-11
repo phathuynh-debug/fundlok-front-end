@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Loader2, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { useAdminPaymentAccounts } from "@/hooks/use-admin";
 import { isAdminRole } from "@/services/authentication.service";
 import { useTranslations } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -59,7 +61,7 @@ export default function AdminBankAccountsClient() {
       </div>
 
       <div className="rounded-lg border bg-card">
-        <div className="flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
           <Select
             value={status}
             onValueChange={(value) =>
@@ -81,6 +83,23 @@ export default function AdminBankAccountsClient() {
               ))}
             </SelectContent>
           </Select>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => void accounts.refetch()}
+            disabled={accounts.isFetching}
+            className="gap-1.5 px-3 text-xs self-end sm:self-auto"
+          >
+            <RefreshCw
+              className={cn(
+                "h-3.5 w-3.5",
+                accounts.isFetching && "animate-spin",
+              )}
+            />
+            <span>{t("admin.table.refresh")}</span>
+          </Button>
         </div>
 
         <div className="p-4">

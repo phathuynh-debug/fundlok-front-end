@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -35,11 +37,15 @@ export function AnalyticsTableView({
   allocation,
   capitalStatus,
   total,
+  onRefetch,
+  isFetching,
 }: {
   points: MonthlyPoint[];
   allocation: IndustryAllocation[];
   capitalStatus: CapitalStatusAllocation[];
   total: number;
+  onRefetch?: () => void;
+  isFetching?: boolean;
 }) {
   const { t, locale } = useTranslations();
 
@@ -238,9 +244,27 @@ export function AnalyticsTableView({
   return (
     <div className="space-y-6">
       <section className="bg-card text-card-foreground border border-border rounded-xl shadow-xs overflow-hidden">
-        <h3 className="px-5 pt-5 pb-3 text-sm font-semibold">
-          {t("dashboard.analytics.charts.capitalFlowTitle")}
-        </h3>
+        <div className="flex items-center justify-between px-5 pt-5 pb-3">
+          <h3 className="text-sm font-semibold">
+            {t("dashboard.analytics.charts.capitalFlowTitle")}
+          </h3>
+          {onRefetch && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onRefetch}
+              disabled={Boolean(isFetching)}
+              className="h-7 gap-1 px-2.5 text-xs font-medium cursor-pointer"
+              aria-label={t("common.refresh")}
+            >
+              <RefreshCw
+                className={`h-3 w-3 ${isFetching ? "animate-spin" : ""}`}
+              />
+              <span>{t("common.refresh")}</span>
+            </Button>
+          )}
+        </div>
         <ActiveTableFiltersBar
           columns={flowColumns}
           sortState={flowSort}
@@ -329,9 +353,27 @@ export function AnalyticsTableView({
       </section>
 
       <section className="bg-card text-card-foreground border border-border rounded-xl shadow-xs overflow-hidden">
-        <h3 className="px-5 pt-5 pb-3 text-sm font-semibold">
-          {t("dashboard.analytics.charts.allocationTitle")}
-        </h3>
+        <div className="flex items-center justify-between px-5 pt-5 pb-3">
+          <h3 className="text-sm font-semibold">
+            {t("dashboard.analytics.charts.allocationTitle")}
+          </h3>
+          {onRefetch && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onRefetch}
+              disabled={Boolean(isFetching)}
+              className="h-7 gap-1 px-2.5 text-xs font-medium cursor-pointer"
+              aria-label={t("common.refresh")}
+            >
+              <RefreshCw
+                className={`h-3 w-3 ${isFetching ? "animate-spin" : ""}`}
+              />
+              <span>{t("common.refresh")}</span>
+            </Button>
+          )}
+        </div>
         <ActiveTableFiltersBar
           columns={allocColumns}
           sortState={allocSort}
@@ -407,9 +449,27 @@ export function AnalyticsTableView({
       </section>
 
       <section className="bg-card text-card-foreground border border-border rounded-xl shadow-xs overflow-hidden">
-        <h3 className="px-5 pt-5 pb-3 text-sm font-semibold">
-          {t("dashboard.analytics.charts.capitalStatusTitle")}
-        </h3>
+        <div className="flex items-center justify-between px-5 pt-5 pb-3">
+          <h3 className="text-sm font-semibold">
+            {t("dashboard.analytics.charts.capitalStatusTitle")}
+          </h3>
+          {onRefetch && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onRefetch}
+              disabled={Boolean(isFetching)}
+              className="h-7 gap-1 px-2.5 text-xs font-medium cursor-pointer"
+              aria-label={t("common.refresh")}
+            >
+              <RefreshCw
+                className={`h-3 w-3 ${isFetching ? "animate-spin" : ""}`}
+              />
+              <span>{t("common.refresh")}</span>
+            </Button>
+          )}
+        </div>
         <ActiveTableFiltersBar
           columns={statusColumns}
           sortState={statusSort}

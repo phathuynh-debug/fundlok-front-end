@@ -1,6 +1,7 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
+import { Loader2, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useMyTranches } from "@/hooks/use-funding";
 import { useTranslations } from "@/lib/i18n";
 import type { Tranche } from "@/services/funding.service";
@@ -36,12 +37,28 @@ export function MyInvestments() {
         className="space-y-4"
         data-testid="my-investments"
       >
-        <h3
-          id="my-investments"
-          className="text-lg font-semibold text-foreground"
-        >
-          {t("dashboard.investor.investments.heading")}
-        </h3>
+        <div className="flex items-center justify-between gap-3">
+          <h3
+            id="my-investments"
+            className="text-lg font-semibold text-foreground"
+          >
+            {t("dashboard.investor.investments.heading")}
+          </h3>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => void tranches.refetch?.()}
+            disabled={Boolean(tranches.isFetching)}
+            className="h-8 gap-1.5 text-xs font-medium cursor-pointer"
+            aria-label={t("common.refresh")}
+          >
+            <RefreshCw
+              className={`h-3.5 w-3.5 ${tranches.isFetching ? "animate-spin" : ""}`}
+            />
+            <span>{t("common.refresh")}</span>
+          </Button>
+        </div>
         <div className="space-y-3">
           {investments.map((tranche) => (
             <InvestmentCard key={tranche.id} tranche={tranche} />

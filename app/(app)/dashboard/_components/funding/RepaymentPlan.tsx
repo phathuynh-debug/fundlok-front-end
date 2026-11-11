@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CalendarDays, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+import { CalendarDays, ChevronDown, ChevronUp, Loader2, RefreshCw } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -72,22 +72,38 @@ export function RepaymentPlan({ round }: { round: SmeRound }) {
       className="space-y-4 rounded-xl border border-border/60 bg-card p-4 md:p-5"
       data-testid="repayment-plan"
     >
-      <div className="flex flex-wrap items-center gap-2">
-        <h3
-          id="repayment-plan"
-          className="flex items-center gap-2 text-sm font-semibold text-foreground"
-        >
-          <CalendarDays className="h-4 w-4 text-muted-foreground" />
-          {projected ? t(`${K}.headingProjected`) : t(`${K}.heading`)}
-        </h3>
-        {projected && (
-          <Badge
-            variant="outline"
-            className="border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300"
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <h3
+            id="repayment-plan"
+            className="flex items-center gap-2 text-sm font-semibold text-foreground"
           >
-            {t(`${K}.badge`)}
-          </Badge>
-        )}
+            <CalendarDays className="h-4 w-4 text-muted-foreground" />
+            {projected ? t(`${K}.headingProjected`) : t(`${K}.heading`)}
+          </h3>
+          {projected && (
+            <Badge
+              variant="outline"
+              className="border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300"
+            >
+              {t(`${K}.badge`)}
+            </Badge>
+          )}
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => void plan.refetch?.()}
+          disabled={Boolean(plan.isFetching)}
+          className="h-7 gap-1 px-2.5 text-xs font-medium cursor-pointer"
+          aria-label={t("common.refresh")}
+        >
+          <RefreshCw
+            className={`h-3 w-3 ${plan.isFetching ? "animate-spin" : ""}`}
+          />
+          <span>{t("common.refresh")}</span>
+        </Button>
       </div>
 
       <dl className="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">

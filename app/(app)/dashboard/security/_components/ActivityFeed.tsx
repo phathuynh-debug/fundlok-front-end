@@ -7,6 +7,7 @@ import {
   ChevronUp,
   Info,
   Loader2,
+  RefreshCw,
   ShieldAlert,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -136,6 +137,8 @@ export function ActivityFeed({
   onFetchMore,
   onCollapse,
   initialCount = DEFAULT_INITIAL_ACTIVITIES,
+  onRefetch,
+  isFetching,
 }: {
   events: SecurityEvent[];
   hasMore?: boolean;
@@ -143,6 +146,8 @@ export function ActivityFeed({
   onFetchMore?: () => void;
   onCollapse?: () => void;
   initialCount?: number;
+  onRefetch?: () => void;
+  isFetching?: boolean;
 }) {
   const { locale, t } = useTranslations();
   const [visibleCount, setVisibleCount] = useState(initialCount);
@@ -178,13 +183,31 @@ export function ActivityFeed({
 
   return (
     <Card className="p-5 md:p-6 gap-0">
-      <div className="flex flex-col gap-1 pb-4">
-        <h2 className="text-base font-semibold text-foreground">
-          {t("dashboard.security.activity.title")}
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          {t("dashboard.security.activity.subtitle")}
-        </p>
+      <div className="flex flex-row items-center justify-between pb-4">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-base font-semibold text-foreground">
+            {t("dashboard.security.activity.title")}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {t("dashboard.security.activity.subtitle")}
+          </p>
+        </div>
+        {onRefetch && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onRefetch}
+            disabled={Boolean(isFetching)}
+            className="h-8 gap-1.5 text-xs font-medium cursor-pointer"
+            aria-label={t("common.refresh")}
+          >
+            <RefreshCw
+              className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`}
+            />
+            <span>{t("common.refresh")}</span>
+          </Button>
+        )}
       </div>
 
       {visibleEvents.length === 0 ? (

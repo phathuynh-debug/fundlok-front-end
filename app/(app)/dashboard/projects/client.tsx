@@ -16,7 +16,9 @@ import {
   Clock,
   ArrowRightLeft,
   CheckCircle2,
+  RefreshCw,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -379,8 +381,12 @@ const SECONDARY_MARKET_VISIBLE = false;
 export default function ProjectsClient() {
   const { user, isLoading: isAuthLoading } = useRequireAuth();
   const { t } = useTranslations();
-  const { data: publicProjects = [], isLoading: isProjectsLoading } =
-    usePublicProjects(!isAuthLoading && user?.role === "INVESTOR");
+  const {
+    data: publicProjects = [],
+    isLoading: isProjectsLoading,
+    isFetching: isProjectsFetching,
+    refetch: refetchProjects,
+  } = usePublicProjects(!isAuthLoading && user?.role === "INVESTOR");
 
   const [marketType, setMarketType] = useState<"primary" | "secondary">(
     "primary",
@@ -446,21 +452,37 @@ export default function ProjectsClient() {
               : t("dashboard.projects.secondarySubtitle")}
           </p>
         </div>
-        {showListings && (
-          <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-full text-xs font-semibold w-fit border border-emerald-500/20">
-            <Briefcase className="h-4 w-4" />
-            <span>
-              {marketType === "primary"
-                ? t("dashboard.projects.opportunitiesAvailable", {
-                    count: publicProjects.length,
-                  })
-                : t("dashboard.projects.showingListings", {
-                    shown: filteredItems.length,
-                    total: mockSecondaryMarket.length,
-                  })}
-            </span>
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {showListings && (
+            <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-full text-xs font-semibold w-fit border border-emerald-500/20">
+              <Briefcase className="h-4 w-4" />
+              <span>
+                {marketType === "primary"
+                  ? t("dashboard.projects.opportunitiesAvailable", {
+                      count: publicProjects.length,
+                    })
+                  : t("dashboard.projects.showingListings", {
+                      shown: filteredItems.length,
+                      total: mockSecondaryMarket.length,
+                    })}
+              </span>
+            </div>
+          )}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => void refetchProjects?.()}
+            disabled={Boolean(isProjectsFetching)}
+            className="h-8 gap-1.5 text-xs font-medium cursor-pointer"
+            aria-label={t("common.refresh")}
+          >
+            <RefreshCw
+              className={`h-3.5 w-3.5 ${isProjectsFetching ? "animate-spin" : ""}`}
+            />
+            <span>{t("common.refresh")}</span>
+          </Button>
+        </div>
       </div>
 
       {/* Market Toggle Pill Selector (hidden, see SECONDARY_MARKET_VISIBLE) */}
@@ -529,15 +551,31 @@ export default function ProjectsClient() {
           </div>
 
           {/* Count display label below search/filters */}
-          <div className="text-xs font-semibold text-muted-foreground tracking-wide">
-            {isInitialLoading ? (
-              <Skeleton className="h-4 w-40 rounded-sm" />
-            ) : (
-              t("dashboard.projects.showingListings", {
-                shown: filteredItems.length,
-                total: activeDataSource.length,
-              })
-            )}
+          <div className="flex items-center justify-between gap-2">
+            <div className="text-xs font-semibold text-muted-foreground tracking-wide">
+              {isInitialLoading ? (
+                <Skeleton className="h-4 w-40 rounded-sm" />
+              ) : (
+                t("dashboard.projects.showingListings", {
+                  shown: filteredItems.length,
+                  total: activeDataSource.length,
+                })
+              )}
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => void refetchProjects?.()}
+              disabled={Boolean(isProjectsFetching)}
+              className="h-7 gap-1 px-2.5 text-xs font-medium cursor-pointer"
+              aria-label={t("common.refresh")}
+            >
+              <RefreshCw
+                className={`h-3 w-3 ${isProjectsFetching ? "animate-spin" : ""}`}
+              />
+              <span>{t("common.refresh")}</span>
+            </Button>
           </div>
 
           {/* Market Listing Section with Loading & Open Up Animation */}

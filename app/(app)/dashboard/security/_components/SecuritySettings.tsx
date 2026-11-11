@@ -93,6 +93,8 @@ export function SecuritySettings({
   const {
     data: sessions = [],
     isLoading: isSessionsLoading,
+    isFetching: isSessionsFetching,
+    refetch: refetchSessions,
     error: sessionsError,
   } = useSessions(protectedSlicesEnabled);
   // An admin whose session was opened without a second factor. The backend
@@ -105,6 +107,7 @@ export function SecuritySettings({
     data: activity = [],
     isLoading: isActivityLoading,
     isFetching: isActivityFetching,
+    refetch: refetchActivity,
   } = useSecurityEvents(protectedSlicesEnabled, activityLimit);
 
   const hasMoreActivity =
@@ -309,6 +312,8 @@ export function SecuritySettings({
               onRevokeAll={handleRevokeAll}
               revokingId={isRevoking ? revokingId : null}
               isRevokingAll={isRevokingAll}
+              onRefetch={() => void refetchSessions?.()}
+              isFetching={Boolean(isSessionsFetching)}
             />
             <ActivityFeed
               events={activity}
@@ -317,6 +322,8 @@ export function SecuritySettings({
               onFetchMore={handleFetchMoreActivity}
               onCollapse={handleCollapseActivity}
               initialCount={INITIAL_ACTIVITY_LIMIT}
+              onRefetch={() => void refetchActivity?.()}
+              isFetching={Boolean(isActivityFetching)}
             />
           </div>
         </div>

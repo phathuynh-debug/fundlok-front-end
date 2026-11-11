@@ -7,8 +7,10 @@ import {
   Loader2,
   Mail,
   Phone,
+  RefreshCw,
   Wallet,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useInvestorLeads, useRateInquiries } from "@/hooks/use-rates";
 import { formatCompactCurrency } from "@/lib/format-currency";
 import { formatDate } from "@/lib/format-date";
@@ -60,6 +62,9 @@ function Panel({
   total,
   href,
   viewAll,
+  refreshLabel,
+  onRefresh,
+  fetching,
   loading,
   empty,
   children,
@@ -70,6 +75,9 @@ function Panel({
   total: number | undefined;
   href: string;
   viewAll: string;
+  refreshLabel: string;
+  onRefresh: () => void;
+  fetching: boolean;
   loading: boolean;
   empty: string | null;
   children: React.ReactNode;
@@ -90,16 +98,30 @@ function Panel({
             </span>
           )}
         </div>
-        <Link
-          href={href}
-          className={cn(
-            "flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-muted-foreground",
-            CONTROL_HOVER,
-          )}
-        >
-          {viewAll}
-          <ArrowRight className="h-3 w-3" aria-hidden />
-        </Link>
+        <div className="flex items-center gap-1.5">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onRefresh}
+            disabled={fetching}
+            aria-label={refreshLabel}
+            className="h-7 gap-1 px-2 text-xs"
+          >
+            <RefreshCw className={cn("h-3 w-3", fetching && "animate-spin")} />
+            <span className="hidden sm:inline">{refreshLabel}</span>
+          </Button>
+          <Link
+            href={href}
+            className={cn(
+              "flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-muted-foreground",
+              CONTROL_HOVER,
+            )}
+          >
+            {viewAll}
+            <ArrowRight className="h-3 w-3" aria-hidden />
+          </Link>
+        </div>
       </div>
       {loading ? (
         <div className="flex flex-1 items-center justify-center py-10">
@@ -146,6 +168,9 @@ export function RecentLeads({
         total={inquiries.data?.total}
         href="/admin/rates?tab=sme"
         viewAll={t("admin.recentLeads.viewAll")}
+        refreshLabel={t("admin.table.refresh")}
+        onRefresh={() => void inquiries.refetch()}
+        fetching={inquiries.isFetching}
         loading={inquiries.isLoading}
         empty={
           inquiries.isError
@@ -192,6 +217,9 @@ export function RecentLeads({
         total={leads.data?.total}
         href="/admin/rates?tab=investor"
         viewAll={t("admin.recentLeads.viewAll")}
+        refreshLabel={t("admin.table.refresh")}
+        onRefresh={() => void leads.refetch()}
+        fetching={leads.isFetching}
         loading={leads.isLoading}
         empty={
           leads.isError

@@ -10,6 +10,7 @@ import type {
 let role = "INVESTOR";
 let data: InvestorAnalytics | undefined;
 let loan: BusinessAnalytics | undefined;
+const myAnalyticsRefetch = vi.fn();
 
 vi.mock("@/hooks/use-authentication", () => ({
   useRequireAuth: () => ({
@@ -21,10 +22,14 @@ vi.mock("@/hooks/use-portfolio", () => ({
   useMyAnalytics: (enabled: boolean) => ({
     data: enabled ? data : undefined,
     isLoading: false,
+    isFetching: false,
+    refetch: myAnalyticsRefetch,
   }),
   useBusinessAnalytics: (enabled: boolean) => ({
     data: enabled ? loan : undefined,
     isLoading: false,
+    isFetching: false,
+    refetch: vi.fn(),
   }),
 }));
 vi.mock("@/lib/i18n", () => ({
@@ -116,6 +121,14 @@ describe("AnalyticsClient", () => {
       screen.getByRole("button", { name: /dashboard\.analytics\.view\.table/ }),
     );
     expect(screen.getAllByText(/950,000/).length).toBeGreaterThan(0);
+
+    myAnalyticsRefetch.mockClear();
+    const refreshButtons = screen.getAllByRole("button", {
+      name: "common.refresh",
+    });
+    expect(refreshButtons.length).toBeGreaterThan(0);
+    fireEvent.click(refreshButtons[0]);
+    expect(myAnalyticsRefetch).toHaveBeenCalled();
   });
 
   it("shows the empty state before any investment is received", () => {

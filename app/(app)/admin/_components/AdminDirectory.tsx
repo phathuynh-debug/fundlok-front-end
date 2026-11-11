@@ -7,7 +7,7 @@ import type {
   AdminProjectRow,
   AdminUserRow,
 } from "@/services/admin.service";
-import { Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +23,7 @@ import { DataTable, type Column } from "./DataTable";
 import { ProjectPreviewSheet } from "./ProjectPreviewSheet";
 import { UserPreviewSheet } from "./UserPreviewSheet";
 import { useTranslations } from "@/lib/i18n";
-import { getInitials } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/utils";
 import { enumLabel, roleLabel } from "@/lib/enum-labels";
 import { formatDate as formatLocaleDate } from "@/lib/format-date";
 import { industryLabel } from "@/lib/industry-label";
@@ -227,6 +227,7 @@ export function AdminDirectory({ mode }: { mode: AdminMode }) {
     data,
     isLoading: isOverviewLoading,
     isFetching,
+    refetch,
   } = useAdminOverview({
     mode,
     page,
@@ -321,19 +322,38 @@ export function AdminDirectory({ mode }: { mode: AdminMode }) {
             )}
           </div>
 
-          {/* Search */}
-          <div className="relative w-full sm:w-64">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              placeholder={
-                mode === "users"
-                  ? t("admin.table.searchUsers")
-                  : t("admin.table.searchProjects")
-              }
-              className="pl-9"
-            />
+          {/* Search + Refetch */}
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1 sm:w-64 sm:flex-initial">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder={
+                  mode === "users"
+                    ? t("admin.table.searchUsers")
+                    : t("admin.table.searchProjects")
+                }
+                className="pl-9"
+              />
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => void refetch()}
+              disabled={isFetching}
+              aria-label={t("admin.table.refresh")}
+              className="h-9 shrink-0 gap-1.5 px-3 text-xs"
+            >
+              <RefreshCw
+                className={cn("h-3.5 w-3.5", isFetching && "animate-spin")}
+              />
+              <span className="hidden sm:inline">
+                {t("admin.table.refresh")}
+              </span>
+            </Button>
           </div>
         </div>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, RefreshCw } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,7 @@ import { useSentEmails } from "@/hooks/use-admin-email";
 import { useCurrentUser } from "@/hooks/use-authentication";
 import { formatDateTime } from "@/lib/format-date";
 import { useTranslations } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 import type { InternalEmail } from "@/services/admin-email.service";
 import { emailErrorCodeText } from "./email-errors";
 
@@ -69,7 +70,7 @@ export function SentEmailsCard() {
   // isPending, not isLoading: it also covers the moment before the query
   // is enabled (waiting for the admin's id), which would otherwise read as
   // an error.
-  const { data, isPending, isError } = useSentEmails();
+  const { data, isPending, isFetching, isError, refetch } = useSentEmails();
   const { data: user } = useCurrentUser();
   const seesEveryone = user?.role === "SYSTEM_ADMIN";
 
@@ -269,11 +270,26 @@ export function SentEmailsCard() {
 
   return (
     <section className="rounded-lg border bg-card p-6">
-      <h2 className="text-lg font-semibold text-foreground">
-        {seesEveryone
-          ? t("admin.email.sent.titleAll")
-          : t("admin.email.sent.title")}
-      </h2>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-lg font-semibold text-foreground">
+          {seesEveryone
+            ? t("admin.email.sent.titleAll")
+            : t("admin.email.sent.title")}
+        </h2>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => void refetch()}
+          disabled={isFetching}
+          className="gap-1.5 px-3 text-xs"
+        >
+          <RefreshCw
+            className={cn("h-3.5 w-3.5", isFetching && "animate-spin")}
+          />
+          <span>{t("admin.table.refresh")}</span>
+        </Button>
+      </div>
 
       {isPending ? (
         <div className="flex items-center gap-2 py-8 text-muted-foreground">

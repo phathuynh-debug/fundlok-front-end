@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { m } from "framer-motion";
-import { BarChart3, PieChart, TableIcon } from "lucide-react";
+import { BarChart3, PieChart, RefreshCw, TableIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRequireAuth } from "@/hooks/use-authentication";
@@ -169,6 +169,15 @@ export default function AnalyticsClient() {
     [allocation],
   );
 
+  const isRefetching = Boolean(isSme ? loan.isFetching : analytics.isFetching);
+  const handleRefetch = () => {
+    if (isSme) {
+      void loan.refetch?.();
+    } else {
+      void analytics.refetch?.();
+    }
+  };
+
   return (
     <m.div {...pageTransitionProps} className="space-y-6 md:space-y-8">
       {/* Header */}
@@ -189,6 +198,21 @@ export default function AnalyticsClient() {
             )}
           </p>
         </div>
+
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={handleRefetch}
+          disabled={isRefetching}
+          className="h-8 gap-1.5 text-xs font-medium cursor-pointer self-start sm:self-center"
+          aria-label={t("common.refresh")}
+        >
+          <RefreshCw
+            className={`h-3.5 w-3.5 ${isRefetching ? "animate-spin" : ""}`}
+          />
+          <span>{t("common.refresh")}</span>
+        </Button>
       </div>
 
       {isAuthLoading ||
@@ -254,36 +278,53 @@ export default function AnalyticsClient() {
               ))}
             </div>
 
-            <div className="p-1 rounded-xl bg-muted/50 border border-border/60 w-fit flex items-center gap-1">
-              {(
-                [
-                  {
-                    key: "charts",
-                    label: t("dashboard.analytics.view.charts"),
-                    icon: PieChart,
-                  },
-                  {
-                    key: "table",
-                    label: t("dashboard.analytics.view.table"),
-                    icon: TableIcon,
-                  },
-                ] as const
-              ).map(({ key, label, icon: Icon }) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => setView(key)}
-                  aria-pressed={view === key}
-                  className={`px-3 py-1.5 rounded-lg text-xs transition duration-200 cursor-pointer flex items-center gap-1.5 ${
-                    view === key
-                      ? "bg-card text-foreground shadow-xs border border-border/40 font-semibold"
-                      : `${CONTROL_IDLE} bg-transparent border border-transparent font-medium`
-                  }`}
-                >
-                  <Icon className="h-3.5 w-3.5" />
-                  {label}
-                </button>
-              ))}
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="p-1 rounded-xl bg-muted/50 border border-border/60 w-fit flex items-center gap-1">
+                {(
+                  [
+                    {
+                      key: "charts",
+                      label: t("dashboard.analytics.view.charts"),
+                      icon: PieChart,
+                    },
+                    {
+                      key: "table",
+                      label: t("dashboard.analytics.view.table"),
+                      icon: TableIcon,
+                    },
+                  ] as const
+                ).map(({ key, label, icon: Icon }) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setView(key)}
+                    aria-pressed={view === key}
+                    className={`px-3 py-1.5 rounded-lg text-xs transition duration-200 cursor-pointer flex items-center gap-1.5 ${
+                      view === key
+                        ? "bg-card text-foreground shadow-xs border border-border/40 font-semibold"
+                        : `${CONTROL_IDLE} bg-transparent border border-transparent font-medium`
+                    }`}
+                  >
+                    <Icon className="h-3.5 w-3.5" />
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleRefetch}
+                disabled={isRefetching}
+                className="h-8 gap-1.5 text-xs font-medium cursor-pointer"
+                aria-label={t("common.refresh")}
+              >
+                <RefreshCw
+                  className={`h-3.5 w-3.5 ${isRefetching ? "animate-spin" : ""}`}
+                />
+                <span>{t("common.refresh")}</span>
+              </Button>
             </div>
           </div>
 
@@ -347,6 +388,8 @@ export default function AnalyticsClient() {
               allocation={allocation}
               capitalStatus={capitalStatus}
               total={allocationTotal}
+              onRefetch={handleRefetch}
+              isFetching={isRefetching}
             />
           )}
         </>

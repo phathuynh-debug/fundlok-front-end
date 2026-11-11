@@ -775,6 +775,7 @@
       "noProjects": "No projects found.",
       "noResults": "No results found.",
       "noUsers": "No users found.",
+      "refresh": "Refresh",
       "role": "Role",
       "searchProjects": "Search projects…",
       "searchUsers": "Search users…",
@@ -1394,6 +1395,7 @@
     "pageSections": "Page sections",
     "processing": "Processing...",
     "projectApplication": "Project application",
+    "refresh": "Refresh",
     "searchPlaceholder": "Search projects by name or industry...",
     "sidebar": {
       "description": "Displays the mobile sidebar.",
