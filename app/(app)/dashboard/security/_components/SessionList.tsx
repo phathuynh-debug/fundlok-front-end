@@ -3,7 +3,13 @@
 import { useState } from "react";
 import { AnimatePresence, m } from "framer-motion";
 import { EASE_OUT } from "@/lib/motion";
-import { ChevronDown, ChevronUp, Laptop, MapPin, RefreshCw } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Laptop,
+  MapPin,
+  RefreshCw,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
