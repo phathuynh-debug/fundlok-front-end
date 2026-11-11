@@ -799,7 +799,8 @@ function DocumentList({
         {/* The signed listing documents (Service Agreement, Standing Offer):
             NEAC's verdict, under their rows. */}
         {(document.document_type === "sme_service_agreement" ||
-          document.document_type === "sme_standing_offer") && (
+          document.document_type === "sme_standing_offer" ||
+          document.document_type === "sme_loan_contract") && (
           <NeacCheckPanel
             document={document}
             projectId={projectId}

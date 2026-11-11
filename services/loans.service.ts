@@ -37,28 +37,54 @@ export interface ListingDocumentChecks {
   signers: { role: "SME" | "GUARANTOR"; name: string | null }[];
 }
 
-/** One of the two documents the SME signs after approval. */
+/**
+ * A detail a document still prints as a blank; it cannot be signed until the
+ * SME completes it (the upload is refused with SIGNING_DETAILS_MISSING).
+ */
+export type MissingDetail =
+  | "COMPANY_NAME"
+  | "ENTERPRISE_CODE"
+  | "COMPANY_ADDRESS"
+  | "LEGAL_REPRESENTATIVE"
+  | "BANK_ACCOUNT"
+  | "GUARANTOR_NAME"
+  | "GUARANTOR_ID"
+  | "GUARANTOR_ADDRESS";
+
+/**
+ * One of the three documents the SME signs after approval. `missing_details`:
+ * what it still prints as a blank (empty once signed). `waiting_for`: the
+ * document to sign first ("standing-offer" for the Loan Contract until the
+ * Offer is on file).
+ */
 export interface SignedListingDocument {
   signed: boolean;
   signed_at: string | null;
   file_name: string | null;
   checks: ListingDocumentChecks | null;
+  missing_details: MissingDetail[];
+  waiting_for: ListingDocumentKind | null;
 }
 
 /**
  * Where signing stands (GET /loans/applications/{id}/listing-documents).
  *
- * `ready`: approved with locked terms, so both documents carry them and can be
- * signed. `published`: the project is live; signing both is what publishes
- * it. `guarantor_verified`: the signing user has a verified identity (eKYC),
- * which the Standing Offer's Personal Guarantor signature is checked against.
+ * `ready`: approved with locked terms, so the documents carry them and can be
+ * signed. `published`: the project is live; signing all three is what
+ * publishes it. `guarantor_verified`: the signing user has a verified identity
+ * (eKYC), which the Personal Guarantor's signature on the Standing Offer and
+ * the Loan Contract template is checked against.
  */
 export interface ListingDocuments {
   ready: boolean;
   published: boolean;
   guarantor_verified: boolean;
+  /** As the Offer and the Loan Contract print it; from the ID card (EKYC) or entered here (SME). */
+  guarantor_address: string | null;
+  guarantor_address_source: "EKYC" | "SME" | null;
   service_agreement: SignedListingDocument;
   standing_offer: SignedListingDocument;
+  loan_contract: SignedListingDocument;
 }
 
 /** The signed PDF's upload limit (the backend's, 25 MB). */
@@ -79,6 +105,19 @@ export const loansService = {
   /** The filled-in Standing Offer PDF, once the request is approved. */
   async getStandingOffer(applicationId: string) {
     return apiClient.getFile(LOANS_ENDPOINTS.standingOffer(applicationId));
+  },
+
+  /** The filled-in Loan Contract template PDF, once the request is approved. */
+  async getLoanContract(applicationId: string) {
+    return apiClient.getFile(LOANS_ENDPOINTS.loanContract(applicationId));
+  },
+
+  /** The Personal Guarantor's address; answers with the new signing status. */
+  async setGuarantorAddress(applicationId: string, address: string) {
+    return apiClient.put<ListingDocuments>(
+      LOANS_ENDPOINTS.guarantorAddress(applicationId),
+      { address },
+    );
   },
 
   async getListingDocuments(applicationId: string) {

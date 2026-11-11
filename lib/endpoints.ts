@@ -205,7 +205,23 @@ export const LOANS_ENDPOINTS = {
    */
   standingOffer: (applicationId: string) =>
     `/loans/applications/${applicationId}/standing-offer`,
-  /** GET: where signing the two listing documents stands. */
+  /**
+   * The Loan Contract template (Contract 5) as a PDF, filled in with the SME,
+   * its Personal Guarantor and the approved terms; each Investor's own
+   * contract is generated from it at commitment. 409 SIGNING_NOT_OPEN until
+   * FundLok approves the request, 409 SIGNING_OFFER_FIRST until the Standing
+   * Offer is signed (it cites the Offer's date). The owning SME only.
+   */
+  loanContract: (applicationId: string) =>
+    `/loans/applications/${applicationId}/loan-contract`,
+  /**
+   * PUT { address }: the Personal Guarantor's address, for the Standing Offer
+   * and the Loan Contract when the eKYC carries none. 409
+   * SIGNING_ALREADY_SIGNED once either is signed.
+   */
+  guarantorAddress: (applicationId: string) =>
+    `/loans/applications/${applicationId}/guarantor-address`,
+  /** GET: where signing the three listing documents stands. */
   listingDocuments: (applicationId: string) =>
     `/loans/applications/${applicationId}/listing-documents`,
   /** POST (multipart `file`): the signed copy, checked with NEAC. */
@@ -216,8 +232,9 @@ export const LOANS_ENDPOINTS = {
     `/loans/applications/${applicationId}/listing-documents/${kind}/signed`,
 } as const;
 
-/** The two documents an SME signs after approval. */
-export type ListingDocumentKind = "service-agreement" | "standing-offer";
+/** The three documents an SME signs after approval. */
+export type ListingDocumentKind =
+  "service-agreement" | "standing-offer" | "loan-contract";
 
 export const RATE_CALCULATOR_ENDPOINTS = {
   calculate: "/api/v1/rates/calculate",

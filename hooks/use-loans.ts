@@ -21,6 +21,8 @@ export const loanKeys = {
     [...loanKeys.all, "service-agreement", applicationId] as const,
   standingOffer: (applicationId: string) =>
     [...loanKeys.all, "standing-offer", applicationId] as const,
+  loanContract: (applicationId: string) =>
+    [...loanKeys.all, "loan-contract", applicationId] as const,
   listingDocuments: (applicationId: string) =>
     [...loanKeys.all, "listing-documents", applicationId] as const,
   signedListingDocument: (
@@ -124,7 +126,24 @@ export function useStandingOffer(applicationId: string, enabled = true) {
   });
 }
 
-/** Where signing the two listing documents stands on an application. */
+/**
+ * The Loan Contract template (Contract 5) for an approved application, as the
+ * PDF the SME and its Personal Guarantor sign; each Investor's own contract is
+ * generated from it at commitment. Generated each time, so never cached.
+ */
+export function useLoanContract(applicationId: string, enabled = true) {
+  return useQuery<{ blob: Blob; filename: string | null }, ApiError>({
+    queryKey: loanKeys.loanContract(applicationId),
+    queryFn: () => loansService.getLoanContract(applicationId),
+    enabled: enabled && !!applicationId,
+    staleTime: 0,
+    gcTime: 0,
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+}
+
+/** Where signing the three listing documents stands on an application. */
 export function useListingDocuments(applicationId: string, enabled = true) {
   return useQuery<ListingDocuments, ApiError>({
     queryKey: loanKeys.listingDocuments(applicationId),
@@ -160,6 +179,30 @@ export function useSignListingDocument(applicationId: string) {
           queryKey: fundingKeys.myRounds(),
         });
       }
+    },
+  });
+}
+
+/**
+ * Saving the Personal Guarantor's address. The Offer and the Loan Contract
+ * print it, so both are generated again with it.
+ */
+export function useSetGuarantorAddress(applicationId: string) {
+  const queryClient = useQueryClient();
+  return useMutation<ListingDocuments, ApiError, string>({
+    mutationFn: (address) =>
+      loansService.setGuarantorAddress(applicationId, address),
+    onSuccess: (status) => {
+      queryClient.setQueryData(
+        loanKeys.listingDocuments(applicationId),
+        status,
+      );
+      void queryClient.invalidateQueries({
+        queryKey: loanKeys.standingOffer(applicationId),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: loanKeys.loanContract(applicationId),
+      });
     },
   });
 }
