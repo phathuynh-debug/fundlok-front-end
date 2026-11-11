@@ -254,13 +254,32 @@ jobs:
 
       - name: Install Chromium
         if: steps.pw-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install chromium
 
       # System deps live outside the cached browser directory, so they are
-      # installed even on a cache hit.
+      # installed on every run, cache hit or not.
+      #
+      # Ubuntu's apt mirrors occasionally fail DNS on hosted runners
+      # ("Temporary failure resolving 'security.ubuntu.com'"). Unbounded, apt
+      # crawls through every package and eats the whole job budget, so each
+      # attempt is capped and the install is retried a few times.
       - name: Install browser system dependencies
-        if: steps.pw-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
+        timeout-minutes: 10
+        run: |
+          sudo tee /etc/apt/apt.conf.d/80-ci-network >/dev/null <<'EOF'
+          Acquire::Retries "3";
+          Acquire::http::Timeout "15";
+          Acquire::https::Timeout "15";
+          EOF
+          for attempt in 1 2 3; do
+            if timeout 180 npx playwright install-deps chromium; then
+              exit 0
+            fi
+            echo "::warning::install-deps attempt ${attempt} failed; retrying"
+            sleep $((attempt * 15))
+          done
+          echo "::error::Could not install browser system dependencies after 3 attempts"
+          exit 1
 
       # Built here rather than inside playwright.config.ts so a build failure
       # is reported as a build failure, not as a webServer timeout.
