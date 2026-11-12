@@ -275,7 +275,8 @@ color means, it's carrying two jobs.
   new gates ordered so they don't ping-pong (an unverified, roleless user must
   land on `/verify-email`, not bounce between it and `/select-role`). The phone
   gate routes on the backend's `phone_verification_required` flag from
-  `/users/me` (only roleless accounts are ever gated); `/verify-phone` sends a
+  `/users/me` (every SME and investor without a verified phone, accounts from
+  before the gate included; never staff); `/verify-phone` sends a
   Zalo ZBS one-time code and the backend refuses a role until it is verified.
 - **Role flow:** users register **without** a role. After login, a user with
   no `role` is sent to `/select-role` (SME vs Investor) which calls

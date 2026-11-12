@@ -579,7 +579,8 @@ async function routeRequest(request: NextRequest, refreshed: string[]) {
   // account — password sign-up or Google — proves a phone number by one-time
   // code before anything else, and the backend refuses PATCH /users/me/role
   // until it has.
-  // The backend computes the flag (only roleless accounts are ever gated), so
+  // The backend computes the flag (every SME and investor without a verified
+  // phone, old accounts included; never staff), so
   // this reads it rather than re-deriving the rule. `=== true` so a backend
   // that predates the flag gates nobody.
   const needsPhoneVerification =

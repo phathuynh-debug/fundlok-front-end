@@ -450,7 +450,19 @@ describe("the phone gate", () => {
     );
   });
 
-  it("never gates an account that already has a role", async () => {
+  it("gates an existing account that has a role but no verified phone", async () => {
+    const existing = { ...NEW_ACCOUNT, role: "SME" };
+    for (const path of ["/dashboard", "/dashboard/settings/profile", "/"]) {
+      expect(redirectedTo(await signedInAs(existing, path)), path).toBe(
+        "/verify-phone",
+      );
+    }
+    expect(
+      redirectedTo(await signedInAs(existing, "/verify-phone")),
+    ).toBeNull();
+  });
+
+  it("sends an account with a role back to its dashboard once verified", async () => {
     const investor = {
       ...NEW_ACCOUNT,
       role: "INVESTOR",
