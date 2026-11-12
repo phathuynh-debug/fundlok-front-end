@@ -16,6 +16,7 @@ import {
 } from "@/services/authentication.service";
 import { usersService } from "@/services/users.service";
 import { authKeys } from "@/hooks/use-authentication";
+import { safeNextPath } from "@/lib/safe-next-path";
 import type { ApiError } from "@/lib/types";
 
 // /auth/login (and the OAuth exchange) may return a partial user — the cookie
@@ -40,21 +41,37 @@ async function hydrateCurrentUser(
 }
 
 // Admins (and system admins) land in the admin area. Users who don't have a
-// role yet must pick one first. Everyone else goes to the dashboard, where
-// middleware further routes SMEs without projects to the application form.
-export function landingRouteFor(user?: User | null) {
+// role yet must pick one first. Everyone else goes back to the page they were
+// sent to sign in from (`from`), else the dashboard, where middleware further
+// routes SMEs without projects to the application form.
+export function landingRouteFor(user?: User | null, from?: string | null) {
   if (isAdminRole(user?.role)) {
     return "/admin";
   }
+  const back = safeNextPath(from);
   // Before the role: a new account proves a phone number first, whichever
-  // way it signed up (password or Google).
+  // way it signed up (password or Google). The page to go back to rides along
+  // as ?next=, like the consent and KYC gates, so the code step can use it.
   if (user?.phone_verification_required) {
-    return "/verify-phone";
+    return back
+      ? `/verify-phone?next=${encodeURIComponent(back)}`
+      : "/verify-phone";
   }
   if (!user?.role) {
     return "/select-role";
   }
-  return "/dashboard";
+  return back ?? "/dashboard";
+}
+
+// The page to return to once signed in: ?from= on /login (where the proxy
+// sends a signed-out visitor, e.g. one opening a repayment link from a Zalo
+// reminder), ?next= on /verify-phone (set by landingRouteFor above). Read
+// when the step finishes rather than while rendering, so neither page needs a
+// Suspense boundary for useSearchParams. landingRouteFor validates it.
+export function signInReturnPath(): string | null {
+  if (typeof window === "undefined") return null;
+  const params = new URLSearchParams(window.location.search);
+  return params.get("from") ?? params.get("next");
 }
 
 export function useLogin() {
@@ -74,7 +91,7 @@ export function useLogin() {
     // Seed for an instant paint, then reconcile against /users/me.
     queryClient.setQueryData(authKeys.currentUser(), user);
     const current = await hydrateCurrentUser(queryClient);
-    router.push(landingRouteFor(current ?? user));
+    router.push(landingRouteFor(current ?? user, signInReturnPath()));
   };
 
   const emailPasswordLogin = useMutation<LoginResult, ApiError, LoginPayload>({
@@ -124,7 +141,7 @@ export function useLogin() {
         return;
       }
       const current = await hydrateCurrentUser(queryClient);
-      router.push(landingRouteFor(current));
+      router.push(landingRouteFor(current, signInReturnPath()));
     },
   });
 

@@ -6,7 +6,10 @@ import { Fingerprint, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { usePasskeyLogin } from "@/hooks/use-authentication";
-import { landingRouteFor } from "@/app/(app)/login/use-login";
+import {
+  landingRouteFor,
+  signInReturnPath,
+} from "@/app/(app)/login/use-login";
 import { isPasskeyCancellation, isPasskeySupported } from "@/lib/passkeys";
 import { useTranslations } from "@/lib/i18n";
 import { apiErrorMessage } from "@/lib/api-error-message";
@@ -42,7 +45,8 @@ export function PasskeySignInButton() {
 
   const handleClick = () => {
     signIn.mutate(undefined, {
-      onSuccess: (user) => router.push(landingRouteFor(user)),
+      onSuccess: (user) =>
+        router.push(landingRouteFor(user, signInReturnPath())),
       onError: (error) => {
         // Dismissing the system sheet is the common case and is not a failure.
         if (isPasskeyCancellation(error)) return;

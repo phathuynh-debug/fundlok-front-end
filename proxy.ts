@@ -590,7 +590,13 @@ async function routeRequest(request: NextRequest, refreshed: string[]) {
     currentUser.phone_verification_required === true;
   if (needsPhoneVerification) {
     if (pathname !== VERIFY_PHONE_ROUTE) {
-      return NextResponse.redirect(new URL(VERIFY_PHONE_ROUTE, request.url));
+      // Remember the page (e.g. a repayment link from a Zalo reminder) so the
+      // code step returns there, as the consent gate below does.
+      const phoneUrl = new URL(VERIFY_PHONE_ROUTE, request.url);
+      if (!AUTH_ROUTES.includes(pathname)) {
+        phoneUrl.searchParams.set("next", pathname + request.nextUrl.search);
+      }
+      return NextResponse.redirect(phoneUrl);
     }
     // On /verify-phone with nothing else allowed first: the consent and role
     // gates below would otherwise send them straight back out.

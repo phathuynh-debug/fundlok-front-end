@@ -10,7 +10,10 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { landingRouteFor } from "@/app/(app)/login/use-login";
+import {
+  landingRouteFor,
+  signInReturnPath,
+} from "@/app/(app)/login/use-login";
 import { useToast } from "@/hooks/use-toast";
 import { useVerifyPhoneCode } from "@/hooks/use-users";
 import { useTranslations } from "@/lib/i18n";
@@ -72,7 +75,7 @@ export function CodeStep({
           title: t("auth.verifyPhone.verifiedTitle"),
           description: t("auth.verifyPhone.verifiedDescription"),
         });
-        router.push(landingRouteFor(user));
+        router.push(landingRouteFor(user, signInReturnPath()));
       },
       onError: (error) => {
         setErrorKey(phoneVerificationErrorKey(error));

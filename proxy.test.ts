@@ -399,6 +399,23 @@ describe("the phone gate", () => {
     }
   });
 
+  it("remembers where a gated account was headed", async () => {
+    const existing = { ...NEW_ACCOUNT, role: "SME" };
+    const link = "/dashboard/repayments/3f2b8c1e-5a7d-4e9b-9c21-7d4e8a6b1f02";
+    const response = await signedInAs(existing, link);
+    const location = new URL(response.headers.get("location") ?? "");
+    expect(location.pathname).toBe("/verify-phone");
+    expect(location.searchParams.get("next")).toBe(link);
+    // The entry pages are not a destination worth returning to.
+    for (const path of ["/login", "/"]) {
+      const entry = await signedInAs(existing, path);
+      expect(
+        new URL(entry.headers.get("location") ?? "").searchParams.has("next"),
+        path,
+      ).toBe(false);
+    }
+  });
+
   it("lets a gated account stay on /verify-phone", async () => {
     expect(
       redirectedTo(await signedInAs(NEW_ACCOUNT, "/verify-phone")),
