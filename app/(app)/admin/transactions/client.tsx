@@ -21,29 +21,36 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ACTIVITY_GROUPS,
+  FEE_INVOICE_FILTERS,
   REPAYMENT_FILTERS,
   TRANSFER_FILTERS,
   type AdminActivityGroup,
+  type AdminFeeInvoice,
   type AdminFundingRound,
   type AdminRepaymentFilter,
   type AdminRoundFilter,
   type AdminTransferFilter,
+  type FeeInvoiceFilter,
 } from "@/services/admin-funding.service";
 import { AdminPageLoader } from "../_components/AdminPageLoader";
 import { ActivityLog } from "./_components/ActivityLog";
+import { FeeInvoiceSheet } from "./_components/FeeInvoiceSheet";
+import { FeeInvoicesTable } from "./_components/FeeInvoicesTable";
 import { FundingRoundsTable } from "./_components/FundingRoundsTable";
 import { RepaymentQueue } from "./_components/RepaymentQueue";
 import { TransferQueue } from "./_components/TransferQueue";
 
-type Tab = "rounds" | "transfers" | "repayments" | "activity";
+type Tab = "rounds" | "transfers" | "repayments" | "fees" | "activity";
 
 // The admin Transactions tab. "Open rounds" is every funding round taking
 // investment, with what it has raised and how many of its tickets wait on
 // staff. "Transfers" is every investor ticket: a receipt to read and a review
 // to decide come first. Clicking a round opens its transfers. "Repayments" is
 // every receipt a business uploaded when it repaid an investor, waiting ones
-// first. "Activity log" is the audit trail: who approved or denied which
-// transfer or repayment, when and why.
+// first. "Service fees" is each closed round's 3% (+ VAT) fee to FundLok with
+// the investment package it is charged on, unpaid first; staff mark one paid
+// once its transfer shows on FundLok's statement. "Activity log" is the audit
+// trail: who approved or denied which transfer or repayment, when and why.
 export default function AdminTransactionsClient() {
   const { user, isLoading } = useRequireAuth();
   const router = useRouter();
@@ -58,6 +65,12 @@ export default function AdminTransactionsClient() {
     useState<AdminRepaymentFilter>("NEEDS_ACTION");
   const [activityGroup, setActivityGroup] =
     useState<AdminActivityGroup>("DECISIONS");
+  const [feeFilter, setFeeFilter] = useState<FeeInvoiceFilter>("UNPAID");
+  // The fee open in the side panel, kept as it stands after "mark paid" so the
+  // panel shows it paid even once it leaves the Unpaid list.
+  const [fee, setFee] = useState<AdminFeeInvoice | null>(null);
+  // Opened from a row's "Mark as paid" button: start in the payment form.
+  const [feeFocusForm, setFeeFocusForm] = useState(false);
 
   useEffect(() => {
     if (!isLoading && user && !isAdminRole(user.role)) {
@@ -100,6 +113,9 @@ export default function AdminTransactionsClient() {
           </TabsTrigger>
           <TabsTrigger value="repayments">
             {t("admin.transactions.tabRepayments")}
+          </TabsTrigger>
+          <TabsTrigger value="fees">
+            {t("admin.transactions.tabFees")}
           </TabsTrigger>
           <TabsTrigger value="activity">
             {t("admin.transactions.tabActivity")}
@@ -228,6 +244,56 @@ export default function AdminTransactionsClient() {
             {/* Keyed by the filter so a change starts again on page 1. */}
             <RepaymentQueue key={repaymentFilter} status={repaymentFilter} />
           </div>
+        </TabsContent>
+
+        <TabsContent value="fees">
+          <div className="rounded-lg border bg-card">
+            <div className="flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
+              <Select
+                value={feeFilter}
+                onValueChange={(value) =>
+                  setFeeFilter(value as FeeInvoiceFilter)
+                }
+              >
+                <SelectTrigger
+                  size="sm"
+                  className="w-full sm:w-48"
+                  aria-label={t("admin.table.status")}
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {FEE_INVOICE_FILTERS.map((filter) => (
+                    <SelectItem key={filter} value={filter}>
+                      {t(`admin.transactions.fees.filters.${filter}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <RefetchButton
+                queryKey={adminFundingKeys.feeInvoices(feeFilter)}
+              />
+            </div>
+            <FeeInvoicesTable
+              status={feeFilter}
+              onOpen={(picked) => {
+                setFeeFocusForm(false);
+                setFee(picked);
+              }}
+              onMarkPaid={(picked) => {
+                setFeeFocusForm(true);
+                setFee(picked);
+              }}
+            />
+          </div>
+          <FeeInvoiceSheet
+            invoice={fee}
+            onOpenChange={(open) => {
+              if (!open) setFee(null);
+            }}
+            onUpdated={setFee}
+            focusForm={feeFocusForm}
+          />
         </TabsContent>
 
         <TabsContent value="activity">

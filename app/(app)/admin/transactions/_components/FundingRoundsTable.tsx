@@ -20,6 +20,7 @@ import type {
   AdminRoundFilter,
 } from "@/services/admin-funding.service";
 import { DataTable, type Column } from "../../_components/DataTable";
+import { FeeStatusBadge } from "./FeeStatusBadge";
 
 // Funding rounds, closing soonest first: what each has raised (confirmed) and
 // holds (reserved, not yet paid), what is still open, and how many of its
@@ -124,6 +125,18 @@ export function FundingRoundsTable({
           >
             {row.needs_action}
           </Badge>
+        ) : (
+          <span className="text-xs text-muted-foreground">—</span>
+        ),
+    },
+    {
+      // The round's service fee (3% + VAT), once it closed. Details and
+      // "mark paid" are in the Service fees tab.
+      key: "fee",
+      header: t("admin.transactions.fees.roundColumn"),
+      render: (row) =>
+        row.fee_invoice ? (
+          <FeeStatusBadge fee={row.fee_invoice} />
         ) : (
           <span className="text-xs text-muted-foreground">—</span>
         ),

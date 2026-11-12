@@ -13,6 +13,7 @@ import type { AdminTable } from "@/services/admin.service";
 import {
   adminFundingService,
   type AdminActivityParams,
+  type AdminFeeInvoice,
   type AdminFundingActivity,
   type AdminFundingRound,
   type AdminInvestorTransfer,
@@ -23,6 +24,8 @@ import {
   type AdminRepaymentReceipt,
   type AdminRoundFilter,
   type AdminTransferListParams,
+  type FeeInvoiceFilter,
+  type MarkFeePaidPayload,
 } from "@/services/admin-funding.service";
 
 export const adminFundingKeys = {
@@ -45,6 +48,8 @@ export const adminFundingKeys = {
     [...adminFundingKeys.all, "repayment", receiptId] as const,
   repaymentReceiptUrl: (receiptId: string) =>
     [...adminFundingKeys.all, "repayment-receipt-url", receiptId] as const,
+  feeInvoices: (status: FeeInvoiceFilter) =>
+    [...adminFundingKeys.all, "fee-invoices", status] as const,
 };
 
 export function useAdminFundingRounds(status: AdminRoundFilter) {
@@ -167,6 +172,33 @@ export function useAdminRepaymentReceiptUrl(receiptId: string | null) {
 }
 
 // Moves the round and may form its loan: every admin funding view refreshes.
+/** SME service-fee invoices, each with its investment package. */
+export function useAdminFeeInvoices(status: FeeInvoiceFilter, enabled = true) {
+  return useQuery<AdminFeeInvoice[], ApiError>({
+    queryKey: adminFundingKeys.feeInvoices(status),
+    queryFn: () => adminFundingService.listFeeInvoices(status),
+    staleTime: 30 * 1000,
+    retry: false,
+    enabled,
+  });
+}
+
+/** Marks a fee paid. Refreshes the fee lists and the rounds (their fee badge). */
+export function useMarkFeeInvoicePaid() {
+  const queryClient = useQueryClient();
+  return useMutation<
+    AdminFeeInvoice,
+    ApiError,
+    { invoiceId: string; payload: MarkFeePaidPayload }
+  >({
+    mutationFn: ({ invoiceId, payload }) =>
+      adminFundingService.markFeeInvoicePaid(invoiceId, payload),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: adminFundingKeys.all });
+    },
+  });
+}
+
 export function useAdvanceRound() {
   const queryClient = useQueryClient();
   return useMutation<AdminFundingRound, ApiError, string>({
