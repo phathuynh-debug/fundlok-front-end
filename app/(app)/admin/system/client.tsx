@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "@/lib/i18n";
 import { AdminPageLoader } from "../_components/AdminPageLoader";
+import { ReminderSenderCard } from "./_components/ReminderSenderCard";
 import { VerificationModeCard } from "./_components/VerificationModeCard";
 
 export default function AdminSystemClient() {
@@ -62,6 +63,8 @@ export default function AdminSystemClient() {
       </div>
 
       <VerificationModeCard />
+
+      <ReminderSenderCard />
 
       {/* Maintenance mode */}
       <div className="rounded-lg border bg-card p-6">

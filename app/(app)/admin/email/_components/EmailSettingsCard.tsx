@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   AlertTriangle,
+  BellRing,
   CheckCircle2,
   Loader2,
   Mail,
@@ -426,6 +427,13 @@ function SettingsForm({
         />
       </div>
 
+      {settings.is_reminder_sender && (
+        <p className="flex items-start gap-2 rounded-md border bg-muted/40 p-3 text-xs leading-relaxed text-muted-foreground">
+          <BellRing className="mt-px h-4 w-4 shrink-0" aria-hidden />
+          {t("admin.email.settings.reminderSenderNotice")}
+        </p>
+      )}
+
       <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" disabled={busy}>
           {saving && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
@@ -458,6 +466,8 @@ function SettingsForm({
             </AlertDialogTitle>
             <AlertDialogDescription>
               {t("admin.email.settings.disconnectBody")}
+              {settings.is_reminder_sender &&
+                ` ${t("admin.email.settings.disconnectReminderSender")}`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

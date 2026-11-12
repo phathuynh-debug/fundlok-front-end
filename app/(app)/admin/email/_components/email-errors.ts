@@ -18,7 +18,7 @@ const KNOWN_CODES = new Set([
   "GMAIL_RECIPIENT_REFUSED",
   "GMAIL_UNAVAILABLE",
   "SOME_RECIPIENTS_REFUSED",
-  // Only on send-log rows from before Google OAuth (App Password logins).
+  "REMINDER_SENDER_UNAVAILABLE",
   "GMAIL_AUTH_FAILED",
 ]);
 

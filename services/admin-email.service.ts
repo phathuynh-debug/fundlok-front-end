@@ -25,6 +25,7 @@ export interface EmailSettings {
   signature_name: string | null;
   signature_title: string | null;
   signature_phone: string | null;
+  is_reminder_sender?: boolean;
 }
 
 // What the admin edits by hand. Turning `enabled` on needs a connected
@@ -40,6 +41,33 @@ export interface EmailSettingsPayload {
 // Rules every admin's sends follow. Empty allowed_domains means any domain.
 export interface EmailPolicy {
   allowed_domains: string[];
+  updated_at: string | null;
+  updated_by: string | null;
+}
+
+// Whether an admin's connected account can send repayment reminders now.
+// Mirrors ReminderSenderStatus in the backend's schemas.py.
+export type ReminderSenderStatus =
+  | "READY" // connected, sending on, an active admin
+  | "PAUSED" // its owner switched sending off
+  | "NEEDS_RECONNECT" // Google no longer accepts the connection
+  | "NOT_CONNECTED" // disconnected since it was chosen
+  | "NOT_ADMIN"; // its owner is no longer an active admin
+
+export interface ReminderSenderAccount {
+  user_id: string;
+  full_name: string | null;
+  gmail_address: string | null;
+  from_name: string | null;
+  status: ReminderSenderStatus;
+}
+
+// SYSTEM_ADMIN only. `sender` null: none chosen, so no reminder goes out.
+// `candidates`: active admins with a connected Google account, plus the
+// chosen one whatever its state.
+export interface ReminderSender {
+  sender: ReminderSenderAccount | null;
+  candidates: ReminderSenderAccount[];
   updated_at: string | null;
   updated_by: string | null;
 }
@@ -144,6 +172,19 @@ export const adminEmailService = {
   savePolicy(allowedDomains: string[]) {
     return apiClient.put<EmailPolicy>(ADMIN_EMAIL_ENDPOINTS.policy, {
       allowed_domains: allowedDomains,
+    });
+  },
+
+  // SYSTEM_ADMIN only.
+  getReminderSender() {
+    return apiClient.get<ReminderSender>(ADMIN_EMAIL_ENDPOINTS.reminderSender);
+  },
+
+  // SYSTEM_ADMIN only. Null stops automatic reminders. Only an account that
+  // is READY or PAUSED can be chosen (400 REMINDER_SENDER_UNAVAILABLE).
+  saveReminderSender(userId: string | null) {
+    return apiClient.put<ReminderSender>(ADMIN_EMAIL_ENDPOINTS.reminderSender, {
+      user_id: userId,
     });
   },
 

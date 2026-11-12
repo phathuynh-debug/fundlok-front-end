@@ -14,6 +14,7 @@ import {
   type EmailSettingsPayload,
   type EmailTestResult,
   type InternalEmail,
+  type ReminderSender,
   type SendEmailPayload,
 } from "@/services/admin-email.service";
 
@@ -29,6 +30,7 @@ export const adminEmailKeys = {
   messages: (userId: string) =>
     [...adminEmailKeys.forUser(userId), "messages"] as const,
   policy: () => [...adminEmailKeys.all, "policy"] as const,
+  reminderSender: () => [...adminEmailKeys.all, "reminder-sender"] as const,
   // The user directory is the same for every admin.
   recipients: (q: string, fundlokOnly: boolean) =>
     [...adminEmailKeys.all, "recipients", q, fundlokOnly] as const,
@@ -99,6 +101,33 @@ export function useSaveEmailPolicy() {
     mutationFn: (domains) => adminEmailService.savePolicy(domains),
     onSuccess: (policy) => {
       queryClient.setQueryData(adminEmailKeys.policy(), policy);
+    },
+  });
+}
+
+// SYSTEM_ADMIN only. Fresh on every visit: the chosen account's status
+// changes whenever its owner pauses, disconnects or reconnects.
+export function useReminderSender(enabled = true) {
+  return useQuery<ReminderSender, ApiError>({
+    queryKey: adminEmailKeys.reminderSender(),
+    queryFn: () => adminEmailService.getReminderSender(),
+    staleTime: 0,
+    retry: false,
+    enabled,
+  });
+}
+
+// SYSTEM_ADMIN only. Null stops automatic reminders.
+export function useSaveReminderSender() {
+  const queryClient = useQueryClient();
+  return useMutation<ReminderSender, ApiError, string | null>({
+    mutationFn: (userId) => adminEmailService.saveReminderSender(userId),
+    onSuccess: (data) => {
+      queryClient.setQueryData(adminEmailKeys.reminderSender(), data);
+      // The system admin's own settings carry is_reminder_sender.
+      void queryClient.invalidateQueries({
+        queryKey: [...adminEmailKeys.all, "user"],
+      });
     },
   });
 }

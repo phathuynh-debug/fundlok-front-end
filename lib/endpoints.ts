@@ -361,6 +361,9 @@ export const ADMIN_EMAIL_ENDPOINTS = {
   disconnect: "/admin/email/disconnect",
   // Allowed recipient domains for every admin. PUT is SYSTEM_ADMIN only.
   policy: "/admin/email/policy",
+  // SYSTEM_ADMIN only (GET and PUT). Whose connected account sends the
+  // automatic repayment reminders; { user_id: null } stops them.
+  reminderSender: "/admin/email/reminder-sender",
   // Sends the test template to the signed-in admin's own address.
   testEmail: "/admin/email/settings/test",
   // Renders exactly what would be sent; sends nothing.

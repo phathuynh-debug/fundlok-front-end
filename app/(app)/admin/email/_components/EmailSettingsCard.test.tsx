@@ -136,6 +136,46 @@ describe("EmailSettingsCard email match enforcement", () => {
     expect(enableSwitch.disabled).toBe(true);
   });
 
+  it("tells the owner when their account sends repayment reminders", () => {
+    mockCurrentUser.mockReturnValue({
+      data: { id: "admin-1", email: "phat.huynh@fundlok.com" },
+    });
+    const settings = {
+      configured: true,
+      enabled: true,
+      gmail_address: "phat.huynh@fundlok.com",
+      from_name: "Phat Huynh",
+      needs_reconnect: false,
+      connected_at: "2026-11-07T08:34:00Z",
+      last_verified_at: null,
+      updated_at: "2026-11-07T08:38:00Z",
+      signature_name: null,
+      signature_title: null,
+      signature_phone: null,
+    };
+    mockEmailSettings.mockReturnValue({
+      isPending: false,
+      isError: false,
+      data: { ...settings, is_reminder_sender: true },
+    });
+    const { unmount } = render(<EmailSettingsCard />);
+    expect(
+      screen.getByText("admin.email.settings.reminderSenderNotice"),
+    ).toBeTruthy();
+    unmount();
+
+    // Absent (a backend without the field) reads as not the sender.
+    mockEmailSettings.mockReturnValue({
+      isPending: false,
+      isError: false,
+      data: settings,
+    });
+    render(<EmailSettingsCard />);
+    expect(
+      screen.queryByText("admin.email.settings.reminderSenderNotice"),
+    ).toBeNull();
+  });
+
   it("maps email_mismatch OAuth callback error code", () => {
     expect(oauthErrorText("email_mismatch", (k) => k)).toBe(
       "admin.email.oauth.errors.email_mismatch",
