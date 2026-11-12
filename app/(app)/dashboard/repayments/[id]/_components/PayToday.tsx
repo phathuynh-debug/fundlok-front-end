@@ -360,6 +360,10 @@ function PayPanel({
           <Button
             type="button"
             size="sm"
+            // The label carries the amount and is long in Vietnamese: on a
+            // narrow phone it wraps onto two lines and the button grows,
+            // instead of running past the card.
+            className="h-auto min-h-8 max-w-full whitespace-normal py-1.5 text-center leading-snug"
             onClick={send}
             disabled={!file || pay.isPending}
           >
