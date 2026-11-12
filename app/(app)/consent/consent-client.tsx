@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { FileText, Loader2, LogOut, Mail, ShieldCheck } from "lucide-react";
 
@@ -60,7 +60,6 @@ function BilingualText({ text }: { text: Bilingual }) {
 export function ConsentClient() {
   const { t, locale } = useTranslations();
   const { toast } = useToast();
-  const router = useRouter();
   const next = safeNextPath(useSearchParams().get("next"));
   const { mutateAsync: sendCode, isPending: sending } = useSendConsentCode();
   const { mutateAsync: accept, isPending: accepting } = useAcceptConsent();
@@ -75,6 +74,8 @@ export function ConsentClient() {
   const [code, setCode] = useState("");
   const [resendAt, setResendAt] = useState<number | null>(null);
   const [now, setNow] = useState(() => Date.now());
+  // Accepted and on the way out: keeps the button busy until the page goes.
+  const [leaving, setLeaving] = useState(false);
 
   // Ticks the "new code in Ns" countdown while one is running.
   useEffect(() => {
@@ -115,7 +116,7 @@ export function ConsentClient() {
 
   const handleAccept = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!allTicked || code.length !== 6) return;
+    if (!allTicked || code.length !== 6 || leaving) return;
     try {
       await accept({
         version: TERMS_VERSION,
@@ -125,9 +126,14 @@ export function ConsentClient() {
         code,
       });
       toast({ title: t("auth.consent.accepted") });
-      // The proxy takes it from there: role selection for a new account,
-      // else where they were going.
-      router.replace(next ?? "/dashboard");
+      setLeaving(true);
+      // A full page load, not router.replace: the client router remembers
+      // that `next` redirected here (the proxy's consent gate, before this
+      // accept) and replays that redirect without asking the server, which
+      // left the user on this page until they reloaded. A real request lets
+      // the proxy see the consent and route onward: role selection for a new
+      // account, else where they were going.
+      window.location.replace(next ?? "/dashboard");
     } catch (err) {
       setCode("");
       toast({
@@ -322,12 +328,14 @@ export function ConsentClient() {
                 <div className="flex flex-wrap items-center gap-3">
                   <Button
                     type="submit"
-                    disabled={!allTicked || code.length !== 6 || accepting}
+                    disabled={
+                      !allTicked || code.length !== 6 || accepting || leaving
+                    }
                   >
-                    {accepting && (
+                    {(accepting || leaving) && (
                       <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
                     )}
-                    {accepting
+                    {accepting || leaving
                       ? t("auth.consent.accepting")
                       : t("auth.consent.accept")}
                   </Button>
