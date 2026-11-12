@@ -489,6 +489,12 @@
       "users": "người dùng",
       "verifications": "lượt xác minh"
     },
+    "phone": {
+      "missing": "Chưa có số",
+      "unverified": "Chưa xác minh",
+      "verified": "Đã xác minh",
+      "verifiedOn": "Xác minh ngày {date}"
+    },
     "preview": {
       "applicationDecided": "Đã ghi nhận quyết định",
       "applicationsHeading": "Đề nghị vay",
@@ -805,6 +811,7 @@
       "noProjects": "Không tìm thấy dự án.",
       "noResults": "Không tìm thấy kết quả.",
       "noUsers": "Không tìm thấy người dùng.",
+      "phone": "Số điện thoại",
       "refresh": "Làm mới",
       "role": "Vai trò",
       "searchProjects": "Tìm dự án…",

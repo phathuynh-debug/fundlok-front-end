@@ -489,6 +489,12 @@
       "users": "users",
       "verifications": "checks"
     },
+    "phone": {
+      "missing": "No phone",
+      "unverified": "Not verified",
+      "verified": "Verified",
+      "verifiedOn": "Verified {date}"
+    },
     "preview": {
       "applicationDecided": "Decision recorded",
       "applicationsHeading": "Funding requests",
@@ -805,6 +811,7 @@
       "noProjects": "No projects found.",
       "noResults": "No results found.",
       "noUsers": "No users found.",
+      "phone": "Phone",
       "refresh": "Refresh",
       "role": "Role",
       "searchProjects": "Search projects…",
