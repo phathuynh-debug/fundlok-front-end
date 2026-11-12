@@ -10,10 +10,7 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import {
-  landingRouteFor,
-  signInReturnPath,
-} from "@/app/(app)/login/use-login";
+import { landingRouteFor, signInReturnPath } from "@/app/(app)/login/use-login";
 import { useToast } from "@/hooks/use-toast";
 import { useVerifyPhoneCode } from "@/hooks/use-users";
 import { useTranslations } from "@/lib/i18n";

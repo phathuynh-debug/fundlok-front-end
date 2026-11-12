@@ -41,9 +41,7 @@ describe("landingRouteFor", () => {
       `/verify-phone?next=${encodeURIComponent(repayment)}`,
     );
     expect(landingRouteFor(unverified)).toBe("/verify-phone");
-    expect(landingRouteFor(unverified, "//evil.example")).toBe(
-      "/verify-phone",
-    );
+    expect(landingRouteFor(unverified, "//evil.example")).toBe("/verify-phone");
   });
 });
 
