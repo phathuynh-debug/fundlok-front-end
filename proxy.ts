@@ -46,10 +46,10 @@ const ADMIN_ROUTE = "/admin";
 // Where users without a role pick one (SME / Investor) before continuing.
 const SELECT_ROLE_ROUTE = "/select-role";
 // Where every SME and investor accepts the Terms & Services and data consent
-// (Contract 1) before anything else, role selection included.
+// (Contract 1), after proving their email and phone and before choosing a role.
 const CONSENT_ROUTE = "/consent";
-// Where a new account proves a phone number, between the email link and the
-// role (see the phone gate below).
+// Where a new account proves a phone number, right after the email link and
+// before the consent and the role (see the phone gate below).
 const VERIFY_PHONE_ROUTE = "/verify-phone";
 // On-demand identity/business verification screen. No longer a blanket entry
 // gate — reached only when a user hits a verification-gated action route.
@@ -575,6 +575,36 @@ async function routeRequest(request: NextRequest, refreshed: string[]) {
     return NextResponse.redirect(new URL("/verify-email", request.url));
   }
 
+  // Phone gate: right after the email, before the consent and the role. A new
+  // account — password sign-up or Google — proves a phone number by one-time
+  // code before anything else, and the backend refuses PATCH /users/me/role
+  // until it has.
+  // The backend computes the flag (only roleless accounts are ever gated), so
+  // this reads it rather than re-deriving the rule. `=== true` so a backend
+  // that predates the flag gates nobody.
+  const needsPhoneVerification =
+    isAuthenticated &&
+    !!currentUser &&
+    currentUser.email_verified !== false &&
+    currentUser.phone_verification_required === true;
+  if (needsPhoneVerification) {
+    if (pathname !== VERIFY_PHONE_ROUTE) {
+      return NextResponse.redirect(new URL(VERIFY_PHONE_ROUTE, request.url));
+    }
+    // On /verify-phone with nothing else allowed first: the consent and role
+    // gates below would otherwise send them straight back out.
+    return pass();
+  }
+  // Nobody else has any business on that page.
+  if (
+    isAuthenticated &&
+    currentUser &&
+    !needsPhoneVerification &&
+    pathname === VERIFY_PHONE_ROUTE
+  ) {
+    return NextResponse.redirect(new URL(authRedirectTarget, request.url));
+  }
+
   const needsConsent =
     isAuthenticated &&
     !!currentUser &&
@@ -606,34 +636,10 @@ async function routeRequest(request: NextRequest, refreshed: string[]) {
     );
   }
 
-  // Phone gate: after the email and the consent, before the role. A new account — password
-  // sign-up or Google — proves a phone number by one-time code before it may
-  // pick a role, and the backend refuses PATCH /users/me/role until it has.
-  // The backend computes the flag (only roleless accounts are ever gated), so
-  // this reads it rather than re-deriving the rule. `=== true` so a backend
-  // that predates the flag gates nobody.
-  const needsPhoneVerification =
-    isAuthenticated &&
-    !!currentUser &&
-    currentUser.email_verified !== false &&
-    currentUser.phone_verification_required === true;
-  if (needsPhoneVerification && pathname !== VERIFY_PHONE_ROUTE) {
-    return NextResponse.redirect(new URL(VERIFY_PHONE_ROUTE, request.url));
-  }
-  // Nobody else has any business on that page.
-  if (
-    isAuthenticated &&
-    currentUser &&
-    !needsPhoneVerification &&
-    pathname === VERIFY_PHONE_ROUTE
-  ) {
-    return NextResponse.redirect(new URL(authRedirectTarget, request.url));
-  }
-
   // Send authenticated users without a role to the select-role screen — but
   // only once their email and phone are verified and the consent is given, so this never fights the
   // gates above (an unverified roleless user stays on /verify-email, then
-  // /consent, then /verify-phone).
+  // /verify-phone, then /consent).
   if (
     isAuthenticated &&
     currentUser &&

@@ -412,6 +412,34 @@ describe("the phone gate", () => {
     );
   });
 
+  it("comes right after the email, before the consent", async () => {
+    const both = { ...NEW_ACCOUNT, consent_required: true };
+    for (const path of ["/consent", "/select-role", "/dashboard"]) {
+      expect(redirectedTo(await signedInAs(both, path)), path).toBe(
+        "/verify-phone",
+      );
+    }
+    // And stays there: the consent gate does not pull them away.
+    expect(redirectedTo(await signedInAs(both, "/verify-phone"))).toBeNull();
+  });
+
+  it("then hands a verified account to the consent", async () => {
+    const verified = {
+      ...NEW_ACCOUNT,
+      phone_verification_required: false,
+      consent_required: true,
+    };
+    // Off /verify-phone towards the role, which the consent gate stops.
+    expect(redirectedTo(await signedInAs(verified, "/verify-phone"))).toBe(
+      "/select-role",
+    );
+    const atRole = await signedInAs(verified, "/select-role");
+    const location = new URL(atRole.headers.get("location") ?? "");
+    expect(location.pathname).toBe("/consent");
+    expect(location.searchParams.get("next")).toBe("/select-role");
+    expect(redirectedTo(await signedInAs(verified, "/consent"))).toBeNull();
+  });
+
   it("moves a verified account on to choosing a role", async () => {
     const verified = { ...NEW_ACCOUNT, phone_verification_required: false };
     expect(redirectedTo(await signedInAs(verified, "/verify-phone"))).toBe(

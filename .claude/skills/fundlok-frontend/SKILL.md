@@ -270,7 +270,8 @@ color means, it's carrying two jobs.
   preserve behavior; consider migrating to `proxy.ts` per the Next 16 docs.
 - The proxy reads the session by calling `/users/me` with the forwarded
   cookie, then gates routes. Order matters: **email-verification gate →
-  phone-verification gate → role-selection gate → role-based landing.** Keep
+  phone-verification gate → consent gate → role-selection gate → role-based
+  landing.** Keep
   new gates ordered so they don't ping-pong (an unverified, roleless user must
   land on `/verify-email`, not bounce between it and `/select-role`). The phone
   gate routes on the backend's `phone_verification_required` flag from
