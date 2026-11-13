@@ -23,6 +23,7 @@ import type { Project } from "@/services/projects.service";
 import {
   listingDaysLeft,
   listingFundedPercent,
+  listingLastTicketVnd,
   INVESTOR_TARGET_RETURN_PCT,
   targetReturnVnd,
 } from "@/lib/listing-figures";
@@ -92,6 +93,8 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
   const listing = loanApplication?.listing ?? null;
   const fundingProgressPct = listing ? listingFundedPercent(listing) : 0;
   const daysRemaining = listing ? listingDaysLeft(listing) : null;
+  // Less than a minimum ticket left to raise: one last ticket of exactly that.
+  const lastTicket = listing ? listingLastTicketVnd(listing) : null;
   const businessScore = loanApplication?.business_score ?? null;
   const isHot = fundingProgressPct >= 75;
 
@@ -394,6 +397,17 @@ export function ProjectCard({ project, role = "SME" }: ProjectCardProps) {
                 style={{ width: `${Math.min(100, fundingProgressPct)}%` }}
               />
             </div>
+            {lastTicket !== null && listing.min_ticket != null && (
+              <p
+                className="text-[11px] leading-relaxed text-muted-foreground"
+                data-testid="last-ticket-note"
+              >
+                {t("investment.lastTicket.cardNote", {
+                  amount: formatCurrency(lastTicket, locale),
+                  min: formatCurrency(listing.min_ticket, locale),
+                })}
+              </p>
+            )}
           </div>
         )}
 

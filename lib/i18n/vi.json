@@ -2385,6 +2385,8 @@
         "details": "Đang chờ chuyển khoản: {reserved} · {count} nhà đầu tư · tối thiểu {min}",
         "failedNote": "Đợt gọi vốn đã đóng mà không nhận được khoản đầu tư nào.",
         "heading": "Huy động vốn",
+        "lastTicketCloseEarly": "Bạn cũng có thể đóng đợt gọi vốn ngay bây giờ.",
+        "lastTicketNote": "Còn {amount} chưa có nhà đầu tư, thấp hơn mức đầu tư tối thiểu {min}. Chỉ một nhà đầu tư đầu tư đúng {amount} mới lấp đầy được phần này. Nếu không ai đầu tư trước khi đợt gọi vốn đóng vào {date}, đợt gọi vốn sẽ đóng mà không có phần này: bạn chỉ nhận số tiền nhà đầu tư đã chuyển và chỉ hoàn trả số đó.",
         "noTickets": "Chưa có nhà đầu tư nào giữ chỗ.",
         "none": "Chưa có khoản đầu tư",
         "noneHint": "Hồ sơ của bạn được giới thiệu tới nhà đầu tư khi ba văn bản ở trên đã được ký và tài khoản ngân hàng nhận vốn đã được duyệt. Việc có đầu tư hay không do nhà đầu tư quyết định.",
@@ -3408,6 +3410,18 @@
       "ofDailyRevenue": "trên doanh thu hằng ngày",
       "perBusinessDay": "Cố định, mỗi ngày làm việc",
       "revenueShareRate": "Tỷ lệ chia sẻ doanh thu"
+    },
+    "lastTicket": {
+      "body": "Đợt gọi vốn này chỉ còn {amount}, thấp hơn mức đầu tư tối thiểu {min}. Một nhà đầu tư có thể đầu tư đúng {amount} để hoàn tất đợt gọi vốn; không nhận số tiền khác.",
+      "cardNote": "Chỉ còn {amount}, thấp hơn mức tối thiểu {min}: một nhà đầu tư có thể đầu tư đúng số này để hoàn tất đợt gọi vốn.",
+      "completesBody": "Khoản này nhận {amount} cuối cùng, thấp hơn mức tối thiểu thông thường {min}. Khoản đầu tư cuối cùng của một đợt gọi vốn có thể nhỏ hơn, miễn là đúng bằng số tiền còn lại.",
+      "completesTitle": "Khoản đầu tư của bạn hoàn tất đợt gọi vốn này",
+      "exactly": "Đúng {amount}, khoản đầu tư cuối cùng của đợt gọi vốn này",
+      "investExactly": "Đầu tư {amount}",
+      "mustBeExact": "Đợt gọi vốn này chỉ còn {amount}, nên khoản đầu tư cuối cùng phải đúng {amount}.",
+      "outOfRangeBody": "Số này thấp hơn mức đầu tư tối thiểu {min}, nên nhà đầu tư cuối cùng chỉ có thể đầu tư đúng {amount}, không nhận số tiền khác.",
+      "outOfRangeTitle": "Đợt gọi vốn này chỉ còn {amount}",
+      "title": "Khoản đầu tư cuối cùng: {amount}"
     },
     "paymentHistory": {
       "subtitle": "Các khoản chia sẻ doanh thu hằng ngày gần đây nhận được từ khoản vay này",

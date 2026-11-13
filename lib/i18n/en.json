@@ -2385,6 +2385,8 @@
         "details": "Waiting on transfers: {reserved} · {count} investors · minimum {min}",
         "failedNote": "The round closed without any investment received.",
         "heading": "Funding",
+        "lastTicketCloseEarly": "You can also close the round now.",
+        "lastTicketNote": "{amount} is still open, below the {min} minimum investment. Only one investor investing exactly {amount} can fill it. If no one does before your round closes on {date}, the round closes without it: you receive only what investors have transferred, and repay only that.",
         "noTickets": "No investor has reserved yet.",
         "none": "No investment yet",
         "noneHint": "Your request is presented to investors once the three documents above are signed and the bank account you receive funds in is approved. Whether they fund it is their decision.",
@@ -3408,6 +3410,18 @@
       "ofDailyRevenue": "of daily revenue",
       "perBusinessDay": "Fixed, each business day",
       "revenueShareRate": "Revenue share rate"
+    },
+    "lastTicket": {
+      "body": "Only {amount} is left in this round, below the {min} minimum ticket. One investor can invest exactly {amount} to complete the round; no other amount is accepted.",
+      "cardNote": "Only {amount} left, below the {min} minimum: one investor can invest exactly that to complete the round.",
+      "completesBody": "It takes the last {amount}, which is below the usual {min} minimum. The last ticket in a round can be smaller, as long as it takes exactly what is left.",
+      "completesTitle": "Your investment completes this round",
+      "exactly": "Exactly {amount}, the last ticket in this round",
+      "investExactly": "Invest {amount} instead",
+      "mustBeExact": "Only {amount} is left in this round, so the last ticket must be exactly {amount}.",
+      "outOfRangeBody": "That is below the {min} minimum ticket, so the last investor can invest exactly {amount} and no other amount.",
+      "outOfRangeTitle": "Only {amount} is left in this round",
+      "title": "Last ticket: {amount}"
     },
     "paymentHistory": {
       "subtitle": "Recent daily revenue share payments received from this loan",

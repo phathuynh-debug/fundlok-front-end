@@ -25,6 +25,7 @@ import {
 } from "@/hooks/use-funding";
 import { useToast } from "@/hooks/use-toast";
 import { BankAccountPrompt } from "../_components/BankAccountPrompt";
+import { LastTicketNotice } from "../_components/LastTicketNotice";
 import { InvestmentConfirmationTable } from "./_components/InvestmentConfirmationTable";
 import { InvestorAgreementStep } from "./_components/InvestorAgreementStep";
 import { InvestTerms } from "./_components/InvestTerms";
@@ -36,7 +37,7 @@ import { TransferDetails } from "./_components/TransferDetails";
 import { useTranslations } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/format-currency";
 import { formatDate } from "@/lib/format-date";
-import { ticketBounds } from "@/lib/listing-figures";
+import { lastTicketVnd, ticketBounds } from "@/lib/listing-figures";
 import { CONTROL_IDLE } from "@/lib/ui-tokens";
 import { cn } from "@/lib/utils";
 import {
@@ -144,6 +145,11 @@ export default function InvestClient() {
   const bounds = fundingWindow ? ticketBounds(fundingWindow) : null;
   const amountInBounds =
     bounds !== null && amount >= bounds.min && amount <= bounds.max;
+  // Less than a minimum ticket left: one last ticket of exactly that amount
+  // (funding-window.md I-6), which is the only amount in bounds then.
+  const lastTicket = fundingWindow
+    ? lastTicketVnd(fundingWindow.capacity_vnd, fundingWindow.min_ticket_vnd)
+    : null;
   const open = fundingWindow?.status === "OPEN";
   // True until the investor has signed the current agreement version.
   const needsAgreement = agreement.data?.required === true;
@@ -351,6 +357,32 @@ export default function InvestClient() {
         />
       </>
     );
+  } else if (!amountInBounds && lastTicket !== null) {
+    const last = formatCurrency(lastTicket, locale);
+    body = (
+      <Notice
+        title={t("investment.lastTicket.outOfRangeTitle", { amount: last })}
+        body={t("investment.lastTicket.outOfRangeBody", {
+          amount: last,
+          min: formatCurrency(fundingWindow.min_ticket_vnd, locale),
+        })}
+        action={
+          <Button
+            type="button"
+            size="sm"
+            className="mt-2"
+            onClick={() => {
+              setIdempotencyKey(crypto.randomUUID());
+              router.replace(
+                `/dashboard/invest?projectId=${projectId}&amount=${lastTicket}`,
+              );
+            }}
+          >
+            {t("investment.lastTicket.investExactly", { amount: last })}
+          </Button>
+        }
+      />
+    );
   } else if (!amountInBounds) {
     body = (
       <Notice
@@ -382,6 +414,16 @@ export default function InvestClient() {
   } else {
     body = (
       <>
+        {/* Below the minimum, but the last ticket: say why it is allowed. */}
+        {lastTicket !== null && amount === lastTicket && (
+          <LastTicketNotice
+            amountVnd={lastTicket}
+            minTicketVnd={fundingWindow.min_ticket_vnd}
+            completes
+            locale={locale}
+            t={t}
+          />
+        )}
         {agreement.data.signed_at ? (
           <SignedAgreementNotice
             signedAt={agreement.data.signed_at}

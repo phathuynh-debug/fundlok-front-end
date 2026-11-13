@@ -116,6 +116,34 @@ describe("ProjectCard — investor view (FE-008)", () => {
     expect(screen.queryByText("dashboard.projectCard.notOpenYet")).toBeNull();
   });
 
+  it("says when only a last ticket below the minimum is left", () => {
+    const listing = (funded: number) => ({
+      listing: {
+        id: "lst1",
+        status: "OPEN",
+        target_amount: 45_000_000,
+        funded_amount: funded,
+        min_ticket: 10_000_000,
+        investor_count: 4,
+        open_at: null,
+        close_at: null,
+      },
+    });
+    const { unmount } = render(
+      <ProjectCard project={withLoan(listing(40_000_000))} role="INVESTOR" />,
+    );
+    expect(screen.getByTestId("last-ticket-note")).toHaveTextContent(
+      'investment.lastTicket.cardNote:{"amount":"₫5,000,000","min":"₫10,000,000"}',
+    );
+    unmount();
+
+    // 15M left: a full minimum ticket still fits.
+    render(
+      <ProjectCard project={withLoan(listing(30_000_000))} role="INVESTOR" />,
+    );
+    expect(screen.queryByTestId("last-ticket-note")).toBeNull();
+  });
+
   it("says the round is not open yet when there is no listing", () => {
     render(<ProjectCard project={withLoan()} role="INVESTOR" />);
     expect(

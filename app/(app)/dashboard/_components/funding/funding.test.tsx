@@ -193,6 +193,48 @@ describe("FundingStatus", () => {
     expect(closeMock).toHaveBeenCalledWith("w-1", expect.anything());
   });
 
+  it("tells the business when what is left is below the minimum ticket", () => {
+    // 45M asked, 40M confirmed: only one investor taking exactly 5M fills it.
+    rounds = [
+      round({
+        target_vnd: 45_000_000,
+        confirmed_vnd: 40_000_000,
+        reserved_vnd: 0,
+        capacity_vnd: 5_000_000,
+      }),
+    ];
+    const { unmount } = render(<FundingStatus projectId="p-1" t={t} />);
+    const note = screen.getByTestId("last-ticket-note");
+    expect(note).toHaveTextContent("dashboard.sme.funding.lastTicketNote");
+    expect(note).toHaveTextContent('"amount":"₫5,000,000"');
+    expect(note).toHaveTextContent('"min":"₫10,000,000"');
+    // The minimum raise is confirmed, so it can also close now.
+    expect(note).toHaveTextContent("dashboard.sme.funding.lastTicketCloseEarly");
+    unmount();
+
+    // Not yet at the minimum raise: no close-now hint.
+    rounds = [
+      round({
+        confirmed_vnd: 20_000_000,
+        reserved_vnd: 25_000_000,
+        capacity_vnd: 5_000_000,
+      }),
+    ];
+    const second = render(<FundingStatus projectId="p-1" t={t} />);
+    expect(screen.getByTestId("last-ticket-note")).not.toHaveTextContent(
+      "lastTicketCloseEarly",
+    );
+    second.unmount();
+
+    // A full minimum ticket still fits, or nothing is left: no note.
+    for (const capacity of [10_000_000, 0]) {
+      rounds = [round({ capacity_vnd: capacity })];
+      const view = render(<FundingStatus projectId="p-1" t={t} />);
+      expect(screen.queryByTestId("last-ticket-note")).toBeNull();
+      view.unmount();
+    }
+  });
+
   it("shows today's repayments once the loan has formed", () => {
     rounds = [
       round({ status: "REPAYING", repayment_start_date: "2026-11-03" }),
