@@ -128,7 +128,9 @@ describe("InvestClient — last ticket below the minimum", () => {
     expect(screen.queryByText(/amountOutOfRangeTitle/)).toBeNull();
 
     fireEvent.click(
-      screen.getByRole("button", { name: /investment\.lastTicket\.investExactly/ }),
+      screen.getByRole("button", {
+        name: /investment\.lastTicket\.investExactly/,
+      }),
     );
     expect(replaceMock).toHaveBeenCalledWith(
       "/dashboard/invest?projectId=p-1&amount=5000000",

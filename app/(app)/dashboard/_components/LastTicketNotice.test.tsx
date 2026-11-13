@@ -36,7 +36,9 @@ describe("LastTicketNotice", () => {
       screen.getByText("Your investment completes this round"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/It takes the last ₫5,000,000, which is below the usual ₫10,000,000 minimum/),
+      screen.getByText(
+        /It takes the last ₫5,000,000, which is below the usual ₫10,000,000 minimum/,
+      ),
     ).toBeInTheDocument();
   });
 });

@@ -209,7 +209,9 @@ describe("FundingStatus", () => {
     expect(note).toHaveTextContent('"amount":"₫5,000,000"');
     expect(note).toHaveTextContent('"min":"₫10,000,000"');
     // The minimum raise is confirmed, so it can also close now.
-    expect(note).toHaveTextContent("dashboard.sme.funding.lastTicketCloseEarly");
+    expect(note).toHaveTextContent(
+      "dashboard.sme.funding.lastTicketCloseEarly",
+    );
     unmount();
 
     // Not yet at the minimum raise: no close-now hint.

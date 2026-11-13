@@ -68,7 +68,8 @@ const window_ = (over: Partial<FundingWindow> = {}): FundingWindow => ({
   ...over,
 });
 
-const amountInput = () => screen.getByLabelText("investment.tab.investmentAmount");
+const amountInput = () =>
+  screen.getByLabelText("investment.tab.investmentAmount");
 const invest = () =>
   fireEvent.click(screen.getByRole("button", { name: /investNow/ }));
 
@@ -89,9 +90,7 @@ describe("InvestmentTab — last ticket below the minimum", () => {
     expect(notice).toHaveTextContent("investment.lastTicket.body");
     // No "Minimum 5M · Maximum 5M" range: one exact amount.
     expect(
-      screen.getByText(
-        'investment.lastTicket.exactly:{"amount":"₫5,000,000"}',
-      ),
+      screen.getByText('investment.lastTicket.exactly:{"amount":"₫5,000,000"}'),
     ).toBeInTheDocument();
     expect(screen.queryByText(/investment\.tab\.minimum/)).toBeNull();
   });
