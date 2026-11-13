@@ -336,6 +336,9 @@ export const ADMIN_ENDPOINTS = {
   // The receipts businesses upload when they repay an investor. Read-only:
   // the investor confirms a repayment, not staff.
   fundingRepayments: "/admin/funding/repayments",
+  // Tickets a business is late repaying: days not marked paid after their
+  // due date. Display only.
+  fundingRepaymentsOverdue: "/admin/funding/repayments/overdue",
   fundingRepayment: (receiptId: string) =>
     `/admin/funding/repayments/${receiptId}`,
   repaymentReceiptUrl: (receiptId: string) =>

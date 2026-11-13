@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { RepaymentQueue } from "./RepaymentQueue";
 import type { AdminRepaymentReceipt } from "@/services/admin-funding.service";
 
@@ -18,6 +18,7 @@ vi.mock("@/hooks/use-admin-funding", () => ({
   }),
   useAdminRepaymentReceiptUrl: () => ({ data: undefined, isLoading: false }),
   useAdminReceiptUrl: () => ({ data: undefined, isLoading: false }),
+  useAdminOverdueRepayments: () => ({ data: undefined }),
   useAdminFundingActivity: () => ({
     data: { items: [], total: 0, page: 1, page_size: 50 },
     isLoading: false,
@@ -145,6 +146,42 @@ describe("RepaymentQueue", () => {
     // Clicking again expands them
     fireEvent.click(groupRow);
     expect(screen.getByTestId("repayment-row-rc-1")).toBeInTheDocument();
+  });
+
+  it("flags a ticket the business is late on in red, and leaves an on-time one alone", () => {
+    const lateOther: AdminRepaymentReceipt = {
+      ...receipt1,
+      id: "rc-3",
+      tranche_id: "tr-2",
+      reference_code: "FLLATE0001",
+      tranche_overdue_days: 2,
+      tranche_overdue_net_vnd: 249_406,
+      tranche_oldest_overdue_date: "2026-11-10",
+      tranche_working_days_late: 3,
+    };
+    items = [receipt1, receipt2, lateOther];
+
+    render(<RepaymentQueue status="ALL" />);
+
+    const late = screen.getByTestId("investment-group-tr-2");
+    expect(late).toHaveAttribute("data-late", "true");
+    expect(late.className).toContain("bg-destructive/5");
+    const badge = within(late).getByTestId("late-badge");
+    expect(badge).toHaveTextContent(
+      'admin.transactions.repayments.overdue.badge.other:{"count":2}',
+    );
+    expect(badge.className).toContain("text-destructive");
+    // The tooltip says how many days, since when, how many working days late
+    // and how much is owed.
+    const detail = badge.getAttribute("title") ?? "";
+    expect(detail).toContain("daysUnpaid.other");
+    expect(detail).toContain("11/10/2026");
+    expect(detail).toContain('workingDaysLate.other:{\\"count\\":3}');
+    expect(detail).toContain("₫249,406");
+
+    const onTime = screen.getByTestId("investment-group-tr-1");
+    expect(onTime).not.toHaveAttribute("data-late");
+    expect(within(onTime).queryByTestId("late-badge")).toBeNull();
   });
 
   it("opens RepaymentReviewSheet when a receipt row is clicked", () => {

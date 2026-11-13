@@ -1007,6 +1007,40 @@
           "INSTALMENT": "Daily repayment",
           "STUB": "First-period interest"
         },
+        "overdue": {
+          "badge": {
+            "one": "Late · 1 day",
+            "other": "Late · {count} days"
+          },
+          "badgeDetail": "{days} since {date}, {working}, {amount} owed",
+          "businesses": {
+            "one": "1 business",
+            "other": "{count} businesses"
+          },
+          "daysUnpaid": {
+            "one": "1 day unpaid",
+            "other": "{count} days unpaid"
+          },
+          "hint": "The business hasn't marked these days paid (no receipt uploaded) and their due date has passed. A day counts as late from the day after it falls due; weekends and public holidays are not counted as working days.",
+          "since": "due {date}",
+          "summary": "{businesses} · {days} · {amount} owed to investors",
+          "tabCount": {
+            "one": "1 late repayment",
+            "other": "{count} late repayments"
+          },
+          "table": {
+            "late": "How late",
+            "owed": "Owed"
+          },
+          "title": {
+            "one": "1 repayment is late",
+            "other": "{count} repayments are late"
+          },
+          "workingDaysLate": {
+            "one": "1 working day late",
+            "other": "{count} working days late"
+          }
+        },
         "reported": "The investor reported a day missing",
         "rowLabel": "Review the repayment from {business} to {investor}",
         "sheet": {

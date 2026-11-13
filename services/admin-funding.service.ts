@@ -311,6 +311,43 @@ export interface AdminRepaymentReceipt {
   content_type: string | null;
   /** The investor reported one of these days as never arriving. */
   open_report: boolean;
+  /** Days on this ticket the business has not marked paid after their due
+   *  date (counted by due date), and what it owes for them. */
+  tranche_overdue_days?: number;
+  tranche_overdue_net_vnd?: number;
+  tranche_oldest_overdue_date?: string | null;
+  /** Working days since the oldest late day (that day included). */
+  tranche_working_days_late?: number;
+}
+
+// Mirrors backend AdminOverdueRepaymentOut: one investor ticket the business
+// is late repaying (days still not marked paid after their due date).
+export interface AdminOverdueRepayment {
+  tranche_id: string;
+  window_id: string;
+  project_name: string;
+  reference_code: string;
+  business: AdminActivityPerson;
+  investor: AdminActivityPerson;
+  /** Late days, counted by due date. */
+  overdue_days: number;
+  oldest_due_date: string;
+  /** Working days since the oldest late day: due Monday and unpaid on
+   *  Tuesday is 1. */
+  working_days_late: number;
+  /** What the business owes the investor for them (net of tax). */
+  overdue_net_vnd: number;
+}
+
+// Mirrors backend AdminOverdueRepaymentsOut: every late repayment as of
+// `as_of` (today, ICT), most working days late first.
+export interface AdminOverdueRepayments {
+  as_of: string;
+  tickets: number;
+  businesses: number;
+  overdue_days: number;
+  overdue_net_vnd: number;
+  items: AdminOverdueRepayment[];
 }
 
 export const adminFundingService = {
@@ -386,6 +423,12 @@ export const adminFundingService = {
     return apiClient.get<AdminTable<AdminRepaymentReceipt>>(
       ADMIN_ENDPOINTS.fundingRepayments,
       { params },
+    );
+  },
+
+  listOverdueRepayments() {
+    return apiClient.get<AdminOverdueRepayments>(
+      ADMIN_ENDPOINTS.fundingRepaymentsOverdue,
     );
   },
 

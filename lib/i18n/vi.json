@@ -1007,6 +1007,40 @@
           "INSTALMENT": "Trả hằng ngày",
           "STUB": "Lãi kỳ đầu"
         },
+        "overdue": {
+          "badge": {
+            "one": "Trễ hạn · 1 ngày",
+            "other": "Trễ hạn · {count} ngày"
+          },
+          "badgeDetail": "{days} từ {date}, {working}, còn nợ {amount}",
+          "businesses": {
+            "one": "1 doanh nghiệp",
+            "other": "{count} doanh nghiệp"
+          },
+          "daysUnpaid": {
+            "one": "1 ngày chưa trả",
+            "other": "{count} ngày chưa trả"
+          },
+          "hint": "Doanh nghiệp chưa đánh dấu đã trả các ngày này (chưa tải biên lai) dù đã qua ngày đến hạn. Một ngày bị tính là trễ hạn từ ngày hôm sau ngày đến hạn; cuối tuần và ngày lễ không tính là ngày làm việc.",
+          "since": "đến hạn {date}",
+          "summary": "{businesses} · {days} · còn nợ nhà đầu tư {amount}",
+          "tabCount": {
+            "one": "1 khoản trả nợ trễ hạn",
+            "other": "{count} khoản trả nợ trễ hạn"
+          },
+          "table": {
+            "late": "Mức trễ",
+            "owed": "Còn nợ"
+          },
+          "title": {
+            "one": "1 khoản trả nợ bị trễ hạn",
+            "other": "{count} khoản trả nợ bị trễ hạn"
+          },
+          "workingDaysLate": {
+            "one": "trễ 1 ngày làm việc",
+            "other": "trễ {count} ngày làm việc"
+          }
+        },
         "reported": "Nhà đầu tư đã báo một ngày chưa nhận",
         "rowLabel": "Xem khoản trả nợ từ {business} cho {investor}",
         "sheet": {

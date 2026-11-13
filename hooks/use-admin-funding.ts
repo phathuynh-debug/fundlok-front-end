@@ -17,6 +17,7 @@ import {
   type AdminFundingActivity,
   type AdminFundingRound,
   type AdminInvestorTransfer,
+  type AdminOverdueRepayments,
   type AdminReceiptDecisionPayload,
   type AdminReceiptUrl,
   type AdminRepaymentListParams,
@@ -44,6 +45,9 @@ export const adminFundingKeys = {
     [...adminFundingKeys.all, "repayment-preview", trancheId] as const,
   repayments: (params: AdminRepaymentListParams) =>
     [...adminFundingKeys.all, "repayments", params] as const,
+  // Under "repayments" so the Repayments tab's refresh reloads it too.
+  overdueRepayments: () =>
+    [...adminFundingKeys.all, "repayments", "overdue"] as const,
   repayment: (receiptId: string) =>
     [...adminFundingKeys.all, "repayment", receiptId] as const,
   repaymentReceiptUrl: (receiptId: string) =>
@@ -143,6 +147,18 @@ export function useAdminRepaymentReceipts(params: AdminRepaymentListParams) {
     staleTime: 30 * 1000,
     retry: false,
     placeholderData: keepPreviousData,
+  });
+}
+
+// Tickets a business is late repaying. Read on the Transactions page itself so
+// the Repayments tab can show its red count from any tab.
+export function useAdminOverdueRepayments(enabled = true) {
+  return useQuery<AdminOverdueRepayments, ApiError>({
+    queryKey: adminFundingKeys.overdueRepayments(),
+    queryFn: () => adminFundingService.listOverdueRepayments(),
+    enabled,
+    staleTime: 60 * 1000,
+    retry: false,
   });
 }
 

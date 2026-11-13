@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import { useIsFetching, useQueryClient } from "@tanstack/react-query";
 import { RefreshCw, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { adminFundingKeys } from "@/hooks/use-admin-funding";
+import {
+  adminFundingKeys,
+  useAdminOverdueRepayments,
+} from "@/hooks/use-admin-funding";
 import { useRequireAuth } from "@/hooks/use-authentication";
 import { isAdminRole } from "@/services/authentication.service";
 import { useTranslations } from "@/lib/i18n";
@@ -37,6 +40,7 @@ import { ActivityLog } from "./_components/ActivityLog";
 import { FeeInvoiceSheet } from "./_components/FeeInvoiceSheet";
 import { FeeInvoicesTable } from "./_components/FeeInvoicesTable";
 import { FundingRoundsTable } from "./_components/FundingRoundsTable";
+import { LateCount, OverdueRepayments } from "./_components/OverdueRepayments";
 import { RepaymentQueue } from "./_components/RepaymentQueue";
 import { TransferQueue } from "./_components/TransferQueue";
 
@@ -47,7 +51,8 @@ type Tab = "rounds" | "transfers" | "repayments" | "fees" | "activity";
 // staff. "Transfers" is every investor ticket: a receipt to read and a review
 // to decide come first. Clicking a round opens its transfers. "Repayments" is
 // every receipt a business uploaded when it repaid an investor, waiting ones
-// first. "Service fees" is each closed round's 3% (+ VAT) fee to FundLok with
+// first, under a red list of every ticket a business has not repaid on time
+// (the tab carries their count in red from any tab). "Service fees" is each closed round's 3% (+ VAT) fee to FundLok with
 // the investment package it is charged on, unpaid first; staff mark one paid
 // once its transfer shows on FundLok's statement. "Activity log" is the audit
 // trail: who approved or denied which transfer or repayment, when and why.
@@ -71,6 +76,11 @@ export default function AdminTransactionsClient() {
   const [fee, setFee] = useState<AdminFeeInvoice | null>(null);
   // Opened from a row's "Mark as paid" button: start in the payment form.
   const [feeFocusForm, setFeeFocusForm] = useState(false);
+  // Called before the admin check below (hooks cannot follow an early return),
+  // so it waits for it.
+  const { data: overdue } = useAdminOverdueRepayments(
+    Boolean(user && isAdminRole(user.role)),
+  );
 
   useEffect(() => {
     if (!isLoading && user && !isAdminRole(user.role)) {
@@ -113,6 +123,7 @@ export default function AdminTransactionsClient() {
           </TabsTrigger>
           <TabsTrigger value="repayments">
             {t("admin.transactions.tabRepayments")}
+            <LateCount count={overdue?.tickets ?? 0} />
           </TabsTrigger>
           <TabsTrigger value="fees">
             {t("admin.transactions.tabFees")}
@@ -213,7 +224,8 @@ export default function AdminTransactionsClient() {
           </div>
         </TabsContent>
 
-        <TabsContent value="repayments">
+        <TabsContent value="repayments" className="flex flex-col gap-4">
+          <OverdueRepayments />
           <div className="rounded-lg border bg-card">
             <div className="flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
               <Select

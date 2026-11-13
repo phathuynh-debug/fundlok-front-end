@@ -33,6 +33,7 @@ import type {
 } from "@/services/admin-funding.service";
 import { TablePager } from "../../_components/TablePager";
 import { personName } from "./activity";
+import { LateBadge } from "./OverdueRepayments";
 import { RepaymentReviewSheet } from "./RepaymentReviewSheet";
 import { RepaymentStatusBadge } from "./RepaymentStatusBadge";
 
@@ -54,6 +55,12 @@ interface InvestmentRepaymentGroup {
   total_gross_vnd: number;
   total_tax_vnd: number;
   summary_receipt: AdminRepaymentReceipt;
+  /** The ticket's days not marked paid after their due date (same on every
+   *  receipt of the ticket). */
+  overdue_days: number;
+  overdue_net_vnd: number;
+  oldest_overdue_date: string | null;
+  working_days_late: number;
 }
 
 export function groupReceiptsByInvestment(
@@ -78,6 +85,10 @@ export function groupReceiptsByInvestment(
         total_gross_vnd: row.gross_vnd,
         total_tax_vnd: row.tax_withheld_vnd,
         summary_receipt: row,
+        overdue_days: row.tranche_overdue_days ?? 0,
+        overdue_net_vnd: row.tranche_overdue_net_vnd ?? 0,
+        oldest_overdue_date: row.tranche_oldest_overdue_date ?? null,
+        working_days_late: row.tranche_working_days_late ?? 0,
       });
     } else {
       existing.receipts.push(row);
@@ -101,7 +112,9 @@ export function groupReceiptsByInvestment(
 // Repayment receipts grouped by investment ticket: each investment row shows
 // Project, Ticket memo & invested principal, Business -> Investor, and
 // paid/total days progress, and expands to list its individual repayment
-// receipts. Clicking a receipt opens the read-only review sheet.
+// receipts. Clicking a receipt opens the read-only review sheet. A ticket the
+// business is late on (a day not marked paid after its due date) gets a red
+// rail and a red "Late" badge with how many days are unpaid.
 export function RepaymentQueue({ status }: { status: AdminRepaymentFilter }) {
   const { t, locale } = useTranslations();
   const [page, setPage] = useState(1);
@@ -414,6 +427,7 @@ export function RepaymentQueue({ status }: { status: AdminRepaymentFilter }) {
             ) : (
               displayedGroups.map((group) => {
                 const expanded = !collapsedIds.has(group.tranche_id);
+                const late = group.overdue_days > 0;
                 const progressPct =
                   group.tranche_total_days > 0
                     ? Math.min(
@@ -427,7 +441,13 @@ export function RepaymentQueue({ status }: { status: AdminRepaymentFilter }) {
                   <React.Fragment key={group.tranche_id}>
                     <TableRow
                       data-testid={`investment-group-${group.tranche_id}`}
-                      className="cursor-pointer bg-muted/20 transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+                      data-late={late || undefined}
+                      className={cn(
+                        "cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
+                        late
+                          ? "bg-destructive/5 hover:bg-destructive/10"
+                          : "bg-muted/20 hover:bg-muted/40",
+                      )}
                       role="button"
                       tabIndex={0}
                       aria-expanded={expanded}
@@ -442,7 +462,12 @@ export function RepaymentQueue({ status }: { status: AdminRepaymentFilter }) {
                         }
                       }}
                     >
-                      <TableCell className="max-w-64 text-xs">
+                      <TableCell
+                        className={cn(
+                          "max-w-64 text-xs",
+                          late && "shadow-[inset_3px_0_0_0_var(--destructive)]",
+                        )}
+                      >
                         <div className="flex items-start gap-2">
                           <span className="mt-0.5 shrink-0 text-muted-foreground">
                             {expanded ? (
@@ -555,7 +580,19 @@ export function RepaymentQueue({ status }: { status: AdminRepaymentFilter }) {
                       </TableCell>
 
                       <TableCell>
-                        <RepaymentStatusBadge receipt={group.summary_receipt} />
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {late && (
+                            <LateBadge
+                              days={group.overdue_days}
+                              workingDaysLate={group.working_days_late}
+                              oldestDueDate={group.oldest_overdue_date}
+                              owedVnd={group.overdue_net_vnd}
+                            />
+                          )}
+                          <RepaymentStatusBadge
+                            receipt={group.summary_receipt}
+                          />
+                        </div>
                       </TableCell>
                     </TableRow>
 
