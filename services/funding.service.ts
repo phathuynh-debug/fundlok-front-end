@@ -91,7 +91,10 @@ export interface ReceiptResult {
   transfer_id: string;
   /** UNDER_REVIEW when the receipt came after the hold lapsed. */
   tranche_status: TrancheStatus;
-  /** AWAITING_FIELDS: FundLok staff read the receipt (no automatic reading yet). */
+  /** AWAITING_FIELDS: FundLok staff read the receipt. With automatic reading
+   *  on (receipt-ocr.md): MATCHED with tranche_status CONFIRMED when it
+   *  matched, REJECTED with failure_codes when it did not (upload the right
+   *  one). */
   check_status: "AWAITING_FIELDS" | "MATCHED" | "MISMATCH" | "REJECTED" | "DUE";
   failure_codes: string[];
   confirmation_level: string;

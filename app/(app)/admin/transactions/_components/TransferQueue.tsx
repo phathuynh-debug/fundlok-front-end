@@ -166,6 +166,7 @@ export function TransferStatusBadge({
       );
     }
     const toCheck = transfer.transfer?.check_status === "AWAITING_FIELDS";
+    const systemAccepted = transfer.transfer?.system_check?.awaiting_review;
     return (
       <Badge
         variant="outline"
@@ -173,7 +174,22 @@ export function TransferStatusBadge({
       >
         {toCheck
           ? t("admin.transactions.needs.receipt")
-          : t("admin.transactions.needs.decision")}
+          : systemAccepted
+            ? t("admin.transactions.needs.system")
+            : t("admin.transactions.needs.decision")}
+      </Badge>
+    );
+  }
+  // Denied by the system: the investor uploads the right one, staff may still
+  // look again.
+  const system = transfer.transfer?.system_check;
+  if (system?.applied && system.verdict === "DENIED" && system.reviewable) {
+    return (
+      <Badge
+        variant="outline"
+        className="border-destructive/40 bg-destructive/10 text-destructive"
+      >
+        {t("admin.transactions.system.badgeDenied")}
       </Badge>
     );
   }

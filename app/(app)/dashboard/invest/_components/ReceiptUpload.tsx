@@ -37,7 +37,9 @@ function sizeLabel(bytes: number): string {
  * After transferring, the investor uploads the receipt their bank app shows:
  * the evidence FundLok checks against the reservation (amount, the business's
  * account, the memo). Once one is in, it says so instead. A receipt sent after
- * the hold lapsed is still taken, for FundLok to review.
+ * the hold lapsed is still taken, for FundLok to review. A receipt FundLok read
+ * and found not to match is rejected on the spot: the investor sees why and
+ * uploads the right one.
  */
 export function ReceiptUpload({
   trancheId,
@@ -56,8 +58,15 @@ export function ReceiptUpload({
     crypto.randomUUID(),
   );
   const late = upload.data?.tranche_status === "UNDER_REVIEW";
+  const confirmed = upload.data?.tranche_status === "CONFIRMED";
+  const rejected = upload.data?.check_status === "REJECTED";
+  const rejectedReason = (code: string) => {
+    const key = `${K}.rejectedReasons.${code}`;
+    const text = t(key);
+    return text === key ? t(`${K}.rejectedReasons.generic`) : text;
+  };
 
-  if (submittedAt || upload.isSuccess) {
+  if ((submittedAt || upload.isSuccess) && !rejected) {
     return (
       <div
         className="flex items-start gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm"
@@ -71,7 +80,7 @@ export function ReceiptUpload({
           <p className="text-xs leading-relaxed text-muted-foreground">
             {late
               ? t(`${K}.lateBody`)
-              : t(`${K}.receivedBody`, {
+              : t(confirmed ? `${K}.confirmedBody` : `${K}.receivedBody`, {
                   date: formatDateTime(submittedAt ?? new Date(), locale),
                 })}
           </p>
@@ -101,7 +110,15 @@ export function ReceiptUpload({
     upload.mutate(
       { trancheId, file, idempotencyKey },
       {
-        onSuccess: () => toast({ title: t(`${K}.uploaded`) }),
+        onSuccess: (result) => {
+          if (result.check_status === "REJECTED") {
+            // The same file would be refused as a duplicate: pick the right one.
+            setFile(null);
+            toast({ variant: "destructive", title: t(`${K}.rejectedTitle`) });
+            return;
+          }
+          toast({ title: t(`${K}.uploaded`) });
+        },
         onError: (failure) => {
           const code = failure.code ?? "";
           const message = KNOWN_ERRORS.has(code)
@@ -149,6 +166,24 @@ export function ReceiptUpload({
           event.target.value = "";
         }}
       />
+
+      {rejected && (
+        <div
+          aria-live="polite"
+          data-testid="receipt-rejected"
+          className="space-y-1.5 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-xs leading-relaxed"
+        >
+          <p className="font-semibold text-destructive">
+            {t(`${K}.rejectedTitle`)}
+          </p>
+          <ul className="list-disc space-y-0.5 pl-4 text-foreground">
+            {(upload.data?.failure_codes ?? []).map((code) => (
+              <li key={code}>{rejectedReason(code)}</li>
+            ))}
+          </ul>
+          <p className="text-muted-foreground">{t(`${K}.rejectedBody`)}</p>
+        </div>
+      )}
 
       {file ? (
         <div className="flex items-center justify-between gap-3 rounded-lg bg-muted/40 px-3 py-2 text-sm">

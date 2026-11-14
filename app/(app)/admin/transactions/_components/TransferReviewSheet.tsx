@@ -33,7 +33,9 @@ import type {
   AdminReceiptFields,
 } from "@/services/admin-funding.service";
 import { ReceiptViewer } from "./ReceiptViewer";
+import { failureLabel } from "./receipt-codes";
 import { RepaymentPreview } from "./RepaymentPreview";
+import { SystemCheckPanel } from "./SystemCheckPanel";
 import { TransferHistory } from "./TransferHistory";
 import { TransferStatusBadge } from "./TransferQueue";
 import { transferErrorMessage } from "./transfer-errors";
@@ -47,6 +49,8 @@ import { transferErrorMessage } from "./transfer-errors";
 // is rejected, and the investor can upload the right one. Approved means
 // received: the business has nothing to confirm. A ticket under
 // review (a late receipt, or the business disputing) is settled the same way.
+// A receipt the system read and decided itself (receipt-ocr.md) shows its
+// verdict and what it read, and staff can keep or reverse it, once.
 // Beside the decision, the repayment approving starts is worked out step by
 // step: the money is received, so the loan works from the next working day.
 // Staff never decide money they sent themselves.
@@ -177,9 +181,11 @@ export function TransferReviewSheet({
                       {data.expected.payee_bank_name}
                     </span>
                   )}
-                  {data.expected.payee_account_name && (
+                  {(data.expected.payee_holder_name ||
+                    data.expected.payee_account_name) && (
                     <span className="block text-muted-foreground">
-                      {data.expected.payee_account_name}
+                      {data.expected.payee_holder_name ||
+                        data.expected.payee_account_name}
                     </span>
                   )}
                 </Row>
@@ -208,8 +214,16 @@ export function TransferReviewSheet({
                   {t("admin.transactions.sheet.noReceipt")}
                 </p>
               )}
-              {data.transfer?.parsed_fields && <CheckResult transfer={data} />}
+              {data.transfer?.parsed_fields &&
+                !data.transfer.system_check?.applied && (
+                  <CheckResult transfer={data} />
+                )}
             </section>
+
+            {/* --- What the system read and decided --- */}
+            {data.transfer?.system_check && (
+              <SystemCheckPanel check={data.transfer.system_check} />
+            )}
 
             {/* --- The repayment approving starts, worked out --- */}
             {(data.needs_action ||
@@ -328,18 +342,6 @@ const FAILURE_FIELD: Record<string, keyof AdminReceiptFields> = {
   TIME_OUT_OF_RANGE: "transferred_at",
 };
 
-function failureLabel(t: (key: string) => string, code: string): string {
-  if (code.startsWith("MISSING_FIELD:")) {
-    return t("admin.transactions.failures.MISSING_FIELD").replace(
-      "{field}",
-      t(`admin.transactions.fields.${code.slice("MISSING_FIELD:".length)}`),
-    );
-  }
-  const key = `admin.transactions.failures.${code}`;
-  const label = t(key);
-  return label === key ? code : label;
-}
-
 // What staff can do now: approve or deny, after looking at the receipt.
 function Actions({
   transfer,
@@ -354,12 +356,30 @@ function Actions({
     transfer.dispute && transfer.dispute.status !== "DECIDED"
       ? transfer.dispute
       : null;
+  const waiting =
+    receipt !== null &&
+    receipt.check_status === "AWAITING_FIELDS" &&
+    receipt.has_file;
+  // A receipt the system decided can be kept or reversed, once.
+  const system = receipt?.system_check ?? null;
+  const reviewingSystem =
+    review === null &&
+    !waiting &&
+    system !== null &&
+    system.applied &&
+    system.reviewable;
+  // Its loan has started: an acceptance can only be kept now.
+  const loanStarted =
+    reviewingSystem &&
+    system.verdict === "ACCEPTED" &&
+    transfer.status === "ACTIVE";
   // A ticket left ATTESTED waits on staff too: approval means received.
   const toDecide =
     receipt !== null &&
     (review !== null ||
       transfer.status === "ATTESTED" ||
-      (receipt.check_status === "AWAITING_FIELDS" && receipt.has_file));
+      waiting ||
+      reviewingSystem);
 
   if (!toDecide) {
     return (
@@ -383,13 +403,22 @@ function Actions({
       body={
         review
           ? causeText(t, review.cause)
-          : t("admin.transactions.sheet.decideReceiptBody")
+          : reviewingSystem
+            ? t(
+                `admin.transactions.system.decideBody.${
+                  loanStarted ? "ACCEPTED_ACTIVE" : system.verdict
+                }`,
+              )
+            : t("admin.transactions.sheet.decideReceiptBody")
       }
       hint={
         review
           ? t("admin.transactions.sheet.reviewHint")
-          : t("admin.transactions.sheet.receiptHint")
+          : reviewingSystem
+            ? t("admin.transactions.system.hint")
+            : t("admin.transactions.sheet.receiptHint")
       }
+      allowDeny={!loanStarted}
     />
   );
 }
@@ -416,10 +445,12 @@ function DecisionForm({
   transferId,
   body,
   hint,
+  allowDeny = true,
 }: {
   transferId: string;
   body: string;
   hint: string;
+  allowDeny?: boolean;
 }) {
   const { t, locale } = useTranslations();
   const { toast } = useToast();
@@ -473,17 +504,19 @@ function DecisionForm({
           )}
           {t("admin.transactions.sheet.approve")}
         </Button>
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          className="flex-1 gap-2"
-          disabled={decide.isPending}
-          onClick={() => send("DENIED")}
-        >
-          <XCircle className="h-3.5 w-3.5" />
-          {t("admin.transactions.sheet.deny")}
-        </Button>
+        {allowDeny && (
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="flex-1 gap-2"
+            disabled={decide.isPending}
+            onClick={() => send("DENIED")}
+          >
+            <XCircle className="h-3.5 w-3.5" />
+            {t("admin.transactions.sheet.deny")}
+          </Button>
+        )}
       </div>
       <p className="text-[11px] leading-relaxed text-muted-foreground">
         {hint}

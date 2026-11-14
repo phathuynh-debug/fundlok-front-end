@@ -23,13 +23,15 @@ export interface AdminFundingRound extends FundingWindow {
   needs_action: number;
 }
 
-/** NEEDS_ACTION is the queue; the others group the ticket states. */
+/** NEEDS_ACTION is the queue; the others group the ticket states.
+ *  SYSTEM_DECIDED: receipts the system read and accepted or denied itself. */
 export const TRANSFER_FILTERS = [
   "ALL",
   "NEEDS_ACTION",
   "AWAITING_TRANSFER",
   "RECEIVED",
   "ENDED",
+  "SYSTEM_DECIDED",
 ] as const;
 export type AdminTransferFilter = (typeof TRANSFER_FILTERS)[number];
 
@@ -40,7 +42,8 @@ export interface AdminTransferListParams {
   page_size: number;
 }
 
-/** What staff typed from the receipt (backend ReceiptFields.to_json). */
+/** What staff typed, or the system read, from the receipt (backend
+ *  ReceiptFields.to_json; the system's reading adds the receiving bank). */
 export interface AdminReceiptFields {
   amount_vnd: number | null;
   transferred_at: string | null;
@@ -49,6 +52,55 @@ export interface AdminReceiptFields {
   payee_account: string | null;
   memo: string | null;
   bank_txn_id: string | null;
+  payee_name?: string | null;
+  payee_bank?: string | null;
+}
+
+/** The receiver on the receipt against the business's verified account
+ *  (backend AdminReceiverCheckOut). */
+export interface AdminReceiverCheck {
+  bank_read: string | null;
+  bank_identified: string | null;
+  bank_identified_bin: string | null;
+  expected_bank: string | null;
+  expected_bank_bin: string | null;
+  account_read: string | null;
+  expected_account: string | null;
+  holder_read: string | null;
+  /** As the bank showed it when the account was verified. */
+  expected_holder: string | null;
+}
+
+export type SystemVerdict = "ACCEPTED" | "DENIED" | "NEEDS_REVIEW";
+
+/** What the system made of the receipt (backend AdminSystemCheckOut,
+ *  docs/specs/direct_transfer/receipt-ocr.md). */
+export interface AdminSystemCheck {
+  verdict: SystemVerdict;
+  /** False: only a suggestion; staff decide as before. */
+  applied: boolean;
+  suggested: "ACCEPTED" | "DENIED" | null;
+  summary: string | null;
+  failure_codes: string[];
+  /** Why it was left for staff, e.g. LOW_CONFIDENCE:memo, PAYEE_BANK_NOT_SHOWN. */
+  review_reasons: string[];
+  receiver: AdminReceiverCheck | null;
+  decided_at: string;
+  engine: string | null;
+  /** 0-100, the lowest among the fields it needs; null for exact PDF text. */
+  confidence: number | null;
+  fields: AdminReceiptFields | null;
+  field_confidence: Record<string, number | null>;
+  notes: string[];
+  /** Accepted and confirmed, and no staff member has looked yet. */
+  awaiting_review: boolean;
+  /** Staff may still approve or deny it. */
+  reviewable: boolean;
+  reviewed_at: string | null;
+  reviewed_by: AdminActivityPerson | null;
+  review_outcome: "APPROVED" | "DENIED" | null;
+  review_reason: string | null;
+  overrides_system: boolean | null;
 }
 
 export type TransferCheckStatus =
@@ -64,6 +116,8 @@ export interface AdminTransferReceipt {
   original_filename: string | null;
   content_type: string | null;
   created_at: string | null;
+  /** Null when the receipt was not read automatically. */
+  system_check?: AdminSystemCheck | null;
 }
 
 export interface AdminTransferReview {
@@ -81,6 +135,8 @@ export interface AdminTransferExpected {
   payee_bank_name: string | null;
   payee_account_number: string | null;
   payee_account_name: string | null;
+  /** The holder name the bank showed when the account was verified. */
+  payee_holder_name?: string | null;
   payer_kyc_name: string;
 }
 

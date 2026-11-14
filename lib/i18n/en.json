@@ -847,7 +847,10 @@
           "reserved": "Investor reserved",
           "sentToReview": "Sent to review: didn't match",
           "uploaded": "Receipt uploaded",
-          "viewed": "Receipt viewed"
+          "viewed": "Receipt viewed",
+          "systemAccepted": "System: receipt matches",
+          "systemDenied": "System: receipt denied",
+          "systemNeedsReview": "System: left for staff"
         },
         "loadFailed": "Couldn't load the history.",
         "note": "Note",
@@ -868,7 +871,11 @@
         "ALREADY_DECIDED": "This receipt was already decided. Reload to see the result.",
         "CAPACITY_EXCEEDED": "The round no longer has room for this investment, so it can't count.",
         "DISPUTE_ALREADY_DECIDED": "Someone already decided this review. Reload to see the outcome.",
-        "NOTHING_TO_DECIDE": "Nothing on this transfer waits for a decision. Reload to see where it stands."
+        "NOTHING_TO_DECIDE": "Nothing on this transfer waits for a decision. Reload to see where it stands.",
+        "LOAN_STARTED": "This investment's loan has started, so it can no longer be denied here.",
+        "SUPERSEDED": "The investor uploaded a newer receipt. Review that one instead.",
+        "DUPLICATE_BANK_TXN": "This bank transaction already funds another investment.",
+        "ROUND_CLOSED": "The round has closed, so this investment can no longer join it."
       },
       "failures": {
         "AMOUNT_MISMATCH": "The amount differs from the reservation.",
@@ -876,7 +883,10 @@
         "PAYEE_MISMATCH": "It was paid into a different account.",
         "PAYER_NAME_MISMATCH": "The sender's name differs from the investor's verified name.",
         "REFERENCE_MISSING": "The memo doesn't contain the payment memo.",
-        "TIME_OUT_OF_RANGE": "The transfer time is before the reservation or in the future."
+        "TIME_OUT_OF_RANGE": "The transfer time is before the reservation or in the future.",
+        "PAYEE_BANK_MISMATCH": "It was paid to an account at a different bank.",
+        "PAYEE_NAME_MISMATCH": "The recipient isn't the holder of the business's verified account.",
+        "DUPLICATE_BANK_TXN": "This bank transaction already funds another investment."
       },
       "fields": {
         "amount_vnd": "Amount",
@@ -885,19 +895,23 @@
         "payee_account": "Recipient account",
         "payer_account": "Sender's account",
         "payer_name": "Sender's name",
-        "transferred_at": "Transfer time"
+        "transferred_at": "Transfer time",
+        "payee_name": "Recipient's name",
+        "payee_bank": "Recipient's bank"
       },
       "filters": {
         "ALL": "All transfers",
         "AWAITING_TRANSFER": "Awaiting transfer",
         "ENDED": "Expired or void",
         "NEEDS_ACTION": "Needs action",
-        "RECEIVED": "Received"
+        "RECEIVED": "Received",
+        "SYSTEM_DECIDED": "Checked by the system"
       },
       "needs": {
         "decision": "Decision needed",
         "receipt": "Receipt to check",
-        "smeDispute": "Reported not received"
+        "smeDispute": "Reported not received",
+        "system": "Confirmed by the system: review"
       },
       "preview": {
         "dayIndex": "Day {index}",
@@ -1077,7 +1091,65 @@
         "reserved": "Reserved",
         "status": "Status"
       },
-      "title": "Transactions"
+      "title": "Transactions",
+      "system": {
+        "heading": "Checked by the system",
+        "readBy": "Read automatically · {confidence} · {time}",
+        "exactText": "exact text",
+        "badgeDenied": "Denied by the system",
+        "verdict": {
+          "ACCEPTED": "Confirmed by the system",
+          "DENIED": "Denied by the system",
+          "NEEDS_REVIEW": "Left for staff to check"
+        },
+        "suggested": {
+          "ACCEPTED": "Looks like a match, but it's left for you:",
+          "DENIED": "Looks like a mismatch, but it's left for you:"
+        },
+        "acceptedAwaiting": "The receipt matches and the investment counts toward the round. Its loan starts when someone approves it here.",
+        "receiverHeading": "Recipient",
+        "onReceipt": "On the receipt",
+        "verifiedAccount": "Business's verified account",
+        "receiver": {
+          "bank": "Bank",
+          "account": "Account",
+          "holder": "Account holder"
+        },
+        "match": {
+          "ok": "Matches",
+          "bad": "Doesn't match",
+          "unknown": "Not confirmed"
+        },
+        "readHeading": "What it read",
+        "lowConfidence": "hard to read ({n}%)",
+        "reviewed": "Reviewed by {name}, {time}: {outcome}.",
+        "outcome": {
+          "APPROVED": "approved",
+          "DENIED": "denied"
+        },
+        "overrides": "This reverses the system's verdict.",
+        "reasons": {
+          "LOW_CONFIDENCE": "Hard to read: {field}",
+          "MISSING_FIELD": "Not found on the receipt: {field}",
+          "AMBIGUOUS": "Read two different ways: {field}",
+          "MASKED": "Partly hidden on the receipt: {field}",
+          "OCR_FAILED": "The receipt couldn't be read automatically.",
+          "NO_TEXT": "No text was found on the receipt.",
+          "PAYEE_BANK_NOT_SHOWN": "The receipt doesn't show the recipient's bank.",
+          "PAYEE_BANK_UNRECOGNIZED": "The recipient's bank couldn't be identified.",
+          "PAYEE_NAME_NOT_SHOWN": "The receipt doesn't show the recipient's name.",
+          "PAYEE_NAME_UNVERIFIED": "The business's account holder was never verified at the bank.",
+          "LATE_RECEIPT": "It was uploaded after the transfer deadline.",
+          "AUTO_VERDICT_OFF": "Automatic decisions are switched off.",
+          "NOT_AWAITING": "The ticket wasn't waiting for a receipt."
+        },
+        "decideBody": {
+          "ACCEPTED": "The system confirmed this transfer from the receipt. Approve to keep it: its loan starts now. Deny if the money didn't reach the business: the investment is cancelled and its place in the round freed.",
+          "ACCEPTED_ACTIVE": "The system confirmed this transfer and its loan has already started, so it can only be kept now.",
+          "DENIED": "The system denied this receipt (see why above). Approve if the money did reach the business: it's recorded as received and its loan starts. Deny to keep the rejection."
+        },
+        "hint": "Final, and recorded with your name next to the system's verdict."
+      }
     },
     "userPreview": {
       "activeSessions": "Active Sessions",
@@ -3201,7 +3273,21 @@
       "title": "Upload your transfer receipt",
       "upload": "Upload receipt",
       "uploaded": "Receipt uploaded",
-      "uploading": "Uploading…"
+      "uploading": "Uploading…",
+      "confirmedBody": "You uploaded your receipt on {date}. It matches your reservation, so your transfer is confirmed.",
+      "rejectedTitle": "Your receipt doesn't match this reservation",
+      "rejectedBody": "Upload the receipt of the transfer you made to the business's account for this reservation, before the time to transfer runs out. If you think this is a mistake, contact FundLok.",
+      "rejectedReasons": {
+        "AMOUNT_MISMATCH": "The amount isn't the amount you reserved.",
+        "REFERENCE_MISSING": "The transfer memo doesn't contain your payment memo.",
+        "PAYEE_MISMATCH": "It wasn't paid into the business's account.",
+        "PAYEE_BANK_MISMATCH": "It was paid to an account at a different bank.",
+        "PAYEE_NAME_MISMATCH": "The recipient isn't the business.",
+        "PAYER_NAME_MISMATCH": "The sender's name isn't the name on your verified ID.",
+        "TIME_OUT_OF_RANGE": "The transfer time is before your reservation.",
+        "DUPLICATE_BANK_TXN": "This bank transaction was already used for another investment.",
+        "generic": "It doesn't match the transfer FundLok asked for."
+      }
     },
     "received": "FundLok checked your transfer: the business has received your investment. Its daily repayments start from the next working day.",
     "repaying": "Your investment is in the loan and being repaid daily. See the schedule on your dashboard.",

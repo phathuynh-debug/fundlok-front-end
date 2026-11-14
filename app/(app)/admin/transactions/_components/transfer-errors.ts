@@ -7,6 +7,11 @@ const KNOWN = new Set([
   "NOTHING_TO_DECIDE",
   "DISPUTE_ALREADY_DECIDED",
   "CAPACITY_EXCEEDED",
+  // Reviewing a receipt the system decided (receipt-ocr.md).
+  "LOAN_STARTED",
+  "SUPERSEDED",
+  "DUPLICATE_BANK_TXN",
+  "ROUND_CLOSED",
 ]);
 
 export function transferErrorMessage(

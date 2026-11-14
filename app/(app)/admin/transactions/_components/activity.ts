@@ -19,6 +19,13 @@ export function activityKind(entry: AdminFundingActivity): {
       return { key: "notReceived", tone: "deny" };
     case "TRANSFER_RECEIPT_REJECTED":
       return { key: "rejected", tone: "deny" };
+    // The system's own verdicts on receipts it read (receipt-ocr.md).
+    case "TRANSFER_SYSTEM_ACCEPTED":
+      return { key: "systemAccepted", tone: "approve" };
+    case "TRANSFER_SYSTEM_DENIED":
+      return { key: "systemDenied", tone: "deny" };
+    case "TRANSFER_SYSTEM_NEEDS_REVIEW":
+      return { key: "systemNeedsReview", tone: "review" };
     case "INVESTMENT_RESERVED":
       return { key: "reserved", tone: "neutral" };
     case "INVESTMENT_RECEIPT_UPLOADED":

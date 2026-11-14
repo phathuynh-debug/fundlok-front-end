@@ -5,6 +5,7 @@ import type {
   AdminFundingActivity,
   AdminInvestorTransfer,
   AdminRepaymentPreview,
+  AdminSystemCheck,
 } from "@/services/admin-funding.service";
 
 const decideMock = vi.fn();
@@ -345,5 +346,200 @@ describe("TransferReviewSheet", () => {
     expect(banner).toHaveTextContent(
       "Checked our Techcombank statement — nothing arrived under FL8TKK1UAQ",
     );
+  });
+
+  // --- receipts the system read and decided (receipt-ocr.md) ---
+
+  const reading = {
+    amount_vnd: 10_000_000,
+    transferred_at: "2026-11-02T05:35:00Z",
+    payer_name: "NGUYEN VAN AN",
+    payer_account: "0123456789",
+    payee_account: "123123123123",
+    memo: "FL8TKK1UAQ chuyen tien",
+    bank_txn_id: "FT25306123456",
+    payee_name: "HUYNH TAN PHAT",
+    payee_bank: "VietinBank",
+  };
+  const accepted: AdminSystemCheck = {
+    verdict: "ACCEPTED",
+    applied: true,
+    suggested: "ACCEPTED",
+    summary: "Read automatically: it matches",
+    failure_codes: [],
+    review_reasons: [],
+    receiver: {
+      bank_read: "VietinBank",
+      bank_identified: "VietinBank",
+      bank_identified_bin: "970415",
+      expected_bank: "VietinBank",
+      expected_bank_bin: "970415",
+      account_read: "123123123123",
+      expected_account: "123123123123",
+      holder_read: "HUYNH TAN PHAT",
+      expected_holder: "HUYNH TAN PHAT",
+    },
+    decided_at: "2026-11-02T05:40:01Z",
+    engine: "tesseract:vie+eng:psm6",
+    confidence: 91.6,
+    fields: reading,
+    field_confidence: { amount_vnd: 95, memo: 62 },
+    notes: [],
+    awaiting_review: true,
+    reviewable: true,
+    reviewed_at: null,
+    reviewed_by: null,
+    review_outcome: null,
+    review_reason: null,
+    overrides_system: null,
+  };
+  const withCheck = (
+    check: AdminSystemCheck,
+    patch: Partial<AdminInvestorTransfer> = {},
+    checkStatus: "MATCHED" | "REJECTED" | "AWAITING_FIELDS" = "MATCHED",
+  ): AdminInvestorTransfer => ({
+    ...base,
+    ...patch,
+    transfer: {
+      ...base.transfer!,
+      check_status: checkStatus,
+      parsed_fields: check.applied ? reading : null,
+      system_check: check,
+    },
+  });
+
+  it("shows what the system read and lets staff deny a receipt it accepted", () => {
+    row = withCheck(accepted, { status: "CONFIRMED" });
+    open();
+
+    const panel = screen.getByTestId("system-check");
+    expect(panel).toHaveTextContent("admin.transactions.system.verdict.ACCEPTED");
+    expect(panel).toHaveTextContent("admin.transactions.system.acceptedAwaiting");
+    expect(screen.getByTestId("receiver-bank")).toHaveAttribute("data-match", "ok");
+    expect(screen.getByTestId("receiver-account")).toHaveAttribute("data-match", "ok");
+    expect(screen.getByTestId("receiver-holder")).toHaveAttribute("data-match", "ok");
+    expect(panel).toHaveTextContent("FL8TKK1UAQ chuyen tien");
+    // A line it found hard to read is marked for staff to check on the image.
+    expect(panel).toHaveTextContent("admin.transactions.system.lowConfidence");
+    // The staff-typed comparison is not shown twice.
+    expect(screen.queryByText("admin.transactions.sheet.matched")).toBeNull();
+    expect(
+      screen.getByText("admin.transactions.system.decideBody.ACCEPTED"),
+    ).toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "admin.transactions.sheet.deny" }),
+    );
+    expect(decideMock).toHaveBeenCalledWith(
+      { transferId: "tf-1", body: { outcome: "DENIED", reason: null } },
+      expect.anything(),
+    );
+  });
+
+  it("lets staff approve a receipt the system denied, showing why it was denied", () => {
+    row = withCheck(
+      {
+        ...accepted,
+        verdict: "DENIED",
+        suggested: "DENIED",
+        failure_codes: ["PAYEE_BANK_MISMATCH"],
+        awaiting_review: false,
+        receiver: {
+          ...accepted.receiver!,
+          bank_read: "Vietcombank",
+          bank_identified: "Vietcombank",
+          bank_identified_bin: "970436",
+        },
+      },
+      { status: "SIGNED", needs_action: false },
+      "REJECTED",
+    );
+    open();
+
+    const panel = screen.getByTestId("system-check");
+    expect(panel).toHaveTextContent("admin.transactions.system.verdict.DENIED");
+    // (The test dictionary knows no labels, so codes show as they are.)
+    expect(panel).toHaveTextContent("PAYEE_BANK_MISMATCH");
+    expect(screen.getByTestId("receiver-bank")).toHaveAttribute("data-match", "bad");
+    expect(
+      screen.getByText("admin.transactions.system.decideBody.DENIED"),
+    ).toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "admin.transactions.sheet.approve" }),
+    );
+    expect(decideMock).toHaveBeenCalledWith(
+      { transferId: "tf-1", body: { outcome: "APPROVED", reason: null } },
+      expect.anything(),
+    );
+  });
+
+  it("only lets staff keep an acceptance once its loan has started", () => {
+    row = withCheck(
+      { ...accepted, awaiting_review: false },
+      { status: "ACTIVE", needs_action: false },
+    );
+    open();
+
+    expect(
+      screen.getByText("admin.transactions.system.decideBody.ACCEPTED_ACTIVE"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "admin.transactions.sheet.approve" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "admin.transactions.sheet.deny" }),
+    ).toBeNull();
+  });
+
+  it("shows staff's review of the system's verdict, which is final", () => {
+    row = withCheck(
+      {
+        ...accepted,
+        awaiting_review: false,
+        reviewable: false,
+        reviewed_at: "2026-11-02T08:00:00Z",
+        reviewed_by: { id: "admin-2", full_name: "Lan Tran", email: "lan@fundlok.test" },
+        review_outcome: "DENIED",
+        review_reason: "No such credit on the business's statement",
+        overrides_system: true,
+      },
+      { status: "VOID", needs_action: false },
+    );
+    open();
+
+    const review = screen.getByTestId("system-review");
+    expect(review).toHaveTextContent("admin.transactions.system.reviewed");
+    expect(review).toHaveTextContent("admin.transactions.system.overrides");
+    expect(review).toHaveTextContent("No such credit on the business's statement");
+    expect(
+      screen.queryByRole("button", { name: "admin.transactions.sheet.approve" }),
+    ).toBeNull();
+  });
+
+  it("shows why an unsure read was left for staff, who decide it as before", () => {
+    row = withCheck(
+      {
+        ...accepted,
+        verdict: "NEEDS_REVIEW",
+        applied: false,
+        suggested: null,
+        awaiting_review: false,
+        reviewable: false,
+        review_reasons: ["LOW_CONFIDENCE:memo", "PAYEE_BANK_NOT_SHOWN"],
+        receiver: null,
+      },
+      {},
+      "AWAITING_FIELDS",
+    );
+    open();
+
+    const panel = screen.getByTestId("system-check");
+    expect(panel).toHaveTextContent("admin.transactions.system.verdict.NEEDS_REVIEW");
+    expect(panel).toHaveTextContent("LOW_CONFIDENCE:memo");
+    expect(panel).toHaveTextContent("PAYEE_BANK_NOT_SHOWN");
+    expect(
+      screen.getByText("admin.transactions.sheet.receiptHint"),
+    ).toBeInTheDocument();
   });
 });

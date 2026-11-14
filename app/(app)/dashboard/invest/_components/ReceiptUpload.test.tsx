@@ -8,7 +8,7 @@ let upload: {
   mutate: typeof mutate;
   isPending: boolean;
   isSuccess: boolean;
-  data?: { tranche_status: string };
+  data?: { tranche_status: string; check_status?: string; failure_codes?: string[] };
 };
 vi.mock("@/hooks/use-funding", () => ({
   useUploadReceipt: () => upload,
@@ -87,6 +87,46 @@ describe("ReceiptUpload", () => {
     );
     expect(screen.getByTestId("receipt-received")).toHaveTextContent(
       "FundLok staff will review it",
+    );
+  });
+
+  it("shows why a receipt FundLok read was rejected and asks for the right one", () => {
+    upload = {
+      mutate,
+      isPending: false,
+      isSuccess: true,
+      data: {
+        tranche_status: "SIGNED",
+        check_status: "REJECTED",
+        failure_codes: ["PAYEE_BANK_MISMATCH", "SOMETHING_NEW"],
+      },
+    };
+    render(
+      <ReceiptUpload trancheId="tr-1" submittedAt={null} locale="en" t={t} />,
+    );
+
+    expect(screen.queryByTestId("receipt-received")).toBeNull();
+    const rejected = screen.getByTestId("receipt-rejected");
+    expect(rejected).toHaveTextContent("Your receipt doesn't match this reservation");
+    expect(rejected).toHaveTextContent("It was paid to an account at a different bank.");
+    expect(rejected).toHaveTextContent("It doesn't match the transfer FundLok asked for.");
+    // The upload form is still there for the right receipt.
+    expect(screen.getByRole("button", { name: "Upload receipt" })).toBeInTheDocument();
+  });
+
+  it("says the transfer is confirmed when the receipt matched", () => {
+    upload = {
+      mutate,
+      isPending: false,
+      isSuccess: true,
+      data: { tranche_status: "CONFIRMED", check_status: "MATCHED", failure_codes: [] },
+    };
+    render(
+      <ReceiptUpload trancheId="tr-1" submittedAt={null} locale="en" t={t} />,
+    );
+
+    expect(screen.getByTestId("receipt-received")).toHaveTextContent(
+      "It matches your reservation, so your transfer is confirmed.",
     );
   });
 });
