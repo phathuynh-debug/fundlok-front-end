@@ -853,11 +853,11 @@
           "reportedMissing": "Đã báo chưa nhận tiền",
           "reserved": "Nhà đầu tư giữ chỗ",
           "sentToReview": "Chuyển xem xét: không khớp",
-          "uploaded": "Đã tải lên biên lai",
-          "viewed": "Đã xem biên lai",
           "systemAccepted": "Hệ thống: biên lai khớp",
           "systemDenied": "Hệ thống: từ chối biên lai",
-          "systemNeedsReview": "Hệ thống: chuyển nhân viên kiểm tra"
+          "systemNeedsReview": "Hệ thống: chuyển nhân viên kiểm tra",
+          "uploaded": "Đã tải lên biên lai",
+          "viewed": "Đã xem biên lai"
         },
         "loadFailed": "Không tải được lịch sử.",
         "note": "Ghi chú",
@@ -878,22 +878,22 @@
         "ALREADY_DECIDED": "Biên lai này đã được quyết định. Hãy tải lại để xem kết quả.",
         "CAPACITY_EXCEEDED": "Đợt gọi vốn không còn chỗ cho khoản đầu tư này nên không thể tính.",
         "DISPUTE_ALREADY_DECIDED": "Đã có người quyết định trường hợp này. Hãy tải lại để xem kết quả.",
-        "NOTHING_TO_DECIDE": "Khoản chuyển này không có gì chờ quyết định. Hãy tải lại để xem trạng thái.",
-        "LOAN_STARTED": "Khoản vay của khoản đầu tư này đã bắt đầu nên không thể từ chối tại đây nữa.",
-        "SUPERSEDED": "Nhà đầu tư đã tải lên biên lai mới hơn. Hãy xem biên lai đó.",
         "DUPLICATE_BANK_TXN": "Giao dịch ngân hàng này đã được dùng cho một khoản đầu tư khác.",
-        "ROUND_CLOSED": "Đợt gọi vốn đã kết thúc nên khoản đầu tư này không thể tham gia nữa."
+        "LOAN_STARTED": "Khoản vay của khoản đầu tư này đã bắt đầu nên không thể từ chối tại đây nữa.",
+        "NOTHING_TO_DECIDE": "Khoản chuyển này không có gì chờ quyết định. Hãy tải lại để xem trạng thái.",
+        "ROUND_CLOSED": "Đợt gọi vốn đã kết thúc nên khoản đầu tư này không thể tham gia nữa.",
+        "SUPERSEDED": "Nhà đầu tư đã tải lên biên lai mới hơn. Hãy xem biên lai đó."
       },
       "failures": {
         "AMOUNT_MISMATCH": "Số tiền khác với lượt giữ chỗ.",
+        "DUPLICATE_BANK_TXN": "Giao dịch ngân hàng này đã được dùng cho một khoản đầu tư khác.",
         "MISSING_FIELD": "Biên lai không có: {field}",
+        "PAYEE_BANK_MISMATCH": "Tiền được chuyển tới tài khoản ở một ngân hàng khác.",
         "PAYEE_MISMATCH": "Tiền được chuyển vào một tài khoản khác.",
+        "PAYEE_NAME_MISMATCH": "Người nhận không phải chủ tài khoản đã xác minh của doanh nghiệp.",
         "PAYER_NAME_MISMATCH": "Tên người chuyển khác với tên đã xác minh của nhà đầu tư.",
         "REFERENCE_MISSING": "Nội dung chuyển khoản không có mã thanh toán.",
-        "TIME_OUT_OF_RANGE": "Thời gian chuyển trước lúc giữ chỗ hoặc ở tương lai.",
-        "PAYEE_BANK_MISMATCH": "Tiền được chuyển tới tài khoản ở một ngân hàng khác.",
-        "PAYEE_NAME_MISMATCH": "Người nhận không phải chủ tài khoản đã xác minh của doanh nghiệp.",
-        "DUPLICATE_BANK_TXN": "Giao dịch ngân hàng này đã được dùng cho một khoản đầu tư khác."
+        "TIME_OUT_OF_RANGE": "Thời gian chuyển trước lúc giữ chỗ hoặc ở tương lai."
       },
       "fees": {
         "bankTxnLabel": "Mã giao dịch ngân hàng",
@@ -954,11 +954,11 @@
         "bank_txn_id": "Mã giao dịch ngân hàng",
         "memo": "Nội dung chuyển khoản",
         "payee_account": "Tài khoản người nhận",
+        "payee_bank": "Ngân hàng nhận",
+        "payee_name": "Tên người nhận",
         "payer_account": "Tài khoản người chuyển",
         "payer_name": "Tên người chuyển",
-        "transferred_at": "Thời gian chuyển",
-        "payee_name": "Tên người nhận",
-        "payee_bank": "Ngân hàng nhận"
+        "transferred_at": "Thời gian chuyển"
       },
       "filters": {
         "ALL": "Tất cả khoản chuyển",
@@ -1172,6 +1172,64 @@
         "waitingForReceipt": "Đang chờ nhà đầu tư chuyển khoản và tải lên biên lai."
       },
       "subtitle": "Các đợt gọi vốn đang nhận đầu tư và các khoản chuyển mà nhà đầu tư báo. Nhân viên đọc từng biên lai và xác nhận tiền đã đến.",
+      "system": {
+        "acceptedAwaiting": "Biên lai khớp và khoản đầu tư được tính vào đợt gọi vốn. Khoản vay chỉ bắt đầu khi có người duyệt tại đây.",
+        "badgeDenied": "Hệ thống đã từ chối",
+        "decideBody": {
+          "ACCEPTED": "Hệ thống đã xác nhận khoản chuyển này từ biên lai. Duyệt để giữ nguyên: khoản vay bắt đầu ngay. Từ chối nếu tiền chưa đến tài khoản doanh nghiệp: khoản đầu tư bị hủy và trả lại chỗ trong đợt gọi vốn.",
+          "ACCEPTED_ACTIVE": "Hệ thống đã xác nhận khoản chuyển này và khoản vay đã bắt đầu, nên giờ chỉ có thể giữ nguyên.",
+          "DENIED": "Hệ thống đã từ chối biên lai này (xem lý do ở trên). Duyệt nếu tiền đã đến tài khoản doanh nghiệp: tiền được ghi nhận là đã nhận và khoản vay bắt đầu. Từ chối để giữ nguyên việc từ chối."
+        },
+        "exactText": "văn bản gốc",
+        "heading": "Hệ thống kiểm tra",
+        "hint": "Quyết định là cuối cùng và được ghi lại kèm tên bạn, bên cạnh kết quả của hệ thống.",
+        "lowConfidence": "khó đọc ({n}%)",
+        "match": {
+          "bad": "Không khớp",
+          "ok": "Khớp",
+          "unknown": "Chưa xác nhận"
+        },
+        "onReceipt": "Trên biên lai",
+        "outcome": {
+          "APPROVED": "đã duyệt",
+          "DENIED": "đã từ chối"
+        },
+        "overrides": "Quyết định này đảo ngược kết quả của hệ thống.",
+        "readBy": "Đọc tự động · {confidence} · {time}",
+        "readHeading": "Thông tin đã đọc",
+        "reasons": {
+          "AMBIGUOUS": "Đọc ra hai giá trị khác nhau: {field}",
+          "AUTO_VERDICT_OFF": "Quyết định tự động đang tắt.",
+          "LATE_RECEIPT": "Biên lai được tải lên sau hạn chuyển khoản.",
+          "LOW_CONFIDENCE": "Khó đọc: {field}",
+          "MASKED": "Bị che một phần trên biên lai: {field}",
+          "MISSING_FIELD": "Không tìm thấy trên biên lai: {field}",
+          "NOT_AWAITING": "Khoản đầu tư không ở trạng thái chờ biên lai.",
+          "NO_TEXT": "Không tìm thấy chữ trên biên lai.",
+          "OCR_FAILED": "Không đọc được biên lai tự động.",
+          "PAYEE_BANK_NOT_SHOWN": "Biên lai không ghi ngân hàng nhận.",
+          "PAYEE_BANK_UNRECOGNIZED": "Không xác định được ngân hàng nhận.",
+          "PAYEE_NAME_NOT_SHOWN": "Biên lai không ghi tên người nhận.",
+          "PAYEE_NAME_UNVERIFIED": "Chủ tài khoản của doanh nghiệp chưa được xác minh với ngân hàng."
+        },
+        "receiver": {
+          "account": "Số tài khoản",
+          "bank": "Ngân hàng",
+          "holder": "Chủ tài khoản"
+        },
+        "receiverHeading": "Người nhận",
+        "reviewed": "{name} đã xem lại lúc {time}: {outcome}.",
+        "suggested": {
+          "ACCEPTED": "Có vẻ khớp, nhưng cần bạn kiểm tra:",
+          "DENIED": "Có vẻ không khớp, nhưng cần bạn kiểm tra:"
+        },
+        "verdict": {
+          "ACCEPTED": "Hệ thống đã xác nhận",
+          "DENIED": "Hệ thống đã từ chối",
+          "NEEDS_REVIEW": "Chuyển nhân viên kiểm tra"
+        },
+        "verifiedAccount": "Tài khoản đã xác minh của doanh nghiệp"
+      },
       "tabActivity": "Nhật ký hoạt động",
       "tabFees": "Phí dịch vụ",
       "tabRepayments": "Trả nợ",
@@ -1187,65 +1245,7 @@
         "reserved": "Giữ chỗ lúc",
         "status": "Trạng thái"
       },
-      "title": "Giao dịch",
-      "system": {
-        "heading": "Hệ thống kiểm tra",
-        "readBy": "Đọc tự động · {confidence} · {time}",
-        "exactText": "văn bản gốc",
-        "badgeDenied": "Hệ thống đã từ chối",
-        "verdict": {
-          "ACCEPTED": "Hệ thống đã xác nhận",
-          "DENIED": "Hệ thống đã từ chối",
-          "NEEDS_REVIEW": "Chuyển nhân viên kiểm tra"
-        },
-        "suggested": {
-          "ACCEPTED": "Có vẻ khớp, nhưng cần bạn kiểm tra:",
-          "DENIED": "Có vẻ không khớp, nhưng cần bạn kiểm tra:"
-        },
-        "acceptedAwaiting": "Biên lai khớp và khoản đầu tư được tính vào đợt gọi vốn. Khoản vay chỉ bắt đầu khi có người duyệt tại đây.",
-        "receiverHeading": "Người nhận",
-        "onReceipt": "Trên biên lai",
-        "verifiedAccount": "Tài khoản đã xác minh của doanh nghiệp",
-        "receiver": {
-          "bank": "Ngân hàng",
-          "account": "Số tài khoản",
-          "holder": "Chủ tài khoản"
-        },
-        "match": {
-          "ok": "Khớp",
-          "bad": "Không khớp",
-          "unknown": "Chưa xác nhận"
-        },
-        "readHeading": "Thông tin đã đọc",
-        "lowConfidence": "khó đọc ({n}%)",
-        "reviewed": "{name} đã xem lại lúc {time}: {outcome}.",
-        "outcome": {
-          "APPROVED": "đã duyệt",
-          "DENIED": "đã từ chối"
-        },
-        "overrides": "Quyết định này đảo ngược kết quả của hệ thống.",
-        "reasons": {
-          "LOW_CONFIDENCE": "Khó đọc: {field}",
-          "MISSING_FIELD": "Không tìm thấy trên biên lai: {field}",
-          "AMBIGUOUS": "Đọc ra hai giá trị khác nhau: {field}",
-          "MASKED": "Bị che một phần trên biên lai: {field}",
-          "OCR_FAILED": "Không đọc được biên lai tự động.",
-          "NO_TEXT": "Không tìm thấy chữ trên biên lai.",
-          "PAYEE_BANK_NOT_SHOWN": "Biên lai không ghi ngân hàng nhận.",
-          "PAYEE_BANK_UNRECOGNIZED": "Không xác định được ngân hàng nhận.",
-          "PAYEE_NAME_NOT_SHOWN": "Biên lai không ghi tên người nhận.",
-          "PAYEE_NAME_UNVERIFIED": "Chủ tài khoản của doanh nghiệp chưa được xác minh với ngân hàng.",
-          "LATE_RECEIPT": "Biên lai được tải lên sau hạn chuyển khoản.",
-          "AUTO_VERDICT_OFF": "Quyết định tự động đang tắt.",
-          "NOT_AWAITING": "Khoản đầu tư không ở trạng thái chờ biên lai."
-        },
-        "decideBody": {
-          "ACCEPTED": "Hệ thống đã xác nhận khoản chuyển này từ biên lai. Duyệt để giữ nguyên: khoản vay bắt đầu ngay. Từ chối nếu tiền chưa đến tài khoản doanh nghiệp: khoản đầu tư bị hủy và trả lại chỗ trong đợt gọi vốn.",
-          "ACCEPTED_ACTIVE": "Hệ thống đã xác nhận khoản chuyển này và khoản vay đã bắt đầu, nên giờ chỉ có thể giữ nguyên.",
-          "DENIED": "Hệ thống đã từ chối biên lai này (xem lý do ở trên). Duyệt nếu tiền đã đến tài khoản doanh nghiệp: tiền được ghi nhận là đã nhận và khoản vay bắt đầu. Từ chối để giữ nguyên việc từ chối."
-        },
-        "hint": "Quyết định là cuối cùng và được ghi lại kèm tên bạn, bên cạnh kết quả của hệ thống."
-      }
+      "title": "Giao dịch"
     },
     "userPreview": {
       "activeSessions": "Phiên hoạt động",
@@ -3354,6 +3354,7 @@
     "receipt": {
       "body": "Sau khi chuyển khoản, hãy tải lên biên lai mà ứng dụng ngân hàng hiển thị (ảnh chụp màn hình hoặc PDF). FundLok sẽ đối chiếu với lượt giữ chỗ này: số tiền, tài khoản của doanh nghiệp và nội dung chuyển khoản.",
       "choose": "Chọn tệp",
+      "confirmedBody": "Bạn đã tải lên biên lai lúc {date}. Biên lai khớp với lượt giữ chỗ nên khoản chuyển của bạn đã được xác nhận.",
       "errors": {
         "DUPLICATE_FILE": "Tệp này đã được tải lên trước đó. Hãy tải lên biên lai của khoản chuyển này.",
         "FILE_TOO_LARGE": "Tệp lớn hơn 10 MB.",
@@ -3367,25 +3368,24 @@
       "lateBody": "Biên lai được gửi sau khi đã hết thời gian chuyển khoản, nên nhân viên FundLok sẽ xem xét và xác nhận khoản chuyển của bạn có được tính hay không.",
       "receivedBody": "Bạn đã tải lên biên lai lúc {date}. FundLok đang đối chiếu với lượt giữ chỗ của bạn; khoản đầu tư được xác nhận khi khoản chuyển được kiểm tra xong.",
       "receivedTitle": "Đã nhận biên lai",
+      "rejectedBody": "Hãy tải lên biên lai của khoản chuyển bạn đã thực hiện vào tài khoản của doanh nghiệp cho lượt giữ chỗ này, trước khi hết thời gian chuyển khoản. Nếu bạn cho rằng có nhầm lẫn, hãy liên hệ FundLok.",
+      "rejectedReasons": {
+        "AMOUNT_MISMATCH": "Số tiền khác với số tiền bạn đã giữ chỗ.",
+        "DUPLICATE_BANK_TXN": "Giao dịch ngân hàng này đã được dùng cho một khoản đầu tư khác.",
+        "PAYEE_BANK_MISMATCH": "Tiền được chuyển tới tài khoản ở một ngân hàng khác.",
+        "PAYEE_MISMATCH": "Tiền không được chuyển vào tài khoản của doanh nghiệp.",
+        "PAYEE_NAME_MISMATCH": "Người nhận không phải là doanh nghiệp.",
+        "PAYER_NAME_MISMATCH": "Tên người chuyển không phải tên trên giấy tờ tùy thân đã xác minh của bạn.",
+        "REFERENCE_MISSING": "Nội dung chuyển khoản không có mã thanh toán của bạn.",
+        "TIME_OUT_OF_RANGE": "Thời gian chuyển trước lúc bạn giữ chỗ.",
+        "generic": "Biên lai không khớp với khoản chuyển FundLok yêu cầu."
+      },
+      "rejectedTitle": "Biên lai không khớp với lượt giữ chỗ này",
       "remove": "Bỏ tệp",
       "title": "Tải lên biên lai chuyển khoản",
       "upload": "Tải lên biên lai",
       "uploaded": "Đã tải lên biên lai",
-      "uploading": "Đang tải lên…",
-      "confirmedBody": "Bạn đã tải lên biên lai lúc {date}. Biên lai khớp với lượt giữ chỗ nên khoản chuyển của bạn đã được xác nhận.",
-      "rejectedTitle": "Biên lai không khớp với lượt giữ chỗ này",
-      "rejectedBody": "Hãy tải lên biên lai của khoản chuyển bạn đã thực hiện vào tài khoản của doanh nghiệp cho lượt giữ chỗ này, trước khi hết thời gian chuyển khoản. Nếu bạn cho rằng có nhầm lẫn, hãy liên hệ FundLok.",
-      "rejectedReasons": {
-        "AMOUNT_MISMATCH": "Số tiền khác với số tiền bạn đã giữ chỗ.",
-        "REFERENCE_MISSING": "Nội dung chuyển khoản không có mã thanh toán của bạn.",
-        "PAYEE_MISMATCH": "Tiền không được chuyển vào tài khoản của doanh nghiệp.",
-        "PAYEE_BANK_MISMATCH": "Tiền được chuyển tới tài khoản ở một ngân hàng khác.",
-        "PAYEE_NAME_MISMATCH": "Người nhận không phải là doanh nghiệp.",
-        "PAYER_NAME_MISMATCH": "Tên người chuyển không phải tên trên giấy tờ tùy thân đã xác minh của bạn.",
-        "TIME_OUT_OF_RANGE": "Thời gian chuyển trước lúc bạn giữ chỗ.",
-        "DUPLICATE_BANK_TXN": "Giao dịch ngân hàng này đã được dùng cho một khoản đầu tư khác.",
-        "generic": "Biên lai không khớp với khoản chuyển FundLok yêu cầu."
-      }
+      "uploading": "Đang tải lên…"
     },
     "received": "FundLok đã kiểm tra khoản chuyển: doanh nghiệp đã nhận khoản đầu tư của bạn. Việc trả nợ hằng ngày bắt đầu từ ngày làm việc tiếp theo.",
     "repaying": "Khoản đầu tư của bạn đã nằm trong khoản vay và đang được trả hằng ngày. Xem lịch trả nợ trên trang tổng quan.",

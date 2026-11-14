@@ -413,11 +413,24 @@ describe("TransferReviewSheet", () => {
     open();
 
     const panel = screen.getByTestId("system-check");
-    expect(panel).toHaveTextContent("admin.transactions.system.verdict.ACCEPTED");
-    expect(panel).toHaveTextContent("admin.transactions.system.acceptedAwaiting");
-    expect(screen.getByTestId("receiver-bank")).toHaveAttribute("data-match", "ok");
-    expect(screen.getByTestId("receiver-account")).toHaveAttribute("data-match", "ok");
-    expect(screen.getByTestId("receiver-holder")).toHaveAttribute("data-match", "ok");
+    expect(panel).toHaveTextContent(
+      "admin.transactions.system.verdict.ACCEPTED",
+    );
+    expect(panel).toHaveTextContent(
+      "admin.transactions.system.acceptedAwaiting",
+    );
+    expect(screen.getByTestId("receiver-bank")).toHaveAttribute(
+      "data-match",
+      "ok",
+    );
+    expect(screen.getByTestId("receiver-account")).toHaveAttribute(
+      "data-match",
+      "ok",
+    );
+    expect(screen.getByTestId("receiver-holder")).toHaveAttribute(
+      "data-match",
+      "ok",
+    );
     expect(panel).toHaveTextContent("FL8TKK1UAQ chuyen tien");
     // A line it found hard to read is marked for staff to check on the image.
     expect(panel).toHaveTextContent("admin.transactions.system.lowConfidence");
@@ -460,7 +473,10 @@ describe("TransferReviewSheet", () => {
     expect(panel).toHaveTextContent("admin.transactions.system.verdict.DENIED");
     // (The test dictionary knows no labels, so codes show as they are.)
     expect(panel).toHaveTextContent("PAYEE_BANK_MISMATCH");
-    expect(screen.getByTestId("receiver-bank")).toHaveAttribute("data-match", "bad");
+    expect(screen.getByTestId("receiver-bank")).toHaveAttribute(
+      "data-match",
+      "bad",
+    );
     expect(
       screen.getByText("admin.transactions.system.decideBody.DENIED"),
     ).toBeInTheDocument();
@@ -499,7 +515,11 @@ describe("TransferReviewSheet", () => {
         awaiting_review: false,
         reviewable: false,
         reviewed_at: "2026-11-02T08:00:00Z",
-        reviewed_by: { id: "admin-2", full_name: "Lan Tran", email: "lan@fundlok.test" },
+        reviewed_by: {
+          id: "admin-2",
+          full_name: "Lan Tran",
+          email: "lan@fundlok.test",
+        },
         review_outcome: "DENIED",
         review_reason: "No such credit on the business's statement",
         overrides_system: true,
@@ -511,9 +531,13 @@ describe("TransferReviewSheet", () => {
     const review = screen.getByTestId("system-review");
     expect(review).toHaveTextContent("admin.transactions.system.reviewed");
     expect(review).toHaveTextContent("admin.transactions.system.overrides");
-    expect(review).toHaveTextContent("No such credit on the business's statement");
+    expect(review).toHaveTextContent(
+      "No such credit on the business's statement",
+    );
     expect(
-      screen.queryByRole("button", { name: "admin.transactions.sheet.approve" }),
+      screen.queryByRole("button", {
+        name: "admin.transactions.sheet.approve",
+      }),
     ).toBeNull();
   });
 
@@ -535,7 +559,9 @@ describe("TransferReviewSheet", () => {
     open();
 
     const panel = screen.getByTestId("system-check");
-    expect(panel).toHaveTextContent("admin.transactions.system.verdict.NEEDS_REVIEW");
+    expect(panel).toHaveTextContent(
+      "admin.transactions.system.verdict.NEEDS_REVIEW",
+    );
     expect(panel).toHaveTextContent("LOW_CONFIDENCE:memo");
     expect(panel).toHaveTextContent("PAYEE_BANK_NOT_SHOWN");
     expect(

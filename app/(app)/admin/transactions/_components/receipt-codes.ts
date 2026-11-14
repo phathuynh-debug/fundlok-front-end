@@ -29,5 +29,7 @@ export function reasonLabel(t: T, code: string): string {
   const key = `admin.transactions.system.reasons.${head}`;
   const label = t(key);
   if (label === key) return code;
-  return arg === undefined ? label : label.replace("{field}", fieldLabel(t, arg));
+  return arg === undefined
+    ? label
+    : label.replace("{field}", fieldLabel(t, arg));
 }

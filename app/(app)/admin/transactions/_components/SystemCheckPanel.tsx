@@ -72,7 +72,10 @@ export function SystemCheckPanel({ check }: { check: AdminSystemCheck }) {
       <div
         className={`flex items-start gap-2.5 rounded-xl border p-3 text-xs leading-relaxed text-foreground ${TONE[check.verdict]}`}
       >
-        <Icon className={`mt-px h-4 w-4 shrink-0 ${TONE_ICON[check.verdict]}`} aria-hidden />
+        <Icon
+          className={`mt-px h-4 w-4 shrink-0 ${TONE_ICON[check.verdict]}`}
+          aria-hidden
+        />
         <div className="min-w-0 space-y-1">
           <p className="font-semibold">{title}</p>
           {check.verdict === "ACCEPTED" && check.awaiting_review && (
@@ -85,13 +88,14 @@ export function SystemCheckPanel({ check }: { check: AdminSystemCheck }) {
               ))}
             </ul>
           )}
-          {check.verdict === "NEEDS_REVIEW" && check.review_reasons.length > 0 && (
-            <ul className="list-disc space-y-0.5 pl-4">
-              {check.review_reasons.map((code) => (
-                <li key={code}>{reasonLabel(t, code)}</li>
-              ))}
-            </ul>
-          )}
+          {check.verdict === "NEEDS_REVIEW" &&
+            check.review_reasons.length > 0 && (
+              <ul className="list-disc space-y-0.5 pl-4">
+                {check.review_reasons.map((code) => (
+                  <li key={code}>{reasonLabel(t, code)}</li>
+                ))}
+              </ul>
+            )}
         </div>
       </div>
 
@@ -122,7 +126,12 @@ function Receiver({ check }: { check: AdminSystemCheck }) {
   const r = check.receiver!;
   const digits = (value: string | null) => (value ?? "").replace(/[\s.-]/g, "");
   const failed = (code: string) => check.failure_codes.includes(code);
-  const rows: { key: string; read: string | null; expected: string | null; match: Match }[] = [
+  const rows: {
+    key: string;
+    read: string | null;
+    expected: string | null;
+    match: Match;
+  }[] = [
     {
       key: "bank",
       read: r.bank_identified ?? r.bank_read,
@@ -179,7 +188,13 @@ function Receiver({ check }: { check: AdminSystemCheck }) {
                 className={`mt-px h-3.5 w-3.5 shrink-0 ${MATCH_CLASS[row.match]}`}
                 aria-label={t(`admin.transactions.system.match.${row.match}`)}
               />
-              <span className={row.match === "bad" ? "font-medium text-destructive" : undefined}>
+              <span
+                className={
+                  row.match === "bad"
+                    ? "font-medium text-destructive"
+                    : undefined
+                }
+              >
                 {row.read || "—"}
               </span>
             </span>
@@ -196,8 +211,18 @@ function Reading({ check }: { check: AdminSystemCheck }) {
   const { t, locale } = useTranslations();
   const fields = check.fields as AdminReceiptFields;
   const shown: [keyof AdminReceiptFields, string | null | undefined][] = [
-    ["amount_vnd", fields.amount_vnd != null ? formatCurrency(fields.amount_vnd, locale) : null],
-    ["transferred_at", fields.transferred_at ? formatDateTime(fields.transferred_at, locale) : null],
+    [
+      "amount_vnd",
+      fields.amount_vnd != null
+        ? formatCurrency(fields.amount_vnd, locale)
+        : null,
+    ],
+    [
+      "transferred_at",
+      fields.transferred_at
+        ? formatDateTime(fields.transferred_at, locale)
+        : null,
+    ],
     ["payer_name", fields.payer_name],
     ["payer_account", fields.payer_account],
     ["payee_name", fields.payee_name],
@@ -222,7 +247,13 @@ function Reading({ check }: { check: AdminSystemCheck }) {
                 {t(`admin.transactions.fields.${name}`)}
               </dt>
               <dd className="min-w-0 break-words text-foreground">
-                <span className={low ? "font-medium text-amber-700 dark:text-amber-300" : undefined}>
+                <span
+                  className={
+                    low
+                      ? "font-medium text-amber-700 dark:text-amber-300"
+                      : undefined
+                  }
+                >
                   {value || "—"}
                 </span>
                 {low && (
@@ -246,7 +277,9 @@ function Reading({ check }: { check: AdminSystemCheck }) {
 function Review({ check }: { check: AdminSystemCheck }) {
   const { t, locale } = useTranslations();
   const who =
-    check.reviewed_by?.full_name || check.reviewed_by?.email || t("admin.transactions.activity.system");
+    check.reviewed_by?.full_name ||
+    check.reviewed_by?.email ||
+    t("admin.transactions.activity.system");
   return (
     <div
       data-testid="system-review"
@@ -262,10 +295,14 @@ function Review({ check }: { check: AdminSystemCheck }) {
           )}
       </p>
       {check.overrides_system && (
-        <p className="font-medium">{t("admin.transactions.system.overrides")}</p>
+        <p className="font-medium">
+          {t("admin.transactions.system.overrides")}
+        </p>
       )}
       {check.review_reason && (
-        <p className="break-words text-muted-foreground">{check.review_reason}</p>
+        <p className="break-words text-muted-foreground">
+          {check.review_reason}
+        </p>
       )}
     </div>
   );
