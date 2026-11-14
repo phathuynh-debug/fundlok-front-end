@@ -186,12 +186,6 @@ export function WelcomeCutscreen({
 
         {/* Top bar: progress, and a close button. */}
         <div className="relative z-10 flex h-14 shrink-0 items-center justify-center px-4 sm:h-16">
-          <p className="sr-only" aria-live="polite">
-            {t("welcome.common.progress", {
-              current: index + 1,
-              total: slides.length,
-            })}
-          </p>
           <div className="flex items-center gap-1.5">
             {slides.map((item, dot) => (
               <button
@@ -224,158 +218,201 @@ export function WelcomeCutscreen({
           </button>
         </div>
 
-        {/* The slide. Scrolls on its own if a small phone cannot fit it, so
-            nothing is ever cut off. */}
-        <div className="relative z-10 min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
-          <AnimatePresence
-            key={motionReady ? "animated" : "loading"}
-            mode="wait"
-            custom={direction}
-            initial={false}
-          >
-            <m.section
-              key={slide.id}
+        {/* The slide, with its controls right under it, centred together.
+            The slide scrolls on its own if a small phone cannot fit it, so
+            nothing is cut off and the controls stay in view. */}
+        <div className="relative z-10 flex min-h-0 flex-1 flex-col justify-center">
+          <div className="min-h-0 overflow-y-auto overflow-x-hidden">
+            <AnimatePresence
+              key={motionReady ? "animated" : "loading"}
+              mode="wait"
               custom={direction}
-              variants={slideVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.35, ease: EASE_OUT }}
-              drag="x"
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.18}
-              onDragEnd={(_, info) => {
-                if (info.offset.x < -SWIPE_THRESHOLD && !isLast) next();
-                else if (info.offset.x > SWIPE_THRESHOLD) back();
-              }}
-              className="mx-auto flex min-h-full w-full max-w-3xl touch-pan-y flex-col items-center justify-center gap-5 px-4 py-4 text-center sm:gap-7 sm:px-8"
+              initial={false}
             >
-              <div
-                className={cn(
-                  "flex w-full shrink-0 items-center justify-center",
-                  // The listing card is the tallest visual; list slides get
-                  // less room so their bullets fit a phone screen.
-                  slide.id === "disclosure"
-                    ? "h-[clamp(16rem,42vh,21rem)]"
-                    : slide.items
-                      ? "h-[clamp(9rem,26vh,14rem)]"
-                      : "h-[clamp(11rem,34vh,18rem)]",
-                )}
+              <m.section
+                key={slide.id}
+                custom={direction}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.35, ease: EASE_OUT }}
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.18}
+                onDragEnd={(_, info) => {
+                  if (info.offset.x < -SWIPE_THRESHOLD && !isLast) next();
+                  else if (info.offset.x > SWIPE_THRESHOLD) back();
+                }}
+                className="mx-auto flex w-full max-w-3xl touch-pan-y flex-col items-center justify-center gap-5 px-4 py-4 text-center sm:gap-7 sm:px-8"
               >
-                <WelcomeVisual id={slide.id} />
-              </div>
-
-              <div className="flex w-full max-w-2xl flex-col items-center gap-3">
-                <m.h2
-                  id={titleId}
-                  className="text-balance text-2xl font-bold tracking-tight sm:text-4xl md:text-5xl"
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: slide.id === "hello" ? 1 : 0.15 }}
+                <div
+                  className={cn(
+                    "flex w-full shrink-0 items-center justify-center",
+                    // The listing card is the tallest visual; list slides get
+                    // less room so their bullets fit a phone screen.
+                    slide.id === "disclosure"
+                      ? "h-[clamp(16rem,42vh,21rem)]"
+                      : slide.items
+                        ? "h-[clamp(9rem,26vh,14rem)]"
+                        : "h-[clamp(11rem,34vh,18rem)]",
+                  )}
                 >
-                  {t(`${base}.title`)}
-                </m.h2>
-                {body !== `${base}.body` && (
-                  <m.p
-                    className="text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base md:text-lg"
+                  <WelcomeVisual id={slide.id} />
+                </div>
+
+                <div className="flex w-full max-w-2xl flex-col items-center gap-3">
+                  <m.h2
+                    id={titleId}
+                    className="text-balance text-2xl font-bold tracking-tight sm:text-4xl md:text-5xl"
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.25 }}
+                    transition={{ delay: slide.id === "hello" ? 1 : 0.15 }}
                   >
-                    {body}
-                  </m.p>
-                )}
+                    {t(`${base}.title`)}
+                  </m.h2>
+                  {body !== `${base}.body` && (
+                    <m.p
+                      className="text-pretty text-sm leading-relaxed text-muted-foreground sm:text-base md:text-lg"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.25 }}
+                    >
+                      {body}
+                    </m.p>
+                  )}
 
-                {slide.items && (
-                  <ul className="mt-1 flex w-full flex-col gap-2 text-left">
-                    {Array.from({ length: slide.items }, (_, item) => (
-                      <m.li
-                        key={item}
-                        className="flex gap-3 rounded-xl border border-border bg-card/60 px-3.5 py-2.5 text-sm leading-relaxed text-foreground sm:text-[15px]"
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.35 + item * 0.12 }}
-                      >
-                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
-                        <span className="min-w-0">
-                          {t(`${base}.items.${item + 1}`)}
-                        </span>
-                      </m.li>
-                    ))}
-                  </ul>
-                )}
-
-                {note !== `${base}.note` && (
-                  <m.p
-                    className="text-xs text-muted-foreground sm:text-sm"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.8 }}
-                  >
-                    {note}
-                  </m.p>
-                )}
-
-                {slide.id === "hello" && (
-                  <m.div
-                    role="group"
-                    aria-label={t("welcome.common.language")}
-                    className="mt-2 inline-flex rounded-full border border-border bg-card p-1"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 1.4 }}
-                  >
-                    {supportedLocales
-                      .slice()
-                      .reverse()
-                      .map((option) => (
-                        <button
-                          key={option}
-                          type="button"
-                          onClick={() => setLocale(option)}
-                          aria-pressed={locale === option}
-                          className={cn(
-                            "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
-                            locale === option
-                              ? "bg-brand text-primary-foreground"
-                              : "text-muted-foreground hover:text-foreground",
-                          )}
+                  {slide.items && (
+                    <ul className="mt-1 flex w-full flex-col gap-2 text-left">
+                      {Array.from({ length: slide.items }, (_, item) => (
+                        <m.li
+                          key={item}
+                          className="flex gap-3 rounded-xl border border-border bg-card/60 px-3.5 py-2.5 text-sm leading-relaxed text-foreground sm:text-[15px]"
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.35 + item * 0.12 }}
                         >
-                          {t(`welcome.common.languages.${option}`)}
-                        </button>
+                          <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
+                          <span className="min-w-0">
+                            {t(`${base}.items.${item + 1}`)}
+                          </span>
+                        </m.li>
                       ))}
-                  </m.div>
+                    </ul>
+                  )}
+
+                  {note !== `${base}.note` && (
+                    <m.p
+                      className="text-xs text-muted-foreground sm:text-sm"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.8 }}
+                    >
+                      {note}
+                    </m.p>
+                  )}
+
+                  {slide.id === "hello" && (
+                    <m.div
+                      role="group"
+                      aria-label={t("welcome.common.language")}
+                      className="mt-2 inline-flex rounded-full border border-border bg-card p-1"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 1.4 }}
+                    >
+                      {supportedLocales
+                        .slice()
+                        .reverse()
+                        .map((option) => (
+                          <button
+                            key={option}
+                            type="button"
+                            onClick={() => setLocale(option)}
+                            aria-pressed={locale === option}
+                            className={cn(
+                              "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
+                              locale === option
+                                ? "bg-brand text-primary-foreground"
+                                : "text-muted-foreground hover:text-foreground",
+                            )}
+                          >
+                            {t(`welcome.common.languages.${option}`)}
+                          </button>
+                        ))}
+                    </m.div>
+                  )}
+                </div>
+              </m.section>
+            </AnimatePresence>
+          </div>
+
+          {/* Controls, centred under the slide: a labelled forward pill that
+            fills up as the walkthrough progresses, with Back beside it. On a
+            phone the pill takes the width beside Back (the longest label,
+            "Vào bảng điều khiển", needs it); from `sm` a grid keeps it dead
+            centre whether or not Back is shown. */}
+          <div className="flex shrink-0 flex-col items-center gap-2.5 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 sm:pb-8 sm:pt-6">
+            <div className="flex w-full max-w-sm items-center gap-3 sm:grid sm:w-auto sm:max-w-none sm:grid-cols-[3.5rem_auto_3.5rem]">
+              <button
+                type="button"
+                onClick={back}
+                disabled={isFirst}
+                aria-label={t("welcome.common.back")}
+                className={cn(
+                  "flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-0",
+                  // On a phone the first slide drops Back so the pill
+                  // spans the row; from `sm` it keeps its grid cell.
+                  isFirst && "max-sm:hidden",
                 )}
-              </div>
-            </m.section>
-          </AnimatePresence>
-        </div>
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </button>
 
-        {/* Controls. */}
-        <div className="relative z-10 flex shrink-0 items-center justify-between gap-3 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 sm:px-8 sm:pb-8">
-          <button
-            type="button"
-            onClick={back}
-            disabled={isFirst}
-            aria-label={t("welcome.common.back")}
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-0"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
+              <button
+                ref={primaryRef}
+                type="button"
+                onClick={next}
+                aria-label={primaryLabel}
+                className="group relative flex h-14 min-w-0 flex-1 items-center justify-center gap-2.5 overflow-hidden whitespace-nowrap rounded-full bg-brand px-5 text-base font-semibold text-primary-foreground shadow-lg shadow-brand/25 transition-transform hover:scale-[1.03] active:scale-[0.98] sm:min-w-[14rem] sm:flex-none sm:px-8 sm:text-lg"
+              >
+                {/* How far through the walkthrough: fills left to right. */}
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-y-0 left-0 bg-white/20 transition-[width] duration-500 ease-out"
+                  style={{ width: `${((index + 1) / slides.length) * 100}%` }}
+                />
+                <span className="relative">{primaryLabel}</span>
+                {/* A gentle nudge on the first slide says "this way"; on hover
+                  the arrow leans forward. */}
+                <m.span
+                  aria-hidden="true"
+                  className="relative flex"
+                  animate={isFirst ? { x: [0, 5, 0] } : { x: 0 }}
+                  transition={
+                    isFirst
+                      ? { duration: 1.4, repeat: Infinity, ease: "easeInOut" }
+                      : { duration: 0.2 }
+                  }
+                >
+                  <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                </m.span>
+              </button>
 
-          <button
-            ref={primaryRef}
-            type="button"
-            onClick={next}
-            className={cn(
-              "flex h-12 items-center justify-center gap-2 rounded-full bg-brand font-semibold text-primary-foreground transition-transform hover:scale-[1.03] active:scale-[0.98]",
-              isFirst || isLast ? "px-7" : "w-12",
-            )}
-            aria-label={primaryLabel}
-          >
-            {(isFirst || isLast) && <span>{primaryLabel}</span>}
-            <ArrowRight className="h-5 w-5" />
-          </button>
+              {/* Mirrors Back so the pill stays centred (from `sm`). */}
+              <span aria-hidden="true" className="hidden sm:block" />
+            </div>
+
+            <p
+              aria-live="polite"
+              className="text-xs tabular-nums text-muted-foreground sm:text-sm"
+            >
+              {t("welcome.common.progress", {
+                current: index + 1,
+                total: slides.length,
+              })}
+            </p>
+          </div>
         </div>
       </div>
     </MotionConfig>

@@ -489,6 +489,12 @@
       "users": "người dùng",
       "verifications": "lượt xác minh"
     },
+    "phone": {
+      "missing": "Chưa có số",
+      "unverified": "Chưa xác minh",
+      "verified": "Đã xác minh",
+      "verifiedOn": "Xác minh ngày {date}"
+    },
     "preview": {
       "applicationDecided": "Đã ghi nhận quyết định",
       "applicationsHeading": "Đề nghị vay",
@@ -805,6 +811,7 @@
       "noProjects": "Không tìm thấy dự án.",
       "noResults": "Không tìm thấy kết quả.",
       "noUsers": "Không tìm thấy người dùng.",
+      "phone": "Số điện thoại",
       "refresh": "Làm mới",
       "role": "Vai trò",
       "searchProjects": "Tìm dự án…",
@@ -888,6 +895,60 @@
         "PAYEE_NAME_MISMATCH": "Người nhận không phải chủ tài khoản đã xác minh của doanh nghiệp.",
         "DUPLICATE_BANK_TXN": "Giao dịch ngân hàng này đã được dùng cho một khoản đầu tư khác."
       },
+      "fees": {
+        "bankTxnLabel": "Mã giao dịch ngân hàng",
+        "bankTxnPlaceholder": "Ví dụ: FT26316123456",
+        "base": "Tổng vốn đã xác nhận",
+        "due": "Hạn thanh toán",
+        "duplicateTxn": "Giao dịch ngân hàng này đã được dùng cho một hóa đơn khác.",
+        "email": "Email cho doanh nghiệp",
+        "emailColumn": "Email",
+        "emailFailed": "Gửi thất bại",
+        "emailNone": "Chưa gửi",
+        "emailSending": "Đang gửi",
+        "emailSent": "Đã gửi",
+        "empty": "Chưa có phí dịch vụ nào. Phí được phát hành khi một đợt gọi vốn đóng.",
+        "emptyUnpaid": "Không có phí dịch vụ chưa thanh toán.",
+        "fee": "Phí (3% + VAT)",
+        "feeLine": "Phí kích hoạt (3%)",
+        "filters": {
+          "ALL": "Tất cả",
+          "PAID": "Đã thanh toán",
+          "UNPAID": "Chưa thanh toán"
+        },
+        "investmentCount": "{count} khoản đầu tư",
+        "invoiceHeading": "Hóa đơn",
+        "invoiceNumber": "Số hóa đơn",
+        "issued": "Ngày phát hành",
+        "lateFee": "Phí trễ hạn",
+        "loadFailed": "Không tải được phí dịch vụ. Vui lòng thử lại.",
+        "markFailed": "Không thể đánh dấu đã thanh toán",
+        "markHeading": "Đánh dấu đã thanh toán",
+        "markHelp": "Kiểm tra sao kê ngân hàng của FundLok có giao dịch {amount} với nội dung {memo}. Việc đánh dấu là cuối cùng, được ghi lại kèm tên bạn, và cho phép doanh nghiệp mở đợt gọi vốn tiếp theo.",
+        "markSubmit": "Đánh dấu đã thanh toán",
+        "marked": "Đã đánh dấu phí dịch vụ đã thanh toán",
+        "marking": "Đang lưu…",
+        "memo": "Nội dung chuyển khoản",
+        "memoColumn": "Nội dung CK",
+        "noInvestments": "Đợt gọi vốn này chưa có khoản đầu tư nào.",
+        "package": "Gói đầu tư",
+        "packageHelp": "Phí là 3% trên số tiền các khoản đầu tư này đã chuyển cho doanh nghiệp, cộng thuế GTGT. Phí được thanh toán riêng vào tài khoản của FundLok và không bao giờ bị trừ vào các khoản đầu tư.",
+        "paidNote": "Đã thanh toán {date} · mã giao dịch {txn}. Doanh nghiệp có thể mở đợt gọi vốn tiếp theo.",
+        "paidOn": "Đã thanh toán {date}",
+        "reasonLabel": "Ghi chú",
+        "reasonPlaceholder": "Ví dụ: Đã thấy trên sao kê Techcombank ngày 12/11",
+        "required": "Nhập mã giao dịch ngân hàng và ghi chú.",
+        "roundColumn": "Phí dịch vụ",
+        "rowLabel": "Mở phí dịch vụ của {name}",
+        "sheetTitle": "Phí dịch vụ",
+        "status": "Trạng thái",
+        "statusOverdue": "Quá hạn",
+        "statusPaid": "Đã thanh toán",
+        "statusUnpaidDue": "Chưa thanh toán · hạn {date}",
+        "statusVoid": "Đã hủy",
+        "total": "Tổng cần thanh toán",
+        "vat": "Thuế GTGT"
+      },
       "fields": {
         "amount_vnd": "Số tiền",
         "bank_txn_id": "Mã giao dịch ngân hàng",
@@ -959,6 +1020,40 @@
         "kind": {
           "INSTALMENT": "Trả hằng ngày",
           "STUB": "Lãi kỳ đầu"
+        },
+        "overdue": {
+          "badge": {
+            "one": "Trễ hạn · 1 ngày",
+            "other": "Trễ hạn · {count} ngày"
+          },
+          "badgeDetail": "{days} từ {date}, {working}, còn nợ {amount}",
+          "businesses": {
+            "one": "1 doanh nghiệp",
+            "other": "{count} doanh nghiệp"
+          },
+          "daysUnpaid": {
+            "one": "1 ngày chưa trả",
+            "other": "{count} ngày chưa trả"
+          },
+          "hint": "Doanh nghiệp chưa đánh dấu đã trả các ngày này (chưa tải biên lai) dù đã qua ngày đến hạn. Một ngày bị tính là trễ hạn từ ngày hôm sau ngày đến hạn; cuối tuần và ngày lễ không tính là ngày làm việc.",
+          "since": "đến hạn {date}",
+          "summary": "{businesses} · {days} · còn nợ nhà đầu tư {amount}",
+          "tabCount": {
+            "one": "1 khoản trả nợ trễ hạn",
+            "other": "{count} khoản trả nợ trễ hạn"
+          },
+          "table": {
+            "late": "Mức trễ",
+            "owed": "Còn nợ"
+          },
+          "title": {
+            "one": "1 khoản trả nợ bị trễ hạn",
+            "other": "{count} khoản trả nợ bị trễ hạn"
+          },
+          "workingDaysLate": {
+            "one": "trễ 1 ngày làm việc",
+            "other": "trễ {count} ngày làm việc"
+          }
         },
         "reported": "Nhà đầu tư đã báo một ngày chưa nhận",
         "rowLabel": "Xem khoản trả nợ từ {business} cho {investor}",
@@ -1078,6 +1173,7 @@
       },
       "subtitle": "Các đợt gọi vốn đang nhận đầu tư và các khoản chuyển mà nhà đầu tư báo. Nhân viên đọc từng biên lai và xác nhận tiền đã đến.",
       "tabActivity": "Nhật ký hoạt động",
+      "tabFees": "Phí dịch vụ",
       "tabRepayments": "Trả nợ",
       "tabRounds": "Đợt đang mở",
       "tabTransfers": "Khoản chuyển",
@@ -2361,6 +2457,8 @@
         "details": "Đang chờ chuyển khoản: {reserved} · {count} nhà đầu tư · tối thiểu {min}",
         "failedNote": "Đợt gọi vốn đã đóng mà không nhận được khoản đầu tư nào.",
         "heading": "Huy động vốn",
+        "lastTicketCloseEarly": "Bạn cũng có thể đóng đợt gọi vốn ngay bây giờ.",
+        "lastTicketNote": "Còn {amount} chưa có nhà đầu tư, thấp hơn mức đầu tư tối thiểu {min}. Chỉ một nhà đầu tư đầu tư đúng {amount} mới lấp đầy được phần này. Nếu không ai đầu tư trước khi đợt gọi vốn đóng vào {date}, đợt gọi vốn sẽ đóng mà không có phần này: bạn chỉ nhận số tiền nhà đầu tư đã chuyển và chỉ hoàn trả số đó.",
         "noTickets": "Chưa có nhà đầu tư nào giữ chỗ.",
         "none": "Chưa có khoản đầu tư",
         "noneHint": "Hồ sơ của bạn được giới thiệu tới nhà đầu tư khi ba văn bản ở trên đã được ký và tài khoản ngân hàng nhận vốn đã được duyệt. Việc có đầu tư hay không do nhà đầu tư quyết định.",
@@ -3398,6 +3496,18 @@
       "ofDailyRevenue": "trên doanh thu hằng ngày",
       "perBusinessDay": "Cố định, mỗi ngày làm việc",
       "revenueShareRate": "Tỷ lệ chia sẻ doanh thu"
+    },
+    "lastTicket": {
+      "body": "Đợt gọi vốn này chỉ còn {amount}, thấp hơn mức đầu tư tối thiểu {min}. Một nhà đầu tư có thể đầu tư đúng {amount} để hoàn tất đợt gọi vốn; không nhận số tiền khác.",
+      "cardNote": "Chỉ còn {amount}, thấp hơn mức tối thiểu {min}: một nhà đầu tư có thể đầu tư đúng số này để hoàn tất đợt gọi vốn.",
+      "completesBody": "Khoản này nhận {amount} cuối cùng, thấp hơn mức tối thiểu thông thường {min}. Khoản đầu tư cuối cùng của một đợt gọi vốn có thể nhỏ hơn, miễn là đúng bằng số tiền còn lại.",
+      "completesTitle": "Khoản đầu tư của bạn hoàn tất đợt gọi vốn này",
+      "exactly": "Đúng {amount}, khoản đầu tư cuối cùng của đợt gọi vốn này",
+      "investExactly": "Đầu tư {amount}",
+      "mustBeExact": "Đợt gọi vốn này chỉ còn {amount}, nên khoản đầu tư cuối cùng phải đúng {amount}.",
+      "outOfRangeBody": "Số này thấp hơn mức đầu tư tối thiểu {min}, nên nhà đầu tư cuối cùng chỉ có thể đầu tư đúng {amount}, không nhận số tiền khác.",
+      "outOfRangeTitle": "Đợt gọi vốn này chỉ còn {amount}",
+      "title": "Khoản đầu tư cuối cùng: {amount}"
     },
     "paymentHistory": {
       "subtitle": "Các khoản chia sẻ doanh thu hằng ngày gần đây nhận được từ khoản vay này",

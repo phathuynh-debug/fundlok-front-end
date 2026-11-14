@@ -48,6 +48,32 @@ export function targetReturnVnd(amountVnd: number): number {
 }
 
 /**
+ * What is left on a round when it is above zero but below the minimum ticket,
+ * else null. The backend then takes one last ticket of exactly that amount,
+ * and no other (funding-window.md I-6, the last-ticket rule): with 45M asked
+ * and 40M taken, one investor can invest exactly 5M to complete the round.
+ */
+export function lastTicketVnd(
+  remainingVnd: number,
+  minTicketVnd: number,
+): number | null {
+  return remainingVnd > 0 && remainingVnd < minTicketVnd ? remainingVnd : null;
+}
+
+/**
+ * The marketplace card's last ticket: what an open listing has left to raise,
+ * when that is below its minimum ticket. The card counts confirmed transfers
+ * only, so part of it may already be reserved; the project page has the
+ * exact figure.
+ */
+export function listingLastTicketVnd(
+  listing: MarketplaceListing,
+): number | null {
+  if (listing.status !== "OPEN" || listing.min_ticket == null) return null;
+  return lastTicketVnd(listingRemaining(listing), listing.min_ticket);
+}
+
+/**
  * The smallest and largest amount one ticket can take on a funding window:
  * its minimum ticket up to what is still open. The last ticket may be below
  * the minimum when it takes exactly what is left (funding-window.md I-6); the

@@ -21,6 +21,70 @@ export interface AdminFundingRound extends FundingWindow {
   sme_full_name: string | null;
   /** Tickets waiting on staff: a receipt to read or a review to decide. */
   needs_action: number;
+  /** The round's service fee, once it closed. Optional: older backends omit it. */
+  fee_invoice?: AdminRoundFee | null;
+}
+
+// --------------------------------------------------------------------------- //
+// Service fees: the SME's 3% (+ VAT) platform fee on each closed round. Mirrors
+// backend app/admin/fee_schemas.py.
+// --------------------------------------------------------------------------- //
+export type FeeInvoiceStatus = "ISSUED" | "PAID" | "OVERDUE" | "VOID";
+export const FEE_INVOICE_FILTERS = ["UNPAID", "PAID", "ALL"] as const;
+export type FeeInvoiceFilter = (typeof FEE_INVOICE_FILTERS)[number];
+
+export interface AdminRoundFee {
+  id: string;
+  status: FeeInvoiceStatus;
+  total_vnd: number;
+  due_at: string;
+  /** Unpaid past its due date (computed: the overdue job is not running). */
+  is_overdue: boolean;
+}
+
+/** One investment in the package the fee is charged on. */
+export interface AdminFeeInvestment {
+  tranche_id: string;
+  investor_name: string | null;
+  investor_email: string;
+  amount_vnd: number;
+  reference_code: string;
+  confirmed_at: string | null;
+}
+
+export interface AdminFeeInvoice {
+  id: string;
+  status: FeeInvoiceStatus;
+  is_overdue: boolean;
+  invoice_number: string;
+  /** The memo the SME puts on its transfer. */
+  reference_code: string;
+  base_vnd: number;
+  fee_vnd: number;
+  vat_vnd: number;
+  late_fee_vnd: number;
+  total_vnd: number;
+  issued_at: string;
+  due_at: string;
+  paid_at: string | null;
+  paid_bank_txn_id: string | null;
+  window_id: string;
+  round_status: string;
+  project_id: string;
+  project_name: string;
+  sme_user_id: string;
+  sme_email: string;
+  sme_full_name: string | null;
+  /** The investments whose confirmed total (base_vnd) the 3% is on. */
+  investments: AdminFeeInvestment[];
+  /** Whether the invoice email reached the SME. */
+  email_status: "SENDING" | "SENT" | "FAILED" | null;
+  emailed_at: string | null;
+}
+
+export interface MarkFeePaidPayload {
+  bank_txn_id: string;
+  reason: string;
 }
 
 /** NEEDS_ACTION is the queue; the others group the ticket states.
@@ -303,6 +367,43 @@ export interface AdminRepaymentReceipt {
   content_type: string | null;
   /** The investor reported one of these days as never arriving. */
   open_report: boolean;
+  /** Days on this ticket the business has not marked paid after their due
+   *  date (counted by due date), and what it owes for them. */
+  tranche_overdue_days?: number;
+  tranche_overdue_net_vnd?: number;
+  tranche_oldest_overdue_date?: string | null;
+  /** Working days since the oldest late day (that day included). */
+  tranche_working_days_late?: number;
+}
+
+// Mirrors backend AdminOverdueRepaymentOut: one investor ticket the business
+// is late repaying (days still not marked paid after their due date).
+export interface AdminOverdueRepayment {
+  tranche_id: string;
+  window_id: string;
+  project_name: string;
+  reference_code: string;
+  business: AdminActivityPerson;
+  investor: AdminActivityPerson;
+  /** Late days, counted by due date. */
+  overdue_days: number;
+  oldest_due_date: string;
+  /** Working days since the oldest late day: due Monday and unpaid on
+   *  Tuesday is 1. */
+  working_days_late: number;
+  /** What the business owes the investor for them (net of tax). */
+  overdue_net_vnd: number;
+}
+
+// Mirrors backend AdminOverdueRepaymentsOut: every late repayment as of
+// `as_of` (today, ICT), most working days late first.
+export interface AdminOverdueRepayments {
+  as_of: string;
+  tickets: number;
+  businesses: number;
+  overdue_days: number;
+  overdue_net_vnd: number;
+  items: AdminOverdueRepayment[];
 }
 
 export const adminFundingService = {
@@ -313,6 +414,19 @@ export const adminFundingService = {
   },
 
   // Does what is due on a round now; audited.
+  listFeeInvoices(status: FeeInvoiceFilter) {
+    return apiClient.get<AdminFeeInvoice[]>(ADMIN_ENDPOINTS.feeInvoices, {
+      params: { status },
+    });
+  },
+
+  markFeeInvoicePaid(invoiceId: string, payload: MarkFeePaidPayload) {
+    return apiClient.post<AdminFeeInvoice>(
+      ADMIN_ENDPOINTS.feeInvoiceMarkPaid(invoiceId),
+      payload,
+    );
+  },
+
   advanceRound(windowId: string) {
     return apiClient.post<AdminFundingRound>(
       ADMIN_ENDPOINTS.fundingRoundAdvance(windowId),
@@ -365,6 +479,12 @@ export const adminFundingService = {
     return apiClient.get<AdminTable<AdminRepaymentReceipt>>(
       ADMIN_ENDPOINTS.fundingRepayments,
       { params },
+    );
+  },
+
+  listOverdueRepayments() {
+    return apiClient.get<AdminOverdueRepayments>(
+      ADMIN_ENDPOINTS.fundingRepaymentsOverdue,
     );
   },
 

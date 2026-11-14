@@ -13,9 +13,11 @@ import type { AdminTable } from "@/services/admin.service";
 import {
   adminFundingService,
   type AdminActivityParams,
+  type AdminFeeInvoice,
   type AdminFundingActivity,
   type AdminFundingRound,
   type AdminInvestorTransfer,
+  type AdminOverdueRepayments,
   type AdminReceiptDecisionPayload,
   type AdminReceiptUrl,
   type AdminRepaymentListParams,
@@ -23,6 +25,8 @@ import {
   type AdminRepaymentReceipt,
   type AdminRoundFilter,
   type AdminTransferListParams,
+  type FeeInvoiceFilter,
+  type MarkFeePaidPayload,
 } from "@/services/admin-funding.service";
 
 export const adminFundingKeys = {
@@ -41,10 +45,15 @@ export const adminFundingKeys = {
     [...adminFundingKeys.all, "repayment-preview", trancheId] as const,
   repayments: (params: AdminRepaymentListParams) =>
     [...adminFundingKeys.all, "repayments", params] as const,
+  // Under "repayments" so the Repayments tab's refresh reloads it too.
+  overdueRepayments: () =>
+    [...adminFundingKeys.all, "repayments", "overdue"] as const,
   repayment: (receiptId: string) =>
     [...adminFundingKeys.all, "repayment", receiptId] as const,
   repaymentReceiptUrl: (receiptId: string) =>
     [...adminFundingKeys.all, "repayment-receipt-url", receiptId] as const,
+  feeInvoices: (status: FeeInvoiceFilter) =>
+    [...adminFundingKeys.all, "fee-invoices", status] as const,
 };
 
 export function useAdminFundingRounds(status: AdminRoundFilter) {
@@ -141,6 +150,18 @@ export function useAdminRepaymentReceipts(params: AdminRepaymentListParams) {
   });
 }
 
+// Tickets a business is late repaying. Read on the Transactions page itself so
+// the Repayments tab can show its red count from any tab.
+export function useAdminOverdueRepayments(enabled = true) {
+  return useQuery<AdminOverdueRepayments, ApiError>({
+    queryKey: adminFundingKeys.overdueRepayments(),
+    queryFn: () => adminFundingService.listOverdueRepayments(),
+    enabled,
+    staleTime: 60 * 1000,
+    retry: false,
+  });
+}
+
 // The review panel reads its own copy, so it shows the receipt as it is now.
 export function useAdminRepaymentReceipt(receiptId: string | null) {
   return useQuery<AdminRepaymentReceipt, ApiError>({
@@ -167,6 +188,33 @@ export function useAdminRepaymentReceiptUrl(receiptId: string | null) {
 }
 
 // Moves the round and may form its loan: every admin funding view refreshes.
+/** SME service-fee invoices, each with its investment package. */
+export function useAdminFeeInvoices(status: FeeInvoiceFilter, enabled = true) {
+  return useQuery<AdminFeeInvoice[], ApiError>({
+    queryKey: adminFundingKeys.feeInvoices(status),
+    queryFn: () => adminFundingService.listFeeInvoices(status),
+    staleTime: 30 * 1000,
+    retry: false,
+    enabled,
+  });
+}
+
+/** Marks a fee paid. Refreshes the fee lists and the rounds (their fee badge). */
+export function useMarkFeeInvoicePaid() {
+  const queryClient = useQueryClient();
+  return useMutation<
+    AdminFeeInvoice,
+    ApiError,
+    { invoiceId: string; payload: MarkFeePaidPayload }
+  >({
+    mutationFn: ({ invoiceId, payload }) =>
+      adminFundingService.markFeeInvoicePaid(invoiceId, payload),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: adminFundingKeys.all });
+    },
+  });
+}
+
 export function useAdvanceRound() {
   const queryClient = useQueryClient();
   return useMutation<AdminFundingRound, ApiError, string>({

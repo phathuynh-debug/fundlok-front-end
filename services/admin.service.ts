@@ -34,6 +34,11 @@ export interface AdminUserRow {
   email_verified?: boolean;
   avatar_url?: string | null;
   created_at?: string | null;
+  // The account's mobile (+84…) and when a one-time code proved it (null:
+  // not yet). SMEs and investors must prove one; admins are exempt. Optional:
+  // a backend that predates them omits both.
+  phone?: string | null;
+  phone_verified_at?: string | null;
   // Optional: a backend that predates consent omits them.
   consent_status?: AdminConsentState;
   consent_accepted_at?: string | null;

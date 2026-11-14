@@ -21,6 +21,22 @@ function cutscreen(page: Page) {
   return page.getByRole("dialog");
 }
 
+/**
+ * Resolves once the cutscreen takes keys. Its arrow-key and Escape listener is
+ * attached in an effect, which React runs after the dialog is painted, so on a
+ * busy CI runner a key pressed the moment the dialog was visible was lost and
+ * it stayed on slide 1. The cutscreen focuses its forward button in a later
+ * effect, so a focused button means the listener is in place.
+ */
+async function ready(page: Page) {
+  await expect(
+    cutscreen(page).getByRole("button", {
+      name: t("welcome.common.getStarted"),
+      exact: true,
+    }),
+  ).toBeFocused();
+}
+
 async function next(page: Page) {
   await page
     .getByRole("button", { name: t("welcome.common.next"), exact: true })
@@ -69,6 +85,7 @@ test.describe("an SME arriving for the first time", () => {
     ).toBeVisible();
 
     // Skipping counts as finishing: on into the tour, which has its own Skip.
+    await ready(page);
     await page.keyboard.press("Escape");
     await expect(page.getByText(t("welcome.common.hello.title"))).toHaveCount(
       0,
@@ -78,6 +95,7 @@ test.describe("an SME arriving for the first time", () => {
   test("moves with the arrow keys", async ({ page }) => {
     await page.goto("/dashboard");
     await expect(cutscreen(page)).toBeVisible();
+    await ready(page);
 
     await page.keyboard.press("ArrowRight");
     await expect(cutscreen(page)).toContainText(t("welcome.sme.intro.title"));

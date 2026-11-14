@@ -315,6 +315,13 @@ export const ADMIN_ENDPOINTS = {
   fundingRoundAdvance: (windowId: string) =>
     `/admin/funding/rounds/${windowId}/advance`,
   fundingTransfers: "/admin/funding/transfers",
+  // SME service-fee invoices (3% of a round's confirmed total + VAT), each with
+  // its investment package. ?status=UNPAID|PAID|ALL.
+  feeInvoices: "/admin/funding/fee-invoices",
+  // The SME's transfer shows on FundLok's statement: mark the invoice paid
+  // (bank transaction ID + reason). Lifts the block on their next round.
+  feeInvoiceMarkPaid: (invoiceId: string) =>
+    `/admin/funding/fee-invoices/${invoiceId}/mark-paid`,
   // The transfers' audit trail: who approved or denied what, and why.
   fundingActivity: "/admin/funding/activity",
   fundingTransfer: (trancheId: string) =>
@@ -329,6 +336,9 @@ export const ADMIN_ENDPOINTS = {
   // The receipts businesses upload when they repay an investor. Read-only:
   // the investor confirms a repayment, not staff.
   fundingRepayments: "/admin/funding/repayments",
+  // Tickets a business is late repaying: days not marked paid after their
+  // due date. Display only.
+  fundingRepaymentsOverdue: "/admin/funding/repayments/overdue",
   fundingRepayment: (receiptId: string) =>
     `/admin/funding/repayments/${receiptId}`,
   repaymentReceiptUrl: (receiptId: string) =>

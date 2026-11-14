@@ -15,9 +15,11 @@ import { useVerificationGate } from "@/hooks/use-verification-gate";
 import { useHasBankAccount } from "@/hooks/use-payment-accounts";
 import { useFundingWindow, useMyTranches } from "@/hooks/use-funding";
 import { BankAccountPrompt } from "../../../_components/BankAccountPrompt";
+import { LastTicketNotice } from "../../../_components/LastTicketNotice";
 import { cn } from "@/lib/utils";
 import {
   INVESTOR_TARGET_RETURN_PCT,
+  lastTicketVnd,
   targetReturnVnd,
   ticketBounds,
 } from "@/lib/listing-figures";
@@ -72,6 +74,10 @@ export function InvestmentTab({
   const takenPercent = Math.floor(percent(confirmed + reserved));
   const bounds = fundingWindow ? ticketBounds(fundingWindow) : null;
   const open = fundingWindow?.status === "OPEN" && (bounds?.max ?? 0) > 0;
+  // Less than a minimum ticket left: one last ticket of exactly that amount.
+  const lastTicket = fundingWindow
+    ? lastTicketVnd(fundingWindow.capacity_vnd, fundingWindow.min_ticket_vnd)
+    : null;
 
   // Investing requires an approved KYC. An unverified investor gets KYC in a
   // new tab; when it's approved that tab closes and this one goes on to
@@ -87,6 +93,17 @@ export function InvestmentTab({
         variant: "destructive",
         title: t(`${K}.invalidAmountTitle`),
         description: t(`${K}.validAmount`),
+      });
+      return;
+    }
+
+    if (lastTicket !== null && numericAmount !== lastTicket) {
+      toast({
+        variant: "destructive",
+        title: t(`${K}.invalidAmountTitle`),
+        description: t("investment.lastTicket.mustBeExact", {
+          amount: formatCurrency(lastTicket, locale),
+        }),
       });
       return;
     }
@@ -234,6 +251,15 @@ export function InvestmentTab({
             </p>
           </div>
 
+          {lastTicket !== null && fundingWindow && (
+            <LastTicketNotice
+              amountVnd={lastTicket}
+              minTicketVnd={fundingWindow.min_ticket_vnd}
+              locale={locale}
+              t={t}
+            />
+          )}
+
           <form onSubmit={handleInvest} className="space-y-6">
             <div className="space-y-2.5">
               <Label
@@ -314,13 +340,21 @@ export function InvestmentTab({
               </div>
 
               <p className="text-xs text-muted-foreground tracking-wide">
-                {t(`${K}.minimum`, {
-                  amount: formatCurrency(bounds!.min, locale),
-                })}{" "}
-                ·{" "}
-                {t(`${K}.maximum`, {
-                  amount: formatCurrency(bounds!.max, locale),
-                })}
+                {lastTicket !== null ? (
+                  t("investment.lastTicket.exactly", {
+                    amount: formatCurrency(lastTicket, locale),
+                  })
+                ) : (
+                  <>
+                    {t(`${K}.minimum`, {
+                      amount: formatCurrency(bounds!.min, locale),
+                    })}{" "}
+                    ·{" "}
+                    {t(`${K}.maximum`, {
+                      amount: formatCurrency(bounds!.max, locale),
+                    })}
+                  </>
+                )}
               </p>
 
               {/* What this amount targets: INVESTOR_TARGET_RETURN_PCT of it,

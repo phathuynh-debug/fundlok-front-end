@@ -489,6 +489,12 @@
       "users": "users",
       "verifications": "checks"
     },
+    "phone": {
+      "missing": "No phone",
+      "unverified": "Not verified",
+      "verified": "Verified",
+      "verifiedOn": "Verified {date}"
+    },
     "preview": {
       "applicationDecided": "Decision recorded",
       "applicationsHeading": "Funding requests",
@@ -805,6 +811,7 @@
       "noProjects": "No projects found.",
       "noResults": "No results found.",
       "noUsers": "No users found.",
+      "phone": "Phone",
       "refresh": "Refresh",
       "role": "Role",
       "searchProjects": "Search projects…",
@@ -888,6 +895,60 @@
         "PAYEE_NAME_MISMATCH": "The recipient isn't the holder of the business's verified account.",
         "DUPLICATE_BANK_TXN": "This bank transaction already funds another investment."
       },
+      "fees": {
+        "bankTxnLabel": "Bank transaction ID",
+        "bankTxnPlaceholder": "e.g. FT26316123456",
+        "base": "Confirmed total",
+        "due": "Due",
+        "duplicateTxn": "This bank transaction has already paid another invoice.",
+        "email": "Email to business",
+        "emailColumn": "Email",
+        "emailFailed": "Failed to send",
+        "emailNone": "Not sent",
+        "emailSending": "Sending",
+        "emailSent": "Sent",
+        "empty": "No service fees yet. A fee is issued when a funding round closes.",
+        "emptyUnpaid": "No unpaid service fees.",
+        "fee": "Fee (3% + VAT)",
+        "feeLine": "Activation fee (3%)",
+        "filters": {
+          "ALL": "All",
+          "PAID": "Paid",
+          "UNPAID": "Unpaid"
+        },
+        "investmentCount": "{count} investments",
+        "invoiceHeading": "Invoice",
+        "invoiceNumber": "Invoice number",
+        "issued": "Issued",
+        "lateFee": "Late fee",
+        "loadFailed": "Couldn't load the service fees. Please try again.",
+        "markFailed": "Couldn't mark the fee as paid",
+        "markHeading": "Mark as paid",
+        "markHelp": "Check FundLok's bank statement for a transfer of {amount} with the memo {memo}. Marking it paid is final, is recorded with your name, and lets the business open its next funding round.",
+        "markSubmit": "Mark as paid",
+        "marked": "Service fee marked as paid",
+        "marking": "Saving…",
+        "memo": "Transfer memo",
+        "memoColumn": "Memo",
+        "noInvestments": "No investments recorded for this round.",
+        "package": "Investment package",
+        "packageHelp": "The fee is 3% of the money these investments sent to the business, plus VAT. It is paid separately into FundLok's own account and never taken out of the investments.",
+        "paidNote": "Paid {date} · bank transaction {txn}. The business can open its next funding round.",
+        "paidOn": "Paid {date}",
+        "reasonLabel": "Note",
+        "reasonPlaceholder": "e.g. Seen on the Techcombank statement on 12/11",
+        "required": "Enter the bank transaction ID and a note.",
+        "roundColumn": "Service fee",
+        "rowLabel": "Open the service fee for {name}",
+        "sheetTitle": "Service fee",
+        "status": "Status",
+        "statusOverdue": "Overdue",
+        "statusPaid": "Paid",
+        "statusUnpaidDue": "Unpaid · due {date}",
+        "statusVoid": "Void",
+        "total": "Total due",
+        "vat": "VAT"
+      },
       "fields": {
         "amount_vnd": "Amount",
         "bank_txn_id": "Bank transaction ID",
@@ -959,6 +1020,40 @@
         "kind": {
           "INSTALMENT": "Daily repayment",
           "STUB": "First-period interest"
+        },
+        "overdue": {
+          "badge": {
+            "one": "Late · 1 day",
+            "other": "Late · {count} days"
+          },
+          "badgeDetail": "{days} since {date}, {working}, {amount} owed",
+          "businesses": {
+            "one": "1 business",
+            "other": "{count} businesses"
+          },
+          "daysUnpaid": {
+            "one": "1 day unpaid",
+            "other": "{count} days unpaid"
+          },
+          "hint": "The business hasn't marked these days paid (no receipt uploaded) and their due date has passed. A day counts as late from the day after it falls due; weekends and public holidays are not counted as working days.",
+          "since": "due {date}",
+          "summary": "{businesses} · {days} · {amount} owed to investors",
+          "tabCount": {
+            "one": "1 late repayment",
+            "other": "{count} late repayments"
+          },
+          "table": {
+            "late": "How late",
+            "owed": "Owed"
+          },
+          "title": {
+            "one": "1 repayment is late",
+            "other": "{count} repayments are late"
+          },
+          "workingDaysLate": {
+            "one": "1 working day late",
+            "other": "{count} working days late"
+          }
         },
         "reported": "The investor reported a day missing",
         "rowLabel": "Review the repayment from {business} to {investor}",
@@ -1078,6 +1173,7 @@
       },
       "subtitle": "Funding rounds taking investment, and the transfers investors report for them. Staff read each receipt and confirm the money arrived.",
       "tabActivity": "Activity log",
+      "tabFees": "Service fees",
       "tabRepayments": "Repayments",
       "tabRounds": "Open rounds",
       "tabTransfers": "Transfers",
@@ -2361,6 +2457,8 @@
         "details": "Waiting on transfers: {reserved} · {count} investors · minimum {min}",
         "failedNote": "The round closed without any investment received.",
         "heading": "Funding",
+        "lastTicketCloseEarly": "You can also close the round now.",
+        "lastTicketNote": "{amount} is still open, below the {min} minimum investment. Only one investor investing exactly {amount} can fill it. If no one does before your round closes on {date}, the round closes without it: you receive only what investors have transferred, and repay only that.",
         "noTickets": "No investor has reserved yet.",
         "none": "No investment yet",
         "noneHint": "Your request is presented to investors once the three documents above are signed and the bank account you receive funds in is approved. Whether they fund it is their decision.",
@@ -3398,6 +3496,18 @@
       "ofDailyRevenue": "of daily revenue",
       "perBusinessDay": "Fixed, each business day",
       "revenueShareRate": "Revenue share rate"
+    },
+    "lastTicket": {
+      "body": "Only {amount} is left in this round, below the {min} minimum ticket. One investor can invest exactly {amount} to complete the round; no other amount is accepted.",
+      "cardNote": "Only {amount} left, below the {min} minimum: one investor can invest exactly that to complete the round.",
+      "completesBody": "It takes the last {amount}, which is below the usual {min} minimum. The last ticket in a round can be smaller, as long as it takes exactly what is left.",
+      "completesTitle": "Your investment completes this round",
+      "exactly": "Exactly {amount}, the last ticket in this round",
+      "investExactly": "Invest {amount} instead",
+      "mustBeExact": "Only {amount} is left in this round, so the last ticket must be exactly {amount}.",
+      "outOfRangeBody": "That is below the {min} minimum ticket, so the last investor can invest exactly {amount} and no other amount.",
+      "outOfRangeTitle": "Only {amount} is left in this round",
+      "title": "Last ticket: {amount}"
     },
     "paymentHistory": {
       "subtitle": "Recent daily revenue share payments received from this loan",

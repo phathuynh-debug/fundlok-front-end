@@ -27,6 +27,7 @@ import { cn, getInitials } from "@/lib/utils";
 import { enumLabel, roleLabel } from "@/lib/enum-labels";
 import { formatDate as formatLocaleDate } from "@/lib/format-date";
 import { industryLabel } from "@/lib/industry-label";
+import { formatVietnameseMobile } from "@/lib/phone-verification";
 
 const PAGE_SIZE = 14;
 
@@ -99,6 +100,15 @@ const buildUserColumns = (
     ),
   },
   {
+    key: "phone",
+    header: t("admin.table.phone"),
+    filterType: "select",
+    // Filtered by its state (verified / not verified / none), not the number.
+    filterValue: (u) => t(phoneStateKey(u)),
+    sortValue: (u) => u.phone ?? "",
+    render: (u) => <PhoneCell user={u} t={t} locale={locale} />,
+  },
+  {
     key: "consent",
     header: t("admin.table.consent"),
     filterType: "select",
@@ -112,6 +122,63 @@ const buildUserColumns = (
     render: (u) => formatDate(u.created_at, locale),
   },
 ];
+
+function phoneStateKey(u: AdminUserRow): string {
+  if (!u.phone) return "admin.phone.missing";
+  return u.phone_verified_at
+    ? "admin.phone.verified"
+    : "admin.phone.unverified";
+}
+
+// The phone column: the number, and whether a one-time code proved it. SMEs
+// and investors must (the phone gate); an admin without one shows a dash.
+function PhoneCell({
+  user,
+  t,
+  locale,
+}: {
+  user: AdminUserRow;
+  t: TranslateFn;
+  locale: string;
+}) {
+  if (!user.phone) {
+    return isStaff(user.role) ? (
+      <span className="text-muted-foreground">—</span>
+    ) : (
+      <Badge variant="secondary">{t("admin.phone.missing")}</Badge>
+    );
+  }
+  const verified = !!user.phone_verified_at;
+  return (
+    <div className="flex flex-col items-start gap-1">
+      <span className="whitespace-nowrap tabular-nums text-foreground">
+        {formatVietnameseMobile(user.phone)}
+      </span>
+      <Badge
+        variant="outline"
+        title={
+          verified
+            ? t("admin.phone.verifiedOn").replace(
+                "{date}",
+                formatDate(user.phone_verified_at, locale),
+              )
+            : undefined
+        }
+        className={
+          verified
+            ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+            : "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+        }
+      >
+        {verified ? t("admin.phone.verified") : t("admin.phone.unverified")}
+      </Badge>
+    </div>
+  );
+}
+
+function isStaff(role: string | null | undefined): boolean {
+  return role === "ADMIN" || role === "SYSTEM_ADMIN";
+}
 
 // The Terms & data consent column: accepted, still owed, or not asked
 // (admins). Nothing at all from a backend that predates consent.
