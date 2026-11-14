@@ -624,8 +624,10 @@
         "LISTING_NOT_OPENABLE": "This request's funding round has already ended.",
         "PROJECT_NOT_LIVE": "The project is not live on the marketplace yet.",
         "RATE_ABOVE_CAP": "The rate is above the legal cap.",
+        "SME_HAS_LIVE_LISTING": "The business already has another listing open or a loan not yet repaid in full.",
         "SME_INVOICE_UNPAID": "The business has an unpaid FundLok invoice.",
         "TARGET_ABOVE_CAP": "The amount asked is above the limit for one funding round.",
+        "TAX_CODE_NOT_VERIFIED_BUSINESS": "The project's tax code isn't the business its owner verified.",
         "TERMS_NOT_LOCKED": "The project has no approved request with locked terms.",
         "generic": "Something went wrong. Try again in a moment."
       },
@@ -3853,6 +3855,12 @@
     "durationOptions": {
       "months": "{count} months"
     },
+    "errors": {
+      "DUPLICATE_TAX_CODE": "This business already has a project on FundLok. Contact support if you think this is a mistake.",
+      "INVALID_TAX_CODE": "Enter a valid tax code: 10 digits, a branch's 10-3 digits, or a 12-digit personal number.",
+      "SME_HAS_OPEN_PROJECT": "You already have a project in progress. You can start another once it ends or its loan is repaid in full.",
+      "TAX_CODE_NOT_VERIFIED_BUSINESS": "This tax code isn't the business you verified. A project can only be for your verified business."
+    },
     "eyebrow": "Project application",
     "fields": {
       "address": "Address",
@@ -3950,7 +3958,8 @@
       "requestedAmount": "Enter a requested amount greater than 0",
       "requestedAmountRange": "Enter an amount between 20,000,000 and 100,000,000 VND",
       "street": "Street is required",
-      "taxId": "Tax ID is required"
+      "taxId": "Tax ID is required",
+      "taxIdFormat": "Enter a valid tax code: 10 digits, a branch's 10-3 digits (0123456789-001), or a 12-digit personal number for a household business."
     }
   },
   "ratePage": {

@@ -59,6 +59,7 @@ import {
   MIN_EMPLOYEES,
 } from "@/lib/constants/company-size";
 import { apiErrorMessage } from "@/lib/api-error-message";
+import { CREATE_ERRORS, isTaxCode } from "./tax-code";
 
 type ProjectApplicationValues = {
   legal_name: string;
@@ -115,7 +116,11 @@ export default function ProjectApplicationClient() {
       .string()
       .trim()
       .min(2, t("projectApplication.validation.legalName")),
-    tax_id: z.string().trim().min(3, t("projectApplication.validation.taxId")),
+    tax_id: z
+      .string()
+      .trim()
+      .min(1, t("projectApplication.validation.taxId"))
+      .refine(isTaxCode, t("projectApplication.validation.taxIdFormat")),
     industry: z
       .string()
       .trim()
@@ -434,14 +439,17 @@ export default function ProjectApplicationClient() {
         router.push("/dashboard");
       },
       onError: (error) => {
+        const code = error.code ?? "";
         toast({
           variant: "destructive",
           title: t("projectApplication.toasts.failedTitle"),
-          description: apiErrorMessage(
-            error,
-            locale,
-            t("projectApplication.toasts.failedDescription"),
-          ),
+          description: CREATE_ERRORS.has(code)
+            ? t(`projectApplication.errors.${code}`)
+            : apiErrorMessage(
+                error,
+                locale,
+                t("projectApplication.toasts.failedDescription"),
+              ),
         });
       },
     });

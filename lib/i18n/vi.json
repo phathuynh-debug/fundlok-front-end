@@ -624,8 +624,10 @@
         "LISTING_NOT_OPENABLE": "Đợt gọi vốn của yêu cầu này đã kết thúc.",
         "PROJECT_NOT_LIVE": "Dự án chưa được niêm yết trên thị trường.",
         "RATE_ABOVE_CAP": "Lãi suất vượt mức trần theo luật.",
+        "SME_HAS_LIVE_LISTING": "Doanh nghiệp đang có một đợt gọi vốn khác hoặc khoản vay chưa trả hết.",
         "SME_INVOICE_UNPAID": "Doanh nghiệp có hóa đơn FundLok chưa thanh toán.",
         "TARGET_ABOVE_CAP": "Số tiền đề nghị vượt hạn mức của một đợt gọi vốn.",
+        "TAX_CODE_NOT_VERIFIED_BUSINESS": "Mã số thuế của dự án không phải của doanh nghiệp mà chủ sở hữu đã xác minh.",
         "TERMS_NOT_LOCKED": "Dự án chưa có yêu cầu được duyệt với điều khoản đã chốt.",
         "generic": "Đã có lỗi xảy ra. Vui lòng thử lại sau."
       },
@@ -3853,6 +3855,12 @@
     "durationOptions": {
       "months": "{count} tháng"
     },
+    "errors": {
+      "DUPLICATE_TAX_CODE": "Doanh nghiệp này đã có dự án trên FundLok. Vui lòng liên hệ bộ phận hỗ trợ nếu bạn cho rằng đây là nhầm lẫn.",
+      "INVALID_TAX_CODE": "Nhập mã số thuế hợp lệ: 10 chữ số, mã chi nhánh 10-3 chữ số, hoặc số định danh cá nhân 12 chữ số.",
+      "SME_HAS_OPEN_PROJECT": "Bạn đang có một dự án chưa hoàn tất. Bạn có thể tạo dự án mới khi dự án đó kết thúc hoặc khoản vay đã được trả hết.",
+      "TAX_CODE_NOT_VERIFIED_BUSINESS": "Mã số thuế này không phải của doanh nghiệp bạn đã xác minh. Dự án chỉ được lập cho doanh nghiệp đã xác minh của bạn."
+    },
     "eyebrow": "Đơn đăng ký dự án",
     "fields": {
       "address": "Địa chỉ",
@@ -3950,7 +3958,8 @@
       "requestedAmount": "Vui lòng nhập số tiền vay lớn hơn 0",
       "requestedAmountRange": "Nhập số tiền từ 20.000.000 đến 100.000.000 VND",
       "street": "Vui lòng nhập đường",
-      "taxId": "Vui lòng nhập mã số thuế"
+      "taxId": "Vui lòng nhập mã số thuế",
+      "taxIdFormat": "Nhập mã số thuế hợp lệ: 10 chữ số, mã chi nhánh 10-3 chữ số (0123456789-001), hoặc số định danh cá nhân 12 chữ số đối với hộ kinh doanh."
     }
   },
   "ratePage": {
