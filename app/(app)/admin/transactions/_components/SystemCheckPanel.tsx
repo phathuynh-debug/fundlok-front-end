@@ -15,7 +15,11 @@ import type {
   AdminReceiptFields,
   AdminSystemCheck,
 } from "@/services/admin-funding.service";
-import { failureLabel, reasonLabel } from "./receipt-codes";
+import {
+  failureLabel,
+  reasonLabel,
+  type ReceiptSubject,
+} from "./receipt-codes";
 
 // What the system made of the receipt (docs/specs/direct_transfer/receipt-ocr.md):
 // its verdict and why, the recipient on the receipt against the business's
@@ -38,18 +42,28 @@ const TONE_ICON = {
   NEEDS_REVIEW: "text-amber-600 dark:text-amber-400",
 } as const;
 
-export function SystemCheckPanel({ check }: { check: AdminSystemCheck }) {
+export function SystemCheckPanel({
+  check,
+  subject = "investment",
+}: {
+  check: AdminSystemCheck;
+  subject?: ReceiptSubject;
+}) {
   const { t, locale } = useTranslations();
+  const repayment = subject === "repayment";
   const Icon =
     check.verdict === "ACCEPTED"
       ? CheckCircle2
       : check.verdict === "DENIED"
         ? XCircle
         : AlertTriangle;
+  const base = repayment
+    ? "admin.transactions.system.repayment"
+    : "admin.transactions.system";
   const title =
     check.verdict === "NEEDS_REVIEW" && check.suggested
-      ? t(`admin.transactions.system.suggested.${check.suggested}`)
-      : t(`admin.transactions.system.verdict.${check.verdict}`);
+      ? t(`${base}.suggested.${check.suggested}`)
+      : t(`${base}.verdict.${check.verdict}`);
   const confidence =
     check.confidence == null
       ? t("admin.transactions.system.exactText")
@@ -81,10 +95,13 @@ export function SystemCheckPanel({ check }: { check: AdminSystemCheck }) {
           {check.verdict === "ACCEPTED" && check.awaiting_review && (
             <p>{t("admin.transactions.system.acceptedAwaiting")}</p>
           )}
+          {repayment && check.verdict === "ACCEPTED" && (
+            <p>{t("admin.transactions.system.repayment.acceptedBody")}</p>
+          )}
           {check.failure_codes.length > 0 && (
             <ul className="list-disc space-y-0.5 pl-4">
               {check.failure_codes.map((code) => (
-                <li key={code}>{failureLabel(t, code)}</li>
+                <li key={code}>{failureLabel(t, code, subject)}</li>
               ))}
             </ul>
           )}
@@ -92,14 +109,15 @@ export function SystemCheckPanel({ check }: { check: AdminSystemCheck }) {
             check.review_reasons.length > 0 && (
               <ul className="list-disc space-y-0.5 pl-4">
                 {check.review_reasons.map((code) => (
-                  <li key={code}>{reasonLabel(t, code)}</li>
+                  <li key={code}>{reasonLabel(t, code, subject)}</li>
                 ))}
               </ul>
             )}
         </div>
       </div>
 
-      {check.receiver && <Receiver check={check} />}
+      {check.receiver && <Receiver check={check} subject={subject} />}
+      {repayment && check.payer && <Payer check={check} />}
       {check.fields && <Reading check={check} />}
       {check.reviewed_at && <Review check={check} />}
     </section>
@@ -121,7 +139,13 @@ const MATCH_CLASS: Record<Match, string> = {
 
 // The recipient's bank, account number and holder: what the receipt shows
 // against the business's verified account.
-function Receiver({ check }: { check: AdminSystemCheck }) {
+function Receiver({
+  check,
+  subject,
+}: {
+  check: AdminSystemCheck;
+  subject: ReceiptSubject;
+}) {
   const { t } = useTranslations();
   const r = check.receiver!;
   const digits = (value: string | null) => (value ?? "").replace(/[\s.-]/g, "");
@@ -169,7 +193,13 @@ function Receiver({ check }: { check: AdminSystemCheck }) {
       <div className="grid grid-cols-[minmax(0,5.5rem)_1fr_1fr] gap-x-3 border-b bg-muted/30 px-3 py-1.5 font-medium text-muted-foreground">
         <span>{t("admin.transactions.system.receiverHeading")}</span>
         <span>{t("admin.transactions.system.onReceipt")}</span>
-        <span>{t("admin.transactions.system.verifiedAccount")}</span>
+        <span>
+          {t(
+            subject === "repayment"
+              ? "admin.transactions.system.repayment.investorAccount"
+              : "admin.transactions.system.verifiedAccount",
+          )}
+        </span>
       </div>
       {rows.map((row) => {
         const MatchIcon = MATCH_ICON[row.match];
@@ -202,6 +232,51 @@ function Receiver({ check }: { check: AdminSystemCheck }) {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// A repayment's sender: the name on the receipt against the holder of the
+// business's verified account.
+function Payer({ check }: { check: AdminSystemCheck }) {
+  const { t } = useTranslations();
+  const p = check.payer!;
+  const match: Match = check.failure_codes.includes("PAYER_NAME_MISMATCH")
+    ? "bad"
+    : p.holder_read && p.expected_holder
+      ? "ok"
+      : "unknown";
+  const MatchIcon = MATCH_ICON[match];
+  return (
+    <div className="overflow-hidden rounded-xl border text-xs">
+      <div className="grid grid-cols-[minmax(0,5.5rem)_1fr_1fr] gap-x-3 border-b bg-muted/30 px-3 py-1.5 font-medium text-muted-foreground">
+        <span>{t("admin.transactions.system.repayment.payerHeading")}</span>
+        <span>{t("admin.transactions.system.onReceipt")}</span>
+        <span>{t("admin.transactions.system.repayment.businessAccount")}</span>
+      </div>
+      <div
+        data-testid="payer-holder"
+        data-match={match}
+        className="grid grid-cols-[minmax(0,5.5rem)_1fr_1fr] items-start gap-x-3 px-3 py-1.5"
+      >
+        <span className="text-muted-foreground">
+          {t("admin.transactions.system.receiver.holder")}
+        </span>
+        <span className="flex min-w-0 items-start gap-1 break-words">
+          <MatchIcon
+            className={`mt-px h-3.5 w-3.5 shrink-0 ${MATCH_CLASS[match]}`}
+            aria-label={t(`admin.transactions.system.match.${match}`)}
+          />
+          <span
+            className={
+              match === "bad" ? "font-medium text-destructive" : undefined
+            }
+          >
+            {p.holder_read || "—"}
+          </span>
+        </span>
+        <span className="min-w-0 break-words">{p.expected_holder || "—"}</span>
+      </div>
     </div>
   );
 }

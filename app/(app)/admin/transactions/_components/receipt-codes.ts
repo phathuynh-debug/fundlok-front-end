@@ -11,7 +11,29 @@ function fieldLabel(t: T, field: string): string {
   return label === key ? field : label;
 }
 
-export function failureLabel(t: T, code: string): string {
+export type ReceiptSubject = "investment" | "repayment";
+
+// The repayment wording first, where it differs; the investment wording else.
+function labelFor(t: T, keys: string[]): string | null {
+  for (const key of keys) {
+    const label = t(key);
+    if (label !== key) return label;
+  }
+  return null;
+}
+
+export function failureLabel(
+  t: T,
+  code: string,
+  subject: ReceiptSubject = "investment",
+): string {
+  if (subject === "repayment" && !code.startsWith("MISSING_FIELD:")) {
+    const label = labelFor(t, [
+      `admin.transactions.repaymentFailures.${code}`,
+      `admin.transactions.failures.${code}`,
+    ]);
+    return label ?? code;
+  }
   if (code.startsWith("MISSING_FIELD:")) {
     return t("admin.transactions.failures.MISSING_FIELD").replace(
       "{field}",
@@ -24,11 +46,19 @@ export function failureLabel(t: T, code: string): string {
 }
 
 /** e.g. LOW_CONFIDENCE:memo, PAYEE_BANK_NOT_SHOWN, OCR_FAILED:TIMEOUT. */
-export function reasonLabel(t: T, code: string): string {
+export function reasonLabel(
+  t: T,
+  code: string,
+  subject: ReceiptSubject = "investment",
+): string {
   const [head, arg] = code.split(":", 2);
-  const key = `admin.transactions.system.reasons.${head}`;
-  const label = t(key);
-  if (label === key) return code;
+  const label = labelFor(t, [
+    ...(subject === "repayment"
+      ? [`admin.transactions.system.repayment.reasons.${head}`]
+      : []),
+    `admin.transactions.system.reasons.${head}`,
+  ]);
+  if (label === null) return code;
   return arg === undefined
     ? label
     : label.replace("{field}", fieldLabel(t, arg));

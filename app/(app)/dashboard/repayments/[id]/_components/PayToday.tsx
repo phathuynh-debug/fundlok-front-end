@@ -36,6 +36,16 @@ const KNOWN_ERRORS = new Set([
   "NOT_DUE_YET",
 ]);
 
+function mismatchMessage(t: (key: string) => string, codes: unknown): string {
+  const reasons = (Array.isArray(codes) ? codes : []).map((code) => {
+    const key = `${K}.mismatch.${String(code)}`;
+    const label = t(key);
+    return label === key ? String(code) : label;
+  });
+  const heading = t(`${K}.errors.RECEIPT_MISMATCH`);
+  return reasons.length > 0 ? `${heading} ${reasons.join(" ")}` : heading;
+}
+
 function sizeLabel(bytes: number): string {
   return bytes < 1024 * 1024
     ? `${Math.max(1, Math.round(bytes / 1024))} KB`
@@ -224,9 +234,12 @@ function PayPanel({
         },
         onError: (failure) => {
           const code = failure.code ?? "";
-          const message = KNOWN_ERRORS.has(code)
-            ? t(`${K}.errors.${code}`)
-            : t(`${K}.errors.generic`);
+          const message =
+            code === "RECEIPT_MISMATCH"
+              ? mismatchMessage(t, failure.details?.failure_codes)
+              : KNOWN_ERRORS.has(code)
+                ? t(`${K}.errors.${code}`)
+                : t(`${K}.errors.generic`);
           setError(message);
           toast({
             variant: "destructive",

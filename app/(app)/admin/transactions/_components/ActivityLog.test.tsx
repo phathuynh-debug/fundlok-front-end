@@ -66,6 +66,18 @@ describe("activityKind", () => {
       tone: "review",
     });
   });
+
+  it("labels the system's checks of repayment receipts", () => {
+    expect(
+      activityKind(entry({ action: "REPAYMENT_RECEIPT_SYSTEM_ACCEPTED" })),
+    ).toEqual({ key: "repaymentSystemAccepted", tone: "approve" });
+    expect(
+      activityKind(entry({ action: "REPAYMENT_RECEIPT_SYSTEM_DENIED" })),
+    ).toEqual({ key: "repaymentSystemRefused", tone: "deny" });
+    expect(
+      activityKind(entry({ action: "REPAYMENT_RECEIPT_SYSTEM_NEEDS_REVIEW" })),
+    ).toEqual({ key: "repaymentSystemUnsure", tone: "review" });
+  });
 });
 
 describe("ActivityLog", () => {

@@ -849,6 +849,9 @@
           "repaymentConfirmed": "Repayment confirmed by investor",
           "repaymentDenied": "Repayment receipt denied",
           "repaymentMarked": "Repayment marked paid",
+          "repaymentSystemAccepted": "System: repayment receipt matches",
+          "repaymentSystemRefused": "System: repayment receipt refused",
+          "repaymentSystemUnsure": "System: repayment receipt left to investor",
           "repaymentViewed": "Repayment receipt viewed",
           "reportedMissing": "Reported not received",
           "reserved": "Investor reserved",
@@ -1002,6 +1005,16 @@
         },
         "total": "Total to repay",
         "transferShort": "receives {net}"
+      },
+      "repaymentFailures": {
+        "AMOUNT_MISMATCH": "The amount differs from the days' net total due.",
+        "DUPLICATE_BANK_TXN": "This bank transaction is already on another repayment receipt or an investment.",
+        "PAYEE_BANK_MISMATCH": "It was paid to an account at a different bank than the investor's.",
+        "PAYEE_MISMATCH": "It was paid into a different account than the investor's.",
+        "PAYEE_NAME_MISMATCH": "The recipient isn't the holder of the investor's verified account.",
+        "PAYER_NAME_MISMATCH": "The sender isn't the holder of the business's verified account.",
+        "REFERENCE_MISSING": "The memo doesn't contain the investment's memo.",
+        "TIME_OUT_OF_RANGE": "The transfer time is before the investment was confirmed or in the future."
       },
       "repayments": {
         "dayStatus": {
@@ -1218,6 +1231,26 @@
           "holder": "Account holder"
         },
         "receiverHeading": "Recipient",
+        "repayment": {
+          "acceptedBody": "Nothing was settled by the system: the investor still confirms the money reached their account.",
+          "businessAccount": "Business's verified account",
+          "investorAccount": "Investor's verified account",
+          "payerHeading": "Sender",
+          "reasons": {
+            "PAYEE_ACCOUNT_MISSING": "The investment has no investor account to compare with.",
+            "PAYEE_NAME_UNVERIFIED": "The investor's account holder was never verified at the bank.",
+            "PAYER_NAME_UNVERIFIED": "The business's account holder was never verified at the bank."
+          },
+          "suggested": {
+            "ACCEPTED": "Looks like a match; left to the investor:",
+            "DENIED": "Doesn't match, but automatic decisions are off, so it was kept:"
+          },
+          "verdict": {
+            "ACCEPTED": "Matches this repayment",
+            "DENIED": "Refused by the system",
+            "NEEDS_REVIEW": "Couldn't be confirmed: left to the investor"
+          }
+        },
         "reviewed": "Reviewed by {name}, {time}: {outcome}.",
         "suggested": {
           "ACCEPTED": "Looks like a match, but it's left for you:",
@@ -1813,6 +1846,22 @@
         },
         "receipts": {
           "alreadyConfirmed": "This repayment was already confirmed.",
+          "check": {
+            "DOES_NOT_MATCH": "Checked automatically: this receipt doesn't match this repayment.",
+            "MATCHES": "Checked automatically: the amount, memo and your account match this repayment.",
+            "UNSURE": "This receipt couldn't be checked automatically.",
+            "codes": {
+              "AMOUNT_MISMATCH": "The amount differs from what was due.",
+              "DUPLICATE_BANK_TXN": "This bank transfer was already used for another repayment.",
+              "PAYEE_BANK_MISMATCH": "It shows an account at a different bank than yours.",
+              "PAYEE_MISMATCH": "It shows a different account number than yours.",
+              "PAYEE_NAME_MISMATCH": "The recipient isn't the holder of your account.",
+              "PAYER_NAME_MISMATCH": "It wasn't sent from the business's verified account.",
+              "REFERENCE_MISSING": "The memo doesn't contain this investment's memo.",
+              "TIME_OUT_OF_RANGE": "The transfer time is before your investment or in the future."
+            },
+            "stillCheck": "Only your own bank account shows whether the money arrived. Check it before you confirm."
+          },
           "confirmAction": "Yes, received",
           "confirmBody": "This records {amount} from {project} (memo {memo}) as received in your bank account and settles the days on this receipt. This cannot be undone.",
           "confirmClosesReport": "Your open missing-payment report for these days will also be closed as paid.",
@@ -2520,12 +2569,23 @@
             "DUPLICATE_FILE": "This receipt was already used. Upload the receipt of this transfer.",
             "FILE_TOO_LARGE": "The file is over 10 MB.",
             "NOT_DUE_YET": "These days aren't due yet.",
+            "RECEIPT_MISMATCH": "This receipt doesn't match this repayment, so nothing was marked paid. Upload the receipt of the transfer you made with this QR.",
             "UNSUPPORTED_TYPE": "Upload a PDF, PNG, JPEG or WEBP.",
             "generic": "Something went wrong. Please try again."
           },
           "failed": "Couldn't record the repayment",
           "heading": "Today's repayment",
           "includes": "{count} working days: {dates}",
+          "mismatch": {
+            "AMOUNT_MISMATCH": "The amount isn't the amount due.",
+            "DUPLICATE_BANK_TXN": "This bank transfer was already used for another repayment.",
+            "PAYEE_BANK_MISMATCH": "It went to an account at a different bank than the investor's.",
+            "PAYEE_MISMATCH": "It went to a different account number than the investor's.",
+            "PAYEE_NAME_MISMATCH": "The recipient isn't the investor's account holder.",
+            "PAYER_NAME_MISMATCH": "It wasn't sent from your business's verified account.",
+            "REFERENCE_MISSING": "The transfer's memo doesn't contain this repayment's memo.",
+            "TIME_OUT_OF_RANGE": "The transfer time is before this investment started or in the future."
+          },
           "noPayee": "The investor's receiving account isn't available yet. Contact FundLok before transferring.",
           "none": "Nothing is due to this investor today.",
           "overdue": "{count} earlier days are still unpaid and included here.",

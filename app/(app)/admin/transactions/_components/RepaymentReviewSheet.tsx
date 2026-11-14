@@ -20,6 +20,7 @@ import type { AdminRepaymentAccount } from "@/services/admin-funding.service";
 import { personName } from "./activity";
 import { ReceiptViewer } from "./ReceiptViewer";
 import { RepaymentStatusBadge } from "./RepaymentStatusBadge";
+import { SystemCheckPanel } from "./SystemCheckPanel";
 import { TransferHistory } from "./TransferHistory";
 
 const K = "admin.transactions.repayments";
@@ -191,6 +192,10 @@ export function RepaymentReviewSheet({
                 filename={data.original_filename}
               />
             </section>
+
+            {data.system_check && (
+              <SystemCheckPanel check={data.system_check} subject="repayment" />
+            )}
 
             <Separator />
 

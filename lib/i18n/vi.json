@@ -849,6 +849,9 @@
           "repaymentConfirmed": "Nhà đầu tư đã xác nhận khoản trả nợ",
           "repaymentDenied": "Đã từ chối biên lai trả nợ",
           "repaymentMarked": "Đã đánh dấu trả nợ",
+          "repaymentSystemAccepted": "Hệ thống: biên lai trả nợ khớp",
+          "repaymentSystemRefused": "Hệ thống: từ chối biên lai trả nợ",
+          "repaymentSystemUnsure": "Hệ thống: để nhà đầu tư kiểm tra biên lai trả nợ",
           "repaymentViewed": "Đã xem biên lai trả nợ",
           "reportedMissing": "Đã báo chưa nhận tiền",
           "reserved": "Nhà đầu tư giữ chỗ",
@@ -1002,6 +1005,16 @@
         },
         "total": "Tổng phải trả",
         "transferShort": "nhận {net}"
+      },
+      "repaymentFailures": {
+        "AMOUNT_MISMATCH": "Số tiền khác với tổng số tiền thực trả của các ngày đến hạn.",
+        "DUPLICATE_BANK_TXN": "Giao dịch ngân hàng này đã có trên một biên lai trả nợ khác hoặc một khoản đầu tư.",
+        "PAYEE_BANK_MISMATCH": "Tiền được chuyển tới tài khoản ở ngân hàng khác với ngân hàng của nhà đầu tư.",
+        "PAYEE_MISMATCH": "Tiền được chuyển vào tài khoản khác với tài khoản của nhà đầu tư.",
+        "PAYEE_NAME_MISMATCH": "Người nhận không phải chủ tài khoản đã xác minh của nhà đầu tư.",
+        "PAYER_NAME_MISMATCH": "Người chuyển không phải chủ tài khoản đã xác minh của doanh nghiệp.",
+        "REFERENCE_MISSING": "Nội dung chuyển khoản không có mã nội dung của khoản đầu tư.",
+        "TIME_OUT_OF_RANGE": "Thời gian chuyển trước khi khoản đầu tư được xác nhận hoặc ở tương lai."
       },
       "repayments": {
         "dayStatus": {
@@ -1218,6 +1231,26 @@
           "holder": "Chủ tài khoản"
         },
         "receiverHeading": "Người nhận",
+        "repayment": {
+          "acceptedBody": "Hệ thống không tất toán gì: nhà đầu tư vẫn tự xác nhận tiền đã vào tài khoản của họ.",
+          "businessAccount": "Tài khoản đã xác minh của doanh nghiệp",
+          "investorAccount": "Tài khoản đã xác minh của nhà đầu tư",
+          "payerHeading": "Người chuyển",
+          "reasons": {
+            "PAYEE_ACCOUNT_MISSING": "Khoản đầu tư không có tài khoản nhà đầu tư để đối chiếu.",
+            "PAYEE_NAME_UNVERIFIED": "Chủ tài khoản của nhà đầu tư chưa được xác minh với ngân hàng.",
+            "PAYER_NAME_UNVERIFIED": "Chủ tài khoản của doanh nghiệp chưa được xác minh với ngân hàng."
+          },
+          "suggested": {
+            "ACCEPTED": "Có vẻ khớp; để nhà đầu tư kiểm tra:",
+            "DENIED": "Không khớp, nhưng quyết định tự động đang tắt nên biên lai vẫn được giữ:"
+          },
+          "verdict": {
+            "ACCEPTED": "Khớp với khoản trả nợ này",
+            "DENIED": "Hệ thống đã từ chối",
+            "NEEDS_REVIEW": "Chưa xác nhận được: để nhà đầu tư kiểm tra"
+          }
+        },
         "reviewed": "{name} đã xem lại lúc {time}: {outcome}.",
         "suggested": {
           "ACCEPTED": "Có vẻ khớp, nhưng cần bạn kiểm tra:",
@@ -1813,6 +1846,22 @@
         },
         "receipts": {
           "alreadyConfirmed": "Khoản trả nợ này đã được xác nhận trước đó.",
+          "check": {
+            "DOES_NOT_MATCH": "Đã kiểm tra tự động: biên lai này không khớp với khoản trả nợ này.",
+            "MATCHES": "Đã kiểm tra tự động: số tiền, nội dung chuyển khoản và tài khoản của bạn khớp với khoản trả nợ này.",
+            "UNSURE": "Không thể kiểm tra tự động biên lai này.",
+            "codes": {
+              "AMOUNT_MISMATCH": "Số tiền khác với số tiền đến hạn.",
+              "DUPLICATE_BANK_TXN": "Giao dịch chuyển khoản này đã được dùng cho một khoản trả nợ khác.",
+              "PAYEE_BANK_MISMATCH": "Biên lai ghi tài khoản ở ngân hàng khác với ngân hàng của bạn.",
+              "PAYEE_MISMATCH": "Biên lai ghi số tài khoản khác với tài khoản của bạn.",
+              "PAYEE_NAME_MISMATCH": "Người nhận không phải chủ tài khoản của bạn.",
+              "PAYER_NAME_MISMATCH": "Tiền không được chuyển từ tài khoản đã xác minh của doanh nghiệp.",
+              "REFERENCE_MISSING": "Nội dung chuyển khoản không có mã nội dung của khoản đầu tư này.",
+              "TIME_OUT_OF_RANGE": "Thời gian chuyển trước khoản đầu tư của bạn hoặc ở tương lai."
+            },
+            "stillCheck": "Chỉ tài khoản ngân hàng của bạn cho biết tiền đã đến hay chưa. Hãy kiểm tra trước khi xác nhận."
+          },
           "confirmAction": "Đã nhận tiền",
           "confirmBody": "Thao tác này ghi nhận bạn đã nhận {amount} từ {project} (nội dung {memo}) vào tài khoản ngân hàng và tất toán các kỳ trên biên lai này. Không thể hoàn tác.",
           "confirmClosesReport": "Báo cáo chưa nhận được tiền của bạn cho các ngày này cũng sẽ được đóng là đã trả.",
@@ -2520,12 +2569,23 @@
             "DUPLICATE_FILE": "Biên lai này đã được dùng. Hãy tải lên biên lai của lần chuyển khoản này.",
             "FILE_TOO_LARGE": "Tệp lớn hơn 10 MB.",
             "NOT_DUE_YET": "Các ngày này chưa đến hạn.",
+            "RECEIPT_MISMATCH": "Biên lai này không khớp với khoản trả nợ này nên chưa có ngày nào được ghi nhận là đã trả. Hãy tải lên biên lai của lần chuyển khoản bạn đã thực hiện bằng mã QR này.",
             "UNSUPPORTED_TYPE": "Hãy tải lên tệp PDF, PNG, JPEG hoặc WEBP.",
             "generic": "Đã có lỗi xảy ra. Vui lòng thử lại."
           },
           "failed": "Không ghi nhận được khoản trả nợ",
           "heading": "Trả nợ hôm nay",
           "includes": "{count} ngày làm việc: {dates}",
+          "mismatch": {
+            "AMOUNT_MISMATCH": "Số tiền không đúng số tiền đến hạn.",
+            "DUPLICATE_BANK_TXN": "Giao dịch chuyển khoản này đã được dùng cho một khoản trả nợ khác.",
+            "PAYEE_BANK_MISMATCH": "Tiền được chuyển tới tài khoản ở ngân hàng khác với ngân hàng của nhà đầu tư.",
+            "PAYEE_MISMATCH": "Tiền được chuyển tới số tài khoản khác với tài khoản của nhà đầu tư.",
+            "PAYEE_NAME_MISMATCH": "Người nhận không phải chủ tài khoản của nhà đầu tư.",
+            "PAYER_NAME_MISMATCH": "Tiền không được chuyển từ tài khoản đã xác minh của doanh nghiệp bạn.",
+            "REFERENCE_MISSING": "Nội dung chuyển khoản không có mã nội dung của khoản trả nợ này.",
+            "TIME_OUT_OF_RANGE": "Thời gian chuyển trước khi khoản đầu tư này bắt đầu hoặc ở tương lai."
+          },
           "noPayee": "Chưa có tài khoản nhận của nhà đầu tư. Hãy liên hệ FundLok trước khi chuyển khoản.",
           "none": "Hôm nay không có khoản nào đến hạn với nhà đầu tư này.",
           "overdue": "Có {count} ngày trước đó chưa trả, đã được cộng vào đây.",

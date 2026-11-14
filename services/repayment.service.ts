@@ -145,6 +145,16 @@ export interface RepaymentReceiptDay {
 export type RepaymentReceiptStatus =
   "AWAITING_CONFIRMATION" | "CONFIRMED" | "REJECTED";
 
+/** Mirrors backend RepaymentSystemCheckOut: what the system read off the
+ *  business's receipt, as advice. Never a confirmation: only the investor's
+ *  own account shows the money arrived. */
+export interface RepaymentSystemCheck {
+  result: "MATCHES" | "DOES_NOT_MATCH" | "UNSURE";
+  /** For DOES_NOT_MATCH: what differs, e.g. AMOUNT_MISMATCH. */
+  failure_codes: string[];
+  checked_at: string;
+}
+
 // Mirrors backend RepaymentReceiptOut: a receipt the business uploaded for
 // repaying the investor, and the days it pays.
 export interface RepaymentReceipt {
@@ -172,6 +182,8 @@ export interface RepaymentReceipt {
   /** The investor reported one of these days as never arriving; confirming
    *  closes that report as paid. */
   open_report: boolean;
+  /** What the system read off the receipt; null when it was not read. */
+  system_check?: RepaymentSystemCheck | null;
 }
 
 export type RepaymentReceiptFilter = "AWAITING" | "ALL";

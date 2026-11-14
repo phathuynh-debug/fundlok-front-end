@@ -135,6 +135,14 @@ export interface AdminReceiverCheck {
   expected_holder: string | null;
 }
 
+/** A repayment receipt's sender against the business's verified account. */
+export interface AdminPayerCheck {
+  holder_read: string | null;
+  /** As the bank showed it when the account was verified. */
+  expected_holder: string | null;
+  expected_account: string | null;
+}
+
 export type SystemVerdict = "ACCEPTED" | "DENIED" | "NEEDS_REVIEW";
 
 /** What the system made of the receipt (backend AdminSystemCheckOut,
@@ -149,6 +157,8 @@ export interface AdminSystemCheck {
   /** Why it was left for staff, e.g. LOW_CONFIDENCE:memo, PAYEE_BANK_NOT_SHOWN. */
   review_reasons: string[];
   receiver: AdminReceiverCheck | null;
+  /** Repayment receipts only: the business as sender. */
+  payer?: AdminPayerCheck | null;
   decided_at: string;
   engine: string | null;
   /** 0-100, the lowest among the fields it needs; null for exact PDF text. */
@@ -367,6 +377,9 @@ export interface AdminRepaymentReceipt {
   content_type: string | null;
   /** The investor reported one of these days as never arriving. */
   open_report: boolean;
+  /** What the system read off the receipt (receipt-ocr.md section 10);
+   *  null when it was not read. Nothing is applied: the investor confirms. */
+  system_check?: AdminSystemCheck | null;
   /** Days on this ticket the business has not marked paid after their due
    *  date (counted by due date), and what it owes for them. */
   tranche_overdue_days?: number;

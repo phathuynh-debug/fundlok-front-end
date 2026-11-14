@@ -4,8 +4,11 @@ import { useState } from "react";
 import {
   AlertTriangle,
   CheckCircle2,
+  CircleHelp,
   Loader2,
   ReceiptText,
+  ShieldCheck,
+  XCircle,
 } from "lucide-react";
 
 import {
@@ -34,6 +37,7 @@ import type {
   RepaymentReceipt,
   RepaymentReceiptAccount,
   RepaymentReceiptFilter,
+  RepaymentSystemCheck,
 } from "@/services/repayment.service";
 
 const K = "dashboard.investor.investments.receipts";
@@ -220,6 +224,10 @@ function ReceiptCard({ receipt }: { receipt: RepaymentReceipt }) {
         </dl>
       )}
 
+      {receipt.system_check && awaiting && (
+        <SystemCheckNote check={receipt.system_check} />
+      )}
+
       {receipt.open_report && awaiting && (
         <p className="flex items-start gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-foreground">
           <AlertTriangle
@@ -282,6 +290,62 @@ function ReceiptCard({ receipt }: { receipt: RepaymentReceipt }) {
         </AlertDialogContent>
       </AlertDialog>
     </li>
+  );
+}
+
+const CHECK_TONE: Record<RepaymentSystemCheck["result"], string> = {
+  MATCHES: "border-emerald-500/40 bg-emerald-500/10",
+  DOES_NOT_MATCH: "border-destructive/40 bg-destructive/10",
+  UNSURE: "bg-muted/30",
+};
+
+// What the system read off the business's receipt (receipt-ocr.md section 10).
+// Advice only: whatever it says, the investor confirms from their own account.
+function SystemCheckNote({ check }: { check: RepaymentSystemCheck }) {
+  const { t } = useTranslations();
+  const Icon =
+    check.result === "MATCHES"
+      ? ShieldCheck
+      : check.result === "DOES_NOT_MATCH"
+        ? XCircle
+        : CircleHelp;
+  const reasons = check.failure_codes
+    .map((code) => [`${K}.check.codes.${code}`, code] as const)
+    .map(([key, code]) => {
+      const label = t(key);
+      return label === key ? code : label;
+    });
+  return (
+    <div
+      className={cn(
+        "flex items-start gap-2 rounded-lg border px-3 py-2 text-xs text-foreground",
+        CHECK_TONE[check.result],
+      )}
+      data-testid="repayment-receipt-check"
+      data-result={check.result}
+    >
+      <Icon
+        className={cn(
+          "mt-0.5 h-3.5 w-3.5 shrink-0",
+          check.result === "MATCHES" &&
+            "text-emerald-600 dark:text-emerald-400",
+          check.result === "DOES_NOT_MATCH" && "text-destructive",
+          check.result === "UNSURE" && "text-muted-foreground",
+        )}
+        aria-hidden
+      />
+      <div className="min-w-0 space-y-1">
+        <p className="font-medium">{t(`${K}.check.${check.result}`)}</p>
+        {reasons.length > 0 && (
+          <ul className="list-disc space-y-0.5 pl-4">
+            {reasons.map((reason) => (
+              <li key={reason}>{reason}</li>
+            ))}
+          </ul>
+        )}
+        <p className="text-muted-foreground">{t(`${K}.check.stillCheck`)}</p>
+      </div>
+    </div>
   );
 }
 

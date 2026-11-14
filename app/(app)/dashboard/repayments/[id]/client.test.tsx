@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import RepaymentClient from "./client";
 import type { SmeRound, SmeTicket } from "@/services/funding.service";
 import type {
@@ -233,6 +233,44 @@ describe("RepaymentClient", () => {
     expect(repaymentDayIds).toEqual(["d-3", "d-5"]);
     expect(file).toBe(receipt);
     expect(idempotencyKey).toEqual(expect.any(String));
+  });
+
+  it("says what did not match when the receipt is refused, and keeps the panel open", () => {
+    open();
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "dashboard.sme.investment.pay.repay",
+      }),
+    );
+    fireEvent.change(screen.getByTestId("pay-receipt-input"), {
+      target: {
+        files: [new File(["png"], "receipt.png", { type: "image/png" })],
+      },
+    });
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: /dashboard\.sme\.investment\.pay\.send/,
+      }),
+    );
+
+    // The backend read the receipt and refused it: nothing was marked paid.
+    const [, { onError }] = payMock.mock.calls[0];
+    act(() =>
+      onError({
+        message: "This receipt does not match the repayment",
+        status: 422,
+        code: "RECEIPT_MISMATCH",
+        details: { failure_codes: ["AMOUNT_MISMATCH", "REFERENCE_MISSING"] },
+      }),
+    );
+
+    const alert = within(screen.getByTestId("pay-panel")).getByRole("alert");
+    expect(alert).toHaveTextContent(
+      "dashboard.sme.investment.pay.errors.RECEIPT_MISMATCH",
+    );
+    expect(alert).toHaveTextContent("AMOUNT_MISMATCH");
+    expect(alert).toHaveTextContent("REFERENCE_MISSING");
+    expect(screen.getByTestId("pay-panel")).toBeInTheDocument();
   });
 
   it("says why a day is due again when FundLok denied its receipt", () => {

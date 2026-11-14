@@ -26,6 +26,12 @@ export function activityKind(entry: AdminFundingActivity): {
       return { key: "systemDenied", tone: "deny" };
     case "TRANSFER_SYSTEM_NEEDS_REVIEW":
       return { key: "systemNeedsReview", tone: "review" };
+    case "REPAYMENT_RECEIPT_SYSTEM_ACCEPTED":
+      return { key: "repaymentSystemAccepted", tone: "approve" };
+    case "REPAYMENT_RECEIPT_SYSTEM_DENIED":
+      return { key: "repaymentSystemRefused", tone: "deny" };
+    case "REPAYMENT_RECEIPT_SYSTEM_NEEDS_REVIEW":
+      return { key: "repaymentSystemUnsure", tone: "review" };
     case "INVESTMENT_RESERVED":
       return { key: "reserved", tone: "neutral" };
     case "INVESTMENT_RECEIPT_UPLOADED":

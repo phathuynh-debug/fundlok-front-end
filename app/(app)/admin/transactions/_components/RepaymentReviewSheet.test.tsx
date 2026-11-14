@@ -125,6 +125,90 @@ describe("RepaymentReviewSheet", () => {
     );
   });
 
+  it("shows the system's reading of the receipt, with the investor and the business compared", () => {
+    row = {
+      ...base,
+      system_check: {
+        verdict: "ACCEPTED",
+        applied: false,
+        suggested: "ACCEPTED",
+        summary: "Read automatically: it matches",
+        failure_codes: [],
+        review_reasons: [],
+        receiver: {
+          bank_read: "Techcombank",
+          bank_identified: "Techcombank",
+          bank_identified_bin: "970407",
+          expected_bank: "Techcombank",
+          expected_bank_bin: "970407",
+          account_read: "19036789012",
+          expected_account: "19036789012",
+          holder_read: "HUYNH TAN PHAT",
+          expected_holder: "HUYNH TAN PHAT",
+        },
+        payer: {
+          holder_read: "CTY FUNDLOK",
+          expected_holder: "CONG TY FUNDLOK",
+          expected_account: "123123123123",
+        },
+        decided_at: "2026-11-16T03:00:05Z",
+        engine: "tesseract:vie+eng:psm6",
+        confidence: 93,
+        fields: {
+          amount_vnd: 140_875,
+          transferred_at: "2026-11-16T02:58:00Z",
+          payer_name: "CTY FUNDLOK",
+          payer_account: "123123123123",
+          payee_account: "19036789012",
+          payee_name: "HUYNH TAN PHAT",
+          payee_bank: "Techcombank",
+          memo: "FL8TKK1UAQ tra no",
+          bank_txn_id: "FT2632012345",
+        },
+        field_confidence: {},
+        notes: [],
+        awaiting_review: false,
+        reviewable: false,
+        reviewed_at: null,
+        reviewed_by: null,
+        review_outcome: null,
+        review_reason: null,
+        overrides_system: null,
+      },
+    };
+    open();
+
+    const check = screen.getByTestId("system-check");
+    // A match only advises: the investor still confirms.
+    expect(check).toHaveTextContent(
+      "admin.transactions.system.repayment.verdict.ACCEPTED",
+    );
+    expect(check).toHaveTextContent(
+      "admin.transactions.system.repayment.acceptedBody",
+    );
+    expect(check).toHaveTextContent(
+      "admin.transactions.system.repayment.investorAccount",
+    );
+    expect(within(check).getByTestId("receiver-holder")).toHaveAttribute(
+      "data-match",
+      "ok",
+    );
+    expect(within(check).getByTestId("payer-holder")).toHaveAttribute(
+      "data-match",
+      "ok",
+    );
+    expect(check).toHaveTextContent("CONG TY FUNDLOK");
+    // Nothing for staff to decide here.
+    expect(
+      screen.getByText("admin.transactions.repayments.sheet.awaitingInvestor"),
+    ).toBeInTheDocument();
+  });
+
+  it("shows no system check for a receipt that was not read", () => {
+    open();
+    expect(screen.queryByTestId("system-check")).toBeNull();
+  });
+
   it("says how a decided receipt went, with nothing left to do", () => {
     row = { ...base, check_status: "MATCHED", needs_action: false };
     open();

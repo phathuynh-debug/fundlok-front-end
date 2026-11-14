@@ -298,6 +298,51 @@ describe("RepaymentReceipts", () => {
     expect(confirmMock).toHaveBeenCalledWith("rc-1", expect.anything());
   });
 
+  it("shows the system's check of the receipt as advice, and still asks the investor", () => {
+    receipts = [
+      receipt({
+        id: "rc-ok",
+        system_check: {
+          result: "MATCHES",
+          failure_codes: [],
+          checked_at: "2026-11-16T03:00:05Z",
+        },
+      }),
+      receipt({
+        id: "rc-bad",
+        system_check: {
+          result: "DOES_NOT_MATCH",
+          failure_codes: ["AMOUNT_MISMATCH"],
+          checked_at: "2026-11-16T03:00:05Z",
+        },
+      }),
+      receipt({ id: "rc-none", system_check: null }),
+    ];
+    render(<RepaymentReceipts />);
+
+    const [ok, bad, none] = screen.getAllByTestId("repayment-receipt");
+    const okCheck = within(ok).getByTestId("repayment-receipt-check");
+    expect(okCheck).toHaveAttribute("data-result", "MATCHES");
+    expect(okCheck).toHaveTextContent(
+      "dashboard.investor.investments.receipts.check.MATCHES",
+    );
+    // Whatever it says, the investor checks their own account.
+    expect(okCheck).toHaveTextContent(
+      "dashboard.investor.investments.receipts.check.stillCheck",
+    );
+    expect(
+      within(ok).getByRole("button", {
+        name: "dashboard.investor.investments.receipts.receivedBtn",
+      }),
+    ).toBeEnabled();
+
+    const badCheck = within(bad).getByTestId("repayment-receipt-check");
+    expect(badCheck).toHaveAttribute("data-result", "DOES_NOT_MATCH");
+    expect(badCheck).toHaveTextContent("AMOUNT_MISMATCH");
+
+    expect(within(none).queryByTestId("repayment-receipt-check")).toBeNull();
+  });
+
   it("notes when confirming closes an open missing-payment report", () => {
     receipts = [receipt({ open_report: true })];
     render(<RepaymentReceipts />);
