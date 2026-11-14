@@ -52,12 +52,6 @@ function sizeLabel(bytes: number): string {
     : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-// Today's repayment to this investor: every day due today or earlier that is
-// not marked paid yet, as one transfer. "Repay" shows where it goes (the
-// investor's own account, the exact amount and the memo, each copyable, and a
-// VietQR carrying all of it), then the business uploads its bank's receipt,
-// which marks those days paid. The investor then has two working days to
-// report a payment that did not arrive.
 export function PayToday({ trancheId }: { trancheId: string }) {
   const { t, locale } = useTranslations();
   const due = useInvestmentDue(trancheId);

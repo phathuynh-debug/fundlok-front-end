@@ -107,12 +107,16 @@ export function SecuritySettings({
     data: activity = [],
     isLoading: isActivityLoading,
     isFetching: isActivityFetching,
+    isPlaceholderData: isActivityPlaceholder,
     refetch: refetchActivity,
   } = useSecurityEvents(protectedSlicesEnabled, activityLimit);
 
+  const isLoadingMoreActivity = isActivityPlaceholder && isActivityFetching;
+  const isRefreshingActivity = isActivityFetching && !isActivityPlaceholder;
+
   const hasMoreActivity =
-    activity.length >= activityLimit && activityLimit < 100;
-  const isLoadingMoreActivity = isActivityFetching && !isActivityLoading;
+    isLoadingMoreActivity ||
+    (activity.length >= activityLimit && activityLimit < 100);
 
   const handleFetchMoreActivity = () => {
     setActivityLimit((prev) => Math.min(prev + INITIAL_ACTIVITY_LIMIT, 100));
@@ -323,7 +327,7 @@ export function SecuritySettings({
               onCollapse={handleCollapseActivity}
               initialCount={INITIAL_ACTIVITY_LIMIT}
               onRefetch={() => void refetchActivity?.()}
-              isFetching={Boolean(isActivityFetching)}
+              isFetching={isRefreshingActivity}
             />
           </div>
         </div>

@@ -13,6 +13,20 @@ const account = vi.hoisted(() => ({
   signinAlertsEnabled: true,
 }));
 
+// The security history: what is shown, and whether a bigger page is loading
+// behind it (keepPreviousData: the shown events are placeholder data).
+const history = vi.hoisted(() => ({
+  events: [] as {
+    id: string;
+    action: string;
+    severity: "info";
+    created_at: string;
+  }[],
+  loading: false,
+  fetching: false,
+  placeholder: false,
+}));
+
 const savePreferences = vi.hoisted(() => vi.fn());
 
 const mutation = vi.hoisted(() => () => ({
@@ -46,9 +60,11 @@ vi.mock("@/hooks/use-authentication", () => ({
     error: account.sessionsError,
   }),
   useSecurityEvents: () => ({
-    data: [],
-    isLoading: false,
-    isFetching: false,
+    data: history.events,
+    isLoading: history.loading,
+    isFetching: history.fetching,
+    isPlaceholderData: history.placeholder,
+    refetch: vi.fn(),
   }),
   useSecurityPreferences: () => ({
     data: { signin_alerts_enabled: account.signinAlertsEnabled },
@@ -228,5 +244,64 @@ describe("SecuritySettings, sign-in alerts", () => {
     expect(savePreferences.mock.calls[0][0]).toEqual({
       signin_alerts_enabled: true,
     });
+  });
+});
+
+describe("SecuritySettings, more security history", () => {
+  const events = Array.from({ length: 7 }, (_, i) => ({
+    id: `ev-${i}`,
+    action: "SIGN_IN",
+    severity: "info" as const,
+    created_at: "2026-11-13T05:20:00Z",
+  }));
+
+  // The history's own card: the sessions card has a refresh button too.
+  const feed = () =>
+    within(
+      screen
+        .getByText("dashboard.security.activity.title")
+        .closest<HTMLElement>('[data-slot="card"]')!,
+    );
+
+  beforeEach(() => {
+    account.sessionsError = null;
+    account.secondFactorRequired = false;
+    history.events = events;
+    history.loading = false;
+    history.fetching = false;
+    history.placeholder = false;
+  });
+
+  it("keeps the page and the shown events while more load; only the feed's button spins", () => {
+    // "Show more" asked for a bigger page: the seven shown stay as placeholder.
+    history.fetching = true;
+    history.placeholder = true;
+    render(<SecuritySettings />);
+
+    expect(
+      feed().getAllByText("dashboard.security.activity.events.signIn"),
+    ).toHaveLength(7);
+    const more = feed().getByRole("button", {
+      name: /dashboard\.security\.activity\.loadingMore/,
+    });
+    expect(more).toBeDisabled();
+    // Loading more is not a refresh.
+    expect(
+      feed().getByRole("button", { name: "common.refresh" }),
+    ).toBeEnabled();
+  });
+
+  it("spins the refresh button, not Show more, on a refresh", () => {
+    history.fetching = true;
+    render(<SecuritySettings />);
+
+    expect(
+      feed().getByRole("button", { name: "common.refresh" }),
+    ).toBeDisabled();
+    expect(
+      feed().getByRole("button", {
+        name: /dashboard\.security\.activity\.showMore/,
+      }),
+    ).toBeEnabled();
   });
 });

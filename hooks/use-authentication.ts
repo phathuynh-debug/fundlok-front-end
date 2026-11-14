@@ -2,7 +2,12 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import {
   authenticationService,
   type Passkey,
@@ -197,6 +202,7 @@ export function useSecurityEvents(enabled = true, limit?: number) {
     staleTime: 60 * 1000,
     retry: false,
     enabled,
+    placeholderData: keepPreviousData,
   });
 }
 
